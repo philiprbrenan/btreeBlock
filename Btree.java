@@ -21,6 +21,7 @@ class Btree extends Test                                                        
 
   final static int linesToPrintABranch = 4;                                     // The number of lines required to print a branch
   final static int maxPrintLevels = 10;                                         // Maximum number of levels to print in a tree
+  final static int maxDepth       =  6;                                         // Maximum depth of any realistic tree
 
 //D1 Construction                                                               // Create a BTree from nodes which can be branches or leaves.  The data associated with the BTree is stored only in the leaves opposite the keys
 
@@ -71,12 +72,15 @@ class Btree extends Test                                                        
   class Leaf                                                                    // Describe a leaf
    {final Next leaf;                                                            // Index of the leaf
     Leaf()
-     {assert freeList.size() > 1;
+     {if (freeList.size() < 1) stop("No more leaves available");
       leaf = freeList.pop();
       nodes[leaf.asInt()].state = BranchOrLeaf.State.leaf;
      }
     Leaf(int n)
      {leaf = new Next(n);
+     }
+    Leaf(Next n)
+     {leaf = n;
      }
     Leaf(boolean root)
      {assert nodes[0].state == BranchOrLeaf.State.leaf;
@@ -95,6 +99,36 @@ class Btree extends Test                                                        
      {final KeyData kd = nodes[leaf.asInt()].keyData[nodes[leaf.asInt()].leafSize.i++];
       kd.key (new Key (Key));
       kd.data(new Data(Data));
+     }
+
+    class FindEqual                                                             // Find the first key in the leaf that is equal to the search key
+     {final Key     search;                                                     // Search key
+      final Data      data;                                                     // Search key
+      final LKDIndex index;                                                     // Index of first such key if found
+      final boolean  found;                                                     // Whether the key was found
+
+      FindEqual(Key Search)                                                     // Find the first key in the branch that is equal to the search key
+       {assert state() == BranchOrLeaf.State.leaf;
+        search = Search;
+        boolean looking = true;
+        int i; for (i = 0; i < leafSize().i && i < keyData().length && looking; i++)
+         {if (keyData()[i].key.equals(search))
+           {looking = false;
+            break;
+           }
+         }
+        if (looking)
+         {data  = null;
+          index = null;
+          found = false;
+         }
+        else
+         {data = keyData()[i].data;
+          index = new LKDIndex(i);
+          found = true;
+         }
+       }
+      Next next() {return leaf;}
      }
 
     class FindFirstGreaterThanOrEqual                                           // Find the first key in the leaf that is equal to or greater than the search key
@@ -144,10 +178,14 @@ class Btree extends Test                                                        
     Branch(int n)
      {branch = new Next(n);
      }
+    Branch(Next n)
+     {branch = n;
+     }
     Branch(boolean root)                                                        // The root is always zero
      {assert nodes[0].state == BranchOrLeaf.State.branch;
       branch = new Next(0);
      }
+
     BranchOrLeaf.State state()   {return nodes[branch.asInt()].state;     }
     BKNIndex       branchSize()  {return nodes[branch.asInt()].branchSize;}
     final KeyNext[]   keyNext()  {return nodes[branch.asInt()].keyNext;   }
@@ -164,6 +202,32 @@ class Btree extends Test                                                        
      }
 
     void top(int top)  {nodes[branch.asInt()].top.set(top);}
+
+    class FindEqual                                                             // Find the first key in the branch that is equal to the search key
+     {final Key     search;                                                     // Search key
+      final BKNIndex first;                                                     // Index of first such key if found
+      final boolean  found;                                                     // Whether the key was found
+
+      FindEqual(Key Search)                                                     // Find the first key in the branch that is equal to the search key
+       {assert state() == BranchOrLeaf.State.branch;
+        search = Search;
+        boolean looking = true;
+        int i; for (i = 0; i < branchSize().i && i < keyNext().length && looking; i++)
+         {if (keyNext()[i].key.equals(search))
+           {looking = false;
+            break;
+           }
+         }
+        if (looking)
+         {found = false;
+          first = null;
+         }
+        else
+         {found = true;
+          first = new BKNIndex(i);
+         }
+       }
+     }
 
     class FindFirstGreaterThanOrEqual                                           // Find the first key in the branch that is equal to or greater than the search key
      {final Key     search;                                                     // Search key
@@ -238,15 +302,17 @@ class Btree extends Test                                                        
   class RootBranch extends Branch {RootBranch() {super(true);}}                 // The Root is a branch
   class RootLeaf   extends Leaf   {RootLeaf()   {super(true);}}                 // The Root is a leaf
 
-  boolean rootIsLeaf() {return nodes[0].state == BranchOrLeaf.State.leaf;}      // Root is a leaf
+  boolean rootIsLeaf()    {return nodes[0] .state == BranchOrLeaf.State.leaf;}  // Root is a leaf
+  boolean isLeaf(int  bl) {return nodes[bl].state == BranchOrLeaf.State.leaf;}  // Indexed branch or leaf is a leaf
+  boolean isLeaf(Next bl) {return isLeaf(bl.asInt());}                          // Indexed branch or leaf is a leaf
 
   class Key                                                                     // A key in a leaf or a branch
-   {final boolean[] key = new boolean[bitsPerKey];                                    // A key is composed of bits
+   {final boolean[] key = new boolean[bitsPerKey];                              // A key is composed of bits
     Key() {}
     Key(int n)  {intToBits(n, key);}
     int asInt() {return bitsToInt(key);}
     boolean equals            (Key Key) {return asInt() == Key.asInt();}
-    boolean greaterThanOrEqual(Key Key) {return asInt()  > Key.asInt();}
+    boolean greaterThanOrEqual(Key Key) {return asInt() >= Key.asInt();}
     public String toString() {return ""+bitsToInt(key);}
     void set(Key Key) {System.arraycopy(Key.key, 0, key, 0, key.length);}
    }
@@ -262,7 +328,7 @@ class Btree extends Test                                                        
   class Next                                                                    // A next reference from a branch to a leaf or a branch
    {boolean[] next = new boolean[bitsPerNext];                                  // Enough bits to reference a leaf or brahch in the block
     Next() {this(0);}                                                           // The root
-    Next(int n) {set(n);}
+    Next(int n)  {set(n);}
     void set(int n)
      {assert n < treeSize;
       intToBits(n, next);
@@ -309,23 +375,30 @@ class Btree extends Test                                                        
 //D1 Find                                                                       // Find the data associated with a key
 
   class Find                                                                    // Find the data associated with a key in a tree
-   {final Key        key;                                                       // Key to find
-    final boolean  found;                                                       // Whether the key was in fact found
-    final Data      data;                                                       // Data associated with key if found
-    final Next        bl;                                                       // Index of leaf located by the key
-    final LKDIndex index;                                                       // Index within leaf of key if found
+   {Leaf.FindEqual leaf;                                                        // Details of the leaf we found using this search
 
     Find(Key Key)
-     {  key = Key;
-      found = false;
-       data = new Data();
-         bl = new Next();
-      index = new LKDIndex();
+     {if (rootIsLeaf())
+       {final Leaf l = new Leaf(0);
+        leaf = l.new FindEqual(Key);
+        return;
+       }
 
-      Next parent = new Next();
+      Branch p = new Branch(0);                                                 // Parent
 
+      for (int i = 0; i < maxDepth; i++)
+       {Branch.FindFirstGreaterThanOrEqual down =
+          p.new FindFirstGreaterThanOrEqual(Key);
+        final Next n = down.next;
+        if (isLeaf(n))
+         {final Leaf l = new Leaf(n);
+          leaf         = l.new FindEqual(Key);
+          return;
+         }
+        p = new Branch(n);
+       }
+      stop("Search did not terminate in a leaf");
      }
-
 
 //    new Repeat()
 //     {void code()
@@ -344,7 +417,22 @@ class Btree extends Test                                                        
 //        copy(Data.v, kd.v.asLayout().get("leafData"));
 //       }
 //     };
+
+    public String toString()
+     {final StringBuilder s = new StringBuilder();                                 //
+      s.append("search:"+leaf.search);
+      s.append( " leaf:"+leaf.next().asInt());
+      s.append(" found:"+(leaf.found ? "1" : "0"));
+      if (leaf.found)
+       {s.append( " data:"+leaf.data);
+        s.append(" index:"+leaf.index.i);
+       }
+      return s.toString()+"\n";
+     }
    }
+
+  Find find(Key Key) {return new Find(Key);}
+
 
 //D1 Print                                                                      // Print a BTree horizontally
 
@@ -424,29 +512,56 @@ class Btree extends Test                                                        
 """);
    }
 
-  static void test_print_branch()
-   {final Btree  t = new Btree(4, 4, 4, 4, 3, 4);
+  static Btree test_small_tree()
+   {final Btree  t = new Btree(8, 8, 4, 4, 3, 4);
     final Branch R = t.new Leaf(0).makeBranch();
     final Leaf   l = t.new Leaf();
+    final Leaf   m = t.new Leaf();
     final Leaf   r = t.new Leaf();
-    R.push(5, l.leaf.asInt());
+    R.push( 8, l.leaf.asInt());
+    R.push(12, m.leaf.asInt());
     R.top(    r.leaf.asInt());
-    l.push(1, 11);
-    l.push(2, 12);
-    l.push(3, 13);
-    l.push(4, 14);
-    r.push(6, 16);
-    r.push(7, 17);
-    r.push(8, 18);
-    r.push(9, 19);
+    l.push( 2, 12);
+    l.push( 4, 14);
+    l.push( 6, 16);
+    l.push( 8, 18);
+    m.push(10, 20);
+    m.push(12, 22);
+    r.push(14, 24);
+    r.push(16, 26);
+    r.push(18, 28);
+    return t;
+   }
+
+  static void test_print_branch()
+   {final Btree  t = test_small_tree();
     //t.stop();
     t.ok("""
-          5          |
-          0          |
-          3          |
-          2          |
-1,2,3,4=3  6,7,8,9=2 |
+          8        12            |
+          0        0.1           |
+          3        2             |
+                   1             |
+2,4,6,8=3  10,12=2    14,16,18=1 |
 """);
+    Find f1 = t.find(t.new Key( 1)); ok(f1, "search:1 leaf:3 found:0\n");
+    Find f2 = t.find(t.new Key( 2)); ok(f2, "search:2 leaf:3 found:1 data:12 index:0\n");
+    Find f3 = t.find(t.new Key( 3)); ok(f3, "search:3 leaf:3 found:0\n");
+    Find f4 = t.find(t.new Key( 4)); ok(f4, "search:4 leaf:3 found:1 data:14 index:1\n");
+    Find f5 = t.find(t.new Key( 5)); ok(f5, "search:5 leaf:3 found:0\n");
+    Find f6 = t.find(t.new Key( 6)); ok(f6, "search:6 leaf:3 found:1 data:16 index:2\n");
+    Find f7 = t.find(t.new Key( 7)); ok(f7, "search:7 leaf:3 found:0\n");
+    Find f8 = t.find(t.new Key( 8)); ok(f8, "search:8 leaf:3 found:1 data:18 index:3\n");
+    Find f9 = t.find(t.new Key( 9)); ok(f9, "search:9 leaf:2 found:0\n");
+    Find fa = t.find(t.new Key(10)); ok(fa, "search:10 leaf:2 found:1 data:20 index:0\n");
+    Find fb = t.find(t.new Key(11)); ok(fb, "search:11 leaf:2 found:0\n");
+    Find fc = t.find(t.new Key(12)); ok(fc, "search:12 leaf:2 found:1 data:22 index:1\n");
+    Find fd = t.find(t.new Key(13)); ok(fd, "search:13 leaf:1 found:0\n");
+    Find fe = t.find(t.new Key(14)); ok(fe, "search:14 leaf:1 found:1 data:24 index:0\n");
+    Find ff = t.find(t.new Key(15)); ok(ff, "search:15 leaf:1 found:0\n");
+    Find fg = t.find(t.new Key(16)); ok(fg, "search:16 leaf:1 found:1 data:26 index:1\n");
+    Find fh = t.find(t.new Key(17)); ok(fh, "search:17 leaf:1 found:0\n");
+    Find fj = t.find(t.new Key(18)); ok(fj, "search:18 leaf:1 found:1 data:28 index:2\n");
+    Find fk = t.find(t.new Key(19)); ok(fk, "search:19 leaf:1 found:0\n");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
