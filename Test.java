@@ -316,7 +316,7 @@ public class Test                                                               
     final boolean n = b.toString().contains("\n");
     testsFailed++;
     if (n) err(currentTestName(), "failed. Got:\n"+a+"\n");
-    else   err(a, "does not equal", b, "in", currentTestName());
+    else   err(a, "\ndoes not equal\n", b, "\nin", currentTestName());
    }
 
   static void ok(String got, String expected)                                   // Confirm two strings match
