@@ -226,6 +226,25 @@ class Btree extends Test                                                        
         new KeyNext(Key, Next);
      }
 
+    int countChildKeys()                                                        // Find the number of keys in the immediate children of this branch
+     {final KeyNext[]kn = keyNext();
+      final int N = branchSize().i;
+      int       C = 0;
+      if (isLeaf(top()))
+       {for (int i = 0; i < N; i++)
+         {C += new Leaf(kn[i].next).leafSize().i;
+         }
+        C += new Leaf(top()).leafSize().i;
+       }
+      else
+       {for (int i = 0; i < N; i++)
+         {C += new Branch(kn[i].next).branchSize().i;
+         }
+        C += new Branch(top()).branchSize().i;
+       }
+      return C;
+     }
+
     void top(int top)  {nodes[index.asInt()].top.set(top);}
 
     class FindEqual                                                             // Find the first key in the branch that is equal to the search key
@@ -235,8 +254,7 @@ class Btree extends Test                                                        
       final Next     next;                                                      // Next branch or leaf associated with this key if found
 
       FindEqual(Key Search)                                                     // Find the first key in the branch that is equal to the search key
-       {assert state() == BranchOrLeaf.State.branch;
-        search = Search;
+       {search = Search;
         boolean looking = true;
         final KeyNext[]kn = keyNext();
         int i; for (i = 0; i < branchSize().i && i < keyNext().length && looking; i++)
@@ -684,6 +702,17 @@ class Btree extends Test                                                        
                       1             |
 2,4,6,8=3  10,11,12=2    14,16,18=1 |
 """);
+
+    FindAndInsert fi19 = t.findAndInsert(t.new Key(19), t.new Data(19));
+    //t.stop();
+    t.ok("""
+          8           12               |
+          0           0.1              |
+          3           2                |
+                      1                |
+2,4,6,8=3  10,11,12=2    14,16,18,19=1 |
+""");
+    ok(t.new Branch(true).countChildKeys(), 11);
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
