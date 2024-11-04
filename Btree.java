@@ -41,9 +41,13 @@ class Btree extends Test                                                        
     nodes[0].setLeaf();                                                         // Start with the root as a leaf
    }
 
-  void ok(String expected) {Test.ok(print(), expected);}
+//D1 Control                                                                    // Testing and control
 
-// Branch or Leaf                                                               // A branch or leaf in the tree
+  void ok(String expected) {Test.ok(print(), expected);}
+  void stop() {Test.stop(toString());}
+  public String toString() {return print();}
+
+//D1 Components                                                                 // A branch or leaf in the tree
 
   class BranchOrLeaf                                                            // A branch or leaf in a btree
    {enum State {leaf, branch, free};                                            // The current state of the branch or leaf: as a leaf, as a branch or free waiting for use
@@ -159,7 +163,7 @@ class Btree extends Test                                                        
         new KeyNext(Key, Next);
      }
 
-    void setTop(int top)  {nodes[branch.asInt()].top.set(top);}
+    void top(int top)  {nodes[branch.asInt()].top.set(top);}
 
     class FindFirstGreaterThanOrEqual                                           // Find the first key in the branch that is equal to or greater than the search key
      {final Key     search;                                                     // Search key
@@ -209,7 +213,7 @@ class Btree extends Test                                                        
            }
 
           S.elementAt(L+0).append(""+keyNext()[i].key.asInt());                 // Key
-          S.elementAt(L+1).append(""+branch.asInt()+(i > 0 ?  "."+i : "") +")");// Branch,key, next pair
+          S.elementAt(L+1).append(""+branch.asInt()+(i > 0 ?  "."+i : ""));     // Branch,key, next pair
           S.elementAt(L+2).append(""+keyNext()[i].next.asInt());
          }
        }
@@ -410,13 +414,38 @@ class Btree extends Test                                                        
     ok(bitsToInt(b), 13);
    }
 
-  static void test_print()
+  static void test_print_leaf()
    {final Btree t = new Btree(4, 4, 4, 4, 3, 4);
     final Leaf lr = t.new Leaf(0);
     lr.push(1, 11);
     lr.push(2, 22);
     t.ok("""
 1,2=0 |
+""");
+   }
+
+  static void test_print_branch()
+   {final Btree  t = new Btree(4, 4, 4, 4, 3, 4);
+    final Branch R = t.new Leaf(0).makeBranch();
+    final Leaf   l = t.new Leaf();
+    final Leaf   r = t.new Leaf();
+    R.push(5, l.leaf.asInt());
+    R.top(    r.leaf.asInt());
+    l.push(1, 11);
+    l.push(2, 12);
+    l.push(3, 13);
+    l.push(4, 14);
+    r.push(6, 16);
+    r.push(7, 17);
+    r.push(8, 18);
+    r.push(9, 19);
+    //t.stop();
+    t.ok("""
+          5          |
+          0          |
+          3          |
+          2          |
+1,2,3,4=3  6,7,8,9=2 |
 """);
    }
 
@@ -427,7 +456,8 @@ class Btree extends Test                                                        
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
     test_bits();
-    test_print();
+    test_print_leaf();
+    test_print_branch();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
