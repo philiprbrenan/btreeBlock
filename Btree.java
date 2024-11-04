@@ -57,6 +57,11 @@ class Btree extends Test                                                        
     void setBranch() {state = State.branch;}
     boolean isLeaf()   {return state == State.leaf;}
     boolean isBranch() {return state == State.branch;}
+
+    BranchOrLeaf()
+     {for (int i = 0; i < maxKeysPerLeaf;   i++) keyData[i] = new KeyData();
+      for (int i = 0; i < maxKeysPerBranch; i++) keyNext[i] = new KeyNext();
+     }
    }
 
   class Leaf                                                                    // Describe a leaf
@@ -77,9 +82,15 @@ class Btree extends Test                                                        
     LKDIndex        leafSize() {return nodes[leaf.asInt()].leafSize;  }
     final KeyData[]  keyData() {return nodes[leaf.asInt()].keyData;   }
 
+    Branch makeBranch()
+     {nodes[leaf.asInt()].state = BranchOrLeaf.State.branch;
+      return new Branch(leaf.asInt());
+     }
+
     void push(int Key, int Data)
-     {nodes[leaf.asInt()].keyData[nodes[leaf.asInt()].leafSize.i++] =
-        new KeyData(Key, Data);
+     {final KeyData kd = nodes[leaf.asInt()].keyData[nodes[leaf.asInt()].leafSize.i++];
+      kd.key (new Key (Key));
+      kd.data(new Data(Data));
      }
 
     class FindFirstGreaterThanOrEqual                                           // Find the first key in the leaf that is equal to or greater than the search key
@@ -137,6 +148,18 @@ class Btree extends Test                                                        
     BKNIndex       branchSize()  {return nodes[branch.asInt()].branchSize;}
     final KeyNext[]   keyNext()  {return nodes[branch.asInt()].keyNext;   }
     final Next            top()  {return nodes[branch.asInt()].top;       }
+
+    Branch makeLeaf()
+     {nodes[branch.asInt()].state = BranchOrLeaf.State.leaf;
+      return new Branch(branch.asInt());
+     }
+
+    void push(int Key, int Next)
+     {nodes[branch.asInt()].keyNext[nodes[branch.asInt()].branchSize.i++] =
+        new KeyNext(Key, Next);
+     }
+
+    void setTop(int top)  {nodes[branch.asInt()].top.set(top);}
 
     class FindFirstGreaterThanOrEqual                                           // Find the first key in the branch that is equal to or greater than the search key
      {final Key     search;                                                     // Search key
@@ -214,31 +237,35 @@ class Btree extends Test                                                        
   boolean rootIsLeaf() {return nodes[0].state == BranchOrLeaf.State.leaf;}      // Root is a leaf
 
   class Key                                                                     // A key in a leaf or a branch
-   {boolean[] key = new boolean[bitsPerKey];                                    // A key is composed of bits
+   {final boolean[] key = new boolean[bitsPerKey];                                    // A key is composed of bits
     Key() {}
     Key(int n)  {intToBits(n, key);}
     int asInt() {return bitsToInt(key);}
     boolean equals            (Key Key) {return asInt() == Key.asInt();}
     boolean greaterThanOrEqual(Key Key) {return asInt()  > Key.asInt();}
     public String toString() {return ""+bitsToInt(key);}
+    void set(Key Key) {System.arraycopy(Key.key, 0, key, 0, key.length);}
    }
 
   class Data                                                                    // A data item associated with a key in a leaf
-   {boolean[] data = new boolean[bitsPerData];                                  // Data is composed of bits
+   {final boolean[] data = new boolean[bitsPerData];                                  // Data is composed of bits
     Data() {}
     Data(int n) {intToBits(n, data);}
     public String toString() {return ""+bitsToInt(data);}
+    void set(Data Data) {System.arraycopy(Data.data, 0, data, 0, data.length);}
    }
 
   class Next                                                                    // A next reference from a branch to a leaf or a branch
    {boolean[] next = new boolean[bitsPerNext];                                  // Enough bits to reference a leaf or brahch in the block
     Next() {this(0);}                                                           // The root
-    Next(int n)
+    Next(int n) {set(n);}
+    void set(int n)
      {assert n < treeSize;
       intToBits(n, next);
      }
     int asInt() {return bitsToInt(next);}
     public String toString() {return ""+bitsToInt(next);}
+    void set(Next Next) {System.arraycopy(Next.next, 0, next, 0, next.length);}
    }
 
   class KeyData                                                                 // A key, data pair in a leaf
@@ -247,6 +274,8 @@ class Btree extends Test                                                        
     KeyData() {}
     KeyData(int Key, int Data) {intToBits(Key, key.key); intToBits(Data, data.data);}
     public String toString() {return "KeyData("+key+","+data+")";}
+    void key (Key  Key)  {key.set(Key);}
+    void data(Data Data) {data.set(Data);}
    }
 
   class KeyNext                                                                 // A key, next pair in a leaf
@@ -255,6 +284,8 @@ class Btree extends Test                                                        
     KeyNext() {}
     KeyNext(int Key, int Next) {intToBits(Key, key.key); intToBits(Next, next.next);}
     public String toString() {return "KeyNext("+key+","+next+")";}
+    void key (Key  Key)  {key .set(Key);}
+    void next(Next Next) {next.set(Next);}
    }
 
   class LKDIndex                                                                // An index to key, data pair in a leaf
