@@ -2,7 +2,7 @@
 // BTree in a block
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
-package com.AppaApps.Silicon;                                                   // Design, simulate and layout a binary tree in a block on a silicon chip.
+package com.AppaApps.Silicon;                                                   // Design, simulate and layout a btree in a block on a silicon chip.
 
 import java.util.*;
 
@@ -19,6 +19,9 @@ class Btree extends Test                                                        
   final Stack<Next>  freeList = new Stack<>();                                  // Free leaf or branches
   final BranchOrLeaf [] nodes;                                                  // The leaves or branches comprising the tree
 
+  final static int linesToPrintABranch = 4;                                     // The number of lines required to print a branch
+  final static int maxPrintLevels = 10;                                         // Maximum number of levels to print in a tree
+
 //D1 Construction                                                               // Create a BTree from nodes which can be branches or leaves.  The data associated with the BTree is stored only in the leaves opposite the keys
 
   Btree                                                                         // Define a BTree with the specified dimensions
@@ -31,31 +34,53 @@ class Btree extends Test                                                        
     maxKeysPerBranch          = MaxKeysPerBranch;
     treeSize                  = TreeSize;
     nodes = new BranchOrLeaf[TreeSize];                                         // Allocate leaves and branches
-    for (int i = 1; i < TreeSize; i++) freeList.push(new Next(i));              // Initially all of the leaves or branches are on the free list, except for the root at index 0
+    for (int i = 0; i < TreeSize; i++)                                          // Initially all of the leaves or branches are on the free list, except for the root at index 0
+     {if (i > 0) freeList.push(new Next(i));
+      nodes[i] = new BranchOrLeaf();
+     }
+    nodes[0].setLeaf();                                                         // Start with the root as a leaf
    }
+
+  void ok(String expected) {Test.ok(print(), expected);}
 
 // Branch or Leaf                                                               // A branch or leaf in the tree
 
   class BranchOrLeaf                                                            // A branch or leaf in a btree
    {enum State {leaf, branch, free};                                            // The current state of the branch or leaf: as a leaf, as a branch or free waiting for use
-    State            state;                                                     // Whether this branch or leaf is a branch, a leaf or free
-    LKDIndex      leafSize;                                                     // Number of key, data pairs currently contained in leafif a leaf
-    BKNIndex    branchSize;                                                     // Number of key, next pairs currently contained in branch if a branch
-    final KeyData[]keyData = new KeyData[maxKeysPerLeaf];                       // Key, data pairs for when a leaf
-    final KeyNext[]keyNext = new KeyNext[maxKeysPerBranch];                     // Key, next pairs for when a branch
-    final Next         top = new Next();                                        // Top next reference for when a branch
+    State               state;                                                  // Whether this branch or leaf is a branch, a leaf or free
+    final LKDIndex   leafSize = new LKDIndex();                                 // Number of key, data pairs currently contained in leafif a leaf
+    final BKNIndex branchSize = new BKNIndex();                                 // Number of key, next pairs currently contained in branch if a branch
+    final KeyData[]   keyData = new KeyData[maxKeysPerLeaf];                    // Key, data pairs for when a leaf
+    final KeyNext[]   keyNext = new KeyNext[maxKeysPerBranch];                  // Key, next pairs for when a branch
+    final Next            top = new Next();                                     // Top next reference for when a branch
+    void setLeaf()   {state = State.leaf;}
+    void setBranch() {state = State.branch;}
+    boolean isLeaf()   {return state == State.leaf;}
+    boolean isBranch() {return state == State.branch;}
    }
 
   class Leaf                                                                    // Describe a leaf
    {final Next leaf;                                                            // Index of the leaf
     Leaf()
-     {assert freeList.size() > 1;                                               // The root is always zero
+     {assert freeList.size() > 1;
       leaf = freeList.pop();
       nodes[leaf.asInt()].state = BranchOrLeaf.State.leaf;
+     }
+    Leaf(int n)
+     {leaf = new Next(n);
+     }
+    Leaf(boolean root)
+     {assert nodes[0].state == BranchOrLeaf.State.leaf;
+      leaf = new Next(0);
      }
     BranchOrLeaf.State state() {return nodes[leaf.asInt()].state;     }
     LKDIndex        leafSize() {return nodes[leaf.asInt()].leafSize;  }
     final KeyData[]  keyData() {return nodes[leaf.asInt()].keyData;   }
+
+    void push(int Key, int Data)
+     {nodes[leaf.asInt()].keyData[nodes[leaf.asInt()].leafSize.i++] =
+        new KeyData(Key, Data);
+     }
 
     class FindFirstGreaterThanOrEqual                                           // Find the first key in the leaf that is equal to or greater than the search key
      {final Key     search;                                                     // Search key
@@ -81,14 +106,32 @@ class Btree extends Test                                                        
          }
        }
      }
+
+    void print(Stack<StringBuilder>S, int level)                                // Print leaf horizontally
+     {padStrings(S, level);
+      final StringBuilder s = new StringBuilder();                              // String builder
+      final int K = leafSize().i;
+      for  (int i = 0; i < K; i++) s.append(""+keyData()[i].key+",");
+      if (s.length() > 0) s.setLength(s.length()-1);                            // Remove trailing comma if present
+      s.append("="+leaf+" ");
+      S.elementAt(level*linesToPrintABranch).append(s.toString());
+      padStrings(S, level);
+     }
    }
 
   class Branch                                                                  // Describe a branch
    {final Next branch;                                                          // Index of the branch
     Branch()
-     {assert freeList.size() > 1;                                               // The root is always zero
+     {assert freeList.size() > 1;
       branch = freeList.pop();
       nodes[branch.asInt()].state = BranchOrLeaf.State.branch;
+     }
+    Branch(int n)
+     {branch = new Next(n);
+     }
+    Branch(boolean root)                                                        // The root is always zero
+     {assert nodes[0].state == BranchOrLeaf.State.branch;
+      branch = new Next(0);
      }
     BranchOrLeaf.State state()   {return nodes[branch.asInt()].state;     }
     BKNIndex       branchSize()  {return nodes[branch.asInt()].branchSize;}
@@ -124,7 +167,51 @@ class Btree extends Test                                                        
        }
      }
 
+    void print(Stack<StringBuilder>S, int level)                                // Print branch horizontally
+     {if (level > maxPrintLevels) return;
+      padStrings(S, level);
+      final int K = branchSize().i;
+      final int L = level * linesToPrintABranch;
+
+      if (K > 0)                                                                // Branch has key, next pairs
+       {for  (int i = 0; i < K; i++)
+         {final int next = keyNext()[i].next.asInt();                              // Each key, next pair
+          if (nodes[next].isLeaf())
+           {final Leaf l = new Leaf(next);
+            l.print(S, level+1);
+           }
+          else
+           {final Branch b = new Branch(next);
+            b.print(S, level+1);
+           }
+
+          S.elementAt(L+0).append(""+keyNext()[i].key.asInt());                 // Key
+          S.elementAt(L+1).append(""+branch.asInt()+(i > 0 ?  "."+i : "") +")");// Branch,key, next pair
+          S.elementAt(L+2).append(""+keyNext()[i].next.asInt());
+         }
+       }
+      else                                                                      // Branch is empty so print just the index of the branch
+       {S.elementAt(L+0).append(""+branch.asInt()+"-");
+       }
+      final int top = top().asInt();                                            // Top next will always be present
+      S.elementAt(L+3).append(top);                                             // Append top next
+      if (nodes[top].isLeaf())
+       {final Leaf l = new Leaf(top);
+        l.print(S, level+1);
+       }
+      else
+       {final Branch b = new Branch(top);
+        b.print(S, level+1);
+       }
+
+      padStrings(S, level);                                                     // Pad the strings at each level of the tree so we have a vertical face to continue with - a bit like Marc Brunel's tunnelling shield
+     }
    }
+
+  class RootBranch extends Branch {RootBranch() {super(true);}}                 // The Root is a branch
+  class RootLeaf   extends Leaf   {RootLeaf()   {super(true);}}                 // The Root is a leaf
+
+  boolean rootIsLeaf() {return nodes[0].state == BranchOrLeaf.State.leaf;}      // Root is a leaf
 
   class Key                                                                     // A key in a leaf or a branch
    {boolean[] key = new boolean[bitsPerKey];                                    // A key is composed of bits
@@ -145,23 +232,26 @@ class Btree extends Test                                                        
 
   class Next                                                                    // A next reference from a branch to a leaf or a branch
    {boolean[] next = new boolean[bitsPerNext];                                  // Enough bits to reference a leaf or brahch in the block
-    Next() {}
-    Next(int n) {intToBits(n, next);}
+    Next() {this(0);}                                                           // The root
+    Next(int n)
+     {assert n < treeSize;
+      intToBits(n, next);
+     }
     int asInt() {return bitsToInt(next);}
     public String toString() {return ""+bitsToInt(next);}
    }
 
   class KeyData                                                                 // A key, data pair in a leaf
-   {Key  key;                                                                   // A key in a leaf
-    Data data;                                                                  // Data associated with the key
+   {final Key   key = new Key();                                                // A key in a leaf
+    final Data data = new Data();                                               // Data associated with the key
     KeyData() {}
     KeyData(int Key, int Data) {intToBits(Key, key.key); intToBits(Data, data.data);}
     public String toString() {return "KeyData("+key+","+data+")";}
    }
 
   class KeyNext                                                                 // A key, next pair in a leaf
-   {Key  key;                                                                   // A key in a branch
-    Next next;                                                                  // Next branch or leaf
+   {final Key   key = new Key();                                                // A key in a branch
+    final Next next = new Next();                                               // Next branch or leaf
     KeyNext() {}
     KeyNext(int Key, int Next) {intToBits(Key, key.key); intToBits(Next, next.next);}
     public String toString() {return "KeyNext("+key+","+next+")";}
@@ -196,6 +286,9 @@ class Btree extends Test                                                        
        data = new Data();
          bl = new Next();
       index = new LKDIndex();
+
+      Next parent = new Next();
+
      }
 
 
@@ -218,6 +311,38 @@ class Btree extends Test                                                        
 //     };
    }
 
+//D1 Print                                                                      // Print a BTree horizontally
+
+  void padStrings(Stack<StringBuilder> S, int level)                            // Pad a stack of strings so they all have the same length
+   {final int N = level * linesToPrintABranch + maxKeysPerLeaf;                 // Number of lines we might want
+    for (int i = S.size(); i <= N; ++i) S.push(new StringBuilder());            // Make sure we have a full deck of strings
+    int m = 0;                                                                  // Maximum length
+    for (StringBuilder s : S) m = m < s.length() ? s.length() : m;              // Find maximum length
+    for (StringBuilder s : S)                                                   // Pad each string to maximum length
+     {if (s.length() < m) s.append(" ".repeat(m - s.length()));                 // Pad string to maximum length
+     }
+   }
+
+  String print()                                                                // Print a tree horizontally
+   {final Stack<StringBuilder> S = new Stack<>();
+
+    if (rootIsLeaf())
+     {final RootLeaf r = new RootLeaf();
+      r.print(S, 0);
+     }
+    else
+     {final RootBranch r = new RootBranch();
+      r.print(S, 0);
+     }
+
+    final StringBuilder t = new StringBuilder();
+    for  (StringBuilder s : S)
+     {final String l = s.toString();
+      if (l.isBlank()) continue;
+      t.append(l+"|\n");
+     }
+    return t.toString();
+   }
 
 //D1 Bits as integers                                                           // Convert between ararys of bits and integers
 
@@ -254,6 +379,16 @@ class Btree extends Test                                                        
     ok(bitsToInt(b), 13);
    }
 
+  static void test_print()
+   {final Btree t = new Btree(4, 4, 4, 4, 3, 4);
+    final Leaf lr = t.new Leaf(0);
+    lr.push(1, 11);
+    lr.push(2, 22);
+    t.ok("""
+1,2=0 |
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {
    }
@@ -261,6 +396,7 @@ class Btree extends Test                                                        
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
     test_bits();
+    test_print();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
