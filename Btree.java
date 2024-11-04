@@ -702,6 +702,7 @@ class Btree extends Test                                                        
                       1             |
 2,4,6,8=3  10,11,12=2    14,16,18=1 |
 """);
+    ok(t.new Branch(true).countChildKeys(), 10);
 
     FindAndInsert fi19 = t.findAndInsert(t.new Key(19), t.new Data(19));
     //t.stop();
