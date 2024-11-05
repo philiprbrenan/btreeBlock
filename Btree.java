@@ -837,7 +837,7 @@ class Btree extends Test                                                        
                    5             |
 2,4,6,8=7  10,12=6    14,16,18=5 |
 """);
-    FindAndInsert fi6 = t.findAndInsert(t.new Key(6), t.new Data(7));
+    FindAndInsert fi6 = t.findAndInsert(t.new Key(6), t.new Data(7));           // Update leaf
     //stop(t);
     t.ok("""
           8        12            |
@@ -852,7 +852,7 @@ class Btree extends Test                                                        
     ok(t.find(t.new Key(6)).data(),  7);
     ok(t.find(t.new Key(8)).data(), 18);
 
-    FindAndInsert fi11 = t.findAndInsert(t.new Key(11), t.new Data(11));
+    FindAndInsert fi11 = t.findAndInsert(t.new Key(11), t.new Data(11));        // Insert directly into a leaf
     //t.stop();
     t.ok("""
           8           12            |
@@ -863,7 +863,7 @@ class Btree extends Test                                                        
 """);
     ok(t.new Branch(true).countChildKeys(), 10);
 
-    FindAndInsert fi19 = t.findAndInsert(t.new Key(19), t.new Data(19));
+    FindAndInsert fi19 = t.findAndInsert(t.new Key(19), t.new Data(19));        // Insert directly into a leaf
     //t.stop();
     t.ok("""
           8           12               |
@@ -874,7 +874,7 @@ class Btree extends Test                                                        
 """);
     ok(t.new Branch(true).countChildKeys(), 11);
 
-    FindAndInsert fi5 = t.findAndInsert(t.new Key(5), t.new Data(5));
+    FindAndInsert fi5 = t.findAndInsert(t.new Key(5), t.new Data(5));           // Insert by repacking
     //t.stop();
     t.ok("""
           8             12               |
