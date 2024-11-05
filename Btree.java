@@ -94,7 +94,7 @@ class Btree extends Test                                                        
       index = new Next(0);
      }
 
-    void freeLeaf() {freeList.push(index);}                                     // Free this leaf
+    void freeLeaf() {freeList.push(index); if (index.asInt() == 6) err("FFFFF", index);}                                     // Free this leaf
 
     BranchOrLeaf.State state() {return nodes[index.asInt()].state;     }
     LKDIndex        leafSize() {return nodes[index.asInt()].leafSize;  }
@@ -265,13 +265,22 @@ class Btree extends Test                                                        
 
     Leaf pushNewLeaf()                                                          // Create a new leaf and push it onto this branch
      {final Leaf leaf = new Leaf();
-      final int p = branchSize().i;
+
+      final int p = branchSize().i;                                             // Current size of branch
       if (p < maxKeysPerBranch)                                                 // Room in the branch
-       {keyNext()[p].next.set(leaf.index);                                      // Push into to branch
+       {
+
+say("BBBB 11", freeList, leaf.index);
+        keyNext()[p].next.set(leaf.index);                                      // Push into to branch
+say("BBBB 22", freeList, leaf.index);
         incBranchSize();                                                        // New size of branch
+say("BBBB 33", freeList, leaf.index);
         return leaf;                                                            // Return leaf so created
        }
-      else return new Leaf(top());                                              // Reuse top because there is no more room in the branch
+      else                                                                      // Reuse top because there is no more room in the branch
+       {say("Use top");
+         return new Leaf(top());
+       }
      }
 
     void unpackLeaf(Leaf leaf, Stack<KeyData> up)                               // Unpack a leaf
@@ -297,10 +306,12 @@ class Btree extends Test                                                        
         leaf.freeLeaf();
        }
       new Leaf(top()).zeroLeafSize();                                           // Clear leaf referenced by top
+      zeroBranchSize();                                                         // Zero the size of this branch ready for repack of key, next pairs
 
+say("FFFF11 Free", freeList);
       for (int i = 0; i < up.size(); i++)                                       // Insert the new key, data pair
        {final KeyData kd = up.elementAt(i);
-        if (Key.greaterThanOrEqual(kd.key))                                     // Insert new key, data pair
+        if (kd.key.greaterThanOrEqual(Key))                                     // Insert new key, data pair
          {up.insertElementAt(new KeyData(Key, Data), i);
           break;
          }
@@ -309,20 +320,17 @@ class Btree extends Test                                                        
       final int N = up.size();                                                  // Recreate the leaves with the key, data pairs packed in
       Leaf leaf = pushNewLeaf();                                                // First new leaf into branch
 
+say("Leaf11", leaf.index, freeList);
       for (int k = 0; k < N; k++)                                               // Repack the leaves
        {final KeyData source = up.elementAt(k);                                 // Source of repack
         if (leaf.leafSize().equals(maxKeysPerLeaf))                             // Start a new leaf when the current one is full
          {leaf = pushNewLeaf();
+say("Leaf22", leaf.index, freeList);
          }
+
         final KeyData target = leaf.keyData()[leaf.leafSize().i];               // Current location
         target.set(source);                                                     // Copy current key, data pair inot cpmacted location in leaf
-       }
-     }
-
-    void repack(Key Key, Data Data)                                             // Repack the keys under this branch adding the new key, data pair
-     {if (isLeaf(top())) repackLeaves(Key, Data);
-      else
-       {
+        leaf.incLeafSize();
        }
      }
 
@@ -514,6 +522,7 @@ class Btree extends Test                                                        
     void inc()  {if (i < maxKeysPerLeaf) ++i; else stop("cannot increment leaf index");}
     void dec()  {if (i > 0)              ++i; else stop("cannot decrement leaf index");}
     void zero() {i = 0;}
+    boolean equals(int N) {return i == N;}
    }
 
   class BKNIndex                                                                // An index to key, next pair in a branch
@@ -524,6 +533,7 @@ class Btree extends Test                                                        
     void inc()  {if (i < maxKeysPerBranch) ++i; else stop("cannot increment branch index");}
     void dec()  {if (i > 0)                ++i; else stop("cannot decrement branch index");}
     void zero() {i = 0;}
+    boolean equals(int N) {return i == N;}
    }
 
 //D1 Find                                                                       // Find the data associated with a key
@@ -597,20 +607,21 @@ class Btree extends Test                                                        
 2,4,6,8=3  10,12=2    14,16,18=1 |
 */
 
-  class FindAndInsert extends Find                                              // Insert the specified key and data into the tree if there is room in the target leaf,or update the key with the data ofteh key already exists
+  class FindAndInsert extends Find                                              // Insert the specified key and data into the tree if there is room in the target leaf,or update the key with the data if the key already exists
    {Key         key;                                                            // Key to insert
     Data        data;                                                           // Data being inserted or updated
     boolean  success;                                                           // Inserted or updated if true
     boolean inserted;                                                           // Inserted if true
 
-    FindAndInsert(Key Key, Data Data)
-     {super(Key);
+    FindAndInsert(Key Key, Data Data)                                           // Findtheleaf that should contain this key and insert or update it is possible
+     {super(Key);                                                               // Find the leaf that should contain this key
       key  = Key; data = Data;
       final Leaf l = leaf();                                                    // Leaf in which the key should go
 
       if (leaf.found)                                                           // Found the key in the leaf so update it with the new data
        {l.update(leaf.index, Data);
         success = true; inserted = false;
+        return;
        }
 
       if (!l.isFull())                                                          // Leaf is not full so we can insert
@@ -632,7 +643,10 @@ class Btree extends Test                                                        
         return;
        }
 
-
+      if (parent.countChildKeys() < maxKeysInLeaves)                            // Repackaging the leaves is possible
+       {parent.repackLeaves(Key, Data);
+        return;
+       }
      }
 
     Leaf leaf() {return new Leaf(leaf.next());}
@@ -723,7 +737,7 @@ class Btree extends Test                                                        
    }
 
   static Btree test_small_tree()
-   {final Btree  t = new Btree(8, 8, 4, 4, 3, 4);
+   {final Btree  t = new Btree(8, 8, 4, 4, 3, 8);
     final Branch R = t.new Leaf(0).makeIntoBranch();
     final Leaf   l = t.new Leaf();
     final Leaf   m = t.new Leaf();
@@ -780,13 +794,22 @@ class Btree extends Test                                                        
     t.ok("""
           8        12            |
           0        0.1           |
-          3        2             |
-                   1             |
-2,4,6,8=3  10,12=2    14,16,18=1 |
+          7        6             |
+                   5             |
+2,4,6,8=7  10,12=6    14,16,18=5 |
 """);
     FindAndInsert fi6 = t.findAndInsert(t.new Key(6), t.new Data(7));
-    //stop(fi);
-    ok(fi6, "key:6 data:7 success:true inserted:false search:6 leaf:3 rootIsLeaf:n parent:0 found:1 data:7 index:2 allFull:n lastNotFull:0");
+    //stop(t);
+    t.ok("""
+          8        12            |
+          0        0.1           |
+          7        6             |
+                   5             |
+2,4,6,8=7  10,12=6    14,16,18=5 |
+""");
+
+
+    ok(fi6, "key:6 data:7 success:true inserted:false search:6 leaf:7 rootIsLeaf:n parent:0 found:1 data:7 index:2 allFull:n lastNotFull:0");
     ok(t.find(t.new Key(6)).data(),  7);
     ok(t.find(t.new Key(8)).data(), 18);
 
@@ -795,9 +818,9 @@ class Btree extends Test                                                        
     t.ok("""
           8           12            |
           0           0.1           |
-          3           2             |
-                      1             |
-2,4,6,8=3  10,11,12=2    14,16,18=1 |
+          7           6             |
+                      5             |
+2,4,6,8=7  10,11,12=6    14,16,18=5 |
 """);
     ok(t.new Branch(true).countChildKeys(), 10);
 
@@ -806,9 +829,21 @@ class Btree extends Test                                                        
     t.ok("""
           8           12               |
           0           0.1              |
-          3           2                |
-                      1                |
-2,4,6,8=3  10,11,12=2    14,16,18,19=1 |
+          7           6                |
+                      5                |
+2,4,6,8=7  10,11,12=6    14,16,18,19=5 |
+""");
+    ok(t.new Branch(true).countChildKeys(), 11);
+
+    say("AAAA");
+    FindAndInsert fi5 = t.findAndInsert(t.new Key(5), t.new Data(5));
+    t.stop();
+    t.ok("""
+          8           12               |
+          0           0.1              |
+          7           6                |
+                      5                |
+2,4,6,8=7  10,11,12=6    14,16,18,19=5 |
 """);
     ok(t.new Branch(true).countChildKeys(), 11);
    }
@@ -819,7 +854,7 @@ class Btree extends Test                                                        
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
     test_find_and_insert();
    }
 
