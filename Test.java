@@ -4,6 +4,8 @@
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout digital a binary tree on a silicon chip.
 
+import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 
 //D1 Construct                                                                  // Develop and test a java program
@@ -196,6 +198,41 @@ public class Test                                                               
   static String sourceFileName()                                                // Name of source file containing this method
    {final StackTraceElement e = Thread.currentThread().getStackTrace()[2];      // 0 is getStackTrace, 1 is this routine, 2 is calling method
     return e.getFileName();
+   }
+
+  static String callerFileAndLine2()                                            // Locate file and line number of caller of caller
+   {final StackTraceElement[] t = new Exception().getStackTrace();
+    if (t.length < 3) return null;
+    final StackTraceElement s = t[2];
+    final String f = s.getFileName();
+    final String m = s.getMethodName();
+    final String l = String.format("%04d", s.getLineNumber());
+    return f+" "+m+" "+l;
+   }
+
+//D2 Coverage                                                                   // Analyze code coverage
+
+  static final TreeMap<String, Integer> coverage = new TreeMap<>();           // Count of how many times each line has been executed
+  static void z()
+   {final String s = callerFileAndLine2();
+    Integer c = coverage.get(s);
+    coverage.put(s, c == null ? 1 : c+1);
+   }
+
+  static void writeCoverage()
+   {final File coverageDir = new File("coverage");
+    final File outputFile  = new File(coverageDir, "coverage.txt");
+
+    if (!coverageDir.exists()) return;
+
+    try (BufferedWriter w = new BufferedWriter(new FileWriter(outputFile)))
+     {for (Map.Entry<String, Integer> e : coverage.entrySet())
+       {w.write(e.getKey() + " "+e.getValue()+"\n");
+       }
+     }
+    catch (IOException e)
+     {stop("Error writing to file: " + e.getMessage());
+     }
    }
 
 //D2 Timing                                                                     // Print log messages
