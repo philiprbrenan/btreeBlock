@@ -63,7 +63,7 @@ class Btree extends Test                                                        
     final BKNIndex branchSize = new BKNIndex();                                 // Number of key, next pairs currently contained in branch if a branch
     final KeyData[]   keyData = new KeyData[maxKeysPerLeaf];                    // Key, data pairs for when a leaf
     final KeyNext[]   keyNext = new KeyNext[maxKeysPerBranch];                  // Key, next pairs for when a branch
-    final Next            top = new Next();                                     // Top next reference for when a branch
+    Next                  top = new Next();                                     // Top next reference for when a branch
     void setLeaf()   {state = State.leaf;}
     void setBranch() {state = State.branch;}
     boolean isLeaf()   {return state == State.leaf;}
@@ -94,7 +94,7 @@ class Btree extends Test                                                        
       index = new Next(0);
      }
 
-    void freeLeaf() {freeList.push(index); if (index.asInt() == 6) err("FFFFF", index);}                                     // Free this leaf
+    void freeLeaf() {freeList.push(index);}                                     // Free this leaf
 
     BranchOrLeaf.State state() {return nodes[index.asInt()].state;     }
     LKDIndex        leafSize() {return nodes[index.asInt()].leafSize;  }
@@ -128,8 +128,8 @@ class Btree extends Test                                                        
       final Data      data;                                                     // Data associated with the  key
       final LKDIndex index;                                                     // Index of first such key if found
 
-      FindEqual(Key Search)                                                     // Find the first key in the branch that is equal to the search key
-       {assert state() == BranchOrLeaf.State.leaf;
+      FindEqual(Key Search)                                                     // Find the first key in the leaf that is equal to the search key
+       {if (state() != BranchOrLeaf.State.leaf) stop("Leaf required, not", state());
         search = Search;
         boolean looking = true;
         final KeyData[]kd = keyData();
@@ -164,7 +164,7 @@ class Btree extends Test                                                        
       final boolean  found;                                                     // Whether the key was found
       final LKDIndex first;                                                     // Index of first such key if found
       FindFirstGreaterThanOrEqual(Key Search)                                   // Find the first key in the  leaf that is equal to or greater than the search key
-       {assert state() == BranchOrLeaf.State.leaf;
+       {if (state() != BranchOrLeaf.State.leaf) stop("Leaf required, not", state());
         search = Search;
         boolean looking = true;
         final KeyData[]kd = keyData();
@@ -206,7 +206,7 @@ class Btree extends Test                                                        
   class Branch                                                                  // Describe a branch
    {final Next index;                                                           // Index of the branch
     Branch()                                                                    // get a new branch off the free list
-     {assert freeList.size() > 1;
+     {if (freeList.size() < 1) stop("No more branches");
       index = freeList.pop();
       nodes[index.asInt()].state = BranchOrLeaf.State.branch;
       zeroBranchSize();
@@ -239,10 +239,26 @@ class Btree extends Test                                                        
       return new Branch(index.asInt());
      }
 
-    void push(int Key, int Next)
-     {nodes[index.asInt()].keyNext[nodes[index.asInt()].branchSize.i++] =
-        new KeyNext(Key, Next);
+    void push(Key Key, Leaf Leaf)
+     {final int n = index.asInt(), i = branchSize().i;
+      if (i >= maxKeysPerBranch) stop("Branch", n, " is already full");
+      nodes[n].keyNext[i].key  = Key;
+      nodes[n].keyNext[i].next = Leaf.index;
+      incBranchSize();
      }
+
+    void push(Key Key, Branch Branch)
+     {final int n = index.asInt(), i = branchSize().i;
+      if (n == 0) stop("Cannot push root into a branch");
+      if (n == index.asInt()) stop("Cannot push branch into self");
+      if (i >= maxKeysPerBranch) stop("Branch", n, " is already full");
+      nodes[n].keyNext[i].key  = Key;
+      nodes[n].keyNext[i].next = Branch.index;
+      incBranchSize();
+     }
+
+    void top(Leaf   Leaf)   {nodes[index.asInt()].top = Leaf.index;}            // Set top to refer to a leaf
+    void top(Branch Branch) {nodes[index.asInt()].top = Branch.index;}          // Set top to refer to a leaf
 
     int countChildKeys()                                                        // Find the number of keys in the immediate children of this branch
      {final KeyNext[]kn = keyNext();
@@ -268,13 +284,8 @@ class Btree extends Test                                                        
 
       final int p = branchSize().i;                                             // Current size of branch
       if (p < maxKeysPerBranch)                                                 // Room in the branch
-       {
-
-say("BBBB 11", freeList, leaf.index);
-        keyNext()[p].next.set(leaf.index);                                      // Push into to branch
-say("BBBB 22", freeList, leaf.index);
+       {keyNext()[p].next = leaf.index;
         incBranchSize();                                                        // New size of branch
-say("BBBB 33", freeList, leaf.index);
         return leaf;                                                            // Return leaf so created
        }
       else                                                                      // Reuse top because there is no more room in the branch
@@ -308,7 +319,6 @@ say("BBBB 33", freeList, leaf.index);
       new Leaf(top()).zeroLeafSize();                                           // Clear leaf referenced by top
       zeroBranchSize();                                                         // Zero the size of this branch ready for repack of key, next pairs
 
-say("FFFF11 Free", freeList);
       for (int i = 0; i < up.size(); i++)                                       // Insert the new key, data pair
        {final KeyData kd = up.elementAt(i);
         if (kd.key.greaterThanOrEqual(Key))                                     // Insert new key, data pair
@@ -320,21 +330,25 @@ say("FFFF11 Free", freeList);
       final int N = up.size();                                                  // Recreate the leaves with the key, data pairs packed in
       Leaf leaf = pushNewLeaf();                                                // First new leaf into branch
 
-say("Leaf11", leaf.index, freeList);
       for (int k = 0; k < N; k++)                                               // Repack the leaves
        {final KeyData source = up.elementAt(k);                                 // Source of repack
         if (leaf.leafSize().equals(maxKeysPerLeaf))                             // Start a new leaf when the current one is full
          {leaf = pushNewLeaf();
-say("Leaf22", leaf.index, freeList);
          }
 
-        final KeyData target = leaf.keyData()[leaf.leafSize().i];               // Current location
-        target.set(source);                                                     // Copy current key, data pair inot cpmacted location in leaf
+        leaf.keyData()[leaf.leafSize().i] = new KeyData(source);                // Current location
         leaf.incLeafSize();
+       }
+
+      if (new Leaf(top()).leafSize().i == 0)
+       {decBranchSize();
+        final int n = branchSize().i;
+        final KeyNext[]bkn = keyNext();
+        top(new Leaf(bkn[n].next));
        }
      }
 
-    void top(int top)  {nodes[index.asInt()].top.set(top);}
+    void top(Next top)  {nodes[index.asInt()].top = top;}
 
     class FindEqual                                                             // Find the first key in the branch that is equal to the search key
      {final Key     search;                                                     // Search key
@@ -378,7 +392,7 @@ say("Leaf22", leaf.index, freeList);
       final Next      next;                                                     // The corresponding next field or top if no such key was found
 
       FindFirstGreaterThanOrEqual(Key Search)                                   // Find the first key in the branch that is equal to or greater than the search key
-       {assert state() == BranchOrLeaf.State.branch;
+       {if (state() != BranchOrLeaf.State.branch) stop("Branch required, not", state());
         search = Search;
         boolean looking = true;
         final KeyNext[]kn = keyNext();
@@ -421,7 +435,8 @@ say("Leaf22", leaf.index, freeList);
             l.print(S, level+1);
            }
           else
-           {final Branch b = new Branch(next);
+           {if (next == 0) stop("Cannot descend through root from index", i, "in branch", index);
+            final Branch b = new Branch(next);
             b.print(S, level+1);
            }
 
@@ -440,7 +455,8 @@ say("Leaf22", leaf.index, freeList);
         l.print(S, level+1);
        }
       else
-       {final Branch b = new Branch(top);
+       {if (top == 0) stop("Cannot descend through root from top in branch", index);
+        final Branch b = new Branch(top);
         b.print(S, level+1);
        }
 
@@ -466,7 +482,9 @@ say("Leaf22", leaf.index, freeList);
     boolean equals            (Key Key) {return asInt() == Key.asInt();}
     boolean greaterThanOrEqual(Key Key) {return asInt() >= Key.asInt();}
     public String toString() {return ""+bitsToInt(key);}
-    void set(Key Key) {System.arraycopy(Key.key, 0, key, 0, key.length);}
+    void set(Key Key)
+     {for (int i = 0; i < key.length; i++) key[i] = Key.key[i];
+     }
    }
 
   class Data                                                                    // A data item associated with a key in a leaf
@@ -474,29 +492,30 @@ say("Leaf22", leaf.index, freeList);
     Data() {}
     Data(int n) {intToBits(n, data);}
     public String toString() {return ""+bitsToInt(data);}
-    void set(Data Data) {System.arraycopy(Data.data, 0, data, 0, data.length);}
+    void set(Data Data)
+     {for (int i = 0; i < data.length; i++) data[i] = Data.data[i];
+     }
    }
 
   class Next                                                                    // A next reference from a branch to a leaf or a branch
    {boolean[] next = new boolean[bitsPerNext];                                  // Enough bits to reference a leaf or brahch in the block
     Next() {this(0);}                                                           // The root
-    Next(int n)  {set(n);}
-    void set(int n)
-     {assert n < treeSize;
+    Next(int n)
+     {if (n >= treeSize) stop("n must be less than", treeSize, "but is", n) ;
       intToBits(n, next);
      }
     boolean equals(Next that) {return asInt() == that.asInt();}
     int asInt() {return bitsToInt(next);}
     public String toString() {return ""+bitsToInt(next);}
-    void set(Next Next) {System.arraycopy(Next.next, 0, next, 0, next.length);}
    }
 
   class KeyData                                                                 // A key, data pair in a leaf
-   {final Key   key = new Key();                                                // A key in a leaf
-    final Data data = new Data();                                               // Data associated with the key
+   {Key   key = new Key();                                                      // A key in a leaf
+    Data data = new Data();                                                     // Data associated with the key
     KeyData() {}
     KeyData(int Key, int  Data) {intToBits(Key, key.key); intToBits(Data, data.data);}
     KeyData(Key Key, Data Data) {set(Key); set(Data);}
+    KeyData(KeyData  KeyData)   {this(KeyData.key, KeyData.data);}
     void set(KeyData source) {key.set(source.key); data.set(source.data);}
     void set(Key  Key)  {key.set(Key);}
     void set(Data Data) {data.set(Data);}
@@ -504,14 +523,14 @@ say("Leaf22", leaf.index, freeList);
    }
 
   class KeyNext                                                                 // A key, next pair in a leaf
-   {final Key   key = new Key();                                                // A key in a branch
-    final Next next = new Next();                                               // Next branch or leaf
+   {Key   key = new Key();                                                      // A key in a branch
+    Next next = new Next();                                                     // Next branch or leaf
     KeyNext() {}
     KeyNext(int Key, int Next) {intToBits(Key, key.key); intToBits(Next, next.next);}
-    void set(KeyNext source) {key.set(source.key); next.set(source.next);}
+    void set(KeyNext source) {key = source.key; next = source.next;}
     public String toString() {return "KeyNext("+key+","+next+")";}
-    void key (Key  Key)  {key .set(Key);}
-    void next(Next Next) {next.set(Next);}
+    void key (Key  Key)  {key  = Key;}
+    void next(Next Next) {next = Next;}
    }
 
   class LKDIndex                                                                // An index to key, data pair in a leaf
@@ -520,7 +539,7 @@ say("Leaf22", leaf.index, freeList);
     LKDIndex(int I) {i = I;}
     public String toString() {return "LKDIndex("+i+")";}
     void inc()  {if (i < maxKeysPerLeaf) ++i; else stop("cannot increment leaf index");}
-    void dec()  {if (i > 0)              ++i; else stop("cannot decrement leaf index");}
+    void dec()  {if (i > 0)              --i; else stop("cannot decrement leaf index");}
     void zero() {i = 0;}
     boolean equals(int N) {return i == N;}
    }
@@ -531,7 +550,7 @@ say("Leaf22", leaf.index, freeList);
     BKNIndex(int I) {i = I;}
     public String toString() {return "BKNIndex("+i+")";}
     void inc()  {if (i < maxKeysPerBranch) ++i; else stop("cannot increment branch index");}
-    void dec()  {if (i > 0)                ++i; else stop("cannot decrement branch index");}
+    void dec()  {if (i > 0)                --i; else stop("cannot decrement branch index");}
     void zero() {i = 0;}
     boolean equals(int N) {return i == N;}
    }
@@ -568,6 +587,7 @@ say("Leaf22", leaf.index, freeList);
         if (isLeaf(n))                                                          // Found the containing leaf
          {final Leaf l = new Leaf(n);
           leaf         = l.new FindEqual(Key);
+          //say("ok(\""+toString()+"\");");
           return;
          }
         parent = new Branch(n);                                                 // Step down to lower branch
@@ -742,9 +762,9 @@ say("Leaf22", leaf.index, freeList);
     final Leaf   l = t.new Leaf();
     final Leaf   m = t.new Leaf();
     final Leaf   r = t.new Leaf();
-    R.push( 8, l.index.asInt());
-    R.push(12, m.index.asInt());
-    R.top(     r.index.asInt());
+    R.push(t.new Key( 8), l);
+    R.push(t.new Key(12), m);
+    R.top(     r.index);
     l.push( 2, 12);
     l.push( 4, 14);
     l.push( 6, 16);
@@ -763,29 +783,48 @@ say("Leaf22", leaf.index, freeList);
     t.ok("""
           8        12            |
           0        0.1           |
-          3        2             |
-                   1             |
-2,4,6,8=3  10,12=2    14,16,18=1 |
+          7        6             |
+                   5             |
+2,4,6,8=7  10,12=6    14,16,18=5 |
 """);
-    Find f1 = t.find(t.new Key( 1)); ok(f1, "search:1 leaf:3 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    Find f2 = t.find(t.new Key( 2)); ok(f2, "search:2 leaf:3 rootIsLeaf:n parent:0 found:1 data:12 index:0 allFull:n lastNotFull:0");
-    Find f3 = t.find(t.new Key( 3)); ok(f3, "search:3 leaf:3 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    Find f4 = t.find(t.new Key( 4)); ok(f4, "search:4 leaf:3 rootIsLeaf:n parent:0 found:1 data:14 index:1 allFull:n lastNotFull:0");
-    Find f5 = t.find(t.new Key( 5)); ok(f5, "search:5 leaf:3 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    Find f6 = t.find(t.new Key( 6)); ok(f6, "search:6 leaf:3 rootIsLeaf:n parent:0 found:1 data:16 index:2 allFull:n lastNotFull:0");
-    Find f7 = t.find(t.new Key( 7)); ok(f7, "search:7 leaf:3 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    Find f8 = t.find(t.new Key( 8)); ok(f8, "search:8 leaf:3 rootIsLeaf:n parent:0 found:1 data:18 index:3 allFull:n lastNotFull:0");
-    Find f9 = t.find(t.new Key( 9)); ok(f9, "search:9 leaf:2 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    Find fa = t.find(t.new Key(10)); ok(fa, "search:10 leaf:2 rootIsLeaf:n parent:0 found:1 data:20 index:0 allFull:n lastNotFull:0");
-    Find fb = t.find(t.new Key(11)); ok(fb, "search:11 leaf:2 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    Find fc = t.find(t.new Key(12)); ok(fc, "search:12 leaf:2 rootIsLeaf:n parent:0 found:1 data:22 index:1 allFull:n lastNotFull:0");
-    Find fd = t.find(t.new Key(13)); ok(fd, "search:13 leaf:1 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    Find fe = t.find(t.new Key(14)); ok(fe, "search:14 leaf:1 rootIsLeaf:n parent:0 found:1 data:24 index:0 allFull:n lastNotFull:0");
-    Find ff = t.find(t.new Key(15)); ok(ff, "search:15 leaf:1 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    Find fg = t.find(t.new Key(16)); ok(fg, "search:16 leaf:1 rootIsLeaf:n parent:0 found:1 data:26 index:1 allFull:n lastNotFull:0");
-    Find fh = t.find(t.new Key(17)); ok(fh, "search:17 leaf:1 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    Find fj = t.find(t.new Key(18)); ok(fj, "search:18 leaf:1 rootIsLeaf:n parent:0 found:1 data:28 index:2 allFull:n lastNotFull:0");
-    Find fk = t.find(t.new Key(19)); ok(fk, "search:19 leaf:1 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    Find f1 = t.find(t.new Key( 1));
+    Find f2 = t.find(t.new Key( 2));
+    Find f3 = t.find(t.new Key( 3));
+    Find f4 = t.find(t.new Key( 4));
+    Find f5 = t.find(t.new Key( 5));
+    Find f6 = t.find(t.new Key( 6));
+    Find f7 = t.find(t.new Key( 7));
+    Find f8 = t.find(t.new Key( 8));
+    Find f9 = t.find(t.new Key( 9));
+    Find fa = t.find(t.new Key(10));
+    Find fb = t.find(t.new Key(11));
+    Find fc = t.find(t.new Key(12));
+    Find fd = t.find(t.new Key(13));
+    Find fe = t.find(t.new Key(14));
+    Find ff = t.find(t.new Key(15));
+    Find fg = t.find(t.new Key(16));
+    Find fh = t.find(t.new Key(17));
+    Find fj = t.find(t.new Key(18));
+    Find fk = t.find(t.new Key(19));
+    ok(f1, "search:1 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(f2, "search:2 leaf:7 rootIsLeaf:n parent:0 found:1 data:12 index:0 allFull:n lastNotFull:0");
+    ok(f3, "search:3 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(f4, "search:4 leaf:7 rootIsLeaf:n parent:0 found:1 data:14 index:1 allFull:n lastNotFull:0");
+    ok(f5, "search:5 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(f6, "search:6 leaf:7 rootIsLeaf:n parent:0 found:1 data:16 index:2 allFull:n lastNotFull:0");
+    ok(f7, "search:7 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(f8, "search:8 leaf:7 rootIsLeaf:n parent:0 found:1 data:18 index:3 allFull:n lastNotFull:0");
+    ok(f9, "search:9 leaf:6 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(fa, "search:10 leaf:6 rootIsLeaf:n parent:0 found:1 data:20 index:0 allFull:n lastNotFull:0");
+    ok(fb, "search:11 leaf:6 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(fc, "search:12 leaf:6 rootIsLeaf:n parent:0 found:1 data:22 index:1 allFull:n lastNotFull:0");
+    ok(fd, "search:13 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(fe, "search:14 leaf:5 rootIsLeaf:n parent:0 found:1 data:24 index:0 allFull:n lastNotFull:0");
+    ok(ff, "search:15 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(fg, "search:16 leaf:5 rootIsLeaf:n parent:0 found:1 data:26 index:1 allFull:n lastNotFull:0");
+    ok(fh, "search:17 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(fj, "search:18 leaf:5 rootIsLeaf:n parent:0 found:1 data:28 index:2 allFull:n lastNotFull:0");
+    ok(fk, "search:19 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
    }
 
   static void test_find_and_insert()
@@ -835,17 +874,16 @@ say("Leaf22", leaf.index, freeList);
 """);
     ok(t.new Branch(true).countChildKeys(), 11);
 
-    say("AAAA");
     FindAndInsert fi5 = t.findAndInsert(t.new Key(5), t.new Data(5));
-    t.stop();
+    //t.stop();
     t.ok("""
-          8           12               |
-          0           0.1              |
-          7           6                |
-                      5                |
-2,4,6,8=7  10,11,12=6    14,16,18,19=5 |
+          8             12               |
+          0             0.1              |
+          6             7                |
+                        4                |
+2,4,5,6=6  8,10,11,12=7    14,16,18,19=4 |
 """);
-    ok(t.new Branch(true).countChildKeys(), 11);
+    ok(t.new Branch(true).countChildKeys(), 12);
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -854,7 +892,7 @@ say("Leaf22", leaf.index, freeList);
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
+   {oldTests();
     test_find_and_insert();
    }
 
