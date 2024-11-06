@@ -341,29 +341,28 @@ class Btree extends Test                                                        
      }
 
     Leaf pushNewLeaf()                                                          // Create a new leaf and push it onto this branch
-     {final Leaf leaf = new Leaf();
+     {final Leaf leaf = new Leaf();                                             // New leaf
 
       final int p = branchSize().i;                                             // Current size of branch
-      if (p < maxKeysPerBranch)                                                 // Room in the branch
+      if (p < maxKeysPerBranch)                                                 // Room in the parent branch to push this new child leaf
        {z();
-        keyNext()[p].next = leaf.index;
+        keyNext()[p].next = leaf.index;                                         // Push child leaf into parent branch
         incBranchSize();                                                        // New size of branch
         return leaf;                                                            // Return leaf so created
        }
-      else                                                                      // Reuse top because there is no more room in the branch
+      else                                                                      // Reuse branch top because there is no more room in the branch
        {z();
-        say("Use top");
-        return new Leaf(top());
+        return new Leaf(top());                                                 // Return top as a leaf
        }
      }
 
     void unpackLeaf(Leaf leaf, Stack<KeyData> up)                               // Unpack a leaf
      {z();
-      final KeyData[]kd = leaf.keyData();
-      final int L = leaf.leafSize().i;
-      for (int l = 0; l < L; l++)
+      final KeyData[]kd = leaf.keyData();                                       // Key, data pairs in leaf
+      final int L = leaf.leafSize().i;                                          // Size of leaf
+      for (int l = 0; l < L; l++)                                               // Unpack each key, data pair in the leaf
        {z();
-        up.push(kd[l]);
+        up.push(kd[l]);                                                         // Unpack the leaf into a stack of key, data pairs
        }
      }
 
@@ -374,25 +373,22 @@ class Btree extends Test                                                        
       final  int B = branchSize().i;                                            // Current size of branch
       for   (int b = 0; b < B; b++)                                             // Unpack each leaf referenced
        {z();
-        final Leaf leaf = new Leaf(kn[b].next);
-        unpackLeaf(leaf, up);
+        unpackLeaf(new Leaf(kn[b].next), up);                                   // Unpack leaf
        }
-      unpackLeaf(new Leaf(top()), up);                                          // Include top
+      unpackLeaf(new Leaf(top()), up);                                          // Unpack top
 
       for   (int b = 0; b < B; b++)                                             // Free all the existing leaves except top which will always be there
        {z();
-        final Leaf leaf = new Leaf(kn[b].next);
-        leaf.freeLeaf();
+        new Leaf(kn[b].next).freeLeaf();                                        // Free leaf
        }
       new Leaf(top()).zeroLeafSize();                                           // Clear leaf referenced by top
       zeroBranchSize();                                                         // Zero the size of this branch ready for repack of key, next pairs
 
-      for (int i = 0; i < up.size(); i++)                                       // Insert the new key, data pair
+      for (int i = 0; i < up.size(); i++)                                       // Insert the new key, data pair in the stack of key, data pairs awaiting repacking
        {z();
-        final KeyData kd = up.elementAt(i);
-        if (kd.key.greaterThanOrEqual(Key))                                     // Insert new key, data pair
+        if (up.elementAt(i).key.greaterThanOrEqual(Key))                        // Found insertion point
          {z();
-          up.insertElementAt(new KeyData(Key, Data), i);
+          up.insertElementAt(new KeyData(Key, Data), i);                        // Insert new key, data pair
           break;
          }
        }
@@ -405,23 +401,21 @@ class Btree extends Test                                                        
         final KeyData source = up.elementAt(k);                                 // Source of repack
         if (leaf.leafSize().equals(maxKeysPerLeaf))                             // Start a new leaf when the current one is full
          {z();
-         leaf = pushNewLeaf();
+          leaf = pushNewLeaf();                                                 // New leaf
          }
 
-        leaf.keyData()[leaf.leafSize().i] = new KeyData(source);                // Current location
-        leaf.incLeafSize();
+        leaf.keyData()[leaf.leafSize().i] = new KeyData(source);                // Push current key, data pair into the current leaf
+        leaf.incLeafSize();                                                     // Move up in leaf
        }
 
       if (new Leaf(top()).leafSize().i == 0)                                    // The top leaf is empty so we replace it with the next top leaf
        {z();
-        decBranchSize();
-        final int n = branchSize().i;
-        final KeyNext[]bkn = keyNext();
-        top(new Leaf(bkn[n].next));
+        decBranchSize();                                                        // Pop the last key, next pair off the body of the parent branch
+        top(new Leaf(keyNext()[branchSize().i].next));                          // Place last next on top of parent branch
        }
      }
 
-    void top(Next top)  {z(); nodes[index.asInt()].top = top;}
+    void top(Next top)  {z(); nodes[index.asInt()].top = top;}                  // Set the top next reference for this branch
 
     class FindEqual                                                             // Find the first key in the branch that is equal to the search key
      {final Key     search;                                                     // Search key
