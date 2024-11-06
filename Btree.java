@@ -235,8 +235,8 @@ class Btree extends Test                                                        
        }
       for (int i = splitLeafSize; i < maxKeysPerLeaf;  i++)
        {r.push(kd[i].key, kd[i].data);
-        if (i == maxKeysPerLeaf-1) R.push(kd[i].key, r);
        }
+      R.top(r);
      }
 
     void print(Stack<StringBuilder>S, int level)                                // Print leaf horizontally
@@ -1009,17 +1009,24 @@ class Btree extends Test                                                        
 
   static void test_split_leaf_root()
    {final Btree  t = new Btree(8, 8, 4, 4, 3, 8);
-//  final Branch r = t.new Leaf();
-//  final Leaf   l = t.new Leaf();
-//  final Leaf   m = t.new Leaf();
-//  final Leaf   r = t.new Leaf();
-//  R.push(t.new Key( 8), l);
-//  R.push(t.new Key(12), m);
-//  R.top(     r.index);
-//  l.push( 2, 12);
-//  l.push( 4, 14);
-//  l.push( 6, 16);
-//  l.push( 8, 18);
+    final Leaf   r = t.new Leaf(true);
+    r.push( 2, 12);
+    r.push( 4, 14);
+    r.push( 6, 16);
+    r.push( 8, 18);
+    //stop(t);
+    t.ok("""
+2,4,6,8=0 |
+""");
+    r.splitRoot();
+    //stop(t);
+    t.ok("""
+      4      |
+      0      |
+      7      |
+      6      |
+2,4=7  6,8=6 |
+""");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
