@@ -231,8 +231,8 @@ class Btree extends Test                                                        
       final Leaf r = new Leaf(); final KeyData[]rkd = r.keyData();
       for (int i = 0; i < splitLeafSize; i++)
        {l.push(kd[i].key, kd[i].data);
-        if (i == splitLeafSize-1) R.push(kd[i].key, l);
        }
+      R.push(kd[splitLeafSize-1].key, l);
       for (int i = splitLeafSize; i < maxKeysPerLeaf;  i++)
        {r.push(kd[i].key, kd[i].data);
        }
