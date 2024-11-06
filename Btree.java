@@ -218,7 +218,7 @@ class Btree extends Test                                                        
        }
      }
 
-    Branch splitRoot()                                                          // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
+    Branch splitLeafRoot()                                                      // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
      {z();
       if (state() != BranchOrLeaf.State.leaf) stop("Leaf required, not", state());
       if (index.asInt() != 0) stop("Not root, but", index);
@@ -305,8 +305,8 @@ class Btree extends Test                                                        
     void push(Key Key, Branch Branch)
      {z();
       final int n = index.asInt(), i = branchSize().i;
-      if (n == 0) stop("Cannot push root into a branch");
-      if (n == index.asInt()) stop("Cannot push branch into self");
+      if (0 == Branch.index.asInt()) stop("Cannot push root into a branch");
+      if (n == Branch.index.asInt()) stop("Cannot push branch into self");
       if (i >= maxKeysPerBranch) stop("Branch", n, " is already full");
       nodes[n].keyNext[i].key  = Key;
       nodes[n].keyNext[i].next = Branch.index;
@@ -547,7 +547,7 @@ class Btree extends Test                                                        
       padStrings(S, level);                                                     // Pad the strings at each level of the tree so we have a vertical face to continue with - a bit like Marc Brunel's tunnelling shield
      }
 
-    void splitRoot()                                                            // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
+    void splitBranchRoot()                                                      // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
      {z();
       if (state() != BranchOrLeaf.State.branch) stop("Branch required, not", state());
       if (index.asInt() != 0) stop("Not root, but", index);
@@ -559,8 +559,8 @@ class Btree extends Test                                                        
       final Branch r = new Branch(); final KeyNext[]rkn = r.keyNext();
       for (int i = 0; i < splitBranchSize; i++)
        {l.push(kn[i].key, new Branch(kn[i].next));
-        if (i == splitBranchSize-1) push(kn[i].key, l);
        }
+      push(kn[splitBranchSize].key, l);
       for(int i = maxKeysPerBranch - splitBranchSize; i < maxKeysPerBranch; i++)
        {r.push(kn[i].key, new Branch(kn[i].next));
        }
@@ -1019,7 +1019,7 @@ class Btree extends Test                                                        
     t.ok("""
 2,4,6,8=0 |
 """);
-    r.splitRoot();
+    r.splitLeafRoot();
     //stop(t);
     t.ok("""
       4      |
@@ -1041,7 +1041,7 @@ class Btree extends Test                                                        
     t.ok("""
 20,40,60,80=0 |
 """);
-    final Branch R = r.splitRoot();
+    final Branch R = r.splitLeafRoot();
     final Leaf l2 = t.new Leaf();
     l2.push( 100, 110);
     l2.push( 120, 130);
@@ -1058,6 +1058,19 @@ class Btree extends Test                                                        
         7         6            5            |
                                4            |
 20,40=7   60,80=6    100,120=5    140,160=4 |
+""");
+    R.splitBranchRoot();
+    //stop(t);
+    t.ok("""
+                  80                       |
+                  0                        |
+                  3                        |
+                  2                        |
+        40                    120          |
+        3                     2            |
+        7                     5            |
+        6                     4            |
+20,40=7   60,80=6   100,120=5    140,160=4 |
 """);
    }
 
