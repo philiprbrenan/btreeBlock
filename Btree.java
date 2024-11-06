@@ -15,6 +15,8 @@ class Btree extends Test                                                        
     maxKeysPerBranch,                                                           // Maximum number of keys in a branch
     maxKeysInLeaves,                                                            // Maximum number of keys in the leaves under one branch
     maxKeysInBranches,                                                          // Maximum number of keys in the branches under one branch
+    splitLeafSize,                                                              // The number of key, data pairs to split out of a leaf
+    splitBranchSize,                                                            // The number of key, nexta pairs to split out of a branch
     treeSize;                                                                   // Number of leaves or branches in tree
 
   final int              root = 0;                                              // The root is always leaf or branch zero
@@ -37,6 +39,8 @@ class Btree extends Test                                                        
     bitsPerNext       = BitsPerNext;
     maxKeysPerLeaf    = MaxKeysPerLeaf;
     maxKeysPerBranch  = MaxKeysPerBranch;
+    splitLeafSize     = maxKeysPerLeaf   >> 1;
+    splitBranchSize   = maxKeysPerBranch >> 1;
     treeSize          = TreeSize;
     maxKeysInLeaves   = maxKeysPerLeaf   * (1 + maxKeysPerBranch);              // Including top
     maxKeysInBranches = maxKeysPerBranch * (1 + maxKeysPerBranch);              // Including top
@@ -124,9 +128,17 @@ class Btree extends Test                                                        
                                                                                 // Push a new key, data pair on into the leaf
     void push(int Key, int Data)
      {z();
-      final KeyData kd = nodes[index.asInt()].keyData[nodes[index.asInt()].leafSize.i++];
+      final int i = index.asInt();
+      final Leaf l = new Leaf(i);
+      final KeyData kd = l.keyData()[l.leafSize().i];
+      l.incLeafSize();
       kd.set(new Key (Key));
       kd.set(new Data(Data));
+     }
+                                                                                // Push a new key, data pair on into the leaf
+    void push(Key Key, Data Data)
+     {z();
+      push(Key.asInt(), Data.asInt());
      }
 
     class FindEqual                                                             // Find the first key in the leaf that is equal to the search key
@@ -203,6 +215,27 @@ class Btree extends Test                                                        
         s.append("Key:"+search+" found:"+printBit(found));
         if (found) s.append(" first:"+first);
         return s.toString();
+       }
+     }
+
+    void splitRoot()                                                            // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
+     {z();
+      if (state() != BranchOrLeaf.State.leaf) stop("Leaf required, not", state());
+      if (index.asInt() != 0) stop("Not root, but", index);
+      final KeyData[]kd = keyData();
+      if (!isFull()) stop("Root is not full, but", leafSize());
+      final Branch R = makeIntoBranch();
+      R.zeroBranchSize();
+
+      final Leaf l = new Leaf(); final KeyData[]lkd = l.keyData();
+      final Leaf r = new Leaf(); final KeyData[]rkd = r.keyData();
+      for (int i = 0; i < splitLeafSize; i++)
+       {l.push(kd[i].key, kd[i].data);
+        if (i == splitLeafSize-1) R.push(kd[i].key, l);
+       }
+      for (int i = splitLeafSize; i < maxKeysPerLeaf;  i++)
+       {r.push(kd[i].key, kd[i].data);
+        if (i == maxKeysPerLeaf-1) R.push(kd[i].key, r);
        }
      }
 
@@ -378,7 +411,7 @@ class Btree extends Test                                                        
         leaf.incLeafSize();
        }
 
-      if (new Leaf(top()).leafSize().i == 0)
+      if (new Leaf(top()).leafSize().i == 0)                                    // The top leaf is empty so we replace it with the next top leaf
        {z();
         decBranchSize();
         final int n = branchSize().i;
@@ -512,6 +545,27 @@ class Btree extends Test                                                        
 
       padStrings(S, level);                                                     // Pad the strings at each level of the tree so we have a vertical face to continue with - a bit like Marc Brunel's tunnelling shield
      }
+
+    void splitRoot()                                                            // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
+     {z();
+      if (state() != BranchOrLeaf.State.branch) stop("Branch required, not", state());
+      if (index.asInt() != 0) stop("Not root, but", index);
+      if (!isFull()) stop("Root is not full, but", branchSize());
+      zeroBranchSize();
+      final KeyNext[]kn = keyNext();
+
+      final Branch l = new Branch(); final KeyNext[]lkn = l.keyNext();
+      final Branch r = new Branch(); final KeyNext[]rkn = r.keyNext();
+      for (int i = 0; i < splitBranchSize; i++)
+       {l.push(kn[i].key, new Branch(kn[i].next));
+        if (i == splitBranchSize-1) push(kn[i].key, l);
+       }
+      for(int i = maxKeysPerBranch - splitBranchSize; i < maxKeysPerBranch; i++)
+       {r.push(kn[i].key, new Branch(kn[i].next));
+       }
+      r.top(top()); top(r);
+      l.top(kn[splitBranchSize].next);
+     }
    }
 
   class RootBranch extends Branch {RootBranch() {super(true); z();}}            // The Root is a branch
@@ -542,6 +596,7 @@ class Btree extends Test                                                        
    {final boolean[] data = new boolean[bitsPerData];                                  // Data is composed of bits
     Data() {z(); }
     Data(int n) {z(); intToBits(n, data);}
+    int asInt() {return bitsToInt(data);}
     public String toString() {z(); return ""+bitsToInt(data);}
     void set(Data Data)
      {z();
