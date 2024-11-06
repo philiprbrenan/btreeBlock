@@ -340,17 +340,17 @@ class Btree extends Test                                                        
       return C;
      }
 
-    Leaf pushNewLeaf()                                                          // Create a new leaf and push it onto this branch
+    Leaf pushNewLeaf()                                                          // Create a new child leaf and push it onto the parent branch
      {final Leaf leaf = new Leaf();                                             // New leaf
 
       final int p = branchSize().i;                                             // Current size of branch
       if (p < maxKeysPerBranch)                                                 // Room in the parent branch to push this new child leaf
        {z();
         keyNext()[p].next = leaf.index;                                         // Push child leaf into parent branch
-        incBranchSize();                                                        // New size of branch
+        incBranchSize();                                                        // New size of parent branch
         return leaf;                                                            // Return leaf so created
        }
-      else                                                                      // Reuse branch top because there is no more room in the branch
+      else                                                                      // Reuse branch top because there is no more room in the parent branch
        {z();
         return new Leaf(top());                                                 // Return top as a leaf
        }
@@ -366,11 +366,11 @@ class Btree extends Test                                                        
        }
      }
 
-    void repackLeaves(Key Key, Data Data)                                       // Repack the keys in the leaves under this branch
+    void repackLeaves(Key Key, Data Data)                                       // Repack the keys in the leaves under the parent branch
      {z();
-      final KeyNext[]kn = keyNext();                                            // Key, next pairs associated with this branch
+      final KeyNext[]kn = keyNext();                                            // Key, next pairs associated with the parent branch
       final Stack<KeyData> up = new Stack<>();                                  // Save area for key, next pairs during repack
-      final  int B = branchSize().i;                                            // Current size of branch
+      final  int B = branchSize().i;                                            // Current size of parent branch
       for   (int b = 0; b < B; b++)                                             // Unpack each leaf referenced
        {z();
         unpackLeaf(new Leaf(kn[b].next), up);                                   // Unpack leaf
@@ -412,6 +412,81 @@ class Btree extends Test                                                        
        {z();
         decBranchSize();                                                        // Pop the last key, next pair off the body of the parent branch
         top(new Leaf(keyNext()[branchSize().i].next));                          // Place last next on top of parent branch
+       }
+     }
+
+    Branch pushNewBranch()                                                      // Create a new child branch and push it onto the parent branch
+     {final Branch branch = new Branch();                                       // New branch
+
+      final int p = branchSize().i;                                             // Current size of branch
+      if (p < maxKeysPerBranch)                                                 // Room in the parent branch to push this new child leaf
+       {z();
+        keyNext()[p].next = branch.index;                                       // Push child branch into parent branch
+        incBranchSize();                                                        // New size of parent branch
+        return branch;                                                          // Return branch so created
+       }
+      else                                                                      // Reuse branch top because there is no more room in the branch
+       {z();
+        return new Branch(top());                                               // Return top as a branch
+       }
+     }
+
+    void unpackBranch(Branch branch, Stack<KeyNext> up)                         // Unpack a branch
+     {z();
+      final KeyNext[]kn = branch.keyNext();                                     // Key, next pairs in branch
+      final int L = branch.branchSize().i;                                      // Size of branch
+      for (int l = 0; l < L; l++)                                               // Unpack each key, data pair in the branch
+       {z();
+        up.push(kn[l]);                                                         // Unpack the branch into a stack of key, data pairs
+       }
+     }
+
+    void repackBranches(Key Key, Next Next)                                     // Repack the keys in the branches under this branch
+     {z();
+      final KeyNext[]kn = keyNext();                                            // Key, next pairs associated with this branch
+      final Stack<KeyNext> up = new Stack<>();                                  // Save area for key, next pairs during repack
+      final  int B = branchSize().i;                                            // Current size of branch
+      for   (int b = 0; b < B; b++)                                             // Unpack each branch referenced
+       {z();
+        unpackBranch(new Branch(kn[b].next), up);                               // Unpack branch
+       }
+      unpackBranch(new Branch(top()), up);                                      // Unpack top
+
+      for   (int b = 0; b < B; b++)                                             // Free all the existing branches except top which will always be there
+       {z();
+        new Branch(kn[b].next).freeBranch();                                    // Free branch
+       }
+      new Branch(top()).zeroBranchSize();                                       // Clear branch referenced by top
+      zeroBranchSize();                                                         // Zero the size of this branch ready for repack of key, next pairs
+
+      for (int i = 0; i < up.size(); i++)                                       // Insert the new key, data pair in the stack of key, data pairs awaiting repacking
+       {z();
+        if (up.elementAt(i).key.greaterThanOrEqual(Key))                        // Found insertion point
+         {z();
+          up.insertElementAt(new KeyNext(Key, Next), i);                        // Insert new key, data pair
+          break;
+         }
+       }
+
+      final int N = up.size();                                                  // Recreate the branches with the key, data pairs packed in
+      Branch branch = pushNewBranch();                                          // First new branch into branch
+
+      for (int k = 0; k < N; k++)                                               // Repack the branches
+       {z();
+        final KeyNext source = up.elementAt(k);                                 // Source of repack
+        if (branch.branchSize().equals(maxKeysPerLeaf))                         // Start a new branch when the current one is full
+         {z();
+          branch = pushNewBranch();                                             // New branch
+         }
+
+        branch.keyNext()[branch.branchSize().i] = new KeyNext(source);          // Push current key, data pair into the current branch
+        branch.incBranchSize();                                                 // Move up in branch
+       }
+
+      if (new Branch(top()).branchSize().i == 0)                                // The top branch is empty so we replace it with the next top branch
+       {z();
+        decBranchSize();                                                        // Pop the last key, next pair off the body of the parent branch
+        top(new Branch(keyNext()[branchSize().i].next));                        // Place last next on top of parent branch
        }
      }
 
@@ -629,11 +704,13 @@ class Btree extends Test                                                        
    {Key   key = new Key();                                                      // A key in a branch
     Next next = new Next();                                                     // Next branch or leaf
     KeyNext() {z(); }
-    KeyNext(int Key, int Next) {z(); intToBits(Key, key.key); intToBits(Next, next.next);}
+    KeyNext(int Key, int Next)  {z(); intToBits(Key, key.key); intToBits(Next, next.next);}
+    KeyNext(Key Key, Next Next) {z(); set(Key); set(Next);}
+    KeyNext(KeyNext  KeyNext)   {this(KeyNext.key, KeyNext.next); z();}
     void set(KeyNext source) {z(); key = source.key; next = source.next;}
+    void set(Key  Key)  {z(); key  = Key;}
+    void set(Next Next) {z(); next = Next;}
     public String toString() {return "KeyNext("+key+","+next+")";}
-    void key (Key  Key)  {z(); key  = Key;}
-    void next(Next Next) {z(); next = Next;}
    }
 
   class LKDIndex                                                                // An index to key, data pair in a leaf
