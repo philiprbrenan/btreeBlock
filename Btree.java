@@ -676,14 +676,14 @@ class Btree extends Test                                                        
      {z();
       if (rootIsLeaf())                                                         // The root is a leaf
        {z();
-        final Leaf l = new Leaf(0);
+        final Leaf l = new Leaf(true);
         leaf         = l.new FindEqual(Key);
         allFull      = true;
         rootIsLeaf   = true;
         return;
        }
 
-      parent  = new Branch(0);                                                  // Parent starts at root which is known to be a branch
+      parent  = new Branch(true);                                               // Parent starts at root which is known to be a branch
       allFull = true;
 
       for (int i = 0; i < maxDepth; i++)                                        // Step down through tree
@@ -879,7 +879,7 @@ class Btree extends Test                                                        
 
   static Btree test_small_tree()
    {final Btree  t = new Btree(8, 8, 4, 4, 3, 8);
-    final Branch R = t.new Leaf(0).makeIntoBranch();
+    final Branch R = t.new Leaf(true).makeIntoBranch();
     final Leaf   l = t.new Leaf();
     final Leaf   m = t.new Leaf();
     final Leaf   r = t.new Leaf();
@@ -1007,15 +1007,32 @@ class Btree extends Test                                                        
     ok(t.new Branch(true).countChildKeys(), 12);
    }
 
+  static void test_split_leaf_root()
+   {final Btree  t = new Btree(8, 8, 4, 4, 3, 8);
+//  final Branch r = t.new Leaf();
+//  final Leaf   l = t.new Leaf();
+//  final Leaf   m = t.new Leaf();
+//  final Leaf   r = t.new Leaf();
+//  R.push(t.new Key( 8), l);
+//  R.push(t.new Key(12), m);
+//  R.top(     r.index);
+//  l.push( 2, 12);
+//  l.push( 4, 14);
+//  l.push( 6, 16);
+//  l.push( 8, 18);
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_bits();
     test_find();
     test_find_and_insert();
+    test_split_leaf_root();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    writeCoverage();
+    test_split_leaf_root();
+    //writeCoverage();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
