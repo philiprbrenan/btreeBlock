@@ -218,7 +218,7 @@ class Btree extends Test                                                        
        }
      }
 
-    void splitRoot()                                                            // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
+    Branch splitRoot()                                                          // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
      {z();
       if (state() != BranchOrLeaf.State.leaf) stop("Leaf required, not", state());
       if (index.asInt() != 0) stop("Not root, but", index);
@@ -237,6 +237,7 @@ class Btree extends Test                                                        
        {r.push(kd[i].key, kd[i].data);
        }
       R.top(r);
+      return R;
      }
 
     void print(Stack<StringBuilder>S, int level)                                // Print leaf horizontally
@@ -1029,6 +1030,37 @@ class Btree extends Test                                                        
 """);
    }
 
+  static void test_split_branch_root()
+   {final Btree  t = new Btree(8, 8, 4, 4, 3, 8);
+    final Leaf   r = t.new Leaf(true);
+    r.push( 20, 12);
+    r.push( 40, 14);
+    r.push( 60, 16);
+    r.push( 80, 18);
+    //stop(t);
+    t.ok("""
+20,40,60,80=0 |
+""");
+    final Branch R = r.splitRoot();
+    final Leaf l2 = t.new Leaf();
+    l2.push( 100, 110);
+    l2.push( 120, 130);
+    final Leaf l3 = t.new Leaf();
+    l3.push( 140, 150);
+    l3.push( 160, 170);
+    R.push(t.new Key( 80), t.new Leaf(R.top()));
+    R.push(t.new Key(120), t.new Leaf(l2.index));
+    R.top(l3);
+    //stop(t);
+    t.ok("""
+        40        80           120          |
+        0         0.1          0.2          |
+        7         6            5            |
+                               4            |
+20,40=7   60,80=6    100,120=5    140,160=4 |
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_bits();
     test_find();
@@ -1038,7 +1070,7 @@ class Btree extends Test                                                        
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_split_leaf_root();
+    test_split_branch_root();
     //writeCoverage();
    }
 
