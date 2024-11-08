@@ -263,10 +263,15 @@ public class Test                                                               
      {final Object o = O[i];
       if (o == null) {b.append("(null)"); continue;}
       final String s = o.toString();
-      if (b.length() > 0 && s.length() > 0                &&
+
+      if (b.length() > 0 && s.length() > 0 && s.charAt(s.length()-1) == '\n')   // Print a string that has a new line at the end indocating it is vertially aligned
+       {b.append("\n"+s);
+       }
+
+      else if (b.length() > 0 && s.length() > 0           &&                    // Offset the next item from the previous item with a space unless a space has been provided
         !Character.isWhitespace(b.charAt(b.length() - 1)) &&
-        !Character.isWhitespace(s.charAt(0))) b.append(" ");
-      b.append(s);
+        !Character.isWhitespace(s.charAt(0))) b.append(" "+s);
+      else b.append(s);
      }
 
     if (sayThisOrStop.size() > 0)                                               // Convert the say into a stop if the expected message does not eventuate
