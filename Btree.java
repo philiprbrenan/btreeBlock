@@ -501,15 +501,16 @@ class Btree extends Test                                                        
       final int N = up.size();                                                  // Recreate the leaves with the key, data pairs packed in
       Leaf leaf = pushNewLeaf();                                                // First new leaf into branch
 
-say("AAAA 00", Key, leaf, "____________________________");
+say("AAAA 00", top(), leaf, "____________________________");
       for (int k = 0; k < N; k++)                                               // Repack the leaves
        {z();
         final KeyData source = up.elementAt(k);                                 // Source of repack
 say("AAAA 11", k, source);
         if (leaf.leafSize().equals(maxKeysPerLeaf))                             // Start a new leaf when the current one is full
          {z();
+say("AAAA 22aa", leaf, Btree.this);
           leaf = pushNewLeaf();                                                 // New leaf
-say("AAAA 22", leaf);
+say("AAAA 22bb", leaf, Btree.this);
          }
 
         leaf.keyData()[leaf.leafSize().asInt()] = new KeyData(source);          // Push current key, data pair into the current leaf
