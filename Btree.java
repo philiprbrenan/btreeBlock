@@ -497,32 +497,36 @@ class Btree extends Test                                                        
       if (!inserted)                                                            // Key is bigger than all existing keys
        {up.push(new KeyData(Key, Data));
        }
-say("AAAA", up);
 
       final int N = up.size();                                                  // Recreate the leaves with the key, data pairs packed in
       Leaf leaf = pushNewLeaf();                                                // First new leaf into branch
 
+say("AAAA 00", Key, leaf, "____________________________");
       for (int k = 0; k < N; k++)                                               // Repack the leaves
        {z();
         final KeyData source = up.elementAt(k);                                 // Source of repack
+say("AAAA 11", k, source);
         if (leaf.leafSize().equals(maxKeysPerLeaf))                             // Start a new leaf when the current one is full
          {z();
           leaf = pushNewLeaf();                                                 // New leaf
+say("AAAA 22", leaf);
          }
 
         leaf.keyData()[leaf.leafSize().asInt()] = new KeyData(source);          // Push current key, data pair into the current leaf
         leaf.incLeafSize();                                                     // Move up in leaf
+say("AAAA 33", leaf);
        }
 
       if (new Leaf(top()).leafSize().asInt() == 0)                              // The top leaf is empty so we replace it with the next top leaf
        {z();
+say("AAAA 44", new Leaf(top()));
         decBranchSize();                                                        // Pop the last key, next pair off the body of the parent branch
         top(new Leaf(keyNext()[branchSize().asInt()].next));                    // Place last next on top of parent branch
        }
 
       final int children = branchSize().asInt();                                // Update the keys in each key, next pair in the parent branch to one less than the lowest key in the next child leaf.
       final KeyNext[]Pkn = keyNext();
-      for(int b = 0; b < children-1; b++)                                       // Free all the existing branches except top which will always be there
+      for(int b = 0; b < children-1; b++)                                       // Fix keys
        {z();
         Pkn[b].key = new Key(new Leaf(kn[b+1].next).smallestKey().asInt()-1);  // A key smaller than any key in the next sibling leaf
        }
