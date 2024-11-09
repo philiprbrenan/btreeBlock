@@ -888,6 +888,7 @@ class Btree extends Test                                                        
        }
       stop("Search did not terminate in a leaf");
      }
+    Find(int Key) {this(new Key(Key));}                                         // From an integer
 
     Leaf      leaf() {z(); return new Leaf(leaf.next());}
     boolean  found() {z(); return leaf.found;}
@@ -1353,18 +1354,22 @@ class Btree extends Test                                                        
 """);
    }
 
-
-  static int[]random_array()                                                    // Random array
-   {final int[]r = {27, 442, 545, 317, 511, 578, 391, 993, 858, 586, 472, 906, 658, 704, 882, 246, 261, 501, 354, 903, 854, 279, 526, 686, 987, 403, 401, 989, 650, 576, 436, 560, 806, 554, 422, 298, 425, 912, 503, 611, 135, 447, 344, 338, 39, 804, 976, 186, 234, 106, 667, 494, 690, 480, 288, 151, 773, 769, 260, 809, 438, 237, 516, 29, 376, 72, 946, 103, 961, 55, 358, 232, 229, 90, 155, 657, 681, 43, 907, 564, 377, 615, 612, 157, 922, 272, 490, 679, 830, 839, 437, 826, 577, 937, 884, 13, 96, 273, 1, 188};
-    return r;
+  static class RandomArray                                                      // Random array
+   {final static int[]r = {27, 442, 545, 317, 511, 578, 391, 993, 858, 586, 472, 906, 658, 704, 882, 246, 261, 501, 354, 903, 854, 279, 526, 686, 987, 403, 401, 989, 650, 576, 436, 560, 806, 554, 422, 298, 425, 912, 503, 611, 135, 447, 344, 338, 39, 804, 976, 186, 234, 106, 667, 494, 690, 480, 288, 151, 773, 769, 260, 809, 438, 237, 516, 29, 376, 72, 946, 103, 961, 55, 358, 232, 229, 90, 155, 657, 681, 43, 907, 564, 377, 615, 612, 157, 922, 272, 490, 679, 830, 839, 437, 826, 577, 937, 884, 13, 96, 273, 1, 188};
+    final static TreeSet<Integer> present = new TreeSet<>();
+    static
+     {for (int i = 0; i < r.length; i++) present.add(r[i]);
+     }
+    boolean present(int i) {return present.contains(i);}
+    int     max()          {return present.last();}
    }
 
   static void test_put_random()                                                 // Load a BTree from random data
-   {final int[]r = random_array();
-    final int N = r.length;
+   {final RandomArray r = new RandomArray();
+    final int N = RandomArray.r.length;
     final Btree t = new Btree(16, 16, 16, 4, 3, N);
 
-    for (int i = 0; i < N; i++) t.put(r[i]);
+    for (int i = 0; i < N; i++) t.put(RandomArray.r[i]);
     //stop(t);
     t.ok("""
                                                                                                                                                                                                                     402                                                                                                                               577                                                                                                                                                                                                                      |
@@ -1381,6 +1386,15 @@ class Btree extends Test                                                        
                                                    11                                                                            19                                                          35                                                                 14                                                                 22                                                             20                                                                 13                                                                                     23                 |
 1,13,27,29=38   39,43,55,72=30     90,96,103,106=9     135=11    151,155,157,186=10    188,229,232,234=62     237,246,260,261=32     272,273=19     279,288,298,317=91    338,344,354,358=50     376,377,391,401=35    403,422,425,436=69    437,438,442,447=53     472,480,490,494=14    501,503,511,516=42    526,545,554,560=80     564,576,577=22    578,586,611,612=78    615,650,657,658=26     667,679,681,686=20    690,704,769,773=46    804,806,809,826=17     830,839,854=13     858,882,884,903=84    906,907,912,922=60     937,946,961,976=18     987,989,993=23 |
 """);
+
+    if (github_actions)
+     {final int M = r.max() + 1;
+      for (int i = 0; i < M; i++)
+       {final Find f = t.new Find(i);
+        ok(r.present(i), f.found());
+        if (f.found()) ok(i, f.data());
+       }
+     }
    }
 
 
