@@ -3,7 +3,9 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout a btree in a block on a silicon chip.
-
+// check memory is not leaking in btree
+// merge root branch into a leaf and show no memory loss
+// Make BKNIndex and LKDIndex extend a common class
 import java.util.*;
 
 class Btree extends Test                                                        // Manipulate a btree
@@ -123,6 +125,8 @@ class Btree extends Test                                                        
     BranchOrLeaf.State state() {z(); return nodes[index.asInt()].state;   }     // State of this memory
     LKDIndex        leafSize() {z(); return nodes[index.asInt()].leafSize;}     // Number of key, data pairs in leaf
     KeyData[]        keyData() {z(); return nodes[index.asInt()].keyData; }     // Key, data pairs in leaf
+
+    void setLeafSize(int size) {z(); leafSize().set(size);}                     //Set the size of the leaf
 
     public String toString()                                                    // Print leaf
      {final StringBuilder s = new StringBuilder();
@@ -357,6 +361,12 @@ class Btree extends Test                                                        
       return s.toString();
      }
 
+    Leaf makeIntoLeaf()                                                         // Transform this branch into leaf
+     {z();
+      nodes[index.asInt()].state = BranchOrLeaf.State.leaf;                     // Make this branch into a leaf
+      return new Leaf(index.asInt());                                           // Return leaf as a branch
+     }
+
     void push(Key Key, Leaf Leaf)                                               // Push a leaf into a branch
      {z();
       final int n = index.asInt(), i = branchSize().asInt();
@@ -535,6 +545,36 @@ class Btree extends Test                                                        
         Pkn[b].key = new Key(new Leaf(kn[b+1].next).smallestKey().asInt()-1);   // A key smaller than any key in the next sibling leaf
        }
       Pkn[children-1].key = new Key(new Leaf(top()).smallestKey().asInt()-1);   // A key smaller than any key in the leaf refernced by top in the parent
+     }
+
+    void repackLeavesIntoRoot()                                                 // Repack the keys in the leaves under the root into the root
+     {z();
+      final KeyNext[]kn = keyNext();                                            // Key, next pairs associated with the parent branch
+      final Stack<KeyData> up = new Stack<>();                                  // Save area for key, next pairs during repack
+      final int B = branchSize().asInt();                                       // Current size of parent branch
+      for  (int b = 0; b < B; b++)                                              // Unpack each leaf referenced
+       {z();
+        unpackLeaf(new Leaf(kn[b].next), up);                                   // Unpack leaf
+       }
+      unpackLeaf(new Leaf(top()), up);                                          // Unpack top
+
+      for  (int b = 0; b < B; b++)                                              // Free all the existing leaves
+       {z();
+        new Leaf(kn[b].next).freeLeaf();                                        // Free leaf
+       }
+      new Leaf(top()).freeLeaf();                                               // Free top
+
+      final Leaf leaf = makeIntoLeaf();                                         // Convert root to leaf
+      leaf.setLeafSize(up.size());                                              // Set size of leaf
+
+      final int N = up.size();                                                  // Recreate the leaves with the key, data pairs packed in
+      final KeyData[]kd = leaf.keyData();                                       // Key, data pairs
+      for (int k = 0; k < N; k++)                                               // Repack the leaves
+       {z();
+        final KeyData ukd = up.elementAt(k);                                    // Source of repack
+        kd[k].set(ukd.key);
+        kd[k].set(ukd.data);
+       }
      }
 
     void top(Next top)  {z(); nodes[index.asInt()].top = top;}                  // Set the top next reference for this branch
@@ -794,6 +834,7 @@ class Btree extends Test                                                        
     void dec()      {z(); if (i > 0)              --i; else stop("cannot decrement leaf index");}
     void zero()     {z(); i = 0;}
     boolean equals(int N) {z(); return i == N;}
+    void set(int I) {z(); i = I;}
     int asInt()     {return i;}
    }
 
@@ -1033,6 +1074,12 @@ class Btree extends Test                                                        
 
       if (isLeaf(n))                                                            // Found the containing leaf
        {z();
+        if (0 == parent.index.asInt())                                          // At the root, the root is a branch and the children are leaves
+         {if (parent.countChildLeafKeys() <= maxKeysPerLeaf)                    // Few enough key, data pairs to hold them in the root as a leaf
+           {parent.repackLeavesIntoRoot();
+            return;
+           }
+         }
         parent.repackLeaves();                                                  // Repack the leaves of this branch
         return;
        }
@@ -1456,6 +1503,28 @@ class Btree extends Test                                                        
            36              39                |
                            34                |
 1,2,7,8=36   9,10,11,12=39    13,14,15,16=34 |
+""");
+
+    ok(t.delete(t.new Key( 7)),  7);
+    ok(t.delete(t.new Key( 8)),  8);
+    ok(t.delete(t.new Key( 9)),  9);
+    ok(t.delete(t.new Key(10)), 10);
+    //stop(t);
+    t.ok("""
+             12               |
+             0                |
+             36               |
+             39               |
+1,2,11,12=36   13,14,15,16=39 |
+""");
+
+    ok(t.delete(t.new Key(11)), 11);
+    ok(t.delete(t.new Key(12)), 12);
+    ok(t.delete(t.new Key(13)), 13);
+    ok(t.delete(t.new Key(14)), 14);
+    //stop(t);
+    t.ok("""
+1,2,15,16=0 |
 """);
    }
 
