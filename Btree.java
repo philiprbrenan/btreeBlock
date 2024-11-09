@@ -55,7 +55,7 @@ class Btree extends Test                                                        
      {if (i > 0) freeList.push(new Next(i));
       nodes[i] = new BranchOrLeaf();
      }
-    nodes[0].setLeaf();                                                         // Start with the root as a leaf
+    nodes[0].state = BranchOrLeaf.State.leaf;                                   // Start with the root as a leaf
    }
 
 //D1 Control                                                                    // Testing and control
@@ -74,10 +74,6 @@ class Btree extends Test                                                        
     final KeyData[]   keyData = new KeyData[maxKeysPerLeaf];                    // Key, data pairs for when a leaf
     final KeyNext[]   keyNext = new KeyNext[maxKeysPerBranch];                  // Key, next pairs for when a branch
     Next                  top = new Next();                                     // Top next reference for when a branch
-    void setLeaf()     {z(); state = State.leaf;}
-    void setBranch()   {z(); state = State.branch;}
-    boolean isLeaf()   {z(); return state == State.leaf;}
-    boolean isBranch() {z(); return state == State.branch;}
 
     BranchOrLeaf()                                                              // Memory for branches and leaves
      {z();
@@ -124,9 +120,9 @@ class Btree extends Test                                                        
       freeList.push(index);
      }
 
-    BranchOrLeaf.State state() {z(); return nodes[index.asInt()].state;     }   // State of this memory
-    LKDIndex        leafSize() {z(); return nodes[index.asInt()].leafSize;  }   // Number of key, data pairs in leaf
-    KeyData[]        keyData() {z(); return nodes[index.asInt()].keyData;   }   // Key, data pairs in leaf
+    BranchOrLeaf.State state() {z(); return nodes[index.asInt()].state;   }     // State of this memory
+    LKDIndex        leafSize() {z(); return nodes[index.asInt()].leafSize;}     // Number of key, data pairs in leaf
+    KeyData[]        keyData() {z(); return nodes[index.asInt()].keyData; }     // Key, data pairs in leaf
 
     public String toString()                                                    // Print leaf
      {final StringBuilder s = new StringBuilder();
@@ -548,7 +544,7 @@ class Btree extends Test                                                        
       if (K > 0)                                                                // Branch has key, next pairs
        {for  (int i = 0; i < K; i++)
          {final int next = keyNext()[i].next.asInt();                           // Each key, next pair
-          if (nodes[next].isLeaf())
+          if (nodes[next].state == BranchOrLeaf.State.leaf)
            {final Leaf l = new Leaf(next);
             l.print(S, level+1);
            }
@@ -572,7 +568,7 @@ class Btree extends Test                                                        
        }
       final int top = top().asInt();                                            // Top next will always be present
       S.elementAt(L+3).append(top);                                             // Append top next
-      if (nodes[top].isLeaf())
+      if (nodes[top].state == BranchOrLeaf.State.leaf)
        {final Leaf l = new Leaf(top);
         l.print(S, level+1);
        }
@@ -736,8 +732,6 @@ class Btree extends Test                                                        
     Next next = new Next();                                                     // Next branch or leaf
     KeyNext() {z(); }
     KeyNext(Key Key, Next Next) {z(); set(Key); set(Next);}
-    KeyNext(KeyNext  KeyNext)   {this(KeyNext.key, KeyNext.next); z();}
-    void set(KeyNext source)    {z(); key = source.key; next = source.next;}
     void set(Key  Key)          {z(); key  = Key;}
     void set(Next Next)         {z(); next = Next;}
     public String toString() {return "KeyNext("+key+","+next+")";}
@@ -954,7 +948,7 @@ class Btree extends Test                                                        
 
   void put(int Key)                                                             // Put some test data into the tree
    {z();
-    put(new Key(Key), new Data(Key));
+    put(Key, Key);
    }
 
 // D1 Merge
@@ -1378,13 +1372,13 @@ class Btree extends Test                                                        
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    //writeCoverage();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
       testSummary();                                                            // Summarize test results
+      if (github_actions) coverageAnalysis(sourceFileName(), 12);               // Coverage analysis
       System.exit(testsFailed);
      }
     catch(Exception e)                                                          // Get a traceback in a format clickable in Geany
