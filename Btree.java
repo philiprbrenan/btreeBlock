@@ -721,7 +721,6 @@ class Btree extends Test                                                        
    {Key   key = new Key();                                                      // A key in a leaf
     Data data = new Data();                                                     // Data associated with the key
     KeyData ()                   {z(); }
-    KeyData (int Key, int  Data) {z(); intToBits(Key, key.key); intToBits(Data, data.data);}
     KeyData (Key Key, Data Data) {z(); set(Key); set(Data);}
     KeyData (KeyData  KeyData)   {this(KeyData.key, KeyData.data); z();}
     void set(KeyData source)     {z(); key.set(source.key); data.set(source.data);}
@@ -734,7 +733,6 @@ class Btree extends Test                                                        
    {Key   key = new Key();                                                      // A key in a branch
     Next next = new Next();                                                     // Next branch or leaf
     KeyNext() {z(); }
-    KeyNext(int Key, int Next)  {z(); intToBits(Key, key.key); intToBits(Next, next.next);}
     KeyNext(Key Key, Next Next) {z(); set(Key); set(Next);}
     KeyNext(KeyNext  KeyNext)   {this(KeyNext.key, KeyNext.next); z();}
     void set(KeyNext source)    {z(); key = source.key; next = source.next;}
