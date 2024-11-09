@@ -1392,7 +1392,7 @@ class Btree extends Test                                                        
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    writeCoverage();
+    //writeCoverage();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
