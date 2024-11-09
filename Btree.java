@@ -453,7 +453,7 @@ class Btree extends Test                                                        
        {z();
         final Leaf l = new Leaf(top());                                         // Return top as a leaf
         l.zeroLeafSize();
-        return l;                                                                 // Return top as a leaf
+        return l;                                                               // Return top as a leaf
        }
      }
 
@@ -874,7 +874,7 @@ class Btree extends Test                                                        
          {allFull = false;
           lastNotFull = parent;
          }
-        Branch.FindFirstGreaterThanOrEqual down =
+        final Branch.FindFirstGreaterThanOrEqual down =
           parent.new FindFirstGreaterThanOrEqual(Key);
         final Next n = down.next;
         if (isLeaf(n))                                                          // Found the containing leaf
@@ -888,6 +888,7 @@ class Btree extends Test                                                        
        }
       stop("Search did not terminate in a leaf");
      }
+
     Find(int Key) {this(new Key(Key));}                                         // From an integer
 
     Leaf      leaf() {z(); return new Leaf(leaf.next());}
@@ -921,7 +922,7 @@ class Btree extends Test                                                        
     boolean  success;                                                           // Inserted or updated if true
     boolean inserted;                                                           // Inserted if true
 
-    FindAndInsert(Key Key, Data Data)                                           // Findtheleaf that should contain this key and insert or update it is possible
+    FindAndInsert(Key Key, Data Data)                                           // Find the leaf that should contain this key and insert or update it is possible
      {super(Key);                                                               // Find the leaf that should contain this key
       z();
       key  = Key; data = Data;
@@ -960,7 +961,7 @@ class Btree extends Test                                                        
 
       if (parent == null)                                                       // No parent so we must have a full leaf as root
        {l.splitLeafRoot();                                                      // Split the full leaf root
-        parent = root();                                              // The root is no longer full
+        parent = root();                                                        // The root is no longer full
        }
 
       if (parent.countChildKeys() < maxKeysInLeaves)                            // Repackaging the leaves is possible
@@ -991,38 +992,48 @@ class Btree extends Test                                                        
 //D1 Insertion                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
 
   void put(Key Key, Data Data)                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
-   {final FindAndInsert f = new FindAndInsert(Key, Data);                       // Try direct insertion with no modifications to the shape of the tree
+   {z();
+    final FindAndInsert f = new FindAndInsert(Key, Data);                       // Try direct insertion with no modifications to the shape of the tree
     if (f.success) return;                                                      // Inserted or updated successfully
+    z();
     Branch p = f.lastNotFull;                                                   // Start the  insertion at the last not full branch in the path to the containing leaf
 
     if (f.allFull)                                                              // Start the insertion at the root, after splitting it, because all branches in the path to the leaf for this search were full
-     {splitRoot();                                                              // Split the root
+     {z();
+      splitRoot();                                                              // Split the root
       final Branch.FindFirstGreaterThanOrEqual                                  // Step down - from the root
         q = root().new FindFirstGreaterThanOrEqual(Key);
       p = new Branch(q.next);                                                   // Not full because we just split the root and this is one of the fragments but everything else is full so this must be the last not full on the search path of the key
      }
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-     {final Branch.FindFirstGreaterThanOrEqual                                  // Step down
+     {z();
+      final Branch.FindFirstGreaterThanOrEqual                                  // Step down
         q = p.new FindFirstGreaterThanOrEqual(Key);
       if (isLeaf(q.next))                                                       // Reached a leaf
-       {p.repackLeaves(Key, Data);                                              // Add the key, data pair: if it were already there findAndInsert would have already inserted it
+       {z();
+        p.repackLeaves(Key, Data);                                              // Add the key, data pair: if it were already there findAndInsert would have already inserted it
+        merge(Key);                                                             // Push the tree back together again along the path of the search
         return;
        }
+      z();
       p.splitChildOfBranch(q);                                                  // Split the child branch in the search path for the key from the parent so the the serach path does not contain a full branch above the containing leaf
       final Branch.FindFirstGreaterThanOrEqual                                  // Step down again as the repack will have altered the local layout
         r = p.new FindFirstGreaterThanOrEqual(Key);
       p = new Branch(r.next);                                                   // We are not on a leaf so continue down through the tree
      }
+    z();
     stop("Fallen of the end of the tree");                                      // The tree must be missing a leaf
    }
 
   void put(int Key, int Data)                                                   // Put some test data into the tree
-   {put(new Key(Key), new Data(Data));
+   {z();
+    put(new Key(Key), new Data(Data));
    }
 
   void put(int Key)                                                             // Put some test data into the tree
-   {put(new Key(Key), new Data(Key));
+   {z();
+    put(new Key(Key), new Data(Key));
    }
 
 //D1 Print                                                                      // Print a BTree horizontally
@@ -1095,6 +1106,65 @@ class Btree extends Test                                                        
    }
 
   static String printBit(boolean B) {z(); return B ? "1" : "n";}                // Print a bit
+
+// D1 Merge
+
+  void merge(Key Key)                                                           // Merge where possible along a path to a key
+   {z();
+    if (rootIsLeaf()) {z(); return;}                                            // Nothing to merge
+    z();
+    Branch parent = root();                                                     // Parent starts at root which is known to be a branch
+
+    for (int i = 0; i < maxDepth; i++)                                          // Step down through tree
+     {z();
+      final Branch.FindFirstGreaterThanOrEqual down =
+        parent.new FindFirstGreaterThanOrEqual(Key);
+      final Next n = down.next;
+      if (isLeaf(n)) {z(); return;}                                             // Found the containing leaf
+      z();
+      final int N = parent.branchSize().asInt();
+      final KeyNext[]Pkn = parent.keyNext();
+      final Stack<KeyNext> pkn = new Stack<>();                                 // Children of parent
+      for (int j = 0; j < N; j++)
+       {z();
+        pkn.push(Pkn[j]);
+       }
+      pkn.push(new KeyNext(null, parent.top()));                                // Add top next so we have all the children in one place
+
+      for (int b = pkn.size()-1; b > 0; b--)                                    // Merge children in body of parent
+       {z();
+        final Branch left  = new Branch(pkn.elementAt(b-1).next);
+        final Branch right = new Branch(pkn.elementAt(b-0).next);
+        final int L = left .branchSize().asInt(),
+                  R = right.branchSize().asInt(), P = L + 1 + R;
+        if (P <= maxKeysPerBranch)                                              // Can merge
+         {z();
+          final KeyNext[]lkn = left .keyNext();
+          final KeyNext[]rkn = right.keyNext();
+          final Stack<KeyNext> kn = new Stack<>();
+          for (int j = 0; j < L; j++) {z(); kn.push(lkn[j]);}                   // Left
+          kn.push(new KeyNext(pkn.elementAt(b-1).key, left.top()));             // Merge in splitting key
+          for (int j = 0; j < R; j++) {z(); kn.push(rkn[j]);}                   // Right
+          for (int j = 0; j < P; j++) {z(); rkn[j] = kn.elementAt(j);}          // Copy back combined body into right sibling
+          right.setBranchSize(P);
+          pkn.removeElementAt(b-1);                                             // Remove splitting key from parent
+         }
+       }
+      parent.top(pkn.pop().next);                                               // Remove top next
+      for (int b = 0; b < pkn.size(); b++)                                      // Reload parent body
+       {z();
+        Pkn[b] = pkn.elementAt(b);
+       }
+      parent.setBranchSize(pkn.size());                                         // Set parent size to match
+      final Branch.FindFirstGreaterThanOrEqual Down =
+        parent.new FindFirstGreaterThanOrEqual(Key);
+      parent = new Branch(Down.next);                                           // Step down
+     }
+    z();
+    stop("Fell off the end of the tree while merging along the search path of", Key);
+   }
+
+  void merge(int Key) {z(); merge(new Key(Key));}                               // Merge along search path of key
 
 //D0 Tests                                                                      // Testing
 
@@ -1316,19 +1386,19 @@ class Btree extends Test                                                        
     for (int i = 1; i <= N; i++) t.put(i);
     //stop(t);
     t.ok("""
-                                                         16                                                                  32                                                                                                                                          |
-                                                         0                                                                   0.1                                                                                                                                         |
-                                                         20                                                                  10                                                                                                                                          |
-                                                                                                                             19                                                                                                                                          |
-                        8                                                                  24                                                                   40                                48                                                                     |
-                        20                                                                 10                                                                   19                                19.1                                                                   |
-                        33                                                                 24                                                                   14                                9                                                                      |
-                        28                                                                 18                                                                                                     32                                                                     |
-           4                            12                                20                                28                                 36                                44                                 52               56                60                |
-           33                           28                                24                                18                                 14                                9                                  32               32.1              32.2              |
-           36                           31                                27                                23                                 17                                13                                 8                11                6                 |
-           39                           34                                29                                25                                 21                                15                                                                    7                 |
-1,2,3,4=36   5,6,7,8=39   9,10,11,12=31   13,14,15,16=34   17,18,19,20=27   21,22,23,24=29   25,26,27,28=23   29,30,31,32=25    33,34,35,36=17   37,38,39,40=21   41,42,43,44=13   45,46,47,48=15     49,50,51,52=8   53,54,55,56=11     57,58,59,60=6     61,62,63,64=7 |
+                                                                                                                                     32                                                                                                                                           |
+                                                                                                                                     0                                                                                                                                            |
+                                                                                                                                     12                                                                                                                                           |
+                                                                                                                                     11                                                                                                                                           |
+                                                             16                                                                                                                                              48                                                                   |
+                                                             12                                                                                                                                              11                                                                   |
+                                                             28                                                                                                                                              10                                                                   |
+                                                             20                                                                                                                                              32                                                                   |
+           4            8                 12                                  20               24                 28                                  36               40                 44                                 52               56                60                |
+           28           28.1              28.2                                20               20.1               20.2                                10               10.1               10.2                               32               32.1              32.2              |
+           36           39                31                                  27               29                 23                                  19               21                 15                                 9                13                7                 |
+                                          34                                                                      25                                                                      17                                                                    8                 |
+1,2,3,4=36   5,6,7,8=39     9,10,11,12=31     13,14,15,16=34   17,18,19,20=27   21,22,23,24=29     25,26,27,28=23     29,30,31,32=25   33,34,35,36=19   37,38,39,40=21     41,42,43,44=15     45,46,47,48=17   49,50,51,52=9   53,54,55,56=13     57,58,59,60=7     61,62,63,64=8 |
 """);
    }
 
@@ -1338,19 +1408,19 @@ class Btree extends Test                                                        
     for (int i = N; i > 0; --i) t.put(i);
     //stop(t);
     t.ok("""
-                                                                                                                            32                                                                  48                                                                   |
-                                                                                                                            0                                                                   0.1                                                                  |
-                                                                                                                            9                                                                   25                                                                   |
-                                                                                                                                                                                                24                                                                   |
-                                                       16                                24                                                                   40                                                                   56                                |
-                                                       9                                 9.1                                                                  25                                                                   24                                |
-                                                       8                                 16                                                                   32                                                                   47                                |
-                                                                                         23                                                                   39                                                                   46                                |
-          4          8                12                                20                                 28                                36                                44                                 52                                60               |
-          8          8.1              8.2                               16                                 23                                32                                39                                 47                                46               |
-          2          7                10                                17                                 26                                33                                40                                 48                                59               |
-                                      3                                 11                                 18                                27                                34                                 41                                49               |
-1,2,3,4=2  5,6,7,8=7    9,10,11,12=10    13,14,15,16=3   17,18,19,20=17   21,22,23,24=11    25,26,27,28=26   29,30,31,32=18   33,34,35,36=33   37,38,39,40=27   41,42,43,44=40   45,46,47,48=34    49,50,51,52=48   53,54,55,56=41   57,58,59,60=59   61,62,63,64=49 |
+                                                                                                                               32                                                                                                                                              |
+                                                                                                                               0                                                                                                                                               |
+                                                                                                                               11                                                                                                                                              |
+                                                                                                                               10                                                                                                                                              |
+                                                       16                                                                                                                                              48                                                                      |
+                                                       11                                                                                                                                              10                                                                      |
+                                                       9                                                                                                                                               39                                                                      |
+                                                       25                                                                                                                                              46                                                                      |
+          4          8                12                                20               24                 28                                  36               40                 44                                  52               56                 60                 |
+          9          9.1              9.2                               25               25.1               25.2                                39               39.1               39.2                                46               46.1               46.2               |
+          3          8                12                                19               13                 26                                  33               27                 40                                  48               41                 59                 |
+                                      4                                                                     20                                                                      34                                                                      49                 |
+1,2,3,4=3  5,6,7,8=8    9,10,11,12=12    13,14,15,16=4   17,18,19,20=19   21,22,23,24=13     25,26,27,28=26     29,30,31,32=20   33,34,35,36=33   37,38,39,40=27     41,42,43,44=40     45,46,47,48=34   49,50,51,52=48   53,54,55,56=41     57,58,59,60=59     61,62,63,64=49 |
 """);
    }
 
@@ -1372,22 +1442,22 @@ class Btree extends Test                                                        
     for (int i = 0; i < N; i++) t.put(RandomArray.r[i]);
     //stop(t);
     t.ok("""
-                                                                                                                                                                                                                    402                                                                                                                               577                                                                                                                                                                                                                      |
-                                                                                                                                                                                                                    0                                                                                                                                 0.1                                                                                                                                                                                                                      |
-                                                                                                                                                                                                                    34                                                                                                                                56                                                                                                                                                                                                                       |
-                                                                                                                                                                                                                                                                                                                                                      55                                                                                                                                                                                                                       |
-                                                              150                                                                               278                                                                                                                                    500                                                                                                                               689                                                            857                                                                                    |
-                                                              34                                                                                34.1                                                                                                                                   56                                                                                                                                55                                                             55.1                                                                                   |
-                                                              33                                                                                51                                                                                                                                     54                                                                                                                                27                                                             68                                                                                     |
-                                                                                                                                                77                                                                                                                                     90                                                                                                                                                                                               89                                                                                     |
-              38               89                  134                              187                   236                    271                                   337                   375                                          436                   471                                          525                   563                                      614                   666                                          803                   829                                       905                   936                    986                |
-              33               33.1                33.2                             51                    51.1                   51.2                                  77                    77.1                                         54                    54.1                                         90                    90.1                                     27                    27.1                                         68                    68.1                                      89                    89.1                   89.2               |
-              38               30                  9                                10                    62                     32                                    91                    50                                           69                    53                                           42                    80                                       78                    26                                           46                    17                                        84                    60                     18                 |
-                                                   11                                                                            19                                                          35                                                                 14                                                                 22                                                             20                                                                 13                                                                                     23                 |
-1,13,27,29=38   39,43,55,72=30     90,96,103,106=9     135=11    151,155,157,186=10    188,229,232,234=62     237,246,260,261=32     272,273=19     279,288,298,317=91    338,344,354,358=50     376,377,391,401=35    403,422,425,436=69    437,438,442,447=53     472,480,490,494=14    501,503,511,516=42    526,545,554,560=80     564,576,577=22    578,586,611,612=78    615,650,657,658=26     667,679,681,686=20    690,704,769,773=46    804,806,809,826=17     830,839,854=13     858,882,884,903=84    906,907,912,922=60     937,946,961,976=18     987,989,993=23 |
+                                                                                                                                                                                                                   402                                                                                                                               577                                                                                                                                                                                                                      |
+                                                                                                                                                                                                                   0                                                                                                                                 0.1                                                                                                                                                                                                                      |
+                                                                                                                                                                                                                   34                                                                                                                                27                                                                                                                                                                                                                       |
+                                                                                                                                                                                                                                                                                                                                                     55                                                                                                                                                                                                                       |
+                                                              150                                                                              278                                                                                                                                    500                                                                                                                               689                                                            857                                                                                    |
+                                                              34                                                                               34.1                                                                                                                                   27                                                                                                                                55                                                             55.1                                                                                   |
+                                                              33                                                                               51                                                                                                                                     54                                                                                                                                26                                                             68                                                                                     |
+                                                                                                                                               77                                                                                                                                     90                                                                                                                                                                                               89                                                                                     |
+              38               89                  134                             187                   236                    271                                   337                   375                                          436                   471                                          525                   563                                      614                   666                                          803                   829                                       905                   936                    986                |
+              33               33.1                33.2                            51                    51.1                   51.2                                  77                    77.1                                         54                    54.1                                         90                    90.1                                     26                    26.1                                         68                    68.1                                      89                    89.1                   89.2               |
+              38               30                  8                               9                     62                     32                                    91                    50                                           69                    53                                           42                    80                                       78                    25                                           46                    16                                        84                    60                     17                 |
+                                                   10                                                                           18                                                          35                                                                 13                                                                 21                                                             19                                                                 12                                                                                     22                 |
+1,13,27,29=38   39,43,55,72=30     90,96,103,106=8     135=10    151,155,157,186=9    188,229,232,234=62     237,246,260,261=32     272,273=18     279,288,298,317=91    338,344,354,358=50     376,377,391,401=35    403,422,425,436=69    437,438,442,447=53     472,480,490,494=13    501,503,511,516=42    526,545,554,560=80     564,576,577=21    578,586,611,612=78    615,650,657,658=25     667,679,681,686=19    690,704,769,773=46    804,806,809,826=16     830,839,854=12     858,882,884,903=84    906,907,912,922=60     937,946,961,976=17     987,989,993=22 |
 """);
 
-    if (github_actions)
+    if (true)                                                                   // Check we can find everything we should be able to find and cannot find the rest
      {final int M = r.max() + 1;
       for (int i = 0; i < M; i++)
        {final Find f = t.new Find(i);
@@ -1396,7 +1466,6 @@ class Btree extends Test                                                        
        }
      }
    }
-
 
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_bits();
@@ -1412,7 +1481,6 @@ class Btree extends Test                                                        
   static void newTests()                                                        // Tests being worked on
    {oldTests();
     //writeCoverage();
-    test_put_random();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
