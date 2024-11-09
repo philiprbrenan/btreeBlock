@@ -86,11 +86,11 @@ class Btree extends Test                                                        
      }
    }
 
-  void splitRoot()
-   {z();
-    if (rootIsLeaf()) {z(); new Leaf  (true).splitLeafRoot();}                  // Split the root branch or leaf
-    else              {z(); root().splitBranchRoot();}
-   }
+//  void splitRoot()
+//   {z();
+//    if (rootIsLeaf()) {z(); new Leaf  (true).splitLeafRoot();}                  // Split the root branch or leaf
+//    else              {z(); root().splitBranchRoot();}
+//   }
 
   class Leaf                                                                    // Describe a leaf
    {final Next index;                                                           // Index of the leaf
@@ -865,7 +865,6 @@ class Btree extends Test                                                        
     void dec()      {z(); if (i > 0)                --i; else stop("cannot decrement branch index");}
     void zero()     {z(); i = 0;}
     void set(int I) {z(); i = I;}
-    boolean equals(int N) {z(); return i == N;}
     int asInt() {return i;}
    }
 
@@ -910,7 +909,6 @@ class Btree extends Test                                                        
          }
         parent = new Branch(n);                                                 // Step down to lower branch
        }
-      z();
       stop("Search did not terminate in a leaf");
      }
 
@@ -1024,9 +1022,9 @@ class Btree extends Test                                                        
 
     if (f.allFull)                                                              // Start the insertion at the root, after splitting it, because all branches in the path to the leaf for this search were full
      {z();
-      splitRoot();                                                              // Split the root
+      root().splitBranchRoot();                                                 // The root must be a branch becuase all full is true
       final Branch.FindFirstGreaterThanOrEqual                                  // Step down - from the root
-        q = root().new FindFirstGreaterThanOrEqual(Key);
+      q = root().new FindFirstGreaterThanOrEqual(Key);
       p = new Branch(q.next);                                                   // Not full because we just split the root and this is one of the fragments but everything else is full so this must be the last not full on the search path of the key
      }
 
@@ -1046,7 +1044,6 @@ class Btree extends Test                                                        
         r = p.new FindFirstGreaterThanOrEqual(Key);
       p = new Branch(r.next);                                                   // We are not on a leaf so continue down through the tree
      }
-    z();
     stop("Fallen of the end of the tree");                                      // The tree must be missing a leaf
    }
 
@@ -1135,8 +1132,6 @@ class Btree extends Test                                                        
 
   void merge(Key Key)                                                           // Merge where possible along a path to a key
    {z();
-    if (rootIsLeaf()) {z(); return;}                                            // Nothing to merge
-    z();
     Branch parent = root();                                                     // Parent starts at root which is known to be a branch
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down through tree
@@ -1184,11 +1179,8 @@ class Btree extends Test                                                        
         parent.new FindFirstGreaterThanOrEqual(Key);
       parent = new Branch(Down.next);                                           // Step down
      }
-    z();
     stop("Fell off the end of the tree while merging along the search path of", Key);
    }
-
-  void merge(int Key) {z(); merge(new Key(Key));}                               // Merge along search path of key
 
 //D0 Tests                                                                      // Testing
 
@@ -1504,7 +1496,7 @@ class Btree extends Test                                                        
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    //writeCoverage();
+    writeCoverage();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
