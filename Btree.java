@@ -86,12 +86,6 @@ class Btree extends Test                                                        
      }
    }
 
-//  void splitRoot()
-//   {z();
-//    if (rootIsLeaf()) {z(); new Leaf  (true).splitLeafRoot();}                  // Split the root branch or leaf
-//    else              {z(); root().splitBranchRoot();}
-//   }
-
   class Leaf                                                                    // Describe a leaf
    {final Next index;                                                           // Index of the leaf
     Leaf()                                                                      // Get a leaf off the free list
@@ -338,13 +332,6 @@ class Btree extends Test                                                        
 
     void assertBranch()
      {if (state() != BranchOrLeaf.State.branch) stop("Not a branch at node:", index);
-     }
-
-    void freeBranch()                                                           // Free this branch
-     {z();
-      if (index.asInt() == 0) stop("Cannot free root as branch");
-      z();
-      freeList.push(index);
      }
 
     BranchOrLeaf.State state() {z(); return nodes[index.asInt()].state;     }
