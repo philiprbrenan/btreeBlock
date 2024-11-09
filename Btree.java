@@ -505,46 +505,6 @@ class Btree extends Test                                                        
 
     void top(Next top)  {z(); nodes[index.asInt()].top = top;}                  // Set the top next reference for this branch
 
-    class FindEqual                                                             // Find the first key in the branch that is equal to the search key
-     {final Key     search;                                                     // Search key
-      final boolean  found;                                                     // Whether the key was found
-      final BKNIndex first;                                                     // Index of first such key if found
-      final Next     next;                                                      // Next branch or leaf associated with this key if found
-
-      FindEqual(Key Search)                                                     // Find the first key in the branch that is equal to the search key
-       {z();
-        search = Search;
-        boolean looking = true;
-        final KeyNext[]kn = keyNext();
-        int i; for (i = 0; i < branchSize().asInt() && i < keyNext().length && looking; i++)
-         {z();
-          if (kn[i].key.equals(search))
-           {z();
-           looking = false;
-            break;
-           }
-         }
-        if (looking)
-         {z();
-          found = false;
-          first = null;
-          next  = null;
-         }
-        else
-         {z();
-          found = true;
-          first = new BKNIndex(i);
-          next  = keyNext()[i].next;
-         }
-       }
-      public String toString()
-       {final StringBuilder s = new StringBuilder();
-        s.append("Key:"+search+" found:"+printBit(found));
-        if (found) s.append(" first:"+first+" next:"+next);
-        return s.toString();
-       }
-     }
-
     class FindFirstGreaterThanOrEqual                                           // Find the first key in the branch that is equal to or greater than the search key
      {final Key     search;                                                     // Search key
       final boolean  found;                                                     // Whether the key was found
@@ -998,8 +958,7 @@ class Btree extends Test                                                        
    }
 
   void put(int Key, int Data)                                                   // Put some test data into the tree
-   {z();
-    put(new Key(Key), new Data(Data));
+   {put(new Key(Key), new Data(Data));
    }
 
   void put(int Key)                                                             // Put some test data into the tree
