@@ -440,13 +440,14 @@ class Btree extends Test                                                        
      }
 
     Leaf pushNewLeaf()                                                          // Create a new child leaf and push it onto the parent branch
-     {final int p = branchSize().asInt();                                       // Current size of branch
+     {final int       p = branchSize().asInt();                                 // Current size of branch
+      final KeyNext[]kn = keyNext();                                            // Key ], next pairs for this branch
       if (p < maxKeysPerBranch)                                                 // Room in the parent branch to push this new child leaf
        {z();
-        final Leaf leaf = new Leaf();                                           // New leaf
-        keyNext()[p].next = leaf.index;                                         // Push child leaf into parent branch
+        final Leaf l = new Leaf();                                              // New leaf
+        kn[p] = new KeyNext(new Key(0), l.index);                               // Push child leaf into parent branch
         incBranchSize();                                                        // New size of parent branch
-        return leaf;                                                            // Return leaf so created
+        return l;                                                               // Return leaf so created
        }
       else                                                                      // Reuse branch top because there is no more room in the parent branch
        {z();
@@ -501,26 +502,20 @@ class Btree extends Test                                                        
       final int N = up.size();                                                  // Recreate the leaves with the key, data pairs packed in
       Leaf leaf = pushNewLeaf();                                                // First new leaf into branch
 
-say("AAAA 00", top(), leaf, "____________________________");
       for (int k = 0; k < N; k++)                                               // Repack the leaves
        {z();
         final KeyData source = up.elementAt(k);                                 // Source of repack
-say("AAAA 11", k, source);
         if (leaf.leafSize().equals(maxKeysPerLeaf))                             // Start a new leaf when the current one is full
          {z();
-say("AAAA 22aa", leaf, Btree.this);
           leaf = pushNewLeaf();                                                 // New leaf
-say("AAAA 22bb", leaf, Btree.this);
          }
 
         leaf.keyData()[leaf.leafSize().asInt()] = new KeyData(source);          // Push current key, data pair into the current leaf
         leaf.incLeafSize();                                                     // Move up in leaf
-say("AAAA 33", leaf);
        }
 
       if (new Leaf(top()).leafSize().asInt() == 0)                              // The top leaf is empty so we replace it with the next top leaf
        {z();
-say("AAAA 44", new Leaf(top()));
         decBranchSize();                                                        // Pop the last key, next pair off the body of the parent branch
         top(new Leaf(keyNext()[branchSize().asInt()].next));                    // Place last next on top of parent branch
        }
@@ -544,99 +539,6 @@ say("AAAA 44", new Leaf(top()));
         up.push(ckn[l]);                                                        // Unpack the child into a stack of key, data pairs
        }
       up.push(new KeyNext(pkn.key, child.top()));                               // Unpack the top of the child using the key from the parent
-     }
-
-    void repackBranches(Key Key, Next Next)                                     // Repack the keys in the branches under the branch
-     {z();
-      final Branch    n = new Branch(Next);                                     // Branch being inserted
-      final KeyNext[]kn = keyNext();                                            // Key, next pairs associated with this branch
-      final Stack<KeyNext> up = new Stack<>();                                  // Save area for key, next pairs during repack
-      final  int B = branchSize().asInt();                                      // Current size of branch
-      for   (int b = 0; b < B; b++)                                             // Unpack each branch referenced
-       {z();
-        unpackBranch(kn[b], up);                                                // Unpack branch
-       }
-      final Key lastKey = new Branch(top()).lastKey();                          // Last key in top of last child
-      unpackBranch(new KeyNext(lastKey, top()), up);                            // Unpack top
-
-      for(int b = 0; b < B; b++)                                                // Free all the existing branches except top which will always be there
-       {z();
-        new Branch(kn[b].next).freeBranch();                                    // Free branch
-       }
-      new Branch(top()).zeroBranchSize();                                       // Clear branch referenced by top
-      zeroBranchSize();                                                         // Zero the size of this branch ready for repack of key, next pairs
-
-if (debug) say("RRRR 11 ", Key);
-      boolean inserted = false;                                                 // Whether we have suceeded in inserting the insertion key into the repack list
-      for (int i = 0; i < up.size(); i++)                                       // Insert the new key, data pair in the stack of key, data pairs awaiting repacking
-       {z();
-        if (up.elementAt(i).key.greaterThanOrEqual(Key))                        // Found insertion point
-         {z();
-          up.insertElementAt(new KeyNext(Key, n.top()), i);
-          final KeyNext[]ikn = n.keyNext();                                     // Key, next pairs in branch being inserted
-          final int        s = n.branchSize().asInt();
-          if (n.hasLeaves())                                                    // Pack leaves into branches
-           {for (int j = s; j > 0; j--)                                         // In reverse order to avoid disrupting the insertion point
-             {up.insertElementAt(ikn[j-1], i);
-             }
-           }
-          else                                                                  // Pack branches into branches
-           {for (int j = s; j > 0; j--)                                         // In reverse order to avoid disrupting the insertion point
-             {up.insertElementAt(ikn[j], i);
-             }
-           }
-          inserted = true;
-          break;
-         }
-       }
-      if (!inserted)
-       {inserted = true;
-       }
-if (debug) say("RRRR 22 ", inserted, up);
-
-      final int N = up.size();                                                  // Recreate the branches with the key, data pairs packed in
-      Branch branch = new Branch();                                             // First new branch into branch
-      final KeyNext[]pkn = keyNext();                                           // Children of parent branch that are being repacked
-      int p = 0;                                                                // Position in parent
-
-      for (int k = 0; k < N; k++)                                               // Repack the branches
-       {z();
-        final KeyNext source = up.elementAt(k);                                 // Source of repack
-        if (branch.branchSize().equals(maxKeysPerBranch))                       // Start a new branch when the current one is full
-         {z();
-          branch.top(source.next);                                              // Latest pair goes on top
-          pkn[p].set(source.key);
-          pkn[p].set(branch.index);
-          ++p;
-          incBranchSize();                                                      // Move up in branch
-          branch = new Branch();                                                // New branch
-         }
-        else                                                                    // Continue laoding existing branch
-         {branch.keyNext()[branch.branchSize().asInt()] = new KeyNext(source);  // Push current key, data pair into the current branch
-          branch.incBranchSize();                                               // Move up in branch
-         }
-       }
-      if (branch.branchSize().asInt() == 0)                                     // The proposed top branch is empty so we use the previously packed child branch as top
-       {z();
-        decBranchSize();                                                        // Pop the last key, next pair off the body of the parent branch
-        top(new Branch(keyNext()[branchSize().asInt()].next));                  // Place last next on top of parent branch
-       }
-      else
-       {z();
-        final KeyNext l = branch.keyNext()[branch.branchSize().asInt()-1];      // Last keyNext in branch
-        branch.decBranchSize();
-        branch.top(l.next);
-        top(branch);
-       }
-
-      final int children = branchSize().asInt();                                // Update the keys in each key, next pair to one less than the lowest key in the next child branch.  Although this is annoying it happens infrequently at higher levels in the tree. The pay off is we get a more compact tree.
-      final KeyNext[]Pkn = keyNext();
-      for(int b = 0; b < children-1; b++)                                       // Free all the existing branches except top which will always be there
-       {z();
-        Pkn[b].key = new Key(new Branch(pkn[b+1].next).smallestKey().asInt()-1);// A key smaller than any key in the next sibling branch
-       }
-      final Key smallest = new Key(new Branch(top()).smallestKey().asInt()-1);  // A key smaller than any key in the top branch
-      Pkn[children-1].key = smallest;
      }
 
     void top(Next top)  {z(); nodes[index.asInt()].top = top;}                  // Set the top next reference for this branch
@@ -1118,7 +1020,6 @@ if (debug) say("RRRR 22 ", inserted, up);
       final Branch.FindFirstGreaterThanOrEqual                                  // Step down again as the repack will have altered the local layout
         r = p.new FindFirstGreaterThanOrEqual(Key);
       p = new Branch(r.next);                                                   // We are not on a leaf so continue down through the tree
-say("AAAA", Btree.this);
      }
     stop("Fallen of the end of the tree");                                      // The tree must be missing a leaf
    }
@@ -1414,114 +1315,29 @@ say("AAAA", Btree.this);
     final Leaf ir = t.new Leaf();
     ir.push( 96, 97);
     ir.push( 98, 99);
+   }
 
-    final Branch i  = t.new Branch();
-    i.push(t.new Key(95), il);
-    i.top(ir);
-    R.repackBranches(t.new Key(95), i.index);
+  static void test_put_ascending()
+   {final Btree  t = new Btree(8, 8, 8, 4, 3, 40);
+    final int N = 64;
+    for (int i = 1; i <= N; i++)
+     {t.put(i, i);
+     }
     //stop(t);
     t.ok("""
-                                            99                         |
-                                            0                          |
-                                            11                         |
-                                            6                          |
-         40         80          95                       120           |
-         11         11.1        11.2                     6             |
-         15         14          9                        13            |
-                                8                        12            |
-20,40=15   60,80=14     90,92=9     96,98=8   100,120=13    140,160=12 |
-""");
-   }
-
-  static void test_put_ascending4()
-   {final Btree  t = new Btree(8, 8, 4, 4, 3, 16);
-    final int N = 4;
-    for (int i = 1; i <= N; i++)
-     {t.put(i, i);
-     }
-
-   //stop(t);
-    t.ok("""
-1,2,3,4=0 |
-""");
-   }
-
-  static void test_put_ascending8()
-   {final Btree  t = new Btree(8, 8, 4, 4, 3, 16);
-    final int N = 8;
-    for (int i = 1; i <= N; i++)
-     {t.put(i, i);
-     }
-
-   //stop(t);
-    t.ok("""
-           4            |
-           0            |
-           15           |
-           13           |
-1,2,3,4=15   5,6,7,8=13 |
-""");
-   }
-
-  static void test_put_ascending16()
-   {final Btree  t = new Btree(8, 8, 4, 4, 3, 16);
-    final int N = 16;
-    for (int i = 1; i <= N; i++)
-     {t.put(i, i);
-     }
-
-   //stop(t);
-    t.ok("""
-           4            8                12                |
-           0            0.1              0.2               |
-           12           15               10                |
-                                         11                |
-1,2,3,4=12   5,6,7,8=15    9,10,11,12=10    13,14,15,16=11 |
-""");
-   }
-
-  static void test_put_ascending32()
-   {final Btree  t = new Btree(8, 8, 5, 4, 3, 20);
-    final int N = 32;
-    for (int i = 1; i <= N; i++)
-     {t.put(i, i);
-     }
-
-   //stop(t);
-   t.ok("""
-                                                             16                                                                |
-                                                             0                                                                 |
-                                                             12                                                                |
-                                                             6                                                                 |
-           4            8                 12                                 20              24               28               |
-           12           12.1              12.2                               6               6.1              6.2              |
-           16           19                10                                 5               8                3                |
-                                          14                                                                  4                |
-1,2,3,4=16   5,6,7,8=19     9,10,11,12=10     13,14,15,16=14   17,18,19,20=5   21,22,23,24=8    25,26,27,28=3    29,30,31,32=4 |
-""");
-   }
-
-  static void test_put_ascending64()
-   {final Btree  t = new Btree(8, 8, 8, 4, 3, 40);
-    final int N = 24;
-    for (int i = 1; i <= N; i++)
-     {t.put(i, i);
-     }
-   say("Before put 25", t);
-   debug = true;
-   t.put(25);
-
-   stop("After put 25", t);
-   t.ok("""
-                                                             16                                                                |
-                                                             0                                                                 |
-                                                             12                                                                |
-                                                             6                                                                 |
-           4            8                 12                                 20              24               28               |
-           12           12.1              12.2                               6               6.1              6.2              |
-           16           19                10                                 5               8                3                |
-                                          14                                                                  4                |
-1,2,3,4=16   5,6,7,8=19     9,10,11,12=10     13,14,15,16=14   17,18,19,20=5   21,22,23,24=8    25,26,27,28=3    29,30,31,32=4 |
+                                                         16                                                                  32                                                                                                                                          |
+                                                         0                                                                   0.1                                                                                                                                         |
+                                                         20                                                                  10                                                                                                                                          |
+                                                                                                                             19                                                                                                                                          |
+                        8                                                                  24                                                                   40                                48                                                                     |
+                        20                                                                 10                                                                   19                                19.1                                                                   |
+                        33                                                                 24                                                                   14                                9                                                                      |
+                        28                                                                 18                                                                                                     32                                                                     |
+           4                            12                                20                                28                                 36                                44                                 52               56                60                |
+           33                           28                                24                                18                                 14                                9                                  32               32.1              32.2              |
+           36                           31                                27                                23                                 17                                13                                 8                11                6                 |
+           39                           34                                29                                25                                 21                                15                                                                    7                 |
+1,2,3,4=36   5,6,7,8=39   9,10,11,12=31   13,14,15,16=34   17,18,19,20=27   21,22,23,24=29   25,26,27,28=23   29,30,31,32=25    33,34,35,36=17   37,38,39,40=21   41,42,43,44=13   45,46,47,48=15     49,50,51,52=8   53,54,55,56=11     57,58,59,60=6     61,62,63,64=7 |
 """);
    }
 
@@ -1531,15 +1347,11 @@ say("AAAA", Btree.this);
     test_find_and_insert();
     test_split_leaf_root();
     test_split_branch_root();
-    test_put_ascending4();
-    test_put_ascending8();
-    test_put_ascending16();
-    test_put_ascending32();
+    test_put_ascending();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_put_ascending64();
+   {oldTests();
     //writeCoverage();
    }
 
