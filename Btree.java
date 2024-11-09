@@ -522,12 +522,11 @@ class Btree extends Test                                                        
     void repackLeaves()                                                         // Repack the keys in the leaves under the parent branch
      {z();
       final UnpackLeaves   ul = new UnpackLeaves();                             // Unpack the leaves under this branch
-      final Stack<KeyData> up = ul.up;                                          // Save area for key, next pairs during repack
 
       new Leaf(top()).zeroLeafSize();                                           // Clear leaf referenced by top
       zeroBranchSize();                                                         // Zero the size of this branch ready for repack of key, next pairs
 
-      repackLeaves(up, ul.kn);                                                  // Repack the key, data pairs into leaves under the current branch
+      repackLeaves(ul.up, ul.kn);                                               // Repack the key, data pairs into leaves under the current branch
      }
 
     void repackLeavesIntoRoot()                                                 // Repack the keys in the leaves under the root into the root
