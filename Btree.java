@@ -436,21 +436,68 @@ class Btree extends Test                                                        
        }
      }
 
+    class UnpackLeaves                                                          // Unpack the leaves
+     {final KeyNext    []  kn;                                                  // Key, next pairs associated with the parent branch
+      final Stack<KeyData> up;                                                  // Save area for key, next pairs during repack
+      final int B;                                                              // Current size of parent branch
+
+      UnpackLeaves()                                                            // Unpack the keys in the leaves under the parent branch
+       {z();
+        kn = keyNext();                                                         // Key, next pairs associated with the parent branch
+        up = new Stack<>();                                                     // Save area for key, next pairs during repack
+         B = branchSize().asInt();                                              // Current size of parent branch
+        for  (int b = 0; b < B; b++)                                            // Unpack each leaf referenced
+         {z();
+          unpackLeaf(new Leaf(kn[b].next), up);                                 // Unpack leaf
+         }
+        unpackLeaf(new Leaf(top()), up);                                        // Unpack top
+
+        for  (int b = 0; b < B; b++)                                            // Free all the existing leaves except top which will always be there
+         {z();
+          new Leaf(kn[b].next).freeLeaf();                                      // Free leaf
+         }
+        new Leaf(top()).zeroLeafSize();                                         // Clear leaf referenced by top
+       }
+     }
+
+    void repackLeaves(Stack<KeyData>up, KeyNext[]kn)                            // Repack the key, data pairs into leaves under the current branch
+     {final int N = up.size();                                                  // Recreate the leaves with the key, data pairs packed in
+      Leaf leaf = pushNewLeaf();                                                // First new leaf into branch
+
+      for (int k = 0; k < N; k++)                                               // Repack the leaves
+       {z();
+        final KeyData source = up.elementAt(k);                                 // Source of repack
+        if (leaf.leafSize().equals(maxKeysPerLeaf))                             // Start a new leaf when the current one is full
+         {z();
+          leaf = pushNewLeaf();                                                 // New leaf
+         }
+
+        leaf.keyData()[leaf.leafSize().asInt()] = new KeyData(source);          // Push current key, data pair into the current leaf
+        leaf.incLeafSize();                                                     // Move up in leaf
+       }
+
+      if (new Leaf(top()).leafSize().asInt() == 0)                              // The top leaf is empty so we replace it with the next top leaf
+       {z();
+        decBranchSize();                                                        // Pop the last key, next pair off the body of the parent branch
+        top(new Leaf(keyNext()[branchSize().asInt()].next));                    // Place last next on top of parent branch
+       }
+
+      final int children = branchSize().asInt();                                // Update the keys in each key, next pair in the parent branch to one less than the lowest key in the next child leaf.
+      final KeyNext[]Pkn = keyNext();
+
+      for(int b = 0; b < children-1; b++)                                       // Fix keys in parent
+       {z();
+        Pkn[b].key = new Key(new Leaf(kn[b+1].next).smallestKey().asInt()-1);   // A key smaller than any key in the next sibling leaf
+       }
+
+      Pkn[children-1].key = new Key(new Leaf(top()).smallestKey().asInt()-1);   // A key smaller than any key in the leaf refernced by top in the parent
+     }
+
     void repackLeaves(Key Key, Data Data)                                       // Repack the keys in the leaves under the parent branch
      {z();
-      final KeyNext[]kn = keyNext();                                            // Key, next pairs associated with the parent branch
-      final Stack<KeyData> up = new Stack<>();                                  // Save area for key, next pairs during repack
-      final int B = branchSize().asInt();                                       // Current size of parent branch
-      for  (int b = 0; b < B; b++)                                              // Unpack each leaf referenced
-       {z();
-        unpackLeaf(new Leaf(kn[b].next), up);                                   // Unpack leaf
-       }
-      unpackLeaf(new Leaf(top()), up);                                          // Unpack top
+      final UnpackLeaves   ul = new UnpackLeaves();                             // Unpack the leaves under this branch
+      final Stack<KeyData> up = ul.up;                                          // Save area for key, next pairs during repack
 
-      for  (int b = 0; b < B; b++)                                              // Free all the existing leaves except top which will always be there
-       {z();
-        new Leaf(kn[b].next).freeLeaf();                                        // Free leaf
-       }
       new Leaf(top()).zeroLeafSize();                                           // Clear leaf referenced by top
       zeroBranchSize();                                                         // Zero the size of this branch ready for repack of key, next pairs
 
@@ -469,99 +516,25 @@ class Btree extends Test                                                        
         up.push(new KeyData(Key, Data));
        }
 
-      final int N = up.size();                                                  // Recreate the leaves with the key, data pairs packed in
-      Leaf leaf = pushNewLeaf();                                                // First new leaf into branch
-
-      for (int k = 0; k < N; k++)                                               // Repack the leaves
-       {z();
-        final KeyData source = up.elementAt(k);                                 // Source of repack
-        if (leaf.leafSize().equals(maxKeysPerLeaf))                             // Start a new leaf when the current one is full
-         {z();
-          leaf = pushNewLeaf();                                                 // New leaf
-         }
-
-        leaf.keyData()[leaf.leafSize().asInt()] = new KeyData(source);          // Push current key, data pair into the current leaf
-        leaf.incLeafSize();                                                     // Move up in leaf
-       }
-
-      if (new Leaf(top()).leafSize().asInt() == 0)                              // The top leaf is empty so we replace it with the next top leaf
-       {z();
-        decBranchSize();                                                        // Pop the last key, next pair off the body of the parent branch
-        top(new Leaf(keyNext()[branchSize().asInt()].next));                    // Place last next on top of parent branch
-       }
-
-      final int children = branchSize().asInt();                                // Update the keys in each key, next pair in the parent branch to one less than the lowest key in the next child leaf.
-      final KeyNext[]Pkn = keyNext();
-      for(int b = 0; b < children-1; b++)                                       // Fix keys
-       {z();
-        Pkn[b].key = new Key(new Leaf(kn[b+1].next).smallestKey().asInt()-1);   // A key smaller than any key in the next sibling leaf
-       }
-      Pkn[children-1].key = new Key(new Leaf(top()).smallestKey().asInt()-1);   // A key smaller than any key in the leaf refernced by top in the parent
+      repackLeaves(up, ul.kn);                                                  // Repack the key, data pairs into leaves under the current branch
      }
 
     void repackLeaves()                                                         // Repack the keys in the leaves under the parent branch
      {z();
-      final KeyNext[]kn = keyNext();                                            // Key, next pairs associated with the parent branch
-      final Stack<KeyData> up = new Stack<>();                                  // Save area for key, next pairs during repack
-      final int B = branchSize().asInt();                                       // Current size of parent branch
-      for  (int b = 0; b < B; b++)                                              // Unpack each leaf referenced
-       {z();
-        unpackLeaf(new Leaf(kn[b].next), up);                                   // Unpack leaf
-       }
-      unpackLeaf(new Leaf(top()), up);                                          // Unpack top
+      final UnpackLeaves   ul = new UnpackLeaves();                             // Unpack the leaves under this branch
+      final Stack<KeyData> up = ul.up;                                          // Save area for key, next pairs during repack
 
-      for  (int b = 0; b < B; b++)                                              // Free all the existing leaves except top which will always be there
-       {z();
-        new Leaf(kn[b].next).freeLeaf();                                        // Free leaf
-       }
       new Leaf(top()).zeroLeafSize();                                           // Clear leaf referenced by top
       zeroBranchSize();                                                         // Zero the size of this branch ready for repack of key, next pairs
 
-      final int N = up.size();                                                  // Recreate the leaves with the key, data pairs packed in
-      Leaf leaf = pushNewLeaf();                                                // First new leaf into branch
-
-      for (int k = 0; k < N; k++)                                               // Repack the leaves
-       {z();
-        final KeyData source = up.elementAt(k);                                 // Source of repack
-        if (leaf.leafSize().equals(maxKeysPerLeaf))                             // Start a new leaf when the current one is full
-         {z();
-          leaf = pushNewLeaf();                                                 // New leaf
-         }
-
-        leaf.keyData()[leaf.leafSize().asInt()] = new KeyData(source);          // Push current key, data pair into the current leaf
-        leaf.incLeafSize();                                                     // Move up in leaf
-       }
-
-      if (new Leaf(top()).leafSize().asInt() == 0)                              // The top leaf is empty so we replace it with the next top leaf
-       {z();
-        decBranchSize();                                                        // Pop the last key, next pair off the body of the parent branch
-        top(new Leaf(keyNext()[branchSize().asInt()].next));                    // Place last next on top of parent branch
-       }
-
-      final int children = branchSize().asInt();                                // Update the keys in each key, next pair in the parent branch to one less than the lowest key in the next child leaf.
-      final KeyNext[]Pkn = keyNext();
-      for(int b = 0; b < children-1; b++)                                       // Fix keys
-       {z();
-        Pkn[b].key = new Key(new Leaf(kn[b+1].next).smallestKey().asInt()-1);   // A key smaller than any key in the next sibling leaf
-       }
-      Pkn[children-1].key = new Key(new Leaf(top()).smallestKey().asInt()-1);   // A key smaller than any key in the leaf refernced by top in the parent
+      repackLeaves(up, ul.kn);                                                  // Repack the key, data pairs into leaves under the current branch
      }
 
     void repackLeavesIntoRoot()                                                 // Repack the keys in the leaves under the root into the root
      {z();
-      final KeyNext[]kn = keyNext();                                            // Key, next pairs associated with the parent branch
-      final Stack<KeyData> up = new Stack<>();                                  // Save area for key, next pairs during repack
-      final int B = branchSize().asInt();                                       // Current size of parent branch
-      for  (int b = 0; b < B; b++)                                              // Unpack each leaf referenced
-       {z();
-        unpackLeaf(new Leaf(kn[b].next), up);                                   // Unpack leaf
-       }
-      unpackLeaf(new Leaf(top()), up);                                          // Unpack top
+      final UnpackLeaves   ul = new UnpackLeaves();                             // Unpack the leaves under this branch
+      final Stack<KeyData> up = ul.up;                                          // Save area for key, next pairs during repack
 
-      for  (int b = 0; b < B; b++)                                              // Free all the existing leaves
-       {z();
-        new Leaf(kn[b].next).freeLeaf();                                        // Free leaf
-       }
       new Leaf(top()).freeLeaf();                                               // Free top
 
       final Leaf leaf = makeIntoLeaf();                                         // Convert root to leaf
