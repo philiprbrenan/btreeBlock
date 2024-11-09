@@ -1123,44 +1123,25 @@ class Btree extends Test                                                        
                    5             |
 2,4,6,8=7  10,12=6    14,16,18=5 |
 """);
-    Find f1 = t.find(t.new Key( 1));
-    Find f2 = t.find(t.new Key( 2));
-    Find f3 = t.find(t.new Key( 3));
-    Find f4 = t.find(t.new Key( 4));
-    Find f5 = t.find(t.new Key( 5));
-    Find f6 = t.find(t.new Key( 6));
-    Find f7 = t.find(t.new Key( 7));
-    Find f8 = t.find(t.new Key( 8));
-    Find f9 = t.find(t.new Key( 9));
-    Find fa = t.find(t.new Key(10));
-    Find fb = t.find(t.new Key(11));
-    Find fc = t.find(t.new Key(12));
-    Find fd = t.find(t.new Key(13));
-    Find fe = t.find(t.new Key(14));
-    Find ff = t.find(t.new Key(15));
-    Find fg = t.find(t.new Key(16));
-    Find fh = t.find(t.new Key(17));
-    Find fj = t.find(t.new Key(18));
-    Find fk = t.find(t.new Key(19));
-    ok(f1, "search:1 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(f2, "search:2 leaf:7 rootIsLeaf:n parent:0 found:1 data:12 index:0 allFull:n lastNotFull:0");
-    ok(f3, "search:3 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(f4, "search:4 leaf:7 rootIsLeaf:n parent:0 found:1 data:14 index:1 allFull:n lastNotFull:0");
-    ok(f5, "search:5 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(f6, "search:6 leaf:7 rootIsLeaf:n parent:0 found:1 data:16 index:2 allFull:n lastNotFull:0");
-    ok(f7, "search:7 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(f8, "search:8 leaf:7 rootIsLeaf:n parent:0 found:1 data:18 index:3 allFull:n lastNotFull:0");
-    ok(f9, "search:9 leaf:6 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(fa, "search:10 leaf:6 rootIsLeaf:n parent:0 found:1 data:20 index:0 allFull:n lastNotFull:0");
-    ok(fb, "search:11 leaf:6 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(fc, "search:12 leaf:6 rootIsLeaf:n parent:0 found:1 data:22 index:1 allFull:n lastNotFull:0");
-    ok(fd, "search:13 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(fe, "search:14 leaf:5 rootIsLeaf:n parent:0 found:1 data:24 index:0 allFull:n lastNotFull:0");
-    ok(ff, "search:15 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(fg, "search:16 leaf:5 rootIsLeaf:n parent:0 found:1 data:26 index:1 allFull:n lastNotFull:0");
-    ok(fh, "search:17 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(fj, "search:18 leaf:5 rootIsLeaf:n parent:0 found:1 data:28 index:2 allFull:n lastNotFull:0");
-    ok(fk, "search:19 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 1)), "search:1 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 2)), "search:2 leaf:7 rootIsLeaf:n parent:0 found:1 data:12 index:0 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 3)), "search:3 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 4)), "search:4 leaf:7 rootIsLeaf:n parent:0 found:1 data:14 index:1 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 5)), "search:5 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 6)), "search:6 leaf:7 rootIsLeaf:n parent:0 found:1 data:16 index:2 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 7)), "search:7 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 8)), "search:8 leaf:7 rootIsLeaf:n parent:0 found:1 data:18 index:3 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 9)), "search:9 leaf:6 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(10)), "search:10 leaf:6 rootIsLeaf:n parent:0 found:1 data:20 index:0 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(11)), "search:11 leaf:6 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(12)), "search:12 leaf:6 rootIsLeaf:n parent:0 found:1 data:22 index:1 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(13)), "search:13 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(14)), "search:14 leaf:5 rootIsLeaf:n parent:0 found:1 data:24 index:0 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(15)), "search:15 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(16)), "search:16 leaf:5 rootIsLeaf:n parent:0 found:1 data:26 index:1 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(17)), "search:17 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(18)), "search:18 leaf:5 rootIsLeaf:n parent:0 found:1 data:28 index:2 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(19)), "search:19 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
    }
 
   static void test_find_and_insert()
