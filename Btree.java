@@ -724,7 +724,7 @@ class Btree extends Test                                                        
 
       if (gte.found)                                                            // Insert in body of parent
        {final int I = gte.first.asInt();
-        for (int i = branchSize().asInt() - 1; i > I; i--)
+        for (int i = branchSize().asInt(); i > I; i--)
          {pkn[i] = pkn[i-1];
          }
         pkn[I] = new KeyNext(split.key, left.index);                            // Insert a key, next pair into the parent
@@ -913,14 +913,6 @@ class Btree extends Test                                                        
    }
 
   Find find(Key Key) {z(); return new Find(Key);}
-
-/*
-          8        12            |
-          0        0.1           |
-          3        2             |
-                   1             |
-2,4,6,8=3  10,12=2    14,16,18=1 |
-*/
 
   class FindAndInsert extends Find                                              // Insert the specified key and data into the tree if there is room in the target leaf,or update the key with the data if the key already exists
    {Key         key;                                                            // Key to insert
@@ -1184,7 +1176,7 @@ class Btree extends Test                                                        
    }
 
   static void test_find_and_insert()
-   {final Btree  t = test_small_tree();
+   {final Btree t = test_small_tree();
     //t.stop();
     t.ok("""
           8        12            |
@@ -1243,8 +1235,8 @@ class Btree extends Test                                                        
    }
 
   static void test_split_leaf_root()
-   {final Btree  t = new Btree(8, 8, 4, 4, 3, 8);
-    final Leaf   l = t.new Leaf(true);
+   {final Btree t = new Btree(8, 8, 4, 4, 3, 8);
+    final Leaf  l = t.new Leaf(true);
     l.push( 2, 12);
     l.push( 4, 14);
     l.push( 6, 16);
@@ -1266,8 +1258,8 @@ class Btree extends Test                                                        
    }
 
   static void test_split_branch_root()
-   {final Btree  t = new Btree(8, 8, 4, 4, 3,16);
-    final Leaf   r = t.new Leaf(true);
+   {final Btree t = new Btree(8, 8, 4, 4, 3,16);
+    final Leaf  r = t.new Leaf(true);
     r.push( 20, 12);
     r.push( 40, 14);
     r.push( 60, 16);
@@ -1318,11 +1310,9 @@ class Btree extends Test                                                        
    }
 
   static void test_put_ascending()
-   {final Btree  t = new Btree(8, 8, 8, 4, 3, 40);
+   {final Btree t = new Btree(8, 8, 8, 4, 3, 40);
     final int N = 64;
-    for (int i = 1; i <= N; i++)
-     {t.put(i, i);
-     }
+    for (int i = 1; i <= N; i++) t.put(i);
     //stop(t);
     t.ok("""
                                                          16                                                                  32                                                                                                                                          |
@@ -1341,6 +1331,59 @@ class Btree extends Test                                                        
 """);
    }
 
+  static void test_put_descending()
+   {final Btree t = new Btree(8, 8, 8, 4, 3, 60);
+    final int N = 64;
+    for (int i = N; i > 0; --i) t.put(i);
+    //stop(t);
+    t.ok("""
+                                                                                                                            32                                                                  48                                                                   |
+                                                                                                                            0                                                                   0.1                                                                  |
+                                                                                                                            9                                                                   25                                                                   |
+                                                                                                                                                                                                24                                                                   |
+                                                       16                                24                                                                   40                                                                   56                                |
+                                                       9                                 9.1                                                                  25                                                                   24                                |
+                                                       8                                 16                                                                   32                                                                   47                                |
+                                                                                         23                                                                   39                                                                   46                                |
+          4          8                12                                20                                 28                                36                                44                                 52                                60               |
+          8          8.1              8.2                               16                                 23                                32                                39                                 47                                46               |
+          2          7                10                                17                                 26                                33                                40                                 48                                59               |
+                                      3                                 11                                 18                                27                                34                                 41                                49               |
+1,2,3,4=2  5,6,7,8=7    9,10,11,12=10    13,14,15,16=3   17,18,19,20=17   21,22,23,24=11    25,26,27,28=26   29,30,31,32=18   33,34,35,36=33   37,38,39,40=27   41,42,43,44=40   45,46,47,48=34    49,50,51,52=48   53,54,55,56=41   57,58,59,60=59   61,62,63,64=49 |
+""");
+   }
+
+
+  static int[]random_array()                                                    // Random array
+   {final int[]r = {27, 442, 545, 317, 511, 578, 391, 993, 858, 586, 472, 906, 658, 704, 882, 246, 261, 501, 354, 903, 854, 279, 526, 686, 987, 403, 401, 989, 650, 576, 436, 560, 806, 554, 422, 298, 425, 912, 503, 611, 135, 447, 344, 338, 39, 804, 976, 186, 234, 106, 667, 494, 690, 480, 288, 151, 773, 769, 260, 809, 438, 237, 516, 29, 376, 72, 946, 103, 961, 55, 358, 232, 229, 90, 155, 657, 681, 43, 907, 564, 377, 615, 612, 157, 922, 272, 490, 679, 830, 839, 437, 826, 577, 937, 884, 13, 96, 273, 1, 188};
+    return r;
+   }
+
+  static void test_put_random()                                                 // Load a BTree from random data
+   {final int[]r = random_array();
+    final int N = r.length;
+    final Btree t = new Btree(16, 16, 16, 4, 3, N);
+
+    for (int i = 0; i < N; i++) t.put(r[i]);
+    //stop(t);
+    t.ok("""
+                                                                                                                                                                                                                    402                                                                                                                               577                                                                                                                                                                                                                      |
+                                                                                                                                                                                                                    0                                                                                                                                 0.1                                                                                                                                                                                                                      |
+                                                                                                                                                                                                                    34                                                                                                                                56                                                                                                                                                                                                                       |
+                                                                                                                                                                                                                                                                                                                                                      55                                                                                                                                                                                                                       |
+                                                              150                                                                               278                                                                                                                                    500                                                                                                                               689                                                            857                                                                                    |
+                                                              34                                                                                34.1                                                                                                                                   56                                                                                                                                55                                                             55.1                                                                                   |
+                                                              33                                                                                51                                                                                                                                     54                                                                                                                                27                                                             68                                                                                     |
+                                                                                                                                                77                                                                                                                                     90                                                                                                                                                                                               89                                                                                     |
+              38               89                  134                              187                   236                    271                                   337                   375                                          436                   471                                          525                   563                                      614                   666                                          803                   829                                       905                   936                    986                |
+              33               33.1                33.2                             51                    51.1                   51.2                                  77                    77.1                                         54                    54.1                                         90                    90.1                                     27                    27.1                                         68                    68.1                                      89                    89.1                   89.2               |
+              38               30                  9                                10                    62                     32                                    91                    50                                           69                    53                                           42                    80                                       78                    26                                           46                    17                                        84                    60                     18                 |
+                                                   11                                                                            19                                                          35                                                                 14                                                                 22                                                             20                                                                 13                                                                                     23                 |
+1,13,27,29=38   39,43,55,72=30     90,96,103,106=9     135=11    151,155,157,186=10    188,229,232,234=62     237,246,260,261=32     272,273=19     279,288,298,317=91    338,344,354,358=50     376,377,391,401=35    403,422,425,436=69    437,438,442,447=53     472,480,490,494=14    501,503,511,516=42    526,545,554,560=80     564,576,577=22    578,586,611,612=78    615,650,657,658=26     667,679,681,686=20    690,704,769,773=46    804,806,809,826=17     830,839,854=13     858,882,884,903=84    906,907,912,922=60     937,946,961,976=18     987,989,993=23 |
+""");
+   }
+
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_bits();
     test_find();
@@ -1348,11 +1391,14 @@ class Btree extends Test                                                        
     test_split_leaf_root();
     test_split_branch_root();
     test_put_ascending();
+    test_put_descending();
+    test_put_random();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
     //writeCoverage();
+    test_put_random();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
