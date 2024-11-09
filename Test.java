@@ -267,7 +267,7 @@ public class Test                                                               
       say(String.format(f+"  %6s  %4s", "Most Executed", "Count", "Line"));
       for (int i = 1; i <= top; i++)
        {final LineCount l = lc.elementAt(i-1);
-        say(String.format(f+"  %6d  %4d\n", l.line, l.count, i));
+        say(String.format(f+"  %6d  %4d", l.line, l.count, i));
        }
      }
    }
