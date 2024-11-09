@@ -1036,6 +1036,8 @@ class Btree extends Test                                                        
 
   void merge(Key Key)                                                           // Merge where possible along a path to a key
    {z();
+    if (rootIsLeaf()) return;                                                   // Only works on a branch
+    z();
     Branch parent = root();                                                     // Parent starts at root which is known to be a branch
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down through tree
@@ -1497,6 +1499,20 @@ class Btree extends Test                                                        
     //stop(t);
     t.ok("""
 1,2,15,16=0 |
+""");
+
+    ok(t.delete(t.new Key( 2)),  2);
+    ok(t.delete(t.new Key(15)), 15);
+    ok(t.delete(t.new Key(16)), 16);
+    //stop(t);
+    t.ok("""
+1=0 |
+""");
+
+    ok(t.delete(t.new Key( 1)),  1);
+    //stop(t);
+    t.ok("""
+=0 |
 """);
    }
 
