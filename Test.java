@@ -214,10 +214,10 @@ public class Test                                                               
 //D2 Coverage                                                                   // Analyze code coverage
 
   static final TreeMap<String, Integer> coverage = new TreeMap<>();             // Count of how many times each line has been executed
-  static final TreeSet<Integer> executed         = new TreeSet<>();             // Which lines have been executed
+  static final TreeSet<        Integer> executed = new TreeSet<>();             // Which lines have been executed
 
   static void z()                                                               // A line that is being executed
-   {final String s = callerFileAndLine2();
+   {final String s = callerFileAndLine2();                                      // File method line
     final int l = Integer.parseInt(s.split("\s")[2]);                           // Line number
     executed.add(l);                                                            // Line numbers executed
     Integer c = coverage.get(s);
@@ -230,13 +230,12 @@ public class Test                                                               
     LineCount(String Line, int Count) {line = Line; count = Count;}
    }
 
-  static void printMostExecuted(Stack<LineCount> stack, String line, int n)     // Print a most frequently executed subroutine
+  static void printMostExecuted(Stack<LineCount> stack, String line, int n)     // Print a most frequently executed subroutine as in: 9843 Btree.java leafSize 0124
    {final String[]s = line.split("\\s");
     stack.push(new LineCount(String.format("%s:%s:%s", s[0], s[2], s[1]), n));
-//   9843 Btree.java leafSize 0124
    }
 
-  static void coverageAnalysis(String source, int top)                          // Coverage analysis
+  static void coverageAnalysis(String source, int top)                          // Coverage analysis: unexecuted lines and lines most frequently executed in a Geany clickable format
    {final Stack<String> sourceLines = readFile(source);
     final Stack<String> notExecuted = new Stack<>();
 
@@ -249,23 +248,22 @@ public class Test                                                               
     if (notExecuted.size() > 0)                                                 // Lines not executed
      {say("Not executed");
       for (int i = 1; i <= notExecuted.size(); i++)                             // Not executed lines as a table
-       {final String line = notExecuted.elementAt(i-1);
-        say(line);
+       {say(notExecuted.elementAt(i-1));
        }
      }
 
     if (top > 0)                                                                // Most frequently executed
-     {Stack<LineCount> lc = new Stack<>();
-
-      coverage.entrySet().stream()                                              // Most frequently executed lines
+     {final Stack<LineCount> lc = new Stack<>();                                // Lines executed most frequqntly
+      coverage.entrySet().stream()                                              // Find most frequently executed lines
        .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))              // Sort by value in descending order
        .limit(top)                                                              // Take the most frequent elements
        .forEach(e -> printMostExecuted(lc, e.getKey(), e.getValue()));          // Print each entry
 
-      int w = 0; for (LineCount l: lc) w = max(w, l.line.length());             // Maximum width of line executed
+      int w = 0; for (LineCount l: lc) w = max(w, l.line.length());             // Maximum width of line executed specification
       final String f = "%-" + w + "s";
       say(String.format(f+"  %6s  %4s", "Most Executed", "Count", "#"));
-      for (int i = 1; i <= top; i++)
+
+      for (int i = 1; i <= top; i++)                                            // Print lines executed most frequently
        {final LineCount l = lc.elementAt(i-1);
         say(String.format(f+"  %6d  %4d", l.line, l.count, i));
        }
@@ -331,7 +329,6 @@ public class Test                                                               
           act+" length("+act.length()+")\n"+
           exp+" length("+exp.length()+")\n");
        }
-//    else --testsFailed;                                                       // the fialing test did not actually fail becuase we got the message we expected
      }
 
     else if (b.length() > 0) System.err.println(b.toString());
