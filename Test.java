@@ -264,7 +264,7 @@ public class Test                                                               
 
       int w = 0; for (LineCount l: lc) w = max(w, l.line.length());             // Maximum width of line executed
       final String f = "%-" + w + "s";
-      say(String.format(f+"  %6s  %4s", "Most Executed", "Count", "Line"));
+      say(String.format(f+"  %6s  %4s", "Most Executed", "Count", "#"));
       for (int i = 1; i <= top; i++)
        {final LineCount l = lc.elementAt(i-1);
         say(String.format(f+"  %6d  %4d", l.line, l.count, i));
