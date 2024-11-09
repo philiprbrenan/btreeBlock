@@ -1378,7 +1378,7 @@ class Btree extends Test                                                        
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
       testSummary();                                                            // Summarize test results
-      if (github_actions) coverageAnalysis(sourceFileName(), 12);               // Coverage analysis
+      if (github_actions) {} coverageAnalysis(sourceFileName(), 12);               // Coverage analysis
       System.exit(testsFailed);
      }
     catch(Exception e)                                                          // Get a traceback in a format clickable in Geany
