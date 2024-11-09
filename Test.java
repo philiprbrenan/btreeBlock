@@ -5,7 +5,6 @@
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout digital a binary tree on a silicon chip.
 
 import java.io.*;
-import java.nio.file.*;
 import java.util.*;
 
 //D1 Construct                                                                  // Develop and test a java program
