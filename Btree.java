@@ -489,6 +489,54 @@ class Btree extends Test                                                        
       Pkn[children-1].key = new Key(new Leaf(top()).smallestKey().asInt()-1);   // A key smaller than any key in the leaf refernced by top in the parent
      }
 
+    void repackLeaves()                                                         // Repack the keys in the leaves under the parent branch
+     {z();
+      final KeyNext[]kn = keyNext();                                            // Key, next pairs associated with the parent branch
+      final Stack<KeyData> up = new Stack<>();                                  // Save area for key, next pairs during repack
+      final int B = branchSize().asInt();                                       // Current size of parent branch
+      for  (int b = 0; b < B; b++)                                              // Unpack each leaf referenced
+       {z();
+        unpackLeaf(new Leaf(kn[b].next), up);                                   // Unpack leaf
+       }
+      unpackLeaf(new Leaf(top()), up);                                          // Unpack top
+
+      for  (int b = 0; b < B; b++)                                              // Free all the existing leaves except top which will always be there
+       {z();
+        new Leaf(kn[b].next).freeLeaf();                                        // Free leaf
+       }
+      new Leaf(top()).zeroLeafSize();                                           // Clear leaf referenced by top
+      zeroBranchSize();                                                         // Zero the size of this branch ready for repack of key, next pairs
+
+      final int N = up.size();                                                  // Recreate the leaves with the key, data pairs packed in
+      Leaf leaf = pushNewLeaf();                                                // First new leaf into branch
+
+      for (int k = 0; k < N; k++)                                               // Repack the leaves
+       {z();
+        final KeyData source = up.elementAt(k);                                 // Source of repack
+        if (leaf.leafSize().equals(maxKeysPerLeaf))                             // Start a new leaf when the current one is full
+         {z();
+          leaf = pushNewLeaf();                                                 // New leaf
+         }
+
+        leaf.keyData()[leaf.leafSize().asInt()] = new KeyData(source);          // Push current key, data pair into the current leaf
+        leaf.incLeafSize();                                                     // Move up in leaf
+       }
+
+      if (new Leaf(top()).leafSize().asInt() == 0)                              // The top leaf is empty so we replace it with the next top leaf
+       {z();
+        decBranchSize();                                                        // Pop the last key, next pair off the body of the parent branch
+        top(new Leaf(keyNext()[branchSize().asInt()].next));                    // Place last next on top of parent branch
+       }
+
+      final int children = branchSize().asInt();                                // Update the keys in each key, next pair in the parent branch to one less than the lowest key in the next child leaf.
+      final KeyNext[]Pkn = keyNext();
+      for(int b = 0; b < children-1; b++)                                       // Fix keys
+       {z();
+        Pkn[b].key = new Key(new Leaf(kn[b+1].next).smallestKey().asInt()-1);   // A key smaller than any key in the next sibling leaf
+       }
+      Pkn[children-1].key = new Key(new Leaf(top()).smallestKey().asInt()-1);   // A key smaller than any key in the leaf refernced by top in the parent
+     }
+
     void top(Next top)  {z(); nodes[index.asInt()].top = top;}                  // Set the top next reference for this branch
 
     class FindFirstGreaterThanOrEqual                                           // Find the first key in the branch that is equal to or greater than the search key
@@ -782,7 +830,7 @@ class Btree extends Test                                                        
        }
 
       parent  = root();                                                         // Parent starts at root which is known to be a branch
-      allFull = true;
+      allFull = true;                                                           // Assume that all branches are full until we discover otherwise
 
       for (int i = 0; i < maxDepth; i++)                                        // Step down through tree
        {z();
@@ -951,6 +999,26 @@ class Btree extends Test                                                        
     put(Key, Key);
    }
 
+//D1 Deletion                                                                   // Delete a key, data pair from the tree
+
+  Data delete(Key Key)                                                          // Delete a key from the tree and returnsd is data if present
+   {z();
+    final Find f = new Find(Key);                                               // Try direct insertion with no modifications to the shape of the tree
+    if (!f.found()) return null;                                                // Inserted or updated successfully
+    z();
+    final Leaf l = f.leaf();
+    final int  N = l.leafSize().asInt(), p = f.index().asInt();
+    final KeyData[]kd = l.keyData();
+    final Data   data = kd[p].data;
+    for (int i = p; i < N-1; ++i)
+     {z();
+      kd[i] = kd[i+1];
+     }
+    l.decLeafSize();
+    merge(Key);
+    return data;
+   }
+
 // D1 Merge
 
   void merge(Key Key)                                                           // Merge where possible along a path to a key
@@ -962,8 +1030,14 @@ class Btree extends Test                                                        
       final Branch.FindFirstGreaterThanOrEqual down =
         parent.new FindFirstGreaterThanOrEqual(Key);
       final Next n = down.next;
-      if (isLeaf(n)) {z(); return;}                                             // Found the containing leaf
-      z();
+
+      if (isLeaf(n))                                                            // Found the containing leaf
+       {z();
+        parent.repackLeaves();                                                  // Repack the leaves of this branch
+        return;
+       }
+
+      z();                                                                      // Branch in the path of the search for the key
       final int N = parent.branchSize().asInt();
       final KeyNext[]Pkn = parent.keyNext();
       final Stack<KeyNext> pkn = new Stack<>();                                 // Children of parent
@@ -1359,6 +1433,32 @@ class Btree extends Test                                                        
      }
    }
 
+  static void test_delete()
+   {final Btree t = new Btree(8, 8, 8, 4, 3, 40);
+    final int N = 16;
+    for (int i = 1; i <= N; i++) t.put(i);
+    //stop(t);
+    t.ok("""
+           4            8                12                |
+           0            0.1              0.2               |
+           36           39               34                |
+                                         35                |
+1,2,3,4=36   5,6,7,8=39    9,10,11,12=34    13,14,15,16=35 |
+""");
+    ok(t.delete(t.new Key(4)), 4);
+    ok(t.delete(t.new Key(3)), 3);
+    ok(t.delete(t.new Key(5)), 5);
+    ok(t.delete(t.new Key(6)), 6);
+    //stop(t);
+    t.ok("""
+           8               12                |
+           0               0.1               |
+           36              39                |
+                           34                |
+1,2,7,8=36   9,10,11,12=39    13,14,15,16=34 |
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_bits();
     test_find();
@@ -1371,7 +1471,8 @@ class Btree extends Test                                                        
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_delete();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
