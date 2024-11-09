@@ -251,6 +251,7 @@ public class Test                                                               
        {say(notExecuted.elementAt(i-1));
        }
      }
+    else say("All lines executed");                                             // All lines were executed
 
     if (top > 0)                                                                // Most frequently executed
      {final Stack<LineCount> lc = new Stack<>();                                // Lines executed most frequqntly
