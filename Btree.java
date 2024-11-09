@@ -387,27 +387,16 @@ class Btree extends Test                                                        
     void top(Leaf   Leaf)   {z(); nodes[index.asInt()].top = Leaf.index;}       // Set top to refer to a leaf
     void top(Branch Branch) {z(); nodes[index.asInt()].top = Branch.index;}     // Set top to refer to a leaf
 
-    int countChildKeys()                                                        // Find the number of keys in the immediate children of this branch
+    int countChildLeafKeys()                                                    // Find the number of keys in the immediate children of this branch
      {z();
       final KeyNext[]kn = keyNext();
       final int N = branchSize().asInt();
       int       C = 0;
-      if (isLeaf(top()))
+      for (int i = 0; i < N; i++)
        {z();
-        for (int i = 0; i < N; i++)
-         {z();
-          C += new Leaf(kn[i].next).leafSize().asInt();
-         }
-        C += new Leaf(top()).leafSize().asInt();
+        C += new Leaf(kn[i].next).leafSize().asInt();
        }
-      else
-       {z();
-        for (int i = 0; i < N; i++)
-         {z();
-          C += new Branch(kn[i].next).branchSize().asInt();
-         }
-        C += new Branch(top()).branchSize().asInt();
-       }
+      C += new Leaf(top()).leafSize().asInt();
       return C;
      }
 
@@ -897,7 +886,7 @@ class Btree extends Test                                                        
         parent = root();                                                        // The root is no longer full
        }
 
-      if (parent.countChildKeys() < maxKeysInLeaves)                            // Repackaging the leaves is possible
+      if (parent.countChildLeafKeys() < maxKeysInLeaves)                        // Repackaging the leaves is possible
        {z();
         parent.repackLeaves(Key, Data);
         success = true;
@@ -1205,7 +1194,7 @@ class Btree extends Test                                                        
                       5             |
 2,4,6,8=7  10,11,12=6    14,16,18=5 |
 """);
-    ok(t.root().countChildKeys(), 10);
+    ok(t.root().countChildLeafKeys(), 10);
 
     FindAndInsert fi19 = t.findAndInsert(t.new Key(19), t.new Data(19));        // Insert directly into a leaf
     //t.stop();
@@ -1216,7 +1205,7 @@ class Btree extends Test                                                        
                       5                |
 2,4,6,8=7  10,11,12=6    14,16,18,19=5 |
 """);
-    ok(t.root().countChildKeys(), 11);
+    ok(t.root().countChildLeafKeys(), 11);
 
     FindAndInsert fi5 = t.findAndInsert(t.new Key(5), t.new Data(5));           // Insert by repacking
     //t.stop();
@@ -1227,7 +1216,7 @@ class Btree extends Test                                                        
                         4                |
 2,4,5,6=6  8,10,11,12=7    14,16,18,19=4 |
 """);
-    ok(t.root().countChildKeys(), 12);
+    ok(t.root().countChildLeafKeys(), 12);
    }
 
   static void test_split_leaf_root()
