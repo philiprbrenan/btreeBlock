@@ -406,21 +406,6 @@ class Btree extends Test                                                        
     void top(Leaf   Leaf)   {z(); nodes[index.asInt()].top = Leaf.index;}       // Set top to refer to a leaf
     void top(Branch Branch) {z(); nodes[index.asInt()].top = Branch.index;}     // Set top to refer to a leaf
 
-    Key smallestKey()                                                           // Find the smallest key under a branch
-     {z();
-      Next p = index;
-      for (int i = 0; i < maxDepth; i++)
-       {z();
-        if (isLeaf(p)) break;
-        z();
-        final Branch b = new Branch(p);
-        final KeyNext[]kn = b.keyNext();
-        final int       N = b.branchSize().asInt();
-        p = N == 0 ? b.top() : kn[0].next;
-       }
-      return new Leaf(p).smallestKey();
-     }
-
     int countChildKeys()                                                        // Find the number of keys in the immediate children of this branch
      {z();
       final KeyNext[]kn = keyNext();
@@ -535,18 +520,6 @@ class Btree extends Test                                                        
         Pkn[b].key = new Key(new Leaf(kn[b+1].next).smallestKey().asInt()-1);  // A key smaller than any key in the next sibling leaf
        }
       Pkn[children-1].key = new Key(new Leaf(top()).smallestKey().asInt()-1);   // A key smaller than any key in the leaf refernced by top in the parent
-     }
-
-    void unpackBranch(KeyNext pkn, Stack<KeyNext> up)                           // Unpack a branch referenced by a key, next pair from the parent branch
-     {z();
-      final Branch child = new Branch(pkn.next);                                // Branch to unpack
-      final KeyNext[]ckn = child.keyNext();                                     // Key, next pairs in branch
-      final int L = child.branchSize().asInt();                                 // Size of child
-      for (int l = 0; l < L; l++)                                               // Unpack each key, next pair in the child
-       {z();
-        up.push(ckn[l]);                                                        // Unpack the child into a stack of key, data pairs
-       }
-      up.push(new KeyNext(pkn.key, child.top()));                               // Unpack the top of the child using the key from the parent
      }
 
     void top(Next top)  {z(); nodes[index.asInt()].top = top;}                  // Set the top next reference for this branch
@@ -774,9 +747,6 @@ class Btree extends Test                                                        
   boolean rootIsLeaf()    {z(); return nodes[0] .state == BranchOrLeaf.State.leaf;}  // Root is a leaf
   boolean isLeaf(int  bl) {z(); return nodes[bl].state == BranchOrLeaf.State.leaf;}  // Indexed branch or leaf is a leaf
   boolean isLeaf(Next bl) {z(); return isLeaf(bl.asInt());}                          // Indexed branch or leaf is a leaf
-  boolean isFull(int bl)                                                        // Whether branch of leaf is full
-   {z(); return isLeaf(bl) ? new Leaf(bl).isFull() : new Branch(bl).isFull();
-   }
 
   class Key                                                                     // A key in a leaf or a branch
    {final boolean[] key = new boolean[bitsPerKey];                              // A key is composed of bits
@@ -813,7 +783,6 @@ class Btree extends Test                                                        
       z();
       intToBits(n, next);
      }
-    boolean equals(Next that) {z(); return asInt() == that.asInt();}
     int asInt()               {return bitsToInt(next);}
     public String toString()  {z(); return ""+bitsToInt(next);}
    }
