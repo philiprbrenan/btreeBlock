@@ -373,12 +373,6 @@ class Btree extends Test                                                        
       return s.toString();
      }
 
-    Branch makeIntoLeaf()
-     {z();
-      nodes[index.asInt()].state = BranchOrLeaf.State.leaf;
-      return new Branch(index.asInt());
-     }
-
     void push(Key Key, Leaf Leaf)
      {z();
       final int n = index.asInt(), i = branchSize().asInt();
