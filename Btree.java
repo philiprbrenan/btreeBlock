@@ -3,7 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout a btree in a block on a silicon chip.
-// Rename Next to Index
+
 import java.util.*;
 
 class Btree extends Test                                                        // Manipulate a btree
@@ -71,10 +71,10 @@ class Btree extends Test                                                        
 
     for (int i = 0; i < treeSize; i++)                                          // Make sure that all allocated branches and leaves that are accessible from the root of the tree
      {BranchOrLeaf n = nodes[i];
-      if      (n.state == BranchOrLeaf.State.leaf)                              // Leaf
+      if      (n.state.leaf())                                                  // Leaf
        {if (!s.contains(i)) stop("Floating leaf", i);
        }
-      else if (n.state == BranchOrLeaf.State.branch)                            // Branch
+      else if (n.state.branch())                                                // Branch
        {if (!s.contains(i)) stop("Floating branch", i);
        }
       else                                                                      // Free or never used
@@ -91,10 +91,10 @@ class Btree extends Test                                                        
    }
 
   void active(Set<Integer> s, int index)                                        // Active branches and leaves
-   {if (nodes[index].state == BranchOrLeaf.State.leaf)                          // Add leaf
+   {if (nodes[index].state.leaf())                                              // Add leaf
      {s.add(index);
      }
-    else if (nodes[index].state == BranchOrLeaf.State.branch)                   // Add branch and its children
+    else if (nodes[index].state.branch())                                       // Add branch and its children
      {s.add(index);
       final Branch    B = new Branch(index);
       final int       N = B.branchSize().asInt();
@@ -118,7 +118,13 @@ class Btree extends Test                                                        
 //D1 Components                                                                 // A branch or leaf in the tree
 
   class BranchOrLeaf                                                            // A branch or leaf in a btree
-   {enum State {leaf, branch, free, neverUsed};                                 // The current state of the branch or leaf: as a leaf, as a branch or free waiting for use
+   {enum State                                                                  // The current state of the branch or leaf: as a leaf, as a branch or free waiting for use
+     {leaf, branch, free, neverUsed;
+      boolean leaf     () {return this == leaf;}
+      boolean branch   () {return this == branch;}
+      boolean free     () {return this == free;}
+      boolean neverUsed() {return this == neverUsed;}
+     }
     State               state;                                                  // Whether this branch or leaf is a branch, a leaf or free
     final LKDIndex   leafSize = new LKDIndex();                                 // Number of key, data pairs currently contained in leafif a leaf
     final BKNIndex branchSize = new BKNIndex();                                 // Number of key, next pairs currently contained in branch if a branch
@@ -155,14 +161,14 @@ class Btree extends Test                                                        
      }
     Leaf(boolean root)                                                          // Access the root as a leaf
      {z();
-      if (nodes[0].state != BranchOrLeaf.State.leaf) stop("Root is not a leaf");
+      if (!nodes[0].state.leaf()) stop("Root is not a leaf");
       z();
       index = new Next(0);
      }
 
     void assertLeaf()                                                           // Confirm that we are on a leaf
      {z();
-      if (state() != BranchOrLeaf.State.leaf) stop("Not a leaf at node:", index);
+      if (!state().leaf()) stop("Not a leaf at node:", index);
      }
 
     void freeLeaf()                                                             // Free this leaf
@@ -251,7 +257,7 @@ class Btree extends Test                                                        
 
       FindEqual(Key Search)                                                     // Find the first key in the leaf that is equal to the search key
        {z();
-        if (state() != BranchOrLeaf.State.leaf) stop("Leaf required, not", state());
+        if (!state().leaf()) stop("Leaf required, not", state());
         z();
         search = Search;
         boolean looking = true;
@@ -296,7 +302,7 @@ class Btree extends Test                                                        
       final LKDIndex first;                                                     // Index of first such key if found
       FindFirstGreaterThanOrEqual(Key Search)                                   // Find the first key in the  leaf that is equal to or greater than the search key
        {z();
-        if (state() != BranchOrLeaf.State.leaf) stop("Leaf required, not", state());
+        if (!state().leaf()) stop("Leaf required, not", state());
         z();
         search = Search;
         boolean looking = true;
@@ -332,7 +338,7 @@ class Btree extends Test                                                        
 
     Branch splitLeafRoot()                                                      // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
      {z();
-      if (state() != BranchOrLeaf.State.leaf) stop("Leaf required, not", state());
+      if (!state().leaf()) stop("Leaf required, not", state());
       z();
       if (index.asInt() != 0) stop("Not root, but", index);
       final KeyData[]kd = keyData();
@@ -390,7 +396,7 @@ class Btree extends Test                                                        
      }
     Branch(boolean root)                                                        // The root is always zero
      {z();
-      if (nodes[0].state != BranchOrLeaf.State.branch) stop("Root is not a branch");
+      if (!nodes[0].state.branch()) stop("Root is not a branch");
       z();
       index = new Next(0);
      }
@@ -406,7 +412,7 @@ class Btree extends Test                                                        
      }
 
     void assertBranch()
-     {if (state() != BranchOrLeaf.State.branch) stop("Not a branch at node:", index);
+     {if (!state().branch()) stop("Not a branch at node:", index);
      }
 
     BranchOrLeaf.State state() {z(); return nodes[index.asInt()].state;     }
@@ -635,7 +641,7 @@ class Btree extends Test                                                        
 
       FindFirstGreaterThanOrEqual(Key Search)                                   // Find the first key in the branch that is equal to or greater than the search key
        {z();
-        if (state() != BranchOrLeaf.State.branch) stop("Branch required, not", state());
+        if (!state().branch()) stop("Branch required, not", state());
         z();
         search = Search;
         boolean looking = true;
@@ -680,7 +686,7 @@ class Btree extends Test                                                        
       if (K > 0)                                                                // Branch has key, next pairs
        {for  (int i = 0; i < K; i++)
          {final int next = keyNext()[i].next.asInt();                           // Each key, next pair
-          if (nodes[next].state == BranchOrLeaf.State.leaf)
+          if (nodes[next].state.leaf())
            {final Leaf l = new Leaf(next);
             l.print(S, level+1);
            }
@@ -704,7 +710,7 @@ class Btree extends Test                                                        
        }
       final int top = top().asInt();                                            // Top next will always be present
       S.elementAt(L+3).append(top);                                             // Append top next
-      if (nodes[top].state == BranchOrLeaf.State.leaf)
+      if (nodes[top].state.leaf())
        {final Leaf l = new Leaf(top);
         l.print(S, level+1);
        }
@@ -808,9 +814,9 @@ class Btree extends Test                                                        
   class RootBranch extends Branch {RootBranch() {super(true); z();}}            // The Root is a branch
   class RootLeaf   extends Leaf   {RootLeaf()   {super(true); z();}}            // The Root is a leaf
 
-  boolean rootIsLeaf()    {z(); return nodes[0] .state == BranchOrLeaf.State.leaf;}  // Root is a leaf
-  boolean isLeaf(int  bl) {z(); return nodes[bl].state == BranchOrLeaf.State.leaf;}  // Indexed branch or leaf is a leaf
-  boolean isLeaf(Next bl) {z(); return isLeaf(bl.asInt());}                          // Indexed branch or leaf is a leaf
+  boolean rootIsLeaf()    {z(); return nodes[0] .state.leaf();}                 // Root is a leaf
+  boolean isLeaf(int  bl) {z(); return nodes[bl].state.leaf();}                 // Indexed branch or leaf is a leaf
+  boolean isLeaf(Next bl) {z(); return isLeaf(bl.asInt());}                     // Indexed branch or leaf is a leaf
 
   class Key                                                                     // A key in a leaf or a branch
    {final boolean[] key = new boolean[bitsPerKey];                              // A key is composed of bits
@@ -873,7 +879,7 @@ class Btree extends Test                                                        
     public String toString() {return "KeyNext("+key+","+next+")";}
    }
 
-  abstract class Index                                                          // An index to key, data pair in a leaf or key, next pair in a branch
+  abstract class BLIndex                                                        // An index to key, data pair in a leaf or key, next pair in a branch
    {int i;                                                                      // Index
     void zero()     {z(); i = 0;}
     boolean equals(int N) {z(); return i == N;}
@@ -881,7 +887,7 @@ class Btree extends Test                                                        
     int asInt()     {return i;}
    }
 
-  class LKDIndex extends Index                                                  // An index to key, data pair in a leaf
+  class LKDIndex extends BLIndex                                                  // An index to key, data pair in a leaf
    {LKDIndex()      {z(); }
     LKDIndex(int I) {z(); i = I;}
     public String toString() {return "LKDIndex("+i+")";}
@@ -889,7 +895,7 @@ class Btree extends Test                                                        
     void dec()      {z(); if (i > 0)              --i; else stop("cannot decrement leaf index");}
    }
 
-  class BKNIndex extends Index                                                  // An index to key, next pair in a branch
+  class BKNIndex extends BLIndex                                                // An index to key, next pair in a branch
    {BKNIndex()      {z(); }
     BKNIndex(int I) {z(); i = I;}
     public String toString() {return "BKNIndex("+i+")";}
