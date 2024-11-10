@@ -19,9 +19,9 @@ class Btree extends Test                                                        
     splitBranchSize,                                                            // The number of key, nexta pairs to split out of a branch
     treeSize;                                                                   // Number of leaves or branches in tree
 
-  final int              root = 0;                                              // The root is always at zero
-  final Stack<Next>  freeList = new Stack<>();                                  // Free leaf or branches
-  final BranchOrLeaf [] nodes;                                                  // The leaves or branches comprising the tree
+  final int                 root = 0;                                           // The root is always at zero
+  final Stack<Integer>  freeList = new Stack<>();                               // Free leaf or branches
+  final BranchOrLeaf []    nodes;                                               // The leaves or branches comprising the tree
 
   final static int
     linesToPrintABranch =  4,                                                   // The number of lines required to print a branch
@@ -29,7 +29,7 @@ class Btree extends Test                                                        
                maxDepth =  6;                                                   // Maximum depth of any realistic tree
 
   int       maxNodeUsed = 0;;                                                   // Maximum branch or leaf index used
-  static boolean debug = false;                                                 // Debugging enabled
+  static boolean debug  = false;                                                // Debugging enabled
 
 //D1 Construction                                                               // Create a BTree from nodes which can be branches or leaves.  The data associated with the BTree is stored only in the leaves opposite the keys
 
@@ -53,11 +53,12 @@ class Btree extends Test                                                        
 
     nodes = new BranchOrLeaf[TreeSize];                                         // Allocate leaves and branches
     for (int i = treeSize; i > 0; i--)                                          // Initially all of the leaves or branches are on the free list, except for the root at index 0
-     {if (i-1 > 0) freeList.push(new Next(i-1));
-      nodes[i-1]       = new BranchOrLeaf();
+     {if (i-1 > 0) freeList.push(i-1);
+      nodes[i-1]       = new BranchOrLeaf(i);
       nodes[i-1].state = BranchOrLeaf.State.neverUsed;
      }
     nodes[0].state = BranchOrLeaf.State.leaf;                                   // Start with the root as a leaf
+    checkNotRelocated();                                                        // Confirm alloctions at start
    }
 
 //D1 Control                                                                    // Testing, control and integrity
@@ -72,13 +73,23 @@ class Btree extends Test                                                        
     for (int i = 0; i < treeSize; i++)                                          // Make sure that all allocated branches and leaves that are accessible from the root of the tree
      {BranchOrLeaf n = nodes[i];
       if      (n.state.leaf())                                                  // Leaf
-       {if (!s.contains(i)) stop("Floating leaf", i);
+       {if (!s.contains(i)) err("Inaccessible leaf", i);
        }
       else if (n.state.branch())                                                // Branch
-       {if (!s.contains(i)) stop("Floating branch", i);
+       {if (!s.contains(i)) err("Inaccessible branch", i);
        }
       else                                                                      // Free or never used
-       {if (s.contains(i)) stop("Freed but in use", i);
+       {if (s.contains(i))  err("Freed but in use", i);
+       }
+     }
+
+    for (int i : freeList)                                                      // Make sure that all items in the free list are not accessible from the root of the tree
+     {BranchOrLeaf n = nodes[i];
+      if      (n.state.leaf())                                                  // Leaf
+       {if (s.contains(i)) stop("Using free leaf", i);
+       }
+      else if (n.state.branch())                                                // Branch
+       {if (s.contains(i)) stop("Using free branch", i);
        }
      }
    }
@@ -106,19 +117,56 @@ class Btree extends Test                                                        
      }
    }
 
-  Next allocate()                                                               // Allocate a branch or leaf
+  int allocate()                                                               // Allocate a branch or leaf
    {z();
     if (freeList.size() < 1) stop("No more leaves or branches available");
     z();
-    final Next index = freeList.pop();
-    maxNodeUsed = max(maxNodeUsed, index.asInt());
+    final int index = freeList.pop();
+    final BranchOrLeaf bl = nodes[index];
+    if (bl.state.leaf() || bl.state.branch()) stop("Attempting to allocate an already allocated node:", index);
+    maxNodeUsed = max(maxNodeUsed, index);
     return index;
+   }
+
+  void checkNotRelocated()                                                      // Check that keyData and KeyNext allocation addresses have not been relocated
+   {for (int i = 0; i < treeSize; i++)                                          // Make sure that all allocated branches and leaves that are accessible from the root of the tree
+     {BranchOrLeaf n = nodes[i];
+      if (isLeaf(i))
+       {final Leaf l = new Leaf(i);
+        final int  N = l.leafSize().asInt();
+        for (int j = 0; j < N; j++)                                             // Each active key, data pair
+         {if (n.keyDataCheck.get(j) != n.keyData[j].check)                        // Check key, data pair has the same address
+           {stop("Leaf", i, "keyData", j, "has been relocated");
+           }
+         }
+       }
+      else if (isBranch(i))
+       {final Branch b = new Branch(i);
+        final int    N = b.branchSize().asInt();
+        for (int j = 0; j < N; j++)                                             // Each key, next pair
+          {if (n.keyNextCheck.get(j) != n.keyNext[j].check)                     // Check key, next pair has the same address
+           {stop("Branch", i, "keyNext", j, "has been relocated");
+           }
+         }
+       }
+     }
+   }
+
+  void free(int index)                                                          // Free the indiocated branch or leaf
+   {z();
+    final BranchOrLeaf bl = nodes[index];
+    if (!bl.state.leaf() && !bl.state.branch()) stop("Attempting to free an already freed node:", index);
+    freeList.push(index);
    }
 
 //D1 Components                                                                 // A branch or leaf in the tree
 
   class BranchOrLeaf                                                            // A branch or leaf in a btree
-   {enum State                                                                  // The current state of the branch or leaf: as a leaf, as a branch or free waiting for use
+   {final  int i;                                                               // The index of this branch or leaf int the block of memory assigned to the tree
+    final Map<Integer,Integer> keyDataCheck = new TreeMap<>();                  // Prevent key, data references being changed in a leaf
+    final Map<Integer,Integer> keyNextCheck = new TreeMap<>();                  // Prevent key, next references being changed in a branch
+
+    enum State                                                                  // The current state of the branch or leaf: as a leaf, as a branch or free waiting for use
      {leaf, branch, free, neverUsed;
       boolean leaf     () {return this == leaf;}
       boolean branch   () {return this == branch;}
@@ -126,36 +174,36 @@ class Btree extends Test                                                        
       boolean neverUsed() {return this == neverUsed;}
      }
     State               state;                                                  // Whether this branch or leaf is a branch, a leaf or free
-    final LKDIndex   leafSize = new LKDIndex();                                 // Number of key, data pairs currently contained in leafif a leaf
+    final LKDIndex   leafSize = new LKDIndex();                                 // Number of key, data pairs currently contained in leaf if a leaf
     final BKNIndex branchSize = new BKNIndex();                                 // Number of key, next pairs currently contained in branch if a branch
     final KeyData[]   keyData = new KeyData[maxKeysPerLeaf];                    // Key, data pairs for when a leaf
     final KeyNext[]   keyNext = new KeyNext[maxKeysPerBranch];                  // Key, next pairs for when a branch
     Next                  top = new Next();                                     // Top next reference for when a branch
 
-    BranchOrLeaf()                                                              // Memory for branches and leaves
-     {z();
-      for (int i = 0; i < maxKeysPerLeaf;   i++) keyData[i] = new KeyData();
-      for (int i = 0; i < maxKeysPerBranch; i++) keyNext[i] = new KeyNext();
+    BranchOrLeaf(int I)                                                         // Memory for branches and leaves
+     {z(); i = I;
+      for (int i = 0; i < maxKeysPerLeaf;   i++) {keyData[i] = new KeyData(); keyDataCheck.put(i, keyData[i].check);}
+      for (int i = 0; i < maxKeysPerBranch; i++) {keyNext[i] = new KeyNext(); keyNextCheck.put(i, keyNext[i].check);}
      }
    }
 
   class Leaf                                                                    // Describe a leaf
-   {final Next index;                                                           // Index of the leaf
+   {final int index;                                                            // Index of the leaf
     Leaf()                                                                      // Get a leaf off the free list
      {z(); if (freeList.size() < 1) stop("No more leaves available");
       z(); index = allocate();
-      nodes[index.asInt()].state = BranchOrLeaf.State.leaf;
+      nodes[index].state = BranchOrLeaf.State.leaf;
       zeroLeafSize();
      }
     Leaf(int n)                                                                 // Access a leaf by number
-     {z(); index = new Next(n); assertLeaf();
+     {z(); index = n; assertLeaf();
      }
     Leaf(Next n)                                                                // Access a leaf by index
-     {z(); index = n; assertLeaf();
+     {z(); index = n.asInt(); assertLeaf();
      }
     Leaf(boolean root)                                                          // Access the root as a leaf
      {z(); if (!nodes[0].state.leaf()) stop("Root is not a leaf");
-      z(); index = new Next(0);
+      z(); index = 0;
      }
 
     void assertLeaf()                                                           // Confirm that we are on a leaf
@@ -167,24 +215,26 @@ class Btree extends Test                                                        
      {z();
       assertLeaf();
       z();
-      if (index == null || index.asInt() == 0) stop("Cannot free root currently a leaf");
+      if (index == 0) stop("Cannot free root currently a leaf");
       z();
-      freeList.push(index);
-      nodes[index.asInt()].state = BranchOrLeaf.State.free;
+      free(index);
+      nodes[index].state = BranchOrLeaf.State.free;
      }
 
-    BranchOrLeaf.State state() {z(); return nodes[index.asInt()].state;   }     // State of this memory
-    LKDIndex        leafSize() {z(); return nodes[index.asInt()].leafSize;}     // Number of key, data pairs in leaf
-    KeyData[]        keyData() {z(); return nodes[index.asInt()].keyData; }     // Key, data pairs in leaf
+    BranchOrLeaf.State state() {z(); return nodes[index].state;   }     // State of this memory
+    LKDIndex        leafSize() {z(); return nodes[index].leafSize;}     // Number of key, data pairs in leaf
+    KeyData[]        keyData() {z(); return nodes[index].keyData; }     // Key, data pairs in leaf
 
     void setLeafSize(int size) {z(); leafSize().set(size);}                     //Set the size of the leaf
 
     void copy(Leaf source)                                                      // Copy a leaf
-     {final KeyData[]skd = source.keyData();                                    // Source key, data pairs
+     {z();
+      final KeyData[]skd = source.keyData();                                    // Source key, data pairs
       final KeyData[]tkd = keyData();                                           // Target key, data pairs
       final int N = source.leafSize().asInt();
       for (int i = 0; i < N; i++)
-       {tkd[i].set(skd[i].key);
+       {z();
+        tkd[i].set(skd[i].key);
         tkd[i].set(skd[i].data);
        }
       setLeafSize(N);
@@ -214,8 +264,8 @@ class Btree extends Test                                                        
 
     Branch makeIntoBranch()                                                     // Transform this leaf into a branch
      {z();
-      nodes[index.asInt()].state = BranchOrLeaf.State.branch;                   // Make this leaf into a branch
-      return new Branch(index.asInt());                                         // Return leaf as a branch
+      nodes[index].state = BranchOrLeaf.State.branch;                   // Make this leaf into a branch
+      return new Branch(index);                                         // Return leaf as a branch
      }
 
     Key smallestKey()                                                           // Smallest key in a leaf
@@ -269,12 +319,12 @@ class Btree extends Test                                                        
          }
        }
 
-      Next next() {z(); return Leaf.this.index;}                                // Index of the containing leaf
+      Next next() {z(); return new Next(Leaf.this.index);}                      // Index of the containing leaf
 
       public String toString()
        {final StringBuilder s = new StringBuilder();
         s.append("Key:"+search+" found:"+printBit(found));
-        if (found) s.append(" data:"+data+" index:"+index.asInt());
+        if (found) s.append(" data:"+data+" index:"+index);
         return s.toString();
        }
      }
@@ -313,7 +363,7 @@ class Btree extends Test                                                        
 
     Branch splitLeafRoot()                                                      // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
      {z(); if (!state().leaf()) stop("Leaf required, not", state());
-      z(); if (index.asInt() != 0) stop("Not root, but", index);
+      z(); if (index != 0) stop("Not root, but", index);
       final KeyData[]kd = keyData();
       z(); if (!isFull()) stop("Root is not full, but", leafSize());
       z();
@@ -346,29 +396,29 @@ class Btree extends Test                                                        
    }
 
   class Branch                                                                  // Describe a branch
-   {final Next index;                                                           // Index of the branch
+   {final int index;                                                            // Index of the branch
     Branch()                                                                    // get a new branch off the free list
      {z(); if (freeList.size() < 1) stop("No more branches");
       z(); index = allocate();
-      z(); nodes[index.asInt()].state = BranchOrLeaf.State.branch;
+      z(); nodes[index].state = BranchOrLeaf.State.branch;
       z(); zeroBranchSize();
      }
     Branch(int n)                                                               // Access the specified branch
-     {z(); index = new Next(n); assertBranch();
+     {z(); index = n; assertBranch();
      }
     Branch(Next n)                                                              // Access the branch at this index
-     {z(); index = n; assertBranch();
+     {z(); index = n.asInt(); assertBranch();
      }
     Branch(boolean root)                                                        // The root is always zero
      {z(); if (!nodes[0].state.branch()) stop("Root is not a branch");
-      z(); index = new Next(0);
+      z(); index = 0;
      }
 
     void freeBranch()                                                           // Free this branch
      {z(); assertBranch();
-      z(); if (index == null || index.asInt() == 0) stop("Cannot free root currently as branch");
-      z(); freeList.push(index);
-      z(); nodes[index.asInt()].state = BranchOrLeaf.State.free;
+      z(); if (index == 0) stop("Cannot free root currently as branch");
+      z(); free(index);
+      z(); nodes[index].state = BranchOrLeaf.State.free;
      }
 
     void assertBranch()
@@ -376,10 +426,10 @@ class Btree extends Test                                                        
       z();
      }
 
-    BranchOrLeaf.State state() {z(); return nodes[index.asInt()].state;     }
-    BKNIndex      branchSize() {z(); return nodes[index.asInt()].branchSize;}
-    KeyNext[]        keyNext() {z(); return nodes[index.asInt()].keyNext;   }
-    Next                 top() {z(); return nodes[index.asInt()].top;       }
+    BranchOrLeaf.State state() {z(); return nodes[index].state;     }
+    BKNIndex      branchSize() {z(); return nodes[index].branchSize;}
+    KeyNext[]        keyNext() {z(); return nodes[index].keyNext;   }
+    Next                 top() {z(); return nodes[index].top;       }
     boolean        hasLeaves() {z(); return isLeaf(top());                  }
     boolean isFull          () {z(); return branchSize().asInt() == maxKeysPerBranch;}
 
@@ -388,6 +438,18 @@ class Btree extends Test                                                        
     void zeroBranchSize     () {z(); branchSize().zero();}
 
     void setBranchSize(int size) {z(); branchSize().set(size);}
+
+    void copy(Branch source)                                                    // Copy a branch
+     {final KeyNext[]skn = source.keyNext();                                    // Source key, next pairs
+      final KeyNext[]tkn = keyNext();                                           // Target key, next pairs
+      final int N = source.branchSize().asInt();
+      for (int i = 0; i < N; i++)                                               // Copy in each key, next pair
+       {tkn[i].set(skn[i].key);
+        tkn[i].set(skn[i].next);
+       }
+      top(source.top());                                                        // Copy top next from source
+      setBranchSize(N);                                                         // Set size of branch
+     }
 
     public String toString()                                                    // Print branch
      {final StringBuilder s = new StringBuilder();
@@ -403,36 +465,36 @@ class Btree extends Test                                                        
      }
 
     Leaf makeIntoLeaf()                                                         // Transform this branch into leaf
-     {z(); nodes[index.asInt()].state = BranchOrLeaf.State.leaf;                // Make this branch into a leaf
-      return new Leaf(index.asInt());                                           // Return leaf as a branch
+     {z(); nodes[index].state = BranchOrLeaf.State.leaf;                // Make this branch into a leaf
+      return new Leaf(index);                                           // Return leaf as a branch
      }
 
     void push(Key Key, Leaf Leaf)                                               // Push a leaf into a branch
      {z();
-      final int n = index.asInt(), i = branchSize().asInt();
+      final int n = index, i = branchSize().asInt();
       if (i >= maxKeysPerBranch) stop("Branch", n, " is already full");
       z();
-      nodes[n].keyNext[i].key  = Key;
-      nodes[n].keyNext[i].next = Leaf.index;
+      nodes[n].keyNext[i].key.set(Key);
+      nodes[n].keyNext[i].next.set(Leaf.index);
       incBranchSize();
      }
 
     void push(Key Key, Branch Branch)                                           // Push a branch into a leaf
      {z();
-      final int n = index.asInt(), i = branchSize().asInt();
-      if (0 == Branch.index.asInt()) stop("Cannot push root into a branch");
+      final int n = index, i = branchSize().asInt();
+      if (0 == Branch.index) stop("Cannot push root into a branch");
       z();
-      if (n == Branch.index.asInt()) stop("Cannot push branch into self");
+      if (n == Branch.index) stop("Cannot push branch into self");
       z();
       if (i >= maxKeysPerBranch) stop("Branch", n, " is already full");
       z();
-      nodes[n].keyNext[i].key  = Key;
-      nodes[n].keyNext[i].next = Branch.index;
+      nodes[n].keyNext[i].key .set(Key);
+      nodes[n].keyNext[i].next.set(Branch.index);
       incBranchSize();
      }
 
-    void top(Leaf   Leaf)   {z(); nodes[index.asInt()].top = Leaf.index;}       // Set top of this branch to refer to a leaf
-    void top(Branch Branch) {z(); nodes[index.asInt()].top = Branch.index;}     // Set top of this branch to refer to a branch
+    void top(Leaf   Leaf)   {z(); nodes[index].top = new Next(Leaf.index);}       // Set top of this branch to refer to a leaf
+    void top(Branch Branch) {z(); nodes[index].top = new Next(Branch.index);}     // Set top of this branch to refer to a branch
 
     int countChildLeafKeys()                                                    // Find the number of keys in the immediate children of this branch
      {z();
@@ -453,13 +515,14 @@ class Btree extends Test                                                        
       if (p < maxKeysPerBranch)                                                 // Room in the parent branch to push this new child leaf
        {z();
         final Leaf l = new Leaf();                                              // New leaf
-        kn[p] = new KeyNext(new Key(0), l.index);                               // Push child leaf into parent branch
+        kn[p] = new KeyNext(new Key(0), new Next(l.index));                      // Push child leaf into parent branch
         incBranchSize();                                                        // New size of parent branch
         return l;                                                               // Return leaf so created
        }
       else                                                                      // Reuse branch top because there is no more room in the parent branch
        {z();
         final Leaf l = new Leaf(top());                                         // Return top as a leaf
+if (debug) say("SSSS top", l, this);
         l.zeroLeafSize();
         return l;                                                               // Return top as a leaf
        }
@@ -470,7 +533,7 @@ class Btree extends Test                                                        
       final KeyData[]kd = leaf.keyData();                                       // Key, data pairs in leaf
       final int L = leaf.leafSize().asInt();                                    // Size of leaf
       for (int l = 0; l < L; l++)                                               // Unpack each key, data pair in the leaf
-       {z(); up.push(kd[l]);                                                    // Unpack the leaf into a stack of key, data pairs
+       {z(); up.push(new KeyData(kd[l]));                                       // Unpack the leaf into a stack of key, data pairs
        }
      }
 
@@ -478,7 +541,6 @@ class Btree extends Test                                                        
      {final KeyNext    []  kn;                                                  // Key, next pairs associated with the parent branch
       final Stack<KeyData> up;                                                  // Save area for key, next pairs during repack
       final int B;                                                              // Current size of parent branch
-
       UnpackLeaves()                                                            // Unpack the keys in the leaves under the parent branch
        {z();
         kn = keyNext();                                                         // Key, next pairs associated with the parent branch
@@ -493,6 +555,7 @@ class Btree extends Test                                                        
         for  (int b = 0; b < B; b++)                                            // Free all the existing leaves except top which will always be there
          {z(); new Leaf(kn[b].next).freeLeaf();                                 // Free leaf
          }
+        setBranchSize(0);                                                       // No key, next pairs in use at the moment
         new Leaf(top()).zeroLeafSize();                                         // Clear leaf referenced by top
        }
      }
@@ -500,17 +563,19 @@ class Btree extends Test                                                        
     void repackLeaves(Stack<KeyData>up, KeyNext[]kn)                            // Repack the key, data pairs into leaves under the current branch
      {final int N = up.size();                                                  // Recreate the leaves with the key, data pairs packed in
       Leaf leaf = pushNewLeaf();                                                // First new leaf into branch
-
+if (debug) say("DDDD111", Branch.this, up);
       for (int k = 0; k < N; k++)                                               // Repack the leaves
        {z();
         final KeyData source = up.elementAt(k);                                 // Source of repack
         if (leaf.leafSize().equals(maxKeysPerLeaf))                             // Start a new leaf when the current one is full
-         {z(); leaf = pushNewLeaf();                                            // New leaf
+         {z();
+          leaf = pushNewLeaf();                                                 // New leaf
          }
-
-        leaf.keyData()[leaf.leafSize().asInt()] = new KeyData(source);          // Push current key, data pair into the current leaf
+        leaf.keyData()[leaf.leafSize().asInt()].set(source);                    // Push current key, data pair into the current leaf
         leaf.incLeafSize();                                                     // Move up in leaf
+if (debug) say("DDDD 222", leaf, this);
        }
+if (debug) say(Btree.this.print());
 
       final Leaf t = new Leaf(top());                                           // The top leaf is empty so we replace it with the next top leaf
       if (new Leaf(top()).leafSize().asInt() == 0)                              // The top leaf is empty so we replace it with the next top leaf
@@ -525,10 +590,13 @@ class Btree extends Test                                                        
 
       for(int b = 0; b < children-1; b++)                                       // Fix keys in parent
        {z();
-        Pkn[b].key = new Key(new Leaf(kn[b+1].next).smallestKey().asInt()-1);   // A key smaller than any key in the next sibling leaf
+        Pkn[b].key.set(new Key(new Leaf(kn[b+1].next).smallestKey().asInt()-1));   // A key smaller than any key in the next sibling leaf
        }
 
-      Pkn[children-1].key = new Key(new Leaf(top()).smallestKey().asInt()-1);   // A key smaller than any key in the leaf refernced by top in the parent
+      if (children > 0)
+       {z();
+        Pkn[children-1].key.set(new Key(new Leaf(top()).smallestKey().asInt()-1)); // A key smaller than any key in the leaf referenced by top in the parent
+       }
      }
 
     void repackLeaves(Key Key, Data Data)                                       // Repack the keys in the leaves under the parent branch
@@ -539,11 +607,13 @@ class Btree extends Test                                                        
       new Leaf(top()).zeroLeafSize();                                           // Clear leaf referenced by top
       zeroBranchSize();                                                         // Zero the size of this branch ready for repack of key, next pairs
 
-      boolean inserted = false;                                                 // Whether thenew key, data pair was inserted or not into the stack of key, data pairs ready to be repacked
+      boolean inserted = false;                                                 // Whether the new key, data pair was inserted or not into the stack of key, data pairs ready to be repacked
+
       for (int i = 0; i < up.size(); i++)                                       // Insert the new key, data pair in the stack of key, data pairs awaiting repacking
        {z();
         if (up.elementAt(i).key.greaterThanOrEqual(Key))                        // Found insertion point
-         {z(); up.insertElementAt(new KeyData(Key, Data), i);                   // Insert new key, data pair
+         {z();
+          up.insertElementAt(new KeyData(Key, Data), i);                        // Insert new key, data pair
           z(); inserted = true;
           break;
          }
@@ -561,11 +631,14 @@ class Btree extends Test                                                        
 
       new Leaf(top()).zeroLeafSize();                                           // Clear leaf referenced by top
       zeroBranchSize();                                                         // Zero the size of this branch ready for repack of key, next pairs
+if (debug) say("CCCC 111");
       repackLeaves(ul.up, ul.kn);                                               // Repack the key, data pairs into leaves under the current branch
+if (debug) say("CCCC 222", Btree.this.print());
      }
 
     void repackLeavesIntoRoot()                                                 // Repack the keys in the leaves under the root into the root
      {z();
+
       final UnpackLeaves   ul = new UnpackLeaves();                             // Unpack the leaves under this branch
       final Stack<KeyData> up = ul.up;                                          // Save area for key, next pairs during repack
 
@@ -584,7 +657,7 @@ class Btree extends Test                                                        
        }
      }
 
-    void top(Next top)  {z(); nodes[index.asInt()].top = top;}                  // Set the top next reference for this branch
+    void top(Next top)  {z(); nodes[index].top = top;}                  // Set the top next reference for this branch
 
     class FindFirstGreaterThanOrEqual                                           // Find the first key in the branch that is equal to or greater than the search key
      {final Key     search;                                                     // Search key
@@ -633,7 +706,7 @@ class Btree extends Test                                                        
            {final Leaf l = new Leaf(next);
             l.print(S, level+1);
            }
-          else
+          else if (nodes[next].state.branch())
            {if (next == 0)
               {say("Cannot descend through root from index", i, "in branch", index);
                break;
@@ -643,12 +716,12 @@ class Btree extends Test                                                        
            }
 
           S.elementAt(L+0).append(""+keyNext()[i].key.asInt());                 // Key
-          S.elementAt(L+1).append(""+index.asInt()+(i > 0 ?  "."+i : ""));      // Branch,key, next pair
+          S.elementAt(L+1).append(""+index+(i > 0 ?  "."+i : ""));      // Branch,key, next pair
           S.elementAt(L+2).append(""+keyNext()[i].next.asInt());
          }
        }
       else                                                                      // Branch is empty so print just the index of the branch
-       {S.elementAt(L+0).append(""+index.asInt()+"Empty");
+       {S.elementAt(L+0).append(""+index+"Empty");
         padStrings(S, level);                                                   // Pad the strings at each level of the tree so we have a vertical face to continue with - a bit like Marc Brunel's tunnelling shield
        }
       final int top = top().asInt();                                            // Top next will always be present
@@ -671,7 +744,7 @@ class Btree extends Test                                                        
 
     void splitBranchRoot()                                                      // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
      {z(); assertBranch();
-      if (index.asInt() != 0) stop("Not root, but", index);
+      if (index != 0) stop("Not root, but", index);
       z();
       if (!isFull()) stop("Root is not full, but", branchSize());
       z();
@@ -728,11 +801,11 @@ class Btree extends Test                                                        
         for (int i = branchSize().asInt(); i > I; i--)
          {z(); pkn[i] = pkn[i-1];
          }
-        pkn[I] = new KeyNext(split.key, left.index);                            // Insert a key, next pair into the parent
+        pkn[I] = new KeyNext(split.key, new Next(left.index));                            // Insert a key, next pair into the parent
        }
       else                                                                      // Push at end of parent
        {z(); top(right);
-        z(); pkn[branchSize().asInt()] = new KeyNext(split.key, left.index);    // Push onto end of parent
+        z(); pkn[branchSize().asInt()] = new KeyNext(split.key, new Next(left.index));    // Push onto end of parent
        }
       incBranchSize();                                                          // The parent now has one more key, next pair
 
@@ -749,11 +822,22 @@ class Btree extends Test                                                        
   class RootBranch extends Branch {RootBranch() {super(true); z();}}            // The Root is a branch
   class RootLeaf   extends Leaf   {RootLeaf()   {super(true); z();}}            // The Root is a leaf
 
-  boolean rootIsLeaf()    {z(); return nodes[0] .state.leaf();}                 // Root is a leaf
-  boolean isLeaf(int  bl) {z(); return nodes[bl].state.leaf();}                 // Indexed branch or leaf is a leaf
-  boolean isLeaf(Next bl) {z(); return isLeaf(bl.asInt());}                     // Indexed branch or leaf is a leaf
+  boolean rootIsLeaf()        {z(); return nodes[0] .state.leaf();}             // Root is a leaf
+  boolean isLeaf    (int  bl) {z(); return nodes[bl].state.leaf();}             // Indexed branch or leaf is a leaf
+  boolean isLeaf    (Next bl) {z(); return isLeaf(bl.asInt());}                 // Indexed branch or leaf is a leaf
+  boolean isBranch  (int  bl) {z(); return nodes[bl].state.branch();}           // Indexed branch or leaf is a branch
+  boolean isBranch  (Next bl) {z(); return isBranch(bl.asInt());}               // Indexed branch or leaf is a branch
 
-  class Key                                                                     // A key in a leaf or a branch
+  class Fixed                                                                   // An item that is allocated only once
+   {static int checkNumber = 0;                                                 // Assign unique numbers to each allocation so we can check for relocations
+    final int check;
+    Fixed()                                                                     // Assign a unique number to this allocation
+     {z();
+      check = ++checkNumber;
+     }
+   }
+
+  class Key extends Fixed                                                       // A key in a leaf or a branch
    {final boolean[] key = new boolean[bitsPerKey];                              // A key is composed of bits
     Key()       {z(); }
     Key(int n)  {z(); intToBits(n, key);}
@@ -766,7 +850,7 @@ class Btree extends Test                                                        
      }
    }
 
-  class Data                                                                    // A data item associated with a key in a leaf
+  class Data extends Fixed                                                      // A data item associated with a key in a leaf
    {final boolean[] data = new boolean[bitsPerData];                            // Data is composed of bits
     Data()      {z();}
     Data(int n) {z(); intToBits(n, data);}
@@ -777,8 +861,8 @@ class Btree extends Test                                                        
      }
    }
 
-  class Next                                                                    // A next reference from a branch to a leaf or a branch
-   {boolean[] next = new boolean[bitsPerNext];                                  // Enough bits to reference a leaf or brahch in the block
+  class Next extends Fixed                                                      // A next reference from a branch to a leaf or a branch
+   {final boolean[] next = new boolean[bitsPerNext];                            // Enough bits to reference a leaf or brahch in the block
     Next() {this(0); z();}                                                      // The root
     Next(int n)
      {z(); if (n >= treeSize) stop("n must be less than", treeSize, "but is", n) ;
@@ -786,11 +870,17 @@ class Btree extends Test                                                        
      }
     int asInt()               {return bitsToInt(next);}
     public String toString()  {z(); return ""+bitsToInt(next);}
+    void set(Next Next)                                                         // Copy the specified next refernce
+     {z(); for (int i = 0; i < next.length; i++) next[i] = Next.next[i];
+     }
+    void set(int n)                                                             // Copy the specified integer as a next reference
+     {z(); intToBits(n, next);
+     }
    }
 
-  class KeyData                                                                 // A key, data pair in a leaf
-   {Key   key = new Key();                                                      // A key in a leaf
-    Data data = new Data();                                                     // Data associated with the key
+  class KeyData extends Fixed                                                   // A key, data pair in a leaf
+   {final Key   key = new Key();                                                // A key in a leaf
+    final Data data = new Data();                                               // Data associated with the key
     KeyData ()                   {z(); }
     KeyData (Key Key, Data Data) {z(); set(Key); set(Data);}
     KeyData (KeyData  KeyData)   {this(KeyData.key, KeyData.data); z();}
@@ -800,13 +890,14 @@ class Btree extends Test                                                        
     public String toString()     {return "KeyData("+key+","+data+")";}
    }
 
-  class KeyNext                                                                 // A key, next pair in a leaf
-   {Key   key = new Key();                                                      // A key in a branch
-    Next next = new Next();                                                     // Next branch or leaf
-    KeyNext() {z(); }
-    KeyNext(Key Key, Next Next) {z(); set(Key); set(Next);}
-    void set(Key  Key)          {z(); key  = Key;}
-    void set(Next Next)         {z(); next = Next;}
+  class KeyNext extends Fixed                                                   // A key, next pair in a leaf
+   {final Key   key = new Key();                                                // A key in a branch
+    final Next next = new Next();                                               // Next branch or leaf
+    KeyNext()                     {z();}
+    KeyNext(Key Key, Next Next)   {z(); set(Key); set(Next);}
+    void set(Key  Key, Next Next) {z(); set(Key); set(Next);}
+    void set(Key  Key)            {z(); key.set(Key);}
+    void set(Next Next)           {z(); next.set(Next);}
     public String toString() {return "KeyNext("+key+","+next+")";}
    }
 
@@ -886,7 +977,7 @@ class Btree extends Test                                                        
     public String toString()                                                    // Print find result
      {final StringBuilder s = new StringBuilder();
       s.append("search:"+leaf.search);
-      s.append( " leaf:"+leaf().index.asInt());
+      s.append( " leaf:"+leaf().index);
       s.append(" rootIsLeaf:"+printBit(rootIsLeaf));
       if (!rootIsLeaf) s.append(" parent:"+parent.index);
       s.append(" found:"+printBit(found()));
@@ -895,7 +986,7 @@ class Btree extends Test                                                        
         s.append(" index:"+index().asInt());
        }
       s.append(" allFull:"+printBit(allFull));
-      if (!allFull) s.append( " lastNotFull:"+lastNotFull.index.asInt());
+      if (!allFull) s.append( " lastNotFull:"+lastNotFull.index);
       return s.toString().trim();
      }
    }
@@ -944,7 +1035,7 @@ class Btree extends Test                                                        
 
       if (parent == null)                                                       // No parent so we must have a full leaf as root
        {z(); l.splitLeafRoot();                                                 // Split the full leaf root
-        z(); parent = root();                                                        // The root is no longer full
+        z(); parent = root();                                                   // The root is no longer full
        }
 
       if (parent.countChildLeafKeys() < maxKeysInLeaves)                        // Repackaging the leaves is possible
@@ -990,7 +1081,9 @@ class Btree extends Test                                                        
       final Branch.FindFirstGreaterThanOrEqual                                  // Step down
         q = p.new FindFirstGreaterThanOrEqual(Key);
       if (isLeaf(q.next))                                                       // Reached a leaf
-       {z(); p.repackLeaves(Key, Data);                                         // Add the key, data pair: if it were already there findAndInsert would have already inserted it
+       {
+if (debug) say("BBBB", Key, p, print());
+        z(); p.repackLeaves(Key, Data);                                         // Add the key, data pair: if it were already there findAndInsert would have already inserted it
         z(); merge(Key);                                                        // Push the tree back together again along the path of the search
         return;
        }
@@ -1015,18 +1108,20 @@ class Btree extends Test                                                        
 
   Data delete(Key Key)                                                          // Delete a key from the tree and returnsd is data if present
    {z();
+if (debug) say("AAAA111", print());
     final Find f = new Find(Key);                                               // Try direct insertion with no modifications to the shape of the tree
     if (!f.found()) return null;                                                // Inserted or updated successfully
     z();
-    final Leaf l = f.leaf();
-    final int  N = l.leafSize().asInt(), p = f.index().asInt();
-    final KeyData[]kd = l.keyData();
-    final Data   data = kd[p].data;
-    for (int i = p; i < N-1; ++i)
+    final Leaf l = f.leaf();                                                    // The leaf that contains the key
+    final int  N = l.leafSize().asInt(), p = f.index().asInt();                 // Size of leaf, position in the leaf of the key
+    final KeyData[]kd = l.keyData();                                            // Key, data pairs in the leaf
+    final Data   data = kd[p].data;                                             // Data associated with the leaf
+    for (int i = p; i < N-1; ++i)                                               // Remove the key, data pair from the leaf
      {z();
-      kd[i] = kd[i+1];
+      kd[i] = new KeyData(kd[i+1]);
      }
-    l.decLeafSize();
+    l.decLeafSize();                                                            // Reduce the leaf size to match
+if (debug) say("AAAA", print());
     merge(Key);
     return data;
    }
@@ -1036,7 +1131,6 @@ class Btree extends Test                                                        
   void merge(Key Key)                                                           // Merge where possible along a path to a key
    {z(); if (rootIsLeaf()) return;                                              // Only works on a branch
     z(); Branch parent = root();                                                // Parent starts at root which is known to be a branch
-
     for (int i = 0; i < maxDepth; i++)                                          // Step down through tree
      {z();
       final Branch.FindFirstGreaterThanOrEqual down =
@@ -1045,7 +1139,7 @@ class Btree extends Test                                                        
 
       if (isLeaf(n))                                                            // Found the containing leaf
        {z();
-        if (0 == parent.index.asInt())                                          // At the root, the root is a branch and the children are leaves
+        if (0 == parent.index)                                          // At the root, the root is a branch and the children are leaves
          {if (parent.countChildLeafKeys() <= maxKeysPerLeaf)                    // Few enough key, data pairs to hold them in the root as a leaf
            {parent.repackLeavesIntoRoot();
             return;
@@ -1062,7 +1156,7 @@ class Btree extends Test                                                        
       for (int j = 0; j < N; j++)
        {z(); pkn.push(Pkn[j]);
        }
-      pkn.push(new KeyNext(null, parent.top()));                                // Add top next so we have all the children in one place
+      pkn.push(new KeyNext(new Key(0), parent.top()));                                // Add top next so we have all the children in one place
 
       for (int b = pkn.size()-1; b > 0; b--)                                    // Merge children in body of parent by comparing them pairwise from top to bottom  to avoid disruption
        {z();
@@ -1089,7 +1183,14 @@ class Btree extends Test                                                        
       for (int b = 0; b < PS; b++)                                              // Reload parent body
        {z(); Pkn[b] = pkn.elementAt(b);
        }
-      parent.setBranchSize(pkn.size());                                         // Set parent size to match
+      parent.setBranchSize(PS);                                                 // Set parent size to match
+
+      if (PS == 0)                                                              // The body of the parent is empty so we can copy the top node into it and release it
+       {final Branch p = new Branch(parent.top());
+        parent.copy(p);
+        p.freeBranch();
+       }
+
       final Branch.FindFirstGreaterThanOrEqual Down =
         parent.new FindFirstGreaterThanOrEqual(Key);
       parent = new Branch(Down.next);                                           // Step down
@@ -1185,7 +1286,7 @@ class Btree extends Test                                                        
     final Leaf   r = t.new Leaf();
     R.push(t.new Key( 8), l);
     R.push(t.new Key(12), m);
-    R.top(     r.index);
+    R.top( t.new Next(r.index));
     l.push( 2, 12);
     l.push( 4, 14);
     l.push( 6, 16);
@@ -1547,6 +1648,87 @@ class Btree extends Test                                                        
 """);
    }
 
+  static void test_delete2()
+   {final Btree t = new Btree(8, 8, 8, 4, 3, 40);
+    final int N = 64;
+    for (int i = 1; i <= N; i++)
+     {t.put(i);
+     }
+    t.ok("""
+                                                                                                                            32                                                                                                                                           |
+                                                                                                                            0                                                                                                                                            |
+                                                                                                                            19                                                                                                                                           |
+                                                                                                                            20                                                                                                                                           |
+                                                      16                                                                                                                                            48                                                                   |
+                                                      19                                                                                                                                            20                                                                   |
+                                                      9                                                                                                                                             21                                                                   |
+                                                      14                                                                                                                                            6                                                                    |
+          4          8               12                               20               24                28                                  36               40                 44                                  52               56                60               |
+          9          9.1             9.2                              14               14.1              14.2                                21               21.1               21.2                                6                6.1               6.2              |
+          3          1               4                                8                10                5                                   13               15                 11                                  18               22                16               |
+                                     7                                                                   12                                                                      17                                                                     2                |
+1,2,3,4=3  5,6,7,8=1    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=5     29,30,31,32=12   33,34,35,36=13   37,38,39,40=15     41,42,43,44=11     45,46,47,48=17   49,50,51,52=18   53,54,55,56=22    57,58,59,60=16    61,62,63,64=2 |
+""");
+    ok(t.delete(t.new Key(21)), 21);
+    ok(t.delete(t.new Key(22)), 22);
+    ok(t.delete(t.new Key(23)), 23);
+    ok(t.delete(t.new Key(24)), 24);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+                                                      16                                                  32                                                                       48                                                                    |
+                                                      0                                                   0.1                                                                      0.2                                                                   |
+                                                      9                                                   14                                                                       21                                                                    |
+                                                                                                                                                                                   6                                                                     |
+          4          8               12                               24               28                                   36               40                 44                                   52               56                60               |
+          9          9.1             9.2                              14               14.1                                 21               21.1               21.2                                 6                6.1               6.2              |
+          3          1               4                                8                10                                   13               15                 11                                   18               22                16               |
+                                     7                                                 12                                                                       17                                                                      2                |
+1,2,3,4=3  5,6,7,8=1    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   25,26,27,28=10     29,30,31,32=12    33,34,35,36=13   37,38,39,40=15     41,42,43,44=11     45,46,47,48=17    49,50,51,52=18   53,54,55,56=22    57,58,59,60=16    61,62,63,64=2 |
+""");
+
+    ok(t.delete(t.new Key(17)), 17);
+    ok(t.delete(t.new Key(18)), 18);
+    ok(t.delete(t.new Key(19)), 19);
+    ok(t.delete(t.new Key(20)), 20);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+                                                      16                               32                                                                       48                                                                    |
+                                                      0                                0.1                                                                      0.2                                                                   |
+                                                      9                                14                                                                       21                                                                    |
+                                                                                                                                                                6                                                                     |
+          4          8               12                               28                                 36               40                 44                                   52               56                60               |
+          9          9.1             9.2                              14                                 21               21.1               21.2                                 6                6.1               6.2              |
+          3          1               4                                8                                  13               15                 11                                   18               22                16               |
+                                     7                                12                                                                     17                                                                      2                |
+1,2,3,4=3  5,6,7,8=1    9,10,11,12=4    13,14,15,16=7   25,26,27,28=8   29,30,31,32=12    33,34,35,36=13   37,38,39,40=15     41,42,43,44=11     45,46,47,48=17    49,50,51,52=18   53,54,55,56=22    57,58,59,60=16    61,62,63,64=2 |
+""");
+
+    ok(t.delete(t.new Key(29)), 29);
+    ok(t.delete(t.new Key(30)), 30);
+    ok(t.delete(t.new Key(31)), 31);
+    stop(t);
+    debug  = true;
+    ok(t.delete(t.new Key(32)), 32);
+    t.checkFreeList();
+
+    stop(t);
+    t.ok("""
+                                                      16                      32                                                                       48                                                                    |
+                                                      0                       0.1                                                                      0.2                                                                   |
+                                                      9                       14                                                                       21                                                                    |
+                                                                                                                                                       6                                                                     |
+          4          8               12                               31                        36               40                 44                                   52               56                60               |
+          9          9.1             9.2                              14                        21               21.1               21.2                                 6                6.1               6.2              |
+          3          1               4                                8                         13               15                 11                                   18               22                16               |
+                                     7                                12                                                            17                                                                      2                |
+1,2,3,4=3  5,6,7,8=1    9,10,11,12=4    13,14,15,16=7   25,26,27,28=8   32=12    33,34,35,36=13   37,38,39,40=15     41,42,43,44=11     45,46,47,48=17    49,50,51,52=18   53,54,55,56=22    57,58,59,60=16    61,62,63,64=2 |
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_bits();
     test_find();
@@ -1557,10 +1739,12 @@ class Btree extends Test                                                        
     test_put_descending();
     test_put_random();
     test_delete();
+    test_delete2();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_delete2();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
