@@ -3,7 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout a btree in a block on a silicon chip.
-// merge root branch into a leaf and show no memory loss
+
 import java.util.*;
 
 class Btree extends Test                                                        // Manipulate a btree
@@ -59,7 +59,7 @@ class Btree extends Test                                                        
     nodes[0].state = BranchOrLeaf.State.leaf;                                   // Start with the root as a leaf
    }
 
-//D1 Control                                                                    // Testing and control
+//D1 Control                                                                    // Testing, control and integrity
 
   void ok(String expected) {Test.ok(print(), expected);}
   void stop() {Test.stop(toString());}
@@ -1626,17 +1626,17 @@ class Btree extends Test                                                        
     test_put_ascending();
     test_put_descending();
     test_put_random();
+    test_delete();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_delete();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      if (github_actions)                                                       // Coverage analysis
+      //if (github_actions)                                                       // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
