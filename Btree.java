@@ -87,21 +87,18 @@ class Btree extends Test                                                        
    }
 
   void active(Set<Integer> s, int index)                                        // Active branches and leaves
-   {if (nodes[index].state == BranchOrLeaf.State.leaf)
+   {if (nodes[index].state == BranchOrLeaf.State.leaf)                          // Add leaf
      {s.add(index);
      }
-    else if (nodes[index].state == BranchOrLeaf.State.branch)
+    else if (nodes[index].state == BranchOrLeaf.State.branch)                   // Add branch and its children
      {s.add(index);
       final Branch    B = new Branch(index);
       final int       N = B.branchSize().asInt();
       final KeyNext[]kn = B.keyNext();
-      for (int i = 0; i < N; i++)
+      for (int i = 0; i < N; i++)                                               // Each child of branch
        {active(s, kn[i].next.asInt());
        }
-      if (B.top().asInt() != 0)
-       {say("AAAA", B.top().asInt());
-        active(s, B.top().asInt());
-       }
+      active(s, B.top().asInt());                                               // Add top
      }
    }
 
@@ -1550,6 +1547,7 @@ class Btree extends Test                                                        
     final int N = 16;
     for (int i = 1; i <= N; i++)
      {t.put(i);
+      t.checkFreeList();
      }
     //stop(t);
     t.ok("""
@@ -1563,6 +1561,8 @@ class Btree extends Test                                                        
     ok(t.delete(t.new Key(3)), 3);
     ok(t.delete(t.new Key(5)), 5);
     ok(t.delete(t.new Key(6)), 6);
+    t.checkFreeList();
+
     //stop(t);
     t.ok("""
           8             12               |
@@ -1576,6 +1576,8 @@ class Btree extends Test                                                        
     ok(t.delete(t.new Key( 8)),  8);
     ok(t.delete(t.new Key( 9)),  9);
     ok(t.delete(t.new Key(10)), 10);
+    t.checkFreeList();
+
     //stop(t);
     t.ok("""
             12              |
@@ -1589,6 +1591,8 @@ class Btree extends Test                                                        
     ok(t.delete(t.new Key(12)), 12);
     ok(t.delete(t.new Key(13)), 13);
     ok(t.delete(t.new Key(14)), 14);
+    t.checkFreeList();
+
     //stop(t);
     t.ok("""
 1,2,15,16=0 |
@@ -1597,17 +1601,20 @@ class Btree extends Test                                                        
     ok(t.delete(t.new Key( 2)),  2);
     ok(t.delete(t.new Key(15)), 15);
     ok(t.delete(t.new Key(16)), 16);
+    t.checkFreeList();
+
     //stop(t);
     t.ok("""
 1=0 |
 """);
 
     ok(t.delete(t.new Key( 1)),  1);
+    t.checkFreeList();
+
     //stop(t);
     t.ok("""
 =0 |
 """);
-    t.checkFreeList();
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
