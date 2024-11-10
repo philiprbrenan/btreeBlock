@@ -773,7 +773,8 @@ class Btree extends Test                                                        
       if (isFull()) stop("Branch should not be full, but it is, branch:", this);
       z();
       final Branch   right = new Branch(gte.next);                              // The child being split
-      if (!right.isFull()) stop("Branch:", right, "should be full but is only:", right.branchSize());
+      if (!right.isFull()) stop("Branch:",
+        right, "should be full but is only:", right.branchSize());
       z();
       final Branch    left = new Branch();                                      // The split out left hand side off the child being split
 
@@ -887,7 +888,7 @@ class Btree extends Test                                                        
     int asInt()     {return i;}
    }
 
-  class LKDIndex extends BLIndex                                                  // An index to key, data pair in a leaf
+  class LKDIndex extends BLIndex                                                // An index to key, data pair in a leaf
    {LKDIndex()      {z(); }
     LKDIndex(int I) {z(); i = I;}
     public String toString() {return "LKDIndex("+i+")";}
