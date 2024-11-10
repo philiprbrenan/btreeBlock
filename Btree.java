@@ -3,7 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout a btree in a block on a silicon chip.
-
+// Rename Next to Index
 import java.util.*;
 
 class Btree extends Test                                                        // Manipulate a btree
@@ -28,6 +28,7 @@ class Btree extends Test                                                        
          maxPrintLevels = 10,                                                   // Maximum number of levels to print in a tree
                maxDepth =  6;                                                   // Maximum depth of any realistic tree
 
+  int       maxNodeUsed = 0;;                                                   // Maximum branch or leaf index used
   static boolean debug = false;                                                 // Debugging enabled
 
 //D1 Construction                                                               // Create a BTree from nodes which can be branches or leaves.  The data associated with the BTree is stored only in the leaves opposite the keys
@@ -105,6 +106,15 @@ class Btree extends Test                                                        
      }
    }
 
+  Next allocate()                                                               // Allocate a branch or leaf
+   {z();
+    if (freeList.size() < 1) stop("No more leaves or branches available");
+    z();
+    final Next index = freeList.pop();
+    maxNodeUsed = max(maxNodeUsed, index.asInt());
+    return index;
+   }
+
 //D1 Components                                                                 // A branch or leaf in the tree
 
   class BranchOrLeaf                                                            // A branch or leaf in a btree
@@ -115,7 +125,6 @@ class Btree extends Test                                                        
     final KeyData[]   keyData = new KeyData[maxKeysPerLeaf];                    // Key, data pairs for when a leaf
     final KeyNext[]   keyNext = new KeyNext[maxKeysPerBranch];                  // Key, next pairs for when a branch
     Next                  top = new Next();                                     // Top next reference for when a branch
-    String    allocationTrace =  null;                                          // Where this branch or leaf as last allocated
 
     BranchOrLeaf()                                                              // Memory for branches and leaves
      {z();
@@ -130,11 +139,9 @@ class Btree extends Test                                                        
      {z();
       if (freeList.size() < 1) stop("No more leaves available");
       z();
-      index = freeList.pop();
+      index = allocate();
       nodes[index.asInt()].state = BranchOrLeaf.State.leaf;
-      nodes[index.asInt()].allocationTrace = traceBack();
       zeroLeafSize();
-
      }
     Leaf(int n)                                                                 // Access a leaf by number
      {z();
@@ -367,7 +374,7 @@ class Btree extends Test                                                        
     Branch()                                                                    // get a new branch off the free list
      {z();
       if (freeList.size() < 1) stop("No more branches");
-      index = freeList.pop();
+      index = allocate();
       nodes[index.asInt()].state = BranchOrLeaf.State.branch;
       zeroBranchSize();
      }
@@ -1384,7 +1391,7 @@ class Btree extends Test                                                        
    }
 
   static void test_split_leaf_root()
-   {final Btree t = new Btree(8, 8, 4, 4, 3, 8);
+   {final Btree t = new Btree(8, 8, 4, 4, 3, 3);
     final Leaf  l = t.new Leaf(true);
     l.push( 2, 12);
     l.push( 4, 14);
@@ -1407,7 +1414,7 @@ class Btree extends Test                                                        
    }
 
   static void test_split_branch_root()
-   {final Btree t = new Btree(8, 8, 4, 4, 3,16);
+   {final Btree t = new Btree(8, 8, 4, 4, 3, 9);
     final Leaf  r = t.new Leaf(true);
     r.push( 20, 12);
     r.push( 40, 14);
@@ -1459,7 +1466,7 @@ class Btree extends Test                                                        
    }
 
   static void test_put_ascending()
-   {final Btree t = new Btree(8, 8, 8, 4, 3, 40);
+   {final Btree t = new Btree(8, 8, 8, 4, 3, 24);
     final int N = 64;
     for (int i = 1; i <= N; i++) t.put(i);
     //stop(t);
@@ -1481,7 +1488,7 @@ class Btree extends Test                                                        
    }
 
   static void test_put_descending()
-   {final Btree t = new Btree(8, 8, 8, 4, 3, 64);
+   {final Btree t = new Btree(8, 8, 8, 4, 3, 24);
     final int N = 64;
     for (int i = N; i > 0; --i) t.put(i);
     //stop(t);
@@ -1515,7 +1522,7 @@ class Btree extends Test                                                        
   static void test_put_random()
    {final RandomArray r = new RandomArray();
     final int N = RandomArray.r.length;
-    final Btree t = new Btree(16, 16, 16, 4, 3, N);
+    final Btree t = new Btree(16, 16, 16, 4, 3, 40);
 
     for (int i = 0; i < N; i++) t.put(RandomArray.r[i]);
     //stop(t);
@@ -1546,7 +1553,7 @@ class Btree extends Test                                                        
    }
 
   static void test_delete()
-   {final Btree t = new Btree(8, 8, 8, 4, 3, 8);
+   {final Btree t = new Btree(8, 8, 8, 4, 3, 5);
     final int N = 16;
     for (int i = 1; i <= N; i++)
      {t.put(i);
