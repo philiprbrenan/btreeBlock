@@ -3,9 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout a btree in a block on a silicon chip.
-// check memory is not leaking in btree
 // merge root branch into a leaf and show no memory loss
-// Make BKNIndex and LKDIndex extend a common class
 import java.util.*;
 
 class Btree extends Test                                                        // Manipulate a btree
@@ -53,9 +51,10 @@ class Btree extends Test                                                        
     maxKeysInBranches = maxKeysPerBranch * (1 + maxKeysPerBranch);              // Including top
 
     nodes = new BranchOrLeaf[TreeSize];                                         // Allocate leaves and branches
-    for (int i = 0; i < TreeSize; i++)                                          // Initially all of the leaves or branches are on the free list, except for the root at index 0
-     {if (i > 0) freeList.push(new Next(i));
-      nodes[i] = new BranchOrLeaf();
+    for (int i = treeSize; i > 0; i--)                                          // Initially all of the leaves or branches are on the free list, except for the root at index 0
+     {if (i-1 > 0) freeList.push(new Next(i-1));
+      nodes[i-1]       = new BranchOrLeaf();
+      nodes[i-1].state = BranchOrLeaf.State.neverUsed;
      }
     nodes[0].state = BranchOrLeaf.State.leaf;                                   // Start with the root as a leaf
    }
@@ -66,16 +65,57 @@ class Btree extends Test                                                        
   void stop() {Test.stop(toString());}
   public String toString() {return print();}
 
+  void checkFreeList()                                                          // Check for memory leaks
+   {final Set<Integer> s = active();                                            // Active branches and leaves
+
+    for (int i = 0; i < treeSize; i++)                                          // Make sure that all allocated branches and leaves that are accessible from the root of the tree
+     {BranchOrLeaf n = nodes[i];
+      if      (n.state == BranchOrLeaf.State.leaf)
+       {if (!s.contains(i)) stop("Floating leaf", i);
+       }
+      else if (n.state == BranchOrLeaf.State.branch)
+       {if (!s.contains(i)) stop("Floating branch", i);
+       }
+     }
+   }
+
+  Set<Integer> active()                                                         // Active branches and leaves
+   {final Set<Integer> s = new TreeSet<>();                                     // The set of active branches and leaves
+    s.add(0);
+    active(s, 0);
+    return s;
+   }
+
+  void active(Set<Integer> s, int index)                                        // Active branches and leaves
+   {if (nodes[index].state == BranchOrLeaf.State.leaf)
+     {s.add(index);
+     }
+    else if (nodes[index].state == BranchOrLeaf.State.branch)
+     {s.add(index);
+      final Branch    B = new Branch(index);
+      final int       N = B.branchSize().asInt();
+      final KeyNext[]kn = B.keyNext();
+      for (int i = 0; i < N; i++)
+       {active(s, kn[i].next.asInt());
+       }
+      if (B.top().asInt() != 0)
+       {say("AAAA", B.top().asInt());
+        active(s, B.top().asInt());
+       }
+     }
+   }
+
 //D1 Components                                                                 // A branch or leaf in the tree
 
   class BranchOrLeaf                                                            // A branch or leaf in a btree
-   {enum State {leaf, branch, free};                                            // The current state of the branch or leaf: as a leaf, as a branch or free waiting for use
+   {enum State {leaf, branch, free, neverUsed};                                 // The current state of the branch or leaf: as a leaf, as a branch or free waiting for use
     State               state;                                                  // Whether this branch or leaf is a branch, a leaf or free
     final LKDIndex   leafSize = new LKDIndex();                                 // Number of key, data pairs currently contained in leafif a leaf
     final BKNIndex branchSize = new BKNIndex();                                 // Number of key, next pairs currently contained in branch if a branch
     final KeyData[]   keyData = new KeyData[maxKeysPerLeaf];                    // Key, data pairs for when a leaf
     final KeyNext[]   keyNext = new KeyNext[maxKeysPerBranch];                  // Key, next pairs for when a branch
     Next                  top = new Next();                                     // Top next reference for when a branch
+    String    allocationTrace =  null;                                          // Where this branch or leaf as last allocated
 
     BranchOrLeaf()                                                              // Memory for branches and leaves
      {z();
@@ -92,7 +132,9 @@ class Btree extends Test                                                        
       z();
       index = freeList.pop();
       nodes[index.asInt()].state = BranchOrLeaf.State.leaf;
+      nodes[index.asInt()].allocationTrace = traceBack();
       zeroLeafSize();
+
      }
     Leaf(int n)                                                                 // Access a leaf by number
      {z();
@@ -117,9 +159,13 @@ class Btree extends Test                                                        
      }
 
     void freeLeaf()                                                             // Free this leaf
-     {if (index == null || index.asInt() == 0) stop("Cannot free root currently a leaf");
+     {z();
+      assertLeaf();
+      z();
+      if (index == null || index.asInt() == 0) stop("Cannot free root currently a leaf");
       z();
       freeList.push(index);
+      nodes[index.asInt()].state = BranchOrLeaf.State.free;
      }
 
     BranchOrLeaf.State state() {z(); return nodes[index.asInt()].state;   }     // State of this memory
@@ -127,6 +173,17 @@ class Btree extends Test                                                        
     KeyData[]        keyData() {z(); return nodes[index.asInt()].keyData; }     // Key, data pairs in leaf
 
     void setLeafSize(int size) {z(); leafSize().set(size);}                     //Set the size of the leaf
+
+    void copy(Leaf source)                                                      // Copy a leaf
+     {final KeyData[]skd = source.keyData();                                    // Source key, data pairs
+      final KeyData[]tkd = keyData();                                           // Target key, data pairs
+      final int N = source.leafSize().asInt();
+      for (int i = 0; i < N; i++)
+       {tkd[i].set(skd[i].key);
+        tkd[i].set(skd[i].data);
+       }
+      setLeafSize(N);
+     }
 
     public String toString()                                                    // Print leaf
      {final StringBuilder s = new StringBuilder();
@@ -284,12 +341,12 @@ class Btree extends Test                                                        
        {z();
         l.push(kd[i].key, kd[i].data);
        }
-      R.push(kd[splitLeafSize-1].key, l);
+      R.push(kd[splitLeafSize-1].key, l);                                       // Insert left leaf into root
       for (int i = splitLeafSize; i < maxKeysPerLeaf;  i++)                     // Build right leaf
        {z();
         r.push(kd[i].key, kd[i].data);
        }
-      R.top(r);
+      R.top(r);                                                                 // Insert right leaf into root
       return R;                                                                 // Return root
      }
 
@@ -329,6 +386,16 @@ class Btree extends Test                                                        
       if (nodes[0].state != BranchOrLeaf.State.branch) stop("Root is not a branch");
       z();
       index = new Next(0);
+     }
+
+    void freeBranch()                                                           // Free this branch
+     {z();
+      assertBranch();
+      z();
+      if (index == null || index.asInt() == 0) stop("Cannot free root currently as branch");
+      z();
+      freeList.push(index);
+      nodes[index.asInt()].state = BranchOrLeaf.State.free;
      }
 
     void assertBranch()
@@ -476,10 +543,12 @@ class Btree extends Test                                                        
         leaf.incLeafSize();                                                     // Move up in leaf
        }
 
+      final Leaf t = new Leaf(top());                                           // The top leaf is empty so we replace it with the next top leaf
       if (new Leaf(top()).leafSize().asInt() == 0)                              // The top leaf is empty so we replace it with the next top leaf
        {z();
         decBranchSize();                                                        // Pop the last key, next pair off the body of the parent branch
-        top(new Leaf(keyNext()[branchSize().asInt()].next));                    // Place last next on top of parent branch
+        t.copy(leaf);                                                           // Copy the last leaf in the body to the top next leaf
+        leaf.freeLeaf();
        }
 
       final int children = branchSize().asInt();                                // Update the keys in each key, next pair in the parent branch to one less than the lowest key in the next child leaf.
@@ -797,29 +866,28 @@ class Btree extends Test                                                        
     public String toString() {return "KeyNext("+key+","+next+")";}
    }
 
-  class LKDIndex                                                                // An index to key, data pair in a leaf
-   {int i;                                                                      // Index to a key, data, pair in a leaf
-    LKDIndex()      {z(); }
-    LKDIndex(int I) {z(); i = I;}
-    public String toString() {return "LKDIndex("+i+")";}
-    void inc()      {z(); if (i < maxKeysPerLeaf) ++i; else stop("cannot increment leaf index");}
-    void dec()      {z(); if (i > 0)              --i; else stop("cannot decrement leaf index");}
+  abstract class Index                                                          // An index to key, data pair in a leaf or key, next pair in a branch
+   {int i;                                                                      // Index
     void zero()     {z(); i = 0;}
     boolean equals(int N) {z(); return i == N;}
     void set(int I) {z(); i = I;}
     int asInt()     {return i;}
    }
 
-  class BKNIndex                                                                // An index to key, next pair in a branch
-   {int i;                                                                      // Index to a key, next pair in a leaf
-    BKNIndex()      {z(); }
+  class LKDIndex extends Index                                                  // An index to key, data pair in a leaf
+   {LKDIndex()      {z(); }
+    LKDIndex(int I) {z(); i = I;}
+    public String toString() {return "LKDIndex("+i+")";}
+    void inc()      {z(); if (i < maxKeysPerLeaf) ++i; else stop("cannot increment leaf index");}
+    void dec()      {z(); if (i > 0)              --i; else stop("cannot decrement leaf index");}
+   }
+
+  class BKNIndex extends Index                                                  // An index to key, next pair in a branch
+   {BKNIndex()      {z(); }
     BKNIndex(int I) {z(); i = I;}
     public String toString() {return "BKNIndex("+i+")";}
     void inc()      {z(); if (i < maxKeysPerBranch) ++i; else stop("cannot increment branch index");}
     void dec()      {z(); if (i > 0)                --i; else stop("cannot decrement branch index");}
-    void zero()     {z(); i = 0;}
-    void set(int I) {z(); i = I;}
-    int asInt() {return i;}
    }
 
 //D1 Find                                                                       // Find the data associated with a key
@@ -1085,6 +1153,7 @@ class Btree extends Test                                                        
           for (int j = 0; j < P; j++) {z(); rkn[j] = kn.elementAt(j);}          // Copy back combined body into right sibling
           right.setBranchSize(P);
           pkn.removeElementAt(b-1);                                             // Remove splitting key from parent
+          left.freeBranch();                                                    // Free the branch liberated on the left
          }
        }
       parent.top(pkn.pop().next);                                               // Remove top next
@@ -1208,29 +1277,50 @@ class Btree extends Test                                                        
     t.ok("""
           8        12            |
           0        0.1           |
-          7        6             |
-                   5             |
-2,4,6,8=7  10,12=6    14,16,18=5 |
+          1        2             |
+                   3             |
+2,4,6,8=1  10,12=2    14,16,18=3 |
 """);
-    ok(t.find(t.new Key( 1)), "search:1 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(t.find(t.new Key( 2)), "search:2 leaf:7 rootIsLeaf:n parent:0 found:1 data:12 index:0 allFull:n lastNotFull:0");
-    ok(t.find(t.new Key( 3)), "search:3 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(t.find(t.new Key( 4)), "search:4 leaf:7 rootIsLeaf:n parent:0 found:1 data:14 index:1 allFull:n lastNotFull:0");
-    ok(t.find(t.new Key( 5)), "search:5 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(t.find(t.new Key( 6)), "search:6 leaf:7 rootIsLeaf:n parent:0 found:1 data:16 index:2 allFull:n lastNotFull:0");
-    ok(t.find(t.new Key( 7)), "search:7 leaf:7 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(t.find(t.new Key( 8)), "search:8 leaf:7 rootIsLeaf:n parent:0 found:1 data:18 index:3 allFull:n lastNotFull:0");
-    ok(t.find(t.new Key( 9)), "search:9 leaf:6 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(t.find(t.new Key(10)), "search:10 leaf:6 rootIsLeaf:n parent:0 found:1 data:20 index:0 allFull:n lastNotFull:0");
-    ok(t.find(t.new Key(11)), "search:11 leaf:6 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(t.find(t.new Key(12)), "search:12 leaf:6 rootIsLeaf:n parent:0 found:1 data:22 index:1 allFull:n lastNotFull:0");
-    ok(t.find(t.new Key(13)), "search:13 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(t.find(t.new Key(14)), "search:14 leaf:5 rootIsLeaf:n parent:0 found:1 data:24 index:0 allFull:n lastNotFull:0");
-    ok(t.find(t.new Key(15)), "search:15 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(t.find(t.new Key(16)), "search:16 leaf:5 rootIsLeaf:n parent:0 found:1 data:26 index:1 allFull:n lastNotFull:0");
-    ok(t.find(t.new Key(17)), "search:17 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
-    ok(t.find(t.new Key(18)), "search:18 leaf:5 rootIsLeaf:n parent:0 found:1 data:28 index:2 allFull:n lastNotFull:0");
-    ok(t.find(t.new Key(19)), "search:19 leaf:5 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+
+    //say("\""+t.find(t.new Key( 1))+"\");");
+    //say("\""+t.find(t.new Key( 2))+"\");");
+    //say("\""+t.find(t.new Key( 3))+"\");");
+    //say("\""+t.find(t.new Key( 4))+"\");");
+    //say("\""+t.find(t.new Key( 5))+"\");");
+    //say("\""+t.find(t.new Key( 6))+"\");");
+    //say("\""+t.find(t.new Key( 7))+"\");");
+    //say("\""+t.find(t.new Key( 8))+"\");");
+    //say("\""+t.find(t.new Key( 9))+"\");");
+    //say("\""+t.find(t.new Key(10))+"\");");
+    //say("\""+t.find(t.new Key(11))+"\");");
+    //say("\""+t.find(t.new Key(12))+"\");");
+    //say("\""+t.find(t.new Key(13))+"\");");
+    //say("\""+t.find(t.new Key(14))+"\");");
+    //say("\""+t.find(t.new Key(15))+"\");");
+    //say("\""+t.find(t.new Key(16))+"\");");
+    //say("\""+t.find(t.new Key(17))+"\");");
+    //say("\""+t.find(t.new Key(18))+"\");");
+    //say("\""+t.find(t.new Key(19))+"\");");
+
+    ok(t.find(t.new Key( 1)), "search:1 leaf:1 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 2)), "search:2 leaf:1 rootIsLeaf:n parent:0 found:1 data:12 index:0 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 3)), "search:3 leaf:1 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 4)), "search:4 leaf:1 rootIsLeaf:n parent:0 found:1 data:14 index:1 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 5)), "search:5 leaf:1 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 6)), "search:6 leaf:1 rootIsLeaf:n parent:0 found:1 data:16 index:2 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 7)), "search:7 leaf:1 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 8)), "search:8 leaf:1 rootIsLeaf:n parent:0 found:1 data:18 index:3 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key( 9)), "search:9 leaf:2 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(10)), "search:10 leaf:2 rootIsLeaf:n parent:0 found:1 data:20 index:0 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(11)), "search:11 leaf:2 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(12)), "search:12 leaf:2 rootIsLeaf:n parent:0 found:1 data:22 index:1 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(13)), "search:13 leaf:3 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(14)), "search:14 leaf:3 rootIsLeaf:n parent:0 found:1 data:24 index:0 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(15)), "search:15 leaf:3 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(16)), "search:16 leaf:3 rootIsLeaf:n parent:0 found:1 data:26 index:1 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(17)), "search:17 leaf:3 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(18)), "search:18 leaf:3 rootIsLeaf:n parent:0 found:1 data:28 index:2 allFull:n lastNotFull:0");
+    ok(t.find(t.new Key(19)), "search:19 leaf:3 rootIsLeaf:n parent:0 found:n allFull:n lastNotFull:0");
    }
 
   static void test_find_and_insert()
@@ -1239,22 +1329,23 @@ class Btree extends Test                                                        
     t.ok("""
           8        12            |
           0        0.1           |
-          7        6             |
-                   5             |
-2,4,6,8=7  10,12=6    14,16,18=5 |
+          1        2             |
+                   3             |
+2,4,6,8=1  10,12=2    14,16,18=3 |
 """);
     FindAndInsert fi6 = t.findAndInsert(t.new Key(6), t.new Data(7));           // Update leaf
     //stop(t);
     t.ok("""
           8        12            |
           0        0.1           |
-          7        6             |
-                   5             |
-2,4,6,8=7  10,12=6    14,16,18=5 |
+          1        2             |
+                   3             |
+2,4,6,8=1  10,12=2    14,16,18=3 |
 """);
 
 
-    ok(fi6, "key:6 data:7 success:true inserted:false search:6 leaf:7 rootIsLeaf:n parent:0 found:1 data:7 index:2 allFull:n lastNotFull:0");
+    //stop(fi6);
+    ok(fi6, "key:6 data:7 success:true inserted:false search:6 leaf:1 rootIsLeaf:n parent:0 found:1 data:7 index:2 allFull:n lastNotFull:0");
     ok(t.find(t.new Key(6)).data(),  7);
     ok(t.find(t.new Key(8)).data(), 18);
 
@@ -1263,9 +1354,9 @@ class Btree extends Test                                                        
     t.ok("""
           8           12            |
           0           0.1           |
-          7           6             |
-                      5             |
-2,4,6,8=7  10,11,12=6    14,16,18=5 |
+          1           2             |
+                      3             |
+2,4,6,8=1  10,11,12=2    14,16,18=3 |
 """);
     ok(t.root().countChildLeafKeys(), 10);
 
@@ -1274,9 +1365,9 @@ class Btree extends Test                                                        
     t.ok("""
           8           12               |
           0           0.1              |
-          7           6                |
-                      5                |
-2,4,6,8=7  10,11,12=6    14,16,18,19=5 |
+          1           2                |
+                      3                |
+2,4,6,8=1  10,11,12=2    14,16,18,19=3 |
 """);
     ok(t.root().countChildLeafKeys(), 11);
 
@@ -1285,9 +1376,9 @@ class Btree extends Test                                                        
     t.ok("""
           7             13               |
           0             0.1              |
-          6             7                |
-                        4                |
-2,4,5,6=6  8,10,11,12=7    14,16,18,19=4 |
+          2             1                |
+                        3                |
+2,4,5,6=2  8,10,11,12=1    14,16,18,19=3 |
 """);
     ok(t.root().countChildLeafKeys(), 12);
    }
@@ -1308,9 +1399,9 @@ class Btree extends Test                                                        
     t.ok("""
       4      |
       0      |
-      7      |
-      6      |
-2,4=7  6,8=6 |
+      1      |
+      2      |
+2,4=1  6,8=2 |
 """);
    ok(b.hasLeaves(), true);
    }
@@ -1338,24 +1429,24 @@ class Btree extends Test                                                        
     R.top(l3);
     //stop(t);
     t.ok("""
-         40         80            120           |
-         0          0.1           0.2           |
-         15         14            13            |
-                                  12            |
-20,40=15   60,80=14    100,120=13    140,160=12 |
+        40        80           120          |
+        0         0.1          0.2          |
+        1         2            3            |
+                               4            |
+20,40=1   60,80=2    100,120=3    140,160=4 |
 """);
     R.splitBranchRoot();
     //stop(t);
     t.ok("""
-                    80                         |
-                    0                          |
-                    11                         |
-                    10                         |
-         40                      120           |
-         11                      10            |
-         15                      13            |
-         14                      12            |
-20,40=15   60,80=14   100,120=13    140,160=12 |
+                  80                       |
+                  0                        |
+                  5                        |
+                  6                        |
+        40                    120          |
+        5                     6            |
+        1                     3            |
+        2                     4            |
+20,40=1   60,80=2   100,120=3    140,160=4 |
 """);
 
     final Leaf il = t.new Leaf();
@@ -1373,19 +1464,19 @@ class Btree extends Test                                                        
     for (int i = 1; i <= N; i++) t.put(i);
     //stop(t);
     t.ok("""
-                                                                                                                                     32                                                                                                                                        |
-                                                                                                                                     0                                                                                                                                         |
-                                                                                                                                     7                                                                                                                                         |
-                                                                                                                                     6                                                                                                                                         |
-                                                             16                                                                                                                                            48                                                                  |
-                                                             7                                                                                                                                             6                                                                   |
-                                                             27                                                                                                                                            5                                                                   |
-                                                             17                                                                                                                                            32                                                                  |
-           4            8                 12                                  20               24                 28                                  36               40                44                                52              56                60                |
-           27           27.1              27.2                                17               17.1               17.2                                5                5.1               5.2                               32              32.1              32.2              |
-           36           39                34                                  28               26                 23                                  18               16                13                                8               4                 1                 |
-                                          31                                                                      21                                                                     11                                                                  2                 |
-1,2,3,4=36   5,6,7,8=39     9,10,11,12=34     13,14,15,16=31   17,18,19,20=28   21,22,23,24=26     25,26,27,28=23     29,30,31,32=21   33,34,35,36=18   37,38,39,40=16    41,42,43,44=13    45,46,47,48=11   49,50,51,52=8   53,54,55,56=4     57,58,59,60=1     61,62,63,64=2 |
+                                                                                                                            32                                                                                                                                           |
+                                                                                                                            0                                                                                                                                            |
+                                                                                                                            19                                                                                                                                           |
+                                                                                                                            20                                                                                                                                           |
+                                                      16                                                                                                                                            48                                                                   |
+                                                      19                                                                                                                                            20                                                                   |
+                                                      9                                                                                                                                             21                                                                   |
+                                                      14                                                                                                                                            6                                                                    |
+          4          8               12                               20               24                28                                  36               40                 44                                  52               56                60               |
+          9          9.1             9.2                              14               14.1              14.2                                21               21.1               21.2                                6                6.1               6.2              |
+          3          1               4                                8                10                5                                   13               15                 11                                  18               22                16               |
+                                     7                                                                   12                                                                      17                                                                     2                |
+1,2,3,4=3  5,6,7,8=1    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=5     29,30,31,32=12   33,34,35,36=13   37,38,39,40=15     41,42,43,44=11     45,46,47,48=17   49,50,51,52=18   53,54,55,56=22    57,58,59,60=16    61,62,63,64=2 |
 """);
    }
 
@@ -1395,19 +1486,19 @@ class Btree extends Test                                                        
     for (int i = N; i > 0; --i) t.put(i);
     //stop(t);
     t.ok("""
-                                                                                                                               32                                                                                                                                              |
-                                                                                                                               0                                                                                                                                               |
-                                                                                                                               10                                                                                                                                              |
-                                                                                                                               9                                                                                                                                               |
-                                                       16                                                                                                                                              48                                                                      |
-                                                       10                                                                                                                                              9                                                                       |
-                                                       8                                                                                                                                               42                                                                      |
-                                                       26                                                                                                                                              50                                                                      |
-          4           8               12                                20               24                 28                                  36               40                 44                                  52               56                 60                 |
-          8           8.1             8.2                               26               26.1               26.2                                42               42.1               42.2                                50               50.1               50.2               |
-          1           11              7                                 17               12                 25                                  33               28                 41                                  49               44                 63                 |
-                                      2                                                                     20                                                                      36                                                                      53                 |
-1,2,3,4=1  5,6,7,8=11    9,10,11,12=7    13,14,15,16=2   17,18,19,20=17   21,22,23,24=12     25,26,27,28=25     29,30,31,32=20   33,34,35,36=33   37,38,39,40=28     41,42,43,44=41     45,46,47,48=36   49,50,51,52=49   53,54,55,56=44     57,58,59,60=63     61,62,63,64=53 |
+                                                                                                                                    32                                                                                                                                    |
+                                                                                                                                    0                                                                                                                                     |
+                                                                                                                                    19                                                                                                                                    |
+                                                                                                                                    20                                                                                                                                    |
+                                                             16                                                                                                                                         48                                                                |
+                                                             19                                                                                                                                         20                                                                |
+                                                             21                                                                                                                                         9                                                                 |
+                                                             14                                                                                                                                         6                                                                 |
+           4            8                 12                                  20               24                 28                                 36              40                44                               52              56               60               |
+           21           21.1              21.2                                14               14.1               14.2                               9               9.1               9.2                              6               6.1              6.2              |
+           16           18                22                                  17               13                 15                                 12              8                 10                               7               3                1                |
+                                          11                                                                      5                                                                    4                                                                 2                |
+1,2,3,4=16   5,6,7,8=18     9,10,11,12=22     13,14,15,16=11   17,18,19,20=17   21,22,23,24=13     25,26,27,28=15     29,30,31,32=5   33,34,35,36=12   37,38,39,40=8    41,42,43,44=10    45,46,47,48=4   49,50,51,52=7   53,54,55,56=3    57,58,59,60=1    61,62,63,64=2 |
 """);
    }
 
@@ -1429,19 +1520,19 @@ class Btree extends Test                                                        
     for (int i = 0; i < N; i++) t.put(RandomArray.r[i]);
     //stop(t);
     t.ok("""
-                                                                                                                                                                                                                  402                                                                                                                              577                                                                                                                                                                                                                    |
-                                                                                                                                                                                                                  0                                                                                                                                0.1                                                                                                                                                                                                                    |
-                                                                                                                                                                                                                  29                                                                                                                               21                                                                                                                                                                                                                     |
-                                                                                                                                                                                                                                                                                                                                                   52                                                                                                                                                                                                                     |
-                                                             150                                                                              278                                                                                                                                   500                                                                                                                               689                                                          857                                                                                    |
-                                                             29                                                                               29.1                                                                                                                                  21                                                                                                                                52                                                           52.1                                                                                   |
-                                                             28                                                                               47                                                                                                                                    51                                                                                                                                20                                                           66                                                                                     |
-                                                                                                                                              76                                                                                                                                    90                                                                                                                                                                                             89                                                                                     |
-              38               89                  134                            187                   236                    271                                   337                   375                                          436                   471                                         525                   563                                      614                   666                                          803                  829                                      905                   936                    986                |
-              28               28.1                28.2                           47                    47.1                   47.2                                  76                    76.1                                         51                    51.1                                        90                    90.1                                     20                    20.1                                         66                   66.1                                     89                    89.1                   89.2               |
-              33               24                  1                              2                     27                     59                                    46                    88                                           50                    67                                          37                    75                                       19                    65                                           41                   9                                        83                    57                     10                 |
-                                                   3                                                                           11                                                          30                                                                 6                                                                 14                                                             12                                                                5                                                                                     15                 |
-1,13,27,29=33   39,43,55,72=24     90,96,103,106=1     135=3    151,155,157,186=2    188,229,232,234=27     237,246,260,261=59     272,273=11     279,288,298,317=46    338,344,354,358=88     376,377,391,401=30    403,422,425,436=50    437,438,442,447=67     472,480,490,494=6    501,503,511,516=37    526,545,554,560=75     564,576,577=14    578,586,611,612=19    615,650,657,658=65     667,679,681,686=12    690,704,769,773=41    804,806,809,826=9     830,839,854=5     858,882,884,903=83    906,907,912,922=57     937,946,961,976=10     987,989,993=15 |
+                                                                                                                                                                                                                   402                                                                                                                            577                                                                                                                                                                                                                 |
+                                                                                                                                                                                                                   0                                                                                                                              0.1                                                                                                                                                                                                                 |
+                                                                                                                                                                                                                   29                                                                                                                             32                                                                                                                                                                                                                  |
+                                                                                                                                                                                                                                                                                                                                                  20                                                                                                                                                                                                                  |
+                                                               150                                                                               278                                                                                                                                 500                                                                                                                             689                                                           857                                                                                |
+                                                               29                                                                                29.1                                                                                                                                32                                                                                                                              20                                                            20.1                                                                               |
+                                                               30                                                                                23                                                                                                                                  21                                                                                                                              33                                                            15                                                                                 |
+                                                                                                                                                 11                                                                                                                                  5                                                                                                                                                                                             6                                                                                  |
+              38               89                   134                              187                   236                    271                                   337                  375                                         436                   471                                         525                   563                                    614                   666                                          803                   829                                     905                   936                   986              |
+              30               30.1                 30.2                             23                    23.1                   23.2                                  11                   11.1                                        21                    21.1                                        5                     5.1                                    33                    33.1                                         15                    15.1                                    6                     6.1                   6.2              |
+              28               19                   38                               37                    31                     17                                    24                   7                                           22                    14                                          27                    12                                     34                    16                                           26                    36                                      8                     18                    35               |
+                                                    25                                                                            13                                                         4                                                                 9                                                                 1                                                            10                                                                 3                                                                                   2                |
+1,13,27,29=28   39,43,55,72=19     90,96,103,106=38     135=25    151,155,157,186=37    188,229,232,234=31     237,246,260,261=17     272,273=13     279,288,298,317=24    338,344,354,358=7     376,377,391,401=4    403,422,425,436=22    437,438,442,447=14     472,480,490,494=9    501,503,511,516=27    526,545,554,560=12    564,576,577=1    578,586,611,612=34    615,650,657,658=16     667,679,681,686=10    690,704,769,773=26    804,806,809,826=36     830,839,854=3     858,882,884,903=8    906,907,912,922=18    937,946,961,976=35    987,989,993=2 |
 """);
 
     if (true)                                                                   // Check we can find everything we should be able to find and cannot find the rest
@@ -1455,16 +1546,18 @@ class Btree extends Test                                                        
    }
 
   static void test_delete()
-   {final Btree t = new Btree(8, 8, 8, 4, 3, 40);
+   {final Btree t = new Btree(8, 8, 8, 4, 3, 8);
     final int N = 16;
-    for (int i = 1; i <= N; i++) t.put(i);
+    for (int i = 1; i <= N; i++)
+     {t.put(i);
+     }
     //stop(t);
     t.ok("""
-           4            8                12                |
-           0            0.1              0.2               |
-           36           39               34                |
-                                         35                |
-1,2,3,4=36   5,6,7,8=39    9,10,11,12=34    13,14,15,16=35 |
+          4          8               12               |
+          0          0.1             0.2              |
+          3          1               4                |
+                                     2                |
+1,2,3,4=3  5,6,7,8=1    9,10,11,12=4    13,14,15,16=2 |
 """);
     ok(t.delete(t.new Key(4)), 4);
     ok(t.delete(t.new Key(3)), 3);
@@ -1472,11 +1565,11 @@ class Btree extends Test                                                        
     ok(t.delete(t.new Key(6)), 6);
     //stop(t);
     t.ok("""
-           8               12                |
-           0               0.1               |
-           36              39                |
-                           34                |
-1,2,7,8=36   9,10,11,12=39    13,14,15,16=34 |
+          8             12               |
+          0             0.1              |
+          3             1                |
+                        2                |
+1,2,7,8=3  9,10,11,12=1    13,14,15,16=2 |
 """);
 
     ok(t.delete(t.new Key( 7)),  7);
@@ -1485,11 +1578,11 @@ class Btree extends Test                                                        
     ok(t.delete(t.new Key(10)), 10);
     //stop(t);
     t.ok("""
-             12               |
-             0                |
-             36               |
-             39               |
-1,2,11,12=36   13,14,15,16=39 |
+            12              |
+            0               |
+            3               |
+            2               |
+1,2,11,12=3   13,14,15,16=2 |
 """);
 
     ok(t.delete(t.new Key(11)), 11);
@@ -1514,6 +1607,7 @@ class Btree extends Test                                                        
     t.ok("""
 =0 |
 """);
+    t.checkFreeList();
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -1535,9 +1629,9 @@ class Btree extends Test                                                        
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      //if (github_actions)
-       {coverageAnalysis(sourceFileName(), 12);               // Coverage analysis
-     }
+      if (github_actions)                                                       // Coverage analysis
+       {coverageAnalysis(sourceFileName(), 12);
+       }
       testSummary();                                                            // Summarize test results
       System.exit(testsFailed);
      }
