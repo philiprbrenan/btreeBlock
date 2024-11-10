@@ -159,6 +159,17 @@ class Btree extends Test                                                        
     freeList.push(index);
    }
 
+  void printLeafData()                                                          // Check that keyData and KeyNext allocation addresses have not been relocated
+   {for (int i = 0; i < treeSize; i++)                                          // Make sure that all allocated branches and leaves that are accessible from the root of the tree
+     {BranchOrLeaf n = nodes[i];
+      if (isLeaf(i))
+       {final Leaf l = new Leaf(i);
+        final int  N = l.leafSize().asInt();
+        say(l);
+       }
+     }
+   }
+
 //D1 Components                                                                 // A branch or leaf in the tree
 
   class BranchOrLeaf                                                            // A branch or leaf in a btree
@@ -563,7 +574,6 @@ if (debug) say("SSSS top", l, this);
     void repackLeaves(Stack<KeyData>up, KeyNext[]kn)                            // Repack the key, data pairs into leaves under the current branch
      {final int N = up.size();                                                  // Recreate the leaves with the key, data pairs packed in
       Leaf leaf = pushNewLeaf();                                                // First new leaf into branch
-if (debug) say("DDDD111", Branch.this, up);
       for (int k = 0; k < N; k++)                                               // Repack the leaves
        {z();
         final KeyData source = up.elementAt(k);                                 // Source of repack
@@ -573,9 +583,7 @@ if (debug) say("DDDD111", Branch.this, up);
          }
         leaf.keyData()[leaf.leafSize().asInt()].set(source);                    // Push current key, data pair into the current leaf
         leaf.incLeafSize();                                                     // Move up in leaf
-if (debug) say("DDDD 222", leaf, this);
        }
-if (debug) say(Btree.this.print());
 
       final Leaf t = new Leaf(top());                                           // The top leaf is empty so we replace it with the next top leaf
       if (new Leaf(top()).leafSize().asInt() == 0)                              // The top leaf is empty so we replace it with the next top leaf
@@ -854,6 +862,7 @@ if (debug) say("CCCC 222", Btree.this.print());
    {final boolean[] data = new boolean[bitsPerData];                            // Data is composed of bits
     Data()      {z();}
     Data(int n) {z(); intToBits(n, data);}
+    Data(Data Data) {z(); set(Data);}
     int asInt() {return bitsToInt(data);}
     public String toString() {z(); return ""+bitsToInt(data);}
     void set(Data Data)                                                         // Copy the specified datum into the current datum
@@ -1108,14 +1117,13 @@ if (debug) say("BBBB", Key, p, print());
 
   Data delete(Key Key)                                                          // Delete a key from the tree and returnsd is data if present
    {z();
-if (debug) say("AAAA111", print());
     final Find f = new Find(Key);                                               // Try direct insertion with no modifications to the shape of the tree
     if (!f.found()) return null;                                                // Inserted or updated successfully
     z();
     final Leaf l = f.leaf();                                                    // The leaf that contains the key
     final int  N = l.leafSize().asInt(), p = f.index().asInt();                 // Size of leaf, position in the leaf of the key
     final KeyData[]kd = l.keyData();                                            // Key, data pairs in the leaf
-    final Data   data = kd[p].data;                                             // Data associated with the leaf
+    final Data   data = new Data(kd[p].data);                                  // Data associated with the leaf
     for (int i = p; i < N-1; ++i)                                               // Remove the key, data pair from the leaf
      {z();
       kd[i] = new KeyData(kd[i+1]);
@@ -1710,22 +1718,20 @@ if (debug) say("AAAA", print());
     ok(t.delete(t.new Key(29)), 29);
     ok(t.delete(t.new Key(30)), 30);
     ok(t.delete(t.new Key(31)), 31);
-    stop(t);
-    debug  = true;
     ok(t.delete(t.new Key(32)), 32);
     t.checkFreeList();
 
-    stop(t);
+    //stop(t);
     t.ok("""
-                                                      16                      32                                                                       48                                                                    |
-                                                      0                       0.1                                                                      0.2                                                                   |
-                                                      9                       14                                                                       21                                                                    |
-                                                                                                                                                       6                                                                     |
-          4          8               12                               31                        36               40                 44                                   52               56                60               |
-          9          9.1             9.2                              14                        21               21.1               21.2                                 6                6.1               6.2              |
-          3          1               4                                8                         13               15                 11                                   18               22                16               |
-                                     7                                12                                                            17                                                                      2                |
-1,2,3,4=3  5,6,7,8=1    9,10,11,12=4    13,14,15,16=7   25,26,27,28=8   32=12    33,34,35,36=13   37,38,39,40=15     41,42,43,44=11     45,46,47,48=17    49,50,51,52=18   53,54,55,56=22    57,58,59,60=16    61,62,63,64=2 |
+                                                      16                        32                                                                       48                                                                    |
+                                                      0                         0.1                                                                      0.2                                                                   |
+                                                      9                         14                                                                       21                                                                    |
+                                                                                                                                                         6                                                                     |
+          4          8               12                 14Empty                                   36               40                 44                                   52               56                60               |
+          9          9.1             9.2                                                          21               21.1               21.2                                 6                6.1               6.2              |
+          3          1               4                                                            13               15                 11                                   18               22                16               |
+                                     7                         12                                                                     17                                                                      2                |
+1,2,3,4=3  5,6,7,8=1    9,10,11,12=4    13,14,15,16=7            25,26,27,28=12    33,34,35,36=13   37,38,39,40=15     41,42,43,44=11     45,46,47,48=17    49,50,51,52=18   53,54,55,56=22    57,58,59,60=16    61,62,63,64=2 |
 """);
    }
 
@@ -1743,7 +1749,7 @@ if (debug) say("AAAA", print());
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
+   {oldTests();
     test_delete2();
    }
 
