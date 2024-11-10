@@ -70,11 +70,14 @@ class Btree extends Test                                                        
 
     for (int i = 0; i < treeSize; i++)                                          // Make sure that all allocated branches and leaves that are accessible from the root of the tree
      {BranchOrLeaf n = nodes[i];
-      if      (n.state == BranchOrLeaf.State.leaf)
+      if      (n.state == BranchOrLeaf.State.leaf)                              // Leaf
        {if (!s.contains(i)) stop("Floating leaf", i);
        }
-      else if (n.state == BranchOrLeaf.State.branch)
+      else if (n.state == BranchOrLeaf.State.branch)                            // Branch
        {if (!s.contains(i)) stop("Floating branch", i);
+       }
+      else                                                                      // Free or never used
+       {if (s.contains(i)) stop("Freed but in use", i);
        }
      }
    }
@@ -1499,7 +1502,7 @@ class Btree extends Test                                                        
 """);
    }
 
-  static class RandomArray                                                      // Random array
+  static class RandomArray
    {final static int[]r = {27, 442, 545, 317, 511, 578, 391, 993, 858, 586, 472, 906, 658, 704, 882, 246, 261, 501, 354, 903, 854, 279, 526, 686, 987, 403, 401, 989, 650, 576, 436, 560, 806, 554, 422, 298, 425, 912, 503, 611, 135, 447, 344, 338, 39, 804, 976, 186, 234, 106, 667, 494, 690, 480, 288, 151, 773, 769, 260, 809, 438, 237, 516, 29, 376, 72, 946, 103, 961, 55, 358, 232, 229, 90, 155, 657, 681, 43, 907, 564, 377, 615, 612, 157, 922, 272, 490, 679, 830, 839, 437, 826, 577, 937, 884, 13, 96, 273, 1, 188};
     final static TreeSet<Integer> present = new TreeSet<>();
     static
@@ -1509,7 +1512,7 @@ class Btree extends Test                                                        
     int     max()          {return present.last();}
    }
 
-  static void test_put_random()                                                 // Load a BTree from random data
+  static void test_put_random()
    {final RandomArray r = new RandomArray();
     final int N = RandomArray.r.length;
     final Btree t = new Btree(16, 16, 16, 4, 3, N);
