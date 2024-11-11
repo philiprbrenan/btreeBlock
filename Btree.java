@@ -455,8 +455,7 @@ class Btree extends Test                                                        
       final KeyNext[]tkn = keyNext();                                           // Target key, next pairs
       final int N = source.branchSize().asInt();
       for (int i = 0; i < N; i++)                                               // Copy in each key, next pair
-       {tkn[i].set(skn[i].key);
-        tkn[i].set(skn[i].next);
+       {tkn[i] = new KeyNext(skn[i].key, skn[i].next);
        }
       top(source.top());                                                        // Copy top next from source
       setBranchSize(N);                                                         // Set size of branch
@@ -639,9 +638,7 @@ if (debug) say("SSSS top", l, this);
 
       new Leaf(top()).zeroLeafSize();                                           // Clear leaf referenced by top
       zeroBranchSize();                                                         // Zero the size of this branch ready for repack of key, next pairs
-if (debug) say("CCCC 111");
       repackLeaves(ul.up, ul.kn);                                               // Repack the key, data pairs into leaves under the current branch
-if (debug) say("CCCC 222", Btree.this.print());
      }
 
     void repackLeavesIntoRoot()                                                 // Repack the keys in the leaves under the root into the root
@@ -1090,9 +1087,7 @@ if (debug) say("CCCC 222", Btree.this.print());
       final Branch.FindFirstGreaterThanOrEqual                                  // Step down
         q = p.new FindFirstGreaterThanOrEqual(Key);
       if (isLeaf(q.next))                                                       // Reached a leaf
-       {
-if (debug) say("BBBB", Key, p, print());
-        z(); p.repackLeaves(Key, Data);                                         // Add the key, data pair: if it were already there findAndInsert would have already inserted it
+       {z(); p.repackLeaves(Key, Data);                                         // Add the key, data pair: if it were already there findAndInsert would have already inserted it
         z(); merge(Key);                                                        // Push the tree back together again along the path of the search
         return;
        }
@@ -1129,7 +1124,6 @@ if (debug) say("BBBB", Key, p, print());
       kd[i] = new KeyData(kd[i+1]);
      }
     l.decLeafSize();                                                            // Reduce the leaf size to match
-if (debug) say("AAAA", print());
     merge(Key);
     return data;
    }
@@ -1143,16 +1137,16 @@ if (debug) say("AAAA", print());
      {z();
       final Branch.FindFirstGreaterThanOrEqual down =
         parent.new FindFirstGreaterThanOrEqual(Key);
-      final Next n = down.next;
 
-      if (isLeaf(n))                                                            // Found the containing leaf
+      if (isLeaf(down.next))                                                    // Found the containing leaf
        {z();
-        if (0 == parent.index)                                          // At the root, the root is a branch and the children are leaves
+        if (0 == parent.index)                                                  // At the root, the root is a branch and the children are leaves
          {if (parent.countChildLeafKeys() <= maxKeysPerLeaf)                    // Few enough key, data pairs to hold them in the root as a leaf
            {parent.repackLeavesIntoRoot();
             return;
            }
          }
+
         parent.repackLeaves();                                                  // Repack the leaves of this branch
         return;
        }
@@ -1164,7 +1158,7 @@ if (debug) say("AAAA", print());
       for (int j = 0; j < N; j++)
        {z(); pkn.push(Pkn[j]);
        }
-      pkn.push(new KeyNext(new Key(0), parent.top()));                                // Add top next so we have all the children in one place
+      pkn.push(new KeyNext(new Key(0), parent.top()));                          // Add top next so we have all the children in one place
 
       for (int b = pkn.size()-1; b > 0; b--)                                    // Merge children in body of parent by comparing them pairwise from top to bottom  to avoid disruption
        {z();
@@ -1186,6 +1180,7 @@ if (debug) say("AAAA", print());
           left.freeBranch();                                                    // Free the branch liberated on the left
          }
        }
+
       parent.top(pkn.pop().next);                                               // Remove top next
       final int PS = pkn.size();                                                // Size of parent
       for (int b = 0; b < PS; b++)                                              // Reload parent body
@@ -1201,7 +1196,7 @@ if (debug) say("AAAA", print());
 
       final Branch.FindFirstGreaterThanOrEqual Down =
         parent.new FindFirstGreaterThanOrEqual(Key);
-      parent = new Branch(Down.next);                                           // Step down
+      if (isBranch(Down.next)) parent = new Branch(Down.next);                  // Step down to a branch: if we step down to a leaf the code at the top of the loop will process it.
      }
     stop("Fell off the end of the tree while merging along the search path of", Key);
    }
@@ -1732,6 +1727,210 @@ if (debug) say("AAAA", print());
           3          1               4                                                            13               15                 11                                   18               22                16               |
                                      7                         12                                                                     17                                                                      2                |
 1,2,3,4=3  5,6,7,8=1    9,10,11,12=4    13,14,15,16=7            25,26,27,28=12    33,34,35,36=13   37,38,39,40=15     41,42,43,44=11     45,46,47,48=17    49,50,51,52=18   53,54,55,56=22    57,58,59,60=16    61,62,63,64=2 |
+""");
+
+    ok(t.delete(t.new Key(13)), 13);
+    ok(t.delete(t.new Key(14)), 14);
+    ok(t.delete(t.new Key(15)), 15);
+    ok(t.delete(t.new Key(16)), 16);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+                                     16                        32                                                                       48                                                                    |
+                                     0                         0.1                                                                      0.2                                                                   |
+                                     9                         14                                                                       21                                                                    |
+                                                                                                                                        6                                                                     |
+          4          8                 14Empty                                   36               40                 44                                   52               56                60               |
+          9          9.1                                                         21               21.1               21.2                                 6                6.1               6.2              |
+          3          1                                                           13               15                 11                                   18               22                16               |
+                     7                        12                                                                     17                                                                      2                |
+1,2,3,4=3  5,6,7,8=1    9,10,11,12=7            25,26,27,28=12    33,34,35,36=13   37,38,39,40=15     41,42,43,44=11     45,46,47,48=17    49,50,51,52=18   53,54,55,56=22    57,58,59,60=16    61,62,63,64=2 |
+""");
+
+    ok(t.delete(t.new Key(25)), 25);
+    ok(t.delete(t.new Key(26)), 26);
+    ok(t.delete(t.new Key(33)), 33);
+    ok(t.delete(t.new Key(34)), 34);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+                                                    32                                                                48                                                                    |
+                                                    0                                                                 0.1                                                                   |
+                                                    14                                                                21                                                                    |
+                                                                                                                      6                                                                     |
+          4           8                26                            38               42                 46                             52               56                60               |
+          14          14.1             14.2                          21               21.1               21.2                           6                6.1               6.2              |
+          3           1                7                             13               15                 11                             18               22                16               |
+                                       12                                                                17                                                                2                |
+1,2,3,4=3   5,6,7,8=1     9,10,11,12=7     27,28=12   35,36,37,38=13   39,40,41,42=15     43,44,45,46=11     47,48=17    49,50,51,52=18   53,54,55,56=22    57,58,59,60=16    61,62,63,64=2 |
+""");
+
+    ok(t.delete(t.new Key(37)), 37);
+    ok(t.delete(t.new Key(38)), 38);
+    ok(t.delete(t.new Key(39)), 39);
+    ok(t.delete(t.new Key(40)), 40);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+                                                    32                                             48                                                                    |
+                                                    0                                              0.1                                                                   |
+                                                    14                                             21                                                                    |
+                                                                                                   6                                                                     |
+          4           8                26                            42               46                             52               56                60               |
+          14          14.1             14.2                          21               21.1                           6                6.1               6.2              |
+          3           1                7                             13               15                             18               22                16               |
+                                       12                                             17                                                                2                |
+1,2,3,4=3   5,6,7,8=1     9,10,11,12=7     27,28=12   35,36,41,42=13   43,44,45,46=15     47,48=17    49,50,51,52=18   53,54,55,56=22    57,58,59,60=16    61,62,63,64=2 |
+""");
+
+    ok(t.delete(t.new Key(3)), 3);
+    ok(t.delete(t.new Key(4)), 4);
+    ok(t.delete(t.new Key(5)), 5);
+    ok(t.delete(t.new Key(6)), 6);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+                                      32                                             48                                                                    |
+                                      0                                              0.1                                                                   |
+                                      14                                             21                                                                    |
+                                                                                     6                                                                     |
+          8              26                            42               46                             52               56                60               |
+          14             14.1                          21               21.1                           6                6.1               6.2              |
+          3              1                             13               15                             18               22                16               |
+                         12                                             17                                                                2                |
+1,2,7,8=3   9,10,11,12=1     27,28=12   35,36,41,42=13   43,44,45,46=15     47,48=17    49,50,51,52=18   53,54,55,56=22    57,58,59,60=16    61,62,63,64=2 |
+""");
+
+    ok(t.delete(t.new Key(59)), 59);
+    ok(t.delete(t.new Key(60)), 60);
+    ok(t.delete(t.new Key(61)), 61);
+    ok(t.delete(t.new Key(62)), 62);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+                                      32                                             48                                                  |
+                                      0                                              0.1                                                 |
+                                      14                                             21                                                  |
+                                                                                     6                                                   |
+          8              26                            42               46                             52               56               |
+          14             14.1                          21               21.1                           6                6.1              |
+          3              1                             13               15                             18               22               |
+                         12                                             17                                              2                |
+1,2,7,8=3   9,10,11,12=1     27,28=12   35,36,41,42=13   43,44,45,46=15     47,48=17    49,50,51,52=18   53,54,55,56=22    57,58,63,64=2 |
+""");
+
+    ok(t.delete(t.new Key(51)), 51);
+    ok(t.delete(t.new Key(52)), 52);
+    ok(t.delete(t.new Key(53)), 53);
+    ok(t.delete(t.new Key(54)), 54);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+                                      32                                             48                                |
+                                      0                                              0.1                               |
+                                      14                                             21                                |
+                                                                                     6                                 |
+          8              26                            42               46                             56              |
+          14             14.1                          21               21.1                           6               |
+          3              1                             13               15                             18              |
+                         12                                             17                             2               |
+1,2,7,8=3   9,10,11,12=1     27,28=12   35,36,41,42=13   43,44,45,46=15     47,48=17    49,50,55,56=18   57,58,63,64=2 |
+""");
+
+    ok(t.delete(t.new Key(35)), 35);
+    ok(t.delete(t.new Key(36)), 36);
+    ok(t.delete(t.new Key(45)), 45);
+    ok(t.delete(t.new Key(46)), 46);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+                                      32                                                             |
+                                      0                                                              |
+                                      14                                                             |
+                                      6                                                              |
+          8              26                            46               54                62         |
+          14             14.1                          6                6.1               6.2        |
+          3              1                             13               17                18         |
+                         12                                                               2          |
+1,2,7,8=3   9,10,11,12=1     27,28=12   41,42,43,44=13   47,48,49,50=17    55,56,57,58=18    63,64=2 |
+""");
+
+    ok(t.delete(t.new Key( 1)),  1);
+    ok(t.delete(t.new Key( 2)),  2);
+    ok(t.delete(t.new Key( 7)),  7);
+    ok(t.delete(t.new Key(64)), 64);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+                          32                                                          |
+                          0                                                           |
+                          14                                                          |
+                          6                                                           |
+            11                             46               54                62      |
+            14                             6                6.1               6.2     |
+            3                              18               17                13      |
+            12                                                                2       |
+8,9,10,11=3   12,27,28=12   41,42,43,44=18   47,48,49,50=17    55,56,57,58=13    63=2 |
+""");
+
+    ok(t.delete(t.new Key( 8)),  8);
+    ok(t.delete(t.new Key( 9)),  9);
+    ok(t.delete(t.new Key(27)), 27);
+    ok(t.delete(t.new Key(28)), 28);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+                     32                                                          |
+                     0                                                           |
+                     14                                                          |
+                     6                                                           |
+14Empty                               46               54                62      |
+                                      6                6.1               6.2     |
+                                      18               17                13      |
+       12                                                                2       |
+         10,11,12=12   41,42,43,44=18   47,48,49,50=17    55,56,57,58=13    63=2 |
+""");
+
+    ok(t.delete(t.new Key(10)), 10);
+    ok(t.delete(t.new Key(11)), 11);
+    ok(t.delete(t.new Key(12)), 12);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+             32                                                          |
+             0                                                           |
+             14                                                          |
+             6                                                           |
+14Empty                       46               54                62      |
+                              6                6.1               6.2     |
+                              18               17                13      |
+       12                                                        2       |
+         =12   41,42,43,44=18   47,48,49,50=17    55,56,57,58=13    63=2 |
+""");
+
+    ok(t.delete(t.new Key(49)), 49);
+    ok(t.delete(t.new Key(50)), 50);
+    ok(t.delete(t.new Key(55)), 55);
+    ok(t.delete(t.new Key(56)), 56);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+               46               62      |
+               0                0.1     |
+               17               13      |
+                                2       |
+41,42,43,44=17   47,48,57,58=13    63=2 |
 """);
    }
 
