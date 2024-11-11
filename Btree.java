@@ -2,7 +2,7 @@
 // BTree in a block
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
-package com.AppaApps.Silicon;                                                   // Design, simulate and layout a btree in a block on a silicon chip.
+package com.AppaApps.Silicon;                                                   // Design, simulate and layout a btree in a block on the surface of a silicon chip.
 
 import java.util.*;
 
@@ -1102,7 +1102,8 @@ class Btree extends Test                                                        
   void merge(Key Key)                                                           // Merge where possible along a path to a key
    {z(); if (rootIsLeaf()) return;                                              // Only works on a branch
     z(); Branch parent = root();                                                // Parent starts at root which is known to be a branch
-//          P                       L   P   R                                   // Collapse root if the following scenario is detected
+                                                                                // Collapse root if any of the following scenarios are detected
+//          P                       L   P   R                                   // Root
 //    L          R       ->       a   b   m   n                                 // Child branches
 //  a   b     m    n                                                            // Grand child branches
     if (parent.branchSize().asInt() == 1)                                       // The body of the parent has one entry
@@ -1169,13 +1170,13 @@ class Btree extends Test                                                        
             L.freeBranch();                                                     // Free liberated left child
             R.freeBranch();                                                     // Free liberated right child
            }
-//               P                  R       Root
-//       L              R   ->              Branch layer
-// empty   empty                            Leaf layer
-          else if (isLeaf(L.top()) && new Leaf(L.top()).leafSize().asInt() == 0)   // Left has empty leaf under it
+//               P                  R                                           // Root
+//       L              R   ->                                                  // Branch layer
+// empty   empty                                                                // Leaf layer
+          else if (isLeaf(L.top()) && new Leaf(L.top()).leafSize().asInt() == 0)// Left has empty leaf under it
            {z();
             parent.copy(R);
-            new Leaf(L.top()).freeLeaf();                                     // Free empty top of left
+            new Leaf(L.top()).freeLeaf();                                       // Free empty top of left
             L.freeBranch();                                                     // Free liberated left child
             R.freeBranch();                                                     // Free liberated right child
            }
@@ -1237,18 +1238,12 @@ class Btree extends Test                                                        
        }
       parent.setBranchSize(PS);                                                 // Set parent size to match
 
-      if (PS == 0)                                                              // The body of the parent is empty so we can copy the top node into it and release it
-       {z(); final Branch p = new Branch(parent.top());
-        parent.copy(p);
-        p.freeBranch();
-       }
-
       final Branch.FindFirstGreaterThanOrEqual Down =
         parent.new FindFirstGreaterThanOrEqual(Key);
       if (isBranch(Down.next)) {z(); parent = new Branch(Down.next);}           // Step down to a branch: if we step down to a leaf the code at the top of the loop will process it.
      }
-    stop("Fell off the end of the tree while merging along the search path of",
-         Key);
+    stop("Fell off the end of the tree while merging",
+         "along the search path for:", Key);
    }
 
 //D1 Print                                                                      // Print a BTree horizontally
