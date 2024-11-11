@@ -128,7 +128,9 @@ class Btree extends Test                                                        
     z();
     final int index = freeList.pop();
     final BranchOrLeaf bl = nodes[index];
-    if (bl.state.leaf() || bl.state.branch()) stop("Attempting to allocate an already allocated node:", index);
+    if (bl.state.leaf() || bl.state.branch())
+     {stop("Attempting to allocate an already allocated node:", index);
+      }
     maxNodeUsed = max(maxNodeUsed, index);
     return index;
    }
@@ -136,7 +138,9 @@ class Btree extends Test                                                        
   void free(int index)                                                          // Free the indicated branch or leaf
    {z();
     final BranchOrLeaf bl = nodes[index];
-    if (!bl.state.leaf() && !bl.state.branch()) stop("Attempting to free an already freed node:", index);
+    if (!bl.state.leaf() && !bl.state.branch())
+     {stop("Attempting to free an already freed node:", index);
+     }
     freeList.push(index);
    }
 
@@ -161,8 +165,8 @@ class Btree extends Test                                                        
 
     BranchOrLeaf(int I)                                                         // Memory for branches and leaves
      {z(); i = I;
-      for (int i = 0; i < maxKeysPerLeaf;   i++) {z(); keyData[i] = new KeyData();}
-      for (int i = 0; i < maxKeysPerBranch; i++) {z(); keyNext[i] = new KeyNext();}
+      for (int i = 0; i < maxKeysPerLeaf;   i++) keyData[i] = new KeyData();
+      for (int i = 0; i < maxKeysPerBranch; i++) keyNext[i] = new KeyNext();
      }
    }
 
@@ -409,8 +413,10 @@ class Btree extends Test                                                        
     BKNIndex      branchSize() {z(); return nodes[index].branchSize;}
     KeyNext[]        keyNext() {z(); return nodes[index].keyNext;   }
     Next                 top() {z(); return nodes[index].top;       }
-    boolean        hasLeaves() {z(); return isLeaf(top());                  }
-    boolean isFull          () {z(); return branchSize().asInt() == maxKeysPerBranch;}
+    boolean        hasLeaves() {z(); return isLeaf(top());          }
+    boolean isFull          ()
+     {z(); return branchSize().asInt() == maxKeysPerBranch;
+     }
 
     void incBranchSize      () {z(); branchSize().inc(); }
     void decBranchSize      () {z(); branchSize().dec(); }
@@ -493,14 +499,13 @@ class Btree extends Test                                                        
       if (p < maxKeysPerBranch)                                                 // Room in the parent branch to push this new child leaf
        {z();
         final Leaf l = new Leaf();                                              // New leaf
-        kn[p] = new KeyNext(new Key(0), new Next(l.index));                      // Push child leaf into parent branch
+        kn[p] = new KeyNext(new Key(0), new Next(l.index));                     // Push child leaf into parent branch
         incBranchSize();                                                        // New size of parent branch
         return l;                                                               // Return leaf so created
        }
       else                                                                      // Reuse branch top because there is no more room in the parent branch
        {z();
         final Leaf l = new Leaf(top());                                         // Return top as a leaf
-if (debug) say("SSSS top", l, this);
         l.zeroLeafSize();
         return l;                                                               // Return top as a leaf
        }
@@ -861,6 +866,7 @@ if (debug) say("SSSS top", l, this);
    {final Key   key = new Key();                                                // A key in a branch
     final Next next = new Next();                                               // Next branch or leaf
     KeyNext()                     {z();}
+    KeyNext(KeyNext KeyNext)      {z(); set(KeyNext.key); set(KeyNext.next);}
     KeyNext(Key Key, Next Next)   {z(); set(Key); set(Next);}
     void set(Key  Key)            {z(); key.set(Key);}
     void set(Next Next)           {z(); next.set(Next);}
@@ -873,23 +879,22 @@ if (debug) say("SSSS top", l, this);
     boolean equals(int N) {z(); return i == N;}
     void set(int I) {z(); i = I;}
     int asInt()     {return i;}
+    void stop(String s) {Test.stop("Cannot "+s+"rement leaf index");}
    }
 
   class LKDIndex extends BLIndex                                                // An index to key, data pair in a leaf
    {LKDIndex()      {z(); }
     LKDIndex(int I) {z(); i = I;}
-    public String toString() {return "LKDIndex("+i+")";}
-    final String m = "rement leaf index";
-    void inc() {z(); if (i < maxKeysPerLeaf) ++i; else stop("Cannot inc"+m);}
-    void dec() {z(); if (i > 0)              --i; else stop("Cannot dec"+m);}
+    void inc() {z(); if (i < maxKeysPerLeaf) ++i; else stop("inc");}
+    void dec() {z(); if (i > 0)              --i; else stop("dec");}
    }
 
   class BKNIndex extends BLIndex                                                // An index to key, next pair in a branch
    {BKNIndex()      {z(); }
     BKNIndex(int I) {z(); i = I;}
     public String toString() {return "BKNIndex("+i+")";}
-    void inc()      {z(); if (i < maxKeysPerBranch) ++i; else stop("Cannot increment branch index");}
-    void dec()      {z(); if (i > 0)                --i; else stop("Cannot decrement branch index");}
+    void inc()      {z(); if (i < maxKeysPerBranch) ++i; else stop("inc");}
+    void dec()      {z(); if (i > 0)                --i; else stop("dec");}
    }
 
 //D1 Find                                                                       // Find the data associated with a key
@@ -959,6 +964,7 @@ if (debug) say("SSSS top", l, this);
    }
 
   Find find(Key Key) {z(); return new Find(Key);}                               // Find a key in a branch
+  Find find(int Key) {z(); return find(new Key(Key));}                          // Find an integer key in a branch
 
   class FindAndInsert extends Find                                              // Insert the specified key and data into the tree if there is room in the target leaf,or update the key with the data if the key already exists
    {Key         key;                                                            // Key to insert
@@ -1079,7 +1085,7 @@ if (debug) say("SSSS top", l, this);
     final Leaf l = f.leaf();                                                    // The leaf that contains the key
     final int  N = l.leafSize().asInt(), p = f.index().asInt();                 // Size of leaf, position in the leaf of the key
     final KeyData[]kd = l.keyData();                                            // Key, data pairs in the leaf
-    final Data   data = new Data(kd[p].data);                                  // Data associated with the leaf
+    final Data   data = new Data(kd[p].data);                                   // Data associated with the leaf
     for (int i = p; i < N-1; ++i)                                               // Remove the key, data pair from the leaf
      {z();
       kd[i] = new KeyData(kd[i+1]);
@@ -1089,11 +1095,94 @@ if (debug) say("SSSS top", l, this);
     return data;
    }
 
+  Data delete(int Key) {z(); return delete(new Key(Key));}                      // Delete a key from the tree and returns its data if present
+
 // D1 Merge
 
   void merge(Key Key)                                                           // Merge where possible along a path to a key
    {z(); if (rootIsLeaf()) return;                                              // Only works on a branch
     z(); Branch parent = root();                                                // Parent starts at root which is known to be a branch
+//          P                       L   P   R                                   // Collapse root if the following scenario is detected
+//    L          R       ->       a   b   m   n                                 // Child branches
+//  a   b     m    n                                                            // Grand child branches
+    if (parent.branchSize().asInt() == 1)                                       // The body of the parent has one entry
+     {z();
+      if (isBranch(parent.top()))                                               // The next level down contains branches
+       {z();
+        final Branch R = new Branch(parent.top());
+        final Branch L = new Branch(parent.keyNext()[0].next);
+        if (L.branchSize().asInt() == 1)                                        // Left has one child in body
+         {z();
+          if (R.branchSize().asInt() == 1)                                      // Right has one child in body
+           {z();
+            final KeyNext[]kn = parent.keyNext();                               // Parent body
+            final Key pk = kn[0].key;                                           // Parent key
+            kn[0] = new KeyNext(L.keyNext()[0]);                                // Move body of left into parent
+            kn[1] = new KeyNext(pk, L.top());                                   // Move top of left into parent
+            kn[2] = new KeyNext(R.keyNext()[0]);                                // Move body of right into parent
+            parent.top(R.top());                                                // Move top of right to top of parent
+            parent.setBranchSize(3);
+            L.freeBranch();                                                     // Free liberated left child
+            R.freeBranch();                                                     // Free liberated right child
+           }
+//          P                       L   P
+//    L          R       ->       a   b   n
+//  a   b   empty   n
+          else if (R.branchSize().asInt() == 0)                                 // Right has one child in body
+           {z();
+            final KeyNext[]kn = parent.keyNext();                               // Parent body
+            final Key pk = kn[0].key;                                           // Parent key
+            kn[0] = new KeyNext(L.keyNext()[0]);                                // Move body of left into parent
+            kn[1] = new KeyNext(pk, L.top());                                   // Move top of left into parent
+            parent.top(R.top());                                                // Move top of right to top of parent
+            parent.setBranchSize(2);
+            L.freeBranch();                                                     // Free liberated left child
+            R.freeBranch();                                                     // Free livebrated right child
+           }
+         }
+//            P                       P   R
+//       L          R       ->      b   m   n
+// empty   b     m    n
+        else if (L.branchSize().asInt() == 0)                                   // Left has no child in body
+         {z();
+          if (R.branchSize().asInt() == 1)                                      // Right has one child in body
+           {z();
+            final KeyNext[]kn = parent.keyNext();                               // Parent body
+            final Key pk = kn[0].key;                                           // Parent key
+            kn[0] = new KeyNext(pk, L.top());                                   // Move top of left into parent
+            kn[1] = new KeyNext(R.keyNext()[0]);                                // Move body of right into parent
+            parent.top(R.top());                                                // Move top of right to top of parent
+            parent.setBranchSize(2);
+            L.freeBranch();                                                     // Free liberated left child
+            R.freeBranch();                                                     // Free liberated right child
+           }
+//             P                       P
+//       L           R       ->      b   n
+// empty   b   empty  n
+          else if (R.branchSize().asInt() == 0)                                 // Right has one child in body
+           {z();
+            final KeyNext[]kn = parent.keyNext();                               // Parent body
+            final Key pk = kn[0].key;                                           // Parent key
+            kn[0] = new KeyNext(pk, L.top());                                   // Move top of left into parent
+            parent.top(R.top());                                                // Move top of right to top of parent
+            parent.setBranchSize(1);
+            L.freeBranch();                                                     // Free liberated left child
+            R.freeBranch();                                                     // Free liberated right child
+           }
+//               P                  R       Root
+//       L              R   ->              Branch layer
+// empty   empty                            Leaf layer
+          else if (isLeaf(L.top()) && new Leaf(L.top()).leafSize().asInt() == 0)   // Left has empty leaf under it
+           {z();
+            parent.copy(R);
+            new Leaf(L.top()).freeLeaf();                                     // Free empty top of left
+            L.freeBranch();                                                     // Free liberated left child
+            R.freeBranch();                                                     // Free liberated right child
+           }
+         }
+       }
+     }
+
     for (int i = 0; i < maxDepth; i++)                                          // Step down through tree
      {z();
       final Branch.FindFirstGreaterThanOrEqual down =
@@ -1107,7 +1196,6 @@ if (debug) say("SSSS top", l, this);
             return;
            }
          }
-
         parent.repackLeaves();                                                  // Repack the leaves of this branch
         return;
        }
@@ -1121,13 +1209,13 @@ if (debug) say("SSSS top", l, this);
        }
       pkn.push(new KeyNext(new Key(0), parent.top()));                          // Add top next so we have all the children in one place
 
-      for (int b = pkn.size()-1; b > 0; b--)                                    // Merge children in body of parent by comparing them pairwise from top to bottom  to avoid disruption
+      for (int b = pkn.size()-1; b > 0; b--)                                    // Merge children in body of parent by comparing them pairwise from top to bottom to avoid disruption
        {z();
         final Branch left  = new Branch(pkn.elementAt(b-1).next);
         final Branch right = new Branch(pkn.elementAt(b-0).next);
         final int L = left .branchSize().asInt(),
                   R = right.branchSize().asInt(), P = L + 1 + R;
-        if (P <= maxKeysPerBranch)                                              // Can merge
+        if (parent.branchSize().asInt() > 1 && P <= maxKeysPerBranch)           // Can merge
          {z();
           final KeyNext []    lkn = left .keyNext();
           final KeyNext []    rkn = right.keyNext();
@@ -1159,7 +1247,8 @@ if (debug) say("SSSS top", l, this);
         parent.new FindFirstGreaterThanOrEqual(Key);
       if (isBranch(Down.next)) {z(); parent = new Branch(Down.next);}           // Step down to a branch: if we step down to a leaf the code at the top of the loop will process it.
      }
-    stop("Fell off the end of the tree while merging along the search path of", Key);
+    stop("Fell off the end of the tree while merging along the search path of",
+         Key);
    }
 
 //D1 Print                                                                      // Print a BTree horizontally
@@ -1793,15 +1882,11 @@ if (debug) say("SSSS top", l, this);
 
     //stop(t);
     t.ok("""
-             32                                                          |
-             0                                                           |
-             14                                                          |
-             6                                                           |
-14Empty                       46               54                62      |
-                              6                6.1               6.2     |
-                              18               17                13      |
-       12                                                        2       |
-         =12   41,42,43,44=18   47,48,49,50=17    55,56,57,58=13    63=2 |
+               46               54                62      |
+               0                0.1               0.2     |
+               13               17                18      |
+                                                  2       |
+41,42,43,44=13   47,48,49,50=17    55,56,57,58=18    63=2 |
 """);
 
     ok(t.delete(t.new Key(49)), 49);
@@ -1814,9 +1899,9 @@ if (debug) say("SSSS top", l, this);
     t.ok("""
                46               62      |
                0                0.1     |
-               17               13      |
+               17               18      |
                                 2       |
-41,42,43,44=17   47,48,57,58=13    63=2 |
+41,42,43,44=17   47,48,57,58=18    63=2 |
 """);
 
     ok(t.delete(t.new Key(43)), 43);
@@ -1829,9 +1914,9 @@ if (debug) say("SSSS top", l, this);
     t.ok("""
                62     |
                0      |
-               13     |
+               18     |
                2      |
-41,42,47,48=13   63=2 |
+41,42,47,48=18   63=2 |
 """);
 
     ok(t.delete(t.new Key(41)), 41);
@@ -1862,6 +1947,37 @@ if (debug) say("SSSS top", l, this);
     ok(t.maxNodeUsed, 23);
    }
 
+  static void test_delete_random()
+   {final RandomArray      r = new RandomArray();
+    final int              N = RandomArray.r.length;
+    final Btree            t = new Btree(16, 16, 16, 4, 3, 40);
+    final TreeSet<Integer> s = new TreeSet<>();
+    for (int i = 0; i < N; i++)
+     {final int a = RandomArray.r[i];
+      t.put(a);
+      s.add(a);
+     }
+
+    for (int i = 0; i < N; i++)
+     {final int a = RandomArray.r[i];
+      ok( t.find(a).found());
+
+      t.delete(a); s.remove(a);
+
+      ok(!t.find(a).found());
+
+      if (s.size() > 1)
+       {ok( t.find(s.first()).found());
+        ok( t.find(s.last ()).found());
+       }
+     }
+    t.ok("""
+=0 |
+""");
+    t.checkFreeList();
+   }
+
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_bits();
     test_find();
@@ -1872,6 +1988,7 @@ if (debug) say("SSSS top", l, this);
     test_put_descending();
     test_put_random();
     test_delete();
+    test_delete_random();
    }
 
   static void newTests()                                                        // Tests being worked on
