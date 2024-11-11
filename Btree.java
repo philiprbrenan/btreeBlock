@@ -51,7 +51,7 @@ class Btree extends Test                                                        
     maxKeysInLeaves   = maxKeysPerLeaf   * (1 + maxKeysPerBranch);              // Including top
     maxKeysInBranches = maxKeysPerBranch * (1 + maxKeysPerBranch);              // Including top
 
-    nodes = new BranchOrLeaf[TreeSize];                                         // Allocate leaves and branches
+    nodes = new BranchOrLeaf[TreeSize];                                         // Pre-allocate leaves and branches
     for (int i = treeSize; i > 0; i--)                                          // Initially all of the leaves or branches are on the free list, except for the root at index 0
      {if (i-1 > 0) freeList.push(i-1);
       nodes[i-1]       = new BranchOrLeaf(i);
@@ -66,57 +66,63 @@ class Btree extends Test                                                        
   void stop() {Test.stop(toString());}
   public String toString() {return print();}
 
-  void checkFreeList()                                                          // Check for memory leaks
-   {final Set<Integer> s = active();                                            // Active branches and leaves
+  class CheckFreeList                                                           // Check for memory leaks
+   {CheckFreeList()
+     {final Set<Integer> s = active();                                          // Active branches and leaves
 
-    for (int i = 0; i < treeSize; i++)                                          // Make sure that all allocated branches and leaves that are accessible from the root of the tree
-     {BranchOrLeaf n = nodes[i];
-      if      (n.state.leaf())                                                  // Leaf
-       {if (!s.contains(i)) err("Inaccessible leaf", i);
+      for (int i = 0; i < treeSize; i++)                                        // Make sure that all allocated branches and leaves that are accessible from the root of the tree
+       {BranchOrLeaf n = nodes[i];
+        if      (n.state.leaf())                                                // Leaf
+         {if (!s.contains(i)) err("Inaccessible leaf", i);
+         }
+        else if (n.state.branch())                                              // Branch
+         {if (!s.contains(i)) err("Inaccessible branch", i);
+         }
+        else                                                                    // Free or never used
+         {if (s.contains(i))  err("Freed but in use", i);
+         }
        }
-      else if (n.state.branch())                                                // Branch
-       {if (!s.contains(i)) err("Inaccessible branch", i);
-       }
-      else                                                                      // Free or never used
-       {if (s.contains(i))  err("Freed but in use", i);
+
+      for (int i : freeList)                                                    // Make sure that all items in the free list are not accessible from the root of the tree
+       {BranchOrLeaf n = nodes[i];
+        if      (n.state.leaf())                                                // Leaf
+         {if (s.contains(i)) stop("Using free leaf", i);
+         }
+        else if (n.state.branch())                                              // Branch
+         {if (s.contains(i)) stop("Using free branch", i);
+         }
        }
      }
 
-    for (int i : freeList)                                                      // Make sure that all items in the free list are not accessible from the root of the tree
-     {BranchOrLeaf n = nodes[i];
-      if      (n.state.leaf())                                                  // Leaf
-       {if (s.contains(i)) stop("Using free leaf", i);
+    Set<Integer> active()                                                       // Active branches and leaves
+     {final Set<Integer> s = new TreeSet<>();                                   // The set of active branches and leaves
+      s.add(0);
+      active(s, 0);
+      return s;
+     }
+
+    void active(Set<Integer> s, int index)                                      // Active branches and leaves
+     {if (nodes[index].state.leaf())                                            // Add leaf
+       {s.add(index);
        }
-      else if (n.state.branch())                                                // Branch
-       {if (s.contains(i)) stop("Using free branch", i);
+      else if (nodes[index].state.branch())                                     // Add branch and its children
+       {s.add(index);
+        final Branch    B = new Branch(index);
+        final int       N = B.branchSize().asInt();
+        final KeyNext[]kn = B.keyNext();
+        for (int i = 0; i < N; i++)                                             // Each child of branch
+         {active(s, kn[i].next.asInt());
+         }
+        active(s, B.top().asInt());                                             // Add top
        }
      }
    }
 
-  Set<Integer> active()                                                         // Active branches and leaves
-   {final Set<Integer> s = new TreeSet<>();                                     // The set of active branches and leaves
-    s.add(0);
-    active(s, 0);
-    return s;
-   }
+  void checkFreeList() {new CheckFreeList();}                                   // Check the free list is consistenmt with the tree
 
-  void active(Set<Integer> s, int index)                                        // Active branches and leaves
-   {if (nodes[index].state.leaf())                                              // Add leaf
-     {s.add(index);
-     }
-    else if (nodes[index].state.branch())                                       // Add branch and its children
-     {s.add(index);
-      final Branch    B = new Branch(index);
-      final int       N = B.branchSize().asInt();
-      final KeyNext[]kn = B.keyNext();
-      for (int i = 0; i < N; i++)                                               // Each child of branch
-       {active(s, kn[i].next.asInt());
-       }
-      active(s, B.top().asInt());                                               // Add top
-     }
-   }
+//D1 Allocate and Free                                                          // Allocate and free branches and leaves allowing memory to be recycled
 
-  int allocate()                                                               // Allocate a branch or leaf
+  int allocate()                                                                // Allocate a branch or leaf
    {z();
     if (freeList.size() < 1) stop("No more leaves or branches available");
     z();
@@ -1872,7 +1878,7 @@ if (debug) say("SSSS top", l, this);
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      //if (github_actions)                                                       // Coverage analysis
+      if (github_actions)                                                       // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
