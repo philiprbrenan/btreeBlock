@@ -1577,81 +1577,6 @@ if (debug) say("SSSS top", l, this);
    }
 
   static void test_delete()
-   {final Btree t = new Btree(8, 8, 8, 4, 3, 5);
-    final int N = 16;
-    for (int i = 1; i <= N; i++)
-     {t.put(i);
-      t.checkFreeList();
-     }
-    //stop(t);
-    t.ok("""
-          4          8               12               |
-          0          0.1             0.2              |
-          3          1               4                |
-                                     2                |
-1,2,3,4=3  5,6,7,8=1    9,10,11,12=4    13,14,15,16=2 |
-""");
-    ok(t.delete(t.new Key(4)), 4);
-    ok(t.delete(t.new Key(3)), 3);
-    ok(t.delete(t.new Key(5)), 5);
-    ok(t.delete(t.new Key(6)), 6);
-    t.checkFreeList();
-
-    //stop(t);
-    t.ok("""
-          8             12               |
-          0             0.1              |
-          3             1                |
-                        2                |
-1,2,7,8=3  9,10,11,12=1    13,14,15,16=2 |
-""");
-
-    ok(t.delete(t.new Key( 7)),  7);
-    ok(t.delete(t.new Key( 8)),  8);
-    ok(t.delete(t.new Key( 9)),  9);
-    ok(t.delete(t.new Key(10)), 10);
-    t.checkFreeList();
-
-    //stop(t);
-    t.ok("""
-            12              |
-            0               |
-            3               |
-            2               |
-1,2,11,12=3   13,14,15,16=2 |
-""");
-
-    ok(t.delete(t.new Key(11)), 11);
-    ok(t.delete(t.new Key(12)), 12);
-    ok(t.delete(t.new Key(13)), 13);
-    ok(t.delete(t.new Key(14)), 14);
-    t.checkFreeList();
-
-    //stop(t);
-    t.ok("""
-1,2,15,16=0 |
-""");
-
-    ok(t.delete(t.new Key( 2)),  2);
-    ok(t.delete(t.new Key(15)), 15);
-    ok(t.delete(t.new Key(16)), 16);
-    t.checkFreeList();
-
-    //stop(t);
-    t.ok("""
-1=0 |
-""");
-
-    ok(t.delete(t.new Key( 1)),  1);
-    t.checkFreeList();
-
-    //stop(t);
-    t.ok("""
-=0 |
-""");
-   }
-
-  static void test_delete2()
    {final Btree t = new Btree(8, 8, 8, 4, 3, 40);
     final int N = 64;
     for (int i = 1; i <= N; i++)
@@ -1932,6 +1857,47 @@ if (debug) say("SSSS top", l, this);
                                 2       |
 41,42,43,44=17   47,48,57,58=13    63=2 |
 """);
+
+    ok(t.delete(t.new Key(43)), 43);
+    ok(t.delete(t.new Key(44)), 44);
+    ok(t.delete(t.new Key(57)), 57);
+    ok(t.delete(t.new Key(58)), 58);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+               62     |
+               0      |
+               13     |
+               2      |
+41,42,47,48=13   63=2 |
+""");
+
+    ok(t.delete(t.new Key(41)), 41);
+    ok(t.delete(t.new Key(42)), 42);
+    ok(t.delete(t.new Key(47)), 47);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+48,63=0 |
+""");
+
+    ok(t.delete(t.new Key(63)), 63);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+48=0 |
+""");
+
+    ok(t.delete(t.new Key(48)), 48);
+    t.checkFreeList();
+
+    //stop(t);
+    t.ok("""
+=0 |
+""");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -1944,12 +1910,10 @@ if (debug) say("SSSS top", l, this);
     test_put_descending();
     test_put_random();
     test_delete();
-    test_delete2();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_delete2();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
