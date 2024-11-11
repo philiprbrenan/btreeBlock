@@ -58,7 +58,6 @@ class Btree extends Test                                                        
       nodes[i-1].state = BranchOrLeaf.State.neverUsed;
      }
     nodes[0].state = BranchOrLeaf.State.leaf;                                   // Start with the root as a leaf
-    checkNotRelocated();                                                        // Confirm alloctions at start
    }
 
 //D1 Control                                                                    // Testing, control and integrity
@@ -128,30 +127,6 @@ class Btree extends Test                                                        
     return index;
    }
 
-  void checkNotRelocated()                                                      // Check that keyData and KeyNext allocation addresses have not been relocated
-   {for (int i = 0; i < treeSize; i++)                                          // Make sure that all allocated branches and leaves that are accessible from the root of the tree
-     {BranchOrLeaf n = nodes[i];
-      if (isLeaf(i))
-       {final Leaf l = new Leaf(i);
-        final int  N = l.leafSize().asInt();
-        for (int j = 0; j < N; j++)                                             // Each active key, data pair
-         {if (n.keyDataCheck.get(j) != n.keyData[j].check)                        // Check key, data pair has the same address
-           {stop("Leaf", i, "keyData", j, "has been relocated");
-           }
-         }
-       }
-      else if (isBranch(i))
-       {final Branch b = new Branch(i);
-        final int    N = b.branchSize().asInt();
-        for (int j = 0; j < N; j++)                                             // Each key, next pair
-          {if (n.keyNextCheck.get(j) != n.keyNext[j].check)                     // Check key, next pair has the same address
-           {stop("Branch", i, "keyNext", j, "has been relocated");
-           }
-         }
-       }
-     }
-   }
-
   void free(int index)                                                          // Free the indiocated branch or leaf
    {z();
     final BranchOrLeaf bl = nodes[index];
@@ -159,23 +134,10 @@ class Btree extends Test                                                        
     freeList.push(index);
    }
 
-  void printLeafData()                                                          // Check that keyData and KeyNext allocation addresses have not been relocated
-   {for (int i = 0; i < treeSize; i++)                                          // Make sure that all allocated branches and leaves that are accessible from the root of the tree
-     {BranchOrLeaf n = nodes[i];
-      if (isLeaf(i))
-       {final Leaf l = new Leaf(i);
-        final int  N = l.leafSize().asInt();
-        say(l);
-       }
-     }
-   }
-
 //D1 Components                                                                 // A branch or leaf in the tree
 
   class BranchOrLeaf                                                            // A branch or leaf in a btree
    {final  int i;                                                               // The index of this branch or leaf int the block of memory assigned to the tree
-    final Map<Integer,Integer> keyDataCheck = new TreeMap<>();                  // Prevent key, data references being changed in a leaf
-    final Map<Integer,Integer> keyNextCheck = new TreeMap<>();                  // Prevent key, next references being changed in a branch
 
     enum State                                                                  // The current state of the branch or leaf: as a leaf, as a branch or free waiting for use
      {leaf, branch, free, neverUsed;
@@ -193,8 +155,8 @@ class Btree extends Test                                                        
 
     BranchOrLeaf(int I)                                                         // Memory for branches and leaves
      {z(); i = I;
-      for (int i = 0; i < maxKeysPerLeaf;   i++) {keyData[i] = new KeyData(); keyDataCheck.put(i, keyData[i].check);}
-      for (int i = 0; i < maxKeysPerBranch; i++) {keyNext[i] = new KeyNext(); keyNextCheck.put(i, keyNext[i].check);}
+      for (int i = 0; i < maxKeysPerLeaf;   i++) {z(); keyData[i] = new KeyData();}
+      for (int i = 0; i < maxKeysPerBranch; i++) {z(); keyNext[i] = new KeyNext();}
      }
    }
 
@@ -833,16 +795,7 @@ if (debug) say("SSSS top", l, this);
   boolean isBranch  (int  bl) {z(); return nodes[bl].state.branch();}           // Indexed branch or leaf is a branch
   boolean isBranch  (Next bl) {z(); return isBranch(bl.asInt());}               // Indexed branch or leaf is a branch
 
-  class Fixed                                                                   // An item that is allocated only once
-   {static int checkNumber = 0;                                                 // Assign unique numbers to each allocation so we can check for relocations
-    final int check;
-    Fixed()                                                                     // Assign a unique number to this allocation
-     {z();
-      check = ++checkNumber;
-     }
-   }
-
-  class Key extends Fixed                                                       // A key in a leaf or a branch
+  class Key                                                                     // A key in a leaf or a branch
    {final boolean[] key = new boolean[bitsPerKey];                              // A key is composed of bits
     Key()       {z(); }
     Key(int n)  {z(); intToBits(n, key);}
@@ -855,7 +808,7 @@ if (debug) say("SSSS top", l, this);
      }
    }
 
-  class Data extends Fixed                                                      // A data item associated with a key in a leaf
+  class Data                                                                    // A data item associated with a key in a leaf
    {final boolean[] data = new boolean[bitsPerData];                            // Data is composed of bits
     Data()      {z();}
     Data(int n) {z(); intToBits(n, data);}
@@ -867,7 +820,7 @@ if (debug) say("SSSS top", l, this);
      }
    }
 
-  class Next extends Fixed                                                      // A next reference from a branch to a leaf or a branch
+  class Next                                                                    // A next reference from a branch to a leaf or a branch
    {final boolean[] next = new boolean[bitsPerNext];                            // Enough bits to reference a leaf or brahch in the block
     Next() {this(0); z();}                                                      // The root
     Next(int n)
@@ -875,7 +828,7 @@ if (debug) say("SSSS top", l, this);
       z(); intToBits(n, next);
      }
     int asInt()               {return bitsToInt(next);}
-    public String toString()  {z(); return ""+bitsToInt(next);}
+    public String toString()  {return ""+bitsToInt(next);}
     void set(Next Next)                                                         // Copy the specified next refernce
      {z(); for (int i = 0; i < next.length; i++) next[i] = Next.next[i];
      }
@@ -884,7 +837,7 @@ if (debug) say("SSSS top", l, this);
      }
    }
 
-  class KeyData extends Fixed                                                   // A key, data pair in a leaf
+  class KeyData                                                                 // A key, data pair in a leaf
    {final Key   key = new Key();                                                // A key in a leaf
     final Data data = new Data();                                               // Data associated with the key
     KeyData ()                   {z(); }
@@ -896,12 +849,11 @@ if (debug) say("SSSS top", l, this);
     public String toString()     {return "KeyData("+key+","+data+")";}
    }
 
-  class KeyNext extends Fixed                                                   // A key, next pair in a leaf
+  class KeyNext                                                                 // A key, next pair in a leaf
    {final Key   key = new Key();                                                // A key in a branch
     final Next next = new Next();                                               // Next branch or leaf
     KeyNext()                     {z();}
     KeyNext(Key Key, Next Next)   {z(); set(Key); set(Next);}
-    void set(Key  Key, Next Next) {z(); set(Key); set(Next);}
     void set(Key  Key)            {z(); key.set(Key);}
     void set(Next Next)           {z(); next.set(Next);}
     public String toString() {return "KeyNext("+key+","+next+")";}
@@ -1142,7 +1094,7 @@ if (debug) say("SSSS top", l, this);
        {z();
         if (0 == parent.index)                                                  // At the root, the root is a branch and the children are leaves
          {if (parent.countChildLeafKeys() <= maxKeysPerLeaf)                    // Few enough key, data pairs to hold them in the root as a leaf
-           {parent.repackLeavesIntoRoot();
+           {z(); parent.repackLeavesIntoRoot();
             return;
            }
          }
@@ -1189,14 +1141,14 @@ if (debug) say("SSSS top", l, this);
       parent.setBranchSize(PS);                                                 // Set parent size to match
 
       if (PS == 0)                                                              // The body of the parent is empty so we can copy the top node into it and release it
-       {final Branch p = new Branch(parent.top());
+       {z(); final Branch p = new Branch(parent.top());
         parent.copy(p);
         p.freeBranch();
        }
 
       final Branch.FindFirstGreaterThanOrEqual Down =
         parent.new FindFirstGreaterThanOrEqual(Key);
-      if (isBranch(Down.next)) parent = new Branch(Down.next);                  // Step down to a branch: if we step down to a leaf the code at the top of the loop will process it.
+      if (isBranch(Down.next)) {z(); parent = new Branch(Down.next);}           // Step down to a branch: if we step down to a leaf the code at the top of the loop will process it.
      }
     stop("Fell off the end of the tree while merging along the search path of", Key);
    }
@@ -1577,7 +1529,7 @@ if (debug) say("SSSS top", l, this);
    }
 
   static void test_delete()
-   {final Btree t = new Btree(8, 8, 8, 4, 3, 40);
+   {final Btree t = new Btree(8, 8, 8, 4, 3, 24);
     final int N = 64;
     for (int i = 1; i <= N; i++)
      {t.put(i);
@@ -1898,6 +1850,7 @@ if (debug) say("SSSS top", l, this);
     t.ok("""
 =0 |
 """);
+    ok(t.maxNodeUsed, 23);
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -1919,7 +1872,7 @@ if (debug) say("SSSS top", l, this);
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      if (github_actions)                                                       // Coverage analysis
+      //if (github_actions)                                                       // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
