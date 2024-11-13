@@ -610,11 +610,11 @@ class Btree extends Test                                                        
        }
 
       q.splitBranch(p, down.next);                                              // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
-      final Node.FindFirstGreaterThanOrEqualInBranch                                    // Step down again as the repack will have altered the local layout
+      final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down again as the repack will have altered the local layout
       Down = p.new FindFirstGreaterThanOrEqualInBranch(Key);
       p = nodes.elementAt(Down.next);
      }
-    stop("Fallen of the end of the tree");                                      // The tree must be missing a leaf
+    stop("Fallen off the end of the tree");                                      // The tree must be missing a leaf
    }
 
   void put(int Key)                                                             // Put some test data into the tree
