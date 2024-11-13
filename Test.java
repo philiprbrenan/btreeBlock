@@ -260,11 +260,12 @@ public class Test                                                               
        .limit(top)                                                              // Take the most frequent elements
        .forEach(e -> printMostExecuted(lc, e.getKey(), e.getValue()));          // Print each entry
 
-      int w = 0; for (LineCount l: lc) w = max(w, l.line.length());             // Maximum width of line executed specification
+      int w = 1; for (LineCount l: lc) w = max(w, l.line.length());             // Maximum width of line executed specification
       final String f = "%-" + w + "s";
       say(String.format(f+"  %6s  %4s", "Most Executed", "Count", "#"));
 
-      for (int i = 1; i <= top; i++)                                            // Print lines executed most frequently
+      final int N = min(w, lc.size());
+      for (int i = 1; i <= N; i++)                                            // Print lines executed most frequently
        {final LineCount l = lc.elementAt(i-1);
         say(String.format(f+"  %6d  %4d", l.line, l.count, i));
        }
