@@ -367,6 +367,43 @@ class Btree extends Test                                                        
       parent.keyNext.insertElementAt(new KeyNext(splitKey, l.node), index);
      }
 
+    boolean mergeRoot()                                                         // Merge into the root
+     {assertBranch();
+      if (branchSize() != 2) stop("Root must have just two children, not:", branchSize());
+
+      final Node p = this;
+      final Node l = nodes.elementAt(keyNext.firstElement().next);
+      final Node r = nodes.elementAt(keyNext. lastElement().next);
+
+      if (p.hasLeavesForChildren())
+       {if (l.leafSize() + r.leafSize() <= maxKeysPerLeaf)
+         {p.keyData.clear();
+          for (; l.leafSize() > 0;)
+           {p.keyData.push(l.keyData.pop());
+           }
+          for (; r.leafSize() > 0;)
+           {p.keyData.push(r.keyData.pop());
+           }
+           p.keyNext.clear();
+          return true;
+         }
+       }
+      else if (l.branchSize() + 1 + r.branchSize() <= maxKeysPerBranch)
+       {final KeyNext pkn = p.keyNext.firstElement();
+        p.keyNext.clear();
+        for (; l.branchSize() > 0;)
+         {p.keyNext.push(l.keyNext.pop());
+         }
+        p.keyNext.push(new KeyNext(pkn.key, l.keyNext.lastElement().next));
+        for (; r.branchSize() > 0;)
+         {p.keyNext.push(r.keyNext.pop());
+         }
+        p.keyNext.push(new KeyNext(r.keyNext.lastElement().next));
+        return true;
+       }
+      return false;
+     }
+
     boolean merge(int index)                                                    // Merge the indexed child with its left sibling
      {assertBranch();
       if (index == 0) return false;
