@@ -365,7 +365,8 @@ class Btree extends Test                                                        
 
     void merge(int index)                                                       // Merge the indexed child with its left sibling
      {assertBranch();
-      if (index == 0) stop("Index cannot be zero");
+      if (index == 0) return;
+      if (index > branchSize()) return;
       if (isFull()) stop("Parent must not be full");
 
       final Node p = this;
