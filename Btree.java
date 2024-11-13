@@ -53,8 +53,21 @@ class Btree extends Test                                                        
     void assertLeaf()   {if (!isLeaf) stop("Leaf required");}
     void assertBranch() {if ( isLeaf) stop("Branch required");}
 
+    Node allocLeaf()    {final Node n = new Node(); nodes.push(n); n.isLeaf = true;  return n;}
+    Node allocBranch()  {final Node n = new Node(); nodes.push(n); n.isLeaf = false; return n;}
+
     int leafSize()   {return keyData.size();}
     int branchSize() {return keyNext.size() - 1;}                               // The  top most entry contains only the top
+
+    boolean isFull()
+     {return isLeaf ? leafSize() == maxKeysPerLeaf : branchSize() == maxKeysPerBranch;
+     }
+
+    boolean hasLeavesForChildren()
+     {assertBranch();
+      final KeyNext kn = keyNext.lastElement();
+      return nodes.elementAt(kn.next).isLeaf;
+     }
 
     int top()
      {assertBranch();
@@ -169,7 +182,7 @@ class Btree extends Test                                                        
       final int      first;                                                     // Index of first such key if found
       final int       next;                                                     // The corresponding next field or top if no such key was found
 
-      FindFirstGreaterThanOrEqualInBranch(int Search)                                   // Find the first key in the branch that is equal to or greater than the search key
+      FindFirstGreaterThanOrEqualInBranch(int Search)                           // Find the first key in the branch that is equal to or greater than the search key
        {assertBranch();
         search = Search;
         boolean looking = true;
@@ -255,7 +268,130 @@ class Btree extends Test                                                        
 
       padStrings(S, level);
      }
-   }
+
+    void splitLeafRoot()                                                        // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
+     {assertLeaf();
+      if (node != 0) stop("Not root, but", node);
+      if (!isFull()) stop("Root is not full, but", leafSize());
+      keyNext.clear();
+      isLeaf = false;
+
+      final Node l = allocLeaf();
+      final Node r = allocLeaf();
+      KeyData first = null;
+      for (int i = 0; i < splitLeafSize; i++)                                   // Build left leaf
+       {first        = keyData.firstElement();
+        l.keyData.push(keyData.firstElement());
+                       keyData.removeElementAt(0);
+       }
+
+      KeyData last = keyData.firstElement();
+      keyNext.push(new KeyNext((last.key - first.key) / 2, l.node));            // Insert left leaf into root
+
+      for (int i = 0; i < splitLeafSize; i++)                                   // Build right leaf
+       {r.keyData.push(keyData.firstElement());
+        keyData.removeElementAt(0);
+       }
+      keyNext.push(new KeyNext(r.node));                                        // Insert right into root
+      keyData.clear();                                                          // A leaf no more
+     }
+
+    void splitBranchRoot()                                                      // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
+     {assertBranch();
+      if (node != 0) stop("Not root, but", node);
+      if (!isFull()) stop("Root is not full, but", branchSize());
+
+      final Node l = allocBranch();
+      final Node r = allocBranch();
+
+      for (int i = 0; i < splitBranchSize; i++)
+       {l.keyNext.push(keyNext.firstElement());
+                       keyNext.removeElementAt(0);
+       }
+
+      final KeyNext split = keyNext.firstElement();
+      keyNext.removeElementAt(0);
+
+      for(int i = 0; i < splitBranchSize; i++)
+       {r.keyNext.push(keyNext.firstElement());
+                       keyNext.removeElementAt(0);
+       }
+        keyNext.push(new KeyNext(split.key, l.node));
+      r.keyNext.push(new KeyNext(top()));
+        keyNext.push(new KeyNext(r.node));
+      l.keyNext.push(new KeyNext(split.next));
+     }
+
+    void splitLeaf(Node parent, int index)                                      // Split a leaf which is not the root
+     {assertLeaf();
+      if (node == 0) stop("Cannot split root with this method");
+      if (!isFull()) stop("Leaf is not full, but", leafSize());
+      if (parent.isFull()) stop("Parent must not be full");
+
+      final Node p = parent;
+      final Node l = allocLeaf();
+      final Node r = this;
+
+      for (int i = 0; i < splitLeafSize; i++)                                   // Build left leaf
+       {l.keyData.push(r.keyData.firstElement());
+                       r.keyData.removeElementAt(0);
+       }
+
+      final int splitKey = (r.keyNext.firstElement().key - l.keyNext.lastElement().key) / 2;
+
+      parent.keyNext.insertElementAt(new KeyNext(splitKey, l.node), index);
+     }
+
+    void splitBranch(Node parent, int index)                                    // Split a branch which is not the root
+     {assertBranch();
+      if (node == 0) stop("Cannot split root with this method");
+      if (!isFull()) stop("Branch is not full, but", branchSize());
+      if (parent.isFull()) stop("Parent must not be full");
+
+      final Node p = parent;
+      final Node l = allocBranch();
+      final Node r = this;
+
+      for (int i = 0; i < splitBranchSize; i++)                                 // Build left branch
+       {l.keyNext.push(r.keyNext.firstElement());
+                       r.keyNext.removeElementAt(0);
+       }
+
+      final int splitKey = r.keyNext.firstElement().key;
+      r.keyNext.removeElementAt(0);
+
+      parent.keyNext.insertElementAt(new KeyNext(splitKey, l.node), index);
+     }
+
+    void merge(int index)                                                       // Merge the indexed child with its left sibling
+     {assertBranch();
+      if (index == 0) stop("Index cannot be zero");
+      if (isFull()) stop("Parent must not be full");
+
+      final Node p = this;
+      final Node l = nodes.elementAt(p.keyNext.elementAt(index-1).next);
+      final Node r = nodes.elementAt(p.keyNext.elementAt(index-0).next);
+
+      if (p.hasLeavesForChildren())
+       {if (l.leafSize() + r.leafSize() <= maxKeysPerLeaf)
+         {final int N = l.leafSize();
+          for (; l.leafSize() > 0;)
+           {r.keyData.insertElementAt(l.keyData.pop(), 0);
+           }
+          p.keyNext.removeElementAt(index);
+         }
+       }
+      else if (l.branchSize() + 1 + r.branchSize() <= maxKeysPerBranch)
+       {final KeyNext pkn = p.keyNext.elementAt(index-1);
+        r.keyNext.insertElementAt(new KeyNext(pkn.key), l.top());
+        final int N = l.leafSize();
+        for (; l.leafSize() > 0;)
+         {r.keyData.insertElementAt(l.keyData.pop(), 0);
+         }
+        p.keyNext.removeElementAt(index);
+       }
+     }
+   }  // Node
 
   class KeyData                                                                 // A key, data pair
    {final int key, data;
@@ -268,6 +404,7 @@ class Btree extends Test                                                        
   class KeyNext                                                                 // A key, next pair
    {final int key, next;
     KeyNext(int Key, int Next) {key = Key; next = Next;}
+    KeyNext(         int Next) {key = -1;  next = Next;}
     public String toString()
      {return"KeyNext(Key:"+key+" next:"+next+")";
      }
