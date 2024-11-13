@@ -39,6 +39,7 @@ class Btree extends Test                                                        
 
   void ok(String expected) {Test.ok(toString(), expected);}                     // Confirm tree is as expected
   void stop()              {Test.stop(toString());}                             // Stop after printing the tree
+  public String toString() {return print();}                                    // Print the tree
 
 //D1 Components                                                                 // A branch or leaf in the tree
 
@@ -74,14 +75,37 @@ class Btree extends Test                                                        
       return keyNext.elementAt(branchSize()).next;
      }
 
+    public String toString()
+     {final StringBuilder s = new StringBuilder();
+      if (isLeaf)
+       {s.append("Leaf(node:"+node+" size:"+leafSize()+")\n");
+
+        for (int i = 0; i < keyData.size(); i++)
+         {final KeyData kd = keyData.elementAt(i);
+          s.append("  "+(i+1)+" key:"+kd.key+" data:"+kd.data+"\n");
+         }
+       }
+      else
+       {s.append("Branch(node:"+node+" size:"+branchSize()+")\n");
+
+        for (int i = 0; i < keyNext.size(); i++)
+         {final KeyNext kn = keyNext.elementAt(i);
+          s.append("  "+(i+1)+" key:"+kn.key+" next:"+kn.next+"\n");
+         }
+       }
+      return s.toString();
+     }
+
     class FindEqualInLeaf                                                       // Find the first key in the leaf that is equal to the search key
-     {final int    search;                                                      // Search key
+     {final Node     leaf;                                                      // The leafbeing searched
+      final int    search;                                                      // Search key
       final boolean found;                                                      // Whether the key was found
       final int      data;                                                      // Data associated with the  key
       final int     index;                                                      // Index of first such key if found
 
       FindEqualInLeaf(int Search)                                               // Find the first key in the leaf that is equal to the search key
        {assertLeaf();
+        leaf = Node.this;
         search = Search;
         boolean looking = true;
         final int N = leafSize();
@@ -102,7 +126,8 @@ class Btree extends Test                                                        
 
       public String toString()
        {final StringBuilder s = new StringBuilder();
-        s.append("FindEqualInLeaf(Key:"+search+" found:"+found);
+        s.append("FindEqualInLeaf(Leaf:"+leaf.node);
+        s.append(" Key:"+search+" found:"+found);
         if (found) s.append(" data:"+data+" index:"+index);
         s.append(")\n");
         return s.toString();
@@ -110,11 +135,13 @@ class Btree extends Test                                                        
      }
 
     class FindFirstGreaterThanOrEqualInLeaf                                     // Find the first key in the leaf that is equal to or greater than the search key
-     {final int     search;                                                     // Search key
+     {final Node     leaf;                                                      // The leaf being searched
+      final int     search;                                                     // Search key
       final boolean  found;                                                     // Whether the key was found
       final int      first;                                                     // Index of first such key if found
       FindFirstGreaterThanOrEqualInLeaf(int Search)                             // Find the first key in the  leaf that is equal to or greater than the search key
        {assertLeaf();
+        leaf = Node.this;
         search = Search;
         boolean looking = true;
         final int N = leafSize();
@@ -134,7 +161,8 @@ class Btree extends Test                                                        
 
       public String toString()                                                  // Print results of search
        {final StringBuilder s = new StringBuilder();
-        s.append("FindFirstGreaterThanOrEqualInLeaf(Key:"+search+" found:"+found);
+        s.append("FindFirstGreaterThanOrEqualInLeaf(Leaf:"+leaf.node);
+        s.append(" Key:"+search+" found:"+found);
         if (found) s.append(" first:"+first);
         s.append(")\n");
         return s.toString();
@@ -142,13 +170,15 @@ class Btree extends Test                                                        
      }
 
     class FindEqualInBranch                                                     // Find the first key in the leaf that is equal to the search key
-     {final int    search;                                                      // Search key
+     {final Node     branch;                                                    // The branch being searched
+      final int    search;                                                      // Search key
       final boolean found;                                                      // Whether the key was found
       final int      next;                                                      // Next associated with the key
       final int     index;                                                      // Index of first such key if found
 
       FindEqualInBranch(int Search)                                             // Find the first key in the branch that is equal to the search key
        {assertBranch();
+        branch = Node.this;
         search = Search;
         boolean looking = true;
         final int N = branchSize();
@@ -169,7 +199,8 @@ class Btree extends Test                                                        
 
       public String toString()
        {final StringBuilder s = new StringBuilder();
-        s.append("FindEqualInBranch(Key:"+search+" found:"+found+" next:"+next);
+        s.append("FindEqualInBranch(branch:"+branch.node);
+        s.append(" Key:"+search+" found:"+found+" next:"+next);
         if (found) s.append(" index:"+index);
         s.append(")\n");
         return s.toString();
@@ -177,13 +208,15 @@ class Btree extends Test                                                        
      }
 
     class FindFirstGreaterThanOrEqualInBranch                                   // Find the first key in the branch that is equal to or greater than the search key
-     {final int     search;                                                     // Search key
+     {final Node     branch;                                                    // The branch being searched
+      final int     search;                                                     // Search key
       final boolean  found;                                                     // Whether the key was found
       final int      first;                                                     // Index of first such key if found
       final int       next;                                                     // The corresponding next field or top if no such key was found
 
       FindFirstGreaterThanOrEqualInBranch(int Search)                           // Find the first key in the branch that is equal to or greater than the search key
        {assertBranch();
+        branch = Node.this;
         search = Search;
         boolean looking = true;
         final int N = branchSize();
@@ -203,7 +236,8 @@ class Btree extends Test                                                        
 
       public String toString()                                                  // Print search results
        {final StringBuilder s = new StringBuilder();
-        s.append("FindFirstGreaterThanOrEqualInBranch(Key:"+search+" found:"+found+" next:"+next);
+        s.append("FindFirstGreaterThanOrEqualInBranch(branch:"+branch.node);
+        s.append(" Key:"+search+" found:"+found+" next:"+next);
         if (found) s.append(" first:"+first);
         s.append(")\n");
         return s.toString();
@@ -225,7 +259,7 @@ class Btree extends Test                                                        
 
     void printBranch(Stack<StringBuilder>S, int level)                          // Print branch horizontally
      {assertBranch();
-      if (level > maxPrintLevels) return;
+    if (level > maxPrintLevels) return;
       padStrings(S, level);
       final int K = branchSize();
       final int L = level * linesToPrintABranch;
@@ -325,10 +359,10 @@ class Btree extends Test                                                        
     void splitLeaf(Node parent, int index)                                      // Split a leaf which is not the root
      {assertLeaf();
       if (node == 0) stop("Cannot split root with this method");
-      if (!isFull()) stop("Leaf is not full, but", leafSize());
-      if (parent.isFull()) stop("Parent must not be full");
-      if (index < 0)            stop("Index", index, "too small");
-      if (index > branchSize()) stop("Index", index, "too big");
+      if (!isFull()) stop("Leaf:", node, "is not full, but has:", leafSize(), this);
+      if (parent.isFull()) stop("Parent:", parent, "must not be full");
+      if (index < 0)           stop("Index", index, "too small");
+      if (index > leafSize()) stop("Index", index, "too big for leaf with:", leafSize());
 
       final Node p = parent;
       final Node l = allocLeaf();
@@ -350,7 +384,7 @@ class Btree extends Test                                                        
       if (!isFull()) stop("Branch is not full, but", branchSize());
       if (parent.isFull()) stop("Parent must not be full");
       if (index < 0)            stop("Index", index, "too small");
-      if (index > branchSize()) stop("Index", index, "too big");
+      if (index > branchSize()) stop("Index", index, "too big for branch with:", branchSize());
 
       final Node p = parent;
       final Node l = allocBranch();
@@ -493,8 +527,7 @@ class Btree extends Test                                                        
 //D1 Find                                                                       // Find the data associated with a key
 
   class Find                                                                    // Find the data associated with a key in the tree
-   {Node leaf;                                                                  // Leaf that should contain the key
-    Node.FindEqualInLeaf search;                                                // Details of the search of the containing leaf
+   {Node.FindEqualInLeaf search;                                                // Details of the search of the containing leaf
 
     Find(int Key)
      {if (root.isLeaf)                                                          // The root is a leaf
@@ -510,7 +543,8 @@ class Btree extends Test                                                        
           parent.new FindFirstGreaterThanOrEqualInBranch(Key);
         final int n = down.next;
         if (nodes.elementAt(n).isLeaf)                                          // Found the containing search
-         {search  = nodes.elementAt(n).new FindEqualInLeaf(Key);
+         {final Node l = nodes.elementAt(n);
+          search  = l.new FindEqualInLeaf(Key);
           return;
          }
         parent = nodes.elementAt(n);                                            // Step down to lower branch
@@ -545,23 +579,23 @@ class Btree extends Test                                                        
 
     FindAndInsert(int Key, int Data)                                            // Find the leaf that should contain this key and insert or update it is possible
      {super(Key);                                                               // Find the leaf that should contain this key
-      key  = Key; data = Data;
+      key = Key; data = Data;
 
       if (search.found)                                                         // Found the key in the leaf so update it with the new data
-       {leaf.keyData.setElementAt(new KeyData(Key, Data), search.index);
-       success = true; inserted = false;
+       {search.leaf.keyData.setElementAt(new KeyData(Key, Data), search.index);
+        success = true; inserted = false;
         return;
        }
 
-      if (!leaf.isFull())                                                       // Leaf is not full so we can insert immediately
+      if (!search.leaf.isFull())                                                       // Leaf is not full so we can insert immediately
        {z();
         final Node.FindFirstGreaterThanOrEqualInLeaf fge =
-          leaf.new FindFirstGreaterThanOrEqualInLeaf(Key);
+          search.leaf.new FindFirstGreaterThanOrEqualInLeaf(Key);
         if (fge.found)                                                          // Found a matching key so insert into body of leaf
-         {leaf.keyData.setElementAt(new KeyData(Key, Data), fge.first);
+         {search.leaf.keyData.setElementAt(new KeyData(Key, Data), fge.first);
          }
         else                                                                    // No matching key so put at end
-         {leaf.keyData.push(new KeyData(Key, Data));
+         {search.leaf.keyData.push(new KeyData(Key, Data));
          }
         success = true;
         return;
@@ -595,6 +629,8 @@ class Btree extends Test                                                        
     if (root.isFull())                                                          // Start the insertion at the root, after splitting it if necessary
      {if (root.isLeaf) root.splitLeafRoot();
       else root.splitBranchRoot();
+      final FindAndInsert F = new FindAndInsert(Key, Data);                       // Spliting the root might have been enough
+      if (F.success) return;                                                      // Inserted or updated successfully
      }
 
     Node p = root;
@@ -614,7 +650,7 @@ class Btree extends Test                                                        
       Down = p.new FindFirstGreaterThanOrEqualInBranch(Key);
       p = nodes.elementAt(Down.next);
      }
-    stop("Fallen off the end of the tree");                                      // The tree must be missing a leaf
+    stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
    }
 
   void put(int Key)                                                             // Put some test data into the tree
@@ -623,8 +659,34 @@ class Btree extends Test                                                        
 
 //D0 Tests                                                                      // Testing
 
+  static void test_put_ascending()
+   {final Btree t = new Btree(4, 3);
+    final int N = 16;
+    for (int i = 1; i <= N; i++)
+     {say(t);
+      t.put(i);
+      say(t);
+     }
+    //stop(t);
+    t.ok("""
+                                                                                                                            32                                                                                                                                           |
+                                                                                                                            0                                                                                                                                            |
+                                                                                                                            19                                                                                                                                           |
+                                                                                                                            20                                                                                                                                           |
+                                                      16                                                                                                                                            48                                                                   |
+                                                      19                                                                                                                                            20                                                                   |
+                                                      9                                                                                                                                             21                                                                   |
+                                                      14                                                                                                                                            6                                                                    |
+          4          8               12                               20               24                28                                  36               40                 44                                  52               56                60               |
+          9          9.1             9.2                              14               14.1              14.2                                21               21.1               21.2                                6                6.1               6.2              |
+          3          1               4                                8                10                5                                   13               15                 11                                  18               22                16               |
+                                     7                                                                   12                                                                      17                                                                     2                |
+1,2,3,4=3  5,6,7,8=1    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=5     29,30,31,32=12   33,34,35,36=13   37,38,39,40=15     41,42,43,44=11     45,46,47,48=17   49,50,51,52=18   53,54,55,56=22    57,58,59,60=16    61,62,63,64=2 |
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
-   {
+   {test_put_ascending();
    }
 
   static void newTests()                                                        // Tests being worked on
