@@ -490,6 +490,100 @@ class Btree extends Test                                                        
     return printCollapsed(S);
    }
 
+//D1 Find                                                                       // Find the data associated with a key
+
+  class Find                                                                    // Find the data associated with a key in the tree
+   {Node leaf;                                                                  // Leaf that should contain the key
+    Node.FindEqualInLeaf search;                                                // Details of the search of the containing leaf
+
+    Find(int Key)
+     {if (root.isLeaf)                                                          // The root is a leaf
+       {search = root.new FindEqualInLeaf(Key);
+        return;
+       }
+
+      Node parent = root;                                                       // Parent starts at root which is known to be a branch
+
+      for (int i = 0; i < maxDepth; i++)                                        // Step down through tree
+       {z();
+        final Node.FindFirstGreaterThanOrEqualInBranch down =                   // Find next child in search path of key
+          parent.new FindFirstGreaterThanOrEqualInBranch(Key);
+        final int n = down.next;
+        if (nodes.elementAt(n).isLeaf)                                          // Found the containing search
+         {search  = nodes.elementAt(n).new FindEqualInLeaf(Key);
+          return;
+         }
+        parent = nodes.elementAt(n);                                            // Step down to lower branch
+       }
+      stop("Search did not terminate in a search");
+     }
+
+    boolean  found() {return search.found;}
+    int      index() {return search.index;}
+    int       data() {return search.data;}
+
+    public String toString()                                                    // Print find result
+     {final StringBuilder s = new StringBuilder();
+      s.append("Find(search:"+search.search);
+      s.append( " search:"+search.index);
+      if (search.found)
+       {s.append( " data:"+data());
+        s.append(" index:"+index());
+       }
+      s.append(")\n");
+      return s.toString();
+     }
+   }
+
+  Find find(int Key) {return find(Key);}                                        // Find a key in the tree
+
+  class FindAndInsert extends Find                                              // Insert the specified key and data into the tree if there is room in the target leaf,or update the key with the data if the key already exists
+   {int          key;                                                           // Key to insert
+    int         data;                                                           // Data being inserted or updated
+    boolean  success;                                                           // Inserted or updated if true
+    boolean inserted;                                                           // Inserted if true
+
+    FindAndInsert(int Key, int Data)                                            // Find the leaf that should contain this key and insert or update it is possible
+     {super(Key);                                                               // Find the leaf that should contain this key
+      key  = Key; data = Data;
+
+      if (search.found)                                                         // Found the key in the leaf so update it with the new data
+       {leaf.keyData.setElementAt(new KeyData(Key, Data), search.index);
+       success = true; inserted = false;
+        return;
+       }
+
+      if (!leaf.isFull())                                                       // Leaf is not full so we can insert immediately
+       {z();
+        final Node.FindFirstGreaterThanOrEqualInLeaf fge =
+          leaf.new FindFirstGreaterThanOrEqualInLeaf(Key);
+        if (fge.found)                                                          // Found a matching key so insert into body of leaf
+         {leaf.keyData.setElementAt(new KeyData(Key, Data), fge.first);
+         }
+        else                                                                    // No matching key so put at end
+         {leaf.keyData.push(new KeyData(Key, Data));
+         }
+        success = true;
+        return;
+       }
+      success = false;
+     }
+
+    public String toString()                                                    // Print find and insert
+     {final StringBuilder s = new StringBuilder();
+      s.append("FindAndInsert(key:"+key);
+      s.append(" data:"+data);
+      s.append(" success:"+success);
+      if (success) s.append(" inserted:"+inserted);
+      s.append(")\n" );
+      return s.toString();
+     }
+   }
+
+  FindAndInsert findAndInsert(int Key, int Data)                                // Find a key and insert it if possible with its associated data
+   {return new FindAndInsert(Key, Data);
+   }
+
 //D0 Tests                                                                      // Testing
 
   static void oldTests()                                                        // Tests thought to be in good shape
