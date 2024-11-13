@@ -584,6 +584,43 @@ class Btree extends Test                                                        
    {return new FindAndInsert(Key, Data);
    }
 
+//D1 Insertion                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
+
+  void put(int Key, int Data)                                                   // Insert a key, data pair into the tree or update and existing key with a new datum
+   {z();
+
+    final FindAndInsert f = new FindAndInsert(Key, Data);                       // Try direct insertion with no modifications to the shape of the tree
+    if (f.success) return;                                                      // Inserted or updated successfully
+
+    if (root.isFull())                                                          // Start the insertion at the root, after splitting it if necessary
+     {if (root.isLeaf) root.splitLeafRoot();
+      else root.splitBranchRoot();
+     }
+
+    Node p = root;
+
+    for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
+     {final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
+      down = p.new FindFirstGreaterThanOrEqualInBranch(Key);
+      Node q = nodes.elementAt(down.next);
+      if (q.isLeaf)                                                             // Reached a leaf
+       {q.splitLeaf(p, down.first);
+        findAndInsert(Key, Data);
+        return;
+       }
+
+      q.splitBranch(p, down.next);                                              // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
+      final Node.FindFirstGreaterThanOrEqualInBranch                                    // Step down again as the repack will have altered the local layout
+      Down = p.new FindFirstGreaterThanOrEqualInBranch(Key);
+      p = nodes.elementAt(Down.next);
+     }
+    stop("Fallen of the end of the tree");                                      // The tree must be missing a leaf
+   }
+
+  void put(int Key)                                                             // Put some test data into the tree
+   {put(Key, Key);
+   }
+
 //D0 Tests                                                                      // Testing
 
   static void oldTests()                                                        // Tests thought to be in good shape
