@@ -327,6 +327,8 @@ class Btree extends Test                                                        
       if (node == 0) stop("Cannot split root with this method");
       if (!isFull()) stop("Leaf is not full, but", leafSize());
       if (parent.isFull()) stop("Parent must not be full");
+      if (index < 0)            stop("Index", index, "too small");
+      if (index > branchSize()) stop("Index", index, "too big");
 
       final Node p = parent;
       final Node l = allocLeaf();
@@ -347,6 +349,8 @@ class Btree extends Test                                                        
       if (node == 0) stop("Cannot split root with this method");
       if (!isFull()) stop("Branch is not full, but", branchSize());
       if (parent.isFull()) stop("Parent must not be full");
+      if (index < 0)            stop("Index", index, "too small");
+      if (index > branchSize()) stop("Index", index, "too big");
 
       final Node p = parent;
       final Node l = allocBranch();
@@ -363,10 +367,11 @@ class Btree extends Test                                                        
       parent.keyNext.insertElementAt(new KeyNext(splitKey, l.node), index);
      }
 
-    void merge(int index)                                                       // Merge the indexed child with its left sibling
+    boolean merge(int index)                                                    // Merge the indexed child with its left sibling
      {assertBranch();
-      if (index == 0) return;
-      if (index > branchSize()) return;
+      if (index == 0) return false;
+      if (index < 0)            stop("Index", index, "too small");
+      if (index > branchSize()) stop("Index", index, "too big");
       if (isFull()) stop("Parent must not be full");
 
       final Node p = this;
@@ -380,6 +385,7 @@ class Btree extends Test                                                        
            {r.keyData.insertElementAt(l.keyData.pop(), 0);
            }
           p.keyNext.removeElementAt(index);
+          return true;
          }
        }
       else if (l.branchSize() + 1 + r.branchSize() <= maxKeysPerBranch)
@@ -390,7 +396,9 @@ class Btree extends Test                                                        
          {r.keyData.insertElementAt(l.keyData.pop(), 0);
          }
         p.keyNext.removeElementAt(index);
+        return true;
        }
+      return false;
      }
    }  // Node
 
