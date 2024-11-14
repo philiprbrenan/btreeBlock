@@ -525,8 +525,9 @@ class Btree extends Test                                                        
         if (nl >= maxKeysPerLeaf) return false;                                 // Steal not possible because there is no where to put the steal
         if (nr <= 1) return false;                                              // Steal not allowed because it would leave the right sibling empty
 
-        l.push        (new KeyData(r.firstElement().key, r.firstElement().data));// Increase left
-        p.setElementAt(new KeyNext(r.firstElement().key, L.next), index);       // Swap key of parent
+        final int k = r.firstElement().key;
+        l.push        (new KeyData(k, r.firstElement().data));                  // Increase left
+        p.setElementAt(new KeyNext(k, L.next), index);                          // Swap key of parent
         r.removeElementAt(0);                                                   // Reduce right
        }
       else                                                                      // Children are branches
@@ -586,7 +587,8 @@ class Btree extends Test                                                        
         final int           nr = nodes.elementAt(R.next).branchSize();
 
         if (nl + 1 + nr > maxKeysPerBranch) return false;                       // Merge not possible because there is not enough room for the combined result
-        r.insertElementAt(new KeyNext(p.elementAt(index-1).key, l.lastElement().next), 0);  // Left top to right
+        final int t = p.elementAt(index-1).key;                                 // Top key
+        r.insertElementAt(new KeyNext(t, l.lastElement().next), 0);             // Left top to right
 
         l.pop();                                                                // Remove left top
         for (int i = 0; i < maxKeysPerBranch && l.size() > 0; i++)              // Transfer left to right
