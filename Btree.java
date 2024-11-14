@@ -465,11 +465,12 @@ class Btree extends Test                                                        
       if (index < 0)            stop("Index", index, "too small");
       if (index > branchSize()) stop("Index", index, "too big");
 
+      final KeyNext        L = keyNext.elementAt(index-1);
+      final KeyNext        R = keyNext.elementAt(index+0);
+      final Stack<KeyNext> p = keyNext;
+
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final KeyNext        L = keyNext.elementAt(index-1);
-        final KeyNext        R = keyNext.elementAt(index+0);
-        final Stack<KeyNext> p = keyNext;
         final Stack<KeyData> l = nodes.elementAt(L.next).keyData;
         final Stack<KeyData> r = nodes.elementAt(R.next).keyData;
         final int           nl = nodes.elementAt(L.next).leafSize();
@@ -485,9 +486,6 @@ class Btree extends Test                                                        
        }
       else                                                                      // Children are branches
        {z();
-        final KeyNext        L = keyNext.elementAt(index-1);
-        final KeyNext        R = keyNext.elementAt(index+0);
-        final Stack<KeyNext> p = keyNext;
         final Stack<KeyNext> l = nodes.elementAt(L.next).keyNext;
         final Stack<KeyNext> r = nodes.elementAt(R.next).keyNext;
         final int           nl = nodes.elementAt(L.next).branchSize();
@@ -512,11 +510,11 @@ class Btree extends Test                                                        
       if (index < 0)             stop("Index", index, "too small");
       if (index >= branchSize()) stop("Index", index, "too big");
 
+      final KeyNext        L = keyNext.elementAt(index+0);
+      final KeyNext        R = keyNext.elementAt(index+1);
+      final Stack<KeyNext> p = keyNext;
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final KeyNext        L = keyNext.elementAt(index+0);
-        final KeyNext        R = keyNext.elementAt(index+1);
-        final Stack<KeyNext> p = keyNext;
         final Stack<KeyData> l = nodes.elementAt(L.next).keyData;
         final Stack<KeyData> r = nodes.elementAt(R.next).keyData;
         final int           nl = nodes.elementAt(L.next).leafSize();
@@ -532,9 +530,6 @@ class Btree extends Test                                                        
        }
       else                                                                      // Children are branches
        {z();
-        final KeyNext        L = keyNext.elementAt(index+0);
-        final KeyNext        R = keyNext.elementAt(index+1);
-        final Stack<KeyNext> p = keyNext;
         final Stack<KeyNext> l = nodes.elementAt(L.next).keyNext;
         final Stack<KeyNext> r = nodes.elementAt(R.next).keyNext;
         final int           nl = nodes.elementAt(L.next).branchSize();
@@ -546,7 +541,6 @@ class Btree extends Test                                                        
         l.setElementAt(new KeyNext(L.key, l.lastElement().next), nl);           // Left top becomes real
         l.push        (new KeyNext(r.firstElement().next));                     // Increase left with right first
         p.setElementAt(new KeyNext(r.firstElement().key, L.next), index);       // Swap key of parent
-
         r.removeElementAt(0);                                                   // Reduce right
        }
       return true;
@@ -559,11 +553,12 @@ class Btree extends Test                                                        
       if (index > branchSize()) stop("Index", index, "too big");
       if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
 
+      final KeyNext        L = keyNext.elementAt(index-1);
+      final KeyNext        R = keyNext.elementAt(index-0);
+      final Stack<KeyNext> p = keyNext;
+
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final KeyNext        L = keyNext.elementAt(index-1);
-        final KeyNext        R = keyNext.elementAt(index-0);
-        final Stack<KeyNext> p = keyNext;
         final Stack<KeyData> l = nodes.elementAt(L.next).keyData;
         final Stack<KeyData> r = nodes.elementAt(R.next).keyData;
         final int           nl = nodes.elementAt(L.next).leafSize();
@@ -574,13 +569,9 @@ class Btree extends Test                                                        
         for (int i = 0; i < maxKeysPerLeaf && l.size() > 0; i++)                // Transfer left to right
          {z(); r.insertElementAt(l.pop(), 0);
          }
-        p.removeElementAt(index-1);                                             // Reduce parent by left sibling
        }
       else                                                                      // Children are branches
        {z();
-        final KeyNext        L = keyNext.elementAt(index-1);
-        final KeyNext        R = keyNext.elementAt(index-0);
-        final Stack<KeyNext> p = keyNext;
         final Stack<KeyNext> l = nodes.elementAt(L.next).keyNext;
         final Stack<KeyNext> r = nodes.elementAt(R.next).keyNext;
         final int           nl = nodes.elementAt(L.next).branchSize();
@@ -594,8 +585,8 @@ class Btree extends Test                                                        
         for (int i = 0; i < maxKeysPerBranch && l.size() > 0; i++)              // Transfer left to right
          {z(); r.insertElementAt(l.pop(), 0);
          }
-        p.removeElementAt(index-1);                                             // Reduce parent on left
        }
+        p.removeElementAt(index-1);                                             // Reduce parent on left
       return true;
      }
 
@@ -609,6 +600,7 @@ class Btree extends Test                                                        
       final KeyNext        L = keyNext.elementAt(index+0);
       final KeyNext        R = keyNext.elementAt(index+1);
       final Stack<KeyNext> p = keyNext;
+
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
         final Stack<KeyData> l = nodes.elementAt(L.next).keyData;
@@ -638,6 +630,7 @@ class Btree extends Test                                                        
           r.removeElementAt(0);
          }
        }
+
       final KeyNext pkn = p.elementAt(index+1);                               // Key of right sibling
       p.setElementAt(new KeyNext(pkn.key, p.elementAt(index).next), index);   // Install key of right sibling in this child
       p.removeElementAt(index+1);                                             // Reduce parent on right
