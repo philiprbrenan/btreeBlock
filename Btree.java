@@ -459,7 +459,7 @@ class Btree extends Test                                                        
       stop("Unable to augment child:", c.node);
      }
 
-    boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible
+    boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
      {z(); assertBranch();
       if (index == 0) return false;
       if (index < 0)            stop("Index", index, "too small");
@@ -606,11 +606,11 @@ class Btree extends Test                                                        
       if (index > branchSize()) stop("Index", index, "too big");
       //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
 
+      final KeyNext        L = keyNext.elementAt(index+0);
+      final KeyNext        R = keyNext.elementAt(index+1);
+      final Stack<KeyNext> p = keyNext;
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final KeyNext        L = keyNext.elementAt(index+0);
-        final KeyNext        R = keyNext.elementAt(index+1);
-        final Stack<KeyNext> p = keyNext;
         final Stack<KeyData> l = nodes.elementAt(L.next).keyData;
         final Stack<KeyData> r = nodes.elementAt(R.next).keyData;
         final int           nl = nodes.elementAt(L.next).leafSize();
@@ -620,15 +620,9 @@ class Btree extends Test                                                        
         for (int i = 0; i < maxKeysPerLeaf && r.size() > 0; i++)                // Transfer right to left
          {z(); l.push(r.pop());
          }
-        final KeyNext pkn = p.elementAt(index+1);                               // Key of right sibling
-        p.setElementAt(new KeyNext(pkn.key, p.elementAt(index).next), index);   // Install key of right sibling in this child
-        p.removeElementAt(index+1);                                             // Reduce parent by  right sibling
        }
       else                                                                      // Children are branches
        {z();
-        final KeyNext        L = keyNext.elementAt(index+0);
-        final KeyNext        R = keyNext.elementAt(index+1);
-        final Stack<KeyNext> p = keyNext;
         final Stack<KeyNext> l = nodes.elementAt(L.next).keyNext;
         final Stack<KeyNext> r = nodes.elementAt(R.next).keyNext;
         final int           nl = nodes.elementAt(L.next).branchSize();
@@ -643,10 +637,10 @@ class Btree extends Test                                                        
           l.push(r.firstElement());
           r.removeElementAt(0);
          }
-        final KeyNext pkn = p.elementAt(index+1);                               // Key of right sibling
-        p.setElementAt(new KeyNext(pkn.key, p.elementAt(index).next), index);   // Install key of right sibling in this child
-        p.removeElementAt(index+1);                                             // Reduce parent on right
        }
+      final KeyNext pkn = p.elementAt(index+1);                               // Key of right sibling
+      p.setElementAt(new KeyNext(pkn.key, p.elementAt(index).next), index);   // Install key of right sibling in this child
+      p.removeElementAt(index+1);                                             // Reduce parent on right
       return true;
      }
    }  // Node
