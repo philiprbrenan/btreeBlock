@@ -19,7 +19,7 @@ class Btree extends Test                                                        
   final static int
    linesToPrintABranch =  4,                                                    // The number of lines required to print a branch
         maxPrintLevels = 10,                                                    // Maximum number of levels to print in a tree
-              maxDepth =  6;                                                    // Maximum depth of any realistic tree
+              maxDepth = 99;                                                    // Maximum depth of any realistic tree
 
   int        nodeCount = 0;                                                     // Unique number for each node
   int      maxNodeUsed = 0;                                                     // Maximum branch or leaf index used
@@ -994,6 +994,18 @@ class Btree extends Test                                                        
 """);
    }
 
+  static void test_put_large_random()
+   {final Btree t = new Btree(2, 3);
+    for (int i = 0; i < random_large.length; ++i)
+     {t.put(random_large[i], i);
+     }
+    for (int i = 0; i < random_large.length; ++i)
+     {Find f = t.find(random_large[i]);
+      ok(f.found());
+      ok(f.data(), i);
+     }
+   }
+
   static void test_find()
    {final Btree t = new Btree(2, 3);
     final int N = 32;
@@ -1597,6 +1609,7 @@ t.ok("""
     test_put_ascending_wide();
     test_put_descending();
     test_put_small_random();
+    test_put_large_random();
     test_find();
     test_steal();
     test_merge_left();
