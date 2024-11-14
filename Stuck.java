@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// A fixed size stack of ordered key, data pairs with null deemed highest
+// A fixed size stack of ordered key, data pairs
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
@@ -15,46 +15,90 @@ class Stuck extends Test                                                        
 //D1 Construction                                                               // Create a stuck
 
   Stuck(int MaxSize)                                                            // Create the stuck with a maximum number of the specified elements
-   {maxSize     = MaxSize;
+   {z();
+      maxSize     = MaxSize;
     currentSize = 0;
     Keys        = new int[maxSize];
     Data        = new int[maxSize];
    }
 
   static Stuck stuck(int MaxSize)                                               // Create the stuck
-   {return new Stuck(MaxSize);
+   {z(); return new Stuck(MaxSize);
    }
 
   public void ok(String expected) {ok(toString(), expected);}                   // Check the stuck
 
 //D1 Characteristics                                                            // Characteristics of the stuck
 
-  int      size          ()       {return currentSize;}                         // The current number of key elements in the stuck as a binary integer
-  int   maxSize          ()       {return maxSize;}                             // The maximum number of key elements the stuck can contain
-  boolean isFull         ()       {return size() > maxSize;}                    // Check the stuck is full
-  boolean isEmpty        ()       {return size() == 0;}                         // Check the stuck is empty
-  void     assertNotFull ()       {if (isFull ()) stop("Full");}                // Assert the stack is not full
-  void     assertNotEmpty()       {if (isEmpty()) stop("Empty");}               // Assert the stack is not empty
-  void     assertIn      (int i)  {if (i < 0 || i >= size()) stop("Out of normal range",   i, "for size", size());}  // Check that the index would yield a valid element
-  void     assertIn1     (int i)  {if (i < 0 || i >  size()) stop("Out of extended range", i, "for size", size());}  // Check that the index would allow an element to be inserted
+  int      size          ()       {z(); return currentSize;}                    // The current number of key elements in the stuck as a binary integer
+  int   maxSize          ()       {z(); return maxSize;}                        // The maximum number of key elements the stuck can contain
+  boolean isFull         ()       {z(); return size() > maxSize;}               // Check the stuck is full
+  boolean isEmpty        ()       {z(); return size() == 0;}                    // Check the stuck is empty
+  void     assertNotFull ()       {z(); if (isFull ()) stop("Full");}           // Assert the stack is not full
+  void     assertNotEmpty()       {z(); if (isEmpty()) stop("Empty");}          // Assert the stack is not empty
+  void     assertIn      (int i)  {z(); if (i < 0 || i >= size()) stop("Out of range",   i, "for size", size());}  // Check that the index would yield a valid element
+
+  class CheckOrder                                                              // Check that the keys are in order,
+   {final boolean inOrder;                                                      // Keys are in order
+    final int outOfOrder;                                                       // Index of first key out of order
+
+    String name() {return "CheckOrder";}                                        // Name of class
+    int limit  () {return size();}                                              // How far to check
+
+    CheckOrder()
+     {boolean looking = true;
+      int i = 1, j = limit();
+      for (;i < j && looking; i++)                                              // Check each key
+       {z();
+        if (Keys[i-1] > Keys[i])
+         {looking = false;
+           break;
+         }
+       }
+      if (looking)
+       {z(); inOrder = true;  outOfOrder = 0;
+       }
+      else
+       {z(); inOrder = false; outOfOrder = i;
+       }
+     }
+    public String toString()                                                    // Print
+     {z();
+      final StringBuilder s = new StringBuilder();
+      s.append(name()+"(inOrder:"+inOrder);
+      s.append(" outOfOrder:"+outOfOrder);
+      s.append(")\n");
+      return s.toString();
+     }
+   }
+  CheckOrder checkOrder() {z(); return new CheckOrder();}                       // Check the order of elements
+
+  class CheckOrderExceptLast extends CheckOrder                                 // Check that the keys are in order except for the last one
+   {String name() {return "CheckOrderExceptLast";}                              // Name of class
+    int limit  () {return size()-1;}                                            // How far to check
+   }
+  CheckOrderExceptLast checkOrderExceptLast() {z(); return new CheckOrderExceptLast();}
 
 //D1 Actions                                                                    // Place and remove data to/from stuck
 
-  void inc  () {assertNotFull (); currentSize++;}                               // Increment the current size
-  void dec  () {assertNotEmpty(); currentSize--;}                               // Decrement the current size
-  void clear() {                  currentSize = 0;}                             // Clear the stuck
+  void inc  () {z(); assertNotFull (); currentSize++;}                          // Increment the current size
+  void dec  () {z(); assertNotEmpty(); currentSize--;}                          // Decrement the current size
+  void clear() {z();                   currentSize = 0;}                        // Clear the stuck
 
   void push(int key, int data)                                                  // Push an element onto the stuck
-   {assertNotFull();
+   {z();
+      assertNotFull();
     Keys[currentSize] = key;
     Data[currentSize] = data;
     inc();
    }
 
   void unshift(int key, int data)                                               // Unshift an element onto the stuck
-   {assertNotFull();
+   {z();
+    assertNotFull();
     for (int i = size(); i > 0; --i)                                            // Shift the stuck up one place
-     {Keys[i] = Keys[i-1];
+     {z();
+      Keys[i] = Keys[i-1];
       Data[i] = Data[i-1];
      }
     Keys[0] = key;
@@ -67,7 +111,8 @@ class Stuck extends Test                                                        
     final int key;                                                              // The popped key
     final int data;                                                             // The popped data
     Pop()
-     {assertNotEmpty();
+     {z();
+      assertNotEmpty();
       dec();
       index = size();
       key  = Keys[index];
@@ -88,12 +133,14 @@ class Stuck extends Test                                                        
    {final int key;                                                              // The shifted key
     final int data;                                                             // The shifted data
     Shift()
-     {assertNotEmpty();
+     {z();
+      assertNotEmpty();
       key  = Keys[0];
       data = Data[0];
 
       for (int i = 0, j = size()-1; i < j; i++)                                 // Shift the stuck down one place
-       {Keys[i] = Keys[i+1];
+       {z();
+      Keys[i] = Keys[i+1];
         Data[i] = Data[i+1];
        }
       dec();
@@ -106,20 +153,22 @@ class Stuck extends Test                                                        
       return s.toString();
      }
    }
-  Shift shift() {return new Shift();}
+  Shift shift() {z(); return new Shift();}
 
   class ElementAt                                                               // Gte the indexed element
    {final int index;                                                            // The index from which the key, data pair were retrieved
     final int key;                                                              // The shifted key
     final int data;                                                             // The shifted data
     ElementAt(int Index)
-     {index = Index;
+     {z();
+      index = Index;
       assertIn(index);
       key  = Keys[index];
       data = Data[index];
      }
     public String toString()                                                    // Print
-     {final StringBuilder s = new StringBuilder();
+     {z();
+      final StringBuilder s = new StringBuilder();
       s.append("ElementAt(index:"+index);
       s.append(" key:"+key);
       s.append(" data:"+data);
@@ -127,31 +176,36 @@ class Stuck extends Test                                                        
       return s.toString();
      }
    }
-  ElementAt elementAt(int Index) {return new ElementAt(Index);}
+  ElementAt elementAt(int Index) {z(); return new ElementAt(Index);}
 
-  void setElementAt(int key, int data, int Index)                                    // Set an element either in range or one above the current range
+  void setElementAt(int key, int data, int Index)                               // Set an element either in range or one above the current range
    {if (Index == size())                                                        // Extended range
-     {Keys[Index] = key;
+     {z();
+      Keys[Index] = key;
       Data[Index] = data;
       inc();
      }
     else                                                                        // In range
-     {assertIn(Index);
+     {z();
+      assertIn(Index);
       Keys[Index] = key;
       Data[Index] = data;
       }
    }
 
-  void insertElementAt(int key, int data, int Index)                                 // Insert an element at the indicated location shifting all the remaining elements up one
+  void insertElementAt(int key, int data, int Index)                            // Insert an element at the indicated location shifting all the remaining elements up one
    {if (Index == size())                                                        // Extended range
-     {Keys[Index] = key;
+     {z();
+      Keys[Index] = key;
       Data[Index] = data;
       inc();
      }
     else                                                                        // In range
-     {assertIn(Index);
+     {z();
+      assertIn(Index);
       for (int i = size(); i > Index; --i)                                      // Shift the stuck up one place
-       {Keys[i] = Keys[i-1];
+       {z();
+      Keys[i] = Keys[i-1];
         Data[i] = Data[i-1];
        }
       Keys[Index] = key;
@@ -164,18 +218,21 @@ class Stuck extends Test                                                        
     final int key;                                                              // The shifted key
     final int data;                                                             // The shifted data
     RemoveElementAt(int Index)
-     {index = Index;
+     {z();
+      index = Index;
       assertIn(index);
       key  = Keys[index];
       data = Data[index];
       for (int i = index, j = size()-1; i < j; i++)                             // Shift the stuck down one place
-       {Keys[i] = Keys[i+1];
+       {z();
+        Keys[i] = Keys[i+1];
         Data[i] = Data[i+1];
        }
       dec();
      }
     public String toString()                                                    // Print
-     {final StringBuilder s = new StringBuilder();
+     {z();
+      final StringBuilder s = new StringBuilder();
       s.append("RemoveElementAt(index:"+index);
       s.append(" key:"+key);
       s.append(" data:"+data);
@@ -183,19 +240,21 @@ class Stuck extends Test                                                        
       return s.toString();
      }
    }
-  RemoveElementAt removeElementAt(int Index) {return new RemoveElementAt(Index);} // Remove the indicated element
+  RemoveElementAt removeElementAt(int Index) {z(); return new RemoveElementAt(Index);} // Remove the indicated element
 
   class FirstElement                                                            // First element
    {final boolean found;                                                        // Whether there was a first element
     final int key;                                                              // The shifted key
     final int data;                                                             // The shifted data
     FirstElement()
-     {found = !isEmpty();
+     {z();
+      found = !isEmpty();
       if (found)
-       {key  = Keys[0];
+       {z();
+        key  = Keys[0];
         data = Data[0];
        }
-      else key = data = 0;
+      else {z(); key = data = 0;}
      }
     public String toString()                                                    // Print
      {final StringBuilder s = new StringBuilder();
@@ -213,13 +272,15 @@ class Stuck extends Test                                                        
     final int key;                                                              // The shifted key
     final int data;                                                             // The shifted data
     LastElement()
-     {found = !isEmpty();
+     {z();
+      found = !isEmpty();
       final int s = size()-1;
       if (found)
-       {key  = Keys[s];
+       {z();
+        key  = Keys[s];
         data = Data[s];
        }
-      else key = data = 0;
+      else {z(); key = data = 0;}
      }
     public String toString()                                                    // Print
      {final StringBuilder s = new StringBuilder();
@@ -230,7 +291,7 @@ class Stuck extends Test                                                        
       return s.toString();
      }
    }
-  LastElement lastElement() {return new LastElement();}                         // Last element
+  LastElement lastElement() {z(); return new LastElement();}                    // Last element
 
 //D1 Search                                                                     // Search a stuck.
 
@@ -240,27 +301,32 @@ class Stuck extends Test                                                        
     final int index ;                                                           // Index of the located key if any
     final int data;                                                             // Located data if key was found
     Search(int Search)
-     {boolean looking = true;
+     {z();
+      boolean looking = true;
       key = Search;
       int i = 0, j = size() - 1;
       for (; i < j && looking; i++)                                             // Search
-       {if (Keys[i] == key)
-         {looking = false; break;
+       {z();
+        if (Keys[i] == key)
+         {z();
+          looking = false; break;
          }
        }
       if (looking)
-       {found = false; index = 0; data = 0;
+       {z(); found = false; index = 0; data = 0;
        }
       else
-       {found = true; index = i; data = Data[i];
+       {z(); found = true;  index = i; data = Data[i];
        }
      }
     public String toString()                                                    // Print
-     {final StringBuilder s = new StringBuilder();
+     {z();
+      final StringBuilder s = new StringBuilder();
       s.append("Search(Search:"+key);
       s.append(" found:"+found);
       if (found)
-       {s.append(" index:"+index);
+       {z();
+      s.append(" index:"+index);
         s.append(" data:"+data);
        }
       s.append(")\n");
@@ -275,27 +341,31 @@ class Stuck extends Test                                                        
     final int index ;                                                           // Index of the located key if any
     final int data;                                                             // Located data if key was found
     SearchFirstGreaterThanOrEqual(int Search)
-     {boolean looking = true;
+     {z();
+      boolean looking = true;
       key = Search;
       int i = 0, j = size() - 1;
       for (; i < j && looking; i++)                                             // Search
-       {if (Keys[i] <= key)                                                     // Search key is equal or greater to the current key
-         {looking = false; break;
+       {z();
+        if (Keys[i] >= key)                                                     // Search key is equal or greater to the current key
+         {z(); looking = false; break;
          }
        }
       if (looking)
-       {found = false; index = 0; data = 0;
+       {z(); found = false; index = 0; data = 0;
        }
       else
-       {found = true; index = i; data = Data[i];
+       {z(); found = true;  index = i; data = Data[i];
        }
      }
     public String toString()                                                    // Print
      {final StringBuilder s = new StringBuilder();
+      z();
       s.append("SearchFirstGreaterThanOrEqual(Search:"+key);
       s.append(" found:"+found);
       if (found)
-       {s.append(" index:"+index);
+       {z();
+        s.append(" index:"+index);
         s.append(" data:"+data);
        }
       s.append(")\n");
@@ -311,10 +381,11 @@ class Stuck extends Test                                                        
 
   public String toString()
    {final StringBuilder s = new StringBuilder();                                //
+    z();
     s.append("Stuck(maxSize:"+maxSize());
     s.append(" size:"+size()+")\n");
     for (int i = 0, j = size(); i < j; i++)                                     // Search
-     {s.append("  "+i+" key:"+Keys[i]+" data:"+Data[i]+"\n");
+     {z(); s.append("  "+i+" key:"+Keys[i]+" data:"+Data[i]+"\n");
      }
     return s.toString();
    }
@@ -452,6 +523,18 @@ FirstElement(found:true key:2 data:1)
     ok(l, """
 LastElement(found:true key:8 data:4)
 """);
+
+    t.clear();
+    FirstElement F = t.firstElement();
+    //stop(F);
+    ok(F, """
+FirstElement(found:false key:0 data:0)
+""");
+    LastElement L = t.lastElement();
+    //stop(L);
+    ok(L, """
+LastElement(found:false key:0 data:0)
+""");
    }
 
   static void test_search()
@@ -460,6 +543,30 @@ LastElement(found:true key:8 data:4)
     //stop(s);
     ok(s, """
 Search(Search:2 found:true index:0 data:1)
+""");
+    Search S = t.search(3);
+    //stop(S);
+    ok(S, """
+Search(Search:3 found:false)
+""");
+   }
+
+  static void test_search_first_greater_than_or_equal()
+   {Stuck  t = test_load();
+    SearchFirstGreaterThanOrEqual s = t.searchFirstGreaterThanOrEqual(4);
+    //stop(s);
+    ok(s, """
+SearchFirstGreaterThanOrEqual(Search:4 found:true index:1 data:2)
+""");
+    SearchFirstGreaterThanOrEqual S = t.searchFirstGreaterThanOrEqual(5);
+    //stop(S);
+    ok(S, """
+SearchFirstGreaterThanOrEqual(Search:5 found:true index:2 data:3)
+""");
+    SearchFirstGreaterThanOrEqual T = t.searchFirstGreaterThanOrEqual(9);
+    //stop(T);
+    ok(T, """
+SearchFirstGreaterThanOrEqual(Search:9 found:false)
 """);
    }
 
@@ -486,6 +593,37 @@ Stuck(maxSize:8 size:5)
 """);
    }
 
+  static void test_check_order()
+   {Stuck      t = test_load();
+    CheckOrder c = t.checkOrder();
+    //stop(c);
+    ok(c, """
+CheckOrder(inOrder:true outOfOrder:0)
+""");
+    t.insertElementAt(99, 97, 1);
+    CheckOrder C = t.checkOrder();
+    //stop(C);
+    ok(C, """
+CheckOrder(inOrder:false outOfOrder:2)
+""");
+   }
+
+  static void test_check_order_except_last()
+   {Stuck      t = test_load();
+    t.push(2, 2);
+    CheckOrderExceptLast c = t.checkOrderExceptLast();
+    //stop(c);
+    ok(c, """
+CheckOrderExceptLast(inOrder:true outOfOrder:0)
+""");
+    t.push(1, 1);
+    CheckOrderExceptLast C = t.checkOrderExceptLast();
+    //stop(C);
+    ok(C, """
+CheckOrderExceptLast(inOrder:false outOfOrder:4)
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_push();
     test_pop();
@@ -496,7 +634,10 @@ Stuck(maxSize:8 size:5)
     test_remove_element_at();
     test_first_last();
     test_search();
+    test_search_first_greater_than_or_equal();
     test_set_element_at();
+    test_check_order();
+    test_check_order_except_last();
    }
 
   static void newTests()                                                        // Tests being worked on
