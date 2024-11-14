@@ -755,7 +755,7 @@ class Btree extends Test                                                        
      }
    }
 
-  Find find(int Key) {z(); return new Find(Key);}                                   // Find a key in the tree
+  Find find(int Key) {z(); return new Find(Key);}                               // Find a key in the tree
 
   class FindAndInsert extends Find                                              // Insert the specified key and data into the tree if there is room in the target leaf,or update the key with the data if the key already exists
    {int          key;                                                           // Key to insert
@@ -934,6 +934,24 @@ class Btree extends Test                                                        
     1          4          8             11            16              19              23              26              30              35              39              42              46              50              54              57               61              67              71              74              78              82               86               89                93               98                  102                 105                  109                 113                  117       119        |
     3          7          10            13            18              21              25              28              34              37              41              44              49              52              56              59               64              69              73              76              81              84               88               91                96               100                 104                 107                  112                 115                            2          |
 1=1  2=3   3=4  4=7   5=8   6=10   7=11   8=13   9=16   10=18   11=19   12=21   13=23   14=25   15=26   16=28   17=30   18=34   19=35   20=37   21=39   22=41   23=42   24=44   25=46   26=49   27=50   28=52   29=54   30=56   31=57   32=59    33=61   34=64   35=67   36=69   37=71   38=73   39=74   40=76   41=78   42=81   43=82   44=84    45=86   46=88    47=89   48=91     49=93   50=96    51=98    52=100    53=102    54=104    55=105    56=107     57=109    58=112    59=113    60=115     61=117    62=119    63,64=2 |
+""");
+   }
+
+  static void test_put_ascending_wide()
+   {final Btree t = new Btree(8, 7);
+    final int N = 64;
+    for (int i = 0; i < N; ++i) t.put(i);
+    //stop(t);
+    t.ok("""
+                                                     15                                                                   31                                                                                                                                           |
+                                                     0                                                                    0.1                                                                                                                                          |
+                                                     9                                                                    15                                                                                                                                           |
+                                                                                                                          10                                                                                                                                           |
+          3          7              11                               19              23                27                                   35               39                 43                 47                 51                 55                            |
+          9          9.1            9.2                              15              15.1              15.2                                 10               10.1               10.2               10.3               10.4               10.5                          |
+          1          3              4                                6               7                 8                                    12               13                 14                 16                 17                 18                            |
+                                    5                                                                  11                                                                                                                                2                             |
+0,1,2,3=1  4,5,6,7=3    8,9,10,11=4    12,13,14,15=5   16,17,18,19=6   20,21,22,23=7     24,25,26,27=8     28,29,30,31=11    32,33,34,35=12   36,37,38,39=13     40,41,42,43=14     44,45,46,47=16     48,49,50,51=17     52,53,54,55=18     56,57,58,59,60,61,62,63=2 |
 """);
    }
 
@@ -1592,6 +1610,7 @@ t.ok("""
 
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_put_ascending();
+    test_put_ascending_wide();
     test_put_descending();
     test_put_small_random();
     test_find();
