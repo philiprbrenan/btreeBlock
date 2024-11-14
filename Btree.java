@@ -64,13 +64,13 @@ class Btree extends Test                                                        
     final Node n = new Node(); nodes.push(n); n.isLeaf = false; return n;}
 
     int leafSize()   {z(); return keyData.size();}                              // Number of children in body of leaf
-    int branchSize() {z(); return keyNext.size() - 1;}                          // Number of children in bods of branch
+    int branchSize() {z(); return keyNext.size() - 1;}                          // Number of children in body of branch
 
     boolean isFull()                                                            // The node is full
      {z(); return isLeaf ? leafSize() == maxKeysPerLeaf : branchSize() == maxKeysPerBranch;
      }
 
-    boolean isLow()                                                             // The node is low on childrfen making it impossible to merge two sibling children
+    boolean isLow()                                                             // The node is low on children making it impossible to merge two sibling children
      {z(); return (isLeaf ? leafSize() : branchSize()) < 2;
      }
 
@@ -107,7 +107,7 @@ class Btree extends Test                                                        
      }
 
     class FindEqualInLeaf                                                       // Find the first key in the leaf that is equal to the search key
-     {final Node     leaf;                                                      // The leafbeing searched
+     {final Node     leaf;                                                      // The leaf being searched
       final int    search;                                                      // Search key
       final boolean found;                                                      // Whether the key was found
       final int      data;                                                      // Data associated with the  key
@@ -127,7 +127,7 @@ class Btree extends Test                                                        
            }
          }
         if (looking)                                                            // Not found
-         {z(); index = N; found = false; data = 0;                              // Unneccessary magic number only to overcome complaints from Java
+         {z(); index = N; found = false; data = 0;                              // Unnecessary magic number only to overcome complaints from Java
          }
         else                                                                    // Found
          {z(); index = i; found = true; data = keyData.elementAt(i).data;
@@ -585,7 +585,7 @@ class Btree extends Test                                                        
         final int           nl = nodes.elementAt(L.next).branchSize();
         final int           nr = nodes.elementAt(R.next).branchSize();
 
-        if (nl + 1 + nr > maxKeysPerBranch) return false;                       // Merge not possible because there is not enopugh room for the combined result
+        if (nl + 1 + nr > maxKeysPerBranch) return false;                       // Merge not possible because there is not enough room for the combined result
         r.insertElementAt(new KeyNext(p.elementAt(index-1).key, l.lastElement().next), 0);  // Left top to right
 
         l.pop();                                                                // Remove left top
@@ -826,7 +826,7 @@ class Btree extends Test                                                        
        {z();
         root.splitBranchRoot();
        }
-      final FindAndInsert F = new FindAndInsert(Key, Data);                     // Spliting the root might have been enough
+      final FindAndInsert F = new FindAndInsert(Key, Data);                     // Splitting the root might have been enough
       if (F.success) return;                                                    // Inserted or updated successfully
      }
 
@@ -881,7 +881,7 @@ class Btree extends Test                                                        
   Integer delete(int Key)                                                       // Insert a key, data pair into the tree or update and existing key with a new datum
    {z(); root.mergeRoot();
 
-    if (root.isLeaf)                                                            // Find and delete dorectly in root as a leaf
+    if (root.isLeaf)                                                            // Find and delete directly in root as a leaf
      {z(); return findAndDelete(Key);
      }
 
