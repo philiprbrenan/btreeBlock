@@ -995,14 +995,25 @@ class Btree extends Test                                                        
    }
 
   static void test_put_large_random()
-   {final Btree t = new Btree(2, 3);
+   {if (!github_actions) return;
+    final Btree t = new Btree(2, 3);
+    final TreeMap<Integer,Integer> s = new TreeMap<>();
     for (int i = 0; i < random_large.length; ++i)
-     {t.put(random_large[i], i);
+     {final int r = random_large[i];
+      s.put(r, i);
+      t.put(r, i);
      }
-    for (int i = 0; i < random_large.length; ++i)
-     {Find f = t.find(random_large[i]);
-      ok(f.found());
-      ok(f.data(), i);
+    final int a = s.firstKey(), b = s.lastKey();
+    for (int i = a-1; i < b + 1; ++i)
+     {if (s.containsKey(i))
+       {Find f = t.find(i);
+        ok(f.found());
+        ok(f.data(), s.get(i));
+       }
+      else
+       {Find f = t.find(i);
+        ok(!f.found());
+       }
      }
    }
 
