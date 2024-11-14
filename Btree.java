@@ -226,6 +226,7 @@ class Btree extends Test                                                        
         boolean looking = true;
         final int N = branchSize();
         int i;
+if (debug) say("SSSS", Search, this);
         for (i = 0; i < N && looking; i++)                                      // Check each key
          {if (keyNext.elementAt(i).key >= search)
            {looking = false; break;
@@ -411,7 +412,7 @@ class Btree extends Test                                                        
      }
 
     boolean mergeRoot()                                                         // Merge into the root
-     {if (!root.isLeaf || branchSize() > 1) return false;
+     {if (root.isLeaf || branchSize() > 1) return false;
       if (node != 0) stop("Expected root, got:", node);
       final Node p = this;
       final Node l = nodes.elementAt(keyNext.firstElement().next);
@@ -420,13 +421,18 @@ class Btree extends Test                                                        
       if (p.hasLeavesForChildren())
        {if (l.leafSize() + r.leafSize() <= maxKeysPerLeaf)
          {p.keyData.clear();
-          for (; l.leafSize() > 0;)
-           {p.keyData.push(l.keyData.pop());
+          final int nl = l.leafSize();
+          for (int i = 0; i < nl; ++i)
+           {p.keyData.push(l.keyData.elementAt(0));
+                           l.keyData.removeElementAt(0);
            }
-          for (; r.leafSize() > 0;)
-           {p.keyData.push(r.keyData.pop());
+          final int nr = r.leafSize();
+          for (int i = 0; i < nr; ++i)
+           {p.keyData.push(r.keyData.elementAt(0));
+                           r.keyData.removeElementAt(0);
            }
-           p.keyNext.clear();
+          p.keyNext.clear();
+          isLeaf = true;
           return true;
          }
        }
@@ -662,6 +668,8 @@ class Btree extends Test                                                        
         final Stack<KeyNext> r = nodes.elementAt(R.next).keyNext;               //
         final int           nl = nodes.elementAt(L.next).branchSize();
         final int           nr = nodes.elementAt(R.next).branchSize();
+
+if (debug) say("SSSS 11", node, Btree.this);
         if (nl + 1 + nr > maxKeysPerBranch) return false;                       // Merge not possible because there is no where to put the steal
         l.setElementAt(new KeyNext(p.elementAt(index).key, l.lastElement().next), nl);  // Re key left top
 
@@ -672,6 +680,7 @@ class Btree extends Test                                                        
         final KeyNext pkn = p.elementAt(index+1);                               // Key of right sibling
         p.setElementAt(new KeyNext(pkn.key, p.elementAt(index).next), index);   // Install key of right sibling in this child
         p.removeElementAt(index+1);                                             // Reduce parent on right
+if (debug) say("SSSS 22", node, Btree.this);
        }
       return true;
      }
@@ -881,12 +890,13 @@ class Btree extends Test                                                        
 
   Integer delete(int Key)                                                       // Insert a key, data pair into the tree or update and existing key with a new datum
    {root.mergeRoot();
-if (debug) say("SSSS22", this);
-    if (root.isLeaf)
+
+    if (root.isLeaf)                                                            // Find and delete dorectly in root as a leaf
      {return findAndDelete(Key);
      }
 
-    Node p = root;
+    Node p = root;                                                              // Start at root
+
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
      {final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
       down = p.new FindFirstGreaterThanOrEqualInBranch(Key);
@@ -895,8 +905,7 @@ if (debug) say("SSSS22", this);
       Node q = nodes.elementAt(down.next);
 
       if (q.isLeaf)                                                             // Reached a leaf
-       {
-        return findAndDelete(Key);
+       {return findAndDelete(Key);
        }
       p = q;
      }
@@ -1199,10 +1208,348 @@ t.ok("""
 """);
 
     for (int i = 1; i < N; i++)
-     {debug = i == 11;
+     {debug = i == 29;
       t.delete(i);
-      //say("        case", i, ": ok(\"\"\"", t, "\"\"\");");
-      if (debug) stop("SSSS", t);
+      //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");");
+      switch(i)
+       {case 1 -> t.ok("""
+                                                                         16                                                                                   |
+                                                                         0                                                                                    |
+                                                                         14                                                                                   |
+                                                                         15                                                                                   |
+                             8                   12                                            20                    24                                       |
+                             14                  14.1                                          15                    15.1                                     |
+                             5                   12                                            20                    24                                       |
+                                                 17                                                                  6                                        |
+    2      4        6                 10                      14                    18                    22                      26         28               |
+    5      5.1      5.2               12                      17                    20                    24                      6          6.1              |
+    1      3        4                 8                       11                    16                    19                      23         25               |
+                    7                 10                      13                    18                    21                                 2                |
+2=1  3,4=3    5,6=4    7,8=7   9,10=8   11,12=10     13,14=11   15,16=13   17,18=16   19,20=18   21,22=19   23,24=21     25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 2 -> t.ok("""
+                                                                       16                                                                                   |
+                                                                       0                                                                                    |
+                                                                       14                                                                                   |
+                                                                       15                                                                                   |
+                           8                   12                                            20                    24                                       |
+                           14                  14.1                                          15                    15.1                                     |
+                           5                   12                                            20                    24                                       |
+                                               17                                                                  6                                        |
+    3    4        6                 10                      14                    18                    22                      26         28               |
+    5    5.1      5.2               12                      17                    20                    24                      6          6.1              |
+    1    3        4                 8                       11                    16                    19                      23         25               |
+                  7                 10                      13                    18                    21                                 2                |
+3=1  4=3    5,6=4    7,8=7   9,10=8   11,12=10     13,14=11   15,16=13   17,18=16   19,20=18   21,22=19   23,24=21     25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 3 -> t.ok("""
+                                                                16                                                                                   |
+                                                                0                                                                                    |
+                                                                14                                                                                   |
+                                                                15                                                                                   |
+                    8                   12                                            20                    24                                       |
+                    14                  14.1                                          15                    15.1                                     |
+                    5                   12                                            20                    24                                       |
+                                        17                                                                  6                                        |
+    4      6                 10                      14                    18                    22                      26         28               |
+    5      5.1               12                      17                    20                    24                      6          6.1              |
+    1      4                 8                       11                    16                    19                      23         25               |
+           7                 10                      13                    18                    21                                 2                |
+4=1  5,6=4    7,8=7   9,10=8   11,12=10     13,14=11   15,16=13   17,18=16   19,20=18   21,22=19   23,24=21     25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 4 -> t.ok("""
+                                                              16                                                                                   |
+                                                              0                                                                                    |
+                                                              14                                                                                   |
+                                                              15                                                                                   |
+                  8                   12                                            20                    24                                       |
+                  14                  14.1                                          15                    15.1                                     |
+                  5                   12                                            20                    24                                       |
+                                      17                                                                  6                                        |
+    5    6                 10                      14                    18                    22                      26         28               |
+    5    5.1               12                      17                    20                    24                      6          6.1              |
+    1    4                 8                       11                    16                    19                      23         25               |
+         7                 10                      13                    18                    21                                 2                |
+5=1  6=4    7,8=7   9,10=8   11,12=10     13,14=11   15,16=13   17,18=16   19,20=18   21,22=19   23,24=21     25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 5 -> t.ok("""
+                                                       16                                                                                   |
+                                                       0                                                                                    |
+                                                       14                                                                                   |
+                                                       15                                                                                   |
+           8                   12                                            20                    24                                       |
+           14                  14.1                                          15                    15.1                                     |
+           5                   12                                            20                    24                                       |
+                               17                                                                  6                                        |
+    6               10                      14                    18                    22                      26         28               |
+    5               12                      17                    20                    24                      6          6.1              |
+    1               8                       11                    16                    19                      23         25               |
+    7               10                      13                    18                    21                                 2                |
+6=1  7,8=7   9,10=8   11,12=10     13,14=11   15,16=13   17,18=16   19,20=18   21,22=19   23,24=21     25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 6 -> t.ok("""
+                                                     16                                                                                   |
+                                                     0                                                                                    |
+                                                     14                                                                                   |
+                                                     15                                                                                   |
+                               12                                          20                    24                                       |
+                               14                                          15                    15.1                                     |
+                               5                                           20                    24                                       |
+                               17                                                                6                                        |
+    7    8         10                     14                    18                    22                      26         28               |
+    5    5.1       5.2                    17                    20                    24                      6          6.1              |
+    1    7         8                      11                    16                    19                      23         25               |
+                   10                     13                    18                    21                                 2                |
+7=1  8=7    9,10=8    11,12=10   13,14=11   15,16=13   17,18=16   19,20=18   21,22=19   23,24=21     25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 7 -> t.ok("""
+                                                                      20                                                           |
+                                                                      0                                                            |
+                                                                      14                                                           |
+                                                                      15                                                           |
+                        12                    16                                            24                                     |
+                        14                    14.1                                          15                                     |
+                        5                     17                                            24                                     |
+                                              20                                            6                                      |
+    8       10                     14                      18                    22                    26         28               |
+    5       5.1                    17                      20                    24                    6          6.1              |
+    1       8                      11                      16                    19                    23         25               |
+            10                     13                      18                    21                               2                |
+8=1  9,10=8    11,12=10   13,14=11   15,16=13     17,18=16   19,20=18   21,22=19   23,24=21   25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 8 -> t.ok("""
+                                                                    20                                                           |
+                                                                    0                                                            |
+                                                                    14                                                           |
+                                                                    15                                                           |
+                      12                    16                                            24                                     |
+                      14                    14.1                                          15                                     |
+                      5                     17                                            24                                     |
+                                            20                                            6                                      |
+    9     10                     14                      18                    22                    26         28               |
+    5     5.1                    17                      20                    24                    6          6.1              |
+    1     8                      11                      16                    19                    23         25               |
+          10                     13                      18                    21                               2                |
+9=1  10=8    11,12=10   13,14=11   15,16=13     17,18=16   19,20=18   21,22=19   23,24=21   25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 9 -> t.ok("""
+                                                              20                                                           |
+                                                              0                                                            |
+                                                              14                                                           |
+                                                              15                                                           |
+                12                    16                                            24                                     |
+                14                    14.1                                          15                                     |
+                5                     17                                            24                                     |
+                                      20                                            6                                      |
+     10                    14                      18                    22                    26         28               |
+     5                     17                      20                    24                    6          6.1              |
+     1                     11                      16                    19                    23         25               |
+     10                    13                      18                    21                               2                |
+10=1   11,12=10   13,14=11   15,16=13     17,18=16   19,20=18   21,22=19   23,24=21   25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 10 -> t.ok("""
+                                                           20                                                           |
+                                                           0                                                            |
+                                                           14                                                           |
+                                                           15                                                           |
+                                     16                                          24                                     |
+                                     14                                          15                                     |
+                                     5                                           24                                     |
+                                     20                                          6                                      |
+     11      12          14                     18                    22                    26         28               |
+     5       5.1         5.2                    20                    24                    6          6.1              |
+     1       10          11                     16                    19                    23         25               |
+                         13                     18                    21                               2                |
+11=1   12=10    13,14=11    15,16=13   17,18=16   19,20=18   21,22=19   23,24=21   25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 11 -> t.ok("""
+                            16                    20                     24                                      |
+                            0                     0.1                    0.2                                     |
+                            5                     20                     24                                      |
+                                                                         6                                       |
+     12         14                     18                     22                     26         28               |
+     5          5.1                    20                     24                     6          6.1              |
+     1          11                     16                     19                     23         25               |
+                13                     18                     21                                2                |
+12=1   13,14=11    15,16=13   17,18=16   19,20=18    21,22=19   23,24=21    25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 12 -> t.ok("""
+                         16                    20                     24                                      |
+                         0                     0.1                    0.2                                     |
+                         5                     20                     24                                      |
+                                                                      6                                       |
+     13      14                     18                     22                     26         28               |
+     5       5.1                    20                     24                     6          6.1              |
+     1       11                     16                     19                     23         25               |
+             13                     18                     21                                2                |
+13=1   14=11    15,16=13   17,18=16   19,20=18    21,22=19   23,24=21    25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 13 -> t.ok("""
+                16                    20                     24                                      |
+                0                     0.1                    0.2                                     |
+                5                     20                     24                                      |
+                                                             6                                       |
+     14                    18                     22                     26         28               |
+     5                     20                     24                     6          6.1              |
+     1                     16                     19                     23         25               |
+     13                    18                     21                                2                |
+14=1   15,16=13   17,18=16   19,20=18    21,22=19   23,24=21    25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 14 -> t.ok("""
+                                     20                    24                                      |
+                                     0                     0.1                                     |
+                                     5                     24                                      |
+                                                           6                                       |
+     15      16          18                     22                     26         28               |
+     5       5.1         5.2                    24                     6          6.1              |
+     1       13          16                     19                     23         25               |
+                         18                     21                                2                |
+15=1   16=13    17,18=16    19,20=18   21,22=19   23,24=21    25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 15 -> t.ok("""
+                            20                    24                                      |
+                            0                     0.1                                     |
+                            5                     24                                      |
+                                                  6                                       |
+     16         18                     22                     26         28               |
+     5          5.1                    24                     6          6.1              |
+     1          16                     19                     23         25               |
+                18                     21                                2                |
+16=1   17,18=16    19,20=18   21,22=19   23,24=21    25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 16 -> t.ok("""
+                         20                    24                                      |
+                         0                     0.1                                     |
+                         5                     24                                      |
+                                               6                                       |
+     17      18                     22                     26         28               |
+     5       5.1                    24                     6          6.1              |
+     1       16                     19                     23         25               |
+             18                     21                                2                |
+17=1   18=16    19,20=18   21,22=19   23,24=21    25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 17 -> t.ok("""
+                20                    24                                      |
+                0                     0.1                                     |
+                5                     24                                      |
+                                      6                                       |
+     18                    22                     26         28               |
+     5                     24                     6          6.1              |
+     1                     19                     23         25               |
+     18                    21                                2                |
+18=1   19,20=18   21,22=19   23,24=21    25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 18 -> t.ok("""
+                                     24                                     |
+                                     0                                      |
+                                     5                                      |
+                                     6                                      |
+     19      20          22                     26         28               |
+     5       5.1         5.2                    6          6.1              |
+     1       18          19                     23         25               |
+                         21                                2                |
+19=1   20=18    21,22=19    23,24=21   25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 19 -> t.ok("""
+                            24                                     |
+                            0                                      |
+                            5                                      |
+                            6                                      |
+     20         22                     26         28               |
+     5          5.1                    6          6.1              |
+     1          19                     23         25               |
+                21                                2                |
+20=1   21,22=19    23,24=21   25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 20 -> t.ok("""
+                         24                                     |
+                         0                                      |
+                         5                                      |
+                         6                                      |
+     21      22                     26         28               |
+     5       5.1                    6          6.1              |
+     1       19                     23         25               |
+             21                                2                |
+21=1   22=19    23,24=21   25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 21 -> t.ok("""
+                24                                     |
+                0                                      |
+                5                                      |
+                6                                      |
+     22                    26         28               |
+     5                     6          6.1              |
+     1                     23         25               |
+     21                               2                |
+22=1   23,24=21   25,26=23   27,28=25    29,30,31,32=2 |
+""");
+        case 22 -> t.ok("""
+                         26                         |
+                         0                          |
+                         5                          |
+                         6                          |
+     23      24                     28              |
+     5       5.1                    6               |
+     1       21                     25              |
+             23                     2               |
+23=1   24=21    25,26=23   27,28=25   29,30,31,32=2 |
+""");
+        case 23 -> t.ok("""
+                26                         |
+                0                          |
+                5                          |
+                6                          |
+     24                    28              |
+     5                     6               |
+     1                     25              |
+     23                    2               |
+24=1   25,26=23   27,28=25   29,30,31,32=2 |
+""");
+        case 24 -> t.ok("""
+     25      26          28               |
+     0       0.1         0.2              |
+     1       23          25               |
+                         2                |
+25=1   26=23    27,28=25    29,30,31,32=2 |
+""");
+        case 25 -> t.ok("""
+     26         28               |
+     0          0.1              |
+     1          25               |
+                2                |
+26=1   27,28=25    29,30,31,32=2 |
+""");
+        case 26 -> t.ok("""
+     27      28               |
+     0       0.1              |
+     1       25               |
+             2                |
+27=1   28=25    29,30,31,32=2 |
+""");
+        case 27 -> t.ok("""
+     28              |
+     0               |
+     1               |
+     2               |
+28=1   29,30,31,32=2 |
+""");
+        case 28 -> t.ok("""
+     29           |
+     0            |
+     1            |
+     2            |
+29=1   30,31,32=2 |
+""");
+        case 29 -> t.ok("""
+30,31,32=0 |
+""");
+        case 30 -> t.ok("""
+31,32=0 |
+""");
+        case 31 -> t.ok("""
+32=0 |
+""");
+       }
      }
    }
 
@@ -1213,11 +1560,11 @@ t.ok("""
     test_steal();
     test_merge_left();
     test_merge_right();
+    test_delete();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_delete();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
