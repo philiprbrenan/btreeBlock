@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// BTree in the java paradigm
+// BTree in the pure java paradigm
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout a btree in a block on the surface of a silicon chip.
@@ -55,8 +55,8 @@ class Btree extends Test                                                        
     final Stack<KeyData> keyData = new Stack<>();                               // Key, data pairs when a leaf
     final Stack<KeyNext> keyNext = new Stack<>();                               // Key, next pairs when a leaf. The last entry is top and so this stack must always have at least one element in it when the node is acting as a branch
 
-    void assertLeaf()   {z(); if (!isLeaf) stop("Leaf required");}
-    void assertBranch() {z(); if ( isLeaf) stop("Branch required");}
+    void assertLeaf()   {if (!isLeaf) stop("Leaf required");}
+    void assertBranch() {if ( isLeaf) stop("Branch required");}
 
     Node allocLeaf()    {z();
     final Node n = new Node(); nodes.push(n); n.isLeaf = true;  return n;}
@@ -221,7 +221,7 @@ class Btree extends Test                                                        
      }
 
     void printLeaf(Stack<StringBuilder>S, int level)                            // Print leaf horizontally
-     { assertLeaf();
+     {assertLeaf();
       padStrings(S, level);
       final StringBuilder s = new StringBuilder();                              // String builder
       final int K = leafSize();
@@ -240,13 +240,10 @@ class Btree extends Test                                                        
       final int L = level * linesToPrintABranch;
 
       if (K > 0)                                                                // Branch has key, next pairs
-       {
-        for  (int i = 0; i < K; i++)
-         {
-          final int next = keyNext.elementAt(i).next;                           // Each key, next pair
+       {for  (int i = 0; i < K; i++)
+         {final int next = keyNext.elementAt(i).next;                           // Each key, next pair
           if (nodes.elementAt(next).isLeaf)
-           {
-            nodes.elementAt(next).printLeaf(S, level+1);
+           {nodes.elementAt(next).printLeaf(S, level+1);
            }
           else
            {if (next == 0)
@@ -271,8 +268,7 @@ class Btree extends Test                                                        
        { nodes.elementAt(top).printLeaf(S, level+1);
        }
       else                                                                      // Print branch
-       {
-        if (top == 0)
+       {if (top == 0)
          {say("Cannot descend through root from top in branch", node);
           return;
          }
@@ -1616,7 +1612,7 @@ t.ok("""
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      //if (github_actions)                                                       // Coverage analysis
+      if (github_actions)                                                       // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
