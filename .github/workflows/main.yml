@@ -1,4 +1,4 @@
-# Test 2024-11-14 at 05:55:18
+# Test 2024-11-14 at 17:14:58
 
 name: Test
 run-name: btreeBlock
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        task: [Btree, Test]
+        task: [Btree, Stuck, Test]
 
     steps:
     - uses: actions/checkout@v4
@@ -53,6 +53,11 @@ jobs:
       if: matrix.task == 'Btree'
       run: |
         java -cp Classes com/AppaApps/Silicon/Btree
+
+    - name: Test Stuck
+      if: matrix.task == 'Stuck'
+      run: |
+        java -cp Classes com/AppaApps/Silicon/Stuck
 
     - name: Test Test
       if: matrix.task == 'Test'
