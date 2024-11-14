@@ -563,6 +563,92 @@ class Btree extends Test                                                        
        }
       return true;
      }
+
+    boolean mergeLeftSibling(int index)                                         // Merge the left sibling
+     {assertBranch();
+      if (index == 0) return false;
+      if (index < 0)            stop("Index", index, "too small");
+      if (index > branchSize()) stop("Index", index, "too big");
+      if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
+
+      if (hasLeavesForChildren())                                               // Children are leaves
+       {final KeyNext        L = keyNext.elementAt(index-1);                    //
+        final KeyNext        R = keyNext.elementAt(index-0);                    //
+        final Stack<KeyNext> p = keyNext;                                       //
+        final Stack<KeyData> l = nodes.elementAt(L.next).keyData;               //
+        final Stack<KeyData> r = nodes.elementAt(R.next).keyData;               //
+        final int           nl = nodes.elementAt(L.next).leafSize();
+        final int           nr = nodes.elementAt(R.next).leafSize();
+
+        if (nl + nr >= maxKeysPerLeaf) return false;                            // Combined body would be too big
+
+        for (int i = 0; i < maxKeysPerLeaf && l.size() > 0; i++)                // Transfer left to right
+         {r.insertElementAt(l.pop(), 0);
+         }
+        p.removeElementAt(index-1);                                             // Reduce parent by left sibling
+       }
+      else                                                                      // Children are branches
+       {final KeyNext        L = keyNext.elementAt(index-1);                    //
+        final KeyNext        R = keyNext.elementAt(index-0);                    //
+        final Stack<KeyNext> p = keyNext;                                       //
+        final Stack<KeyNext> l = nodes.elementAt(L.next).keyNext;               //
+        final Stack<KeyNext> r = nodes.elementAt(R.next).keyNext;               //
+        final int           nl = nodes.elementAt(L.next).branchSize();
+        final int           nr = nodes.elementAt(R.next).branchSize();
+
+        if (nl + 1 + nr > maxKeysPerBranch) return false;                       // Merge not possible because there is not enopugh room for the combined result
+        r.insertElementAt(new KeyNext(p.elementAt(index-1).key, l.lastElement().next), 0);  // Left top to right
+
+        l.pop();                                                                // Remove left top
+        for (int i = 0; i < maxKeysPerBranch && l.size() > 0; i++)              // Transfer left to right
+         {r.insertElementAt(l.pop(), 0);
+         }
+        p.removeElementAt(index-1);                                             // Reduce parent on left
+       }
+      return true;
+     }
+
+    boolean mergeRightSibling(int index)                                        // Merge the right sibling
+     {assertBranch();
+      if (index > branchSize()) return false;
+      if (index < 0)            stop("Index", index, "too small");
+      if (index > branchSize()) stop("Index", index, "too big");
+      if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
+
+      if (hasLeavesForChildren())                                               // Children are leaves
+       {final KeyNext        L = keyNext.elementAt(index+0);                    //
+        final KeyNext        R = keyNext.elementAt(index+1);                    //
+        final Stack<KeyNext> p = keyNext;                                       //
+        final Stack<KeyData> l = nodes.elementAt(L.next).keyData;               //
+        final Stack<KeyData> r = nodes.elementAt(R.next).keyData;               //
+        final int           nl = nodes.elementAt(L.next).leafSize();
+        final int           nr = nodes.elementAt(R.next).leafSize();
+
+        if (nl + nr > maxKeysPerLeaf) return false;                             // Combined body would be too big
+        for (int i = 0; i < maxKeysPerLeaf && r.size() > 0; i++)                // Transfer right to left
+         {l.push(r.pop());
+         }
+        p.removeElementAt(index+1);                                             // Reduce parent by  right sibling
+       }
+      else                                                                      // Children are branches
+       {final KeyNext        L = keyNext.elementAt(index+0);                    //
+        final KeyNext        R = keyNext.elementAt(index+1);                    //
+        final Stack<KeyNext> p = keyNext;                                       //
+        final Stack<KeyNext> l = nodes.elementAt(L.next).keyNext;               //
+        final Stack<KeyNext> r = nodes.elementAt(R.next).keyNext;               //
+        final int           nl = nodes.elementAt(L.next).branchSize();
+        final int           nr = nodes.elementAt(R.next).branchSize();
+        if (nl + 1 + nr > maxKeysPerBranch) return false;                       // Merge not possible because there is no where to put the steal
+        l.setElementAt(new KeyNext(p.elementAt(index).key, l.lastElement().next), nl);  // Re key left top
+
+        for (int i = 0; i < maxKeysPerBranch && r.size() > 0; i++)              // Transfer right to left
+         {l.push(r.firstElement());
+          r.removeElementAt(0);
+         }
+        p.removeElementAt(index+1);                                             // Reduce parent on right
+       }
+      return true;
+     }
    }  // Node
 
   class KeyData                                                                 // A key, data pair
@@ -930,15 +1016,133 @@ t.ok("""
 """);
    }
 
+  static void test_merge_left()
+   {final Btree t = new Btree(4, 3);
+    final int N = 32;
+    for (int i = 1; i <= N; i++) t.put(i);
+    t.delete(25);
+    t.delete(28);
+    //t.stop();
+    t.ok("""
+                            8                                         16                                                                              |
+                            0                                         0.1                                                                             |
+                            14                                        22                                                                              |
+                                                                      15                                                                              |
+             4                                  12                                           20                    24                                 |
+             14                                 22                                           15                    15.1                               |
+             5                                  12                                           20                    24                                 |
+             9                                  17                                                                 6                                  |
+      2              6               10                    14                     18                    22                   26      28               |
+      5              9               12                    17                     20                    24                   6       6.1              |
+      1              4               8                     11                     16                    19                   23      25               |
+      3              7               10                    13                     18                    21                           2                |
+1,2=1  3,4=3   5,6=4  7,8=7   9,10=8   11,12=10   13,14=11   15,16=13    17,18=16   19,20=18   21,22=19   23,24=21     26=23   27=25    29,30,31,32=2 |
+""");
+    t.nodes.elementAt(6).mergeLeftSibling(1);
+    //t.stop();
+    t.ok("""
+                            8                                         16                                                                        |
+                            0                                         0.1                                                                       |
+                            14                                        22                                                                        |
+                                                                      15                                                                        |
+             4                                  12                                           20                    24                           |
+             14                                 22                                           15                    15.1                         |
+             5                                  12                                           20                    24                           |
+             9                                  17                                                                 6                            |
+      2              6               10                    14                     18                    22                      28              |
+      5              9               12                    17                     20                    24                      6               |
+      1              4               8                     11                     16                    19                      25              |
+      3              7               10                    13                     18                    21                      2               |
+1,2=1  3,4=3   5,6=4  7,8=7   9,10=8   11,12=10   13,14=11   15,16=13    17,18=16   19,20=18   21,22=19   23,24=21     26,27=25   29,30,31,32=2 |
+""");
+    t.nodes.elementAt(15).mergeLeftSibling(1);
+    //t.stop();
+t.ok("""
+                            8                                         16                                                                          |
+                            0                                         0.1                                                                         |
+                            14                                        22                                                                          |
+                                                                      15                                                                          |
+             4                                  12                                                                     24                         |
+             14                                 22                                                                     15                         |
+             5                                  12                                                                     24                         |
+             9                                  17                                                                     6                          |
+      2              6               10                    14                     18         20           22                      28              |
+      5              9               12                    17                     24         24.1         24.2                    6               |
+      1              4               8                     11                     16         18           19                      25              |
+      3              7               10                    13                                             21                      2               |
+1,2=1  3,4=3   5,6=4  7,8=7   9,10=8   11,12=10   13,14=11   15,16=13    17,18=16   19,20=18     21,22=19     23,24=21   26,27=25   29,30,31,32=2 |
+""");
+   }
+
+  static void test_merge_right()
+   {final Btree t = new Btree(4, 3);
+    final int N = 32;
+    for (int i = 1; i <= N; i++) t.put(i);
+    t.delete(25);
+    t.delete(28);
+    //t.stop();
+    t.ok("""
+                            8                                         16                                                                              |
+                            0                                         0.1                                                                             |
+                            14                                        22                                                                              |
+                                                                      15                                                                              |
+             4                                  12                                           20                    24                                 |
+             14                                 22                                           15                    15.1                               |
+             5                                  12                                           20                    24                                 |
+             9                                  17                                                                 6                                  |
+      2              6               10                    14                     18                    22                   26      28               |
+      5              9               12                    17                     20                    24                   6       6.1              |
+      1              4               8                     11                     16                    19                   23      25               |
+      3              7               10                    13                     18                    21                           2                |
+1,2=1  3,4=3   5,6=4  7,8=7   9,10=8   11,12=10   13,14=11   15,16=13    17,18=16   19,20=18   21,22=19   23,24=21     26=23   27=25    29,30,31,32=2 |
+""");
+    t.nodes.elementAt(6).mergeRightSibling(0);
+    //t.stop();
+    t.ok("""
+                            8                                         16                                                                        |
+                            0                                         0.1                                                                       |
+                            14                                        22                                                                        |
+                                                                      15                                                                        |
+             4                                  12                                           20                    24                           |
+             14                                 22                                           15                    15.1                         |
+             5                                  12                                           20                    24                           |
+             9                                  17                                                                 6                            |
+      2              6               10                    14                     18                    22                      26              |
+      5              9               12                    17                     20                    24                      6               |
+      1              4               8                     11                     16                    19                      23              |
+      3              7               10                    13                     18                    21                      2               |
+1,2=1  3,4=3   5,6=4  7,8=7   9,10=8   11,12=10   13,14=11   15,16=13    17,18=16   19,20=18   21,22=19   23,24=21     26,27=23   29,30,31,32=2 |
+""");
+    t.nodes.elementAt(15).mergeRightSibling(0);
+    //t.stop();
+    t.ok("""
+                            8                                         16                                                                          |
+                            0                                         0.1                                                                         |
+                            14                                        22                                                                          |
+                                                                      15                                                                          |
+             4                                  12                                                                     20                         |
+             14                                 22                                                                     15                         |
+             5                                  12                                                                     20                         |
+             9                                  17                                                                     6                          |
+      2              6               10                    14                     18         20           22                      26              |
+      5              9               12                    17                     20         20.1         20.2                    6               |
+      1              4               8                     11                     16         18           19                      23              |
+      3              7               10                    13                                             21                      2               |
+1,2=1  3,4=3   5,6=4  7,8=7   9,10=8   11,12=10   13,14=11   15,16=13    17,18=16   19,20=18     21,22=19     23,24=21   26,27=23   29,30,31,32=2 |
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_put_ascending();
     test_put_descending();
     test_put_small_random();
+    test_steal();
+    test_merge_left();
+    test_merge_right();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_steal();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
