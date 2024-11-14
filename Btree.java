@@ -67,6 +67,10 @@ class Btree extends Test                                                        
      {return isLeaf ? leafSize() == maxKeysPerLeaf : branchSize() == maxKeysPerBranch;
      }
 
+    boolean isLow()                                                             //
+     {return (isLeaf ? leafSize() : branchSize()) < 2;
+     }
+
     boolean hasLeavesForChildren()
      {assertBranch();
       final KeyNext kn = keyNext.lastElement();
@@ -114,8 +118,7 @@ class Btree extends Test                                                        
         final int N = leafSize();
         int i;
         for (i = 0; i < N && looking; i++)                                      // Compare with each valid key
-         {z();
-          if (keyData.elementAt(i).key == search)
+         {if (keyData.elementAt(i).key == search)
            {looking = false; break;
            }
          }
@@ -187,8 +190,7 @@ class Btree extends Test                                                        
         final int N = branchSize();
         int i;
         for (i = 0; i < N && looking; i++)                                      // Compare with each valid key
-         {z();
-          if (keyNext.elementAt(i).key == search)
+         {if (keyNext.elementAt(i).key == search)
            {looking = false; break;
            }
          }
@@ -409,9 +411,8 @@ class Btree extends Test                                                        
      }
 
     boolean mergeRoot()                                                         // Merge into the root
-     {assertBranch();
-      if (branchSize() != 2) stop("Root must have just two children, not:", branchSize());
-
+     {if (!root.isLeaf || branchSize() > 1) return false;
+      if (node != 0) stop("Expected root, got:", node);
       final Node p = this;
       final Node l = nodes.elementAt(keyNext.firstElement().next);
       final Node r = nodes.elementAt(keyNext. lastElement().next);
@@ -432,12 +433,17 @@ class Btree extends Test                                                        
       else if (l.branchSize() + 1 + r.branchSize() <= maxKeysPerBranch)
        {final KeyNext pkn = p.keyNext.firstElement();
         p.keyNext.clear();
-        for (; l.branchSize() > 0;)
-         {p.keyNext.push(l.keyNext.pop());
+        final int nl = l.branchSize();
+        for (int i = 0; i < nl; ++i)
+         {p.keyNext.push(l.keyNext.elementAt(0));
+                         l.keyNext.removeElementAt(0);
+
          }
         p.keyNext.push(new KeyNext(pkn.key, l.keyNext.lastElement().next));
-        for (; r.branchSize() > 0;)
-         {p.keyNext.push(r.keyNext.pop());
+        final int nr = r.branchSize();
+        for (int i = 0; i < nr; ++i)
+         {p.keyNext.push(r.keyNext.elementAt(0));
+                         r.keyNext.removeElementAt(0);
          }
         p.keyNext.push(new KeyNext(r.keyNext.lastElement().next));
         return true;
@@ -445,7 +451,7 @@ class Btree extends Test                                                        
       return false;
      }
 
-    boolean merge(int index)                                                    // Merge the indexed child with its left sibling
+/*    boolean merge(int index)                                                    // Merge the indexed child with its left sibling
      {assertBranch();
       if (index == 0) return false;
       if (index < 0)            stop("Index", index, "too small");
@@ -477,6 +483,22 @@ class Btree extends Test                                                        
         return true;
        }
       return false;
+     }
+*/
+
+    void augment(int index)                                                     // Augment the indexed child so it has at least two children in its body
+     {assertBranch();
+      if (index < 0)            stop("Index", index, "too small");
+      if (index > branchSize()) stop("Index", index, "too big");
+      if (isLow() && node != root.node) stop("Parent:", node, "must not be low on children");
+
+      final Node c = nodes.elementAt(nodes.elementAt(node).keyNext.elementAt(index).next);
+      if (!c.isLow())               return;
+      if (stealFromLeft    (index)) return;
+      if (stealFromRight   (index)) return;
+      if (mergeLeftSibling (index)) return;
+      if (mergeRightSibling(index)) return;
+      stop("Unable to augment child:", c.node);
      }
 
     boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible
@@ -613,7 +635,7 @@ class Btree extends Test                                                        
       if (index > branchSize()) return false;
       if (index < 0)            stop("Index", index, "too small");
       if (index > branchSize()) stop("Index", index, "too big");
-      if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
+      //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {final KeyNext        L = keyNext.elementAt(index+0);                    //
@@ -628,6 +650,8 @@ class Btree extends Test                                                        
         for (int i = 0; i < maxKeysPerLeaf && r.size() > 0; i++)                // Transfer right to left
          {l.push(r.pop());
          }
+        final KeyNext pkn = p.elementAt(index+1);                               // Key of right sibling
+        p.setElementAt(new KeyNext(pkn.key, p.elementAt(index).next), index);   // Install key of right sibling in this child
         p.removeElementAt(index+1);                                             // Reduce parent by  right sibling
        }
       else                                                                      // Children are branches
@@ -645,6 +669,8 @@ class Btree extends Test                                                        
          {l.push(r.firstElement());
           r.removeElementAt(0);
          }
+        final KeyNext pkn = p.elementAt(index+1);                               // Key of right sibling
+        p.setElementAt(new KeyNext(pkn.key, p.elementAt(index).next), index);   // Install key of right sibling in this child
         p.removeElementAt(index+1);                                             // Reduce parent on right
        }
       return true;
@@ -716,8 +742,7 @@ class Btree extends Test                                                        
       Node parent = root;                                                       // Parent starts at root which is known to be a branch
 
       for (int i = 0; i < maxDepth; i++)                                        // Step down through tree
-       {z();
-        final Node.FindFirstGreaterThanOrEqualInBranch down =                   // Find next child in search path of key
+       {final Node.FindFirstGreaterThanOrEqualInBranch down =                   // Find next child in search path of key
           parent.new FindFirstGreaterThanOrEqualInBranch(Key);
         final int n = down.next;
         if (nodes.elementAt(n).isLeaf)                                          // Found the containing search
@@ -766,8 +791,7 @@ class Btree extends Test                                                        
        }
 
       if (!search.leaf.isFull())                                                // Leaf is not full so we can insert immediately
-       {z();
-        final Node.FindFirstGreaterThanOrEqualInLeaf fge =
+       {final Node.FindFirstGreaterThanOrEqualInLeaf fge =
           search.leaf.new FindFirstGreaterThanOrEqualInLeaf(Key);
         if (fge.found)
          {search.leaf.keyData.insertElementAt(new KeyData(Key, Data), fge.first);
@@ -799,9 +823,7 @@ class Btree extends Test                                                        
 //D1 Insertion                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
 
   void put(int Key, int Data)                                                   // Insert a key, data pair into the tree or update and existing key with a new datum
-   {z();
-
-    final FindAndInsert f = new FindAndInsert(Key, Data);                       // Try direct insertion with no modifications to the shape of the tree
+   {final FindAndInsert f = new FindAndInsert(Key, Data);                       // Try direct insertion with no modifications to the shape of the tree
     if (f.success) return;                                                      // Inserted or updated successfully
 
     if (root.isFull())                                                          // Start the insertion at the root, after splitting it if necessary
@@ -846,17 +868,40 @@ class Btree extends Test                                                        
 
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
 
-  Integer delete(int Key)                                                       // Delete a key from the tree and returns its data if present
-   {z();
-    final Find f = new Find(Key);                                               // Try direct insertion with no modifications to the shape of the tree
+  Integer findAndDelete(int Key)                                                // Delete a key from the tree and returns its data if present without modifying the shape of tree
+   {final Find f = new Find(Key);                                               // Try direct insertion with no modifications to the shape of the tree
     if (!f.search.found) return null;                                           // Inserted or updated successfully
-    z();
     final Node     l = f.search.leaf;                                           // The leaf that contains the key
     final int      i = f.search.index;                                          // Position in the leaf of the key
     final KeyData kd = l.keyData.elementAt(i);                                  // Key, data pairs in the leaf
     l.keyData.removeElementAt(i);                                               // Remove the key, data pair from the leaf
     //merge(Key);
     return kd.data;
+   }
+
+  Integer delete(int Key)                                                       // Insert a key, data pair into the tree or update and existing key with a new datum
+   {root.mergeRoot();
+if (debug) say("SSSS22", this);
+    if (root.isLeaf)
+     {return findAndDelete(Key);
+     }
+
+    Node p = root;
+    for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
+     {final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
+      down = p.new FindFirstGreaterThanOrEqualInBranch(Key);
+
+      p.augment(down.first);
+      Node q = nodes.elementAt(down.next);
+
+      if (q.isLeaf)                                                             // Reached a leaf
+       {
+        return findAndDelete(Key);
+       }
+      p = q;
+     }
+    stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
+    return null;
    }
 
 //D0 Tests                                                                      // Testing
@@ -1020,8 +1065,8 @@ t.ok("""
    {final Btree t = new Btree(4, 3);
     final int N = 32;
     for (int i = 1; i <= N; i++) t.put(i);
-    t.delete(25);
-    t.delete(28);
+    t.findAndDelete(25);
+    t.findAndDelete(28);
     //t.stop();
     t.ok("""
                             8                                         16                                                                              |
@@ -1078,8 +1123,8 @@ t.ok("""
    {final Btree t = new Btree(4, 3);
     final int N = 32;
     for (int i = 1; i <= N; i++) t.put(i);
-    t.delete(25);
-    t.delete(28);
+    t.findAndDelete(25);
+    t.findAndDelete(28);
     //t.stop();
     t.ok("""
                             8                                         16                                                                              |
@@ -1107,7 +1152,7 @@ t.ok("""
              14                                 22                                           15                    15.1                         |
              5                                  12                                           20                    24                           |
              9                                  17                                                                 6                            |
-      2              6               10                    14                     18                    22                      26              |
+      2              6               10                    14                     18                    22                      28              |
       5              9               12                    17                     20                    24                      6               |
       1              4               8                     11                     16                    19                      23              |
       3              7               10                    13                     18                    21                      2               |
@@ -1120,16 +1165,45 @@ t.ok("""
                             0                                         0.1                                                                         |
                             14                                        22                                                                          |
                                                                       15                                                                          |
-             4                                  12                                                                     20                         |
+             4                                  12                                                                     24                         |
              14                                 22                                                                     15                         |
              5                                  12                                                                     20                         |
              9                                  17                                                                     6                          |
-      2              6               10                    14                     18         20           22                      26              |
+      2              6               10                    14                     18         20           22                      28              |
       5              9               12                    17                     20         20.1         20.2                    6               |
       1              4               8                     11                     16         18           19                      23              |
       3              7               10                    13                                             21                      2               |
 1,2=1  3,4=3   5,6=4  7,8=7   9,10=8   11,12=10   13,14=11   15,16=13    17,18=16   19,20=18     21,22=19     23,24=21   26,27=23   29,30,31,32=2 |
 """);
+   }
+
+  static void test_delete()
+   {final Btree t = new Btree(4, 3);
+    final int N = 32;
+    for (int i = 1; i <= N; i++) t.put(i);
+    //t.stop();
+    t.ok("""
+                            8                                         16                                                                                    |
+                            0                                         0.1                                                                                   |
+                            14                                        22                                                                                    |
+                                                                      15                                                                                    |
+             4                                  12                                           20                    24                                       |
+             14                                 22                                           15                    15.1                                     |
+             5                                  12                                           20                    24                                       |
+             9                                  17                                                                 6                                        |
+      2              6               10                    14                     18                    22                      26         28               |
+      5              9               12                    17                     20                    24                      6          6.1              |
+      1              4               8                     11                     16                    19                      23         25               |
+      3              7               10                    13                     18                    21                                 2                |
+1,2=1  3,4=3   5,6=4  7,8=7   9,10=8   11,12=10   13,14=11   15,16=13    17,18=16   19,20=18   21,22=19   23,24=21     25,26=23   27,28=25    29,30,31,32=2 |
+""");
+
+    for (int i = 1; i < N; i++)
+     {debug = i == 11;
+      t.delete(i);
+      //say("        case", i, ": ok(\"\"\"", t, "\"\"\");");
+      if (debug) stop("SSSS", t);
+     }
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -1142,7 +1216,8 @@ t.ok("""
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_delete();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
