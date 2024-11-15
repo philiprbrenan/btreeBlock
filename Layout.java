@@ -27,6 +27,47 @@ public class Layout extends Test                                                
    {return top.toString();
    }
 
+  class Location                                                                // The location in memory of a field after integrating array indices
+   {final Field  field;                                                         // Field definition
+    final String  name;                                                         // Field full name
+    final int[]indices;                                                         // Indices to field
+    final int       at;                                                         // Location of field in memory
+    final int    width;                                                         // Width of field in memory
+
+    Location(String Name, int...Indices)
+     {name    = Name;
+      indices = Indices;
+      if (top.fullNames.containsKey(Name))
+       {field  = top.fullNames.get(Name);
+        width = field.width;
+        int a = field.at;
+        int i = Indices.length;
+        for(Field f = field; f.up != null; f = f.up)                            // Convolute path to field with indices
+         {if (f instanceof Array)
+           {if (i > 0)
+             {a += f.width * Indices[i-1];
+             }
+            else
+             {stop("Too few indices");
+             }
+           }
+         }
+        at = a;
+       }
+      else
+       {field = null;
+        at = width = 0;
+        stop("No such name:", Name);
+       }
+     }
+
+    public String toString()
+     {final StringBuilder s = new StringBuilder();
+      s.append("Location(name:"+name+" at:"+at+" width:"+width+")\n");
+      return s.toString();
+     }
+   }
+
 //D1 Layouts                                                                    // Field memory of the chip as variables, arrays, structures, unions. Dividing the memory in this manner makes it easier to program the chip symbolically.
 
   abstract class Field                                                          // Variable/Array/Structure/Union definition.
@@ -292,6 +333,11 @@ V    4     2            a                    A.s.a
 V    6     2            b                    A.s.b
 V    8     4            c                    A.s.c
 V   28     4        e                    e
+""");
+
+    Location lc = l.new Location("A.s.c", 2);
+    ok(lc, """
+Location(name:A.s.c at:56 width:4)
 """);
    }
 
