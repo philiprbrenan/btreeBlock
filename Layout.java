@@ -302,11 +302,11 @@ public class Layout extends Test                                                
      }
    }
 
-  Bit       bit      (String name)                       {return new Bit      (name);}
-  Variable  variable (String name, int width)            {return new Variable (name, width);}
-  Array     array    (String name, Field   ml, int size) {return new Array    (name, ml, size);}
-  Structure structure(String name, Field...ml)           {return new Structure(name, ml);}
-  Union     union    (String name, Field...ml)           {return new Union    (name, ml);}
+  Bit       bit      (String n)                   {return new Bit      (n);}
+  Variable  variable (String n, int w)            {return new Variable (n, w);}
+  Array     array    (String n, Field   m, int s) {return new Array    (n, m, s);}
+  Structure structure(String n, Field...m)        {return new Structure(n, m);}
+  Union     union    (String n, Field...m)        {return new Union    (n, m);}
 
 //D0                                                                            // Tests.
 
