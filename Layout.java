@@ -339,6 +339,25 @@ Location(name:A.s.c at:24 width:4)
 """);
    }
 
+  static void test_array()
+   {Layout    l = new Layout();
+    Variable  a = l.variable ("a", 2);
+    Array     A = l.array    ("A", a, 4);
+    l.layout("S", A);
+    //stop(l);
+    l.ok("""
+T   At  Wide      Name                   Path
+S    0     8      S
+A    0     8        A                    A
+V    0     2          a                    A.a
+""");
+
+    Location lc = l.new Location("A.a", 2);
+    ok(lc, """
+Location(name:A.a at:4 width:2)
+""");
+   }
+
   static void test_arrays()
    {Layout    l = new Layout();
     Variable  a = l.variable ("a", 2);
@@ -376,11 +395,12 @@ Location(name:C.B.S.A.s.c at:392 width:4)
 
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_layout();
+    test_array();
+    test_arrays();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_arrays();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
