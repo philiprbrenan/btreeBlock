@@ -21,7 +21,11 @@ public class Layout extends Test                                                
 
   Field asFields() {return top;}                                                // Get field definitions associated with memory
 
-  void ok(String expected) {Test.ok(top.toString(), expected);}      // Confirm layout is as expected
+  void ok(String expected) {Test.ok(top.toString(), expected);}                 // Confirm layout is as expected
+
+  public String toString()
+   {return top.toString();
+   }
 
 //D1 Layouts                                                                    // Field memory of the chip as variables, arrays, structures, unions. Dividing the memory in this manner makes it easier to program the chip symbolically.
 
@@ -97,24 +101,16 @@ public class Layout extends Test                                                
      {final StringBuilder s = new StringBuilder();
       //s.append("Memory: "+memory.memoryNumber+"\n");
       s.append(String.format
-       ("%1s %4s  %4s  %5s    %8s   %s\n",
-        "T", "At", "Wide", "Index", "Value", "Field name"));
+       ("%1s %4s  %4s      %-16s       %s\n",
+        "T", "At", "Wide", "Name", "Path"));
       return s;
      }
 
     String printName(Layout.Field top)                                          // Print the name of a field showing whether it is a constant and its classification
      {final StringBuilder s = new StringBuilder();
       s.append(indent());
-      s.append(name);
-      if (!classification.isEmpty())                                            // Add any classification
-       {s.append("(");
-        for(String c: classification) s.append(c+", ");                         // Classification
-        s.setLength(s.length()-2);
-        s.append(")");
-       }
+      s.append(String.format("%-16s", name));
       fullName(top, s);                                                         // Full name for this field
-      //s.append(" N="+number);
-      //if (up != null) s.append(" U="+up.number);
       return s.toString();
      }
 
@@ -122,14 +118,14 @@ public class Layout extends Test                                                
      {final String  n = printName(top);                                         // Name using indentation to show depth
       final char    c = fieldType();                                            // First letter of inner most class name to identify type of field
 
-      s.append(String.format("%c %4d  %4d      %s\n",                           // Variable
+      s.append(String.format("%c %4d  %4d      %-16s\n",                        // Variable
                              c,  at,  width,   n));
      }
 
     public String toString()                                                    // Print the field and its sub structure
      {final StringBuilder s = header();
       print(this, s);
-      return s.toString();
+      return s.toString().replaceAll("\\s+\n", "\n");
      }
 
     Bit       toBit      () {return (Bit)      this;}                           // Try to convert to a bit
@@ -180,20 +176,16 @@ public class Layout extends Test                                                
     void indexNames()                                                           // Index the name of this field and its sub fields
      {indexName();
       element.indexNames();                                                     // Full names of sub fields relative to outer most layout
-      //element.indexNames(fullNames, null);                                    // Index name in this array
      }
 
     void print(Layout.Field top, StringBuilder s)                               // Print the array
      {final String  n = printName(top);                                         // Name using indentation to show depth
       final char    c = fieldType();                                            // First letter of inner most class name to identify type of field
-
-      for (int j = 0; j < size; j++)                                            // Each array element
-       {final int    w = width;                                                 // Bits occupied bythe array
-        final int    p = at + element.width * j;                                // Position of the array element
-        s.append(String.format("%c %4d  %4d  %5d  %s\n",                        // Index of the array
-                               c,  p,   w,   j,  n));
-        element.print(top, s);                                                  // Print the array element without headers
-       }
+      final int     w = width;                                                  // Bits occupied bythe array
+      final int     p = at;                                                     // Position of the array element
+      s.append(String.format("%c %4d  %4d      %16s\n",                         // Index of the array
+                               c,  p,   w,     n));
+      element.print(top, s);                                                    // Print the array element without headers
      }
    }
 
@@ -271,10 +263,40 @@ public class Layout extends Test                                                
      }
    }
 
+  Bit       bit      (String name)                       {return new Bit      (name);}
+  Variable  variable (String name, int width)            {return new Variable (name, width);}
+  Array     array    (String name, Field   ml, int size) {return new Array    (name, ml, size);}
+  Structure structure(String name, Field...ml)           {return new Structure(name, ml);}
+  Union     union    (String name, Field...ml)           {return new Union    (name, ml);}
+
 //D0                                                                            // Tests.
 
+  static void test_layout()
+   {Layout    l = new Layout();
+    Variable  a = l.variable ("a", 2);
+    Variable  b = l.variable ("b", 2);
+    Variable  c = l.variable ("c", 4);
+    Structure s = l.structure("s", a, b, c);
+    Array     A = l.array    ("A", s, 3);
+    Variable  d = l.variable ("d", 4);
+    Variable  e = l.variable ("e", 4);
+    l.layout("S", d, A, e);
+    //stop(l);
+    l.ok("""
+T   At  Wide      Name                   Path
+S    0    32      S
+V    0     4        d                    d
+A    4    24        A                    A
+S    4     8          s                    A.s
+V    4     2            a                    A.s.a
+V    6     2            b                    A.s.b
+V    8     4            c                    A.s.c
+V   28     4        e                    e
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
-   {
+   {test_layout();
    }
 
   static void newTests()                                                        // Tests being worked on
