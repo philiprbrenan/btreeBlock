@@ -31,9 +31,7 @@ public class Layout extends Test                                                
   int size() {z(); return top == null ? 0 : top.width;}                         // Size of memory
   void ok(String expected) {Test.ok(top.toString(), expected);}                 // Confirm layout is as expected
 
-  public String toString()
-   {return top.toString();
-   }
+  public String toString() {return top.toString();}                             // Print layout
 
 //D1 Location                                                                   // The location in memory of a field after array indices have been applied
 
@@ -44,34 +42,31 @@ public class Layout extends Test                                                
     final int       at;                                                         // Location of field in memory
     final int    width;                                                         // Width of field in memory
 
-    Location(String Name, int...Indices)
-     {z();
-      name    = Name;
-      indices = Indices;
-      if (top.fullNames.containsKey(Name))
+    Location(String Name, int...Indices)                                        // Locate a field after applying array subscripts
+     {z(); name = Name; indices = Indices;
+      field = top.fullNames.get(Name);                                          // Locate field name
+
+      if (field == null)                                                        // Undefined field
+       {stop("No such name:", Name, "in:", Layout.this);
+       }
+
+      z(); int a = field.at, i = Indices.length;
+
+      for(Field f = field; f != null; f = f.up)                                 // Convolute path to field with indices
        {z();
-        field = top.fullNames.get(Name);
-        width = field.width;
-        int a = field.at, i = Indices.length;
-        for(Field f = field; f != null; f = f.up)                            // Convolute path to field with indices
+        if (f instanceof Array)
          {z();
-          if (f instanceof Array)
+          final Array A = f.toArray();
+          if (i > 0)
            {z();
-            final Array A = f.toArray();
-            if (i > 0)
-             {z();
-              a += A.element.width * Indices[i-1]; --i;
-             }
-            else stop("Too few indices");
+            final int w = A.element.width, s = A.size, n = Indices[--i];
+            if (n < 0 || n >= s) stop("Array:", A.fullName, "has size:", s, "but is being indexed with:", n);
+            a += w * n;
            }
+          else stop("Too few indices");
          }
-        at = a;
        }
-      else
-       {field = null;
-        at = width = 0;
-        stop("No such name:", Name);
-       }
+      at = a; width = field.width;
      }
 
     public String toString()
@@ -425,14 +420,15 @@ V    8     4                    c                    B.S.A.s.c
 V   28     4                e                    B.S.e
 """);
 
-    Location lc = l.location("B.S.A.s.c", 1, 2, 2);
-    ok(lc, """
-Location(name:B.S.A.s.c at:216 width:4)
+
+    Location c1 = l.location("B.S.A.s.c", 1, 2, 1);
+    ok(c1, """
+Location(name:B.S.A.s.c at:208 width:4)
 """);
 
-    Location ld = l.location("B.S.A.s.c", 1, 2, 3);
-    ok(ld, """
-Location(name:B.S.A.s.c at:224 width:4)
+    Location c2 = l.location("B.S.A.s.c", 1, 2, 2);
+    ok(c2, """
+Location(name:B.S.A.s.c at:216 width:4)
 """);
 
     ok(l.size(), 640);
