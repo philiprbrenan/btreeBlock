@@ -10,6 +10,16 @@ import java.util.*;
 
 public class Layout extends Test                                                // A Memory layout for a chip. There might be several such layouts representing parts of the chip.
  {Field top;                                                                    // The top most field in a set of nested fields describing memory.
+  final Stack<Field> fields = new Stack<>();                                    // Field creation sequence to enable efficient duplication of a layout
+
+  static Layout layout() {return new Layout();}                                 // Create a new Layout that can be loaded field by field
+
+  void compile()                                                                // Lay out the layout
+   {z();
+    top = fields.lastElement();                                                 // The last defined field becomes the super structure
+    top.layout(0, 0);                                                           // Locate field positions
+    top.indexNames();                                                           // Index the names of the fields
+   }
 
   void layout(String name, Field...fields)                                      // Create a new Layout loaded from an implied structure of fields
    {z();
@@ -25,7 +35,9 @@ public class Layout extends Test                                                
    {return top.toString();
    }
 
-  class Location                                                                // The location in memory of a field after integrating array indices
+//D1 Location                                                                   // The location in memory of a field after array indices have been applied
+
+  class Location                                                                // The location in memory of a field after array indices have been applied
    {final Field  field;                                                         // Field definition
     final String  name;                                                         // Field full name
     final int[]indices;                                                         // Indices to field
@@ -38,10 +50,10 @@ public class Layout extends Test                                                
       indices = Indices;
       if (top.fullNames.containsKey(Name))
        {z();
-      field  = top.fullNames.get(Name);
+        field = top.fullNames.get(Name);
         width = field.width;
         int a = field.at, i = Indices.length;
-        for(Field f = field; f.up != null; f = f.up)                            // Convolute path to field with indices
+        for(Field f = field; f != null; f = f.up)                            // Convolute path to field with indices
          {z();
           if (f instanceof Array)
            {z();
@@ -69,6 +81,10 @@ public class Layout extends Test                                                
      }
    }
 
+  Location location(String Name, int...Indices)                                 // The location in memory of a field after array indices have been applied
+   {return new Location(Name, Indices);
+   }
+
 //D1 Layouts                                                                    // Field memory of the chip as variables, arrays, structures, unions. Dividing the memory in this manner makes it easier to program the chip symbolically.
 
   abstract class Field                                                          // Variable/Array/Structure/Union definition.
@@ -83,7 +99,10 @@ public class Layout extends Test                                                
     final Map<String,Field> fullNames = new TreeMap<>();                        // Fields by name
     final Set<String>  classification = new TreeSet<>();                        // Names that identify the type of the field to aid debugging
 
-    Field(String Name) {name = Name; number = ++numbers;}                       // Create a new named field with a unique number
+    Field(String Name)                                                          // Create a new named field with a unique number
+     {z(); name = Name; number = ++numbers;
+      fields.push(this);
+     }
 
     int at   () {return at;}                                                    // Position of field in memory
     int width() {return width;}                                                 // Size of the memory in bits occupied by this field
@@ -141,8 +160,8 @@ public class Layout extends Test                                                
      {final StringBuilder s = new StringBuilder();
       //s.append("Memory: "+memory.memoryNumber+"\n");
       s.append(String.format
-       ("%1s %4s  %4s      %-16s       %s\n",
-        "T", "At", "Wide", "Name", "Path"));
+       ("%1s %4s  %4s  %4s    %-16s       %s\n",
+        "T", "At", "Wide", "Size", "Name", "Path"));
       return s;
      }
 
@@ -158,7 +177,7 @@ public class Layout extends Test                                                
      {final String  n = printName(top);                                         // Name using indentation to show depth
       final char    c = fieldType();                                            // First letter of inner most class name to identify type of field
 
-      s.append(String.format("%c %4d  %4d      %-16s\n",                        // Variable
+      s.append(String.format("%c %4d  %4d          %-16s\n",                        // Variable
                              c,  at,  width,   n));
      }
 
@@ -195,7 +214,7 @@ public class Layout extends Test                                                
    {Bit(String name) {super(name, 1); z(); }
    }
 
-  class Array extends Field                                                     // Layout an array definition.
+  class Array extends Field                                                     // Layout an array definition.  Arrays are of fixed size being that many repitions of their element.
    {int size;                                                                   // Dimension of array
     Field element;                                                              // The elements of this array are of this type
 
@@ -225,22 +244,24 @@ public class Layout extends Test                                                
     void print(Layout.Field top, StringBuilder s)                               // Print the array
      {final String  n = printName(top);                                         // Name using indentation to show depth
       final char    c = fieldType();                                            // First letter of inner most class name to identify type of field
-      final int     w = width;                                                  // Bits occupied bythe array
+      final int     w = width;                                                  // Bits occupied by the array
+      final int     z = size;                                                   // Number of elements in array
       final int     p = at;                                                     // Position of the array element
-      s.append(String.format("%c %4d  %4d      %16s\n",                         // Index of the array
-                               c,  p,   w,     n));
+      s.append(String.format("%c %4d  %4d  %4d    %16s\n",                     // Index of the array
+                               c,  p,   w,  z,   n));
       element.print(top, s);                                                    // Print the array element without headers
      }
    }
 
   class Structure extends Field                                                 // Layout a structure
-   {final Map<String,Field> subMap   = new TreeMap<>();                         // Unique variables contained inside this structure
+   {final Field[]fields;                                                        // Supplied field definitions
+    final Map<String,Field> subMap   = new TreeMap<>();                         // Unique variables contained inside this structure
     final Stack     <Field> subStack = new Stack  <>();                         // Order of fields inside this structure
 
     Structure(String Name, Field...Fields)                                      // Fields in the structure
      {super(Name);
       z();
-
+      fields = Fields;
       for (int i = 0; i < Fields.length; ++i) addField(Fields[i]);              // Each field supplied
      }
 
@@ -304,11 +325,27 @@ public class Layout extends Test                                                
      }
    }
 
+
   Bit       bit      (String n)                   {return new Bit      (n);}
   Variable  variable (String n, int w)            {return new Variable (n, w);}
   Array     array    (String n, Field   m, int s) {return new Array    (n, m, s);}
   Structure structure(String n, Field...m)        {return new Structure(n, m);}
   Union     union    (String n, Field...m)        {return new Union    (n, m);}
+
+//D1 Duplication                                                                // Duplicate a layout
+
+  Layout duplicate()                                                            // Duplicate this layout
+   {Layout l = layout();
+    for(Field f: fields)
+     {if (f instanceof Bit)       {Bit        b = f.toBit();       l.bit      (b.name);}
+      if (f instanceof Variable)  {Variable   v = f.toVariable();  l.variable (v.name, v.width);}
+      if (f instanceof Array)     {Array      a = f.toArray();     l.array    (a.name, a.element, a.size);}
+      if (f instanceof Structure) {Structure  s = f.toStructure(); l.structure(s.name, s.fields);}
+      if (f instanceof Union)     {Union      u = f.toUnion();     l.union    (u.name, u.fields);}
+     }
+    l.compile();
+    return l;
+   }
 
 //D0                                                                            // Tests.
 
@@ -321,21 +358,22 @@ public class Layout extends Test                                                
     Array     A = l.array    ("A", s, 3);
     Variable  d = l.variable ("d", 4);
     Variable  e = l.variable ("e", 4);
-    l.layout("S", d, A, e);
+    Structure S = l.structure("S", d, A, e);
+    l.compile();
     //stop(l);
     l.ok("""
-T   At  Wide      Name                   Path
-S    0    32      S
-V    0     4        d                    d
-A    4    24        A                    A
-S    4     8          s                    A.s
-V    4     2            a                    A.s.a
-V    6     2            b                    A.s.b
-V    8     4            c                    A.s.c
-V   28     4        e                    e
+T   At  Wide  Size    Name                   Path
+S    0    32          S
+V    0     4            d                    d
+A    4    24     3      A                    A
+S    4     8              s                    A.s
+V    4     2                a                    A.s.a
+V    6     2                b                    A.s.b
+V    8     4                c                    A.s.c
+V   28     4            e                    e
 """);
 
-    Location lc = l.new Location("A.s.c", 2);
+    Location lc = l.location("A.s.c", 2);
     ok(lc, """
 Location(name:A.s.c at:24 width:4)
 """);
@@ -345,23 +383,22 @@ Location(name:A.s.c at:24 width:4)
    {Layout    l = new Layout();
     Variable  a = l.variable ("a", 2);
     Array     A = l.array    ("A", a, 4);
-    l.layout("S", A);
+    l.compile();
     //stop(l);
     l.ok("""
-T   At  Wide      Name                   Path
-S    0     8      S
-A    0     8        A                    A
-V    0     2          a                    A.a
+T   At  Wide  Size    Name                   Path
+A    0     8     4    A
+V    0     2            a                    a
 """);
 
-    Location lc = l.new Location("A.a", 2);
+    Location lc = l.location("a", 2);
     ok(lc, """
-Location(name:A.a at:4 width:2)
+Location(name:a at:4 width:2)
 """);
    }
 
   static void test_arrays()
-   {Layout    l = new Layout();
+   {Layout    l = layout();
     Variable  a = l.variable ("a", 2);
     Variable  b = l.variable ("b", 2);
     Variable  c = l.variable ("c", 4);
@@ -372,46 +409,53 @@ Location(name:A.a at:4 width:2)
     Structure S = l.structure("S", d, A, e);
     Array     B = l.array    ("B", S, 4);
     Array     C = l.array    ("C", B, 5);
-    l.layout("S", C);
+    l.compile();
     //stop(l);
     l.ok("""
-T   At  Wide      Name                   Path
-S    0   640      S
-A    0   640        C                    C
-A    0   128          B                    C.B
-S    0    32            S                    C.B.S
-V    0     4              d                    C.B.S.d
-A    4    24              A                    C.B.S.A
-S    4     8                s                    C.B.S.A.s
-V    4     2                  a                    C.B.S.A.s.a
-V    6     2                  b                    C.B.S.A.s.b
-V    8     4                  c                    C.B.S.A.s.c
-V   28     4              e                    C.B.S.e
+T   At  Wide  Size    Name                   Path
+A    0   640     5    C
+A    0   128     4      B                    B
+S    0    32              S                    B.S
+V    0     4                d                    B.S.d
+A    4    24     3          A                    B.S.A
+S    4     8                  s                    B.S.A.s
+V    4     2                    a                    B.S.A.s.a
+V    6     2                    b                    B.S.A.s.b
+V    8     4                    c                    B.S.A.s.c
+V   28     4                e                    B.S.e
 """);
 
-    Location lc = l.new Location("C.B.S.A.s.c", 2, 3, 4);
+    Location lc = l.location("B.S.A.s.c", 1, 2, 2);
     ok(lc, """
-Location(name:C.B.S.A.s.c at:392 width:4)
+Location(name:B.S.A.s.c at:216 width:4)
 """);
+
+    Location ld = l.location("B.S.A.s.c", 1, 2, 3);
+    ok(ld, """
+Location(name:B.S.A.s.c at:224 width:4)
+""");
+
     ok(l.size(), 640);
     ok(a.sameSize(b), 2);
     s.toStructure();
     A.toArray();
+
+    Layout L = l.duplicate();
+    ok(l, L);
    }
 
   static void test_union()
-   {Layout    l = new Layout();
+   {Layout    l = layout();
     Variable  a = l.variable ("a", 2);
     Variable  b = l.bit      ("b");
     Union     u = l.union    ("u", a, b);
-    l.layout("S", u);
+    l.compile();
     //stop(l);
     l.ok("""
-T   At  Wide      Name                   Path
-S    0     2      S
-U    0     2        u                    u
-V    0     2          a                    u.a
-B    0     1          b                    u.b
+T   At  Wide  Size    Name                   Path
+U    0     2          u
+V    0     2            a                    a
+B    0     1            b                    b
 """);
 
     ok(l.size(), 2);
@@ -424,11 +468,12 @@ B    0     1          b                    u.b
    {test_layout();
     test_array();
     test_arrays();
+    test_union();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_union();
+    test_array();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
