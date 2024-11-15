@@ -12,15 +12,13 @@ public class Layout extends Test                                                
  {Field top;                                                                    // The top most field in a set of nested fields describing memory.
 
   void layout(String name, Field...fields)                                      // Create a new Layout loaded from an implied structure of fields
-   {top = new Structure(name, fields);                                          // Create a structure to hold the named  outermost fields
+   {z();
+    top = new Structure(name, fields);                                          // Create a structure to hold the named  outermost fields
     top.layout(0, 0);                                                           // Locate field positions
     top.indexNames();                                                           // Index the names of the fields
    }
 
-  int size() {return top == null ? 0 : top.width;}                              // Size of memory
-
-  Field asFields() {return top;}                                                // Get field definitions associated with memory
-
+  int size() {z(); return top == null ? 0 : top.width;}                         // Size of memory
   void ok(String expected) {Test.ok(top.toString(), expected);}                 // Confirm layout is as expected
 
   public String toString()
@@ -35,17 +33,22 @@ public class Layout extends Test                                                
     final int    width;                                                         // Width of field in memory
 
     Location(String Name, int...Indices)
-     {name    = Name;
+     {z();
+      name    = Name;
       indices = Indices;
       if (top.fullNames.containsKey(Name))
-       {field  = top.fullNames.get(Name);
+       {z();
+      field  = top.fullNames.get(Name);
         width = field.width;
         int a = field.at, i = Indices.length;
         for(Field f = field; f.up != null; f = f.up)                            // Convolute path to field with indices
-         {if (f instanceof Array)
-           {final Array A = f.toArray();
+         {z();
+          if (f instanceof Array)
+           {z();
+            final Array A = f.toArray();
             if (i > 0)
-             {a += A.element.width * Indices[i-1]; --i;
+             {z();
+              a += A.element.width * Indices[i-1]; --i;
              }
             else stop("Too few indices");
            }
@@ -86,10 +89,12 @@ public class Layout extends Test                                                
     int width() {return width;}                                                 // Size of the memory in bits occupied by this field
 
     void fullName(Layout.Field top, StringBuilder s)                            // The full name of a field relative to the indicated top
-     {if (top == this) return;
+     {z();
+      if (top == this) return;
       final Stack<String> names = new Stack<>();                                // Full name path
       for(Layout.Field f = this; f.up != null; f = f.up)                        // Go up structure
-       {names.insertElementAt(f.name, 0);
+       {z();
+        names.insertElementAt(f.name, 0);
         if (f.up == top) break;
        }
       if (names.size() == 0) return;                                            // Zero length path to element
@@ -100,9 +105,11 @@ public class Layout extends Test                                                
      }
 
     void indexName()                                                            // Index all the full names of a field
-     {final Stack<String> names = new Stack<>();                                // Full name path
+     {z();
+      final Stack<String> names = new Stack<>();                                // Full name path
       for(Layout.Field f = this; f.up != null; f = f.up)                        // Go up structure
-       {names.insertElementAt(f.name, 0);
+       {z();
+        names.insertElementAt(f.name, 0);
         final StringBuilder s = new StringBuilder();
         final String top = names.pop();
         for(String n : names) s.append(n+".");
@@ -118,20 +125,14 @@ public class Layout extends Test                                                
     public Layout       asLayout() {return Layout.this;}                        // Layout associated with this field
 
     int sameSize(Field b)                                                       // Check the specified field is the same size as this field
-     {final int A = width, B = b.width;
+     {z();
+      final int A = width, B = b.width;
       if (A != B) stop("Fields must have the same width, but field", name,
         "has width", A, "while field", b.name, "has size", B);
       return A;
      }
 
-    void isBit()                                                                // Check the specified field is a bit field
-     {if (width != 1) stop("Field must be one bit wide, but it is",
-        width, "bits wide");
-     }
-
     abstract void layout(int at, int depth);                                    // Layout this field
-
-    void position(int At) {at = At;}                                            // Reposition a field after an index of a containing array has been changed
 
     String  indent() {return "  ".repeat(depth);}                               // Indentation during printing
     char fieldType() {return getClass().getName().split("\\$")[1].charAt(0);}   // First letter of inner most class name to identify type of field
@@ -167,29 +168,31 @@ public class Layout extends Test                                                
       return s.toString().replaceAll("\\s+\n", "\n");
      }
 
-    Bit       toBit      () {return (Bit)      this;}                           // Try to convert to a bit
-    Variable  toVariable () {return (Variable) this;}                           // Try to convert to a variable
-    Array     toArray    () {return (Array)    this;}                           // Try to convert to an array
-    Structure toStructure() {return (Structure)this;}                           // Try to convert to a structure
-    Union     toUnion    () {return (Union)    this;}                           // Try to convert to a union
+    Bit       toBit      () {z(); return (Bit)      this;}                      // Try to cast a field to a bit
+    Variable  toVariable () {z(); return (Variable) this;}                      // Try to cast a field to a variable
+    Array     toArray    () {z(); return (Array)    this;}                      // Try to cast a field to an array
+    Structure toStructure() {z(); return (Structure)this;}                      // Try to cast a field to a structure
+    Union     toUnion    () {z(); return (Union)    this;}                      // Try to cast a field to a union
    }
 
   class Variable extends Field                                                  // Layout a variable with no sub structure
    {Variable(String name, int Width)
      {super(name); width = Width;
+      z();
+
      }
 
     void indexNames()                                                           // Index the name of this field
-     {indexName();
+     {z(); indexName();
      }
 
     void layout(int At, int Depth)                                              // Layout the variable in the structure
-     {at = At; depth = Depth;
+     {z(); at = At; depth = Depth;
      }
    }
 
   class Bit extends Variable                                                    // A variable of unit width is a boolean. could have called it a boolean but decied to callit abool instead becuase it was shorter and more like
-   {Bit(String name) {super(name, 1);}
+   {Bit(String name) {super(name, 1); z(); }
    }
 
   class Array extends Field                                                     // Layout an array definition.
@@ -198,14 +201,15 @@ public class Layout extends Test                                                
 
     Array(String Name, Field Element, int Size)                                 // Create the array definition
      {super(Name);                                                              // Name of array
+      z();
+
       size = Size;                                                              // Size of array
       element = Element;                                                        // Field definition associated with this layout
      }
 
-    int at(int i) {return at+i*element.width;}                                  // Offset of this array field in the structure
-
     void layout(int At, int Depth)                                              // Position this array within the layout
-     {depth = Depth;                                                            // Depth of field in the layout
+     {z();
+      depth = Depth;                                                            // Depth of field in the layout
       element.layout(At, Depth+1);                                              // Field sub structure
       at = At;                                                                  // Position on index
       element.up = this;                                                        // Chain up to containing parent field
@@ -213,7 +217,8 @@ public class Layout extends Test                                                
      }
 
     void indexNames()                                                           // Index the name of this field and its sub fields
-     {indexName();
+     {z();
+      indexName();
       element.indexNames();                                                     // Full names of sub fields relative to outer most layout
      }
 
@@ -234,11 +239,14 @@ public class Layout extends Test                                                
 
     Structure(String Name, Field...Fields)                                      // Fields in the structure
      {super(Name);
+      z();
+
       for (int i = 0; i < Fields.length; ++i) addField(Fields[i]);              // Each field supplied
      }
 
     void addField(Field layout)                                                 // Add additional fields
-     {final Field field = layout.asField();                                     // Field associated with this layout
+     {z();
+      final Field field = layout.asField();                                     // Field associated with this layout
       field.up = this;                                                          // Chain up to containing structure
       if (subMap.containsKey(field.name))
        {stop("Structure:", name, "already contains field with this name:",
@@ -249,7 +257,8 @@ public class Layout extends Test                                                
      }
 
     void layout(int At, int Depth)                                              // Place the structure in the layout
-     {at = At;
+     {z();
+      at = At;
       width = 0;
       depth = Depth;
       for(Field v : subStack)                                                   // Field sub structure
@@ -260,23 +269,16 @@ public class Layout extends Test                                                
      }
 
     void indexNames()                                                           // Index the name of this structure and its sub fields
-     {indexName();
+     {z();
+      indexName();
       for (Field f : subStack)                                                  // Each field in the structure
        {f.indexNames();                                                         // Index name in outermost layout
        }
      }
 
-    void position(int At)                                                       // Reposition this structure after an index of a containing array has been changed
-     {at = At;
-      int w = 0;
-      for(Field v : subStack)                                                   // Field sub structure
-       {v.position(v.at = at+w);                                                // Substructures are laid out sequentially
-        w += v.width;
-       }
-     }
-
     void print(Layout.Field top, StringBuilder s)                               // Print the structure
-     {super.print(top, s);
+     {z();
+      super.print(top, s);
       for(Field f: subStack) f.print(top, s);                                   // Print each field of structure
      }
    }
@@ -284,21 +286,21 @@ public class Layout extends Test                                                
   class Union extends Structure                                                 // Union of fields laid out in memory on top of each other - it is up to you to have a way of deciding which fields are valid
    {Union(String Name, Field...Fields)                                          // Fields in the union
      {super(Name, Fields);
+      z();
      }
 
     void layout(int at, int Depth)                                              // Compile this variable so that the size, width and byte fields are correct
-     {width = 0;
+     {z();
+
+      width = 0;
       depth = Depth;
       for(Field v : subMap.values())                                            // Find largest substructure
-       {v.at = at;                                                              // Substructures are laid out on top of each other
+       {z();
+
+        v.at = at;                                                              // Substructures are laid out on top of each other
         v.layout(v.at, Depth+1);
         width = max(width, v.width);                                            // Space occupied is determined by largest field of union
        }
-     }
-
-    void position(int At)                                                       // Reposition this union after an index of a containing array has been changed
-     {at = At;
-      for(Field v : subMap.values()) v.position(at);
      }
    }
 
@@ -391,6 +393,31 @@ V   28     4              e                    C.B.S.e
     ok(lc, """
 Location(name:C.B.S.A.s.c at:392 width:4)
 """);
+    ok(l.size(), 640);
+    ok(a.sameSize(b), 2);
+    s.toStructure();
+    A.toArray();
+   }
+
+  static void test_union()
+   {Layout    l = new Layout();
+    Variable  a = l.variable ("a", 2);
+    Variable  b = l.bit      ("b");
+    Union     u = l.union    ("u", a, b);
+    l.layout("S", u);
+    //stop(l);
+    l.ok("""
+T   At  Wide      Name                   Path
+S    0     2      S
+U    0     2        u                    u
+V    0     2          a                    u.a
+B    0     1          b                    u.b
+""");
+
+    ok(l.size(), 2);
+    a.toVariable();
+    b.toBit();
+    u.toUnion();
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -401,12 +428,13 @@ Location(name:C.B.S.A.s.c at:392 width:4)
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    test_union();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      if (github_actions)                                                       // Coverage analysis
+      //if (github_actions)                                                       // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
