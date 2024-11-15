@@ -3,7 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
-
+// Reference the keys and data through a small mapping table and free stack so that we can manipulate keys and data by a small index rather than copying them directly.
 class Stuck extends Test                                                        // A fixed size stack of ordered key, data pairs with null deemed highest
  {final int maxSize;                                                            // The maximum number of entries in the stuck.
   final int[]Keys;                                                              // The keys on the stuck
@@ -14,7 +14,7 @@ class Stuck extends Test                                                        
 
   Stuck(int MaxSize)                                                            // Create the stuck with a maximum number of the specified elements
    {z();
-      maxSize     = MaxSize;
+    maxSize     = MaxSize;
     currentSize = 0;
     Keys        = new int[maxSize];
     Data        = new int[maxSize];
@@ -28,12 +28,12 @@ class Stuck extends Test                                                        
 
 //D1 Characteristics                                                            // Characteristics of the stuck
 
-  int      size            ()       {z(); return currentSize;}                    // The current number of key elements in the stuck as a binary integer
-  int   maxSize            ()       {z(); return maxSize;}                        // The maximum number of key elements the stuck can contain
-  boolean isFull           ()       {z(); return size() > maxSize;}               // Check the stuck is full
-  boolean isEmpty          ()       {z(); return size() == 0;}                    // Check the stuck is empty
-  void     assertNotFull   ()       {z(); if (isFull ()) stop("Full");}           // Assert the stack is not full
-  void     assertNotEmpty  ()       {z(); if (isEmpty()) stop("Empty");}          // Assert the stack is not empty
+  int      size            ()       {z(); return currentSize;}                  // The current number of key elements in the stuck as a binary integer
+  int   maxSize            ()       {z(); return maxSize;}                      // The maximum number of key elements the stuck can contain
+  boolean isFull           ()       {z(); return size() > maxSize;}             // Check the stuck is full
+  boolean isEmpty          ()       {z(); return size() == 0;}                  // Check the stuck is empty
+  void     assertNotFull   ()       {z(); if (isFull ()) stop("Full");}         // Assert the stack is not full
+  void     assertNotEmpty  ()       {z(); if (isEmpty()) stop("Empty");}        // Assert the stack is not empty
   void     assertInNormal  (int i)  {z(); if (i < 0 || i >= size()) stop("Out of normal range",   i, "for size", size());}  // Check that the index would yield a valid element
   void     assertInExtended(int i)  {z(); if (i < 0 || i >  size()) stop("Out of extended range", i, "for size", size());}  // Check that the index would yield a valid element
 
@@ -193,7 +193,7 @@ class Stuck extends Test                                                        
   void insertElementAt(int key, int data, int Index)                            // Insert an element at the indicated location shifting all the remaining elements up one
    {z();
     assertInExtended(Index);
-    for (int i = size(); i > Index; --i)                                      // Shift the stuck up one place
+    for (int i = size(); i > Index; --i)                                        // Shift the stuck up one place
      {z();
       Keys[i] = Keys[i-1];
       Data[i] = Data[i-1];
@@ -765,7 +765,7 @@ CheckOrderExceptLast(inOrder:false outOfOrder:4)
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      //if (github_actions)                                                       // Coverage analysis
+      //if (github_actions)                                                     // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
