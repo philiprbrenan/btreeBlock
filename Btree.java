@@ -53,7 +53,7 @@ class Btree extends Test                                                        
     final  int node = nodeCount++;
 
     final Stack<KeyData> keyData = new Stack<>();                               // Key, data pairs when a leaf
-    final Stack<KeyNext> keyNext = new Stack<>();                               // Key, next pairs when a leaf. The last entry is top and so this stack must always have at least one element in it when the node is acting as a branch
+    final Stack<KeyNext> keyNext = new Stack<>();                               // Key, next pairs when a branch. The last entry is top and so this stack must always have at least one element in it when the node is acting as a branch
 
     void assertLeaf()   {if (!isLeaf) stop("Leaf required");}
     void assertBranch() {if ( isLeaf) stop("Branch required");}
@@ -96,7 +96,9 @@ class Btree extends Test                                                        
          }
        }
       else                                                                      // Print a branch
-       {s.append("Branch(node:"+node+" size:"+branchSize()+")\n");
+       {s.append("Branch(node:"+node+
+                 " size:"+branchSize()+
+                 " top:"+top()+"\n");
 
         for (int i = 0; i < keyNext.size(); i++)
          {final KeyNext kn = keyNext.elementAt(i);
@@ -331,7 +333,6 @@ class Btree extends Test                                                        
       r.keyNext.push(new KeyNext(top()));
 
       final KeyNext pl = keyNext.firstElement();
-      final KeyNext pr = keyNext. lastElement();
       keyData.clear(); keyNext.clear();
 
       keyNext.push(new KeyNext(pl.key, l.node));
@@ -820,7 +821,7 @@ class Btree extends Test                                                        
      {z();
       final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
       down = p.new FindFirstGreaterThanOrEqualInBranch(Key);
-      Node q = nodes.elementAt(down.next);
+      final Node q = nodes.elementAt(down.next);
       if (q.isLeaf)                                                             // Reached a leaf
        {z();
         q.splitLeaf(p, down.first);
