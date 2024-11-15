@@ -40,16 +40,14 @@ public class Layout extends Test                                                
       if (top.fullNames.containsKey(Name))
        {field  = top.fullNames.get(Name);
         width = field.width;
-        int a = field.at;
-        int i = Indices.length;
+        int a = field.at, i = Indices.length;
         for(Field f = field; f.up != null; f = f.up)                            // Convolute path to field with indices
          {if (f instanceof Array)
-           {if (i > 0)
-             {a += f.width * Indices[i-1];
+           {final Array A = f.toArray();
+            if (i > 0)
+             {a += A.element.width * Indices[i-1]; --i;
              }
-            else
-             {stop("Too few indices");
-             }
+            else stop("Too few indices");
            }
          }
         at = a;
@@ -337,7 +335,42 @@ V   28     4        e                    e
 
     Location lc = l.new Location("A.s.c", 2);
     ok(lc, """
-Location(name:A.s.c at:56 width:4)
+Location(name:A.s.c at:24 width:4)
+""");
+   }
+
+  static void test_arrays()
+   {Layout    l = new Layout();
+    Variable  a = l.variable ("a", 2);
+    Variable  b = l.variable ("b", 2);
+    Variable  c = l.variable ("c", 4);
+    Structure s = l.structure("s", a, b, c);
+    Array     A = l.array    ("A", s, 3);
+    Variable  d = l.variable ("d", 4);
+    Variable  e = l.variable ("e", 4);
+    Structure S = l.structure("S", d, A, e);
+    Array     B = l.array    ("B", S, 4);
+    Array     C = l.array    ("C", B, 5);
+    l.layout("S", C);
+    //stop(l);
+    l.ok("""
+T   At  Wide      Name                   Path
+S    0   640      S
+A    0   640        C                    C
+A    0   128          B                    C.B
+S    0    32            S                    C.B.S
+V    0     4              d                    C.B.S.d
+A    4    24              A                    C.B.S.A
+S    4     8                s                    C.B.S.A.s
+V    4     2                  a                    C.B.S.A.s.a
+V    6     2                  b                    C.B.S.A.s.b
+V    8     4                  c                    C.B.S.A.s.c
+V   28     4              e                    C.B.S.e
+""");
+
+    Location lc = l.new Location("C.B.S.A.s.c", 2, 3, 4);
+    ok(lc, """
+Location(name:C.B.S.A.s.c at:392 width:4)
 """);
    }
 
@@ -347,6 +380,7 @@ Location(name:A.s.c at:56 width:4)
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    test_arrays();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
