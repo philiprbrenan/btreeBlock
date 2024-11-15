@@ -4,8 +4,6 @@
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
 
-import java.util.*;
-
 class Stuck extends Test                                                        // A fixed size stack of ordered key, data pairs with null deemed highest
  {final int maxSize;                                                            // The maximum number of entries in the stuck.
   final int[]Keys;                                                              // The keys on the stuck
@@ -30,22 +28,21 @@ class Stuck extends Test                                                        
 
 //D1 Characteristics                                                            // Characteristics of the stuck
 
-  int      size          ()       {z(); return currentSize;}                    // The current number of key elements in the stuck as a binary integer
-  int   maxSize          ()       {z(); return maxSize;}                        // The maximum number of key elements the stuck can contain
-  boolean isFull         ()       {z(); return size() > maxSize;}               // Check the stuck is full
-  boolean isEmpty        ()       {z(); return size() == 0;}                    // Check the stuck is empty
-  void     assertNotFull ()       {z(); if (isFull ()) stop("Full");}           // Assert the stack is not full
-  void     assertNotEmpty()       {z(); if (isEmpty()) stop("Empty");}          // Assert the stack is not empty
-  void     assertIn      (int i)  {z(); if (i < 0 || i >= size()) stop("Out of range",   i, "for size", size());}  // Check that the index would yield a valid element
+  int      size            ()       {z(); return currentSize;}                    // The current number of key elements in the stuck as a binary integer
+  int   maxSize            ()       {z(); return maxSize;}                        // The maximum number of key elements the stuck can contain
+  boolean isFull           ()       {z(); return size() > maxSize;}               // Check the stuck is full
+  boolean isEmpty          ()       {z(); return size() == 0;}                    // Check the stuck is empty
+  void     assertNotFull   ()       {z(); if (isFull ()) stop("Full");}           // Assert the stack is not full
+  void     assertNotEmpty  ()       {z(); if (isEmpty()) stop("Empty");}          // Assert the stack is not empty
+  void     assertInNormal  (int i)  {z(); if (i < 0 || i >= size()) stop("Out of normal range",   i, "for size", size());}  // Check that the index would yield a valid element
+  void     assertInExtended(int i)  {z(); if (i < 0 || i >  size()) stop("Out of extended range", i, "for size", size());}  // Check that the index would yield a valid element
 
-  class CheckOrder                                                              // Check that the keys are in order,
+  class CheckOrder extends Limit                                                // Check that tall he keys are in order,
    {final boolean inOrder;                                                      // Keys are in order
     final int outOfOrder;                                                       // Index of first key out of order
+    String name() {return "CheckOrder";}                                        // Name of limit
 
-    String name() {return "CheckOrder";}                                        // Name of class
-    int limit  () {return size();}                                              // How far to check
-
-    CheckOrder()
+    CheckOrder()                                                                // Check that all the keys are in order,
      {boolean looking = true;
       int i = 1, j = limit();
       for (;i < j && looking; i++)                                              // Check each key
@@ -162,7 +159,7 @@ class Stuck extends Test                                                        
     ElementAt(int Index)
      {z();
       index = Index;
-      assertIn(index);
+      assertInNormal(index);
       key  = Keys[index];
       data = Data[index];
      }
@@ -187,30 +184,23 @@ class Stuck extends Test                                                        
      }
     else                                                                        // In range
      {z();
-      assertIn(Index);
+      assertInNormal(Index);
       Keys[Index] = key;
       Data[Index] = data;
       }
    }
 
   void insertElementAt(int key, int data, int Index)                            // Insert an element at the indicated location shifting all the remaining elements up one
-   {if (Index == size())                                                        // Extended range
+   {z();
+    assertInExtended(Index);
+    for (int i = size(); i > Index; --i)                                      // Shift the stuck up one place
      {z();
-      Keys[Index] = key;
-      Data[Index] = data;
-      inc();
-     }
-    else                                                                        // In range
-     {z();
-      assertIn(Index);
-      for (int i = size(); i > Index; --i)                                      // Shift the stuck up one place
-       {z();
       Keys[i] = Keys[i-1];
-        Data[i] = Data[i-1];
-       }
-      Keys[Index] = key;
-      Data[Index] = data;
+      Data[i] = Data[i-1];
      }
+    Keys[Index] = key;
+    Data[Index] = data;
+    inc();
    }
 
   class RemoveElementAt                                                         // Remove the indicated element
@@ -220,7 +210,7 @@ class Stuck extends Test                                                        
     RemoveElementAt(int Index)
      {z();
       index = Index;
-      assertIn(index);
+      assertInNormal(index);
       key  = Keys[index];
       data = Data[index];
       for (int i = index, j = size()-1; i < j; i++)                             // Shift the stuck down one place
@@ -295,16 +285,23 @@ class Stuck extends Test                                                        
 
 //D1 Search                                                                     // Search a stuck.
 
-  class Search                                                                  // Search for an element
+  class Limit                                                                   // Search all of the stuck
+   {String name() {return "Limit";}                                             // Name of limit
+    int   limit() {return size();}                                              // How far to check
+   }
+
+  class Search extends Limit                                                    // Search for an element within all elements of the stuck
    {final int key;                                                              // Search key
     final boolean found;                                                        // Whether the key was found
     final int index ;                                                           // Index of the located key if any
     final int data;                                                             // Located data if key was found
-    Search(int Search)
+    String name() {return "Search";}                                            // Name of the search
+
+    Search(int Search)                                                          // Search for an element within all elements of the stuck
      {z();
       boolean looking = true;
       key = Search;
-      int i = 0, j = size() - 1;
+      int i = 0, j = limit();
       for (; i < j && looking; i++)                                             // Search
        {z();
         if (Keys[i] == key)
@@ -312,56 +309,17 @@ class Stuck extends Test                                                        
           looking = false; break;
          }
        }
-      if (looking)
+      if (looking)                                                              // Search key is bigger than all keys in the stuck
        {z(); found = false; index = 0; data = 0;
        }
-      else
+      else                                                                      // Found a greater than or equal key in the stuck
        {z(); found = true;  index = i; data = Data[i];
        }
      }
     public String toString()                                                    // Print
      {z();
       final StringBuilder s = new StringBuilder();
-      s.append("Search(Search:"+key);
-      s.append(" found:"+found);
-      if (found)
-       {z();
-      s.append(" index:"+index);
-        s.append(" data:"+data);
-       }
-      s.append(")\n");
-      return s.toString();
-     }
-   }
-  Search search(int Search) {return new Search(Search);}                        // Search for a key
-
-  class SearchFirstGreaterThanOrEqual                                           // Search for the first key that is greater than or equal
-   {final int key;                                                              // Search key
-    final boolean found;                                                        // Whether the key was found
-    final int index ;                                                           // Index of the located key if any
-    final int data;                                                             // Located data if key was found
-    SearchFirstGreaterThanOrEqual(int Search)
-     {z();
-      boolean looking = true;
-      key = Search;
-      int i = 0, j = size() - 1;
-      for (; i < j && looking; i++)                                             // Search
-       {z();
-        if (Keys[i] >= key)                                                     // Search key is equal or greater to the current key
-         {z(); looking = false; break;
-         }
-       }
-      if (looking)
-       {z(); found = false; index = 0; data = 0;
-       }
-      else
-       {z(); found = true;  index = i; data = Data[i];
-       }
-     }
-    public String toString()                                                    // Print
-     {final StringBuilder s = new StringBuilder();
-      z();
-      s.append("SearchFirstGreaterThanOrEqual(Search:"+key);
+      s.append(name()+"(Search:"+key);
       s.append(" found:"+found);
       if (found)
        {z();
@@ -372,9 +330,70 @@ class Stuck extends Test                                                        
       return s.toString();
      }
    }
+  Search search(int Search) {return new Search(Search);}                        // Search for a key ignoring the last element on the stuck
+
+  class SearchExceptLast extends Search                                         // Search for an element ignoring the last element on the stuck
+   {SearchExceptLast(int Search) {super(Search);}
+    int   limit() {return size()-1;}                                            // How much of the stuck to search
+    String name() {return "SearchExceptLast";}                                  // Name of the search
+   }
+  SearchExceptLast searchExceptLast(int Search) {return new SearchExceptLast(Search);}  // Search for a key ignoring the last element on the stuck
+
+  class SearchFirstGreaterThanOrEqual extends Limit                             // Search for the first key that is greater than or equal
+   {final int    search;                                                        // Search key
+    final boolean found;                                                        // Whether the search key was found
+    final int     index;                                                        // Index of the located key if any
+    final int       key;                                                        // Located key if the search key was found
+    final int      data;                                                        // Located data if search key was found
+    String name() {return "SearchFirstGreaterThanOrEqual";}                     // Name of the search
+
+    SearchFirstGreaterThanOrEqual(int Search)
+     {z();
+      boolean looking = true;
+      search = Search;
+      int i = 0, j = limit();
+      for (; i < j && looking; i++)                                             // Search
+       {z();
+        if (Keys[i] >= search)                                                  // Search key is equal or greater to the current key
+         {z(); looking = false; break;
+         }
+       }
+      if (looking)                                                              // Search key is bigger than all keys in the stuck except possibly the last one
+       {z(); found = false; index = limit(); key = 0;       data = 0;
+       }
+      else                                                                      // Found a greater than or equal key in the stuck excluding the last key
+       {z(); found = true;  index = i; key = Keys[i]; data = Data[i];
+       }
+     }
+    public String toString()                                                    // Print
+     {final StringBuilder s = new StringBuilder();
+      z();
+      s.append(name()+"(Search:"+search);
+      s.append(" index:"+index);
+      s.append(" found:"+found);
+      if (found)
+       {z();
+        s.append(  " key:"+key);
+        s.append( " data:"+data);
+       }
+      s.append(")\n");
+      return s.toString();
+     }
+   }
   SearchFirstGreaterThanOrEqual                                                 // Search for a key
   searchFirstGreaterThanOrEqual(int Search)
    {return new SearchFirstGreaterThanOrEqual(Search);
+   }
+
+  class     SearchFirstGreaterThanOrEqualExceptLast                             // Search for an element ignoring the last element on the stuck
+    extends SearchFirstGreaterThanOrEqual
+   {SearchFirstGreaterThanOrEqualExceptLast(int Search) {super(Search);}
+    int   limit() {return size()-1;}                                            // How much of the stuck to search
+    String name() {return "SearchFirstGreaterThanOrEqualExceptLast";}           // Name of the search
+   }
+  SearchFirstGreaterThanOrEqualExceptLast                                       // Search for a key ignoring the last element on the stuck
+  searchFirstGreaterThanOrEqualExceptLast(int Search)
+   {return new SearchFirstGreaterThanOrEqualExceptLast(Search);
    }
 
 //D1 Print                                                                      // Print a stuck
@@ -475,23 +494,24 @@ ElementAt(index:2 key:6 data:3)
   static void test_insert_element_at()
    {Stuck t = test_load();
     t.insertElementAt(9, 9, 2);
-    //stop(t);
-    t.ok("""
-Stuck(maxSize:8 size:4)
-  0 key:2 data:1
-  1 key:4 data:2
-  2 key:9 data:9
-  3 key:6 data:3
-""");
-    t.insertElementAt(9, 9, 4);
-    //stop(t);
     t.ok("""
 Stuck(maxSize:8 size:5)
   0 key:2 data:1
   1 key:4 data:2
   2 key:9 data:9
   3 key:6 data:3
-  4 key:9 data:9
+  4 key:8 data:4
+""");
+    t.insertElementAt(7, 7, 5);
+    //stop(t);
+    t.ok("""
+Stuck(maxSize:8 size:6)
+  0 key:2 data:1
+  1 key:4 data:2
+  2 key:9 data:9
+  3 key:6 data:3
+  4 key:8 data:4
+  5 key:7 data:7
 """);
    }
 
@@ -539,11 +559,20 @@ LastElement(found:false key:0 data:0)
 
   static void test_search()
    {Stuck  t = test_load();
+    t.ok("""
+Stuck(maxSize:8 size:4)
+  0 key:2 data:1
+  1 key:4 data:2
+  2 key:6 data:3
+  3 key:8 data:4
+""");
+
     Search s = t.search(2);
     //stop(s);
     ok(s, """
 Search(Search:2 found:true index:0 data:1)
 """);
+
     Search S = t.search(3);
     //stop(S);
     ok(S, """
@@ -551,22 +580,100 @@ Search(Search:3 found:false)
 """);
    }
 
+  static void test_search_except_last()
+   {Stuck  t = test_load();
+    t.ok("""
+Stuck(maxSize:8 size:4)
+  0 key:2 data:1
+  1 key:4 data:2
+  2 key:6 data:3
+  3 key:8 data:4
+""");
+    SearchExceptLast s = t.searchExceptLast(4);
+    //stop(s);
+    ok(s, """
+SearchExceptLast(Search:4 found:true index:1 data:2)
+""");
+    SearchExceptLast S = t.searchExceptLast(8);
+    //stop(S);
+    ok(S, """
+SearchExceptLast(Search:8 found:false)
+""");
+   }
+
   static void test_search_first_greater_than_or_equal()
    {Stuck  t = test_load();
+    t.ok("""
+Stuck(maxSize:8 size:4)
+  0 key:2 data:1
+  1 key:4 data:2
+  2 key:6 data:3
+  3 key:8 data:4
+""");
+
+    SearchFirstGreaterThanOrEqual b = t.searchFirstGreaterThanOrEqual(1);
+    //stop(b);
+    ok(b, """
+SearchFirstGreaterThanOrEqual(Search:1 index:0 found:true key:2 data:1)
+""");
+
     SearchFirstGreaterThanOrEqual s = t.searchFirstGreaterThanOrEqual(4);
     //stop(s);
     ok(s, """
-SearchFirstGreaterThanOrEqual(Search:4 found:true index:1 data:2)
+SearchFirstGreaterThanOrEqual(Search:4 index:1 found:true key:4 data:2)
 """);
+
     SearchFirstGreaterThanOrEqual S = t.searchFirstGreaterThanOrEqual(5);
     //stop(S);
     ok(S, """
-SearchFirstGreaterThanOrEqual(Search:5 found:true index:2 data:3)
+SearchFirstGreaterThanOrEqual(Search:5 index:2 found:true key:6 data:3)
 """);
-    SearchFirstGreaterThanOrEqual T = t.searchFirstGreaterThanOrEqual(9);
+
+    SearchFirstGreaterThanOrEqual T = t.searchFirstGreaterThanOrEqual(7);
     //stop(T);
     ok(T, """
-SearchFirstGreaterThanOrEqual(Search:9 found:false)
+SearchFirstGreaterThanOrEqual(Search:7 index:3 found:true key:8 data:4)
+""");
+
+    SearchFirstGreaterThanOrEqual E = t.searchFirstGreaterThanOrEqual(9);
+    //stop(E);
+    ok(E, """
+SearchFirstGreaterThanOrEqual(Search:9 index:4 found:false)
+""");
+   }
+
+  static void test_search_first_greater_than_or_equal_except_last()
+   {Stuck  t = test_load();
+    t.ok("""
+Stuck(maxSize:8 size:4)
+  0 key:2 data:1
+  1 key:4 data:2
+  2 key:6 data:3
+  3 key:8 data:4
+""");
+
+    SearchFirstGreaterThanOrEqualExceptLast b = t.searchFirstGreaterThanOrEqualExceptLast(1);
+    //stop(b);
+    ok(b, """
+SearchFirstGreaterThanOrEqualExceptLast(Search:1 index:0 found:true key:2 data:1)
+""");
+
+    SearchFirstGreaterThanOrEqualExceptLast s = t.searchFirstGreaterThanOrEqualExceptLast(4);
+    //stop(s);
+    ok(s, """
+SearchFirstGreaterThanOrEqualExceptLast(Search:4 index:1 found:true key:4 data:2)
+""");
+
+    SearchFirstGreaterThanOrEqualExceptLast S = t.searchFirstGreaterThanOrEqualExceptLast(5);
+    //stop(S);
+    ok(S, """
+SearchFirstGreaterThanOrEqualExceptLast(Search:5 index:2 found:true key:6 data:3)
+""");
+
+    SearchFirstGreaterThanOrEqualExceptLast T = t.searchFirstGreaterThanOrEqualExceptLast(7);
+    //stop(T);
+    ok(T, """
+SearchFirstGreaterThanOrEqualExceptLast(Search:7 index:3 found:false)
 """);
    }
 
@@ -624,6 +731,14 @@ CheckOrderExceptLast(inOrder:false outOfOrder:4)
 """);
    }
 
+  static void test_find_first()
+   {Stuck      t = stuck(4);
+    t.push(2, 2);
+    say(t);
+    SearchFirstGreaterThanOrEqual s = t.searchFirstGreaterThanOrEqual(1);
+    stop(s);
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_push();
     test_pop();
@@ -634,7 +749,9 @@ CheckOrderExceptLast(inOrder:false outOfOrder:4)
     test_remove_element_at();
     test_first_last();
     test_search();
+    test_search_except_last();
     test_search_first_greater_than_or_equal();
+    test_search_first_greater_than_or_equal_except_last();
     test_set_element_at();
     test_check_order();
     test_check_order_except_last();
@@ -642,6 +759,7 @@ CheckOrderExceptLast(inOrder:false outOfOrder:4)
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    //test_find_first();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
