@@ -405,7 +405,7 @@ public class Test                                                               
    {if (a.toString().equals(b.toString())) {++testsPassed; return;}
     final boolean n = b.toString().contains("\n");
     testsFailed++;
-    if (n) err(currentTestName(), "failed. Got:\n"+a+"\n");
+    if (n) err(currentTestName(), "Failed, got:\n"+a+"\n");
     else   err(a, "\ndoes not equal\n", b, "\nin", currentTestName());
    }
 
@@ -417,7 +417,7 @@ public class Test                                                               
     boolean matchesLen = true, matches = true;
     if (le != lg)                                                               // Failed on length
      {matchesLen = false;
-      err(b, currentTestName(), "failed: Mismatched length, expected",
+      err(b, currentTestName(), "Failed: mismatched length, expected",
         le, "got", lg, "for text:\n"+G);
 
 //    for (int i = 0; i < G.length(); i++)                                      // Check each character side by side
@@ -478,8 +478,8 @@ public class Test                                                               
     final int lg = G.length, le = E.length;
 
     if (le != lg)
-     {err(currentTestName(), "failed:",
-       "Mismatched length, got", lg, "expected", le, "got:\n"+G);
+     {err(currentTestName(), "Failed:",
+       "mismatched length, got", lg, "expected", le, "got:\n"+G);
       ++testsFailed;
       return;
      }
