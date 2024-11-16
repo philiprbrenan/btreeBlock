@@ -633,6 +633,17 @@ class BtreeStuck extends Test                                                   
 
 //D1 Print                                                                      // Print a BTree horizontally
 
+   String printBoxed()                                                          // Print a tree in a box
+    {final String  s = toString();
+     final int     n = longestLine(s)-1;
+     final String[]L = s.split("\n");
+     final StringBuilder t = new StringBuilder();
+     t.append("+"); t.append("-".repeat(n)); t.append("+\n");
+     for(String l : L) t.append("| "+l+"\n");
+     t.append("+"); t.append("-".repeat(n)); t.append("+\n");
+     return t.toString();
+    }
+
   void padStrings(Stack<StringBuilder> S, int level)                            // Pad the strings at each level of the tree so we have a vertical face to continue with - a bit like Marc Brunel's tunneling shield
    {final int N = level * linesToPrintABranch + maxKeysPerLeaf;                 // Number of lines we might want
     for (int i = S.size(); i <= N; ++i) S.push(new StringBuilder());            // Make sure we have a full deck of strings
@@ -1039,6 +1050,7 @@ class BtreeStuck extends Test                                                   
   static void test_delete()
    {final BtreeStuck t = new BtreeStuck(4, 3);
     final int N = 32;
+    final boolean box = false;                                                  // Print read me
     for (int i = 1; i <= N; i++) t.put(i);
     //t.stop();
     t.ok("""
@@ -1053,9 +1065,12 @@ class BtreeStuck extends Test                                                   
 1,2,3,4=1  5,6,7,8=4    9,10,11,12=6    13,14,15,16=10   17,18,19,20=12   21,22,23,24=15    25,26,27,28=17   29,30,31,32=2 |
 """);
 
+    if (box) say("At start with", N, "elements", t.printBoxed());
+
     for (int i = 1; i <= N; i++)
      {t.delete(i);
       //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");");
+      if (box) say("After deleting:", i, t.printBoxed());
       switch(i)
        {case 1 -> t.ok("""
                                                      16                                                                     |
