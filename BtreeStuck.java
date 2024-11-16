@@ -517,8 +517,8 @@ class BtreeStuck extends Test                                                   
     boolean mergeLeftSibling(int index)                                         // Merge the left sibling
      {z(); assertBranch();
       if (index == 0) return false;
-      if (index < 0)            stop("Index", index, "too small");
-      if (index > branchSize()) stop("Index", index, "too big");
+      if (index < 0)            stop("Index", index, "too small for branch of size:", branchSize());
+      if (index > branchSize()) stop("Index", index, "too big for branch of size:", branchSize());
       //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
       if (branchSize() < 2) return false;
 
@@ -879,7 +879,7 @@ class BtreeStuck extends Test                                                   
     Node p = root;                                                              // Start at root
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
      {z();
-      for (int j = 0, n = p.branchSize(); j < n; j++)                           // Try merging each sibling pair
+      for (int j = 0; j < p.branchSize(); j++)                                  // Try merging each sibling pair
        {z();
         p.mergeLeftSibling (j);
         p.mergeRightSibling(j);
