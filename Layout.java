@@ -22,13 +22,6 @@ public class Layout extends Test                                                
     top.indexNames();                                                           // Index the names of the fields
    }
 
-  void layout(String name, Field...fields)                                      // Create a new Layout loaded from an implied structure of fields
-   {z();
-    top = new Structure(name, fields);                                          // Create a structure to hold the named  outermost fields
-    top.layout(0, 0);                                                           // Locate field positions
-    top.indexNames();                                                           // Index the names of the fields
-   }
-
   int size() {z(); return top == null ? 0 : top.width;}                         // Size of memory
   void ok(String expected) {Test.ok(top.toString(), expected);}                 // Confirm layout is as expected
 
@@ -79,7 +72,7 @@ public class Layout extends Test                                                
    }
 
   Location location(String Name, int...Indices)                                 // The location in memory of a field after array indices have been applied
-   {return new Location(Name, Indices);
+   {z(); return new Location(Name, Indices);
    }
 
 //D1 Layouts                                                                    // Field memory of the chip as variables, arrays, structures, unions. Dividing the memory in this manner makes it easier to program the chip symbolically.
@@ -100,12 +93,13 @@ public class Layout extends Test                                                
       fields.push(this);
      }
 
-    int at   () {return at;}                                                    // Position of field in memory
-    int width() {return width;}                                                 // Size of the memory in bits occupied by this field
+    int at   () {z(); return at;}                                               // Position of field in memory
+    int width() {z(); return width;}                                            // Size of the memory in bits occupied by this field
 
     void fullName(Layout.Field top, StringBuilder s)                            // The full name of a field relative to the indicated top
      {z();
       if (top == this) return;
+      z();
       final Stack<String> names = new Stack<>();                                // Full name path
       for(Layout.Field f = this; f.up != null; f = f.up)                        // Go up structure
        {z();
@@ -113,9 +107,10 @@ public class Layout extends Test                                                
         if (f.up == top) break;
        }
       if (names.size() == 0) return;                                            // Zero length path to element
+      z();
       final String        t = names.pop();
       s.append("     ");
-      for(String n : names) s.append(n+".");
+      for(String n : names) {z(); s.append(n+".");}
       s.append(t);
      }
 
@@ -240,7 +235,7 @@ public class Layout extends Test                                                
       final int     w = width;                                                  // Bits occupied by the array
       final int     z = size;                                                   // Number of elements in array
       final int     p = at;                                                     // Position of the array element
-      s.append(String.format("%c %4d  %4d  %4d    %16s\n",                     // Index of the array
+      s.append(String.format("%c %4d  %4d  %4d    %16s\n",                      // Index of the array
                                c,  p,   w,  z,   n));
       element.print(top, s);                                                    // Print the array element without headers
      }
@@ -261,11 +256,11 @@ public class Layout extends Test                                                
     void addField(Field field)                                                  // Add additional fields
      {z();
       field.up = this;                                                          // Chain up to containing structure
-if (debug) say("SSSS", name, number, field.name, field.number);
       if (subMap.containsKey(field.name))
        {stop("Structure:", name, "already contains field with this name:",
              field.name);
        }
+      z();
       subMap.put   (field.name, field);                                         // Add as a field by name to this structure
       subStack.push(field);                                                     // Add as a field in order to this structure
      }
@@ -276,7 +271,8 @@ if (debug) say("SSSS", name, number, field.name, field.number);
       width = 0;
       depth = Depth;
       for(Field v : subStack)                                                   // Field sub structure
-       {v.at = at+width;
+       {z();
+        v.at = at+width;
         v.layout(v.at, Depth+1);
         width += v.width;
        }
@@ -286,7 +282,7 @@ if (debug) say("SSSS", name, number, field.name, field.number);
      {z();
       indexName();
       for (Field f : subStack)                                                  // Each field in the structure
-       {f.indexNames();                                                         // Index name in outermost layout
+       {z(); f.indexNames();                                                    // Index name in outermost layout
        }
      }
 
@@ -310,7 +306,6 @@ if (debug) say("SSSS", name, number, field.name, field.number);
       depth = Depth;
       for(Field v : subMap.values())                                            // Find largest substructure
        {z();
-
         v.at = at;                                                              // Substructures are laid out on top of each other
         v.layout(v.at, Depth+1);
         width = max(width, v.width);                                            // Space occupied is determined by largest field of union
@@ -336,7 +331,7 @@ if (debug) say("SSSS", name, number, field.name, field.number);
    {z();
     final Field[]fields = new Field[f.length];
     for (int i = 0; i < f.length; i++)
-     {fields[i] = l.fields.elementAt(f[i].number);
+     {z(); fields[i] = l.fields.elementAt(f[i].number);
      }
     return fields;
    }
@@ -368,7 +363,7 @@ if (debug) say("SSSS", name, number, field.name, field.number);
 //  fields.pop();                                                               // Remove the duplicated field from the list of fields
     for(Field lf: l.fields) fields.push(lf);                                     // Add all the duplicated fields in the correct order
     for (int i = 0; i < fields.size(); i++)
-     {fields.elementAt(i).number = i;
+     {z(); fields.elementAt(i).number = i;
      }
     return f;                                                                   // Resulting field
    }
@@ -466,6 +461,8 @@ Location(name:B.S.A.s.c at:216 width:4)
     ok(a.sameSize(b), 2);
     s.toStructure();
     A.toArray();
+    ok(b.at(),    6);
+    ok(b.width(), 2);
 
     Layout L = l.duplicate();
     ok(l, L);
@@ -543,12 +540,53 @@ Location(name:s.c at:6 width:4)
 """);
    }
 
+  static void test_duplicate_array()
+   {Layout    l = new Layout();
+    Variable  a = l.variable ("a", 2);
+    Array     A = l.array    ("A", a, 8);
+    l.compile();
+    //stop(l);
+    l.ok("""
+T   At  Wide  Size    Name                   Path
+A    0    16     8    A
+V    0     2            a                    a
+""");
+
+    Layout    L = new Layout();
+    Variable  X = L.variable ("X", 2);
+    Field     Y = L.duplicate(l);
+    Variable  Z = L.variable ("Y", 4);
+    Structure S = L.structure("S", X, Y, Z);
+    L.compile();
+
+    //stop(L);
+    L.ok("""
+T   At  Wide  Size    Name                   Path
+S    0    22          S
+V    0     2            X                    X
+A    2    16     8      A                    A
+V    2     2              a                    A.a
+V   18     4            Y                    Y
+""");
+
+    Location a0 = L.location("A.a", 0);
+    ok(a0, """
+Location(name:A.a at:2 width:2)
+""");
+
+    Location a1 = L.location("A.a", 1);
+    ok(a1, """
+Location(name:A.a at:4 width:2)
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_layout();
     test_array();
     test_arrays();
     test_union();
     test_duplicate();
+    test_duplicate_array();
    }
 
   static void newTests()                                                        // Tests being worked on
@@ -558,7 +596,7 @@ Location(name:s.c at:6 width:4)
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      if (github_actions)                                                       // Coverage analysis
+      //if (github_actions)                                                       // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
