@@ -11,6 +11,7 @@ import java.util.*;
 public class Layout extends Test                                                // A Memory layout for a chip. There might be several such layouts representing parts of the chip.
  {Field top;                                                                    // The top most field in a set of nested fields describing memory.
   final Stack<Field> fields = new Stack<>();                                    // Field creation sequence to enable efficient duplication of a layout
+  static boolean debug = false;                                                 // Debugging when true
 
   static Layout layout() {return new Layout();}                                 // Create a new Layout that can be loaded field by field
 
@@ -66,6 +67,7 @@ public class Layout extends Test                                                
           else stop("Too few indices");
          }
        }
+      if (i != 0) stop("Too many indices, excess:", i);
       at = a; width = field.width;
      }
 
@@ -83,19 +85,18 @@ public class Layout extends Test                                                
 //D1 Layouts                                                                    // Field memory of the chip as variables, arrays, structures, unions. Dividing the memory in this manner makes it easier to program the chip symbolically.
 
   abstract class Field                                                          // Variable/Array/Structure/Union definition.
-   {final String  name;                                                         // Name of field
-    final  int  number;                                                         // Number of field
-    static int numbers = 0;                                                     // Numbers of fields
-    String    fullName;                                                         // Full name of this field
-    int at;                                                                     // Offset of field from start of memory
-    int width;                                                                  // Number of bits in a field
-    int depth;                                                                  // Depth of field - the number of containing arrays/structures/unions above
-    Field up;                                                                   // Upward chain to containing array/structure/union
+   {final String                 name;                                          // Name of field
+    int                        number;                                          // Number of field
+    String                   fullName;                                          // Full name of this field
+    int                            at;                                          // Offset of field from start of memory
+    int                         width;                                          // Number of bits in a field
+    int                         depth;                                          // Depth of field - the number of containing arrays/structures/unions above
+    Field                          up;                                          // Upward chain to containing array/structure/union
     final Map<String,Field> fullNames = new TreeMap<>();                        // Fields by name
     final Set<String>  classification = new TreeSet<>();                        // Names that identify the type of the field to aid debugging
 
     Field(String Name)                                                          // Create a new named field with a unique number
-     {z(); name = Name; number = ++numbers;
+     {z(); name = Name; number = fields.size();
       fields.push(this);
      }
 
@@ -134,9 +135,6 @@ public class Layout extends Test                                                
 
     Field get(String path) {return fullNames.get(path);}                        // Address a contained field by name
     abstract void indexNames();                                                 // Set the full names of all the sub fields in a field
-
-    public Layout.Field asField () {return this;}                               // Layout associated with this field
-    public Layout       asLayout() {return Layout.this;}                        // Layout associated with this field
 
     int sameSize(Field b)                                                       // Check the specified field is the same size as this field
      {z();
@@ -260,10 +258,10 @@ public class Layout extends Test                                                
       for (int i = 0; i < Fields.length; ++i) addField(Fields[i]);              // Each field supplied
      }
 
-    void addField(Field layout)                                                 // Add additional fields
+    void addField(Field field)                                                  // Add additional fields
      {z();
-      final Field field = layout.asField();                                     // Field associated with this layout
       field.up = this;                                                          // Chain up to containing structure
+if (debug) say("SSSS", name, number, field.name, field.number);
       if (subMap.containsKey(field.name))
        {stop("Structure:", name, "already contains field with this name:",
              field.name);
@@ -327,19 +325,52 @@ public class Layout extends Test                                                
   Structure structure(String n, Field...m)        {return new Structure(n, m);}
   Union     union    (String n, Field...m)        {return new Union    (n, m);}
 
-//D1 Duplication                                                                // Duplicate a layout
+//D1 Duplication                                                                // Duplicate a layout so that ot can be integrated into other layouts
+
+  Field locateField(Layout l, Field f)                                          // Locate the field in the specified layout that corresponds to the specified field in this layout
+   {z();
+    return l.fields.elementAt(f.number);
+   }
+
+  Field[]locateFields(Layout l, Field[]f)                                       // Locate the fields in the specified layout that corresponds to the specified fields in this layout
+   {z();
+    final Field[]fields = new Field[f.length];
+    for (int i = 0; i < f.length; i++)
+     {fields[i] = l.fields.elementAt(f[i].number);
+     }
+    return fields;
+   }
 
   Layout duplicate()                                                            // Duplicate this layout
-   {Layout l = layout();
+   {z();
+    Layout l = layout();                                                        // Start the layout
+
     for(Field f: fields)
-     {if (f instanceof Bit)       {Bit        b = f.toBit();       l.bit      (b.name);}
-      if (f instanceof Variable)  {Variable   v = f.toVariable();  l.variable (v.name, v.width);}
-      if (f instanceof Array)     {Array      a = f.toArray();     l.array    (a.name, a.element, a.size);}
-      if (f instanceof Structure) {Structure  s = f.toStructure(); l.structure(s.name, s.fields);}
-      if (f instanceof Union)     {Union      u = f.toUnion();     l.union    (u.name, u.fields);}
+     {z();
+      final Field F = switch (f)
+       {case Bit        b -> l.bit      (b.name);
+        case Variable   v -> l.variable (v.name, v.width);
+        case Array      a -> l.array    (a.name, locateField (l, a.element), a.size);
+        case Union      u -> l.union    (u.name, locateFields(l, u.fields));
+        case Structure  s -> l.structure(s.name, locateFields(l, s.fields));
+        default -> null;
+       };
      }
     l.compile();
     return l;
+   }
+
+  Field duplicate(Layout L)                                                     // Duplicate the specified layout inside this layout
+   {z();
+    final Layout l = L.duplicate();
+    final Field  f = l.top;
+
+//  fields.pop();                                                               // Remove the duplicated field from the list of fields
+    for(Field lf: l.fields) fields.push(lf);                                     // Add all the duplicated fields in the correct order
+    for (int i = 0; i < fields.size(); i++)
+     {fields.elementAt(i).number = i;
+     }
+    return f;                                                                   // Resulting field
    }
 
 //D0                                                                            // Tests.
@@ -460,16 +491,68 @@ B    0     1            b                    b
     u.toUnion();
    }
 
+  static void test_duplicate()
+   {Layout    l = new Layout();
+    Variable  a = l.variable ("a", 2);
+    Variable  b = l.variable ("b", 2);
+    Variable  c = l.variable ("c", 4);
+    Structure s = l.structure("s", a, b, c);
+    l.compile();
+    //stop(l);
+
+    Layout    L = new Layout();
+    Variable  A = L.variable ("A", 2);
+    Field     B = L.duplicate(l);
+    Variable  C = L.variable ("C", 4);
+    Structure S = L.structure("S", A, B, C);
+    L.compile();
+
+    //stop(L);
+    L.ok("""
+T   At  Wide  Size    Name                   Path
+S    0    14          S
+V    0     2            A                    A
+S    2     8            s                    s
+V    2     2              a                    s.a
+V    4     2              b                    s.b
+V    6     4              c                    s.c
+V   10     4            C                    C
+""");
+
+    Layout  M = L.duplicate();
+    //stop(M);
+    ok(L, M);
+
+    Layout  N = M.duplicate();
+    //stop(N);
+    ok(L, N);
+
+    Location La = L.location("s.a");
+    ok(La, """
+Location(name:s.a at:2 width:2)
+""");
+
+    Location Lb = L.location("s.b");
+    ok(Lb, """
+Location(name:s.b at:4 width:2)
+""");
+
+    Location Lc = L.location("s.c");
+    ok(Lc, """
+Location(name:s.c at:6 width:4)
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_layout();
     test_array();
     test_arrays();
     test_union();
+    test_duplicate();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_array();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
