@@ -50,6 +50,17 @@ public class Test                                                               
   static String   ones(int n) {return "1".repeat(n);}                           // A string of ones
   static String zeroes(int n) {return "0".repeat(n);}                           // A string of zeroes
 
+  static int longestLine(String s)                                              // Longest line  in a string
+   {int l = 0, i = 0, j = 0;
+    for (; i < s.length(); i++, j++)
+     {if (s.charAt(i) == '\n')
+       {l = max(l, j);
+        j = 0;
+       }
+     }
+    return max(l, j);
+   }
+
 //D2 Numeric routines                                                           // Numeric routines
 
   static int max(int n, int...rest)                                             // Maximum of some numbers
@@ -517,7 +528,7 @@ public class Test                                                               
     ok(max(1d, 2d, 3d), 3d);
    }
 
-  static void test_string()
+  static void test_string()                                                     // Confirm an error message
    {String e = """
 AAAAA
 BBBBB
@@ -542,9 +553,19 @@ CCCCC
     ok(e, g); --testsFailed;
    }
 
+  static void test_longest_line()
+   {ok(longestLine(""),      0);
+    ok(longestLine("A"),     1);
+    ok(longestLine("\n"),    1);
+    ok(longestLine("\n\n"),  1);
+    ok(longestLine("\nA\n"), 2);
+    ok(longestLine("A\nBBB\nCC\n"), 4);
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_max_min();
     test_string();
+    test_longest_line();
    }
 
   static void newTests()                                                        // Tests being worked on
