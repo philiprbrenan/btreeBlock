@@ -881,7 +881,7 @@ class BtreeStuck extends Test                                                   
      {z();
       for (int j = 0, n = p.branchSize(); j < n; j++)                           // Try merging each sibling pair
        {z();
-        //p.mergeLeftSibling (j);
+        p.mergeLeftSibling (j);
         p.mergeRightSibling(j);
        }
       if (p.isLeaf) return;
