@@ -165,7 +165,7 @@ public class Layout extends Test                                                
      {final String  n = printName(top);                                         // Name using indentation to show depth
       final char    c = fieldType();                                            // First letter of inner most class name to identify type of field
 
-      s.append(String.format("%c %4d  %4d          %-16s\n",                        // Variable
+      s.append(String.format("%c %4d  %4d          %-16s\n",                    // Variable
                              c,  at,  width,   n));
      }
 
