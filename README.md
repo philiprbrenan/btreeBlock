@@ -4,7 +4,8 @@
 
 # Btree in a block
 
-A [B-Tree](https://en.wikipedia.org/wiki/B-tree) in a block. For reasons why you might want to get involved in this project to put a Btree on a [Silicon](https://en.wikipedia.org/wiki/Silicon) [chip](https://en.wikipedia.org/wiki/Integrated_circuit), see:
+A [B-Tree](https://en.wikipedia.org/wiki/B-tree) in a block. For reasons why you might want to get involved in this
+project to put a [B-Tree](https://en.wikipedia.org/wiki/B-tree) in a block on a [Silicon](https://en.wikipedia.org/wiki/Silicon) [chip](https://en.wikipedia.org/wiki/Integrated_circuit), see:
 
 http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html
 
