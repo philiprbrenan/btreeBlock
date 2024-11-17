@@ -19,10 +19,12 @@ abstract class StuckStatic extends Test                                         
   final ElementAt ElementAt3 = new ElementAt();                                 // An element at
   final RemoveElementAt RemoveElementAt1 = new RemoveElementAt();               // Remove an element
   final RemoveElementAt RemoveElementAt2 = new RemoveElementAt();               // Remove an element
-  final FirstElement    FirstElement1    = new FirstElement();                  // First element
-  final FirstElement    FirstElement2    = new FirstElement();                  // First element
-  final LastElement      LastElement1    = new LastElement();                   // First element
-  final LastElement      LastElement2    = new LastElement();                   // First element
+  final FirstElement       FirstElement1 = new FirstElement();                  // First element
+  final FirstElement       FirstElement2 = new FirstElement();                  // First element
+  final LastElement         LastElement1 = new LastElement();                   // Last element
+  final LastElement         LastElement2 = new LastElement();                   // Last element
+  final Search                   Search1 = new Search();                        // Search element
+  final Search                   Search2 = new Search();                        // Search element
 
 //D1 Construction                                                               // Create a stuck
 
@@ -291,9 +293,9 @@ abstract class StuckStatic extends Test                                         
   FirstElement firstElement2() {return FirstElement2.firstElement();}           // First element
 
   class LastElement                                                             // Last element
-   {boolean found;                                                        // Whether there was a last element
-    int key;                                                              // The shifted key
-    int data;                                                             // The shifted data
+   {boolean found;                                                              // Whether there was a last element
+    int key;                                                                    // The shifted key
+    int data;                                                                   // The shifted data
     LastElement lastElement()
      {z();
       found = !isEmpty();
@@ -326,13 +328,16 @@ abstract class StuckStatic extends Test                                         
    }
 
   class Search extends Limit                                                    // Search for an element within all elements of the stuck
-   {final int key;                                                              // Search key
-    final boolean found;                                                        // Whether the key was found
-    final int index ;                                                           // Index of the located key if any
-    final int data;                                                             // Located data if key was found
+   {int key;                                                                    // Search key
+    boolean found;                                                              // Whether the key was found
+    int index ;                                                                 // Index of the located key if any
+    int data;                                                                   // Located data if key was found
     String name() {return "Search";}                                            // Name of the search
 
-    Search(int Search)                                                          // Search for an element within all elements of the stuck
+    Search()           {}                                                       // Search for an element within all elements of the stuck
+    Search(int Search) {search(Search);}                                        // Search for an element within all elements of the stuck
+
+    Search search(int Search)                                                   // Search for an element within all elements of the stuck
      {z();
       boolean looking = true;
       key = Search;
@@ -350,6 +355,7 @@ abstract class StuckStatic extends Test                                         
       else                                                                      // Found a greater than or equal key in the stuck
        {z(); found = true;  index = i; data = data(i);
        }
+      return this;
      }
     public String toString()                                                    // Print
      {z();
@@ -365,7 +371,8 @@ abstract class StuckStatic extends Test                                         
       return s.toString();
      }
    }
-  Search search(int Search) {return new Search(Search);}                        // Search for a key ignoring the last element on the stuck
+  Search search1(int Search) {return Search1.search(Search);}                   // Search for a key ignoring the last element on the stuck
+  Search search2(int Search) {return Search2.search(Search);}                        // Search for a key ignoring the last element on the stuck
 
   class SearchExceptLast extends Search                                         // Search for an element ignoring the last element on the stuck
    {SearchExceptLast(int Search) {super(Search);}
@@ -602,13 +609,13 @@ StuckStatic(maxSize:8 size:4)
   3 key:8 data:4
 """);
 
-    Search s = t.search(2);
+    Search s = t.search1(2);
     //stop(s);
     ok(s, """
 Search(Search:2 found:true index:0 data:1)
 """);
 
-    Search S = t.search(3);
+    Search S = t.search2(3);
     //stop(S);
     ok(S, """
 Search(Search:3 found:false)
