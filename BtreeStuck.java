@@ -52,8 +52,11 @@ class BtreeStuck extends Test                                                   
    {boolean isLeaf;                                                             // A leaf if true
     final  int node = nodeCount++;
 
-    final Stuck keyData = new Stuck(maxKeysPerLeaf);                            // Key, data pairs when a leaf
-    final Stuck keyNext = new Stuck(maxKeysPerBranch+1);                        // Key, next pairs when a branch. The last entry is top and so this stack must always have at least one element in it when the node is acting as a branch
+    class KeyStuck  extends Stuck {int maxSize() {return maxKeysPerLeaf;}};     // Key, data pairs when a leaf
+    class NextStuck extends Stuck {int maxSize() {return maxKeysPerBranch+1;}}; // Key, next pairs when a branch. The last entry is top and so this stack must always have at least one element in it when the node is acting as a branch
+
+    final Stuck keyData = new KeyStuck();                                       // Key, data pairs when a leaf
+    final Stuck keyNext = new NextStuck();                                      // Key, next pairs when a branch. The last entry is top and so this stack must always have at least one element in it when the node is acting as a branch
 
     void assertLeaf()   {if (!isLeaf) stop("Leaf required");}
     void assertBranch() {if ( isLeaf) stop("Branch required");}
