@@ -9,7 +9,10 @@ abstract class StuckStatic extends Test                                         
   final int[]Keys;                                                              // The keys on the stuck
   final int[]Data;                                                              // The data on the stuck
   int currentSize;                                                              // The current size of the stuck
-  final Pop Pop = new Pop();                                                    // A popped element
+  final Pop   Pop    = new Pop();                                               // A popped element
+  final Shift Shift1 = new Shift();                                             // A shifted element
+  final Shift Shift2 = new Shift();                                             // A shifted element
+  final Shift Shift3 = new Shift();                                             // A shifted element
 
 //D1 Construction                                                               // Create a stuck
 
@@ -143,9 +146,9 @@ abstract class StuckStatic extends Test                                         
   Pop pop() {return Pop.pop();}
 
   class Shift                                                                   // Shift a key, data pair from the stuck
-   {final int key;                                                              // The shifted key
-    final int data;                                                             // The shifted data
-    Shift()
+   {int key;                                                                    // The shifted key
+    int data;                                                                   // The shifted data
+    Shift shift()
      {z();
       assertNotEmpty();
       key   = key (0);
@@ -156,6 +159,7 @@ abstract class StuckStatic extends Test                                         
         copyKeyData(i, i+1);
        }
       dec();
+      return this;
      }
     public String toString()                                                    // Print
      {final StringBuilder s = new StringBuilder();
@@ -165,7 +169,9 @@ abstract class StuckStatic extends Test                                         
       return s.toString();
      }
    }
-  Shift shift() {z(); return new Shift();}
+  Shift shift1() {z(); return Shift1.shift();}
+  Shift shift2() {z(); return Shift2.shift();}
+  Shift shift3() {z(); return Shift3.shift();}
 
   class ElementAt                                                               // Gte the indexed element
    {final int index;                                                            // The index from which the key, data pair were retrieved
@@ -464,7 +470,7 @@ StuckStatic(maxSize:8 size:3)
 
   static void test_shift()
    {StuckStatic t = test_load();
-    Shift s = t.shift();
+    Shift s = t.shift1();
     //stop(s);
     ok(s, """
 Shift(key:2 data:1)
