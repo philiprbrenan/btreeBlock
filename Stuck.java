@@ -45,7 +45,7 @@ abstract class Stuck extends Test                                               
       int i = 1, j = limit();
       for (;i < j && looking; i++)                                              // Check each key
        {z();
-        if (Keys[i-1] > Keys[i])
+        if (key(i-1) > key(i))
          {looking = false;
            break;
          }
@@ -74,6 +74,25 @@ abstract class Stuck extends Test                                               
    }
   CheckOrderExceptLast checkOrderExceptLast() {z(); return new CheckOrderExceptLast();}
 
+//D1 Memory                                                                     // Actions on memory of stuck
+
+  int  key     (int Index)              {return Keys[Index];}
+  int  data    (int Index)              {return Data[Index];}
+  void setKey  (int Index,  int Value)  {       Keys[Index] = Value;}
+  void setData (int Index,  int Value)  {       Data[Index] = Value;}
+  void copyKey (int Source, int Target) {setKey (Target, key (Source));}
+  void copyData(int Source, int Target) {setData(Target, data(Source));}
+
+  void  setKeyData(int Index, int Key, int Data)
+   {setKey (Index, Key);
+    setData(Index, Data);
+   }
+
+  void copyKeyData(int Source, int Target)
+   {copyKey (Target, Source);
+    copyData(Target, Source);
+   }
+
 //D1 Actions                                                                    // Place and remove data to/from stuck
 
   void inc  () {z(); assertNotFull (); currentSize++;}                          // Increment the current size
@@ -82,9 +101,8 @@ abstract class Stuck extends Test                                               
 
   void push(int key, int data)                                                  // Push an element onto the stuck
    {z();
-      assertNotFull();
-    Keys[currentSize] = key;
-    Data[currentSize] = data;
+    assertNotFull();
+    setKeyData(currentSize, key, data);
     inc();
    }
 
@@ -93,11 +111,9 @@ abstract class Stuck extends Test                                               
     assertNotFull();
     for (int i = size(); i > 0; --i)                                            // Shift the stuck up one place
      {z();
-      Keys[i] = Keys[i-1];
-      Data[i] = Data[i-1];
+      copyKeyData(i, i-1);
      }
-    Keys[0] = key;
-    Data[0] = data;
+    setKeyData(0, key, data);
     inc();
    }
 
@@ -110,8 +126,8 @@ abstract class Stuck extends Test                                               
       assertNotEmpty();
       dec();
       index = size();
-      key  = Keys[index];
-      data = Data[index];
+      key   = key (index);
+      data  = data(index);
      }
     public String toString()                                                    // Print
      {final StringBuilder s = new StringBuilder();
@@ -130,13 +146,12 @@ abstract class Stuck extends Test                                               
     Shift()
      {z();
       assertNotEmpty();
-      key  = Keys[0];
-      data = Data[0];
+      key   = key (0);
+      data  = data(0);
 
       for (int i = 0, j = size()-1; i < j; i++)                                 // Shift the stuck down one place
        {z();
-      Keys[i] = Keys[i+1];
-        Data[i] = Data[i+1];
+        copyKeyData(i, i+1);
        }
       dec();
      }
@@ -158,8 +173,8 @@ abstract class Stuck extends Test                                               
      {z();
       index = Index;
       assertInNormal(index);
-      key  = Keys[index];
-      data = Data[index];
+      key   = key (index);
+      data  = data(index);
      }
     public String toString()                                                    // Print
      {z();
@@ -176,15 +191,13 @@ abstract class Stuck extends Test                                               
   void setElementAt(int key, int data, int Index)                               // Set an element either in range or one above the current range
    {if (Index == size())                                                        // Extended range
      {z();
-      Keys[Index] = key;
-      Data[Index] = data;
+      setKeyData(Index, key, data);
       inc();
      }
     else                                                                        // In range
      {z();
       assertInNormal(Index);
-      Keys[Index] = key;
-      Data[Index] = data;
+      setKeyData(Index, key, data);
       }
    }
 
@@ -193,11 +206,9 @@ abstract class Stuck extends Test                                               
     assertInExtended(Index);
     for (int i = size(); i > Index; --i)                                        // Shift the stuck up one place
      {z();
-      Keys[i] = Keys[i-1];
-      Data[i] = Data[i-1];
+      copyKeyData(i, i-1);
      }
-    Keys[Index] = key;
-    Data[Index] = data;
+    setKeyData(Index, key, data);
     inc();
    }
 
@@ -209,12 +220,11 @@ abstract class Stuck extends Test                                               
      {z();
       index = Index;
       assertInNormal(index);
-      key  = Keys[index];
-      data = Data[index];
+      key  = key (index);
+      data = data(index);
       for (int i = index, j = size()-1; i < j; i++)                             // Shift the stuck down one place
        {z();
-        Keys[i] = Keys[i+1];
-        Data[i] = Data[i+1];
+        copyKeyData(i, i+1);
        }
       dec();
      }
@@ -239,8 +249,8 @@ abstract class Stuck extends Test                                               
       found = !isEmpty();
       if (found)
        {z();
-        key  = Keys[0];
-        data = Data[0];
+        key  = key (0);
+        data = data(0);
        }
       else {z(); key = data = 0;}
      }
@@ -265,8 +275,8 @@ abstract class Stuck extends Test                                               
       final int s = size()-1;
       if (found)
        {z();
-        key  = Keys[s];
-        data = Data[s];
+        key  = key (s);
+        data = data(s);
        }
       else {z(); key = data = 0;}
      }
@@ -302,7 +312,7 @@ abstract class Stuck extends Test                                               
       int i = 0, j = limit();
       for (; i < j && looking; i++)                                             // Search
        {z();
-        if (Keys[i] == key)
+        if (key(i) == key)
          {z();
           looking = false; break;
          }
@@ -311,7 +321,7 @@ abstract class Stuck extends Test                                               
        {z(); found = false; index = 0; data = 0;
        }
       else                                                                      // Found a greater than or equal key in the stuck
-       {z(); found = true;  index = i; data = Data[i];
+       {z(); found = true;  index = i; data = data(i);
        }
      }
     public String toString()                                                    // Print
@@ -352,7 +362,7 @@ abstract class Stuck extends Test                                               
       int i = 0, j = limit();
       for (; i < j && looking; i++)                                             // Search
        {z();
-        if (Keys[i] >= search)                                                  // Search key is equal or greater to the current key
+        if (key(i) >= search)                                                  // Search key is equal or greater to the current key
          {z(); looking = false; break;
          }
        }
@@ -360,7 +370,7 @@ abstract class Stuck extends Test                                               
        {z(); found = false; index = limit(); key = 0;       data = 0;
        }
       else                                                                      // Found a greater than or equal key in the stuck excluding the last key
-       {z(); found = true;  index = i; key = Keys[i]; data = Data[i];
+       {z(); found = true;  index = i; key = key(i); data = data(i);
        }
      }
     public String toString()                                                    // Print
@@ -402,7 +412,7 @@ abstract class Stuck extends Test                                               
     s.append("Stuck(maxSize:"+maxSize());
     s.append(" size:"+size()+")\n");
     for (int i = 0, j = size(); i < j; i++)                                     // Search
-     {z(); s.append("  "+i+" key:"+Keys[i]+" data:"+Data[i]+"\n");
+     {z(); s.append("  "+i+" key:"+key(i)+" data:"+data(i)+"\n");
      }
     return s.toString();
    }
