@@ -270,7 +270,7 @@ class BtreeStuckStatic extends Test                                             
         r.keyData.push(f.key, f.data);
        }
 
-      final int first = r.keyData.firstElement().key;                           // First of right leaf
+      final int first = r.keyData.firstElement1().key;                          // First of right leaf
       final int last  = l.keyData. lastElement().key;                           // Last of left leaf
       final int kv = (last + first) / 2;                                        // Insert left leaf into root
       keyNext.push(kv, l.node);                                                 // Insert left leaf into root
@@ -322,11 +322,11 @@ class BtreeStuckStatic extends Test                                             
 
       for (int i = 0; i < splitLeafSize; i++)                                   // Build left leaf
        {z();
-        final StuckStatic.FirstElement f = r.keyData.firstElement();
+        final StuckStatic.FirstElement f = r.keyData.firstElement1();
         l.keyData.push(f.key, f.data);
         r.keyData.shift1();
        }
-      final int F = r.keyData.firstElement().key;
+      final int F = r.keyData.firstElement1().key;
       final int L = l.keyData.lastElement().key;
       final int splitKey = (F + L) / 2;
 
@@ -347,12 +347,12 @@ class BtreeStuckStatic extends Test                                             
 
       for (int i = 0; i < splitBranchSize; i++)                                 // Build left branch
        {z();
-        final StuckStatic.FirstElement f = r.keyNext.firstElement();
+        final StuckStatic.FirstElement f = r.keyNext.firstElement1();
         l.keyNext.push(f.key, f.data);
         r.keyNext.shift1();
        }
 
-      final StuckStatic.FirstElement split = r.keyNext.firstElement();          // Build right branch
+      final StuckStatic.FirstElement split = r.keyNext.firstElement1();          // Build right branch
       r.keyNext.shift1();
       l     .keyNext.push(0, split.data);                                       // Becomes top and so is iognored by search ... except last
       parent.keyNext.insertElementAt(split.key, l.node, index);
@@ -363,7 +363,7 @@ class BtreeStuckStatic extends Test                                             
       if (root.isLeaf || branchSize() > 1) return false;
       if (node != 0) stop("Expected root, got:", node);
       final Node p = this;
-      final Node l = nodes.elementAt(keyNext.firstElement().data);
+      final Node l = nodes.elementAt(keyNext.firstElement1().data);
       final Node r = nodes.elementAt(keyNext. lastElement().data);
 
       if (p.hasLeavesForChildren())                                             // Leaves
@@ -389,7 +389,7 @@ class BtreeStuckStatic extends Test                                             
        }
       else if (l.branchSize() + 1 + r.branchSize() <= maxKeysPerBranch)         // Branches
        {z();
-        final StuckStatic.FirstElement pkn = p.keyNext.firstElement();
+        final StuckStatic.FirstElement pkn = p.keyNext.firstElement1();
         p.keyNext.clear();
         final int nl = l.branchSize();
         for (int i = 0; i < nl; ++i)
@@ -465,7 +465,7 @@ class BtreeStuckStatic extends Test                                             
         final StuckStatic.LastElement  t = l.lastElement();                     // Increase right with left top
         r.insertElementAt(p.elementAt1(index).key, t.data, 0);                  // Increase right with left top
         l.pop();                                                                // Remove left top
-        final StuckStatic.FirstElement b = r.firstElement();                    // Increase right with left top
+        final StuckStatic.FirstElement b = r.firstElement1();                   // Increase right with left top
         r.setElementAt(p.elementAt1(index-1).key, b.data, 0);                   // Reduce key of parent of left
         p.setElementAt(l.lastElement().key,      L.data, index-1);              // Reduce key of parent of left
        }
@@ -491,8 +491,8 @@ class BtreeStuckStatic extends Test                                             
         if (nl >= maxKeysPerLeaf) return false;                                 // Steal not possible because there is no where to put the steal
         if (nr <= 1) return false;                                              // Steal not allowed because it would leave the right sibling empty
 
-        final int k = r.firstElement().key;
-        l.push        (k, r.firstElement().data);                               // Increase left
+        final int k = r.firstElement1().key;
+        l.push        (k, r.firstElement1().data);                              // Increase left
         p.setElementAt(k, L.data, index);                                       // Swap key of parent
         r.removeElementAt1(0);                                                  // Reduce right
        }
@@ -507,8 +507,8 @@ class BtreeStuckStatic extends Test                                             
         if (nr <= 1) return false;                                              // Steal not allowed because it would leave the right sibling empty
 
         l.setElementAt(L.key, l.lastElement().data, nl);                        // Left top becomes real
-        l.push        (0, r.firstElement().data);                               // New top for left is ignored by search ,.. except last
-        p.setElementAt(r.firstElement().key, L.data, index);                    // Swap key of parent
+        l.push        (0, r.firstElement1().data);                              // New top for left is ignored by search ,.. except last
+        p.setElementAt(r.firstElement1().key, L.data, index);                   // Swap key of parent
         r.removeElementAt1(0);                                                  // Reduce right
        }
       return true;
