@@ -21,6 +21,8 @@ abstract class StuckStatic extends Test                                         
   final RemoveElementAt RemoveElementAt2 = new RemoveElementAt();               // Remove an element
   final FirstElement    FirstElement1    = new FirstElement();                  // First element
   final FirstElement    FirstElement2    = new FirstElement();                  // First element
+  final LastElement      LastElement1    = new LastElement();                   // First element
+  final LastElement      LastElement2    = new LastElement();                   // First element
 
 //D1 Construction                                                               // Create a stuck
 
@@ -289,10 +291,10 @@ abstract class StuckStatic extends Test                                         
   FirstElement firstElement2() {return FirstElement2.firstElement();}           // First element
 
   class LastElement                                                             // Last element
-   {final boolean found;                                                        // Whether there was a last element
-    final int key;                                                              // The shifted key
-    final int data;                                                             // The shifted data
-    LastElement()
+   {boolean found;                                                        // Whether there was a last element
+    int key;                                                              // The shifted key
+    int data;                                                             // The shifted data
+    LastElement lastElement()
      {z();
       found = !isEmpty();
       final int s = size()-1;
@@ -302,6 +304,7 @@ abstract class StuckStatic extends Test                                         
         data = data(s);
        }
       else {z(); key = data = 0;}
+      return this;
      }
     public String toString()                                                    // Print
      {final StringBuilder s = new StringBuilder();
@@ -312,7 +315,8 @@ abstract class StuckStatic extends Test                                         
       return s.toString();
      }
    }
-  LastElement lastElement() {z(); return new LastElement();}                    // Last element
+  LastElement lastElement1() {return LastElement1.lastElement();}               // Last element
+  LastElement lastElement2() {return LastElement2.lastElement();}               // Last element
 
 //D1 Search                                                                     // Search a stuck.
 
@@ -569,7 +573,7 @@ StuckStatic(maxSize:8 size:3)
     ok(f, """
 FirstElement(found:true key:2 data:1)
 """);
-    LastElement l = t.lastElement();
+    LastElement l = t.lastElement1();
     //stop(l);
     ok(l, """
 LastElement(found:true key:8 data:4)
@@ -581,7 +585,7 @@ LastElement(found:true key:8 data:4)
     ok(F, """
 FirstElement(found:false key:0 data:0)
 """);
-    LastElement L = t.lastElement();
+    LastElement L = t.lastElement2();
     //stop(L);
     ok(L, """
 LastElement(found:false key:0 data:0)
