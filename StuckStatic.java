@@ -9,10 +9,16 @@ abstract class StuckStatic extends Test                                         
   final int[]Keys;                                                              // The keys on the stuck
   final int[]Data;                                                              // The data on the stuck
   int currentSize;                                                              // The current size of the stuck
-  final Pop   Pop    = new Pop();                                               // A popped element
-  final Shift Shift1 = new Shift();                                             // A shifted element
-  final Shift Shift2 = new Shift();                                             // A shifted element
-  final Shift Shift3 = new Shift();                                             // A shifted element
+  final Pop       Pop1       = new Pop();                                       // A popped element
+  final Pop       Pop2       = new Pop();                                       // A popped element
+  final Shift     Shift1     = new Shift();                                     // A shifted element
+  final Shift     Shift2     = new Shift();                                     // A shifted element
+  final Shift     Shift3     = new Shift();                                     // A shifted element
+  final ElementAt ElementAt1 = new ElementAt();                                 // An element at
+  final ElementAt ElementAt2 = new ElementAt();                                 // An element at
+  final ElementAt ElementAt3 = new ElementAt();                                 // An element at
+  final RemoveElementAt RemoveElementAt1 = new RemoveElementAt();               // Remove an element
+  final RemoveElementAt RemoveElementAt2 = new RemoveElementAt();               // Remove an element
 
 //D1 Construction                                                               // Create a stuck
 
@@ -143,7 +149,7 @@ abstract class StuckStatic extends Test                                         
       return s.toString();
      }
    }
-  Pop pop() {return Pop.pop();}
+  Pop pop() {return Pop1.pop();}
 
   class Shift                                                                   // Shift a key, data pair from the stuck
    {int key;                                                                    // The shifted key
@@ -174,15 +180,16 @@ abstract class StuckStatic extends Test                                         
   Shift shift3() {z(); return Shift3.shift();}
 
   class ElementAt                                                               // Gte the indexed element
-   {final int index;                                                            // The index from which the key, data pair were retrieved
-    final int key;                                                              // The shifted key
-    final int data;                                                             // The shifted data
-    ElementAt(int Index)
+   {int index;                                                                  // The index from which the key, data pair were retrieved
+    int key;                                                                    // The shifted key
+    int data;                                                                   // The shifted data
+    ElementAt elementAt(int Index)
      {z();
       index = Index;
       assertInNormal(index);
       key   = key (index);
       data  = data(index);
+      return this;
      }
     public String toString()                                                    // Print
      {z();
@@ -194,7 +201,9 @@ abstract class StuckStatic extends Test                                         
       return s.toString();
      }
    }
-  ElementAt elementAt(int Index) {z(); return new ElementAt(Index);}
+  ElementAt elementAt1(int Index) {z(); return ElementAt1.elementAt(Index);}
+  ElementAt elementAt2(int Index) {z(); return ElementAt2.elementAt(Index);}
+  ElementAt elementAt3(int Index) {z(); return ElementAt3.elementAt(Index);}
 
   void setElementAt(int key, int data, int Index)                               // Set an element either in range or one above the current range
    {if (Index == size())                                                        // Extended range
@@ -221,10 +230,10 @@ abstract class StuckStatic extends Test                                         
    }
 
   class RemoveElementAt                                                         // Remove the indicated element
-   {final int index;                                                            // The index from which the key, data pair were retrieved
-    final int key;                                                              // The shifted key
-    final int data;                                                             // The shifted data
-    RemoveElementAt(int Index)
+   {int index;                                                                  // The index from which the key, data pair were retrieved
+    int key;                                                                    // The shifted key
+    int data;                                                                   // The shifted data
+    RemoveElementAt removeElementAt(int Index)
      {z();
       index = Index;
       assertInNormal(index);
@@ -235,6 +244,7 @@ abstract class StuckStatic extends Test                                         
         copyKeyData(i, i+1);
        }
       dec();
+      return this;
      }
     public String toString()                                                    // Print
      {z();
@@ -246,7 +256,7 @@ abstract class StuckStatic extends Test                                         
       return s.toString();
      }
    }
-  RemoveElementAt removeElementAt(int Index) {z(); return new RemoveElementAt(Index);} // Remove the indicated element
+  RemoveElementAt removeElementAt1(int Index) {z(); return RemoveElementAt1.removeElementAt(Index);} // Remove the indicated element
 
   class FirstElement                                                            // First element
    {final boolean found;                                                        // Whether there was a first element
@@ -500,7 +510,7 @@ StuckStatic(maxSize:8 size:5)
 
   static void test_elementAt()
    {StuckStatic     t = test_load();
-    ElementAt e = t.elementAt(2);
+    ElementAt e = t.elementAt1(2);
     //stop(e);
     ok(e, """
 ElementAt(index:2 key:6 data:3)
@@ -533,7 +543,7 @@ StuckStatic(maxSize:8 size:6)
 
   static void test_remove_element_at()
    {StuckStatic t = test_load();
-    RemoveElementAt a = t.removeElementAt(2);
+    RemoveElementAt a = t.removeElementAt1(2);
     //stop(a);
     ok(a, """
 RemoveElementAt(index:2 key:6 data:3)
