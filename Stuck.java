@@ -4,24 +4,23 @@
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
 // Reference the keys and data through a small mapping table and free stack so that we can manipulate keys and data by a small index rather than copying them directly.
-class Stuck extends Test                                                        // A fixed size stack of ordered key, data pairs with null deemed highest
- {final int maxSize;                                                            // The maximum number of entries in the stuck.
+abstract class Stuck extends Test                                               // A fixed size stack of ordered key, data pairs with null deemed highest
+ {abstract int maxSize();                                                       // The maximum number of entries in the stuck.
   final int[]Keys;                                                              // The keys on the stuck
   final int[]Data;                                                              // The data on the stuck
   int currentSize;                                                              // The current size of the stuck
 
 //D1 Construction                                                               // Create a stuck
 
-  Stuck(int MaxSize)                                                            // Create the stuck with a maximum number of the specified elements
+  Stuck()                                                                       // Create the stuck with a maximum number of the specified elements
    {z();
-    maxSize     = MaxSize;
     currentSize = 0;
-    Keys        = new int[maxSize];
-    Data        = new int[maxSize];
+    Keys        = new int[maxSize()];
+    Data        = new int[maxSize()];
    }
 
-  static Stuck stuck(int MaxSize)                                               // Create the stuck
-   {z(); return new Stuck(MaxSize);
+  static Stuck stuck(final int MaxSize)                                               // Create the stuck
+   {z(); return new Stuck() {int maxSize() {return MaxSize;}};
    }
 
   public void ok(String expected) {ok(toString(), expected);}                   // Check the stuck
@@ -29,8 +28,7 @@ class Stuck extends Test                                                        
 //D1 Characteristics                                                            // Characteristics of the stuck
 
   int      size            ()       {z(); return currentSize;}                  // The current number of key elements in the stuck as a binary integer
-  int   maxSize            ()       {z(); return maxSize;}                      // The maximum number of key elements the stuck can contain
-  boolean isFull           ()       {z(); return size() > maxSize;}             // Check the stuck is full
+  boolean isFull           ()       {z(); return size() > maxSize();}           // Check the stuck is full
   boolean isEmpty          ()       {z(); return size() == 0;}                  // Check the stuck is empty
   void     assertNotFull   ()       {z(); if (isFull ()) stop("Full");}         // Assert the stack is not full
   void     assertNotEmpty  ()       {z(); if (isEmpty()) stop("Empty");}        // Assert the stack is not empty
