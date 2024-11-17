@@ -763,7 +763,7 @@ CheckOrderExceptLast(inOrder:false outOfOrder:4)
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      //if (github_actions)                                                     // Coverage analysis
+      if (github_actions)                                                     // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
