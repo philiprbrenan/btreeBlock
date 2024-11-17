@@ -118,7 +118,7 @@ abstract class Stuck extends Test                                               
    }
 
   class Pop                                                                     // Pop a key, data pair from the stuck
-   {final int index;
+   {final int index;                                                            // The index of the popped element
     final int key;                                                              // The popped key
     final int data;                                                             // The popped data
     Pop()
