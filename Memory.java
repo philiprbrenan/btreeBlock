@@ -15,7 +15,7 @@ class Memory extends Test                                                       
    {bits = new boolean[Size];
    }
 
-  static Memory memory(int Size) {return new Memory(Size);}                      // Create memory
+  static Memory memory(int Size) {z(); return new Memory(Size);}                // Create memory
 
   public String toString()
    {final StringBuilder s = new StringBuilder();
@@ -26,47 +26,152 @@ class Memory extends Test                                                       
     return t+"\n"+s.reverse().toString()+"\n";
    }
 
+  int size() {z(); return bits.length;}                                         // Size of memory
+
 //D1 Operations                                                                 // Operations on memory
 
+//D2 Basic                                                                      // Basic memory access
+
+  void check(int start, int width)                                              // Check a request is in the range of the memory
+   {z();
+    if (start < 0) stop("Too small:", start);
+    if (start + width  > size()) stop("Out of range:", start+width);
+    if  (width < 1) stop("Width must be one or more, not:", width);
+   }
+
+//D3 Set                                                                        // Set a bit
+
+  void set(int start, boolean value)                                            // Set a bit
+   {z();
+    check(start, 1);
+    bits[start] = value;
+   }
+
+  void set(int start, int width, int value)                                     // Set some memory from an integer
+   {check(start, width);
+    z();
+
+    final int w = min(Integer.SIZE-1, width);
+    for(int i = 0; i < w; ++i)
+     {z();
+      final int n =  value & (1 << i);
+      set(start+i, n != 0);
+     }
+   }
+
+//D3 Get                                                                        // Get a bit
+
+  boolean getBit(int start)                                                     // Get a bit from memory
+   {check(start, 1);
+    z(); return bits[start];
+   }
+
+  int getInt(int start, int width)                                              // Get an int from memory
+   {check(start, width);
+    z();
+    if (start < 0 || start + width  >= size()) stop("Out of range");
+    z();
+    if  (width < 1) stop("width must be one or more, not:", width);
+    z();
+    final int w = min(Integer.SIZE-1, width);
+    int n = 0;
+    for(int i = 0; i < w; ++i)
+     {z();
+      if (getBit(start+i)) {z(); n |= (1 << i);}
+     }
+    return n;
+   }
+
+//D2 Composite                                                                  // Composite memory access
+
   void zero(int start, int width)                                               // Zero some memory
-   {for(int i = 0; i < width; ++i) bits[start+i] = false;
+   {z(); for(int i = 0; i < width; ++i) {z(); set(start+i, false);}
    }
 
   void ones(int start, int width)                                               // Ones some memory
-   {for(int i = 0; i < width; ++i) bits[start+i] = true;
+   {z(); for(int i = 0; i < width; ++i) {z(); set(start+i, true);}
    }
 
   boolean isAllZero(int start, int width)                                       // Check that the specified memory is all zeros
-   {for(int i = 0; i < width; ++i) if ( bits[start+i]) return false;
+   {z();
+    for(int i = 0; i < width; ++i)
+     {z();
+      if (getBit(start+i))
+       {z();
+        return false;
+       }
+     }
     return true;
    }
 
   boolean isAllOnes(int start, int width)                                       // Check that  the specified memory is all ones
-   {for(int i = 0; i < width; ++i) if (!bits[start+i]) return false;
+   {z();
+    for(int i = 0; i < width; ++i)
+     {z();
+      if (!getBit(start+i)) {z(); return false;}
+     }
     return true;
    }
 
-  void set(int start, int width, int value)                                     // Set some memory from an integer
-   {final int w = min(Integer.SIZE-1, width);
-    for(int i = 0; i < w; ++i)
-     {final int n =  value & (1 << i);
-      bits[start+i] = n != 0;
+  void copy(int target, int source, int width)                                  // Copy the specified number of bits from source to start
+   {z();
+    for(int i = 0; i < width; ++i)
+     {z();
+      set(target+i, getBit(source+i));
      }
    }
 
-  int getInt(int start, int width)                                              // Get an int from memory
-   {final int w = min(Integer.SIZE-1, width);
-    int n = 0;
-    for(int i = 0; i < w; ++i) if (bits[start+i]) n |= (1 << i);
-    return n;
-   }
-
-  void copy(int target, int source, int width)                                  // Copy the specified number of bits from source to start
-   {for(int i = 0; i < width; ++i) bits[target+i] = bits[source+i];
-   }
-
   void invert(int start, int width)                                             // Invert the specified bits
-   {for(int i = 0; i < width; ++i) bits[start+i] = !bits[start+i];
+   {z();
+    for(int i = 0; i < width; ++i)
+     {z();
+      set(start+i, !getBit(start+i));
+     }
+   }
+
+//D2 Boolean operations
+
+  boolean equals(int a, int b, int width)                                       // Whether a == b
+   {z();
+    for(int i = 0; i < width; ++i)
+     {z();
+      if (getBit(a+i) != getBit(b+i))
+       {z();
+        return false;
+       }
+     }
+    z();
+    return true;
+   }
+
+  boolean notEquals(int a, int b, int width)                                    // Whether a != b
+   {z(); return !equals(a, b, width);
+   }
+
+  boolean lessThan(int a, int b, int width)                                     // Whether a < b
+   {z();
+    for(int i = width; i > 0; --i)
+     {z();
+      if (!getBit(a+i-1) &&  getBit(b+i-1)) {z(); return true;}
+      if ( getBit(a+i-1) && !getBit(b+i-1)) {z(); return false;}
+     }
+    z();
+    return false;
+   }
+
+  boolean lessThanOrEqual(int a, int b, int width)                              // Whether a <= b
+   {z();
+    return lessThan(a, b, width) || equals(a, b, width);
+   }
+
+  boolean greaterThan(int a, int b, int width)                                  // Whether a > b
+   {z();
+    return !lessThan(a, b, width) && !equals(a, b, width);
+   }
+
+  boolean greaterThanOrEqual(int a, int b, int width)                           // Whether a >= b
+   {z();
+    return !lessThan(a, b, width);
    }
 
 //D0                                                                            // Tests
@@ -124,11 +229,28 @@ class Memory extends Test                                                       
 """);
    }
 
+  static void test_boolean()
+   {for   (int i = 0; i <= 2; i++)
+     {for (int j = 0; j <= 2; j++)
+       {Memory m = memory(8);
+        m.set(0, 4, i);
+        m.set(4, 4, j);
+        ok(m.equals            (0, 4, 4) == (i == j));
+        ok(m.notEquals         (0, 4, 4) == (i != j));
+        ok(m.lessThan          (0, 4, 4) == (i <  j));
+        ok(m.lessThanOrEqual   (0, 4, 4) == (i <= j));
+        ok(m.greaterThan       (0, 4, 4) == (i >  j));
+        ok(m.greaterThanOrEqual(0, 4, 4) == (i >= j));
+       }
+     }
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_set_get();
     test_zero_ones();
     test_copy();
     test_invert();
+    test_boolean();
    }
 
   static void newTests()                                                        // Tests being worked on
