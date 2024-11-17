@@ -65,6 +65,10 @@ class Memory extends Test                                                       
    {for(int i = 0; i < width; ++i) bits[target+i] = bits[source+i];
    }
 
+  void invert(int start, int width)                                             // Invert the specified bits
+   {for(int i = 0; i < width; ++i) bits[start+i] = !bits[start+i];
+   }
+
 //D0                                                                            // Tests
 
   static void test_set_get()
@@ -104,10 +108,27 @@ class Memory extends Test                                                       
 """);
    }
 
+  static void test_invert()
+   {Memory m = memory(8);
+
+    m.ones(1, 2);
+    ok(""+m, """
+765-3210
+00000110
+""");
+
+    m.invert(2, 2);
+    ok(""+m, """
+765-3210
+00001010
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_set_get();
     test_zero_ones();
     test_copy();
+    test_invert();
    }
 
   static void newTests()                                                        // Tests being worked on
