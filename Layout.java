@@ -20,6 +20,7 @@ public class Layout extends Test                                                
     top = fields.lastElement();                                                 // The last defined field becomes the super structure
     top.layout(0, 0);                                                           // Locate field positions
     top.indexNames();                                                           // Index the names of the fields
+    for (Field f: fields) f.locator = new Locator(f);                           // Create a locator for each field
    }
 
   int size() {z(); return top == null ? 0 : top.width;}                         // Size of memory
@@ -37,6 +38,7 @@ public class Layout extends Test                                                
     int                         width;                                          // Number of bits in a field
     int                         depth;                                          // Depth of field - the number of containing arrays/structures/unions above
     Field                          up;                                          // Upward chain to containing array/structure/union
+    Locator                   locator;                                          // A locator for this field which includes array indices
     final Map<String,Field> fullNames = new TreeMap<>();                        // Fields by name
     final Set<String>  classification = new TreeSet<>();                        // Names that identify the type of the field to aid debugging
 
@@ -45,8 +47,8 @@ public class Layout extends Test                                                
       fields.push(this);
      }
 
-    int at   () {z(); return at;}                                               // Position of field in memory
-    int width() {z(); return width;}                                            // Size of the memory in bits occupied by this field
+    int at(int...Indices) {return locator.at(Indices);}                         // Location of field taking into account field indices
+    int width()           {z(); return width;}                                  // Size of the memory in bits occupied by this field
 
     void fullName(Layout.Field top, StringBuilder s)                            // The full name of a field relative to the indicated top
      {z();
@@ -325,16 +327,17 @@ public class Layout extends Test                                                
    {final Field       field;                                                    // Field definition
     final Stack<Array>arrays = new Stack<>();                                   // Array elements requiring including in the path to the element
 
-    Locator(String Name)                                                        // Locate a field
-     {z();
-      field = top.fullNames.get(Name);                                          // Locate field name
-
+    Locator(String Name)                                                        // Locate a field by name
+     {this(top.fullNames.get(Name));                                            // Locate field name
       if (field == null)                                                        // Undefined field
        {stop("No such name:", Name, "in:", Layout.this);
        }
-
       z();
+     }
 
+    Locator(Field Field)                                                        // Locate a field
+     {z();
+      field = Field;
       for(Field f = field; f != null; f = f.up)                                 // Convolute path to field with indices
        {z();
         if (f instanceof Array)
@@ -363,12 +366,10 @@ public class Layout extends Test                                                
      }
 
     public String toString()                                                    // Print locator
-     {z();
-      final StringBuilder s = new StringBuilder();
+     {final StringBuilder s = new StringBuilder();
       s.append("Locator:\n");
       for(int i = 0; i < arrays.size(); ++i)                                    // Convolute path to field with indices
-       {z();
-        s.append(arrays.elementAt(i));
+       {s.append(arrays.elementAt(i));
        }
       return s.toString();
      }
@@ -463,7 +464,7 @@ V   28     4                e                    B.S.e
     ok(a.sameSize(b), 2);
     s.toStructure();
     A.toArray();
-    ok(b.at(),    6);
+    ok(b.at(0,0,0),    6);
     ok(b.width(), 2);
 
     Layout L = l.duplicate();
@@ -571,19 +572,8 @@ A    0     8     4      A                    A
 V    0     2              a                    A.a
 """);
 
-    final Locator L = l.locator("A.a");
-    ok(L.at(2, 2), 20);
-    ok(L.at(2, 3), 22);
-    ok(L, """
-Locator:
-T   At  Wide  Size    Name                   Path
-A    0    32     4    B
-A    0     8     4      A                    A
-V    0     2              a                    A.a
-T   At  Wide  Size    Name                   Path
-A    0     8     4      A
-V    0     2              a                    a
-""");
+    ok(a.at(2, 2), 20);
+    ok(a.at(2, 3), 22);
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
