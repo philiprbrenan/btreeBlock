@@ -25,6 +25,7 @@ public class Layout extends Test                                                
 
   int size() {z(); return top == null ? 0 : top.width;}                         // Size of memory
   void ok(String expected) {Test.ok(top.toString(), expected);}                 // Confirm layout is as expected
+  Field get(String path)   {return top.fullNames.get(path);}                    // Address a contained field by name
 
   public String toString() {return top.toString();}                             // Print layout
 
@@ -47,7 +48,7 @@ public class Layout extends Test                                                
       fields.push(this);
      }
 
-    int at(int...Indices) {return locator.at(Indices);}                         // Location of field taking into account field indices
+    int at(int...Indices) {z(); return locator.at(Indices);}                    // Location of field taking into account field indices
     int width()           {z(); return width;}                                  // Size of the memory in bits occupied by this field
 
     void fullName(Layout.Field top, StringBuilder s)                            // The full name of a field relative to the indicated top
@@ -350,7 +351,8 @@ public class Layout extends Test                                                
     int at(int...Indices)                                                       // The address of an element in memory including any array indices
      {z();
       if (Indices.length != arrays.size())                                      // Check number of indices
-       {stop("Wrong number of indices, expected:", arrays.size(), "but got:", Indices.length);
+       {stop("Wrong number of indices, expected:", arrays.size(),
+         "but got:", Indices.length);
        }
 
       z(); int d = field.at; final int N = arrays.size();
@@ -359,7 +361,8 @@ public class Layout extends Test                                                
        {z();
         final Array A = arrays.elementAt(i);
         final int   w = A.element.width, s = A.size, n = Indices[i];
-        if (n < 0 || n >= s) stop("Array:", A.fullName, "has size:", s, "but is being indexed with:", n);
+        if (n < 0 || n >= s) stop("Array:", A.fullName, "has size:", s,
+         "but is being indexed with:", n);
         d += w * n;
        }
       return d;
@@ -573,7 +576,7 @@ V    0     2              a                    A.a
 """);
 
     ok(a.at(2, 2), 20);
-    ok(a.at(2, 3), 22);
+    ok(l.get("A.a").at(2, 3), 22);
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
