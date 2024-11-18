@@ -17,14 +17,20 @@ abstract class StuckStatic extends Test                                         
   final ElementAt ElementAt1 = new ElementAt();                                 // An element at
   final ElementAt ElementAt2 = new ElementAt();                                 // An element at
   final ElementAt ElementAt3 = new ElementAt();                                 // An element at
-  final RemoveElementAt RemoveElementAt1 = new RemoveElementAt();               // Remove an element
-  final RemoveElementAt RemoveElementAt2 = new RemoveElementAt();               // Remove an element
-  final FirstElement       FirstElement1 = new FirstElement();                  // First element
-  final FirstElement       FirstElement2 = new FirstElement();                  // First element
-  final LastElement         LastElement1 = new LastElement();                   // Last element
-  final LastElement         LastElement2 = new LastElement();                   // Last element
-  final Search                   Search1 = new Search();                        // Search element
-  final Search                   Search2 = new Search();                        // Search element
+  final RemoveElementAt   RemoveElementAt1 = new RemoveElementAt();             // Remove an element
+  final RemoveElementAt   RemoveElementAt2 = new RemoveElementAt();             // Remove an element
+  final FirstElement         FirstElement1 = new FirstElement();                // First element
+  final FirstElement         FirstElement2 = new FirstElement();                // First element
+  final LastElement           LastElement1 = new LastElement();                 // Last element
+  final LastElement           LastElement2 = new LastElement();                 // Last element
+  final Search                     Search1 = new Search();                      // Search element
+  final Search                     Search2 = new Search();                      // Search element
+  final SearchExceptLast SearchExceptLast1 = new SearchExceptLast();            // Search element
+  final SearchExceptLast SearchExceptLast2 = new SearchExceptLast();            // Search element
+  final SearchFirstGreaterThanOrEqual SearchFirstGreaterThanOrEqual1 = new SearchFirstGreaterThanOrEqual();  // Search element
+  final SearchFirstGreaterThanOrEqual SearchFirstGreaterThanOrEqual2 = new SearchFirstGreaterThanOrEqual();  // Search element
+  final SearchFirstGreaterThanOrEqualExceptLast SearchFirstGreaterThanOrEqualExceptLast1 = new SearchFirstGreaterThanOrEqualExceptLast();  // Search element
+  final SearchFirstGreaterThanOrEqualExceptLast SearchFirstGreaterThanOrEqualExceptLast2 = new SearchFirstGreaterThanOrEqualExceptLast();  // Search element
 
 //D1 Construction                                                               // Create a stuck
 
@@ -289,8 +295,8 @@ abstract class StuckStatic extends Test                                         
       return s.toString();
      }
    }
-  FirstElement firstElement1() {return FirstElement1.firstElement();}           // First element
-  FirstElement firstElement2() {return FirstElement2.firstElement();}           // First element
+  FirstElement firstElement1() {z(); return FirstElement1.firstElement();}      // First element
+  FirstElement firstElement2() {z(); return FirstElement2.firstElement();}      // First element
 
   class LastElement                                                             // Last element
    {boolean found;                                                              // Whether there was a last element
@@ -317,8 +323,8 @@ abstract class StuckStatic extends Test                                         
       return s.toString();
      }
    }
-  LastElement lastElement1() {return LastElement1.lastElement();}               // Last element
-  LastElement lastElement2() {return LastElement2.lastElement();}               // Last element
+  LastElement lastElement1() {z(); return LastElement1.lastElement();}          // Last element
+  LastElement lastElement2() {z(); return LastElement2.lastElement();}          // Last element
 
 //D1 Search                                                                     // Search a stuck.
 
@@ -334,8 +340,8 @@ abstract class StuckStatic extends Test                                         
     int data;                                                                   // Located data if key was found
     String name() {return "Search";}                                            // Name of the search
 
-    Search()           {}                                                       // Search for an element within all elements of the stuck
-    Search(int Search) {search(Search);}                                        // Search for an element within all elements of the stuck
+    Search()           {z(); }                                                  // Search for an element within all elements of the stuck
+    Search(int Search) {z(); search(Search);}                                   // Search for an element within all elements of the stuck
 
     Search search(int Search)                                                   // Search for an element within all elements of the stuck
      {z();
@@ -371,25 +377,28 @@ abstract class StuckStatic extends Test                                         
       return s.toString();
      }
    }
-  Search search1(int Search) {return Search1.search(Search);}                   // Search for a key ignoring the last element on the stuck
-  Search search2(int Search) {return Search2.search(Search);}                        // Search for a key ignoring the last element on the stuck
+  Search search1(int Search) {z(); return Search1.search(Search);}              // Search for a key ignoring the last element on the stuck
+  Search search2(int Search) {z(); return Search2.search(Search);}              // Search for a key ignoring the last element on the stuck
 
   class SearchExceptLast extends Search                                         // Search for an element ignoring the last element on the stuck
-   {SearchExceptLast(int Search) {super(Search);}
-    int   limit() {return size()-1;}                                            // How much of the stuck to search
-    String name() {return "SearchExceptLast";}                                  // Name of the search
+   {SearchExceptLast()                            {super(); z();}
+    SearchExceptLast                 (int search) {super(search); z();}
+    SearchExceptLast searchExceptLast(int search) {z(); search(search); return this;}
+    int   limit() {z(); return size()-1;}                                            // How much of the stuck to search
+    String name() {z(); return "SearchExceptLast";}                                  // Name of the search
    }
-  SearchExceptLast searchExceptLast(int Search) {return new SearchExceptLast(Search);}  // Search for a key ignoring the last element on the stuck
+  SearchExceptLast searchExceptLast1(int Search) {z(); return SearchExceptLast1.searchExceptLast(Search);}  // Search for a key ignoring the last element on the stuck
+  SearchExceptLast searchExceptLast2(int Search) {z(); return SearchExceptLast2.searchExceptLast(Search);}  // Search for a key ignoring the last element on the stuck
 
   class SearchFirstGreaterThanOrEqual extends Limit                             // Search for the first key that is greater than or equal
-   {final int    search;                                                        // Search key
-    final boolean found;                                                        // Whether the search key was found
-    final int     index;                                                        // Index of the located key if any
-    final int       key;                                                        // Located key if the search key was found
-    final int      data;                                                        // Located data if search key was found
+   {int    search;                                                              // Search key
+    boolean found;                                                              // Whether the search key was found
+    int     index;                                                              // Index of the located key if any
+    int       key;                                                              // Located key if the search key was found
+    int      data;                                                              // Located data if search key was found
     String name() {return "SearchFirstGreaterThanOrEqual";}                     // Name of the search
 
-    SearchFirstGreaterThanOrEqual(int Search)
+    SearchFirstGreaterThanOrEqual searchFirstGreaterThanOrEqual(int Search)
      {z();
       boolean looking = true;
       search = Search;
@@ -406,6 +415,7 @@ abstract class StuckStatic extends Test                                         
       else                                                                      // Found a greater than or equal key in the stuck excluding the last key
        {z(); found = true;  index = i; key = key(i); data = data(i);
        }
+      return this;
      }
     public String toString()                                                    // Print
      {final StringBuilder s = new StringBuilder();
@@ -423,19 +433,29 @@ abstract class StuckStatic extends Test                                         
      }
    }
   SearchFirstGreaterThanOrEqual                                                 // Search for a key
-  searchFirstGreaterThanOrEqual(int Search)
-   {return new SearchFirstGreaterThanOrEqual(Search);
+  searchFirstGreaterThanOrEqual1(int Search)
+   {z(); return SearchFirstGreaterThanOrEqual1.searchFirstGreaterThanOrEqual(Search);
+   }
+  SearchFirstGreaterThanOrEqual                                                 // Search for a key
+  searchFirstGreaterThanOrEqual2(int Search)
+   {z(); return SearchFirstGreaterThanOrEqual2.searchFirstGreaterThanOrEqual(Search);
    }
 
   class     SearchFirstGreaterThanOrEqualExceptLast                             // Search for an element ignoring the last element on the stuck
     extends SearchFirstGreaterThanOrEqual
-   {SearchFirstGreaterThanOrEqualExceptLast(int Search) {super(Search);}
-    int   limit() {return size()-1;}                                            // How much of the stuck to search
-    String name() {return "SearchFirstGreaterThanOrEqualExceptLast";}           // Name of the search
+   {SearchFirstGreaterThanOrEqualExceptLast()           {}
+    SearchFirstGreaterThanOrEqualExceptLast
+    searchFirstGreaterThanOrEqualExceptLast(int search) {z(); searchFirstGreaterThanOrEqual(search); return this;}   // Search for a key ignoring the last element on the stuck
+    int   limit() {z(); return size()-1;}                                       // How much of the stuck to search
+    String name() {z(); return "SearchFirstGreaterThanOrEqualExceptLast";}      // Name of the search
    }
   SearchFirstGreaterThanOrEqualExceptLast                                       // Search for a key ignoring the last element on the stuck
-  searchFirstGreaterThanOrEqualExceptLast(int Search)
-   {return new SearchFirstGreaterThanOrEqualExceptLast(Search);
+  searchFirstGreaterThanOrEqualExceptLast1(int Search)
+   {z(); return SearchFirstGreaterThanOrEqualExceptLast1.searchFirstGreaterThanOrEqualExceptLast(Search);
+   }
+  SearchFirstGreaterThanOrEqualExceptLast                                       // Search for a key ignoring the last element on the stuck
+  searchFirstGreaterThanOrEqualExceptLast2(int Search)
+   {z(); return SearchFirstGreaterThanOrEqualExceptLast2.searchFirstGreaterThanOrEqualExceptLast(Search);
    }
 
 //D1 Print                                                                      // Print a stuck
@@ -631,12 +651,12 @@ StuckStatic(maxSize:8 size:4)
   2 key:6 data:3
   3 key:8 data:4
 """);
-    SearchExceptLast s = t.searchExceptLast(4);
+    SearchExceptLast s = t.searchExceptLast1(4);
+    SearchExceptLast S = t.searchExceptLast2(8);
     //stop(s);
     ok(s, """
 SearchExceptLast(Search:4 found:true index:1 data:2)
 """);
-    SearchExceptLast S = t.searchExceptLast(8);
     //stop(S);
     ok(S, """
 SearchExceptLast(Search:8 found:false)
@@ -653,31 +673,31 @@ StuckStatic(maxSize:8 size:4)
   3 key:8 data:4
 """);
 
-    SearchFirstGreaterThanOrEqual b = t.searchFirstGreaterThanOrEqual(1);
+    SearchFirstGreaterThanOrEqual b = t.searchFirstGreaterThanOrEqual1(1);
+    SearchFirstGreaterThanOrEqual s = t.searchFirstGreaterThanOrEqual2(4);
     //stop(b);
     ok(b, """
 SearchFirstGreaterThanOrEqual(Search:1 index:0 found:true key:2 data:1)
 """);
 
-    SearchFirstGreaterThanOrEqual s = t.searchFirstGreaterThanOrEqual(4);
     //stop(s);
     ok(s, """
 SearchFirstGreaterThanOrEqual(Search:4 index:1 found:true key:4 data:2)
 """);
 
-    SearchFirstGreaterThanOrEqual S = t.searchFirstGreaterThanOrEqual(5);
+    SearchFirstGreaterThanOrEqual S = t.searchFirstGreaterThanOrEqual1(5);
+    SearchFirstGreaterThanOrEqual T = t.searchFirstGreaterThanOrEqual2(7);
     //stop(S);
     ok(S, """
 SearchFirstGreaterThanOrEqual(Search:5 index:2 found:true key:6 data:3)
 """);
 
-    SearchFirstGreaterThanOrEqual T = t.searchFirstGreaterThanOrEqual(7);
     //stop(T);
     ok(T, """
 SearchFirstGreaterThanOrEqual(Search:7 index:3 found:true key:8 data:4)
 """);
 
-    SearchFirstGreaterThanOrEqual E = t.searchFirstGreaterThanOrEqual(9);
+    SearchFirstGreaterThanOrEqual E = t.searchFirstGreaterThanOrEqual1(9);
     //stop(E);
     ok(E, """
 SearchFirstGreaterThanOrEqual(Search:9 index:4 found:false)
@@ -694,25 +714,25 @@ StuckStatic(maxSize:8 size:4)
   3 key:8 data:4
 """);
 
-    SearchFirstGreaterThanOrEqualExceptLast b = t.searchFirstGreaterThanOrEqualExceptLast(1);
+    SearchFirstGreaterThanOrEqualExceptLast b = t.searchFirstGreaterThanOrEqualExceptLast1(1);
+    SearchFirstGreaterThanOrEqualExceptLast s = t.searchFirstGreaterThanOrEqualExceptLast2(4);
     //stop(b);
     ok(b, """
 SearchFirstGreaterThanOrEqualExceptLast(Search:1 index:0 found:true key:2 data:1)
 """);
 
-    SearchFirstGreaterThanOrEqualExceptLast s = t.searchFirstGreaterThanOrEqualExceptLast(4);
     //stop(s);
     ok(s, """
 SearchFirstGreaterThanOrEqualExceptLast(Search:4 index:1 found:true key:4 data:2)
 """);
 
-    SearchFirstGreaterThanOrEqualExceptLast S = t.searchFirstGreaterThanOrEqualExceptLast(5);
+    SearchFirstGreaterThanOrEqualExceptLast S = t.searchFirstGreaterThanOrEqualExceptLast1(5);
+    SearchFirstGreaterThanOrEqualExceptLast T = t.searchFirstGreaterThanOrEqualExceptLast2(7);
     //stop(S);
     ok(S, """
 SearchFirstGreaterThanOrEqualExceptLast(Search:5 index:2 found:true key:6 data:3)
 """);
 
-    SearchFirstGreaterThanOrEqualExceptLast T = t.searchFirstGreaterThanOrEqualExceptLast(7);
     //stop(T);
     ok(T, """
 SearchFirstGreaterThanOrEqualExceptLast(Search:7 index:3 found:false)
@@ -773,14 +793,6 @@ CheckOrderExceptLast(inOrder:false outOfOrder:4)
 """);
    }
 
-  static void test_find_first()
-   {StuckStatic      t = stuckStatic(4);
-    t.push(2, 2);
-    say(t);
-    SearchFirstGreaterThanOrEqual s = t.searchFirstGreaterThanOrEqual(1);
-    stop(s);
-   }
-
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_push();
     test_pop();
@@ -801,13 +813,12 @@ CheckOrderExceptLast(inOrder:false outOfOrder:4)
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    //test_find_first();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      if (github_actions)                                                     // Coverage analysis
+      //if (github_actions)                                                       // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
