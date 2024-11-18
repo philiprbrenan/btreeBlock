@@ -109,21 +109,24 @@ class BtreeStuckStatic extends Test                                             
      }
 
     class FindEqualInLeaf                                                       // Find the first key in the leaf that is equal to the search key
-     {final Node     leaf;                                                      // The leaf being searched
-      final int    search;                                                      // Search key
-      final boolean found;                                                      // Whether the key was found
-      final int      data;                                                      // Data associated with the  key
-      final int     index;                                                      // Index of first such key if found
+     {Node     leaf;                                                            // The leaf being searched
+      int    search;                                                            // Search key
+      boolean found;                                                            // Whether the key was found
+      int      data;                                                            // Data associated with the  key
+      int     index;                                                            // Index of first such key if found
 
-      FindEqualInLeaf(int Search)                                               // Find the first key in the leaf that is equal to the search key
+      FindEqualInLeaf() {}                                                      // Find the first key in the leaf that is equal to the search key
+
+      FindEqualInLeaf findEqualInLeaf(int Search)                               // Find the first key in the leaf that is equal to the search key
        {z(); assertLeaf();
         leaf   = Node.this;
         search = Search;
 
-        final StuckStatic.Search s = keyData.new Search(Search);
+        final StuckStatic.Search s = keyData.search1(Search);
         found  = s.found;
         index  = s.index;
         data   = s.data;
+        return this;
        }
 
       public String toString()                                                  // Print details of find equal in leaf
@@ -136,21 +139,28 @@ class BtreeStuckStatic extends Test                                             
        }
      }
 
-    class FindFirstGreaterThanOrEqualInLeaf                                     // Find the first key in the leaf that is equal to or greater than the search key
-     {final Node     leaf;                                                      // The leaf being searched
-      final int    search;                                                      // Search key
-      final boolean found;                                                      // Whether the key was found
-      final int     first;                                                      // Index of first such key if found
+    final FindEqualInLeaf FindEqualInLeaf1 = new FindEqualInLeaf();
+    final FindEqualInLeaf FindEqualInLeaf2 = new FindEqualInLeaf();
+          FindEqualInLeaf findEqualInLeaf1(int Search) {return FindEqualInLeaf1.findEqualInLeaf(Search);}
+          FindEqualInLeaf findEqualInLeaf2(int Search) {return FindEqualInLeaf2.findEqualInLeaf(Search);}
 
-      FindFirstGreaterThanOrEqualInLeaf(int Search)                             // Find the first key in the  leaf that is equal to or greater than the search key
+    class FindFirstGreaterThanOrEqualInLeaf                                     // Find the first key in the leaf that is equal to or greater than the search key
+     {Node     leaf;                                                            // The leaf being searched
+      int    search;                                                            // Search key
+      boolean found;                                                            // Whether the key was found
+      int     first;                                                            // Index of first such key if found
+
+      FindFirstGreaterThanOrEqualInLeaf                                         // Find the first key in the  leaf that is equal to or greater than the search key
+      findFirstGreaterThanOrEqualInLeaf(int Search)                             // Find the first key in the  leaf that is equal to or greater than the search key
        {z(); assertLeaf();
         leaf   = Node.this;
         search = Search;
 
         final StuckStatic.SearchFirstGreaterThanOrEqual s =
-        keyData.new SearchFirstGreaterThanOrEqual(Search);
+        keyData.searchFirstGreaterThanOrEqual1(Search);
         found = s.found;
         first = s.index;
+        return this;
        }
 
       public String toString()                                                  // Print results of search
@@ -162,23 +172,29 @@ class BtreeStuckStatic extends Test                                             
         return s.toString();
        }
      }
+    final FindFirstGreaterThanOrEqualInLeaf FindFirstGreaterThanOrEqualInLeaf1 = new FindFirstGreaterThanOrEqualInLeaf();
+    final FindFirstGreaterThanOrEqualInLeaf FindFirstGreaterThanOrEqualInLeaf2 = new FindFirstGreaterThanOrEqualInLeaf();
+          FindFirstGreaterThanOrEqualInLeaf findFirstGreaterThanOrEqualInLeaf1(int Search) {return FindFirstGreaterThanOrEqualInLeaf1.findFirstGreaterThanOrEqualInLeaf(Search);}
+          FindFirstGreaterThanOrEqualInLeaf findFirstGreaterThanOrEqualInLeaf2(int Search) {return FindFirstGreaterThanOrEqualInLeaf2.findFirstGreaterThanOrEqualInLeaf(Search);}
 
     class FindFirstGreaterThanOrEqualInBranch                                   // Find the first key in the branch that is equal to or greater than the search key
-     {final Node     branch;                                                    // The branch being searched
-      final int     search;                                                     // Search key
-      final boolean  found;                                                     // Whether the key was found
-      final int      first;                                                     // Index of first such key if found
-      final int       next;                                                     // The corresponding next field or top if no such key was found
+     {Node     branch;                                                          // The branch being searched
+      int     search;                                                           // Search key
+      boolean  found;                                                           // Whether the key was found
+      int      first;                                                           // Index of first such key if found
+      int       next;                                                           // The corresponding next field or top if no such key was found
 
-      FindFirstGreaterThanOrEqualInBranch(int Search)                           // Find the first key in the branch that is equal to or greater than the search key
+      FindFirstGreaterThanOrEqualInBranch                                       // Find the first key in the branch that is equal to or greater than the search key
+      findFirstGreaterThanOrEqualInBranch(int Search)                           // Find the first key in the branch that is equal to or greater than the search key
        {z(); assertBranch();
         branch = Node.this;
         search = Search;
         final StuckStatic.SearchFirstGreaterThanOrEqualExceptLast s =
-            keyNext.searchFirstGreaterThanOrEqualExceptLast(Search);
+            keyNext.searchFirstGreaterThanOrEqualExceptLast1(Search);
         found = s.found;
         first = s.index;
-        next  = s.found ? s.data : keyNext.lastElement1().data;                  // Next if no key matches
+        next  = s.found ? s.data : keyNext.lastElement1().data;                 // Next if no key matches
+        return this;
        }
 
       public String toString()                                                  // Print search results
@@ -190,6 +206,10 @@ class BtreeStuckStatic extends Test                                             
         return s.toString();
        }
      }
+    final FindFirstGreaterThanOrEqualInBranch FindFirstGreaterThanOrEqualInBranch1 = new FindFirstGreaterThanOrEqualInBranch();
+    final FindFirstGreaterThanOrEqualInBranch FindFirstGreaterThanOrEqualInBranch2 = new FindFirstGreaterThanOrEqualInBranch();
+          FindFirstGreaterThanOrEqualInBranch findFirstGreaterThanOrEqualInBranch1(int Search) {return FindFirstGreaterThanOrEqualInBranch1.findFirstGreaterThanOrEqualInBranch(Search);}
+          FindFirstGreaterThanOrEqualInBranch findFirstGreaterThanOrEqualInBranch2(int Search) {return FindFirstGreaterThanOrEqualInBranch2.findFirstGreaterThanOrEqualInBranch(Search);}
 
     void printLeaf(Stack<StringBuilder>S, int level)                            // Print leaf horizontally
      {assertLeaf();
@@ -686,12 +706,12 @@ class BtreeStuckStatic extends Test                                             
   class Find                                                                    // Find the data associated with a key in the tree
    {Node.FindEqualInLeaf search;                                                // Details of the search of the containing leaf
 
-    Find(int Key)                                                               // Find the data associated with a key in the tree
+    Find find(int Key)                                                          // Find the data associated with a key in the tree
      {z();
       if (root.isLeaf)                                                          // The root is a leaf
        {z();
-        search = root.new FindEqualInLeaf(Key);
-        return;
+        search = root.findEqualInLeaf1(Key);
+        return this;
        }
 
       Node parent = root;                                                       // Parent starts at root which is known to be a branch
@@ -699,17 +719,18 @@ class BtreeStuckStatic extends Test                                             
       for (int i = 0; i < maxDepth; i++)                                        // Step down through tree
        {z();
         final Node.FindFirstGreaterThanOrEqualInBranch down =                   // Find next child in search path of key
-          parent.new FindFirstGreaterThanOrEqualInBranch(Key);
+          parent.findFirstGreaterThanOrEqualInBranch1(Key);
         final int n = down.next;
         if (nodes.elementAt(n).isLeaf)                                          // Found the containing search
          {z();
           final Node l = nodes.elementAt(n);
-          search  = l.new FindEqualInLeaf(Key);
-          return;
+          search  = l.findEqualInLeaf1(Key);
+          return this;
          }
         parent = nodes.elementAt(n);                                            // Step down to lower branch
        }
       stop("Search did not terminate in a leaf");
+      return this;
      }
 
     Node     leaf()  {z(); return search.leaf;}
@@ -729,8 +750,10 @@ class BtreeStuckStatic extends Test                                             
       return s.toString();
      }
    }
-
-  Find find(int Key) {z(); return new Find(Key);}                               // Find a key in the tree
+  final Find Find1 = new Find();
+  final Find Find2 = new Find();
+        Find find1(int Search) {z(); return Find1.find(Search);}
+        Find find2(int Search) {z(); return Find2.find(Search);}
 
   class FindAndInsert extends Find                                              // Insert the specified key and data into the tree if there is room in the target leaf,or update the key with the data if the key already exists
    {int          key;                                                           // Key to insert
@@ -738,8 +761,9 @@ class BtreeStuckStatic extends Test                                             
     boolean  success;                                                           // Inserted or updated if true
     boolean inserted;                                                           // Inserted if true
 
-    FindAndInsert(int Key, int Data)                                            // Find the leaf that should contain this key and insert or update it is possible
-     {super(Key);                                                               // Find the leaf that should contain this key
+    FindAndInsert() {}
+    FindAndInsert findAndInsert(int Key, int Data)                              // Find the leaf that should contain this key and insert or update it is possible
+     {find(Key);                                                                // Find the leaf that should contain this key
       z();
       key = Key; data = Data;
 
@@ -747,13 +771,13 @@ class BtreeStuckStatic extends Test                                             
        {z();
         leaf().keyData.setElementAt(Key, Data, index());
         success = true; inserted = false;
-        return;
+        return this;
        }
 
       if (!leaf().isFull())                                                     // Leaf is not full so we can insert immediately
        {z();
         final Node.FindFirstGreaterThanOrEqualInLeaf f =
-          leaf().new FindFirstGreaterThanOrEqualInLeaf(Key);
+          leaf().findFirstGreaterThanOrEqualInLeaf1(Key);
         if (f.found)                                                            // Overwrite existing key
          {z();
           leaf().keyData.insertElementAt(Key, Data, f.first);
@@ -763,9 +787,10 @@ class BtreeStuckStatic extends Test                                             
           leaf().keyData.push(Key, Data);
          }
         success = true;
-        return;
+        return this;
        }
       success = false;
+      return this;
      }
 
     public String toString()                                                    // Print find and insert
@@ -779,16 +804,18 @@ class BtreeStuckStatic extends Test                                             
      }
    }
 
-  FindAndInsert findAndInsert(int Key, int Data)                                // Find a key and insert it if possible with its associated data
-   {z();
-    return new FindAndInsert(Key, Data);
-   }
+  final FindAndInsert FindAndInsert1 = new FindAndInsert();
+  final FindAndInsert FindAndInsert2 = new FindAndInsert();
+  final FindAndInsert FindAndInsert3 = new FindAndInsert();
+        FindAndInsert findAndInsert1(int Key, int Data) {z(); return FindAndInsert1.findAndInsert(Key, Data);}
+        FindAndInsert findAndInsert2(int Key, int Data) {z(); return FindAndInsert2.findAndInsert(Key, Data);}
+        FindAndInsert findAndInsert3(int Key, int Data) {z(); return FindAndInsert3.findAndInsert(Key, Data);}
 
 //D1 Insertion                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
 
   void put(int Key, int Data)                                                   // Insert a key, data pair into the tree or update and existing key with a new datum
    {z();
-    final FindAndInsert f = new FindAndInsert(Key, Data);                       // Try direct insertion with no modifications to the shape of the tree
+    final FindAndInsert f = findAndInsert1(Key, Data);                          // Try direct insertion with no modifications to the shape of the tree
     if (f.success) return;                                                      // Inserted or updated successfully
 
     if (root.isFull())                                                          // Start the insertion at the root, after splitting it if necessary
@@ -801,7 +828,7 @@ class BtreeStuckStatic extends Test                                             
        {z();
         root.splitBranchRoot();
        }
-      final FindAndInsert F = new FindAndInsert(Key, Data);                     // Splitting the root might have been enough
+      final FindAndInsert F = findAndInsert2(Key, Data);                        // Splitting the root might have been enough
       if (F.success) return;                                                    // Inserted or updated successfully
      }
 
@@ -810,12 +837,12 @@ class BtreeStuckStatic extends Test                                             
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
      {z();
       final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
-      down = p.new FindFirstGreaterThanOrEqualInBranch(Key);
+      down = p.findFirstGreaterThanOrEqualInBranch1(Key);
       final Node q = nodes.elementAt(down.next);
       if (q.isLeaf)                                                             // Reached a leaf
        {z();
         q.splitLeaf(p, down.first);
-        findAndInsert(Key, Data);
+        findAndInsert3(Key, Data);
         merge(Key);
         return;
        }
@@ -824,7 +851,7 @@ class BtreeStuckStatic extends Test                                             
        {z();
         q.splitBranch(p, down.first);                                           // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
         final Node.FindFirstGreaterThanOrEqualInBranch                          // Step down again as the split will have altered the local layout
-        Down = p.new FindFirstGreaterThanOrEqualInBranch(Key);
+        Down = p.findFirstGreaterThanOrEqualInBranch1(Key);
         p = nodes.elementAt(Down.next);
        }
       else
@@ -844,7 +871,7 @@ class BtreeStuckStatic extends Test                                             
 
   Integer findAndDelete(int Key)                                                // Delete a key from the tree and returns its data if present without modifying the shape of tree
    {z();
-    final Find f = new Find(Key);                                               // Try direct insertion with no modifications to the shape of the tree
+    final Find     f = find1(Key);                                              // Try direct insertion with no modifications to the shape of the tree
     if (!f.found()) return null;                                                // Inserted or updated successfully
     final Node     l = f.leaf();                                                // The leaf that contains the key
     final int      i = f.index();                                               // Position in the leaf of the key
@@ -865,7 +892,7 @@ class BtreeStuckStatic extends Test                                             
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
      {z();
       final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
-      down = p.new FindFirstGreaterThanOrEqualInBranch(Key);
+      down = p.findFirstGreaterThanOrEqualInBranch1(Key);
 
       p.augment(down.first);
       Node q = nodes.elementAt(down.next);
@@ -898,7 +925,7 @@ class BtreeStuckStatic extends Test                                             
       if (p.isLeaf) return;
 
       final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
-      down = p.new FindFirstGreaterThanOrEqualInBranch(Key);
+      down = p.findFirstGreaterThanOrEqualInBranch1(Key);
       p = nodes.elementAt(down.next);
      }
     stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
@@ -1004,12 +1031,12 @@ class BtreeStuckStatic extends Test                                             
     final int a = s.firstKey(), b = s.lastKey();
     for (int i = a-1; i < b + 1; ++i)
      {if (s.containsKey(i))
-       {Find f = t.find(i);
+       {Find f = t.find1(i);
         ok(f.found());
         ok(f.data(), s.get(i));
        }
       else
-       {Find f = t.find(i);
+       {Find f = t.find1(i);
         ok(!f.found());
        }
      }
@@ -1032,7 +1059,7 @@ class BtreeStuckStatic extends Test                                             
 2,4,6,8,10,12,14,16=1   18,20,22,24,26,28,30,32=4   34,36,38,40,42,44,46,48=6   50,52,54,56,58,60,62,64=2 |
 """);
     for (int i = 0; i <= 2*N+1; i++)                                            // Update
-     {Find f = t.find(i);
+     {Find f = t.find1(i);
       if (i > 0 && i % 2 == 0)
        {ok(f.found(), true);
         ok(f.data(),  i);
@@ -1041,7 +1068,7 @@ class BtreeStuckStatic extends Test                                             
       else ok(f.found(), false);
      }
     for (int i = 0; i <= 2*N+1; i++)
-     {Find f = t.find(i);
+     {Find f = t.find2(i);
       if (i > 0 && i % 2 == 0)
        {ok(f.found(), true);
         ok(f.data(),  i-1);
