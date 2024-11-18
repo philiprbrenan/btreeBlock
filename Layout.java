@@ -27,54 +27,6 @@ public class Layout extends Test                                                
 
   public String toString() {return top.toString();}                             // Print layout
 
-//D1 Location                                                                   // The location in memory of a field after array indices have been applied
-
-  class Location                                                                // The location in memory of a field after array indices have been applied
-   {final Field  field;                                                         // Field definition
-    final String  name;                                                         // Field full name
-    final int[]indices;                                                         // Indices to field
-    final int       at;                                                         // Location of field in memory
-    final int    width;                                                         // Width of field in memory
-
-    Location(String Name, int...Indices)                                        // Locate a field after applying array subscripts
-     {z(); name = Name; indices = Indices;
-      field = top.fullNames.get(Name);                                          // Locate field name
-
-      if (field == null)                                                        // Undefined field
-       {stop("No such name:", Name, "in:", Layout.this);
-       }
-
-      z(); int a = field.at, i = Indices.length;
-
-      for(Field f = field; f != null; f = f.up)                                 // Convolute path to field with indices
-       {z();
-        if (f instanceof Array)
-         {z();
-          final Array A = f.toArray();
-          if (i > 0)
-           {z();
-            final int w = A.element.width, s = A.size, n = Indices[--i];
-            if (n < 0 || n >= s) stop("Array:", A.fullName, "has size:", s, "but is being indexed with:", n);
-            a += w * n;
-           }
-          else stop("Too few indices");
-         }
-       }
-      if (i != 0) stop("Too many indices, excess:", i);
-      at = a; width = field.width;
-     }
-
-    public String toString()
-     {final StringBuilder s = new StringBuilder();
-      s.append("Location(name:"+name+" at:"+at+" width:"+width+")\n");
-      return s.toString();
-     }
-   }
-
-  Location location(String Name, int...Indices)                                 // The location in memory of a field after array indices have been applied
-   {z(); return new Location(Name, Indices);
-   }
-
 //D1 Layouts                                                                    // Field memory of the chip as variables, arrays, structures, unions. Dividing the memory in this manner makes it easier to program the chip symbolically.
 
   abstract class Field                                                          // Variable/Array/Structure/Union definition.
@@ -360,12 +312,70 @@ public class Layout extends Test                                                
     final Layout l = L.duplicate();
     final Field  f = l.top;
 
-//  fields.pop();                                                               // Remove the duplicated field from the list of fields
     for(Field lf: l.fields) fields.push(lf);                                     // Add all the duplicated fields in the correct order
     for (int i = 0; i < fields.size(); i++)
      {z(); fields.elementAt(i).number = i;
      }
     return f;                                                                   // Resulting field
+   }
+
+//D1 Location                                                                   // The location in memory of a field after array indices have been applied
+
+  class Locator                                                                 // Locate the address in memory of a layout element
+   {final Field       field;                                                    // Field definition
+    final Stack<Array>arrays = new Stack<>();                                   // Array elements requiring including in the path to the element
+
+    Locator(String Name)                                                        // Locate a field
+     {z();
+      field = top.fullNames.get(Name);                                          // Locate field name
+
+      if (field == null)                                                        // Undefined field
+       {stop("No such name:", Name, "in:", Layout.this);
+       }
+
+      z();
+
+      for(Field f = field; f != null; f = f.up)                                 // Convolute path to field with indices
+       {z();
+        if (f instanceof Array)
+         {z();
+          arrays.insertElementAt((Array)f, 0);
+         }
+       }
+     }
+
+    int at(int...Indices)                                                       // The address of an element in memory including any array indices
+     {z();
+      if (Indices.length != arrays.size())                                      // Check number of indices
+       {stop("Wrong number of indices, expected:", arrays.size(), "but got:", Indices.length);
+       }
+
+      z(); int d = field.at; final int N = arrays.size();
+
+      for(int i = 0; i < N; ++i)                                                // Convolute path to field with indices
+       {z();
+        final Array A = arrays.elementAt(i);
+        final int   w = A.element.width, s = A.size, n = Indices[i];
+        if (n < 0 || n >= s) stop("Array:", A.fullName, "has size:", s, "but is being indexed with:", n);
+        d += w * n;
+       }
+      return d;
+     }
+
+    public String toString()                                                    // Print locator
+     {z();
+      final StringBuilder s = new StringBuilder();
+      s.append("Locator:\n");
+      for(int i = 0; i < arrays.size(); ++i)                                    // Convolute path to field with indices
+       {z();
+        s.append(arrays.elementAt(i));
+       }
+      return s.toString();
+     }
+   }
+
+  Locator locator(String Name)                                                  // Locate the address in memory of a layout element
+   {z(); return new Locator(Name);
    }
 
 //D0                                                                            // Tests.
@@ -394,10 +404,9 @@ V    8     4                c                    A.s.c
 V   28     4            e                    e
 """);
 
-    Location lc = l.location("A.s.c", 2);
-    ok(lc, """
-Location(name:A.s.c at:24 width:4)
-""");
+    Locator lc = l.locator("A.s.c");
+    ok(lc.at(1), 16);
+    ok(lc.at(2), 24);
    }
 
   static void test_array()
@@ -412,10 +421,9 @@ A    0     8     4    A
 V    0     2            a                    a
 """);
 
-    Location lc = l.location("a", 2);
-    ok(lc, """
-Location(name:a at:4 width:2)
-""");
+    Locator lc = l.locator("a");
+    ok(lc.at(1), 2);
+    ok(lc.at(2), 4);
    }
 
   static void test_arrays()
@@ -447,15 +455,9 @@ V   28     4                e                    B.S.e
 """);
 
 
-    Location c1 = l.location("B.S.A.s.c", 1, 2, 1);
-    ok(c1, """
-Location(name:B.S.A.s.c at:208 width:4)
-""");
-
-    Location c2 = l.location("B.S.A.s.c", 1, 2, 2);
-    ok(c2, """
-Location(name:B.S.A.s.c at:216 width:4)
-""");
+    Locator x = l.locator("B.S.A.s.c");
+    ok(x.at(1, 2, 1), 208);
+    ok(x.at(1, 2, 2), 216);
 
     ok(l.size(), 640);
     ok(a.sameSize(b), 2);
@@ -523,21 +525,6 @@ V   10     4            C                    C
     Layout  N = M.duplicate();
     //stop(N);
     ok(L, N);
-
-    Location La = L.location("s.a");
-    ok(La, """
-Location(name:s.a at:2 width:2)
-""");
-
-    Location Lb = L.location("s.b");
-    ok(Lb, """
-Location(name:s.b at:4 width:2)
-""");
-
-    Location Lc = L.location("s.c");
-    ok(Lc, """
-Location(name:s.c at:6 width:4)
-""");
    }
 
   static void test_duplicate_array()
@@ -568,15 +555,34 @@ A    2    16     8      A                    A
 V    2     2              a                    A.a
 V   18     4            Y                    Y
 """);
+   }
 
-    Location a0 = L.location("A.a", 0);
-    ok(a0, """
-Location(name:A.a at:2 width:2)
+  static void test_array_indexing()
+   {Layout    l = new Layout();
+    Variable  a = l.variable ("a", 2);
+    Array     A = l.array    ("A", a, 4);
+    Array     B = l.array    ("B", A, 4);
+    l.compile();
+    //stop(l);
+    l.ok("""
+T   At  Wide  Size    Name                   Path
+A    0    32     4    B
+A    0     8     4      A                    A
+V    0     2              a                    A.a
 """);
 
-    Location a1 = L.location("A.a", 1);
-    ok(a1, """
-Location(name:A.a at:4 width:2)
+    final Locator L = l.locator("A.a");
+    ok(L.at(2, 2), 20);
+    ok(L.at(2, 3), 22);
+    ok(L, """
+Locator:
+T   At  Wide  Size    Name                   Path
+A    0    32     4    B
+A    0     8     4      A                    A
+V    0     2              a                    A.a
+T   At  Wide  Size    Name                   Path
+A    0     8     4      A
+V    0     2              a                    a
 """);
    }
 
@@ -587,6 +593,7 @@ Location(name:A.a at:4 width:2)
     test_union();
     test_duplicate();
     test_duplicate_array();
+    test_array_indexing();
    }
 
   static void newTests()                                                        // Tests being worked on
@@ -596,7 +603,7 @@ Location(name:A.a at:4 width:2)
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      if (github_actions)                                                       // Coverage analysis
+      //if (github_actions)                                                       // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
