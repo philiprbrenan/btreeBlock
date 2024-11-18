@@ -113,11 +113,19 @@ class Memory extends Test                                                       
     return true;
    }
 
-  void copy(int target, int source, int width)                                  // Copy the specified number of bits from source to start
+  void copy(int target, int source, int width)                                  // Copy the specified number of bits from source to target low bits first
    {z();
     for(int i = 0; i < width; ++i)
      {z();
       set(target+i, getBit(source+i));
+     }
+   }
+
+  void copyHigh(int target, int source, int width)                              // Copy the specified number of bits from source to target high bits first
+   {z();
+    for(int i = width; i > 0; --i)
+     {z();
+      set(target+i-1, getBit(source+i-1));
      }
    }
 
@@ -206,7 +214,7 @@ class Memory extends Test                                                       
 00000110
 """);
 
-    m.copy(5, 1, 2);
+    m.copyHigh(5, 1, 2);
     ok(""+m, """
 765-3210
 01100110
