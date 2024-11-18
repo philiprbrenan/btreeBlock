@@ -41,7 +41,7 @@ class Memory extends Test                                                       
 
 //D3 Set                                                                        // Set a bit
 
-  void set(int start, boolean value)                                            // Set a bit
+  void set(int start, boolean value)                                            // Set a bit from a boolean
    {z();
     check(start, 1);
     bits[start] = value;
@@ -61,7 +61,7 @@ class Memory extends Test                                                       
 
 //D3 Get                                                                        // Get a bit
 
-  boolean getBit(int start)                                                     // Get a bit from memory
+  boolean getBit(int start)                                                     // Get a boolean from memory
    {check(start, 1);
     z(); return bits[start];
    }
