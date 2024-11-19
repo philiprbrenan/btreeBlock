@@ -25,8 +25,19 @@ class MemoryLayout extends Test                                                 
 
 //D1 Components                                                                 // A branch or leaf in the tree
 
-  void equals(Layout.Locator target, Layout.Locator source)
-   {
+  abstract class Equals                                                         // Compare two fields
+   {final Layout.Field a;
+    final Layout.Field b;
+    int[]iA() {final int[]i = {1,2}; return i;}
+    int[]iB() {final int[]i = {2,1}; return i;}
+
+    Equals(Layout.Field A, Layout.Field B)
+     {a = A; b = B;
+      a.sameSize(b);
+     }
+    boolean x()
+     {return memory.equals(a.at(iA()), b.at(iB()), a.width());
+     }
    }
 
 //D0 Tests                                                                      // Testing
