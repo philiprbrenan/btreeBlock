@@ -53,6 +53,7 @@ public class Layout extends Test                                                
       final int   width = Field.this.width;
       final int      at;
       Location(int At) {at = At;}
+      int sameSize(Location b) {return field.sameSize(b.field);}
       public String toString() {return field.name+"@"+at;}
      }
 
