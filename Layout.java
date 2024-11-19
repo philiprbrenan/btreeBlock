@@ -48,7 +48,16 @@ public class Layout extends Test                                                
       fields.push(this);
      }
 
-    int at(int...Indices) {z(); return locator.at(Indices);}                    // Location of field taking into account field indices
+    class Location                                                              // The location of a field after indices have been applied
+     {final Field field = Field.this;
+      final int   width = Field.this.width;
+      final int      at;
+      Location(int At) {at = At;}
+      public String toString() {return field.name+"@"+at;}
+     }
+
+    Location at(int...Indices) {z(); return new Location(locator.at(Indices));} // Location of field taking into account field indices
+
     int width()           {z(); return width;}                                  // Size of the memory in bits occupied by this field
 
     void fullName(Layout.Field top, StringBuilder s)                            // The full name of a field relative to the indicated top
@@ -409,8 +418,9 @@ V   28     4            e                    e
 """);
 
     Locator lc = l.locator("A.s.c");
-    ok(lc.at(1), 16);
-    ok(lc.at(2), 24);
+    ok(lc.at(1),  16);
+    ok(lc.at(2),  24);
+    ok(e.at(), "e@28");
    }
 
   static void test_array()
@@ -467,7 +477,7 @@ V   28     4                e                    B.S.e
     ok(a.sameSize(b), 2);
     s.toStructure();
     A.toArray();
-    ok(b.at(0,0,0),    6);
+    ok(b.at(0,0,0),    "b@6");
     ok(b.width(), 2);
 
     Layout L = l.duplicate();
@@ -492,6 +502,7 @@ B    0     1            b                    b
     a.toVariable();
     b.toBit();
     u.toUnion();
+
    }
 
   static void test_duplicate()
@@ -575,8 +586,8 @@ A    0     8     4      A                    A
 V    0     2              a                    A.a
 """);
 
-    ok(a.at(2, 2), 20);
-    ok(l.get("A.a").at(2, 3), 22);
+    ok(a.at(2, 2),            "a@20");
+    ok(l.get("A.a").at(2, 3), "a@22");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
