@@ -182,6 +182,22 @@ class Memory extends Test                                                       
     return !lessThan(a, b, width);
    }
 
+//D1 Patterns                                                                   // Pattern the memory to make testing more interesting
+
+  void increasing()                                                             // Increase the separation of ones and zeros
+   {z();
+    final int N = size();
+    int k0 = 0, k1 = 0, n = 1;
+    for(int i = 0; i < N; ++i)
+     {z();
+      if (k0 >= n && k1 >= n)
+       {z(); k0 = k1 = 0; ++n;
+       }
+      if      (k0++ < n) set(i, false);
+      else if (k1++ < n) set(i, true);
+     }
+   }
+
 //D0                                                                            // Tests
 
   static void test_set_get()
@@ -253,6 +269,12 @@ class Memory extends Test                                                       
      }
    }
 
+  static void test_increasing()
+   {Memory m = memory(32);
+    m.increasing();
+    say(m);
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_set_get();
     test_zero_ones();
@@ -262,7 +284,8 @@ class Memory extends Test                                                       
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_increasing();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
