@@ -115,6 +115,10 @@ class MemoryLayout extends Test                                                 
    {return memory.getInt(field.locator.at(indices), field.width);
    }
 
+  void set(Layout.Field field, int value, int...indices)                        // Set a value in memory
+   {memory.set(field.locator.at(indices), field.width, value);
+   }
+
 //D1 Components                                                                 // A branch or leaf in the tree
 
   class At
@@ -206,6 +210,8 @@ class MemoryLayout extends Test                                                 
    {TestMemoryLayout t = new TestMemoryLayout();
         MemoryLayout m = t.M;
     ok(m.at(t.a, 0, 2, 2), "a[0,2,2]=3");
+    m.set(t.c, 5, 0, 0, 2);
+    //say(m);
     m.ok("""
 Line T       At      Wide       Size    Indices        Value   Name
    1 A        0       640          5                           C
@@ -224,7 +230,7 @@ Line T       At      Wide       Size    Indices        Value   Name
   14 S        4         8               0 0 2                          s
   15 V        4         2               0 0 2              0             a
   16 V        6         2               0 0 2              0             b
-  17 V        8         4               0 0 2             14             c
+  17 V        8         4               0 0 2              5             c
   18 V       28         4               0 0                3         e
  311 S        0        32               4 3                        S
  312 V        0         4               4 3                0         d
