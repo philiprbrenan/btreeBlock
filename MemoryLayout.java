@@ -111,12 +111,13 @@ class MemoryLayout extends Test                                                 
 
 //D1 Get and Set                                                                // Get and set values in memory
 
-  int getInt(Layout.Field field, int...indices)                                 // Get a value from memory
-   {return memory.getInt(field.locator.at(indices), field.width);
+  int getInt(Layout.Field field,            int...indices)                      // Get a value from memory
+   {z(); return new At(field, indices).result;
    }
 
-  void set(Layout.Field field, int value, int...indices)                        // Set a value in memory
-   {memory.set(field.locator.at(indices), field.width, value);
+  void set  (Layout.Field field, int value, int...indices)                      // Set a value in memory
+   {z(); final At a = new At(field, indices);
+    memory.set(a.at, a.width, value);
    }
 
 //D1 Components                                                                 // A branch or leaf in the tree
@@ -124,13 +125,20 @@ class MemoryLayout extends Test                                                 
   class At
    {final Layout.Field field;
     final int[]indices;
+    final int  width;
+    final int  at;
     final int  result;
     At(Layout.Field Field, int...Indices)
-     {z(); field = Field; indices = Indices;
-      result = memory.getInt(field.locator.at(indices), width());
+     {z(); field = Field; indices = Indices; width = field.width;
+      at     = field.locator.at(indices);
+      result = memory.getInt(at, width);
      }
-    int width()              {z(); return field.width();}
-    int sameSize(At b)       {z(); return field.sameSize(b.field);}
+    int     width()        {z(); return field.width();}
+    boolean sameSize(At b)
+     {z(); field.sameSize(b.field);
+      z(); if (MemoryLayout.this != b.ml()) stop("Different memory layout");
+      z(); return true;
+     }
 
     public String toString()                                                    // Print field name(indices)=value or name=value if there are no indices
      {final StringBuilder s = new StringBuilder();
@@ -141,63 +149,97 @@ class MemoryLayout extends Test                                                 
          {s.append(indices[i]);
           if (i < N-1) s.append(",");
          }
-        s.append("]");
+        s.append("]"+at);
        }
       s.append("="+result);
       return s.toString();
      }
+    MemoryLayout ml() {return MemoryLayout.this;}
    }
 
   At at(Layout.Field Field, int...Indices)
    {return new At(Field, Indices);
    }
 
-//D1 Boolean                                                                    // Boolean operations on fields held in memeory
 
-  boolean equals(At a, At b)                                                    // Whether  a == b
-   {z(); a.sameSize(b);
-    return memory.equals(a.result, b.result, a.width());
+//D2 Composite                                                                  // Composite memory access
+
+  void zero(At a)                                                               // Zero some memory
+   {z(); memory.zero(a.at, a.width);
    }
 
-  boolean notEquals(At a, At b)                                                 // Whether a != b
+  void ones(At a)                                                               // Ones some memory
+   {z(); memory.ones(a.at, a.width);
+   }
+
+  void copy(At target, At source)                                               // Copy the specified number of bits from source to target low bits first
+   {z(); target.sameSize(source);
+    memory.copy(target.at, source.at, source.width);
+   }
+
+  void copyHigh(At target, At source)                                                      // Copy the specified number of bits from source to target high bits first
+   {z(); target.sameSize(source);
+    memory.copyHigh(target.at, source.at, source.width);
+   }
+
+  void invert(At a)                                                             // Invert the specified bits
+   {z(); memory.invert(a.result, a.width());
+   }
+
+//D1 Boolean                                                                    // Boolean operations on fields held in memeory
+
+  boolean isAllZero(At a)                                                       // Check that the specified memory is all zeros
+   {z(); return memory.isAllZero(a.at, a.width);
+   }
+
+  boolean isAllOnes(At a)                                                       // Check that  the specified memory is all ones
+   {z(); return memory.isAllOnes(a.at, a.width);
+   }
+
+  boolean equal(At a, At b)                                                     // Whether  a == b
    {z(); a.sameSize(b);
-    return memory.notEquals(a.result, b.result, a.width());
+    z(); return memory.equals(a.at, b.at, a.width);
+   }
+
+  boolean notEqual(At a, At b)                                                  // Whether a != b
+   {z(); a.sameSize(b);
+    return memory.notEquals(a.at, b.at, a.width);
    }
 
   boolean lessThan(At a, At b)                                                  // Whether a < b
    {z(); a.sameSize(b);
-    return memory.lessThan(a.result, b.result, a.width());
+    return memory.lessThan(a.at, b.at, a.width);
    }
 
   boolean lessThanOrEqual(At a, At b)                                           // Whether a <= b
    {z(); a.sameSize(b);
-    return memory.lessThanOrEqual(a.result, b.result, a.width());
+    return memory.lessThanOrEqual(a.at, b.at, a.width);
    }
 
   boolean greaterThan(At a, At b)                                               // Whether a > b
    {z(); a.sameSize(b);
-    return memory.greaterThan(a.result, b.result, a.width());
+    return memory.greaterThan(a.at, b.at, a.width);
    }
 
   boolean greaterThanOrEqual(At a, At b)                                        // Whether a >= b
    {z(); a.sameSize(b);
-    return memory.greaterThanOrEqual(a.result, b.result, a.width());
+    return memory.greaterThanOrEqual(a.at, b.at, a.width);
    }
 
 //D0 Tests                                                                      // Testing
 
   static class TestMemoryLayout
    {Layout           l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", 2);
-    Layout.Variable  b = l.variable ("b", 2);
-    Layout.Variable  c = l.variable ("c", 4);
+    Layout.Variable  a = l.variable ("a", 3);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Variable  c = l.variable ("c", 5);
     Layout.Structure s = l.structure("s", a, b, c);
     Layout.Array     A = l.array    ("A", s, 3);
-    Layout.Variable  d = l.variable ("d", 4);
-    Layout.Variable  e = l.variable ("e", 4);
+    Layout.Variable  d = l.variable ("d", 5);
+    Layout.Variable  e = l.variable ("e", 7);
     Layout.Structure S = l.structure("S", d, A, e);
-    Layout.Array     B = l.array    ("B", S, 4);
-    Layout.Array     C = l.array    ("C", B, 5);
+    Layout.Array     B = l.array    ("B", S, 3);
+    Layout.Array     C = l.array    ("C", B, 3);
     MemoryLayout     M;
     TestMemoryLayout()
      {l.compile();
@@ -206,58 +248,81 @@ class MemoryLayout extends Test                                                 
      }
    }
 
-  static void test_get()                                                        // Tests thought to be in good shape
+  static void test_get_set()
    {TestMemoryLayout t = new TestMemoryLayout();
         MemoryLayout m = t.M;
-    ok(m.at(t.a, 0, 2, 2), "a[0,2,2]=3");
-    m.set(t.c, 5, 0, 0, 2);
-    //say(m);
-    m.ok("""
-Line T       At      Wide       Size    Indices        Value   Name
-   1 A        0       640          5                           C
-   2 A        0       128          4    0                        B
-   3 S        0        32               0 0                        S
-   4 V        0         4               0 0                2         d
-   5 A        4        24          3    0 0                          A
-   6 S        4         8               0 0 0                          s
-   7 V        4         2               0 0 0              3             a
-   8 V        6         2               0 0 0              0             b
-   9 V        8         4               0 0 0             14             c
-  10 S        4         8               0 0 1                          s
-  11 V        4         2               0 0 1              0             a
-  12 V        6         2               0 0 1              0             b
-  13 V        8         4               0 0 1             15             c
-  14 S        4         8               0 0 2                          s
-  15 V        4         2               0 0 2              0             a
-  16 V        6         2               0 0 2              0             b
-  17 V        8         4               0 0 2              5             c
-  18 V       28         4               0 0                3         e
- 311 S        0        32               4 3                        S
- 312 V        0         4               4 3                0         d
- 313 A        4        24          3    4 3                          A
- 314 S        4         8               4 3 0                          s
- 315 V        4         2               4 3 0              0             a
- 316 V        6         2               4 3 0              0             b
- 317 V        8         4               4 3 0              0             c
- 318 S        4         8               4 3 1                          s
- 319 V        4         2               4 3 1              0             a
- 320 V        6         2               4 3 1              0             b
- 321 V        8         4               4 3 1             14             c
- 322 S        4         8               4 3 2                          s
- 323 V        4         2               4 3 2              3             a
- 324 V        6         2               4 3 2              3             b
- 325 V        8         4               4 3 2             15             c
- 326 V       28         4               4 3               15         e
-""");
+              Layout l = m.layout;
+    ok(m.at(t.c,     0, 0, 1), "c[0,0,1]24=30");
+    m.set  (t.c, 11, 0, 0, 1);
+    ok(m.at(t.c,     0, 0, 1), "c[0,0,1]24=11");
+
+    ok(m.at(t.a,     0, 2, 2), "a[0,2,2]125=7");
+    m.set  (t.a,  5, 0, 2, 2);
+    ok(m.at(t.a,     0, 2, 2), "a[0,2,2]125=5");
+
+    ok(m.at(t.b,     1, 2, 2), "b[1,2,2]272=0");
+    m.set  (t.b,  7, 1, 2, 2);
+    ok(m.at(t.b,     1, 2, 2), "b[1,2,2]272=7");
+
+    ok(m.at(t.e,     1, 2), "e[1,2]281=0");
+    m.set  (t.e, 11, 1, 2);
+    ok(m.at(t.e,     1, 2), "e[1,2]281=11");
+   }
+
+  static void test_boolean()
+   {TestMemoryLayout t = new TestMemoryLayout();
+        MemoryLayout m = t.M;
+    m.set  (t.a, 1, 0, 1, 1);
+    m.set  (t.a, 2, 0, 1, 2);
+    m.set  (t.a, 1, 0, 2, 1);
+    m.set  (t.a, 2, 0, 2, 2);
+
+    ok( m.equal(m.at(t.a, 0, 1, 1), m.at(t.a, 0, 2, 1)));
+    ok(!m.equal(m.at(t.a, 0, 1, 1), m.at(t.a, 0, 1, 2)));
+
+    ok(!m.notEqual(m.at(t.a, 0, 1, 1), m.at(t.a, 0, 2, 1)));
+    ok( m.notEqual(m.at(t.a, 0, 1, 1), m.at(t.a, 0, 1, 2)));
+
+    ok( m.lessThan       (m.at(t.a, 0, 1, 1), m.at(t.a, 0, 1, 2)));
+    ok(!m.lessThan       (m.at(t.a, 0, 1, 1), m.at(t.a, 0, 2, 1)));
+    ok( m.lessThanOrEqual(m.at(t.a, 0, 1, 1), m.at(t.a, 0, 1, 2)));
+    ok( m.lessThanOrEqual(m.at(t.a, 0, 1, 1), m.at(t.a, 0, 2, 1)));
+    ok(!m.lessThanOrEqual(m.at(t.a, 0, 1, 2), m.at(t.a, 0, 2, 1)));
+
+    ok(!m.greaterThan       (m.at(t.a, 0, 1, 1), m.at(t.a, 0, 1, 2)));
+    ok( m.greaterThan       (m.at(t.a, 0, 1, 2), m.at(t.a, 0, 1, 1)));
+    ok( m.greaterThanOrEqual(m.at(t.a, 0, 2, 1), m.at(t.a, 0, 1, 1)));
+    ok( m.greaterThanOrEqual(m.at(t.a, 0, 1, 1), m.at(t.a, 0, 2, 1)));
+    ok(!m.greaterThanOrEqual(m.at(t.a, 0, 2, 1), m.at(t.a, 0, 1, 2)));
+   }
+
+  static void test_copy()
+   {TestMemoryLayout t = new TestMemoryLayout();
+        MemoryLayout m = t.M;
+    m.set  (t.a, 1, 0, 0, 0);
+    m.set  (t.a, 2, 0, 0, 1);
+    m.set  (t.a, 3, 0, 0, 2);
+
+    ok(m.at(t.a, 0, 0, 0), "a[0,0,0]5=1");
+    ok(m.at(t.a, 0, 0, 1), "a[0,0,1]17=2");
+    ok(m.at(t.a, 0, 0, 2), "a[0,0,2]29=3");
+
+    m.copy(m.at(t.a, 0, 0, 1), m.at(t.a, 0, 0, 0));
+    m.copy(m.at(t.a, 0, 0, 2), m.at(t.a, 0, 0, 1));
+
+    ok(m.at(t.a, 0, 0, 0), "a[0,0,0]5=1");
+    ok(m.at(t.a, 0, 0, 1), "a[0,0,1]17=1");
+    ok(m.at(t.a, 0, 0, 2), "a[0,0,2]29=1");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
-   {
+   {test_get_set();
+    test_boolean();
+    test_copy();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_get();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
