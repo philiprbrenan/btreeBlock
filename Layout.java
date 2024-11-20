@@ -96,7 +96,7 @@ public class Layout extends Test                                                
 
     abstract void layout(int at, int depth);                                    // Layout this field
 
-    static String indent() {return "  ".repeat(depth);}                         // Indentation during printing
+    String  indent() {return "  ".repeat(depth);}                               // Indentation during printing
     char fieldType() {return getClass().getName().split("\\$")[1].charAt(0);}   // First letter of inner most class name to identify type of field
 
     StringBuilder header()                                                      // Create a string builder with a header preloaded
