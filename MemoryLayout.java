@@ -23,19 +23,20 @@ class MemoryLayout extends Test                                                 
        ("%4s %1s %8s  %8s   %8s   %8s     %8s   %s\n",
         "Line", "T", "At", "Wide", "Size", "Indices", "Value", "Name"));
     final Stack<Integer>indices = new Stack<>();
-    print(layout.top, s, 0, 0, indices);
+    final int[]lineNumber       = new int[1]; lineNumber[0] = 1;
+    print(layout.top, s, lineNumber, 0, indices);
     return s.toString();
    }
 
 //D1 Print                                                                      // Print a memory layout
 
   void print(Layout.Field field, StringBuilder t,                               // Print the values of each variable in memory
-             int lineNumber, int indent, Stack<Integer> indices)
+             int[]lineNumber, int indent, Stack<Integer> indices)
    {final int[]in = new int[indices.size()];
     for (int i = 0, I = indices.size(); i < I; i++) in[i] = indices.elementAt(i);
 
     t.append(String.format("%4d %s %8d  %8d",
-      lineNumber+1, field.fieldType(), field.at, field.width));
+      lineNumber[0], field.fieldType(), field.at, field.width));
 
     t.append(switch(field)                                                      // Size
      {case Layout.Bit       b -> String.format("%11s", "");
@@ -75,13 +76,15 @@ class MemoryLayout extends Test                                                 
       case Layout.Array     a ->                                                // Array
        {for (int i = 0; i < a.size; i++)
          {indices.push(i);
-          print(a.element, t, lineNumber++, indent+1, indices);
+          lineNumber[0]++;
+          print(a.element, t, lineNumber, indent+1, indices);
           indices.pop();
          }
        }
       case Layout.Structure s ->                                                // Structure and Union
        {for (int i = 0; i < s.fields.length; i++)
-         {print(s.fields[i], t, lineNumber++, indent+1, indices);
+         {lineNumber[0]++;
+          print(s.fields[i], t, lineNumber, indent+1, indices);
          }
        }
       default -> stop("Unknown field type:", field);
@@ -200,7 +203,43 @@ class MemoryLayout extends Test                                                 
    {TestMemoryLayout t = new TestMemoryLayout();
         MemoryLayout m = t.M;
     ok(m.at(t.a, 0, 2, 2), "a[0,2,2]=3");
-    say(m);
+    m.ok("""
+Line T       At      Wide       Size    Indices        Value   Name
+   1 A        0       640          5                           C
+   2 A        0       128          4    0                        B
+   3 S        0        32               0 0                        S
+   4 V        0         4               0 0                2         d
+   5 A        4        24          3    0 0                          A
+   6 S        4         8               0 0 0                          s
+   7 V        4         2               0 0 0              3             a
+   8 V        6         2               0 0 0              0             b
+   9 V        8         4               0 0 0             14             c
+  10 S        4         8               0 0 1                          s
+  11 V        4         2               0 0 1              0             a
+  12 V        6         2               0 0 1              0             b
+  13 V        8         4               0 0 1             15             c
+  14 S        4         8               0 0 2                          s
+  15 V        4         2               0 0 2              0             a
+  16 V        6         2               0 0 2              0             b
+  17 V        8         4               0 0 2             14             c
+  18 V       28         4               0 0                3         e
+ 311 S        0        32               4 3                        S
+ 312 V        0         4               4 3                0         d
+ 313 A        4        24          3    4 3                          A
+ 314 S        4         8               4 3 0                          s
+ 315 V        4         2               4 3 0              0             a
+ 316 V        6         2               4 3 0              0             b
+ 317 V        8         4               4 3 0              0             c
+ 318 S        4         8               4 3 1                          s
+ 319 V        4         2               4 3 1              0             a
+ 320 V        6         2               4 3 1              0             b
+ 321 V        8         4               4 3 1             14             c
+ 322 S        4         8               4 3 2                          s
+ 323 V        4         2               4 3 2              3             a
+ 324 V        6         2               4 3 2              3             b
+ 325 V        8         4               4 3 2             15             c
+ 326 V       28         4               4 3               15         e
+""");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
