@@ -48,17 +48,7 @@ public class Layout extends Test                                                
       fields.push(this);
      }
 
-    class Location                                                              // The location of a field after indices have been applied
-     {final Field field = Field.this;
-      final int   width = Field.this.width;
-      final int      at;
-      Location(int At) {at = At;}
-      int sameSize(Location b) {return field.sameSize(b.field);}
-      public String toString() {return field.name+"@"+at;}
-     }
-
-    Location at(int...Indices) {z(); return new Location(locator.at(Indices));} // Location of field taking into account field indices
-
+    int at(int...Indices) {z(); return locator.at(Indices);}                    // Location of field taking into account field indices
     int width()           {z(); return width;}                                  // Size of the memory in bits occupied by this field
 
     void fullName(Layout.Field top, StringBuilder s)                            // The full name of a field relative to the indicated top
@@ -106,7 +96,7 @@ public class Layout extends Test                                                
 
     abstract void layout(int at, int depth);                                    // Layout this field
 
-    String  indent() {return "  ".repeat(depth);}                               // Indentation during printing
+    static String indent() {return "  ".repeat(depth);}                         // Indentation during printing
     char fieldType() {return getClass().getName().split("\\$")[1].charAt(0);}   // First letter of inner most class name to identify type of field
 
     StringBuilder header()                                                      // Create a string builder with a header preloaded
@@ -127,8 +117,8 @@ public class Layout extends Test                                                
      }
 
     void print(Layout.Field top, StringBuilder s)                               // Print the field
-     {final String  n = printName(top);                                         // Name using indentation to show depth
-      final char    c = fieldType();                                            // First letter of inner most class name to identify type of field
+     {final String n = printName(top);                                          // Name using indentation to show depth
+      final char   c = fieldType();                                             // First letter of inner most class name to identify type of field
 
       s.append(String.format("%c %4d  %4d          %-16s\n",                    // Variable
                              c,  at,  width,   n));
@@ -421,7 +411,7 @@ V   28     4            e                    e
     Locator lc = l.locator("A.s.c");
     ok(lc.at(1),  16);
     ok(lc.at(2),  24);
-    ok(e.at(), "e@28");
+    ok(e.at(), 28);
    }
 
   static void test_array()
@@ -478,7 +468,7 @@ V   28     4                e                    B.S.e
     ok(a.sameSize(b), 2);
     s.toStructure();
     A.toArray();
-    ok(b.at(0,0,0),    "b@6");
+    ok(b.at(0,0,0),    6);
     ok(b.width(), 2);
 
     Layout L = l.duplicate();
@@ -587,8 +577,8 @@ A    0     8     4      A                    A
 V    0     2              a                    A.a
 """);
 
-    ok(a.at(2, 2),            "a@20");
-    ok(l.get("A.a").at(2, 3), "a@22");
+    ok(a.at(2, 2),            20);
+    ok(l.get("A.a").at(2, 3), 22);
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
