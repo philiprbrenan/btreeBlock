@@ -409,6 +409,7 @@ V   28     4            e                    e
 """);
 
     Locator lc = l.locator("A.s.c");
+    ok(lc.at(0),   8);
     ok(lc.at(1),  16);
     ok(lc.at(2),  24);
     ok(e.at(), 28);
@@ -427,6 +428,7 @@ V    0     2            a                    a
 """);
 
     Locator lc = l.locator("a");
+    ok(lc.at(0), 0);
     ok(lc.at(1), 2);
     ok(lc.at(2), 4);
    }
@@ -460,7 +462,15 @@ V   28     4                e                    B.S.e
 """);
 
 
+    Locator k = l.locator("B.S.A.s.a");
+    ok(k.at(0, 0, 0),   4);
+    ok(k.at(0, 0, 1),  12);
+    ok(k.at(1, 2, 1), 204);
+    ok(k.at(1, 2, 2), 212);
+
     Locator x = l.locator("B.S.A.s.c");
+    ok(x.at(0, 0, 0),   8);
+    ok(x.at(0, 0, 1),  16);
     ok(x.at(1, 2, 1), 208);
     ok(x.at(1, 2, 2), 216);
 
