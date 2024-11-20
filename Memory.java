@@ -51,11 +51,10 @@ class Memory extends Test                                                       
   void set(int start, int width, int value)                                     // Set some memory from an integer
    {check(start, width);
     z();
-
     final int w = min(Integer.SIZE-1, width);
     for(int i = 0; i < w; ++i)
      {z();
-      final int n =  value & (1 << i);
+      final int n = value & (1 << i);
       set(start+i, n != 0);
      }
    }
