@@ -58,7 +58,7 @@ class MemoryLayout extends Test                                                 
     t.append(switch(field)                                                      // Value
      {case Layout.Variable  v ->
        {final int a = field.locator.at(in);
-        final int n = memory.getInt(a, field.width);
+        final int n = getInt(field, in);
         yield String.format("%13d", n);
        }
       case Layout.Array     a -> String.format("%13s", "");
@@ -109,6 +109,11 @@ class MemoryLayout extends Test                                                 
     ++Layout.testsPassed;                                                       // Lines found
    }
 
+//D1 Get and Set                                                                // Get and set values in memory
+
+  int getInt(Layout.Field field, int...indices)                                 // Get a value from memory
+   {return memory.getInt(field.locator.at(indices), field.width);
+   }
 
 //D1 Components                                                                 // A branch or leaf in the tree
 
@@ -138,6 +143,7 @@ class MemoryLayout extends Test                                                 
       return s.toString();
      }
    }
+
   At at(Layout.Field Field, int...Indices)
    {return new At(Field, Indices);
    }
