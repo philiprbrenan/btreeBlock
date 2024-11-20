@@ -17,6 +17,8 @@ class MemoryLayout extends Test                                                 
     memory = new Memory(layout.size());
    }
 
+//D1 Print                                                                      // Print a memory layout
+
   public String toString()                                                      // Print the values of the layout variable in memory
    {final StringBuilder s = new StringBuilder();
     s.append(String.format
@@ -28,8 +30,6 @@ class MemoryLayout extends Test                                                 
     return s.toString();
    }
 
-//D1 Print                                                                      // Print a memory layout
-
   void print(Layout.Field field, StringBuilder t,                               // Print the values of each variable in memory
              int[]lineNumber, int indent, Stack<Integer> indices)
    {final int[]in = new int[indices.size()];
@@ -39,8 +39,7 @@ class MemoryLayout extends Test                                                 
       lineNumber[0], field.fieldType(), field.at, field.width));
 
     t.append(switch(field)                                                      // Size
-     {case Layout.Bit       b -> String.format("%11s", "");
-      case Layout.Variable  v -> String.format("%11s", "");
+     {case Layout.Variable  v -> String.format("%11s", "");
       case Layout.Array     a -> String.format("%11d", a.size);
       case Layout.Structure s -> String.format("%11s", "");
       default -> {stop("Unknown field type:", field); yield "";}
@@ -57,8 +56,7 @@ class MemoryLayout extends Test                                                 
      }
 
     t.append(switch(field)                                                      // Value
-     {case Layout.Bit       b -> String.format("%13d", memory.getInt(field.locator.at(in), 1));
-      case Layout.Variable  v ->
+     {case Layout.Variable  v ->
        {final int a = field.locator.at(in);
         final int n = memory.getInt(a, field.width);
         yield String.format("%13d", n);
@@ -71,8 +69,7 @@ class MemoryLayout extends Test                                                 
     t.append("   "+("  ".repeat(indent))+field.name+"\n");                      // Name
 
     switch(field)                                                               // Sub fields
-     {case Layout.Bit       b -> {}
-      case Layout.Variable  v -> {}
+     {case Layout.Variable  v -> {}
       case Layout.Array     a ->                                                // Array
        {for (int i = 0; i < a.size; i++)
          {indices.push(i);
