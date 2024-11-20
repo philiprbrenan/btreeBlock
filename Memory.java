@@ -69,7 +69,7 @@ class Memory extends Test                                                       
   int getInt(int start, int width)                                              // Get an int from memory
    {check(start, width);
     z();
-    if (start < 0 || start + width  >= size()) stop("Out of range");
+    if (start < 0 || start + width  > size()) stop("Out of range");
     z();
     if  (width < 1) stop("width must be one or more, not:", width);
     z();
