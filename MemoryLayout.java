@@ -17,20 +17,191 @@ class MemoryLayout extends Test                                                 
     memory = new Memory(layout.size());
    }
 
+  public String toString()                                                      // Print the values of the layout variable in memory
+   {final StringBuilder s = new StringBuilder();
+    s.append(String.format
+       ("%4s %1s %8s  %8s   %8s   %8s     %8s   %s\n",
+        "Line", "T", "At", "Wide", "Size", "Indices", "Value", "Name"));
+    final Stack<Integer>indices = new Stack<>();
+    print(layout.top, s, 0, 0, indices);
+    return s.toString();
+   }
+
+//D1 Print                                                                      // Print a memory layout
+
+  void print(Layout.Field field, StringBuilder t,                               // Print the values of each variable in memory
+             int lineNumber, int indent, Stack<Integer> indices)
+   {final int[]in = new int[indices.size()];
+    for (int i = 0, I = indices.size(); i < I; i++) in[i] = indices.elementAt(i);
+
+    t.append(String.format("%4d %s %8d  %8d",
+      lineNumber+1, field.fieldType(), field.at, field.width));
+
+    t.append(switch(field)                                                      // Size
+     {case Layout.Bit       b -> String.format("%11s", "");
+      case Layout.Variable  v -> String.format("%11s", "");
+      case Layout.Array     a -> String.format("%11d", a.size);
+      case Layout.Structure s -> String.format("%11s", "");
+      default -> {stop("Unknown field type:", field); yield "";}
+     });
+
+    t.append("   ");
+    for (int i = 0; i < 4; i++)                                                 // Indices
+     {if (i < indices.size())
+       {t.append(String.format("%2d", indices.elementAt(i)));
+       }
+      else
+       {t.append("  ");
+       }
+     }
+
+    t.append(switch(field)                                                      // Value
+     {case Layout.Bit       b -> String.format("%13d", memory.getInt(field.locator.at(in), 1));
+      case Layout.Variable  v ->
+       {final int a = field.locator.at(in);
+        final int n = memory.getInt(a, field.width);
+        yield String.format("%13d", n);
+       }
+      case Layout.Array     a -> String.format("%13s", "");
+      case Layout.Structure s -> String.format("%13s", "");
+      default -> {stop("Unknown field type:", field); yield "";}
+      });
+
+    t.append("   "+("  ".repeat(indent))+field.name+"\n");                      // Name
+
+    switch(field)                                                               // Sub fields
+     {case Layout.Bit       b -> {}
+      case Layout.Variable  v -> {}
+      case Layout.Array     a ->                                                // Array
+       {for (int i = 0; i < a.size; i++)
+         {indices.push(i);
+          print(a.element, t, lineNumber++, indent+1, indices);
+          indices.pop();
+         }
+       }
+      case Layout.Structure s ->                                                // Structure and Union
+       {for (int i = 0; i < s.fields.length; i++)
+         {print(s.fields[i], t, lineNumber++, indent+1, indices);
+         }
+       }
+      default -> stop("Unknown field type:", field);
+     };
+   }
+
 //D1 Control                                                                    // Testing, control and integrity
 
-  void ok(String expected) {Test.ok(toString(), expected);}                     // Confirm memory layout is as expected
   void stop()              {Test.stop(toString());}                             // Stop after printing
-  public String toString() {return "";}                                         // Print
+
+  void ok(String Lines)                                                         // Check that specified lines are present in the memory layout
+   {final String  m = toString();                                               // Memory as string
+    final String[]L = Lines.split("\\n");                                       // Lines of expected
+    int p = 0;
+    for(int i = 0; i < L.length; ++i)                                           // Each expected
+     {final String l = L[i];
+      final int    q = m.indexOf(l, p);                                         // Check specified lines are present
+      if (q == -1)                                                              // Line missing
+       {err("Layout does not contain line:", i+1, "\n"+l+"\n");
+        ++Layout.testsFailed;
+        return;
+       }
+      p = q;
+     }
+    ++Layout.testsPassed;                                                       // Lines found
+   }
+
 
 //D1 Components                                                                 // A branch or leaf in the tree
 
-  boolean equals(Layout.Field.Location a, Layout.Field.Location b)
-    {a.sameSize(b);
-     return memory.equals(a.at, b.at, a.width);
+  class At
+   {final Layout.Field field;
+    final int[]indices;
+    final int  result;
+    At(Layout.Field Field, int...Indices)
+     {z(); field = Field; indices = Indices;
+      result = memory.getInt(field.locator.at(indices), width());
+     }
+    int width()              {z(); return field.width();}
+    int sameSize(At b)       {z(); return field.sameSize(b.field);}
+
+    public String toString()                                                    // Print field name(indices)=value or name=value if there are no indices
+     {final StringBuilder s = new StringBuilder();
+      s.append(field.name);
+      if (indices.length > 0)
+       {s.append("[");
+        for (int i = 0, N = indices.length; i < N; i++)
+         {s.append(indices[i]);
+          if (i < N-1) s.append(",");
+         }
+        s.append("]");
+       }
+      s.append("="+result);
+      return s.toString();
+     }
+   }
+  At at(Layout.Field Field, int...Indices)
+   {return new At(Field, Indices);
+   }
+
+//D1 Boolean                                                                    // Boolean operations on fields held in memeory
+
+  boolean equals(At a, At b)                                                    // Whether  a == b
+   {z(); a.sameSize(b);
+    return memory.equals(a.result, b.result, a.width());
+   }
+
+  boolean notEquals(At a, At b)                                                 // Whether a != b
+   {z(); a.sameSize(b);
+    return memory.notEquals(a.result, b.result, a.width());
+   }
+
+  boolean lessThan(At a, At b)                                                  // Whether a < b
+   {z(); a.sameSize(b);
+    return memory.lessThan(a.result, b.result, a.width());
+   }
+
+  boolean lessThanOrEqual(At a, At b)                                           // Whether a <= b
+   {z(); a.sameSize(b);
+    return memory.lessThanOrEqual(a.result, b.result, a.width());
+   }
+
+  boolean greaterThan(At a, At b)                                               // Whether a > b
+   {z(); a.sameSize(b);
+    return memory.greaterThan(a.result, b.result, a.width());
+   }
+
+  boolean greaterThanOrEqual(At a, At b)                                        // Whether a >= b
+   {z(); a.sameSize(b);
+    return memory.greaterThanOrEqual(a.result, b.result, a.width());
    }
 
 //D0 Tests                                                                      // Testing
+
+  static class TestMemoryLayout
+   {Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 2);
+    Layout.Variable  b = l.variable ("b", 2);
+    Layout.Variable  c = l.variable ("c", 4);
+    Layout.Structure s = l.structure("s", a, b, c);
+    Layout.Array     A = l.array    ("A", s, 3);
+    Layout.Variable  d = l.variable ("d", 4);
+    Layout.Variable  e = l.variable ("e", 4);
+    Layout.Structure S = l.structure("S", d, A, e);
+    Layout.Array     B = l.array    ("B", S, 4);
+    Layout.Array     C = l.array    ("C", B, 5);
+    MemoryLayout     M;
+    TestMemoryLayout()
+     {l.compile();
+      M = new MemoryLayout(l);
+      M.memory.increasing();
+     }
+   }
+
+  static void test_get()                                                        // Tests thought to be in good shape
+   {TestMemoryLayout t = new TestMemoryLayout();
+        MemoryLayout m = t.M;
+    ok(m.at(t.a, 0, 2, 2), "a[0,2,2]=3");
+    say(m);
+   }
 
   static void oldTests()                                                        // Tests thought to be in good shape
    {
@@ -38,6 +209,7 @@ class MemoryLayout extends Test                                                 
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    test_get();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
