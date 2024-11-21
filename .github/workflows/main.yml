@@ -1,4 +1,4 @@
-# Test 2024-11-20 at 20:52:57
+# Test 2024-11-21 at 01:53:46
 
 name: Test
 run-name: btreeBlock
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        task: [Btree, BtreeStuck, BtreeStuckStatic, Layout, Memory, MemoryLayout, Stuck, StuckStatic, Test]
+        task: [Btree, BtreeStuck, BtreeStuckStatic, Layout, Memory, MemoryLayout, Stuck, StuckSML, StuckStatic, Test]
 
     steps:
     - uses: actions/checkout@v4
@@ -83,6 +83,11 @@ jobs:
       if: matrix.task == 'Stuck'
       run: |
         java -cp Classes com/AppaApps/Silicon/Stuck
+
+    - name: Test StuckSML
+      if: matrix.task == 'StuckSML'
+      run: |
+        java -cp Classes com/AppaApps/Silicon/StuckSML
 
     - name: Test StuckStatic
       if: matrix.task == 'StuckStatic'
