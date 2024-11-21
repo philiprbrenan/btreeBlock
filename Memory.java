@@ -198,6 +198,16 @@ class Memory extends Test                                                       
      }
    }
 
+  void alternating(int b)                                                       // Alternate between 0 and 1 in blocks of the specified size
+   {z();
+    final int N = size();
+    boolean v = false;
+    for(int i = 0, j = 0; i < N; ++i, ++j)
+     {z(); if (j == b) {j = 0; v = !v;}
+      set(i, v);
+     }
+   }
+
 //D0                                                                            // Tests
 
   static void test_set_get()
@@ -275,17 +285,25 @@ class Memory extends Test                                                       
     say(m);
    }
 
+  static void test_alternating()
+   {Memory m = memory(32);
+    m.alternating(4);
+    say(m);
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_set_get();
     test_zero_ones();
     test_copy();
     test_invert();
     test_boolean();
+    test_increasing();
+    test_alternating();
    }
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_increasing();
+    test_alternating();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
