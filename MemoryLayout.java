@@ -17,48 +17,63 @@ class MemoryLayout extends Test                                                 
     memory = new Memory(layout.size());
    }
 
-//D1 Print                                                                      // Print a memory layout
-
-  public String toString()                                                      // Print the values of the layout variable in memory
-   {final StringBuilder s = new StringBuilder();
-    s.append(String.format
-       ("%4s %1s %8s  %8s   %8s   %8s     %8s   %s\n",
-        "Line", "T", "At", "Wide", "Size", "Indices", "Value", "Name"));
-    final Stack<Integer>indices = new Stack<>();
-    final int[]lineNumber       = new int[1]; lineNumber[0] = 1;
-    print(layout.top, s, lineNumber, 0, indices);
-    return s.toString();
+  MemoryLayout(Memory Memory, Layout Layout)
+   {memory = Memory;
+    layout = Layout;
    }
 
-  void print(Layout.Field field, StringBuilder t,                               // Print the values of each variable in memory
-             int[]lineNumber, int indent, Stack<Integer> indices)
-   {final int[]in = new int[indices.size()];
-    for (int i = 0, I = indices.size(); i < I; i++) in[i] = indices.elementAt(i);
+//D1 Print                                                                      // Print a memory layout
 
-    t.append(String.format("%4d %s %8d  %8d",
-      lineNumber[0], field.fieldType(), field.at, field.width));
+  static class PrintPosition                                                    // Position in print
+   {final StringBuilder s = new StringBuilder();
+    int line = 1;
+    int bits = 0;
+    final Stack<Integer> indices = new Stack<>();
+   }
 
-    t.append(switch(field)                                                      // Size
+  public String toString()                                                      // Print the values of the layout variable in memory
+   {final PrintPosition pp = new PrintPosition();
+    pp.s.append(String.format
+       ("%4s %1s %8s  %8s   %8s   %8s     %8s   %s\n",
+        "Line", "T", "At", "Wide", "Size", "Indices", "Value", "Name"));
+    print(layout.top, pp, 0);
+    return pp.s.toString();
+   }
+
+  void print(Layout.Field field, PrintPosition pp, int indent)                  // Print the values of each variable in memory
+   {final int   I = pp.indices.size();
+    final int[]in = new int[I];
+    for (int i = 0; i < I; i++) in[i] = pp.indices.elementAt(i);
+
+    pp.s.append(String.format("%4d %s %8d  %8d",
+      pp.line, field.fieldType(), pp.bits, field.width));
+
+    pp.bits += switch(field)                                                    // Bit position
+     {case Layout.Variable  v -> field.width;
+      default -> 0;
+     };
+
+    pp.s.append(switch(field)                                                      // Size
      {case Layout.Variable  v -> String.format("%11s", "");
       case Layout.Array     a -> String.format("%11d", a.size);
       case Layout.Structure s -> String.format("%11s", "");
       default -> {stop("Unknown field type:", field); yield "";}
      });
 
-    t.append("   ");
+    pp.s.append("   ");
     for (int i = 0; i < 4; i++)                                                 // Indices
-     {if (i < indices.size())
-       {t.append(String.format("%2d", indices.elementAt(i)));
+     {if (i < pp.indices.size())
+       {pp.s.append(String.format("%2d", pp.indices.elementAt(i)));
        }
       else
-       {t.append("  ");
+       {pp.s.append("  ");
        }
      }
 
-    t.append(switch(field)                                                      // Value
+    pp.s.append(switch(field)                                                      // Value
      {case Layout.Variable  v ->
        {final int a = field.locator.at(in);
-        final int n = getInt(field, in);
+        final int n = getInt(field, 0, in);
         yield String.format("%13d", n);
        }
       case Layout.Array     a -> String.format("%13s", "");
@@ -66,22 +81,22 @@ class MemoryLayout extends Test                                                 
       default -> {stop("Unknown field type:", field); yield "";}
       });
 
-    t.append("   "+("  ".repeat(indent))+field.name+"\n");                      // Name
+    pp.s.append("   "+("  ".repeat(indent))+field.name+"\n");                   // Name
 
     switch(field)                                                               // Sub fields
      {case Layout.Variable  v -> {}
       case Layout.Array     a ->                                                // Array
        {for (int i = 0; i < a.size; i++)
-         {indices.push(i);
-          lineNumber[0]++;
-          print(a.element, t, lineNumber, indent+1, indices);
-          indices.pop();
+         {pp.indices.push(i);
+          pp.line++;
+          print(a.element, pp, indent+1);
+          pp.indices.pop();
          }
        }
       case Layout.Structure s ->                                                // Structure and Union
        {for (int i = 0; i < s.fields.length; i++)
-         {lineNumber[0]++;
-          print(s.fields[i], t, lineNumber, indent+1, indices);
+         {pp.line++;
+          print(s.fields[i], pp, indent+1);
          }
        }
       default -> stop("Unknown field type:", field);
@@ -111,12 +126,12 @@ class MemoryLayout extends Test                                                 
 
 //D1 Get and Set                                                                // Get and set values in memory
 
-  int getInt(Layout.Field field,            int...indices)                      // Get a value from memory
-   {z(); return new At(field, indices).result;
+  int getInt(Layout.Field field, int Base,            int...indices)            // Get a value from memory
+   {z(); return new At(field, Base, indices).result;
    }
 
-  void set  (Layout.Field field, int value, int...indices)                      // Set a value in memory
-   {z(); final At a = new At(field, indices);
+  void set  (Layout.Field field, int value, int Base, int...indices)            // Set a value in memory
+   {z(); final At a = new At(field, Base, indices);
     memory.set(a.at, a.width, value);
    }
 
@@ -126,11 +141,14 @@ class MemoryLayout extends Test                                                 
    {final Layout.Field field;
     final int[]indices;
     final int  width;
+    final int  base;
+    final int  delta;
     final int  at;
     final int  result;
-    At(Layout.Field Field, int...Indices)
-     {z(); field = Field; indices = Indices; width = field.width;
-      at     = field.locator.at(indices);
+    At(Layout.Field Field, int Base, int...Indices)
+     {z(); field = Field; indices = Indices; width = field.width; base = Base;
+      delta  = field.locator.at(indices);
+      at     = base + delta;
       result = memory.getInt(at, width);
      }
     int     width()        {z(); return field.width();}
@@ -149,7 +167,7 @@ class MemoryLayout extends Test                                                 
          {s.append(indices[i]);
           if (i < N-1) s.append(",");
          }
-        s.append("]"+at);
+        s.append("]("+base+"+"+delta+")"+at);
        }
       s.append("="+result);
       return s.toString();
@@ -157,8 +175,8 @@ class MemoryLayout extends Test                                                 
     MemoryLayout ml() {return MemoryLayout.this;}
    }
 
-  At at(Layout.Field Field, int...Indices)
-   {return new At(Field, Indices);
+  At at(Layout.Field Field, int Base, int...Indices)
+   {return new At(Field, Base, Indices);
    }
 
 
@@ -252,73 +270,163 @@ class MemoryLayout extends Test                                                 
    {TestMemoryLayout t = new TestMemoryLayout();
         MemoryLayout m = t.M;
               Layout l = m.layout;
-    ok(m.at(t.c,     0, 0, 1), "c[0,0,1]24=30");
-    m.set  (t.c, 11, 0, 0, 1);
-    ok(m.at(t.c,     0, 0, 1), "c[0,0,1]24=11");
+   ok(m.at(t.c,     0, 0, 0, 0), "c[0,0,0](0+12)12=16");
+   m.set  (t.c, 11, 0, 0, 0, 0);
+   ok(m.at(t.c,     0, 0, 0, 0), "c[0,0,0](0+12)12=11");
 
-    ok(m.at(t.a,     0, 2, 2), "a[0,2,2]125=7");
-    m.set  (t.a,  5, 0, 2, 2);
-    ok(m.at(t.a,     0, 2, 2), "a[0,2,2]125=5");
+   ok(m.at(t.c,     0, 0, 0, 1), "c[0,0,1](0+24)24=30");
+   m.set  (t.c, 11, 0, 0, 0, 1);
+   ok(m.at(t.c,     0, 0, 0, 1), "c[0,0,1](0+24)24=11");
 
-    ok(m.at(t.b,     1, 2, 2), "b[1,2,2]272=0");
-    m.set  (t.b,  7, 1, 2, 2);
-    ok(m.at(t.b,     1, 2, 2), "b[1,2,2]272=7");
+   ok(m.at(t.a,     0, 0, 2, 2), "a[0,2,2](0+125)125=7");
+   m.set  (t.a,  5, 0, 0, 2, 2);
+   ok(m.at(t.a,     0, 0, 2, 2), "a[0,2,2](0+125)125=5");
 
-    ok(m.at(t.e,     1, 2), "e[1,2]281=0");
-    m.set  (t.e, 11, 1, 2);
-    ok(m.at(t.e,     1, 2), "e[1,2]281=11");
+   ok(m.at(t.b,     0, 1, 2, 2), "b[1,2,2](0+272)272=0");
+   m.set  (t.b,  7, 0, 1, 2, 2);
+   ok(m.at(t.b,     0, 1, 2, 2), "b[1,2,2](0+272)272=7");
+
+    ok(m.at(t.e,     0, 1, 2), "e[1,2](0+281)281=0");
+    m.set  (t.e, 11, 0, 1, 2);
+    ok(m.at(t.e,     0, 1, 2), "e[1,2](0+281)281=11");
    }
 
   static void test_boolean()
    {TestMemoryLayout t = new TestMemoryLayout();
         MemoryLayout m = t.M;
-    m.set  (t.a, 1, 0, 1, 1);
-    m.set  (t.a, 2, 0, 1, 2);
-    m.set  (t.a, 1, 0, 2, 1);
-    m.set  (t.a, 2, 0, 2, 2);
+    m.set  (t.a, 1, 0, 0, 1, 1);
+    m.set  (t.a, 2, 0, 0, 1, 2);
+    m.set  (t.a, 1, 0, 0, 2, 1);
+    m.set  (t.a, 2, 0, 0, 2, 2);
 
-    ok( m.equal(m.at(t.a, 0, 1, 1), m.at(t.a, 0, 2, 1)));
-    ok(!m.equal(m.at(t.a, 0, 1, 1), m.at(t.a, 0, 1, 2)));
+    ok( m.equal   (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 2, 1)));
+    ok(!m.equal   (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 1, 2)));
+    ok(!m.notEqual(m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 2, 1)));
+    ok( m.notEqual(m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 1, 2)));
 
-    ok(!m.notEqual(m.at(t.a, 0, 1, 1), m.at(t.a, 0, 2, 1)));
-    ok( m.notEqual(m.at(t.a, 0, 1, 1), m.at(t.a, 0, 1, 2)));
+    ok( m.lessThan          (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 1, 2)));
+    ok(!m.lessThan          (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 2, 1)));
+    ok( m.lessThanOrEqual   (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 1, 2)));
+    ok( m.lessThanOrEqual   (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 2, 1)));
+    ok(!m.lessThanOrEqual   (m.at(t.a, 0, 0, 1, 2), m.at(t.a, 0, 0, 2, 1)));
 
-    ok( m.lessThan       (m.at(t.a, 0, 1, 1), m.at(t.a, 0, 1, 2)));
-    ok(!m.lessThan       (m.at(t.a, 0, 1, 1), m.at(t.a, 0, 2, 1)));
-    ok( m.lessThanOrEqual(m.at(t.a, 0, 1, 1), m.at(t.a, 0, 1, 2)));
-    ok( m.lessThanOrEqual(m.at(t.a, 0, 1, 1), m.at(t.a, 0, 2, 1)));
-    ok(!m.lessThanOrEqual(m.at(t.a, 0, 1, 2), m.at(t.a, 0, 2, 1)));
-
-    ok(!m.greaterThan       (m.at(t.a, 0, 1, 1), m.at(t.a, 0, 1, 2)));
-    ok( m.greaterThan       (m.at(t.a, 0, 1, 2), m.at(t.a, 0, 1, 1)));
-    ok( m.greaterThanOrEqual(m.at(t.a, 0, 2, 1), m.at(t.a, 0, 1, 1)));
-    ok( m.greaterThanOrEqual(m.at(t.a, 0, 1, 1), m.at(t.a, 0, 2, 1)));
-    ok(!m.greaterThanOrEqual(m.at(t.a, 0, 2, 1), m.at(t.a, 0, 1, 2)));
+    ok(!m.greaterThan       (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 1, 2)));
+    ok( m.greaterThan       (m.at(t.a, 0, 0, 1, 2), m.at(t.a, 0, 0, 1, 1)));
+    ok( m.greaterThanOrEqual(m.at(t.a, 0, 0, 2, 1), m.at(t.a, 0, 0, 1, 1)));
+    ok( m.greaterThanOrEqual(m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 2, 1)));
+    ok(!m.greaterThanOrEqual(m.at(t.a, 0, 0, 2, 1), m.at(t.a, 0, 0, 1, 2)));
    }
 
   static void test_copy()
    {TestMemoryLayout t = new TestMemoryLayout();
         MemoryLayout m = t.M;
-    m.set  (t.a, 1, 0, 0, 0);
-    m.set  (t.a, 2, 0, 0, 1);
-    m.set  (t.a, 3, 0, 0, 2);
+    m.set  (t.a, 1, 0, 0, 0, 0);
+    m.set  (t.a, 2, 0, 0, 0, 1);
+    m.set  (t.a, 3, 0, 0, 0, 2);
 
-    ok(m.at(t.a, 0, 0, 0), "a[0,0,0]5=1");
-    ok(m.at(t.a, 0, 0, 1), "a[0,0,1]17=2");
-    ok(m.at(t.a, 0, 0, 2), "a[0,0,2]29=3");
+    ok(m.at(t.a, 0, 0, 0, 0), "a[0,0,0](0+5)5=1");
+    ok(m.at(t.a, 0, 0, 0, 1), "a[0,0,1](0+17)17=2");
+    ok(m.at(t.a, 0, 0, 0, 2), "a[0,0,2](0+29)29=3");
 
-    m.copy(m.at(t.a, 0, 0, 1), m.at(t.a, 0, 0, 0));
-    m.copy(m.at(t.a, 0, 0, 2), m.at(t.a, 0, 0, 1));
+    m.copy(m.at(t.a, 0, 0, 0, 1), m.at(t.a, 0, 0, 0, 0));
+    m.copy(m.at(t.a, 4, 0, 0, 1), m.at(t.a, 0, 0, 0, 1));
 
-    ok(m.at(t.a, 0, 0, 0), "a[0,0,0]5=1");
-    ok(m.at(t.a, 0, 0, 1), "a[0,0,1]17=1");
-    ok(m.at(t.a, 0, 0, 2), "a[0,0,2]29=1");
+    ok(m.at(t.a, 0, 0, 0, 0), "a[0,0,0](0+5)5=1");
+    ok(m.at(t.a, 4, 0, 0, 0), "a[0,0,0](4+5)9=7");
+    ok(m.at(t.a, 0, 0, 0, 2), "a[0,0,2](0+29)29=3");
    }
+
+  static void test_base()
+   {Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Variable  c = l.variable ("c", 4);
+    Layout.Variable  d = l.variable ("d", 4);
+    Layout.Structure s = l.structure("s", a, b, c, d);
+    l.compile();
+
+    MemoryLayout     m = new MemoryLayout(l);
+    m.memory.alternating(4);
+    //stop(m);
+    m.ok("""
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        16                                      s
+   2 V        0         4                                  0     a
+   3 V        4         4                                 15     b
+   4 V        8         4                                  0     c
+   5 V       12         4                                 15     d
+""");
+    ok(m.getInt(a, 0),  0);
+    ok(m.getInt(a, 4), 15);
+    m.set(a,  9,  0);
+    m.set(a, 10,  4);
+    m.set(b, 11,  4);
+    m.set(a, 12, 12);
+
+    //stop(m);
+    m.ok("""
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        16                                      s
+   2 V        0         4                                  9     a
+   3 V        4         4                                 10     b
+   4 V        8         4                                 11     c
+   5 V       12         4                                 12     d
+""");
+   }
+
+  static void test_based_array()
+   {Layout           l = Layout.layout();
+    Layout.Variable  z = l.variable ("z", 4);
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Array     A = l.array    ("A", a, 4);
+    Layout.Structure S = l.structure("S", z, A);
+    l.compile();
+
+    MemoryLayout     m = new MemoryLayout(l);
+    m.memory.alternating(4);
+    //stop(m);
+    m.ok("""
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        20                                      S
+   2 V        0         4                                  0     z
+   3 A        4        16          4                             A
+   4 V        4         4               0                 15       a
+   5 V        8         4               1                  0       a
+   6 V       12         4               2                 15       a
+   7 V       16         4               3                  0       a
+""");
+    ok(m.getInt(a, 0, 0), 15);
+    ok(m.getInt(a, 4, 0),  0);
+    m.set(a,  9,  0, 0);
+    m.set(a, 10,  4, 0);
+    m.set(a, 11,  8, 0);
+    m.set(a, 12, 12, 0);
+    ok(m.getInt(a, 0, 0),  9);
+    ok(m.getInt(a, 4, 0), 10);
+    ok(m.getInt(a, 4, 1), 11);
+    ok(m.getInt(a, 4, 2), 12);
+
+    //stop(m);
+    m.ok("""
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        20                                      S
+   2 V        0         4                                  0     z
+   3 A        4        16          4                             A
+   4 V        4         4               0                  9       a
+   5 V        8         4               1                 10       a
+   6 V       12         4               2                 11       a
+   7 V       16         4               3                 12       a
+""");
+   }
+
+
 
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_get_set();
     test_boolean();
     test_copy();
+    test_base();
+    test_based_array();
    }
 
   static void newTests()                                                        // Tests being worked on
