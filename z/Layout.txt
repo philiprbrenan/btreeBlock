@@ -1,0 +1,21 @@
+
+  Layout layout()                                                               // Layout describing stuck
+   {z();
+    Layout           l             = Layout.layout();
+    Layout.Variable  leafKey       = l.variable ("leafKey"     ,             bitsPerKey());
+    Layout.Array     leafKeys      = l.array    ("leafKeys"    , leafKey,    maxSize());
+    Layout.Variable  leafData      = l.variable ("leafData"    ,             bitsPerData());
+    Layout.Array     leafDatas     = l.array    ("leafDatas"   , leafData,   maxSize());
+    Layout.Structure leaf          = l.structure("leaf"        , leafKeys,   leafData);
+    Layout.Variable  branchKey     = l.variable ("branchKey"   , bitsPerKey());
+    Layout.Array     branchKeys    = l.array    ("branchKeys"  , branchKey,  maxSize());
+    Layout.Variable  branchNext    = l.variable ("branchNext"  ,             bitsPerNext());
+    Layout.Array     branchNexts   = l.array    ("branchNexts" , branchNext, maxSize());
+    Layout.Structure branch        = l.structure("branch"      , branchKeys, branchNexts);
+    Layout.Union     branchOrLeaf  = l.union    ("branchOrLeaf", leaf, branch);
+    Layout.Bit       isLeaf        = l.bit      ("isLeaf");
+    Layout.Variable  currentSize   = l.variable ("currentSize" , bitsPerSize());
+    Layout.Structure stuck         = l.structure("stuck"       , isLeaf, currentSize, branchOrLeaf);
+    l.compile();
+    return l;
+   }
