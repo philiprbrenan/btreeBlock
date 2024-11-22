@@ -15,12 +15,13 @@ public class Layout extends Test                                                
 
   static Layout layout() {return new Layout();}                                 // Create a new Layout that can be loaded field by field
 
-  void compile()                                                                // Lay out the layout
+  Layout compile()                                                              // Lay out the layout
    {z();
     top = fields.lastElement();                                                 // The last defined field becomes the super structure
     top.layout(0, 0);                                                           // Locate field positions
     top.indexNames();                                                           // Index the names of the fields
     for (Field f: fields) f.locator = new Locator(f);                           // Create a locator for each field
+    return this;
    }
 
   int size() {z(); return top == null ? 0 : top.width;}                         // Size of memory
@@ -306,8 +307,7 @@ public class Layout extends Test                                                
         default -> null;
        };
      }
-    l.compile();
-    return l;
+    return l.compile();
    }
 
   Field duplicate(Layout L)                                                     // Duplicate the specified layout inside this layout
@@ -361,7 +361,7 @@ public class Layout extends Test                                                
        {z();
         final Array A = arrays.elementAt(i);
         final int   w = A.element.width, s = A.size, n = Indices[i];
-        if (n < 0 || n >= s) stop("Array:", A.fullName, "has size:", s,
+        if (n < 0 || n >= s) stop("Array:", A.name, "has size:", s,
          "but is being indexed with:", n);
         d += w * n;
        }
