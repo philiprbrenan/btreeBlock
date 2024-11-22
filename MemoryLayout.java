@@ -7,27 +7,30 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 class MemoryLayout extends Test                                                 // Memory layout
- {final Layout layout;
-  final Memory memory;
+ {final Layout layout;                                                          // Layout of part of memory
+  final Memory memory;                                                          // Memory containing layout
+  final int      base;                                                          // Base of layout in memory
 
 //D1 Construction                                                               // Address memory via a layout
 
   MemoryLayout(Layout Layout)
-   {layout = Layout;
-    memory = new Memory(layout.size());
+   {this(new Memory(Layout.size()), Layout, 0);
    }
 
-  MemoryLayout(Memory Memory, Layout Layout)
+  MemoryLayout(Memory Memory, Layout Layout) {this(Memory, Layout, 0);}
+
+  MemoryLayout(Memory Memory, Layout Layout, int Base)
    {memory = Memory;
     layout = Layout;
+    base   = Base;
    }
 
 //D1 Print                                                                      // Print a memory layout
 
-  static class PrintPosition                                                    // Position in print
+  class PrintPosition                                                           // Position in print
    {final StringBuilder s = new StringBuilder();
     int line = 1;
-    int bits = 0;
+    int bits = base;
     final Stack<Integer> indices = new Stack<>();
    }
 
@@ -53,7 +56,7 @@ class MemoryLayout extends Test                                                 
       default -> 0;
      };
 
-    pp.s.append(switch(field)                                                      // Size
+    pp.s.append(switch(field)                                                   // Size
      {case Layout.Variable  v -> String.format("%11s", "");
       case Layout.Array     a -> String.format("%11d", a.size);
       case Layout.Structure s -> String.format("%11s", "");
@@ -70,10 +73,10 @@ class MemoryLayout extends Test                                                 
        }
      }
 
-    pp.s.append(switch(field)                                                      // Value
+    pp.s.append(switch(field)                                                   // Value
      {case Layout.Variable  v ->
        {final int a = field.locator.at(in);
-        final int n = getInt(field, 0, in);
+        final int n = getInt(field, base, in);
         yield String.format("%13d", n);
        }
       case Layout.Array     a -> String.format("%13s", "");
@@ -131,7 +134,8 @@ class MemoryLayout extends Test                                                 
    }
 
   void set  (Layout.Field field, int value, int Base, int...indices)            // Set a value in memory
-   {z(); final At a = new At(field, Base, indices);
+   {z();
+    final At a = new At(field, Base, indices);
     memory.set(a.at, a.width, value);
    }
 
@@ -248,13 +252,13 @@ class MemoryLayout extends Test                                                 
 
   static class TestMemoryLayout
    {Layout           l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", 3);
+    Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
-    Layout.Variable  c = l.variable ("c", 5);
+    Layout.Variable  c = l.variable ("c", 4);
     Layout.Structure s = l.structure("s", a, b, c);
     Layout.Array     A = l.array    ("A", s, 3);
-    Layout.Variable  d = l.variable ("d", 5);
-    Layout.Variable  e = l.variable ("e", 7);
+    Layout.Variable  d = l.variable ("d", 4);
+    Layout.Variable  e = l.variable ("e", 4);
     Layout.Structure S = l.structure("S", d, A, e);
     Layout.Array     B = l.array    ("B", S, 3);
     Layout.Array     C = l.array    ("C", B, 3);
@@ -262,7 +266,7 @@ class MemoryLayout extends Test                                                 
     TestMemoryLayout()
      {l.compile();
       M = new MemoryLayout(l);
-      M.memory.increasing();
+      M.memory.alternating(4);
      }
    }
 
@@ -270,25 +274,25 @@ class MemoryLayout extends Test                                                 
    {TestMemoryLayout t = new TestMemoryLayout();
         MemoryLayout m = t.M;
               Layout l = m.layout;
-   ok(m.at(t.c,     0, 0, 0, 0), "c[0,0,0](0+12)12=16");
+   ok(m.at(t.c,     0, 0, 0, 0), "c[0,0,0](0+12)12=15");
    m.set  (t.c, 11, 0, 0, 0, 0);
    ok(m.at(t.c,     0, 0, 0, 0), "c[0,0,0](0+12)12=11");
 
-   ok(m.at(t.c,     0, 0, 0, 1), "c[0,0,1](0+24)24=30");
+   ok(m.at(t.c,     0, 0, 0, 1), "c[0,0,1](0+24)24=0");
    m.set  (t.c, 11, 0, 0, 0, 1);
    ok(m.at(t.c,     0, 0, 0, 1), "c[0,0,1](0+24)24=11");
 
-   ok(m.at(t.a,     0, 0, 2, 2), "a[0,2,2](0+125)125=7");
+   ok(m.at(t.a,     0, 0, 2, 2), "a[0,2,2](0+116)116=15");
    m.set  (t.a,  5, 0, 0, 2, 2);
-   ok(m.at(t.a,     0, 0, 2, 2), "a[0,2,2](0+125)125=5");
+   ok(m.at(t.a,     0, 0, 2, 2), "a[0,2,2](0+116)116=5");
 
-   ok(m.at(t.b,     0, 1, 2, 2), "b[1,2,2](0+272)272=0");
+   ok(m.at(t.b,     0, 1, 2, 2), "b[1,2,2](0+252)252=15");
    m.set  (t.b,  7, 0, 1, 2, 2);
-   ok(m.at(t.b,     0, 1, 2, 2), "b[1,2,2](0+272)272=7");
+   ok(m.at(t.b,     0, 1, 2, 2), "b[1,2,2](0+252)252=7");
 
-    ok(m.at(t.e,     0, 1, 2), "e[1,2](0+281)281=0");
+    ok(m.at(t.e,     0, 1, 2), "e[1,2](0+260)260=15");
     m.set  (t.e, 11, 0, 1, 2);
-    ok(m.at(t.e,     0, 1, 2), "e[1,2](0+281)281=11");
+    ok(m.at(t.e,     0, 1, 2), "e[1,2](0+260)260=11");
    }
 
   static void test_boolean()
@@ -324,16 +328,16 @@ class MemoryLayout extends Test                                                 
     m.set  (t.a, 2, 0, 0, 0, 1);
     m.set  (t.a, 3, 0, 0, 0, 2);
 
-    ok(m.at(t.a, 0, 0, 0, 0), "a[0,0,0](0+5)5=1");
-    ok(m.at(t.a, 0, 0, 0, 1), "a[0,0,1](0+17)17=2");
-    ok(m.at(t.a, 0, 0, 0, 2), "a[0,0,2](0+29)29=3");
+    ok(m.at(t.a, 0, 0, 0, 0), "a[0,0,0](0+4)4=1");
+    ok(m.at(t.a, 0, 0, 0, 1), "a[0,0,1](0+16)16=2");
+    ok(m.at(t.a, 0, 0, 0, 2), "a[0,0,2](0+28)28=3");
 
     m.copy(m.at(t.a, 0, 0, 0, 1), m.at(t.a, 0, 0, 0, 0));
     m.copy(m.at(t.a, 4, 0, 0, 1), m.at(t.a, 0, 0, 0, 1));
 
-    ok(m.at(t.a, 0, 0, 0, 0), "a[0,0,0](0+5)5=1");
-    ok(m.at(t.a, 4, 0, 0, 0), "a[0,0,0](4+5)9=7");
-    ok(m.at(t.a, 0, 0, 0, 2), "a[0,0,2](0+29)29=3");
+    ok(m.at(t.a, 0, 0, 0, 0), "a[0,0,0](0+4)4=1");
+    ok(m.at(t.a, 4, 0, 0, 0), "a[0,0,0](4+4)8=0");
+    ok(m.at(t.a, 0, 0, 0, 2), "a[0,0,2](0+28)28=3");
    }
 
   static void test_base()
