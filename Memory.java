@@ -18,13 +18,32 @@ class Memory extends Test                                                       
 
   static Memory memory(int Size) {z(); return new Memory(Size);}                // Create memory
 
-  public String toString()
-   {final StringBuilder s = new StringBuilder();
-    final StringBuilder t = new StringBuilder("0123-5678+".repeat(1+bits.length/10));
-    t.setLength(bits.length);
-    t.reverse();
-    for(int i = 0; i < bits.length; ++i) s.append(bits[i] ? "1" : "0");
-    return t+"\n"+s.reverse().toString()+"\n";
+  public String toString()                                                      // Print memory in hex
+   {final int N = 256;
+    final String T = "4... 4... 4... 4... "+
+                     "3... 3... 3... 3... "+
+                     "2... 2... 2... 2... "+
+                     "1... 1... 1... 1...";
+    final String t = (""+new StringBuilder("0123 4567 89AB CDEF ".repeat(4)).reverse()).trim();
+
+    final StringBuilder B = new StringBuilder();                                // One block a multiple of N in length
+    for(int i = 0; i < bits.length; i++) B.append(getBit(i) ? '1' : '0');
+    for(int i = 0; i < N && B.length() % N > 0; i++) B.append('0');
+
+    final StringBuilder S = new StringBuilder();                                // Final result
+    for   (int i = 0, n = B.length() / N; i < n; ++i)                           // Lines of hex
+     {z();
+      final StringBuilder s = new StringBuilder();                              // Line of hex
+      for (int j = 0; j < N; j += 4)                                            // Blocks of 4 bits
+       {final StringBuilder H = new StringBuilder(B.substring(i*N+j, i*N+j+4));// Bits to convert
+        final int h = Integer.parseInt(""+H.reverse(), 2);                      // Low endian
+        s.append("0123456789abcdef".charAt(h));
+        if (j % 16 == 12) s.append(" ");
+       }
+      S.append(String.format("%4d  ", i)+(""+s.reverse()).trim()+"\n");
+     }
+
+    return "      "+T+"\nLine  "+t+"\n"+S;
    }
 
   int size() {z(); return bits.length;}                                         // Size of memory
@@ -36,7 +55,8 @@ class Memory extends Test                                                       
   void check(int start, int width)                                              // Check a request is in the range of the memory
    {z();
     if (start < 0) stop("Too small:", start);
-    if (start + width  > size()) stop("Out of range:", start+width);
+    if (start + width  > size()) stop("Out of range. Addressing:", start+width,
+     "in memory of size:", size());
     if  (width < 1) stop("Width must be one or more, not:", width);
    }
 
@@ -184,20 +204,6 @@ class Memory extends Test                                                       
 
 //D1 Patterns                                                                   // Pattern the memory to make testing more interesting
 
-  void increasing()                                                             // Increase the separation of ones and zeros
-   {z();
-    final int N = size();
-    int k0 = 0, k1 = 0, n = 1;
-    for(int i = 0; i < N; ++i)
-     {z();
-      if (k0 >= n && k1 >= n)
-       {z(); k0 = k1 = 0; ++n;
-       }
-      if      (k0++ < n) set(i, false);
-      else if (k1++ < n) set(i, true);
-     }
-   }
-
   void alternating(int b)                                                       // Alternate between 0 and 1 in blocks of the specified size
    {z();
     final int N = size();
@@ -235,15 +241,19 @@ class Memory extends Test                                                       
    {Memory m = memory(8);
 
     m.ones(1, 2);
+    //stop(m);
     ok(""+m, """
-765-3210
-00000110
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0006
 """);
 
     m.copyHigh(5, 1, 2);
+    //stop(m);
     ok(""+m, """
-765-3210
-01100110
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0066
 """);
    }
 
@@ -251,15 +261,19 @@ class Memory extends Test                                                       
    {Memory m = memory(8);
 
     m.ones(1, 2);
+    //stop(m);
     ok(""+m, """
-765-3210
-00000110
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0006
 """);
 
     m.invert(2, 2);
+    //stop(m);
     ok(""+m, """
-765-3210
-00001010
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 000a
 """);
    }
 
@@ -279,16 +293,15 @@ class Memory extends Test                                                       
      }
    }
 
-  static void test_increasing()
-   {Memory m = memory(32);
-    m.increasing();
-    say(m);
-   }
-
   static void test_alternating()
-   {Memory m = memory(32);
+   {Memory m = memory(256);
     m.alternating(4);
-    say(m);
+    //stop(m);
+    ok(""+m, """
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0
+""");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -297,13 +310,11 @@ class Memory extends Test                                                       
     test_copy();
     test_invert();
     test_boolean();
-    test_increasing();
     test_alternating();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_alternating();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
