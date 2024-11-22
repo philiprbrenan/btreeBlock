@@ -102,15 +102,15 @@ abstract class StuckStatic extends Test                                         
   int  data    (int Index)              {return Data[Index];}
   void setKey  (int Index,  int Value)  {       Keys[Index] = Value;}
   void setData (int Index,  int Value)  {       Data[Index] = Value;}
-  void copyKey (int Source, int Target) {setKey (Target, key (Source));}
-  void copyData(int Source, int Target) {setData(Target, data(Source));}
+  void copyKey (int Target, int Source) {setKey (Target, key (Source));}
+  void copyData(int Target, int Source) {setData(Target, data(Source));}
 
   void  setKeyData(int Index, int Key, int Data)
    {setKey (Index, Key);
     setData(Index, Data);
    }
 
-  void copyKeyData(int Source, int Target)
+  void copyKeyData(int Target, int Source)
    {copyKey (Target, Source);
     copyData(Target, Source);
    }
@@ -191,7 +191,7 @@ abstract class StuckStatic extends Test                                         
   Shift shift2() {z(); return Shift2.shift();}
   Shift shift3() {z(); return Shift3.shift();}
 
-  class ElementAt                                                               // Gte the indexed element
+  class ElementAt                                                               // Get the indexed element
    {int index;                                                                  // The index from which the key, data pair were retrieved
     int key;                                                                    // The shifted key
     int data;                                                                   // The shifted data
