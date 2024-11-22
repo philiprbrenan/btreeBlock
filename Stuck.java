@@ -80,15 +80,15 @@ abstract class Stuck extends Test                                               
   int  data    (int Index)              {return Data[Index];}
   void setKey  (int Index,  int Value)  {       Keys[Index] = Value;}
   void setData (int Index,  int Value)  {       Data[Index] = Value;}
-  void copyKey (int Source, int Target) {setKey (Target, key (Source));}
-  void copyData(int Source, int Target) {setData(Target, data(Source));}
+  void copyKey (int Target, int Source) {setKey (Target, key (Source));}
+  void copyData(int Target, int Source) {setData(Target, data(Source));}
 
   void  setKeyData(int Index, int Key, int Data)
    {setKey (Index, Key);
     setData(Index, Data);
    }
 
-  void copyKeyData(int Source, int Target)
+  void copyKeyData(int Target, int Source)
    {copyKey (Target, Source);
     copyData(Target, Source);
    }
@@ -165,7 +165,7 @@ abstract class Stuck extends Test                                               
    }
   Shift shift() {z(); return new Shift();}
 
-  class ElementAt                                                               // Gte the indexed element
+  class ElementAt                                                               // Get the indexed element
    {final int index;                                                            // The index from which the key, data pair were retrieved
     final int key;                                                              // The shifted key
     final int data;                                                             // The shifted data
