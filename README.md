@@ -4,7 +4,7 @@
 
 # Btree in a block
 
-A [B-Tree](https://en.wikipedia.org/wiki/B-tree) in a block. For reasons why you might want to get involved in this
+For reasons why you might want to get involved in this
 project to put a [B-Tree](https://en.wikipedia.org/wiki/B-tree) in a block on a [Silicon](https://en.wikipedia.org/wiki/Silicon) [chip](https://en.wikipedia.org/wiki/Integrated_circuit), see:
 
 http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html
@@ -16,7 +16,7 @@ reduce the [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) [co
 reduced [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) as a macro [preprocessor](https://en.wikipedia.org/wiki/Preprocessor) to generate pseudo machine [code](https://en.wikipedia.org/wiki/Computer_program) for a
 machine optimized for manipulating a [B-Tree](https://en.wikipedia.org/wiki/B-tree) .
 
-![Roadmap](flowChart/DevelopmentFlowChart.py)
+![Roadmap](flowChart/DevelopmentFlowChart.png)
 
 The  machine [code](https://en.wikipedia.org/wiki/Computer_program) will then be  optimized and reduced as far as possible and
 used to generate actual machine [code](https://en.wikipedia.org/wiki/Computer_program) for a [Verilog](https://en.wikipedia.org/wiki/Verilog) implementation of [B-Tree](https://en.wikipedia.org/wiki/B-tree) which can be run on an foga or [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) .
