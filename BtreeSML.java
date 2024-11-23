@@ -56,7 +56,7 @@ abstract class BtreeSML extends Test                                            
 
   static BtreeSML btreeSML(final int leafKeys, int branchKeys)                  // Define a test BTree with the specified dimensions
    {return  new BtreeSML()
-     {int maxSize         () {return        400;}
+     {int maxSize         () {return       2000;}
       int maxKeysPerLeaf  () {return   leafKeys;}
       int maxKeysPerBranch() {return branchKeys;}
       int bitsPerKey      () {return         16;}
