@@ -19,6 +19,7 @@ my @ext  = qw(.java .md .pl .txt);                                              
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
 my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
+   @java = grep {!m(z/)} @java;                                                 # Remove backups
 
 for my $s(@files)                                                               # Upload each selected file
  {my $c = readBinaryFile $s;                                                    # Load file
