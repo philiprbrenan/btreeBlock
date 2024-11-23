@@ -342,9 +342,8 @@ class BtreeStuckStatic extends Test                                             
 
       for (int i = 0; i < splitLeafSize; i++)                                   // Build left leaf
        {z();
-        final StuckStatic.FirstElement f = r.keyData.firstElement1();
+        final StuckStatic.Shift f = r.keyData.shift1();
         l.keyData.push(f.key, f.data);
-        r.keyData.shift1();
        }
       final int F = r.keyData.firstElement1().key;
       final int L = l.keyData.lastElement1 ().key;
@@ -367,13 +366,11 @@ class BtreeStuckStatic extends Test                                             
 
       for (int i = 0; i < splitBranchSize; i++)                                 // Build left branch
        {z();
-        final StuckStatic.FirstElement f = r.keyNext.firstElement1();
+        final StuckStatic.Shift f = r.keyNext.shift1();
         l.keyNext.push(f.key, f.data);
-        r.keyNext.shift1();
        }
 
-      final StuckStatic.FirstElement split = r.keyNext.firstElement1();          // Build right branch
-      r.keyNext.shift1();
+      final StuckStatic.Shift split = r.keyNext.shift1();                       // Build right branch
       l     .keyNext.push(0, split.data);                                       // Becomes top and so is iognored by search ... except last
       parent.keyNext.insertElementAt(split.key, l.node, index);
      }
