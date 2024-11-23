@@ -29,8 +29,11 @@ abstract class BtreeSML extends Test                                            
   Layout.Field     branch;                                                      // Layout of a branch in the memory used by btree
   Layout.Union     branchOrLeaf;                                                // Layout of either a leaf or a branch in the memory used by btree
   Layout.Bit       isLeaf;                                                      // Whether the current node is a leaf or a branch
+  Layout.Variable  free;                                                        // Free list chain
   Layout.Structure node;                                                        // Layout of a node in the memory used by btree
   Layout.Array     nodes;                                                       // Layout of an array of nodes in the memory used by btree
+  Layout.Variable  freedChain;                                                  // Single linked list of freed nodes
+  Layout.Structure bTree;                                                       // Btree
 
   final static int
    linesToPrintABranch =  4,                                                    // The number of lines required to print a branch
@@ -50,7 +53,14 @@ abstract class BtreeSML extends Test                                            
     layout = layout();
     memoryLayout = new MemoryLayout(layout);
     memory = memoryLayout.memory;
-    root  = new Node();                                                         // The root
+    for (int i = maxSize(); i > 0; --i)                                         // Put all the nodes on the free chain at the start with low nodes first
+     {final Node n = new Node(i-1);
+                 n.clear();
+      final int f = memoryLayout.getInt(freedChain,         0);
+                    memoryLayout.set   (free,       f,      0, n.node);
+                    memoryLayout.set   (freedChain, n.node, 0);
+     }
+    root  = allocate(false);                                                    // The root is always at zero, which frees zero to act as the end of list marker on the free chain
     root.isLeaf(true);                                                          // The root starts as a leaf
    }
 
@@ -89,12 +99,15 @@ abstract class BtreeSML extends Test                                            
      };
 
     layout           = Layout.layout();
-    leaf             = layout.duplicate("leaf",         Leaf.layout());
+    leaf             = layout.duplicate("leaf",         Leaf  .layout());
     branch           = layout.duplicate("branch",       Branch.layout());
     branchOrLeaf     = layout.union    ("branchOrLeaf", leaf, branch);
     isLeaf           = layout.bit      ("isLeaf");
-    node             = layout.structure("node",  isLeaf, branchOrLeaf);
-    nodes            = layout.array    ("nodes", node, maxSize());
+    free             = layout.variable ("free",         btree.bitsPerNext());
+    node             = layout.structure("node",         isLeaf,     free, branchOrLeaf);
+    nodes            = layout.array    ("nodes",        node,       maxSize());
+    freedChain       = layout.variable ("freedChain",   btree.bitsPerNext());
+    bTree            = layout.structure("bTree",        freedChain, nodes);
     return layout.compile();
    }
 
@@ -106,9 +119,19 @@ abstract class BtreeSML extends Test                                            
 
 //D1 Components                                                                 // A branch or leaf in the tree
 
+  Node allocate(boolean check)                                                  // Allocate a node with or without checking for sufficient free space
+   {z(); final int  f = memoryLayout.getInt(freedChain,    0);
+    z(); if (check && f == 0) stop("No more memory available");
+    z(); final int  F = memoryLayout.getInt(free,          0, f);
+                        memoryLayout.set   (freedChain, F, 0);
+    final Node n = new Node(f); n.clear();
+    return n;
+   }
+
+  Node allocate() {return allocate(true);}                                      // Allocate a node checking for free space
+
   class Node                                                                    // A branch or leaf in the tree
-   {final  int node;
-    Node()         {node = nodeCount++;}                                        // Access a new node
+   {final int node;                                                             // The number of the node
     Node(int Node) {node = Node;}                                               // Access an existing node
 
     boolean isLeaf()             {return memoryLayout.getInt(isLeaf, 0, node) > 0;}           // A leaf if true
@@ -117,8 +140,13 @@ abstract class BtreeSML extends Test                                            
     void assertLeaf()   {if (!isLeaf()) stop("Leaf required");}
     void assertBranch() {if ( isLeaf()) stop("Branch required");}
 
-    Node allocLeaf()    {z(); final Node n = new Node(); n.isLeaf(true);  return n;}
-    Node allocBranch()  {z(); final Node n = new Node(); n.isLeaf(false); return n;}
+    Node allocLeaf()    {z(); final Node n = allocate(); n.isLeaf(true);  return n;}
+    Node allocBranch()  {z(); final Node n = allocate(); n.isLeaf(false); return n;}
+
+    void clear()                                                                // Clear a new node
+     {final Layout.Field n = BtreeSML.this.node;
+      memory.zero(n.at(node), n.width);
+     }
 
     int leafBase()   {z(); return leaf  .at(node);}                             // Base of leaf stuck in memeory of this node
     int branchBase() {z(); return branch.at(node);}                             // Base of branch stuck inmemory of this node
@@ -465,7 +493,7 @@ abstract class BtreeSML extends Test                                            
           return true;
          }
        }
-      else if (l.branchSize() + 1 + r.branchSize() <= maxKeysPerBranch())         // Branches
+      else if (l.branchSize() + 1 + r.branchSize() <= maxKeysPerBranch())       // Branches
        {z();
         final StuckSML.FirstElement pkn = Branch.firstElement1(p.branchBase());
         Branch.clear(p.branchBase());
