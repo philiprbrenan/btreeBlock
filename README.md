@@ -9,6 +9,19 @@ project to put a [B-Tree](https://en.wikipedia.org/wiki/B-tree) in a block on a 
 
 http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html
 
+# Roadmap
+
+Currently the implementation is in [Java](https://en.wikipedia.org/wiki/Java_(programming_language)), but the intent is to successively
+reduce the [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) [code](https://en.wikipedia.org/wiki/Computer_program) until it looks just like [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program), then use the
+reduced [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) as a macro [preprocessor](https://en.wikipedia.org/wiki/Preprocessor) to generate pseudo machine [code](https://en.wikipedia.org/wiki/Computer_program) for a
+machine optimized for manipulating a [B-Tree](https://en.wikipedia.org/wiki/B-tree) .
+
+![Roadmap](flowChart/DevelopmentFlowChart.py)
+
+The  machine [code](https://en.wikipedia.org/wiki/Computer_program) will then be  optimized and reduced as far as possible and
+used to generate actual machine [code](https://en.wikipedia.org/wiki/Computer_program) for a [Verilog](https://en.wikipedia.org/wiki/Verilog) implementation of [B-Tree](https://en.wikipedia.org/wiki/B-tree) which can be run on an foga or [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) .
+
+# Deleting in ascending order
 
 ```
 At start with 32 elements
