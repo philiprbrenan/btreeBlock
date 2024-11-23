@@ -23,6 +23,9 @@ used to generate actual machine [code](https://en.wikipedia.org/wiki/Computer_pr
 
 # Deleting in ascending order
 
+Print of the evoluation of a [B-Tree](https://en.wikipedia.org/wiki/B-tree) as the lowest element is deleted
+successively until the [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)) is empty.
+
 ```
 At start with 32 elements
 +----------------------------------------------------------------------------------------------------------------------------+
