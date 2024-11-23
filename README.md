@@ -19,7 +19,8 @@ machine optimized for manipulating a [B-Tree](https://en.wikipedia.org/wiki/B-tr
 ![Roadmap](flowChart/DevelopmentFlowChart.png)
 
 The  machine [code](https://en.wikipedia.org/wiki/Computer_program) will then be  optimized and reduced as far as possible and
-used to generate actual machine [code](https://en.wikipedia.org/wiki/Computer_program) for a [Verilog](https://en.wikipedia.org/wiki/Verilog) implementation of [B-Tree](https://en.wikipedia.org/wiki/B-tree) which can be run on an [fpga](https://en.wikipedia.org/wiki/Field-programmable_gate_array) or [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) .
+used to generate actual machine [code](https://en.wikipedia.org/wiki/Computer_program) for a [Verilog](https://en.wikipedia.org/wiki/Verilog) implementation of a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) just
+capable of running the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm on an [fpga](https://en.wikipedia.org/wiki/Field-programmable_gate_array) or [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) .
 
 # Deleting in ascending order
 
