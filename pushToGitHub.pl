@@ -16,7 +16,7 @@ my $user = q(philiprbrenan);                                                    
 my $repo = q(btreeBlock);                                                       # Repo
 my $wf   = q(.github/workflows/main.yml);                                       # Work flow on Ubuntu
 my @ext  = qw(.java .md .pl .txt .png .py);                                     # All files to upload to github
-#  @ext  = qw(.java .md .pl .txt);                                              # Reduced set of files to upload to github
+   @ext  = qw(.java .md .pl .txt);                                              # Reduced set of files to upload to github
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
         @files = grep {!m(z/)} @files;                                          # Remove backups
