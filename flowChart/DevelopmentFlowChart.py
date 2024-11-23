@@ -9,7 +9,7 @@ dot.node('BSS',  'BtreeStuckStatic\nreduced use of new')
 dot.node('BSML', 'BtreeSML\nstatic bit memory')
 
 dot.node('S',    'Stuck\nfixed key/value stack in normal java')
-dot.node('SS',   'StuckStatic\nredued use of new')
+dot.node('SS',   'StuckStatic\nreduced use of new')
 dot.node('SSML', 'StuckSML\nstatic bit memory')
 
 dot.node('L',    'Layout\nmemory layout in normal java')
@@ -22,6 +22,11 @@ dot.edge('BSS', 'BSML')
 dot.edge('S',    'SS')
 dot.edge('SS',   'SSML')
 dot.edge('SSML', 'BSML')
+
+dot.edge('L',    'SSML')
+dot.edge('M',    'SSML')
+dot.edge('L',    'BSML')
+dot.edge('M',    'BSML')
 
 dot.render('DevelopmentFlowChart', format='png', cleanup=True)                  # Display
 dot.view('flowchart_output')
