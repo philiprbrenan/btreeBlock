@@ -18,8 +18,8 @@ my $wf   = q(.github/workflows/main.yml);                                       
 my @ext  = qw(.java .md .pl .txt);                                              # Files to upload to github
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
+        @files = grep {!m(z/)} @files;                                          # Remove backups
 my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
-   @java = grep {!m(z/)} @java;                                                 # Remove backups
 
 for my $s(@files)                                                               # Upload each selected file
  {my $c = readBinaryFile $s;                                                    # Load file
