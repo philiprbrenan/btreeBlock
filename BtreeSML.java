@@ -56,7 +56,7 @@ abstract class BtreeSML extends Test                                            
 
   static BtreeSML btreeSML(final int leafKeys, int branchKeys)                  // Define a test BTree with the specified dimensions
    {return  new BtreeSML()
-     {int maxSize         () {return         40;}
+     {int maxSize         () {return        400;}
       int maxKeysPerLeaf  () {return   leafKeys;}
       int maxKeysPerBranch() {return branchKeys;}
       int bitsPerKey      () {return         16;}
@@ -80,7 +80,7 @@ abstract class BtreeSML extends Test                                            
      };
 
     Branch = new StuckSML()                                                     // Branch
-     {int               maxSize() {return btree.maxKeysPerLeaf();}
+     {int               maxSize() {return btree.maxKeysPerBranch();}
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerNext();}
       int           bitsPerSize() {return btree.bitsPerSize();}
@@ -403,17 +403,16 @@ abstract class BtreeSML extends Test                                            
       final Node l = allocLeaf();                                               // New  split out leaf
       final Node r = this;                                                      // Existing  leaf
 
-      for (int i = 0; i < splitLeafSize(); i++)                                   // Build left leaf
+      for (int i = 0; i < splitLeafSize(); i++)                                 // Build left leaf
        {z();
-        final StuckSML.FirstElement f = Leaf.firstElement1(r.leafBase());
+        final StuckSML.Shift f = Leaf.shift1(r.leafBase());
         Leaf.push(l.leafBase(), f.key, f.data);
-        Leaf.shift1(r.leafBase());
        }
       final int F = Leaf.firstElement1(r.leafBase()).key;
       final int L = Leaf. lastElement1(l.leafBase()).key;
       final int splitKey = (F + L) / 2;
-
-      Branch.insertElementAt(p.branchBase(), splitKey, l.node, index);                       // Insert new key, next pair in parent
+say("AAAA", p, index);
+      Branch.insertElementAt(p.branchBase(), splitKey, l.node, index);          // Insert new key, next pair in parent
      }
 
     void splitBranch(Node parent, int index)                                    // Split a branch which is not the root by splitting right to left
@@ -428,16 +427,14 @@ abstract class BtreeSML extends Test                                            
       final Node l = allocBranch();
       final Node r = this;
 
-      for (int i = 0; i < splitBranchSize(); i++)                                 // Build left branch
+      for (int i = 0; i < splitBranchSize(); i++)                               // Build left branch
        {z();
-        final StuckSML.FirstElement f = Branch.firstElement1(r.branchBase());
+        final StuckSML.Shift f = Branch.shift1(r.branchBase());
         Branch.push(l.branchBase(), f.key, f.data);
-        Branch.shift1(r.branchBase());
        }
 
-      final StuckSML.FirstElement split = Branch.firstElement1(r.branchBase()); // Build right branch
-      Branch.shift1         (r     .branchBase());
-      Branch.push           (r     .branchBase(), 0, split.data);               // Becomes top and so is ignored by search ... except last
+      final StuckSML.Shift split = Branch.shift1(r.branchBase());               // Build right branch
+      Branch.push           (l     .branchBase(), 0, split.data);               // Becomes top and so is ignored by search ... except last
       Branch.insertElementAt(parent.branchBase(), split.key, l.node, index);
      }
 
@@ -984,15 +981,6 @@ abstract class BtreeSML extends Test                                            
 
   static void test_put_ascending()
    {final BtreeSML t = btreeSML(4, 3);
-    final int N = 63;
-    for (int i = 1; i <= N; i++) t.put(i);
-    debug = true;
-    t.put(N+1);
-    t.stop();
-   }
-
-  static void test_put_ascending33()
-   {final BtreeSML t = btreeSML(4, 3);
     final int N = 64;
     for (int i = 1; i <= N; i++) t.put(i);
     //t.stop();
@@ -1032,6 +1020,15 @@ abstract class BtreeSML extends Test                                            
    }
 
   static void test_put_descending()
+   {final BtreeSML t = btreeSML(2, 3);
+    final int N = 6;
+    for (int i = N; i > 1; --i) t.put(i);
+    say(t);
+    t.put(1);
+    stop(t);
+   }
+
+  static void test_put_descending33()
    {final BtreeSML t = btreeSML(2, 3);
     final int N = 64;
     for (int i = N; i > 0; --i) t.put(i);
@@ -1441,7 +1438,7 @@ abstract class BtreeSML extends Test                                            
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_put_ascending();
+    test_put_descending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
