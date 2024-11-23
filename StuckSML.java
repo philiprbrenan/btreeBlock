@@ -41,6 +41,7 @@ abstract class StuckSML extends Test                                            
   final SearchFirstGreaterThanOrEqualExceptLast SearchFirstGreaterThanOrEqualExceptLast1 = new SearchFirstGreaterThanOrEqualExceptLast();  // Search element
   final SearchFirstGreaterThanOrEqualExceptLast SearchFirstGreaterThanOrEqualExceptLast2 = new SearchFirstGreaterThanOrEqualExceptLast();  // Search element
 
+  static boolean debug;                                                         // Debug when true
 //D1 Construction                                                               // Create a stuck
 
   StuckSML()                                                                    // Create the stuck with a maximum number of the specified elements
