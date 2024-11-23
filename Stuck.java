@@ -521,6 +521,31 @@ Stuck(maxSize:8 size:6)
   4 key:8 data:4
   5 key:7 data:7
 """);
+    t.insertElementAt(6, 6, 0);
+    //stop(t);
+    t.ok("""
+Stuck(maxSize:8 size:7)
+  0 key:6 data:6
+  1 key:2 data:1
+  2 key:4 data:2
+  3 key:9 data:9
+  4 key:6 data:3
+  5 key:8 data:4
+  6 key:7 data:7
+""");
+    t.insertElementAt(5, 5, 0);
+    //stop(t);
+    t.ok("""
+Stuck(maxSize:8 size:8)
+  0 key:5 data:5
+  1 key:6 data:6
+  2 key:2 data:1
+  3 key:4 data:2
+  4 key:9 data:9
+  5 key:6 data:3
+  6 key:8 data:4
+  7 key:7 data:7
+""");
    }
 
   static void test_remove_element_at()
