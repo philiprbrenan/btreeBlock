@@ -38,11 +38,11 @@ abstract class BtreeSML extends Test                                            
   final static int
    linesToPrintABranch =  4,                                                    // The number of lines required to print a branch
         maxPrintLevels = 10,                                                    // Maximum number of levels to print in a tree
-              maxDepth = 99;                                                    // Maximum depth of any realistic tree
+              maxDepth = 99,                                                    // Maximum depth of any realistic tree
+           testMaxSize = github_actions ? 1000 : 50;                            // Maximum number of leaves plus branchs during testing
 
-  int        nodeCount = 0;                                                     // Unique number for each node.   Initially we use this count for linear allocation just to get things going. Later we will use a proper free chain to get the next free node if there is one.
-
-  int      maxNodeUsed = 0;                                                     // Maximum branch or leaf index used
+  int         nodeUsed = 0;                                                     // Number of nodes currently in use
+  int      maxNodeUsed = 0;                                                     // Maximum number of branches plus leaves used
 
   static boolean debug = false;                                                 // Debugging enabled
 
@@ -66,13 +66,13 @@ abstract class BtreeSML extends Test                                            
 
   static BtreeSML btreeSML(final int leafKeys, int branchKeys)                  // Define a test BTree with the specified dimensions
    {return  new BtreeSML()
-     {int maxSize         () {return       2000;}
-      int maxKeysPerLeaf  () {return   leafKeys;}
-      int maxKeysPerBranch() {return branchKeys;}
-      int bitsPerKey      () {return         16;}
-      int bitsPerData     () {return         16;}
-      int bitsPerNext     () {return         16;}
-      int bitsPerSize     () {return         16;}
+     {int maxSize         () {return testMaxSize;}
+      int maxKeysPerLeaf  () {return    leafKeys;}
+      int maxKeysPerBranch() {return  branchKeys;}
+      int bitsPerKey      () {return          16;}
+      int bitsPerData     () {return          16;}
+      int bitsPerNext     () {return          16;}
+      int bitsPerSize     () {return          16;}
      };
    }
 
@@ -117,7 +117,7 @@ abstract class BtreeSML extends Test                                            
   void stop()              {Test.stop(toString());}                             // Stop after printing the tree
   public String toString() {return print();}                                    // Print the tree
 
-//D1 Mmeory allocation                                                          // Allocate and free memory
+//D1 Memory allocation                                                          // Allocate and free memory
 
   Node allocate(boolean check)                                                  // Allocate a node with or without checking for sufficient free space
    {z(); final int  f = memoryLayout.getInt(freedChain,    0);                  // Last freed node
@@ -125,10 +125,20 @@ abstract class BtreeSML extends Test                                            
     z(); final int  F = memoryLayout.getInt(free,          0, f);               // Second to last freed node
                         memoryLayout.set   (freedChain, F, 0);                  // Make second to last freed node the forst freed nod to liberate the existeing first free node
     final Node n = new Node(f); n.clear();                                      // Construct and clear the node
+    maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                                // Number of nodes in use
     return n;
    }
 
-  Node allocate() {return allocate(true);}                                      // Allocate a node checking for free space
+  Node allocate() {z(); return allocate(true);}                                 // Allocate a node checking for free space
+
+  void freeNode(int node)                                                       // Free a node by number
+   {z(); if (node == 0) stop("Cannot free root");                               // The root is never freed
+    z(); new Node(node).erase();                                                // Clear the node to encourage erroneous frees to do damage that shows up quickly.
+    final int  f = memoryLayout.getInt(freedChain,       0);                    // Last freed node from head of free chain
+                   memoryLayout.set   (free,          f, 0, node);              // Chain this node in front of the last freed node
+                   memoryLayout.set   (freedChain, node, 0);                    // Make this node the head of the free chain
+    maxNodeUsed  = max(maxNodeUsed, --nodeUsed);                                // Number of nodes in use
+   }
 
 //D1 Components                                                                 // A branch or leaf in the tree
 
@@ -136,8 +146,12 @@ abstract class BtreeSML extends Test                                            
    {final int node;                                                             // The number of the node
     Node(int Node) {node = Node;}                                               // Access an existing node
 
-    boolean isLeaf()             {return memoryLayout.getInt(isLeaf, 0, node) > 0;}           // A leaf if true
-    void    isLeaf(boolean leaf) {       memoryLayout.set   (isLeaf, leaf ? 1 : 0, 0, node);} // Set as leaf if true
+    boolean isLeaf()                                                            // A leaf if true
+     {return memoryLayout.getInt(isLeaf, 0, node) > 0;
+     }
+    void    isLeaf(boolean leaf)                                                // Set as leaf if true
+     {memoryLayout.set(isLeaf, leaf ? 1 : 0, 0, node);
+     }
 
     void assertLeaf()   {if (!isLeaf()) stop("Leaf required");}
     void assertBranch() {if ( isLeaf()) stop("Branch required");}
@@ -145,17 +159,18 @@ abstract class BtreeSML extends Test                                            
     Node allocLeaf()    {z(); final Node n = allocate(); n.isLeaf(true);  return n;}
     Node allocBranch()  {z(); final Node n = allocate(); n.isLeaf(false); return n;}
 
-    void clear()                                                                // Clear a new node
-     {final Layout.Field n = BtreeSML.this.node;
+    void free() {z(); freeNode(node);}                                          // Clear a new node to zeros ready for use
+
+    void clear()                                                                // Clear a new node to zeros ready for use
+     {z();
+      final Layout.Field n = BtreeSML.this.node;
       memory.zero(n.at(node), n.width);
      }
 
-    void free()                                                                 // Free a node
-     {z(); if (node == 0) stop("Cannot free root");                             // The root is never freed
-      z(); clear();
-      final int  f = memoryLayout.getInt(freedChain,       0);                  // Last freed node from head of free chain
-                     memoryLayout.set   (free,          f, 0, node);            // Chain this node in front of the last freed node
-                     memoryLayout.set   (freedChain, node, 0);                  // Make this node the head of the free chain
+    void erase()                                                                // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
+     {z();
+      final Layout.Field n = BtreeSML.this.node;
+      memory.ones(n.at(node), n.width);
      }
 
     int leafBase()   {z(); return leaf  .at(node);}                             // Base of leaf stuck in memeory of this node
@@ -165,13 +180,11 @@ abstract class BtreeSML extends Test                                            
     int branchSize() {z(); return Branch.size(branchBase())-1;}                 // Number of children in body of branch
 
     boolean isFull()                                                            // The node is full
-     {z();
-      return isLeaf() ? leafSize() == maxKeysPerLeaf() : branchSize() == maxKeysPerBranch();
+     {z(); return isLeaf() ? leafSize() == maxKeysPerLeaf  ():
+                           branchSize() == maxKeysPerBranch();
      }
 
-    boolean isLow()                                                             // The node is low on children making it impossible to merge two sibling children
-     {z(); return (isLeaf() ? leafSize() : branchSize()) < 2;
-     }
+    boolean isLow() {z(); return (isLeaf() ? leafSize() : branchSize()) < 2;}   // The node is low on children making it impossible to merge two sibling children
 
     boolean hasLeavesForChildren()                                              // The node has leaves for children
      {z(); assertBranch();
@@ -238,10 +251,8 @@ abstract class BtreeSML extends Test                                            
        }
      }
 
-    final FindEqualInLeaf FindEqualInLeaf1 = new FindEqualInLeaf();
-    final FindEqualInLeaf FindEqualInLeaf2 = new FindEqualInLeaf();
-          FindEqualInLeaf findEqualInLeaf1(int Search) {return FindEqualInLeaf1.findEqualInLeaf(Search);}
-          FindEqualInLeaf findEqualInLeaf2(int Search) {return FindEqualInLeaf2.findEqualInLeaf(Search);}
+    final FindEqualInLeaf FindEqualInLeaf1 =                    new FindEqualInLeaf();
+          FindEqualInLeaf findEqualInLeaf1(int Search) {z(); return FindEqualInLeaf1.findEqualInLeaf(Search);}
 
     class FindFirstGreaterThanOrEqualInLeaf                                     // Find the first key in the leaf that is equal to or greater than the search key
      {Node     leaf;                                                            // The leaf being searched
@@ -271,10 +282,8 @@ abstract class BtreeSML extends Test                                            
         return s.toString();
        }
      }
-    final FindFirstGreaterThanOrEqualInLeaf FindFirstGreaterThanOrEqualInLeaf1 = new FindFirstGreaterThanOrEqualInLeaf();
-    final FindFirstGreaterThanOrEqualInLeaf FindFirstGreaterThanOrEqualInLeaf2 = new FindFirstGreaterThanOrEqualInLeaf();
-          FindFirstGreaterThanOrEqualInLeaf findFirstGreaterThanOrEqualInLeaf1(int Search) {return FindFirstGreaterThanOrEqualInLeaf1.findFirstGreaterThanOrEqualInLeaf(Search);}
-          FindFirstGreaterThanOrEqualInLeaf findFirstGreaterThanOrEqualInLeaf2(int Search) {return FindFirstGreaterThanOrEqualInLeaf2.findFirstGreaterThanOrEqualInLeaf(Search);}
+    final FindFirstGreaterThanOrEqualInLeaf FindFirstGreaterThanOrEqualInLeaf1 =                    new FindFirstGreaterThanOrEqualInLeaf();
+          FindFirstGreaterThanOrEqualInLeaf findFirstGreaterThanOrEqualInLeaf1(int Search) {z(); return FindFirstGreaterThanOrEqualInLeaf1.findFirstGreaterThanOrEqualInLeaf(Search);}
 
     class FindFirstGreaterThanOrEqualInBranch                                   // Find the first key in the branch that is equal to or greater than the search key
      {Node     branch;                                                          // The branch being searched
@@ -305,17 +314,17 @@ abstract class BtreeSML extends Test                                            
         return s.toString();
        }
      }
-    final FindFirstGreaterThanOrEqualInBranch FindFirstGreaterThanOrEqualInBranch1 = new FindFirstGreaterThanOrEqualInBranch();
-    final FindFirstGreaterThanOrEqualInBranch FindFirstGreaterThanOrEqualInBranch2 = new FindFirstGreaterThanOrEqualInBranch();
-          FindFirstGreaterThanOrEqualInBranch findFirstGreaterThanOrEqualInBranch1(int Search) {return FindFirstGreaterThanOrEqualInBranch1.findFirstGreaterThanOrEqualInBranch(Search);}
-          FindFirstGreaterThanOrEqualInBranch findFirstGreaterThanOrEqualInBranch2(int Search) {return FindFirstGreaterThanOrEqualInBranch2.findFirstGreaterThanOrEqualInBranch(Search);}
+    final FindFirstGreaterThanOrEqualInBranch FindFirstGreaterThanOrEqualInBranch1 =                    new FindFirstGreaterThanOrEqualInBranch();
+          FindFirstGreaterThanOrEqualInBranch findFirstGreaterThanOrEqualInBranch1(int Search) {z(); return FindFirstGreaterThanOrEqualInBranch1.findFirstGreaterThanOrEqualInBranch(Search);}
 
     void printLeaf(Stack<StringBuilder>S, int level)                            // Print leaf horizontally
      {assertLeaf();
       padStrings(S, level);
       final StringBuilder s = new StringBuilder();                              // String builder
       final int K = leafSize();
-      for  (int i = 0; i < K; i++) s.append(""+Leaf.elementAt1(leafBase(), i).key+",");
+      for  (int i = 0; i < K; i++)
+       {s.append(""+Leaf.elementAt1(leafBase(), i).key+",");
+       }
       if (s.length() > 0) s.setLength(s.length()-1);                            // Remove trailing comma if present
       s.append("="+node+" ");
       S.elementAt(level*linesToPrintABranch).append(s.toString());
@@ -323,7 +332,7 @@ abstract class BtreeSML extends Test                                            
      }
 
     void printBranch(Stack<StringBuilder>S, int level)                          // Print branch horizontally
-     { assertBranch();
+     {assertBranch();
       if (level > maxPrintLevels) return;
       padStrings(S, level);
       final int K = branchSize();
@@ -373,9 +382,9 @@ abstract class BtreeSML extends Test                                            
 
     void splitLeafRoot()                                                        // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
      {z(); assertLeaf();
-      if (node != 0) stop("Wanted root, but got node:", node);
-      if (!isFull()) stop("Root is not full, but has size:", leafSize());
-      isLeaf(false);
+      z(); if (node != 0) stop("Wanted root, but got node:", node);
+      z(); if (!isFull()) stop("Root is not full, but has size:", leafSize());
+      z(); isLeaf(false);
 
       final Node l  = allocLeaf();                                              // New left leaf
       final Node r  = allocLeaf();                                              // New right leaf
@@ -401,9 +410,9 @@ abstract class BtreeSML extends Test                                            
 
     void splitBranchRoot()                                                      // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
      {z(); assertBranch();
-      if (node != 0) stop("Not root, but node:", node);
-      if (!isFull()) stop("Root is not full, but has size:", branchSize());
-
+      z(); if (node != 0) stop("Not root, but node:", node);
+      z(); if (!isFull()) stop("Root is not full, but has size:", branchSize());
+      z();
       final Node l = allocBranch();                                             // New left branch
       final Node r = allocBranch();                                             // New right branch
 
@@ -431,12 +440,14 @@ abstract class BtreeSML extends Test                                            
 
     void splitLeaf(Node parent, int index)                                      // Split a leaf which is not the root
      {z(); assertLeaf();
-      if (node == 0)          stop("Cannot split root with this method");
-      if (!isFull())          stop("Leaf:", node, "is not full, but has:", leafSize(), this);
-      if (parent.isFull())    stop("Parent:", parent, "must not be full");
-      if (index < 0)          stop("Index", index, "too small");
-      if (index > leafSize()) stop("Index", index, "too big for leaf with:", leafSize());
-
+      z(); if (node == 0)          stop("Cannot split root with this method");
+      z(); if (!isFull())          stop("Leaf:", node, "is not full, but has:",
+                                         leafSize(), this);
+      z(); if (parent.isFull())    stop("Parent:", parent, "must not be full");
+      z(); if (index < 0)          stop("Index", index, "too small");
+      z(); if (index > leafSize()) stop("Index", index, "too big for leaf with:",
+                                         leafSize());
+      z();
       final Node p = parent;                                                    // Parent
       final Node l = allocLeaf();                                               // New  split out leaf
       final Node r = this;                                                      // Existing  leaf
@@ -454,19 +465,20 @@ abstract class BtreeSML extends Test                                            
 
     void splitBranch(Node parent, int index)                                    // Split a branch which is not the root by splitting right to left
      {z(); assertBranch();
-      if (node == 0)            stop("Cannot split root with this method");
-      if (!isFull())            stop("Branch:", node, "is not full, but", branchSize());
-      if (parent.isFull())      stop("Parent:", parent.node, "must not be full");
-      if (index < 0)            stop("Index", index, "too small in node:", node);
-      if (index > branchSize()) stop("Index", index, "too big for branch with:", branchSize(), "in node:", node);
-
+      z(); if (node == 0)       stop("Cannot split root with this method");
+      z(); if (!isFull())       stop("Branch:", node, "is not full, but",
+                                      branchSize());
+      z(); if (parent.isFull()) stop("Parent:", parent.node, "must not be full");
+      z(); if (index < 0)       stop("Index", index, "too small in node:", node);
+      z(); if (index > branchSize()) stop("Index", index, "too big for branch with:",
+                                       branchSize(), "in node:", node);
+      z();
       final Node p = parent;
       final Node l = allocBranch();
       final Node r = this;
 
       for (int i = 0; i < splitBranchSize(); i++)                               // Build left branch
-       {z();
-        final StuckSML.Shift f = Branch.shift1(r.branchBase());
+       {z(); final StuckSML.Shift f = Branch.shift1(r.branchBase());
         Branch.push(l.branchBase(), f.key, f.data);
        }
 
@@ -477,8 +489,9 @@ abstract class BtreeSML extends Test                                            
 
     boolean mergeRoot()                                                         // Merge into the root
      {z();
-      if (root.isLeaf() || branchSize() > 1) return false;
-      if (node != 0) stop("Expected root, got:", node);
+      z(); if (root.isLeaf() || branchSize() > 1) return false;
+      z(); if (node != 0) stop("Expected root, got:", node);
+      z();
       final Node p = this;
       final Node l = new Node(Branch.firstElement1(branchBase()).data);
       final Node r = new Node(Branch. lastElement1(branchBase()).data);
@@ -500,6 +513,8 @@ abstract class BtreeSML extends Test                                            
             Leaf.push(p.leafBase(), f.key, f.data);
            }
           isLeaf(true);
+          l.free();
+          r.free();
           return true;
          }
        }
@@ -521,34 +536,37 @@ abstract class BtreeSML extends Test                                            
           final StuckSML.Shift f = Branch.shift1(r.branchBase());
           Branch.push(p.branchBase(), f.key, f.data);
          }
-        Branch.push(p.branchBase(), 0, Branch.lastElement2(r.branchBase()).data);                      // Top so ignored by search ... except last
+        Branch.push(p.branchBase(), 0, Branch.lastElement2(r.branchBase()).data);// Top so ignored by search ... except last
+        l.free();
+        r.free();
         return true;
        }
+      z();
       return false;
      }
 
     void augment(int index)                                                     // Augment the indexed child so it has at least two children in its body
      {z(); assertBranch();
-      if (index < 0)            stop("Index", index, "too small");
-      if (index > branchSize()) stop("Index", index, "too big");
-      if (isLow() && node != root.node) stop("Parent:", node, "must not be low on children");
-
+      z(); if (index < 0)            stop("Index", index, "too small");
+      z(); if (index > branchSize()) stop("Index", index, "too big");
+      z(); if (isLow() && node != root.node) stop("Parent:", node, "must not be low on children");
+      z();
       final StuckSML.ElementAt p = Branch.elementAt1(new Node(node).branchBase(), index);
       final Node               c = new Node(p.data);
-      if (!c.isLow())               return;
-      if (stealFromLeft    (index)) return;
-      if (stealFromRight   (index)) return;
-      if (mergeLeftSibling (index)) return;
-      if (mergeRightSibling(index)) return;
+      z(); if (!c.isLow())               return;
+      z(); if (stealFromLeft    (index)) return;
+      z(); if (stealFromRight   (index)) return;
+      z(); if (mergeLeftSibling (index)) return;
+      z(); if (mergeRightSibling(index)) return;
       stop("Unable to augment child:", c.node);
      }
 
     boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
      {z(); assertBranch();
-      if (index == 0) return false;
-      if (index < 0)            stop("Index", index, "too small");
-      if (index > branchSize()) stop("Index", index, "too big");
-
+      z(); if (index == 0) return false;
+      z(); if (index < 0)            stop("Index", index, "too small");
+      z(); if (index > branchSize()) stop("Index", index, "too big");
+      z();
       final int                 p = branchBase();
       final StuckSML.ElementAt  L = Branch.elementAt1(p, index-1);
       final StuckSML.ElementAt  R = Branch.elementAt2(p, index+0);
@@ -560,13 +578,13 @@ abstract class BtreeSML extends Test                                            
         final int nl = new Node(L.data).leafSize();
         final int nr = new Node(R.data).leafSize();
 
-        if (nr >= maxKeysPerLeaf()) return false;                               // Steal not possible because there is no where to put the steal
-        if (nl <= 1) return false;                                              // Steal not allowed because it would leave the leaf sibling empty
-
+        z(); if (nr >= maxKeysPerLeaf()) return false;                          // Steal not possible because there is no where to put the steal
+        z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the leaf sibling empty
+        z();
         final StuckSML.LastElement ll = Leaf.lastElement1(l);
         Leaf.insertElementAt(r, ll.key, ll.data, 0);                            // Increase right
         Leaf.pop(l);                                                            // Reduce left
-        Branch.setElementAt(p, Leaf.elementAt1(l, nl-2).key, L.data, index-1); // Swap key of parent
+        Branch.setElementAt(p, Leaf.elementAt1(l, nl-2).key, L.data, index-1);  // Swap key of parent
        }
       else                                                                      // Children are branches
        {z();
@@ -575,25 +593,25 @@ abstract class BtreeSML extends Test                                            
         final int nl = new Node(L.data).branchSize();
         final int nr = new Node(R.data).branchSize();
 
-        if (nr >= maxKeysPerBranch()) return false;                             // Steal not possible because there is no where to put the steal
-        if (nl <= 1) return false;                                              // Steal not allowed because it would leave the left sibling empty
-
+        z(); if (nr >= maxKeysPerBranch()) return false;                        // Steal not possible because there is no where to put the steal
+        z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the left sibling empty
+        z();
         final StuckSML.LastElement  t = Branch.lastElement1(l);                 // Increase right with left top
         Branch.insertElementAt(r, Branch.elementAt1(branchBase(), index).key, t.data, 0);                  // Increase right with left top
         Branch.pop(l);                                                          // Remove left top
         final StuckSML.FirstElement b = Branch.firstElement1(r);                // Increase right with left top
-        Branch.setElementAt(r, Branch.elementAt1  (p, index-1).key, b.data, 0);                   // Reduce key of parent of left
-        Branch.setElementAt(p, Branch.lastElement1(l).key,      L.data, index-1);             // Reduce key of parent of left
+        Branch.setElementAt(r, Branch.elementAt1  (p, index-1).key, b.data, 0); // Reduce key of parent of left
+        Branch.setElementAt(p, Branch.lastElement1(l).key, L.data, index-1);    // Reduce key of parent of left
        }
       return true;
      }
 
     boolean stealFromRight(int index)                                           // Steal from the right sibling of the indicated child if possible
      {z(); assertBranch();
-      if (index == branchSize()) return false;
-      if (index < 0)             stop("Index", index, "too small");
-      if (index >= branchSize()) stop("Index", index, "too big");
-
+      z(); if (index == branchSize()) return false;
+      z(); if (index < 0)             stop("Index", index, "too small");
+      z(); if (index >= branchSize()) stop("Index", index, "too big");
+      z();
       final int                p = branchBase();
       final StuckSML.ElementAt L = Branch.elementAt1(p, index+0);
       final StuckSML.ElementAt R = Branch.elementAt2(p, index+1);
@@ -605,9 +623,9 @@ abstract class BtreeSML extends Test                                            
         final int nl = new Node(L.data).leafSize();
         final int nr = new Node(R.data).leafSize();
 
-        if (nl >= maxKeysPerLeaf()) return false;                               // Steal not possible because there is no where to put the steal
-        if (nr <= 1) return false;                                              // Steal not allowed because it would leave the right sibling empty
-
+        z(); if (nl >= maxKeysPerLeaf()) return false;                          // Steal not possible because there is no where to put the steal
+        z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
+        z();
         final int k = Leaf.firstElement1(r).key;
         Leaf.push            (l, k, Leaf.firstElement1(r).data);                // Increase left
         Branch.setElementAt  (p, k, L.data, index);                             // Swap key of parent
@@ -620,9 +638,9 @@ abstract class BtreeSML extends Test                                            
         final int nl = new Node(L.data).branchSize();
         final int nr = new Node(R.data).branchSize();
 
-        if (nl >= maxKeysPerBranch()) return false;                             // Steal not possible because there is no where to put the steal
-        if (nr <= 1) return false;                                              // Steal not allowed because it would leave the right sibling empty
-
+        z(); if (nl >= maxKeysPerBranch()) return false;                        // Steal not possible because there is no where to put the steal
+        z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
+        z();
         Branch.setElementAt(l, L.key, Branch.lastElement1(l).data, nl);         // Left top becomes real
         Branch.push(l, 0, Branch.firstElement1(r).data);                        // New top for left is ignored by search ,.. except last
         Branch.setElementAt(p, Branch.firstElement1(r).key, L.data, index);     // Swap key of parent
@@ -633,12 +651,12 @@ abstract class BtreeSML extends Test                                            
 
     boolean mergeLeftSibling(int index)                                         // Merge the left sibling
      {z(); assertBranch();
-      if (index == 0) return false;
-      if (index < 0)            stop("Index", index, "too small for branch of size:", branchSize());
-      if (index > branchSize()) stop("Index", index, "too big for branch of size:", branchSize());
+      z(); if (index == 0) return false;
+      z(); if (index < 0)            stop("Index", index, "too small for branch of size:", branchSize());
+      z(); if (index > branchSize()) stop("Index", index, "too big for branch of size:", branchSize());
       //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
-      if (branchSize() < 2) return false;
-
+      z(); if (branchSize() < 2) return false;
+      z();
       final int                p = branchBase();
       final StuckSML.ElementAt L = Branch.elementAt1(p, index-1);
       final StuckSML.ElementAt R = Branch.elementAt2(p, index-0);
@@ -651,12 +669,12 @@ abstract class BtreeSML extends Test                                            
         final int nr = new Node(R.data).leafSize();
 
         if (nl + nr >= maxKeysPerLeaf()) return false;                          // Combined body would be too big
-
+        z();
         for (int i = 0; i < maxKeysPerLeaf() && Leaf.size(l) > 0; i++)          // Transfer left to right
-         {z();
-          final StuckSML.Pop q = Leaf.pop(l);
+         {z(); final StuckSML.Pop q = Leaf.pop(l);
           Leaf.insertElementAt(r, q.key, q.data, 0);
          }
+        freeNode(L.data);                                                       // Free the empty left node
        }
       else                                                                      // Children are branches
        {z();
@@ -666,6 +684,7 @@ abstract class BtreeSML extends Test                                            
         final int nr = new Node(R.data).branchSize();
 
         if (nl + 1 + nr > maxKeysPerBranch()) return false;                     // Merge not possible because there is not enough room for the combined result
+        z();
         final int t = Branch.elementAt1(p, index-1).key;                        // Top key
         Branch.insertElementAt(r, t, Branch.lastElement1(l).data, 0);           // Left top to right
 
@@ -675,6 +694,7 @@ abstract class BtreeSML extends Test                                            
           final StuckSML.Pop q = Branch.pop(l);
           Branch.insertElementAt(r, q.key, q.data, 0);
          }
+        freeNode(L.data);                                                       // Free the empty left node
        }
       Branch.removeElementAt1(p, index-1);                                      // Reduce parent on left
       return true;
@@ -682,12 +702,12 @@ abstract class BtreeSML extends Test                                            
 
     boolean mergeRightSibling(int index)                                        // Merge the right sibling
      {z(); assertBranch();
-      if (index >= branchSize()) return false;
-      if (index < 0)            stop("Index", index, "too small");
-      if (index > branchSize()) stop("Index", index, "too big");
+      z(); if (index >= branchSize()) return false;
+      z(); if (index < 0)            stop("Index", index, "too small");
+      z(); if (index > branchSize()) stop("Index", index, "too big");
       //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
-      if (branchSize() < 2) return false;
-
+      z(); if (branchSize() < 2) return false;
+      z();
       final int                p = branchBase();
       final StuckSML.ElementAt L = Branch.elementAt1(p, index+0);
       final StuckSML.ElementAt R = Branch.elementAt2(p, index+1);
@@ -700,11 +720,13 @@ abstract class BtreeSML extends Test                                            
         final int nr = new Node(R.data).leafSize();
 
         if (nl + nr > maxKeysPerLeaf()) return false;                           // Combined body would be too big
+        z();
         for (int i = 0; i < maxKeysPerLeaf() && Leaf.size(r) > 0; i++)          // Transfer right to left
          {z();
           final StuckSML.Shift q = Leaf.shift1(r);
           Leaf.push(l, q.key, q.data);
          }
+        freeNode(R.data);                                                       // Free the empty right node
        }
       else                                                                      // Children are branches
        {z();
@@ -714,14 +736,14 @@ abstract class BtreeSML extends Test                                            
         final int nr = new Node(R.data).branchSize();
 
         if (nl + 1 + nr > maxKeysPerBranch()) return false;                     // Merge not possible because there is no where to put the steal
-        final StuckSML.LastElement ll = Branch.lastElement1(l);
+        z(); final StuckSML.LastElement ll = Branch.lastElement1(l);
         Branch.setElementAt(l, Branch.elementAt1(p, index).key, ll.data, nl);   // Re-key left top
 
         for (int i = 0; i < maxKeysPerBranch() && Branch.size(r) > 0; i++)      // Transfer right to left
-         {z();
-          final StuckSML.Shift f = Branch.shift1(r);
+         {z();final StuckSML.Shift f = Branch.shift1(r);
           Branch.push(l, f.key, f.data);
          }
+        freeNode(R.data);                                                       // Free the empty right node
        }
 
       final StuckSML.ElementAt pkn = Branch.elementAt1(p, index+1);             // Key of right sibling
@@ -829,8 +851,8 @@ abstract class BtreeSML extends Test                                            
       return s.toString();
      }
    }
-  final Find Find1 = new Find();
-  final Find Find2 = new Find();
+  final Find Find1 =                    new Find();
+  final Find Find2 =                    new Find();
         Find find1(int Search) {z(); return Find1.find(Search);}
         Find find2(int Search) {z(); return Find2.find(Search);}
 
@@ -868,7 +890,7 @@ abstract class BtreeSML extends Test                                            
         success = true;
         return this;
        }
-      success = false;
+      z(); success = false;
       return this;
      }
 
@@ -883,9 +905,9 @@ abstract class BtreeSML extends Test                                            
      }
    }
 
-  final FindAndInsert FindAndInsert1 = new FindAndInsert();
-  final FindAndInsert FindAndInsert2 = new FindAndInsert();
-  final FindAndInsert FindAndInsert3 = new FindAndInsert();
+  final FindAndInsert FindAndInsert1 =                           new FindAndInsert();
+  final FindAndInsert FindAndInsert2 =                           new FindAndInsert();
+  final FindAndInsert FindAndInsert3 =                           new FindAndInsert();
         FindAndInsert findAndInsert1(int Key, int Data) {z(); return FindAndInsert1.findAndInsert(Key, Data);}
         FindAndInsert findAndInsert2(int Key, int Data) {z(); return FindAndInsert2.findAndInsert(Key, Data);}
         FindAndInsert findAndInsert3(int Key, int Data) {z(); return FindAndInsert3.findAndInsert(Key, Data);}
@@ -896,7 +918,7 @@ abstract class BtreeSML extends Test                                            
    {z();
     final FindAndInsert f = findAndInsert1(Key, Data);                          // Try direct insertion with no modifications to the shape of the tree
     if (f.success) return;                                                      // Inserted or updated successfully
-
+    z();
     if (root.isFull())                                                          // Start the insertion at the root, after splitting it if necessary
      {z();
       if (root.isLeaf())
@@ -907,10 +929,11 @@ abstract class BtreeSML extends Test                                            
        {z();
         root.splitBranchRoot();
        }
+      z();
       final FindAndInsert F = findAndInsert2(Key, Data);                        // Splitting the root might have been enough
       if (F.success) return;                                                    // Inserted or updated successfully
      }
-
+    z();
     Node p = root;
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
@@ -925,7 +948,7 @@ abstract class BtreeSML extends Test                                            
         merge(Key);
         return;
        }
-
+      z();
       if (q.isFull())
        {z();
         q.splitBranch(p, down.first);                                           // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
@@ -950,13 +973,13 @@ abstract class BtreeSML extends Test                                            
 
   Integer findAndDelete(int Key)                                                // Delete a key from the tree and returns its data if present without modifying the shape of tree
    {z();
-    final Find     f = find1(Key);                                              // Try direct insertion with no modifications to the shape of the tree
-    if (!f.found()) return null;                                                // Inserted or updated successfully
-    final Node     l = f.leaf();                                                // The leaf that contains the key
-    final int      i = f.index();                                               // Position in the leaf of the key
-    final StuckSML.ElementAt kd = Leaf.elementAt1(l.leafBase(), i);             // Key, data pairs in the leaf
-    Leaf.removeElementAt1(l.leafBase(), i);                                     // Remove the key, data pair from the leaf
-    return kd.data;
+    z(); final Find     f = find1(Key);                                         // Try direct insertion with no modifications to the shape of the tree
+    z(); if (!f.found()) return null;                                           // Inserted or updated successfully
+    z(); final Node     l = f.leaf();                                           // The leaf that contains the key
+    z(); final int      i = f.index();                                          // Position in the leaf of the key
+    z(); final StuckSML.ElementAt kd = Leaf.elementAt1(l.leafBase(), i);        // Key, data pairs in the leaf
+    z(); Leaf.removeElementAt1(l.leafBase(), i);                                // Remove the key, data pair from the leaf
+    z(); return kd.data;
    }
 
   Integer delete(int Key)                                                       // Insert a key, data pair into the tree or update and existing key with a new datum
@@ -965,6 +988,7 @@ abstract class BtreeSML extends Test                                            
     if (root.isLeaf())                                                          // Find and delete directly in root as a leaf
      {z(); return findAndDelete(Key);
      }
+    z();
 
     Node p = root;                                                              // Start at root
 
@@ -982,7 +1006,7 @@ abstract class BtreeSML extends Test                                            
         merge(Key);
         return data;
        }
-      p = q;
+      z(); p = q;
      }
     stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
     return null;
@@ -996,8 +1020,8 @@ abstract class BtreeSML extends Test                                            
     Node p = root;                                                              // Start at root
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-     {z();
-      if (p.isLeaf()) return;
+     {z(); if (p.isLeaf()) return;
+      z();
       for (int j = 0; j < p.branchSize(); j++)                                  // Try merging each sibling pair
        {z();
         p.mergeLeftSibling (j);
@@ -1022,20 +1046,21 @@ abstract class BtreeSML extends Test                                            
     for (int i = 1; i <= N; i++) t.put(i);
     //t.stop();
     t.ok("""
-                                                                                                                               32                                                                                                                                           |
-                                                                                                                               0                                                                                                                                            |
-                                                                                                                               50                                                                                                                                           |
-                                                                                                                               51                                                                                                                                           |
-                                                       16                                                                                                                                              48                                56                                 |
-                                                       50                                                                                                                                              51                                51.1                               |
-                                                       7                                                                                                                                               28                                52                                 |
-                                                       18                                                                                                                                                                                8                                  |
-          4          8               12                                 20               24                 28                                  36               40                 44                                  52                                  60              |
-          7          7.1             7.2                                18               18.1               18.2                                28               28.1               28.2                                52                                  8               |
-          1          4               6                                  12               15                 17                                  22               25                 27                                  38                                  49              |
-                                     10                                                                     20                                                                      32                                  43                                  2               |
-1,2,3,4=1  5,6,7,8=4    9,10,11,12=6    13,14,15,16=10   17,18,19,20=12   21,22,23,24=15     25,26,27,28=17     29,30,31,32=20   33,34,35,36=22   37,38,39,40=25     41,42,43,44=27     45,46,47,48=32   49,50,51,52=38   53,54,55,56=43     57,58,59,60=49   61,62,63,64=2 |
+                                                                                                                            32                                                                                                                                           |
+                                                                                                                            0                                                                                                                                            |
+                                                                                                                            17                                                                                                                                           |
+                                                                                                                            21                                                                                                                                           |
+                                                      16                                                                                                                                            48                                56                                 |
+                                                      17                                                                                                                                            21                                21.1                               |
+                                                      5                                                                                                                                             16                                23                                 |
+                                                      11                                                                                                                                                                              6                                  |
+          4          8               12                               20               24                28                                  36               40                 44                                  52                                  60              |
+          5          5.1             5.2                              11               11.1              11.2                                16               16.1               16.2                                23                                  6               |
+          1          3               4                                8                10                9                                   13               15                 14                                  18                                  20              |
+                                     7                                                                   12                                                                      19                                  22                                  2               |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=12   33,34,35,36=13   37,38,39,40=15     41,42,43,44=14     45,46,47,48=19   49,50,51,52=18   53,54,55,56=22     57,58,59,60=20   61,62,63,64=2 |
 """);
+    // stop("maximumNodes used", t.maxNodeUsed); // 25
    }
 
   static void test_put_ascending_wide()
@@ -1044,16 +1069,17 @@ abstract class BtreeSML extends Test                                            
     for (int i = 1; i <= N; ++i) t.put(i);
     //stop(t);
     t.ok("""
-                                                                                                         32                                                                                                                     |
-                                                                                                         0                                                                                                                      |
-                                                                                                         15                                                                                                                     |
-                                                                                                         16                                                                                                                     |
-                  8                          16                            24                                                         40                           48                             56                            |
-                  15                         15.1                          15.2                                                       16                           16.1                           16.2                          |
-                  1                          4                             6                                                          10                           12                             14                            |
-                                                                           8                                                                                                                      2                             |
-1,2,3,4,5,6,7,8=1   9,10,11,12,13,14,15,16=4     17,18,19,20,21,22,23,24=6     25,26,27,28,29,30,31,32=8   33,34,35,36,37,38,39,40=10   41,42,43,44,45,46,47,48=12     49,50,51,52,53,54,55,56=14     57,58,59,60,61,62,63,64=2 |
+                                                                                                      32                                                                                                                  |
+                                                                                                      0                                                                                                                   |
+                                                                                                      9                                                                                                                   |
+                                                                                                      10                                                                                                                  |
+                  8                         16                           24                                                       40                          48                            56                            |
+                  9                         9.1                          9.2                                                      10                          10.1                          10.2                          |
+                  1                         3                            4                                                        6                           7                             8                             |
+                                                                         5                                                                                                                  2                             |
+1,2,3,4,5,6,7,8=1  9,10,11,12,13,14,15,16=3    17,18,19,20,21,22,23,24=4    25,26,27,28,29,30,31,32=5   33,34,35,36,37,38,39,40=6   41,42,43,44,45,46,47,48=7     49,50,51,52,53,54,55,56=8     57,58,59,60,61,62,63,64=2 |
 """);
+    // stop("maximumNodes used", t.maxNodeUsed); // 12
    }
 
   static void test_put_descending()
@@ -1062,20 +1088,21 @@ abstract class BtreeSML extends Test                                            
     for (int i = N; i > 0; --i) t.put(i);
     //t.stop();
     t.ok("""
-                                                                                        16                                                                                                32                                                                                                                                                                                              |
-                                                                                        0                                                                                                 0.1                                                                                                                                                                                             |
-                                                                                        102                                                                                               100                                                                                                                                                                                             |
-                                                                                                                                                                                          68                                                                                                                                                                                              |
-                   4                  8                                                                                                  24                                                                                                40                                              48                                                56                                           |
-                   102                102.1                                                                                              100                                                                                               68                                              68.1                                              68.2                                         |
-                   103                95                                                                                                 76                                                                                                52                                              28                                                18                                           |
-                                      86                                                                                                 62                                                                                                                                                                                                  7                                            |
-        2                    6                     10         12           14                       18         20           22                       26         28           30                       34         36           38                      42         44           46                        50         52           54                        58        60         62         |
-        103                  95                    86         86.1         86.2                     76         76.1         76.2                     62         62.1         62.2                     52         52.1         52.2                    28         28.1         28.2                      18         18.1         18.2                      7         7.1        7.2        |
-        104                  97                    89         85           83                       78         75           73                       65         61           59                       54         49           43                      32         27           25                        20         17           15                        10        6          4          |
-        101                  93                                            80                                               69                                               56                                               38                                              22                                                12                                             1          |
-1,2=104    3,4=101    5,6=97   7,8=93      9,10=89   11,12=85     13,14=83     15,16=80    17,18=78   19,20=75     21,22=73     23,24=69    25,26=65   27,28=61     29,30=59     31,32=56    33,34=54   35,36=49     37,38=43     39,40=38   41,42=32   43,44=27     45,46=25     47,48=22     49,50=20   51,52=17     53,54=15     55,56=12     57,58=10   59,60=6    61,62=4    63,64=1 |
+                                                                                  16                                                                                              32                                                                                                                                                                                          |
+                                                                                  0                                                                                               0.1                                                                                                                                                                                         |
+                                                                                  39                                                                                              43                                                                                                                                                                                          |
+                                                                                                                                                                                  29                                                                                                                                                                                          |
+               4                 8                                                                                                24                                                                                               40                                              48                                             56                                          |
+               39                39.1                                                                                             43                                                                                               29                                              29.1                                           29.2                                        |
+               44                42                                                                                               22                                                                                               23                                              16                                             11                                          |
+                                 38                                                                                               28                                                                                                                                                                                              5                                           |
+       2                6                    10         12           14                      18         20           22                      26         28           30                       34         36           38                      42         44           46                       50         52          54                      58        60         62         |
+       44               42                   38         38.1         38.2                    22         22.1         22.2                    28         28.1         28.2                     23         23.1         23.2                    16         16.1         16.2                     11         11.1        11.2                    5         5.1        5.2        |
+       45               41                   40         37           35                      26         33           31                      30         27           25                       14         17           20                      19         15           13                       6          10          8                       4         3          2          |
+       9                32                                           34                                              21                                              24                                               18                                              12                                              7                                            1          |
+1,2=45   3,4=9   5,6=41   7,8=32     9,10=40   11,12=37     13,14=35     15,16=34   17,18=26   19,20=33     21,22=31     23,24=21   25,26=30   27,28=27     29,30=25     31,32=24    33,34=14   35,36=17     37,38=20     39,40=18   41,42=19   43,44=15     45,46=13     47,48=12     49,50=6   51,52=10     53,54=8     55,56=7     57,58=4   59,60=3    61,62=2    63,64=1 |
 """);
+    // stop("maximumNodes used", t.maxNodeUsed); // 46
    }
 
   static void test_put_small_random()
@@ -1083,20 +1110,21 @@ abstract class BtreeSML extends Test                                            
     for (int i = 0; i < random_small.length; ++i) t.put(random_small[i]);
     //stop(t);
     t.ok("""
-                                                                                                                                                                                                                                                      476                                                                                                                                                                                                                                                                                      |
-                                                                                                                                                                                                                                                      0                                                                                                                                                                                                                                                                                        |
-                                                                                                                                                                                                                                                      23                                                                                                                                                                                                                                                                                       |
-                                                                                                                                                                                                                                                      24                                                                                                                                                                                                                                                                                       |
-                                                                           160                                                                                              354                                                                                                                                                            582                                                                           781                                                 892                                                               |
-                                                                           23                                                                                               23.1                                                                                                                                                           24                                                                            24.1                                                24.2                                                              |
-                                                                           33                                                                                               29                                                                                                                                                             25                                                                            10                                                  37                                                                |
-                                                                                                                                                                            6                                                                                                                                                                                                                                                                                                7                                                                 |
-                 41            81                   120                                                  241               270                            327                                              419                       439                                    502                   535                562                                             654                           688                                              831                                         909                   949                      |
-                 33            33.1                 33.2                                                 29                29.1                           29.2                                             6                         6.1                                    25                    25.1               25.2                                            10                            10.1                                             37                                          7                     7.1                      |
-                 39            40                   30                                                   31                13                             22                                               12                        27                                     28                    11                 36                                              32                            19                                               35                                          38                    14                       |
-                                                    16                                                                                                    5                                                                          1                                                                               8                                                                             3                                                9                                                                 2                        |
-1,13,27,29,39=39   43,55,72=40     90,96,103,106=30     135,151,155,157=16    186,188,229,232,234,237=31    246,260,261=13     272,273,279,288,298,317=22     338,344,354=5     358,376,377,391,401,403=12    422,425,436,437,438=27    442,447,472=1    480,490,494,501=28    503,511,516,526=11     545,554,560=36     564,576,577,578=8    586,611,612,615,650=32    657,658,667,679,681,686=19     690,704,769,773=3     804,806,809,826,830=35    839,854,858,882,884=9     903,906,907=38    912,922,937,946=14    961,976,987,989,993=2 |
+                                                                                                                                                                                                                                                      476                                                                                                                                                                                                                                                                                     |
+                                                                                                                                                                                                                                                      0                                                                                                                                                                                                                                                                                       |
+                                                                                                                                                                                                                                                      16                                                                                                                                                                                                                                                                                      |
+                                                                                                                                                                                                                                                      17                                                                                                                                                                                                                                                                                      |
+                                                                           160                                                                                              354                                                                                                                                                            582                                                                          781                                                 892                                                               |
+                                                                           16                                                                                               16.1                                                                                                                                                           17                                                                           17.1                                                17.2                                                              |
+                                                                           27                                                                                               23                                                                                                                                                             20                                                                           9                                                   30                                                                |
+                                                                                                                                                                            5                                                                                                                                                                                                                                                                                               6                                                                 |
+                 41            81                   120                                                  241               270                            327                                              419                       439                                    502                   535                562                                             654                           688                                             831                                         909                   949                      |
+                 27            27.1                 27.2                                                 23                23.1                           23.2                                             5                         5.1                                    20                    20.1               20.2                                            9                             9.1                                             30                                          6                     6.1                      |
+                 32            28                   24                                                   25                12                             19                                               11                        21                                     22                    10                 29                                              26                            18                                              14                                          31                    13                       |
+                                                    15                                                                                                    4                                                                          1                                                                               7                                                                             3                                               8                                                                 2                        |
+1,13,27,29,39=32   43,55,72=28     90,96,103,106=24     135,151,155,157=15    186,188,229,232,234,237=25    246,260,261=12     272,273,279,288,298,317=19     338,344,354=4     358,376,377,391,401,403=11    422,425,436,437,438=21    442,447,472=1    480,490,494,501=22    503,511,516,526=10     545,554,560=29     564,576,577,578=7    586,611,612,615,650=26    657,658,667,679,681,686=18    690,704,769,773=3     804,806,809,826,830=14    839,854,858,882,884=8     903,906,907=31    912,922,937,946=13    961,976,987,989,993=2 |
 """);
+    //stop("maximumNodes used", t.maxNodeUsed); // 33
    }
 
   static void test_put_large_random()
@@ -1130,13 +1158,13 @@ abstract class BtreeSML extends Test                                            
     t.ok("""
                                                   33                                                      |
                                                   0                                                       |
-                                                  7                                                       |
-                                                  8                                                       |
+                                                  5                                                       |
+                                                  6                                                       |
                       17                                                      49                          |
-                      7                                                       8                           |
-                      1                                                       6                           |
-                      4                                                       2                           |
-2,4,6,8,10,12,14,16=1   18,20,22,24,26,28,30,32=4   34,36,38,40,42,44,46,48=6   50,52,54,56,58,60,62,64=2 |
+                      5                                                       6                           |
+                      1                                                       4                           |
+                      3                                                       2                           |
+2,4,6,8,10,12,14,16=1   18,20,22,24,26,28,30,32=3   34,36,38,40,42,44,46,48=4   50,52,54,56,58,60,62,64=2 |
 """);
     for (int i = 0; i <= 2*N+1; i++)                                            // Update
      {Find f = t.find1(i);
@@ -1157,255 +1185,255 @@ abstract class BtreeSML extends Test                                            
      }
    }
 
-  static void test_delete()
+  static void test_delete_ascending()
    {final BtreeSML t = btreeSML(4, 3);
     final int N = 32;
     final boolean box = false;                                                  // Print read me
     for (int i = 1; i <= N; i++) t.put(i);
     //t.stop();
     t.ok("""
-                                                       16                                24                                |
-                                                       0                                 0.1                               |
-                                                       7                                 18                                |
-                                                                                         8                                 |
-          4          8               12                                 20                                 28              |
-          7          7.1             7.2                                18                                 8               |
-          1          4               6                                  12                                 17              |
-                                     10                                 15                                 2               |
-1,2,3,4=1  5,6,7,8=4    9,10,11,12=6    13,14,15,16=10   17,18,19,20=12   21,22,23,24=15    25,26,27,28=17   29,30,31,32=2 |
+                                                      16                               24                               |
+                                                      0                                0.1                              |
+                                                      5                                11                               |
+                                                                                       6                                |
+          4          8               12                               20                                28              |
+          5          5.1             5.2                              11                                6               |
+          1          3               4                                8                                 9               |
+                                     7                                10                                2               |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10    25,26,27,28=9   29,30,31,32=2 |
 """);
 
     if (box) say("At start with", N, "elements", t.printBoxed());
 
     for (int i = 1; i <= N; i++)
      {t.delete(i);
-      //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");");
+      //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
       if (box) say("After deleting:", i, t.printBoxed());
-      switch(i)
-       {case 1 -> t.ok("""
-                                                     16                                                                     |
-                                                     0                                                                      |
-                                                     7                                                                      |
-                                                     18                                                                     |
-        4          8               12                                 20               24                 28                |
-        7          7.1             7.2                                18               18.1               18.2              |
-        1          4               6                                  12               15                 17                |
-                                   10                                                                     2                 |
-2,3,4=1  5,6,7,8=4    9,10,11,12=6    13,14,15,16=10   17,18,19,20=12   21,22,23,24=15     25,26,27,28=17     29,30,31,32=2 |
+      switch(i) {
+        case 1 -> t.ok("""
+                                                    16                                                                   |
+                                                    0                                                                    |
+                                                    5                                                                    |
+                                                    11                                                                   |
+        4          8               12                               20               24                28                |
+        5          5.1             5.2                              11               11.1              11.2              |
+        1          3               4                                8                10                9                 |
+                                   7                                                                   2                 |
+2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 2 -> t.ok("""
-                                                   16                                                                     |
-                                                   0                                                                      |
-                                                   7                                                                      |
-                                                   18                                                                     |
-      4          8               12                                 20               24                 28                |
-      7          7.1             7.2                                18               18.1               18.2              |
-      1          4               6                                  12               15                 17                |
-                                 10                                                                     2                 |
-3,4=1  5,6,7,8=4    9,10,11,12=6    13,14,15,16=10   17,18,19,20=12   21,22,23,24=15     25,26,27,28=17     29,30,31,32=2 |
+                                                  16                                                                   |
+                                                  0                                                                    |
+                                                  5                                                                    |
+                                                  11                                                                   |
+      4          8               12                               20               24                28                |
+      5          5.1             5.2                              11               11.1              11.2              |
+      1          3               4                                8                10                9                 |
+                                 7                                                                   2                 |
+3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 3 -> t.ok("""
-                                                 16                                                                     |
-                                                 0                                                                      |
-                                                 7                                                                      |
-                                                 18                                                                     |
-    4          8               12                                 20               24                 28                |
-    7          7.1             7.2                                18               18.1               18.2              |
-    1          4               6                                  12               15                 17                |
-                               10                                                                     2                 |
-4=1  5,6,7,8=4    9,10,11,12=6    13,14,15,16=10   17,18,19,20=12   21,22,23,24=15     25,26,27,28=17     29,30,31,32=2 |
+                                                16                                                                   |
+                                                0                                                                    |
+                                                5                                                                    |
+                                                11                                                                   |
+    4          8               12                               20               24                28                |
+    5          5.1             5.2                              11               11.1              11.2              |
+    1          3               4                                8                10                9                 |
+                               7                                                                   2                 |
+4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 4 -> t.ok("""
-                                          16                                                                     |
-                                          0                                                                      |
-                                          7                                                                      |
-                                          18                                                                     |
-          8             12                                 20               24                 28                |
-          7             7.1                                18               18.1               18.2              |
-          1             6                                  12               15                 17                |
-                        10                                                                     2                 |
-5,6,7,8=1  9,10,11,12=6    13,14,15,16=10   17,18,19,20=12   21,22,23,24=15     25,26,27,28=17     29,30,31,32=2 |
+                                         16                                                                   |
+                                         0                                                                    |
+                                         5                                                                    |
+                                         11                                                                   |
+          8             12                               20               24                28                |
+          5             5.1                              11               11.1              11.2              |
+          1             4                                8                10                9                 |
+                        7                                                                   2                 |
+5,6,7,8=1  9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 5 -> t.ok("""
-                                        16                                                                     |
-                                        0                                                                      |
-                                        7                                                                      |
-                                        18                                                                     |
-        8             12                                 20               24                 28                |
-        7             7.1                                18               18.1               18.2              |
-        1             6                                  12               15                 17                |
-                      10                                                                     2                 |
-6,7,8=1  9,10,11,12=6    13,14,15,16=10   17,18,19,20=12   21,22,23,24=15     25,26,27,28=17     29,30,31,32=2 |
+                                       16                                                                   |
+                                       0                                                                    |
+                                       5                                                                    |
+                                       11                                                                   |
+        8             12                               20               24                28                |
+        5             5.1                              11               11.1              11.2              |
+        1             4                                8                10                9                 |
+                      7                                                                   2                 |
+6,7,8=1  9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 6 -> t.ok("""
-                                      16                                                                     |
-                                      0                                                                      |
-                                      7                                                                      |
-                                      18                                                                     |
-      8             12                                 20               24                 28                |
-      7             7.1                                18               18.1               18.2              |
-      1             6                                  12               15                 17                |
-                    10                                                                     2                 |
-7,8=1  9,10,11,12=6    13,14,15,16=10   17,18,19,20=12   21,22,23,24=15     25,26,27,28=17     29,30,31,32=2 |
+                                     16                                                                   |
+                                     0                                                                    |
+                                     5                                                                    |
+                                     11                                                                   |
+      8             12                               20               24                28                |
+      5             5.1                              11               11.1              11.2              |
+      1             4                                8                10                9                 |
+                    7                                                                   2                 |
+7,8=1  9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 7 -> t.ok("""
-                                    16                                                                     |
-                                    0                                                                      |
-                                    7                                                                      |
-                                    18                                                                     |
-    8             12                                 20               24                 28                |
-    7             7.1                                18               18.1               18.2              |
-    1             6                                  12               15                 17                |
-                  10                                                                     2                 |
-8=1  9,10,11,12=6    13,14,15,16=10   17,18,19,20=12   21,22,23,24=15     25,26,27,28=17     29,30,31,32=2 |
+                                   16                                                                   |
+                                   0                                                                    |
+                                   5                                                                    |
+                                   11                                                                   |
+    8             12                               20               24                28                |
+    5             5.1                              11               11.1              11.2              |
+    1             4                                8                10                9                 |
+                  7                                                                   2                 |
+8=1  9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 8 -> t.ok("""
-                              16                                                                     |
-                              0                                                                      |
-                              7                                                                      |
-                              18                                                                     |
-             12                                20               24                 28                |
-             7                                 18               18.1               18.2              |
-             1                                 12               15                 17                |
-             10                                                                    2                 |
-9,10,11,12=1   13,14,15,16=10   17,18,19,20=12   21,22,23,24=15     25,26,27,28=17     29,30,31,32=2 |
+                             16                                                                   |
+                             0                                                                    |
+                             5                                                                    |
+                             11                                                                   |
+             12                              20               24                28                |
+             5                               11               11.1              11.2              |
+             1                               8                10                9                 |
+             7                                                                  2                 |
+9,10,11,12=1   13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 9 -> t.ok("""
-                                              20                                                  |
-                                              0                                                   |
-                                              7                                                   |
-                                              18                                                  |
-           12               16                                 24               28                |
-           7                7.1                                18               18.1              |
-           1                10                                 15               17                |
-                            12                                                  2                 |
-10,11,12=1   13,14,15,16=10    17,18,19,20=12   21,22,23,24=15   25,26,27,28=17     29,30,31,32=2 |
+                                            20                                                 |
+                                            0                                                  |
+                                            5                                                  |
+                                            11                                                 |
+           12              16                                24              28                |
+           5               5.1                               11              11.1              |
+           1               7                                 10              9                 |
+                           8                                                 2                 |
+10,11,12=1   13,14,15,16=7    17,18,19,20=8   21,22,23,24=10   25,26,27,28=9     29,30,31,32=2 |
 """);
         case 10 -> t.ok("""
-                                           20                                                  |
-                                           0                                                   |
-                                           7                                                   |
-                                           18                                                  |
-        12               16                                 24               28                |
-        7                7.1                                18               18.1              |
-        1                10                                 15               17                |
-                         12                                                  2                 |
-11,12=1   13,14,15,16=10    17,18,19,20=12   21,22,23,24=15   25,26,27,28=17     29,30,31,32=2 |
+                                         20                                                 |
+                                         0                                                  |
+                                         5                                                  |
+                                         11                                                 |
+        12              16                                24              28                |
+        5               5.1                               11              11.1              |
+        1               7                                 10              9                 |
+                        8                                                 2                 |
+11,12=1   13,14,15,16=7    17,18,19,20=8   21,22,23,24=10   25,26,27,28=9     29,30,31,32=2 |
 """);
         case 11 -> t.ok("""
-                                        20                                                  |
-                                        0                                                   |
-                                        7                                                   |
-                                        18                                                  |
-     12               16                                 24               28                |
-     7                7.1                                18               18.1              |
-     1                10                                 15               17                |
-                      12                                                  2                 |
-12=1   13,14,15,16=10    17,18,19,20=12   21,22,23,24=15   25,26,27,28=17     29,30,31,32=2 |
+                                      20                                                 |
+                                      0                                                  |
+                                      5                                                  |
+                                      11                                                 |
+     12              16                                24              28                |
+     5               5.1                               11              11.1              |
+     1               7                                 10              9                 |
+                     8                                                 2                 |
+12=1   13,14,15,16=7    17,18,19,20=8   21,22,23,24=10   25,26,27,28=9     29,30,31,32=2 |
 """);
         case 12 -> t.ok("""
-                               20                                                  |
-                               0                                                   |
-                               7                                                   |
-                               18                                                  |
-              16                                24               28                |
-              7                                 18               18.1              |
-              1                                 15               17                |
-              12                                                 2                 |
-13,14,15,16=1   17,18,19,20=12   21,22,23,24=15   25,26,27,28=17     29,30,31,32=2 |
+                              20                                                 |
+                              0                                                  |
+                              5                                                  |
+                              11                                                 |
+              16                               24              28                |
+              5                                11              11.1              |
+              1                                10              9                 |
+              8                                                2                 |
+13,14,15,16=1   17,18,19,20=8   21,22,23,24=10   25,26,27,28=9     29,30,31,32=2 |
 """);
         case 13 -> t.ok("""
-                                              24                               |
-                                              0                                |
-                                              7                                |
-                                              18                               |
-           16               20                                 28              |
-           7                7.1                                18              |
-           1                12                                 17              |
-                            15                                 2               |
-14,15,16=1   17,18,19,20=12    21,22,23,24=15   25,26,27,28=17   29,30,31,32=2 |
+                                             24                              |
+                                             0                               |
+                                             5                               |
+                                             11                              |
+           16              20                                28              |
+           5               5.1                               11              |
+           1               8                                 9               |
+                           10                                2               |
+14,15,16=1   17,18,19,20=8    21,22,23,24=10   25,26,27,28=9   29,30,31,32=2 |
 """);
         case 14 -> t.ok("""
-                                           24                               |
-                                           0                                |
-                                           7                                |
-                                           18                               |
-        16               20                                 28              |
-        7                7.1                                18              |
-        1                12                                 17              |
-                         15                                 2               |
-15,16=1   17,18,19,20=12    21,22,23,24=15   25,26,27,28=17   29,30,31,32=2 |
+                                          24                              |
+                                          0                               |
+                                          5                               |
+                                          11                              |
+        16              20                                28              |
+        5               5.1                               11              |
+        1               8                                 9               |
+                        10                                2               |
+15,16=1   17,18,19,20=8    21,22,23,24=10   25,26,27,28=9   29,30,31,32=2 |
 """);
         case 15 -> t.ok("""
-                                        24                               |
-                                        0                                |
-                                        7                                |
-                                        18                               |
-     16               20                                 28              |
-     7                7.1                                18              |
-     1                12                                 17              |
-                      15                                 2               |
-16=1   17,18,19,20=12    21,22,23,24=15   25,26,27,28=17   29,30,31,32=2 |
+                                       24                              |
+                                       0                               |
+                                       5                               |
+                                       11                              |
+     16              20                                28              |
+     5               5.1                               11              |
+     1               8                                 9               |
+                     10                                2               |
+16=1   17,18,19,20=8    21,22,23,24=10   25,26,27,28=9   29,30,31,32=2 |
 """);
         case 16 -> t.ok("""
-                               24                               |
-                               0                                |
-                               7                                |
-                               18                               |
-              20                                28              |
-              7                                 18              |
-              1                                 17              |
-              15                                2               |
-17,18,19,20=1   21,22,23,24=15   25,26,27,28=17   29,30,31,32=2 |
+                               24                              |
+                               0                               |
+                               5                               |
+                               11                              |
+              20                               28              |
+              5                                11              |
+              1                                9               |
+              10                               2               |
+17,18,19,20=1   21,22,23,24=10   25,26,27,28=9   29,30,31,32=2 |
 """);
         case 17 -> t.ok("""
-           20               24                28               |
-           0                0.1               0.2              |
-           1                15                17               |
-                                              2                |
-18,19,20=1   21,22,23,24=15    25,26,27,28=17    29,30,31,32=2 |
+           20               24               28               |
+           0                0.1              0.2              |
+           1                10               9                |
+                                             2                |
+18,19,20=1   21,22,23,24=10    25,26,27,28=9    29,30,31,32=2 |
 """);
         case 18 -> t.ok("""
-        20               24                28               |
-        0                0.1               0.2              |
-        1                15                17               |
-                                           2                |
-19,20=1   21,22,23,24=15    25,26,27,28=17    29,30,31,32=2 |
+        20               24               28               |
+        0                0.1              0.2              |
+        1                10               9                |
+                                          2                |
+19,20=1   21,22,23,24=10    25,26,27,28=9    29,30,31,32=2 |
 """);
         case 19 -> t.ok("""
-     20               24                28               |
-     0                0.1               0.2              |
-     1                15                17               |
-                                        2                |
-20=1   21,22,23,24=15    25,26,27,28=17    29,30,31,32=2 |
+     20               24               28               |
+     0                0.1              0.2              |
+     1                10               9                |
+                                       2                |
+20=1   21,22,23,24=10    25,26,27,28=9    29,30,31,32=2 |
 """);
         case 20 -> t.ok("""
-              24               28               |
-              0                0.1              |
-              1                17               |
-                               2                |
-21,22,23,24=1   25,26,27,28=17    29,30,31,32=2 |
+              24              28               |
+              0               0.1              |
+              1               9                |
+                              2                |
+21,22,23,24=1   25,26,27,28=9    29,30,31,32=2 |
 """);
         case 21 -> t.ok("""
-           24               28               |
-           0                0.1              |
-           1                17               |
-                            2                |
-22,23,24=1   25,26,27,28=17    29,30,31,32=2 |
+           24              28               |
+           0               0.1              |
+           1               9                |
+                           2                |
+22,23,24=1   25,26,27,28=9    29,30,31,32=2 |
 """);
         case 22 -> t.ok("""
-        24               28               |
-        0                0.1              |
-        1                17               |
-                         2                |
-23,24=1   25,26,27,28=17    29,30,31,32=2 |
+        24              28               |
+        0               0.1              |
+        1               9                |
+                        2                |
+23,24=1   25,26,27,28=9    29,30,31,32=2 |
 """);
         case 23 -> t.ok("""
-     24               28               |
-     0                0.1              |
-     1                17               |
-                      2                |
-24=1   25,26,27,28=17    29,30,31,32=2 |
+     24              28               |
+     0               0.1              |
+     1               9                |
+                     2                |
+24=1   25,26,27,28=9    29,30,31,32=2 |
 """);
         case 24 -> t.ok("""
               28              |
@@ -1454,6 +1482,303 @@ abstract class BtreeSML extends Test                                            
      }
    }
 
+  static void test_delete_descending()
+   {final BtreeSML t = btreeSML(4, 3);
+    final int N = 32;
+    final boolean box = false;                                                  // Print read me
+    for (int i = 1; i <= N; i++) t.put(i);
+    //t.stop();
+    t.ok("""
+                                                      16                               24                               |
+                                                      0                                0.1                              |
+                                                      5                                11                               |
+                                                                                       6                                |
+          4          8               12                               20                                28              |
+          5          5.1             5.2                              11                                6               |
+          1          3               4                                8                                 9               |
+                                     7                                10                                2               |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10    25,26,27,28=9   29,30,31,32=2 |
+""");
+
+    if (box) say("At start with", N, "elements", t.printBoxed());
+
+    for (int i = N; i > 0; --i)
+     {t.delete(i);
+      //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
+      if (box) say("After deleting:", i, t.printBoxed());
+      switch(i) {
+        case 32 -> t.ok("""
+                                                      16                                                              |
+                                                      0                                                               |
+                                                      5                                                               |
+                                                      6                                                               |
+          4          8               12                               20               24               28            |
+          5          5.1             5.2                              6                6.1              6.2           |
+          1          3               4                                8                10               9             |
+                                     7                                                                  2             |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10    25,26,27,28=9    29,30,31=2 |
+""");
+        case 31 -> t.ok("""
+                                                      16                                                           |
+                                                      0                                                            |
+                                                      5                                                            |
+                                                      6                                                            |
+          4          8               12                               20               24               28         |
+          5          5.1             5.2                              6                6.1              6.2        |
+          1          3               4                                8                10               9          |
+                                     7                                                                  2          |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10    25,26,27,28=9    29,30=2 |
+""");
+        case 30 -> t.ok("""
+                                                      16                                                        |
+                                                      0                                                         |
+                                                      5                                                         |
+                                                      6                                                         |
+          4          8               12                               20               24               28      |
+          5          5.1             5.2                              6                6.1              6.2     |
+          1          3               4                                8                10               9       |
+                                     7                                                                  2       |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10    25,26,27,28=9    29=2 |
+""");
+        case 29 -> t.ok("""
+                                                      16                                                |
+                                                      0                                                 |
+                                                      5                                                 |
+                                                      6                                                 |
+          4          8               12                               20               24               |
+          5          5.1             5.2                              6                6.1              |
+          1          3               4                                8                10               |
+                                     7                                                 9                |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10    25,26,27,28=9 |
+""");
+        case 28 -> t.ok("""
+                                                      16                                             |
+                                                      0                                              |
+                                                      5                                              |
+                                                      6                                              |
+          4          8               12                               20               24            |
+          5          5.1             5.2                              6                6.1           |
+          1          3               4                                8                10            |
+                                     7                                                 9             |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10    25,26,27=9 |
+""");
+        case 27 -> t.ok("""
+                                                      16                                          |
+                                                      0                                           |
+                                                      5                                           |
+                                                      6                                           |
+          4          8               12                               20               24         |
+          5          5.1             5.2                              6                6.1        |
+          1          3               4                                8                10         |
+                                     7                                                 9          |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10    25,26=9 |
+""");
+        case 26 -> t.ok("""
+                                                      16                                       |
+                                                      0                                        |
+                                                      5                                        |
+                                                      6                                        |
+          4          8               12                               20               24      |
+          5          5.1             5.2                              6                6.1     |
+          1          3               4                                8                10      |
+                                     7                                                 9       |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10    25=9 |
+""");
+        case 25 -> t.ok("""
+                                                      16                               |
+                                                      0                                |
+                                                      5                                |
+                                                      6                                |
+          4          8               12                               20               |
+          5          5.1             5.2                              6                |
+          1          3               4                                8                |
+                                     7                                10               |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10 |
+""");
+        case 24 -> t.ok("""
+                                     12                                             |
+                                     0                                              |
+                                     5                                              |
+                                     6                                              |
+          4          8                               16              20             |
+          5          5.1                             6               6.1            |
+          1          3                               7               8              |
+                     4                                               10             |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4   13,14,15,16=7   17,18,19,20=8    21,22,23=10 |
+""");
+        case 23 -> t.ok("""
+                                     12                                          |
+                                     0                                           |
+                                     5                                           |
+                                     6                                           |
+          4          8                               16              20          |
+          5          5.1                             6               6.1         |
+          1          3                               7               8           |
+                     4                                               10          |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4   13,14,15,16=7   17,18,19,20=8    21,22=10 |
+""");
+        case 22 -> t.ok("""
+                                     12                                       |
+                                     0                                        |
+                                     5                                        |
+                                     6                                        |
+          4          8                               16              20       |
+          5          5.1                             6               6.1      |
+          1          3                               7               8        |
+                     4                                               10       |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4   13,14,15,16=7   17,18,19,20=8    21=10 |
+""");
+        case 21 -> t.ok("""
+                                     12                              |
+                                     0                               |
+                                     5                               |
+                                     6                               |
+          4          8                               16              |
+          5          5.1                             6               |
+          1          3                               7               |
+                     4                               8               |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4   13,14,15,16=7   17,18,19,20=8 |
+""");
+        case 20 -> t.ok("""
+                     8                                           |
+                     0                                           |
+                     5                                           |
+                     6                                           |
+          4                        12              16            |
+          5                        6               6.1           |
+          1                        4               7             |
+          3                                        8             |
+1,2,3,4=1  5,6,7,8=3  9,10,11,12=4   13,14,15,16=7    17,18,19=8 |
+""");
+        case 19 -> t.ok("""
+                     8                                        |
+                     0                                        |
+                     5                                        |
+                     6                                        |
+          4                        12              16         |
+          5                        6               6.1        |
+          1                        4               7          |
+          3                                        8          |
+1,2,3,4=1  5,6,7,8=3  9,10,11,12=4   13,14,15,16=7    17,18=8 |
+""");
+        case 18 -> t.ok("""
+                     8                                     |
+                     0                                     |
+                     5                                     |
+                     6                                     |
+          4                        12              16      |
+          5                        6               6.1     |
+          1                        4               7       |
+          3                                        8       |
+1,2,3,4=1  5,6,7,8=3  9,10,11,12=4   13,14,15,16=7    17=8 |
+""");
+        case 17 -> t.ok("""
+                     8                             |
+                     0                             |
+                     5                             |
+                     6                             |
+          4                        12              |
+          5                        6               |
+          1                        4               |
+          3                        7               |
+1,2,3,4=1  5,6,7,8=3  9,10,11,12=4   13,14,15,16=7 |
+""");
+        case 16 -> t.ok("""
+          4          8               12            |
+          0          0.1             0.2           |
+          1          3               4             |
+                                     7             |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15=7 |
+""");
+        case 15 -> t.ok("""
+          4          8               12         |
+          0          0.1             0.2        |
+          1          3               4          |
+                                     7          |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14=7 |
+""");
+        case 14 -> t.ok("""
+          4          8               12      |
+          0          0.1             0.2     |
+          1          3               4       |
+                                     7       |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13=7 |
+""");
+        case 13 -> t.ok("""
+          4          8               |
+          0          0.1             |
+          1          3               |
+                     4               |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4 |
+""");
+        case 12 -> t.ok("""
+          4          8            |
+          0          0.1          |
+          1          3            |
+                     4            |
+1,2,3,4=1  5,6,7,8=3    9,10,11=4 |
+""");
+        case 11 -> t.ok("""
+          4          8         |
+          0          0.1       |
+          1          3         |
+                     4         |
+1,2,3,4=1  5,6,7,8=3    9,10=4 |
+""");
+        case 10 -> t.ok("""
+          4          8      |
+          0          0.1    |
+          1          3      |
+                     4      |
+1,2,3,4=1  5,6,7,8=3    9=4 |
+""");
+        case 9 -> t.ok("""
+          4          |
+          0          |
+          1          |
+          3          |
+1,2,3,4=1  5,6,7,8=3 |
+""");
+        case 8 -> t.ok("""
+          4        |
+          0        |
+          1        |
+          3        |
+1,2,3,4=1  5,6,7=3 |
+""");
+        case 7 -> t.ok("""
+          4      |
+          0      |
+          1      |
+          3      |
+1,2,3,4=1  5,6=3 |
+""");
+        case 6 -> t.ok("""
+          4    |
+          0    |
+          1    |
+          3    |
+1,2,3,4=1  5=3 |
+""");
+        case 5 -> t.ok("""
+1,2,3,4=0 |
+""");
+        case 4 -> t.ok("""
+1,2,3=0 |
+""");
+        case 3 -> t.ok("""
+1,2=0 |
+""");
+        case 2 -> t.ok("""
+1=0 |
+""");
+        case 1 -> t.ok("""
+=0 |
+""");
+       }
+     }
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_put_ascending();
     test_put_ascending_wide();
@@ -1461,17 +1786,19 @@ abstract class BtreeSML extends Test                                            
     test_put_small_random();
     test_put_large_random();
     test_find();
-    //test_delete();
+    test_delete_ascending();
+    test_delete_descending();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    //test_delete_descending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      if (github_actions)                                                       // Coverage analysis
+      //if (github_actions)                                                       // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
