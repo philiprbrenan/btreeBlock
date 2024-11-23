@@ -234,6 +234,12 @@ class Btree extends Test                                                        
       padStrings(S, level);
      }
 
+    void leafToArray(Stack<KeyData>s)                                           // Leaf as an array
+     {z(); assertLeaf();
+      final int K = leafSize();
+      for  (int i = 0; i < K; i++) {z(); s.push(keyData.elementAt(i));}
+     }
+
     void printBranch(Stack<StringBuilder>S, int level)                          // Print branch horizontally
      { assertBranch();
       if (level > maxPrintLevels) return;
@@ -278,6 +284,31 @@ class Btree extends Test                                                        
        }
 
       padStrings(S, level);
+     }
+
+    void branchToArray(Stack<KeyData>s)                                         // Branch to array
+     {z(); assertBranch();
+      final int K = branchSize() + 1;                                           // To allow for top next
+
+      if (K > 0)                                                                // Branch has key, next pairs
+       {z();
+        for  (int i = 0; i < K; i++)
+         {z();
+          final int next = keyNext.elementAt(i).next;                           // Each key, next pair
+          if (nodes.elementAt(next).isLeaf)
+           {z(); nodes.elementAt(next).leafToArray(s);
+           }
+          else
+           {z();
+            if (next == 0)
+             {say("Cannot descend through root from index", i,
+                  "in branch", node);
+              break;
+             }
+            z(); nodes.elementAt(next).branchToArray(s);
+           }
+         }
+       }
      }
 
     void splitLeafRoot()                                                        // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
@@ -639,7 +670,7 @@ class Btree extends Test                                                        
    {final int key, data;
     KeyData(int Key, int Data) {z(); key = Key; data = Data;}
     public String toString()
-     {return"KeyData(Key:"+key+" data:"+data+")";
+     {return"KeyData(Key:"+key+" data:"+data+")\n";
      }
    }
 
@@ -648,8 +679,19 @@ class Btree extends Test                                                        
     KeyNext(int Key, int Next) {z(); key = Key; next = Next;}
     KeyNext(         int Next) {z(); key = -1;  next = Next;}
     public String toString()
-     {return"KeyNext(Key:"+key+" next:"+next+")";
+     {return"KeyNext(Key:"+key+" next:"+next+")\n";
      }
+   }
+
+//D1 Array                                                                      // Key, data pairs in the tree as an array
+
+  Stack<KeyData> toArray()                                                      // Key, data pairs in the tree as an array
+   {z();
+    final Stack<KeyData> s = new Stack<>();
+
+    if (root.isLeaf) {z(); root.  leafToArray(s);}
+    else             {z(); root.branchToArray(s);}
+    return s;
    }
 
 //D1 Print                                                                      // Print a BTree horizontally
@@ -1616,6 +1658,38 @@ t.ok("""
      }
    }
 
+  static void test_to_array()
+   {final Btree t = new Btree(2, 3);
+
+    final int M = 2;
+    for (int i = 1; i <= M; i++) t.put(i);
+    ok(""+t.toArray(), """
+[KeyData(Key:1 data:1)
+, KeyData(Key:2 data:2)
+]""");
+
+    final int N = 16;
+    for (int i = M; i <= N; i++) t.put(i);
+    ok(""+t.toArray(), """
+[KeyData(Key:1 data:1)
+, KeyData(Key:2 data:2)
+, KeyData(Key:3 data:3)
+, KeyData(Key:4 data:4)
+, KeyData(Key:5 data:5)
+, KeyData(Key:6 data:6)
+, KeyData(Key:7 data:7)
+, KeyData(Key:8 data:8)
+, KeyData(Key:9 data:9)
+, KeyData(Key:10 data:10)
+, KeyData(Key:11 data:11)
+, KeyData(Key:12 data:12)
+, KeyData(Key:13 data:13)
+, KeyData(Key:14 data:14)
+, KeyData(Key:15 data:15)
+, KeyData(Key:16 data:16)
+]""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_put_ascending();
     test_put_ascending_wide();
@@ -1627,6 +1701,7 @@ t.ok("""
     test_merge_left();
     test_merge_right();
     test_delete();
+    test_to_array();
    }
 
   static void newTests()                                                        // Tests being worked on
