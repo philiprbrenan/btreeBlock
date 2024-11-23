@@ -117,18 +117,20 @@ abstract class BtreeSML extends Test                                            
   void stop()              {Test.stop(toString());}                             // Stop after printing the tree
   public String toString() {return print();}                                    // Print the tree
 
-//D1 Components                                                                 // A branch or leaf in the tree
+//D1 Mmeory allocation                                                          // Allocate and free memory
 
   Node allocate(boolean check)                                                  // Allocate a node with or without checking for sufficient free space
-   {z(); final int  f = memoryLayout.getInt(freedChain,    0);
-    z(); if (check && f == 0) stop("No more memory available");
-    z(); final int  F = memoryLayout.getInt(free,          0, f);
-                        memoryLayout.set   (freedChain, F, 0);
-    final Node n = new Node(f); n.clear();
+   {z(); final int  f = memoryLayout.getInt(freedChain,    0);                  // Last freed node
+    z(); if (check && f == 0) stop("No more memory available");                 // No more free nodes available
+    z(); final int  F = memoryLayout.getInt(free,          0, f);               // Second to last freed node
+                        memoryLayout.set   (freedChain, F, 0);                  // Make second to last freed node the forst freed nod to liberate the existeing first free node
+    final Node n = new Node(f); n.clear();                                      // Construct and clear the node
     return n;
    }
 
   Node allocate() {return allocate(true);}                                      // Allocate a node checking for free space
+
+//D1 Components                                                                 // A branch or leaf in the tree
 
   class Node                                                                    // A branch or leaf in the tree
    {final int node;                                                             // The number of the node
@@ -146,6 +148,14 @@ abstract class BtreeSML extends Test                                            
     void clear()                                                                // Clear a new node
      {final Layout.Field n = BtreeSML.this.node;
       memory.zero(n.at(node), n.width);
+     }
+
+    void free()                                                                 // Free a node
+     {z(); if (node == 0) stop("Cannot free root");                             // The root is never freed
+      z(); clear();
+      final int  f = memoryLayout.getInt(freedChain,       0);                  // Last freed node from head of free chain
+                     memoryLayout.set   (free,          f, 0, node);            // Chain this node in front of the last freed node
+                     memoryLayout.set   (freedChain, node, 0);                  // Make this node the head of the free chain
      }
 
     int leafBase()   {z(); return leaf  .at(node);}                             // Base of leaf stuck in memeory of this node
