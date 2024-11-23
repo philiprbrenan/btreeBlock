@@ -878,7 +878,7 @@ class Btree extends Test                                                        
       down = p.new FindFirstGreaterThanOrEqualInBranch(Key);
 
       p.augment(down.first);
-      Node q = nodes.elementAt(down.next);
+      final Node q = nodes.elementAt(down.next);
 
       if (q.isLeaf)                                                             // Reached a leaf
        {z();
