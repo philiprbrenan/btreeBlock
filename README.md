@@ -4,8 +4,7 @@
 
 # Btree in a block
 
-For reasons why you might want to get involved in this
-project to put a [B-Tree](https://en.wikipedia.org/wiki/B-tree) in a block on a [Silicon](https://en.wikipedia.org/wiki/Silicon) [chip](https://en.wikipedia.org/wiki/Integrated_circuit), see:
+For reasons why you might want to get involved in this project to put a [B-Tree](https://en.wikipedia.org/wiki/B-tree) in a block on a [Silicon](https://en.wikipedia.org/wiki/Silicon) [chip](https://en.wikipedia.org/wiki/Integrated_circuit), see:
 
 http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html
 
@@ -18,14 +17,14 @@ machine optimized for manipulating a [B-Tree](https://en.wikipedia.org/wiki/B-tr
 
 ![Roadmap](flowChart/DevelopmentFlowChart.png)
 
-The  machine [code](https://en.wikipedia.org/wiki/Computer_program) will then be  optimized and reduced as far as possible and
-used to generate actual machine [code](https://en.wikipedia.org/wiki/Computer_program) for a [Verilog](https://en.wikipedia.org/wiki/Verilog) implementation of a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) just
+The psuedo machine [code](https://en.wikipedia.org/wiki/Computer_program) will then be  optimized and reduced as far as possible
+to generate actual machine [code](https://en.wikipedia.org/wiki/Computer_program) for a [Verilog](https://en.wikipedia.org/wiki/Verilog) implementation of a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) just
 capable of running the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm on an [fpga](https://en.wikipedia.org/wiki/Field-programmable_gate_array) or [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) .
 
 # Deleting in ascending order
 
-Print of the evoluation of a [B-Tree](https://en.wikipedia.org/wiki/B-tree) as the lowest element is deleted
-successively until the [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)) is empty.
+The evolution of a [B-Tree](https://en.wikipedia.org/wiki/B-tree) as the lowest element is deleted successively until
+the [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)) is empty.
 
 ```
 At start with 32 elements
