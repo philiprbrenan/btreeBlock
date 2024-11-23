@@ -24,6 +24,12 @@ public class Layout extends Test                                                
     return this;
    }
 
+  Layout compile(String name)                                                   // Lay out the layout giving the top most field a new name
+   {final Layout l = compile();
+    l.top.name = name;
+    return l;
+   }
+
   int size() {z(); return top == null ? 0 : top.width;}                         // Size of memory
   void ok(String expected) {Test.ok(top.toString(), expected);}                 // Confirm layout is as expected
   Field get(String path)   {return top.fullNames.get(path);}                    // Address a contained field by name
@@ -33,7 +39,7 @@ public class Layout extends Test                                                
 //D1 Layouts                                                                    // Field memory of the chip as variables, arrays, structures, unions. Dividing the memory in this manner makes it easier to program the chip symbolically.
 
   abstract class Field                                                          // Variable/Array/Structure/Union definition.
-   {final String                 name;                                          // Name of field
+   {String                       name;                                          // Name of field
     int                        number;                                          // Number of field
     String                   fullName;                                          // Full name of this field
     int                            at;                                          // Offset of field from start of memory
@@ -315,11 +321,18 @@ public class Layout extends Test                                                
     final Layout l = L.duplicate();
     final Field  f = l.top;
 
-    for(Field lf: l.fields) fields.push(lf);                                     // Add all the duplicated fields in the correct order
-    for (int i = 0; i < fields.size(); i++)
+    for(Field lf: l.fields) fields.push(lf);                                    // Add all the duplicated fields in the correct order
+    for (int i = 0; i < fields.size(); i++)                                     // Renumber the fields
      {z(); fields.elementAt(i).number = i;
      }
     return f;                                                                   // Resulting field
+   }
+
+  Field duplicate(String name, Layout layout)                                   // Duplicate this layout for use int the current layout giving the top most field a new name
+   {z();
+    final Field f = duplicate(layout);
+    f.name = name;
+    return f;
    }
 
 //D1 Location                                                                   // The location in memory of a field after array indices have been applied
@@ -517,7 +530,7 @@ B    0     1            b                    b
 
     Layout    L = new Layout();
     Variable  A = L.variable ("A", 2);
-    Field     B = L.duplicate(l);
+    Field     B = L.duplicate("B", l);
     Variable  C = L.variable ("C", 4);
     Structure S = L.structure("S", A, B, C);
     L.compile();
@@ -527,10 +540,10 @@ B    0     1            b                    b
 T   At  Wide  Size    Name                   Path
 S    0    14          S
 V    0     2            A                    A
-S    2     8            s                    s
-V    2     2              a                    s.a
-V    4     2              b                    s.b
-V    6     4              c                    s.c
+S    2     8            B                    B
+V    2     2              a                    B.a
+V    4     2              b                    B.b
+V    6     4              c                    B.c
 V   10     4            C                    C
 """);
 
@@ -541,6 +554,12 @@ V   10     4            C                    C
     Layout  N = M.duplicate();
     //stop(N);
     ok(L, N);
+
+    //stop("AAAA", M.get("B.a"));
+    ok(""+M.get("B.a"), """
+T   At  Wide  Size    Name                   Path
+V    2     2              a
+""");
    }
 
   static void test_duplicate_array()
