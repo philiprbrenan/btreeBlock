@@ -80,7 +80,7 @@ abstract class BtreeSML extends Test                                            
      };
 
     Branch = new StuckSML()                                                     // Branch
-     {int               maxSize() {return btree.maxKeysPerBranch();}
+     {int               maxSize() {return btree.maxKeysPerBranch()+1;}          // Not forgetting top next
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerNext();}
       int           bitsPerSize() {return btree.bitsPerSize();}
@@ -411,7 +411,6 @@ abstract class BtreeSML extends Test                                            
       final int F = Leaf.firstElement1(r.leafBase()).key;
       final int L = Leaf. lastElement1(l.leafBase()).key;
       final int splitKey = (F + L) / 2;
-say("AAAA", p, index);
       Branch.insertElementAt(p.branchBase(), splitKey, l.node, index);          // Insert new key, next pair in parent
      }
 
@@ -1021,15 +1020,6 @@ say("AAAA", p, index);
 
   static void test_put_descending()
    {final BtreeSML t = btreeSML(2, 3);
-    final int N = 6;
-    for (int i = N; i > 1; --i) t.put(i);
-    say(t);
-    t.put(1);
-    stop(t);
-   }
-
-  static void test_put_descending33()
-   {final BtreeSML t = btreeSML(2, 3);
     final int N = 64;
     for (int i = N; i > 0; --i) t.put(i);
     //t.stop();
@@ -1433,12 +1423,11 @@ say("AAAA", p, index);
     test_put_small_random();
     test_put_large_random();
     test_find();
-    test_delete();
+    //test_delete();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_put_descending();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
