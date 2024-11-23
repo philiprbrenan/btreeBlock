@@ -868,7 +868,7 @@ class BtreeStuck extends Test                                                   
       down = p.new FindFirstGreaterThanOrEqualInBranch(Key);
 
       p.augment(down.first);
-      Node q = nodes.elementAt(down.next);
+      final Node q = nodes.elementAt(down.next);
 
       if (q.isLeaf)                                                             // Reached a leaf
        {z();
@@ -890,12 +890,12 @@ class BtreeStuck extends Test                                                   
     Node p = root;                                                              // Start at root
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
      {z();
+      if (p.isLeaf) return;
       for (int j = 0; j < p.branchSize(); j++)                                  // Try merging each sibling pair
        {z();
         p.mergeLeftSibling (j);
         p.mergeRightSibling(j);
        }
-      if (p.isLeaf) return;
 
       final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
       down = p.new FindFirstGreaterThanOrEqualInBranch(Key);
