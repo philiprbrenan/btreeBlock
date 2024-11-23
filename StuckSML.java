@@ -1,51 +1,45 @@
 //------------------------------------------------------------------------------
-// A fixed size stack of ordered key, data pairs in a static memory layout
+// A fixed size stack of ordered key, data pairs in a static bit memory
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
 // Reference the keys and data through a small mapping table and free stack so that we can manipulate keys and data by a small index rather than copying them directly.
 abstract class StuckSML extends Test                                            // A fixed size stack of ordered key, data pairs with null deemed highest
- {abstract int maxSize();                                                       // The maximum number of entries in the stuck.
-  abstract Memory memory();                                                     // Memory containing the stuck
+ {abstract Memory memory();                                                     // Memory containing the stuck
+  MemoryLayout memoryLayout() {return new MemoryLayout(memory(), layout);};     // The memory layout of this stuck
+  abstract int maxSize();                                                       // The maximum number of entries in the stuck.
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
-  abstract int bitsPerNext();                                                   // The number of bits in a next field
   abstract int bitsPerSize();                                                   // The number of bits in size field
-  int stuckBaseAt() {return 0;}                                                 // Offset the meory for the stuck by this amount
-  abstract MemoryLayout memoryLayout();                                         // The memory layout of this stuck
+  int baseAt() {return 0;}                                                      // Offset the meory for the stuck by this amount
 
   Layout layout;                                                                // Layout of memory containing the stuck
-  Layout.Variable  key;                                                         // Key in a leaf
+  Layout.Variable  key;                                                         // Key in a stuck
   Layout.Array     Keys;                                                        // Array of keys
-  Layout.Variable  data;                                                        // Data ssociated with a key
-  Layout.Array     Data;                                                        // Array of dataa associated with the array of keys
+  Layout.Variable  data;                                                        // Data associated with a key
+  Layout.Array     Data;                                                        // Array of data associated with the array of keys
   Layout.Variable  currentSize;                                                 // Current size of stuck
-  Layout.Structure stuck;                                                       // The stuck
+  Layout.Structure stuck;                                                       // The stuck itself
 
   final Pop                           Pop1 = new Pop();                         // A popped element
-  final Pop                           Pop2 = new Pop();                         // A popped element
   final Shift                       Shift1 = new Shift();                       // A shifted element
   final Shift                       Shift2 = new Shift();                       // A shifted element
   final Shift                       Shift3 = new Shift();                       // A shifted element
   final ElementAt               ElementAt1 = new ElementAt();                   // An element at
   final ElementAt               ElementAt2 = new ElementAt();                   // An element at
-  final ElementAt               ElementAt3 = new ElementAt();                   // An element at
   final RemoveElementAt   RemoveElementAt1 = new RemoveElementAt();             // Remove an element
-  final RemoveElementAt   RemoveElementAt2 = new RemoveElementAt();             // Remove an element
   final FirstElement         FirstElement1 = new FirstElement();                // First element
   final FirstElement         FirstElement2 = new FirstElement();                // First element
   final LastElement           LastElement1 = new LastElement();                 // Last element
   final LastElement           LastElement2 = new LastElement();                 // Last element
   final Search                     Search1 = new Search();                      // Search element
   final Search                     Search2 = new Search();                      // Search element
-  final SearchExceptLast SearchExceptLast1 = new SearchExceptLast();            // Search element
-  final SearchExceptLast SearchExceptLast2 = new SearchExceptLast();            // Search element
+  final SearchExceptLast SearchExceptLast1 = new SearchExceptLast();            // Search for an element in the stuck ignoriung the last element
+  final SearchExceptLast SearchExceptLast2 = new SearchExceptLast();            // Search for an element in the stuck ignoriung the last element
   final SearchFirstGreaterThanOrEqual SearchFirstGreaterThanOrEqual1 = new SearchFirstGreaterThanOrEqual();  // Search element
   final SearchFirstGreaterThanOrEqual SearchFirstGreaterThanOrEqual2 = new SearchFirstGreaterThanOrEqual();  // Search element
   final SearchFirstGreaterThanOrEqualExceptLast SearchFirstGreaterThanOrEqualExceptLast1 = new SearchFirstGreaterThanOrEqualExceptLast();  // Search element
   final SearchFirstGreaterThanOrEqualExceptLast SearchFirstGreaterThanOrEqualExceptLast2 = new SearchFirstGreaterThanOrEqualExceptLast();  // Search element
-
-  static boolean debug;                                                         // d ebug if true
 
 //D1 Construction                                                               // Create a stuck
 
@@ -69,15 +63,14 @@ abstract class StuckSML extends Test                                            
   static StuckSML stuckStatic()                                                 // Create a sample stuck
    {z();
     return new StuckSML()
-     {final Memory memory = new Memory(layout.size()+stuckBaseAt());
+     {final Memory memory = new Memory(layout.size()+baseAt());
       int maxSize     () {return  4;}
       int bitsPerKey  () {return 16;}
       int bitsPerData () {return 16;}
-      int bitsPerNext () {return 16;}
       int bitsPerSize () {return 16;}
-      int stuckBaseAt () {return 16;}                                           // Test an offset stuck
+      int baseAt ()      {return 16;}                                           // Test an offset stuck
       Memory       memory      () {return memory;}
-      MemoryLayout memoryLayout() {return new MemoryLayout(memory, layout, stuckBaseAt());}
+      MemoryLayout memoryLayout() {return new MemoryLayout(memory, layout, baseAt());}
      };
    }
 
@@ -89,12 +82,12 @@ abstract class StuckSML extends Test                                            
    {z(); final int s = memoryLayout().getInt(currentSize, base);
     return s;
    }
-  boolean isFull           (int base)         {z(); return size(base) > maxSize();}    // Check the stuck is full
-  boolean isEmpty          (int base)         {z(); return size(base) == 0;}           // Check the stuck is empty
-  void     assertNotFull   (int base)         {z(); if (isFull (base)) stop("Full");}  // Assert the stack is not full
-  void     assertNotEmpty  (int base)         {z(); if (isEmpty(base)) stop("Empty");} // Assert the stack is not empty
-  void     assertInNormal  (int base, int i)  {z(); final int s = size(base); if (i < 0 || i >= s) stop("Out of normal range",   i, "for size", s);}  // Check that the index would yield a valid element
-  void     assertInExtended(int base, int i)  {z(); final int s = size(base); if (i < 0 || i >  s) stop("Out of extended range", i, "for size", s);}  // Check that the index would yield a valid element
+  boolean isFull       (int base) {z(); return size(base) > maxSize();}         // Check the stuck is full
+  boolean isEmpty      (int base) {z(); return size(base) == 0;}                // Check the stuck is empty
+  void assertNotFull   (int base) {z(); if (isFull (base)) stop("Full") ;}      // Assert the stack is not full
+  void assertNotEmpty  (int base) {z(); if (isEmpty(base)) stop("Empty");}      // Assert the stack is not empty
+  void assertInNormal  (int base, int i) {z(); final int s = size(base); if (i < 0 || i >= s) stop("Out of normal range",   i, "for size", s);} // Check that the index would yield a valid element
+  void assertInExtended(int base, int i) {z(); final int s = size(base); if (i < 0 || i >  s) stop("Out of extended range", i, "for size", s);} // Check that the index would yield a valid element
 
   class CheckOrder extends Limit                                                // Check that all the keys are in order,
    {boolean inOrder;                                                            // Keys are in order
@@ -109,18 +102,10 @@ abstract class StuckSML extends Test                                            
       boolean looking = true;
       int i = 1, j = limit(base);
       for (;i < j && looking; i++)                                              // Check each key
-       {z();
-        if (key(base, i-1) > key(base, i))
-         {looking = false;
-           break;
-         }
+       {z(); if (key(base, i-1) > key(base, i)) {looking = false; break;}
        }
-      if (looking)
-       {z(); inOrder = true;  outOfOrder = 0;
-       }
-      else
-       {z(); inOrder = false; outOfOrder = i;
-       }
+      if (looking) {z(); inOrder = true;  outOfOrder = 0;}
+      else         {z(); inOrder = false; outOfOrder = i;}
      }
     public String toString()                                                    // Print
      {z();
@@ -146,8 +131,8 @@ abstract class StuckSML extends Test                                            
 
   int  key     (int base, int Index)              {return memoryLayout().getInt(key,  base, Index);}
   int  data    (int base, int Index)              {return memoryLayout().getInt(data, base, Index);}
-  void setKey  (int base, int Index,  int Value)  {memoryLayout().set(key,  Value, base, Index);}
-  void setData (int base, int Index,  int Value)  {memoryLayout().set(data, Value, base, Index);}
+  void setKey  (int base, int Index,  int Value)  {memoryLayout().set(key,  Value,    base, Index);}
+  void setData (int base, int Index,  int Value)  {memoryLayout().set(data, Value,    base, Index);}
   void copyKey (int base, int Target, int Source) {setKey (base, Target, key (base, Source));}
   void copyData(int base, int Target, int Source) {setData(base, Target, data(base, Source));}
 
@@ -201,7 +186,7 @@ abstract class StuckSML extends Test                                            
       data  = data(base, index);
       return this;
      }
-    public String toString()                                                    // Print
+    public String toString()
      {final StringBuilder s = new StringBuilder();
       s.append("Pop(index:"+index);
       s.append(" key:"+key);
@@ -222,9 +207,8 @@ abstract class StuckSML extends Test                                            
       key   = key (base, 0);
       data  = data(base, 0);
 
-      for (int i = 0, j = size(base)-1; i < j; i++)                                 // Shift the stuck down one place
-       {z();
-        copyKeyData(base, i, i+1);
+      for (int i = 0, j = size(base)-1; i < j; i++)                             // Shift the stuck down one place
+       {z(); copyKeyData(base, i, i+1);
        }
       dec(base);
       return this;
@@ -265,27 +249,20 @@ abstract class StuckSML extends Test                                            
    }
   ElementAt elementAt1(int Base, int Index) {z(); return ElementAt1.elementAt(Base, Index);}
   ElementAt elementAt2(int Base, int Index) {z(); return ElementAt2.elementAt(Base, Index);}
-  ElementAt elementAt3(int Base, int Index) {z(); return ElementAt3.elementAt(Base, Index);}
 
   void setElementAt(int Base, int key, int data, int Index)                     // Set an element either in range or one above the current range
    {if (Index == size(Base))                                                    // Extended range
-     {z();
-      setKeyData(Base, Index, key, data);
-      inc(Base);
+     {z(); setKeyData(Base, Index, key, data); inc(Base);
      }
     else                                                                        // In range
-     {z();
-      assertInNormal(Base, Index);
-      setKeyData(Base, Index, key, data);
-      }
+     {z(); assertInNormal(Base, Index); setKeyData(Base, Index, key, data);
+     }
    }
 
   void insertElementAt(int base, int key, int data, int Index)                  // Insert an element at the indicated location shifting all the remaining elements up one
-   {z();
-    assertInExtended(base, Index);
-    for (int i = size(base); i > Index; --i)                                        // Shift the stuck up one place
-     {z();
-      copyKeyData(base, i, i-1);
+   {z(); assertInExtended(base, Index);
+    for (int i = size(base); i > Index; --i)                                    // Shift the stuck up one place
+     {z(); copyKeyData(base, i, i-1);
      }
     setKeyData(base, Index, key, data);
     inc(base);
@@ -302,8 +279,7 @@ abstract class StuckSML extends Test                                            
       key  = key (base, index);
       data = data(base, index);
       for (int i = index, j = size(base)-1; i < j; i++)                         // Shift the stuck down one place
-       {z();
-        copyKeyData(base, i, i+1);
+       {z(); copyKeyData(base, i, i+1);
        }
       dec(base);
       return this;
@@ -319,7 +295,6 @@ abstract class StuckSML extends Test                                            
      }
    }
   RemoveElementAt removeElementAt1(int Base, int Index) {z(); return RemoveElementAt1.removeElementAt(Base, Index);} // Remove the indicated element
-  RemoveElementAt removeElementAt2(int Base, int Index) {z(); return RemoveElementAt2.removeElementAt(Base, Index);} // Remove the indicated element
 
   class FirstElement                                                            // First element
    {boolean found;                                                              // Whether there was a first element
@@ -346,8 +321,8 @@ abstract class StuckSML extends Test                                            
       return s.toString();
      }
    }
-  FirstElement firstElement1(int base) {z(); return FirstElement1.firstElement(base);}      // First element
-  FirstElement firstElement2(int base) {z(); return FirstElement2.firstElement(base);}      // First element
+  FirstElement firstElement1(int base) {z(); return FirstElement1.firstElement(base);} // First element
+  FirstElement firstElement2(int base) {z(); return FirstElement2.firstElement(base);} // First element
 
   class LastElement                                                             // Last element
    {boolean found;                                                              // Whether there was a last element
@@ -382,8 +357,8 @@ abstract class StuckSML extends Test                                            
 
   class Limit                                                                   // Search all of the stuck
    {Limit() {z();}
-    String name()           {z(); return "Limit";}                              // Name of limit
-    int   limit(int base)   {z(); return size(base);}                           // How far to check
+    String name() {return "Limit";}                                             // Name of limit
+    int   limit(int base) {z(); return size(base);}                             // How far to check
    }
 
   class Search extends Limit                                                    // Search for an element within all elements of the stuck
@@ -394,7 +369,6 @@ abstract class StuckSML extends Test                                            
     String name() {return "Search";}                                            // Name of the search
 
     Search()                     {z();}                                         // Search for an element within all elements of the stuck
-    Search(int base, int Search) {z(); search(base, Search);}                  // Search for an element within all elements of the stuck
 
     Search search(int base, int Search)                                         // Search for an element within all elements of the stuck
      {z();
@@ -402,18 +376,10 @@ abstract class StuckSML extends Test                                            
       key = Search;
       int i = 0, j = limit(base);
       for (; i < j && looking; i++)                                             // Search
-       {z();
-        if (key(base, i) == key)
-         {z();
-          looking = false; break;
-         }
+       {z(); if (key(base, i) == key) {z();looking = false; break;}
        }
-      if (looking)                                                              // Search key is bigger than all keys in the stuck
-       {z(); found = false; index = 0; data = 0;
-       }
-      else                                                                      // Found a greater than or equal key in the stuck
-       {z(); found = true;  index = i; data = data(base, i);
-       }
+      if (looking) {z(); found = false; index = 0; data = 0;}                   // Search key is bigger than all keys in the stuck
+      else {z(); found = true;  index = i; data = data(base, i);}               // Found a greater than or equal key in the stuck
       return this;
      }
     public String toString()                                                    // Print
@@ -421,11 +387,7 @@ abstract class StuckSML extends Test                                            
       final StringBuilder s = new StringBuilder();
       s.append(name()+"(Search:"+key);
       s.append(" found:"+found);
-      if (found)
-       {z();
-        s.append(" index:"+index);
-        s.append(" data:"+data);
-       }
+      if (found) {z(); s.append(" index:"+index+" data:"+data);}
       s.append(")\n");
       return s.toString();
      }
@@ -435,7 +397,6 @@ abstract class StuckSML extends Test                                            
 
   class SearchExceptLast extends Search                                         // Search for an element ignoring the last element on the stuck
    {SearchExceptLast                 ()                     {super(); z();}
-    SearchExceptLast                 (int base, int search) {super(base, search); z();}
     SearchExceptLast searchExceptLast(int base, int search) {z(); search(base, search); return this;}
     int   limit(int base) {z(); return size(base)-1;}                           // How much of the stuck to search
     String name()         {z(); return "SearchExceptLast";}                     // Name of the search
@@ -451,7 +412,8 @@ abstract class StuckSML extends Test                                            
     int      data;                                                              // Located data if search key was found
     String name() {return "SearchFirstGreaterThanOrEqual";}                     // Name of the search
 
-    SearchFirstGreaterThanOrEqual searchFirstGreaterThanOrEqual(int base, int Search)
+    SearchFirstGreaterThanOrEqual searchFirstGreaterThanOrEqual                 // Search for first greater than or equal
+     (int base, int Search)
      {z();
       boolean looking = true;
       search = Search;
@@ -528,7 +490,7 @@ abstract class StuckSML extends Test                                            
 
   static StuckSML test_load()
    {StuckSML t = stuckStatic();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     t.push(base, 2, 1); t.push(base, 4, 2); t.push(base, 6, 3); t.push(base, 8, 4);
     ok(t.toString(base), """
 StuckSML(maxSize:4 size:4)
@@ -542,7 +504,7 @@ StuckSML(maxSize:4 size:4)
 
   static void test_push()
    {StuckSML t = stuckStatic();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     t.push(base, 15,  9);
     t.push(base, 14, 10);
     t.push(base, 13, 11);
@@ -583,7 +545,7 @@ StuckSML(maxSize:4 size:4)
 
   static void test_pop()
    {StuckSML     t = test_load();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     Pop p = t.pop(base);
     //stop(p);
     ok(p, """
@@ -600,7 +562,7 @@ StuckSML(maxSize:4 size:3)
 
   static void test_shift()
    {StuckSML t = test_load();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     Shift s = t.shift1(base);
     //stop(s);
     ok(s, """
@@ -613,11 +575,32 @@ StuckSML(maxSize:4 size:3)
   1 key:6 data:3
   2 key:8 data:4
 """);
+    Shift S = t.shift2(base);
+    //stop(s);
+    ok(S, """
+Shift(key:4 data:2)
+""");
+    //stop(t.toString(base));
+    ok(t.toString(base), """
+StuckSML(maxSize:4 size:2)
+  0 key:6 data:3
+  1 key:8 data:4
+""");
+    Shift T = t.shift3(base);
+    //stop(s);
+    ok(T, """
+Shift(key:6 data:3)
+""");
+    //stop(t.toString(base));
+    ok(t.toString(base), """
+StuckSML(maxSize:4 size:1)
+  0 key:8 data:4
+""");
    }
 
   static void test_unshift()
    {StuckSML t = test_load();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     Pop p = t.pop(base);
     t.unshift(base, 9, 9);
     //stop(t.toString(base));
@@ -632,17 +615,22 @@ StuckSML(maxSize:4 size:4)
 
   static void test_elementAt()
    {StuckSML     t = test_load();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     ElementAt e = t.elementAt1(base, 2);
     //stop(e);
     ok(e, """
 ElementAt(index:2 key:6 data:3)
 """);
+    ElementAt E = t.elementAt2(base, 3);
+    //stop(E);
+    ok(E, """
+ElementAt(index:3 key:8 data:4)
+""");
    }
 
   static void test_insert_element_at()
    {StuckSML t = test_load();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     Pop p = t.pop(base);
     t.insertElementAt(base, 9, 9, 2);
     //stop(t.toString(base));
@@ -667,7 +655,7 @@ StuckSML(maxSize:4 size:4)
 
   static void test_remove_element_at()
    {StuckSML t = test_load();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     RemoveElementAt a = t.removeElementAt1(base, 2);
     //stop(a);
     ok(a, """
@@ -684,7 +672,7 @@ StuckSML(maxSize:4 size:3)
 
   static void test_first_last()
    {StuckSML t = test_load();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     FirstElement f = t.firstElement1(base);
     //stop(f);
     ok(f, """
@@ -711,7 +699,7 @@ LastElement(found:false key:0 data:0)
 
   static void test_search()
    {StuckSML  t = test_load();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     //stop(t.toString(base));
     ok(t.toString(base), """
 StuckSML(maxSize:4 size:4)
@@ -736,7 +724,7 @@ Search(Search:3 found:false)
 
   static void test_search_except_last()
    {StuckSML  t = test_load();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     //stop(t.toString(base));
     ok(t.toString(base), """
 StuckSML(maxSize:4 size:4)
@@ -759,7 +747,7 @@ SearchExceptLast(Search:8 found:false)
 
   static void test_search_first_greater_than_or_equal()
    {StuckSML  t = test_load();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     //stop(t.toString(base));
     ok(t.toString(base), """
 StuckSML(maxSize:4 size:4)
@@ -802,7 +790,7 @@ SearchFirstGreaterThanOrEqual(Search:9 index:4 found:false)
 
   static void test_search_first_greater_than_or_equal_except_last()
    {StuckSML  t = test_load();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     //stop(t.toString(base));
     ok(t.toString(base), """
 StuckSML(maxSize:4 size:4)
@@ -839,7 +827,7 @@ SearchFirstGreaterThanOrEqualExceptLast(Search:7 index:3 found:false)
 
   static void test_set_element_at()
    {StuckSML  t = test_load();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     t.setElementAt(base, 22, 33, 2);
     //stop(t.toString(base));
     ok(t.toString(base), """
@@ -858,11 +846,21 @@ StuckSML(maxSize:4 size:4)
   2 key:22 data:33
   3 key:99 data:97
 """);
+    t.pop(base);
+    t.setElementAt(base, 88, 87, 3);
+    //stop(t.toString(base));
+    ok(t.toString(base), """
+StuckSML(maxSize:4 size:4)
+  0 key:2 data:1
+  1 key:4 data:2
+  2 key:22 data:33
+  3 key:88 data:87
+""");
    }
 
   static void test_check_order()
    {StuckSML     t = test_load();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     CheckOrder   c = t.checkOrder(base);
     //stop(c);
     ok(c, """
@@ -879,7 +877,7 @@ CheckOrder(inOrder:false outOfOrder:2)
 
   static void test_check_order_except_last()
    {StuckSML     t = test_load();
-    final int base = t.stuckBaseAt();
+    final int base = t.baseAt();
     CheckOrderExceptLast c = t.checkOrderExceptLast(base);
     ok(c, """
 CheckOrderExceptLast(inOrder:true outOfOrder:0)
@@ -920,7 +918,7 @@ CheckOrderExceptLast(inOrder:false outOfOrder:2)
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      if (github_actions)                                                       // Coverage analysis
+      //if (github_actions)                                                       // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
