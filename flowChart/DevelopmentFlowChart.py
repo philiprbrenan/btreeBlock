@@ -20,7 +20,9 @@ dot.edge('BS',  'BSS')
 dot.edge('BSS', 'BSML')
 
 dot.edge('S',    'SS')
+dot.edge('S',    'BS')
 dot.edge('SS',   'SSML')
+dot.edge('SS',   'BSS')
 dot.edge('SSML', 'BSML')
 
 dot.edge('L',    'SSML')
