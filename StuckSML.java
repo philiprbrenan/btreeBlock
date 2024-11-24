@@ -231,12 +231,18 @@ abstract class StuckSML extends Test                                            
     int key;                                                                    // The shifted key
     int data;                                                                   // The shifted data
     int base;                                                                   // The base of the stuck
-    ElementAt elementAt(int Base, int Index)
+    ElementAt() {}
+    ElementAt elementAt(int Base, int Index)                                    // Look up key and data associated with the index in the stuck at the specified base offset in memory
      {z(); index = Index; base = Base;
       assertInNormal(base, index);
       key   = key   (base, index);
       data  = data  (base, index);
       return this;
+     }
+    ElementAt copy()
+     {z(); final ElementAt c = new ElementAt();
+      c.index = index; c.key = key; c.data = data; c.base = base;
+      return c;
      }
     public String toString()                                                    // Print
      {z();
