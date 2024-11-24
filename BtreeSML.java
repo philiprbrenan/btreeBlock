@@ -220,6 +220,8 @@ abstract class BtreeSML extends Test                                            
       return s.toString();
      }
 
+//D2 Search                                                                     // Search within a node
+
     class FindEqualInLeaf                                                       // Find the first key in the leaf that is equal to the search key
      {Node     leaf;                                                            // The leaf being searched
       int    search;                                                            // Search key
@@ -317,6 +319,46 @@ abstract class BtreeSML extends Test                                            
     final FindFirstGreaterThanOrEqualInBranch FindFirstGreaterThanOrEqualInBranch1 =                    new FindFirstGreaterThanOrEqualInBranch();
           FindFirstGreaterThanOrEqualInBranch findFirstGreaterThanOrEqualInBranch1(int Search) {z(); return FindFirstGreaterThanOrEqualInBranch1.findFirstGreaterThanOrEqualInBranch(Search);}
 
+//D2 Array                                                                      // Represent the contents of the tree as an array
+
+    void leafToArray(Stack<StuckSML.ElementAt>s)                                // Leaf as an array
+     {z(); assertLeaf();
+      final int K = leafSize();
+      for  (int i = 0; i < K; i++)
+       {z();
+        final StuckSML.ElementAt e = Leaf.elementAt1(leafBase(), i);
+        s.push(e.copy());
+       }
+     }
+
+    void branchToArray(Stack<StuckSML.ElementAt>s)                              // Branch to array
+     {z(); assertBranch();
+      final int K = branchSize() + 1;                                           // To allow for top next
+
+      if (K > 0)                                                                // Branch has key, next pairs
+       {z();
+        for  (int i = 0; i < K; i++)
+         {z();
+          final int next = Branch.elementAt1(branchBase(), i).data;             // Each key, next pair
+          final Node n = new Node(next);
+          if (   n.isLeaf())
+           {z(); n.leafToArray(s);
+           }
+          else
+           {z();
+            if (next == 0)
+             {say("Cannot descend through root from index", i,
+                  "in branch", node);
+              break;
+             }
+            z(); n.branchToArray(s);
+           }
+         }
+       }
+     }
+
+//D2 Print                                                                      // Print the contents of the tree
+
     void printLeaf(Stack<StringBuilder>S, int level)                            // Print leaf horizontally
      {assertLeaf();
       padStrings(S, level);
@@ -379,6 +421,8 @@ abstract class BtreeSML extends Test                                            
 
       padStrings(S, level);
      }
+
+//D2 Split                                                                      // Split nodes in half to increase the number of nodes in the tree
 
     void splitLeafRoot()                                                        // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
      {z(); assertLeaf();
@@ -487,80 +531,6 @@ abstract class BtreeSML extends Test                                            
       Branch.insertElementAt(parent.branchBase(), split.key, l.node, index);
      }
 
-    boolean mergeRoot()                                                         // Merge into the root
-     {z();
-      z(); if (root.isLeaf() || branchSize() > 1) return false;
-      z(); if (node != 0) stop("Expected root, got:", node);
-      z();
-      final Node p = this;
-      final Node l = new Node(Branch.firstElement1(branchBase()).data);
-      final Node r = new Node(Branch. lastElement1(branchBase()).data);
-
-      if (p.hasLeavesForChildren())                                             // Leaves
-       {z();
-        if (l.leafSize() + r.leafSize() <= maxKeysPerLeaf())
-         {z(); Leaf.clear(p.branchBase());
-          final int nl = l.leafSize();
-          for (int i = 0; i < nl; ++i)
-           {z();
-            final StuckSML.Shift f = Leaf.shift1(l.leafBase());
-            Leaf.push(p.leafBase(), f.key, f.data);
-           }
-          final int nr = r.leafSize();
-          for (int i = 0; i < nr; ++i)
-           {z();
-            final StuckSML.Shift f = Leaf.shift1(r.leafBase());
-            Leaf.push(p.leafBase(), f.key, f.data);
-           }
-          isLeaf(true);
-          l.free();
-          r.free();
-          return true;
-         }
-       }
-      else if (l.branchSize() + 1 + r.branchSize() <= maxKeysPerBranch())       // Branches
-       {z();
-        final StuckSML.FirstElement pkn = Branch.firstElement1(p.branchBase());
-        Branch.clear(p.branchBase());
-        final int nl = l.branchSize();
-        for (int i = 0; i < nl; ++i)
-         {z();
-          final StuckSML.Shift f = Branch.shift1(l.branchBase());
-          Branch.push(p.branchBase(), f.key, f.data);
-
-         }
-        Branch.push(p.branchBase(), pkn.key, Branch.lastElement1(l.branchBase()).data);
-        final int nr = r.branchSize();
-        for (int i = 0; i < nr; ++i)
-         {z();
-          final StuckSML.Shift f = Branch.shift1(r.branchBase());
-          Branch.push(p.branchBase(), f.key, f.data);
-         }
-        Branch.push(p.branchBase(), 0, Branch.lastElement2(r.branchBase()).data);// Top so ignored by search ... except last
-        l.free();
-        r.free();
-        return true;
-       }
-      z();
-      return false;
-     }
-
-    void augment(int index)                                                     // Augment the indexed child so it has at least two children in its body
-     {z(); assertBranch();
-      z(); if (index < 0)            stop("Index", index, "too small");
-      z(); if (index > branchSize()) stop("Index", index, "too big");
-      z(); if (isLow() && node != root.node) stop("Parent:", node, "must not be low on children");
-      z();
-      final StuckSML.ElementAt p = Branch.elementAt1(new Node(node).branchBase(), index);
-      final Node               c = new Node(p.data);
-      z(); if (!c.isLow())               return;
-      z(); if (stealFromLeft    (index)) return;
-      z(); if (stealFromRight   (index)) return;
-      z(); if (mergeLeftSibling (index)) return;
-      z(); if (mergeRightSibling(index)) return;
-      stop("Unable to augment child:", c.node);
-     }
-
     boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
      {z(); assertBranch();
       z(); if (index == 0) return false;
@@ -647,6 +617,66 @@ abstract class BtreeSML extends Test                                            
         Branch.removeElementAt1(r, 0);                                          // Reduce right
        }
       return true;
+     }
+
+//D2 Merge                                                                      // Merge  two nodes together and free the resulting free node
+
+    boolean mergeRoot()                                                         // Merge into the root
+     {z();
+      z(); if (root.isLeaf() || branchSize() > 1) return false;
+      z(); if (node != 0) stop("Expected root, got:", node);
+      z();
+      final Node p = this;
+      final Node l = new Node(Branch.firstElement1(branchBase()).data);
+      final Node r = new Node(Branch. lastElement1(branchBase()).data);
+
+      if (p.hasLeavesForChildren())                                             // Leaves
+       {z();
+        if (l.leafSize() + r.leafSize() <= maxKeysPerLeaf())
+         {z(); Leaf.clear(p.branchBase());
+          final int nl = l.leafSize();
+          for (int i = 0; i < nl; ++i)
+           {z();
+            final StuckSML.Shift f = Leaf.shift1(l.leafBase());
+            Leaf.push(p.leafBase(), f.key, f.data);
+           }
+          final int nr = r.leafSize();
+          for (int i = 0; i < nr; ++i)
+           {z();
+            final StuckSML.Shift f = Leaf.shift1(r.leafBase());
+            Leaf.push(p.leafBase(), f.key, f.data);
+           }
+          isLeaf(true);
+          l.free();
+          r.free();
+          return true;
+         }
+       }
+      else if (l.branchSize() + 1 + r.branchSize() <= maxKeysPerBranch())       // Branches
+       {z();
+        final StuckSML.FirstElement pkn = Branch.firstElement1(p.branchBase());
+        Branch.clear(p.branchBase());
+        final int nl = l.branchSize();
+        for (int i = 0; i < nl; ++i)
+         {z();
+          final StuckSML.Shift f = Branch.shift1(l.branchBase());
+          Branch.push(p.branchBase(), f.key, f.data);
+
+         }
+        Branch.push(p.branchBase(), pkn.key, Branch.lastElement1(l.branchBase()).data);
+        final int nr = r.branchSize();
+        for (int i = 0; i < nr; ++i)
+         {z();
+          final StuckSML.Shift f = Branch.shift1(r.branchBase());
+          Branch.push(p.branchBase(), f.key, f.data);
+         }
+        Branch.push(p.branchBase(), 0, Branch.lastElement2(r.branchBase()).data);// Top so ignored by search ... except last
+        l.free();
+        r.free();
+        return true;
+       }
+      z();
+      return false;
      }
 
     boolean mergeLeftSibling(int index)                                         // Merge the left sibling
@@ -751,7 +781,37 @@ abstract class BtreeSML extends Test                                            
       Branch.removeElementAt1(p, index+1);                                      // Reduce parent on right
       return true;
      }
+
+//D2 Balance                                                                    // Balance the tree by merging and stealing
+
+    void balance(int index)                                                     // Augment the indexed child so it has at least two children in its body
+     {z(); assertBranch();
+      z(); if (index < 0)            stop("Index", index, "too small");
+      z(); if (index > branchSize()) stop("Index", index, "too big");
+      z(); if (isLow() && node != root.node) stop("Parent:", node, "must not be low on children");
+      z();
+      final StuckSML.ElementAt p = Branch.elementAt1(new Node(node).branchBase(), index);
+      final Node               c = new Node(p.data);
+      z(); if (!c.isLow())               return;
+      z(); if (stealFromLeft    (index)) return;
+      z(); if (stealFromRight   (index)) return;
+      z(); if (mergeLeftSibling (index)) return;
+      z(); if (mergeRightSibling(index)) return;
+      stop("Unable to balance child:", c.node);
+     }
+
    }  // Node
+
+//D1 Array                                                                      // Key, data pairs in the tree as an array
+
+  Stack<StuckSML.ElementAt> toArray()                                                      // Key, data pairs in the tree as an array
+   {z();
+    final Stack<StuckSML.ElementAt> s = new Stack<>();
+
+    if (root.isLeaf()) {z(); root.  leafToArray(s);}
+    else               {z(); root.branchToArray(s);}
+    return s;
+   }
 
 //D1 Print                                                                      // Print a BTree horizontally
 
@@ -997,7 +1057,7 @@ abstract class BtreeSML extends Test                                            
       final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
       down = p.findFirstGreaterThanOrEqualInBranch1(Key);
 
-      p.augment(down.first);
+      p.balance(down.first);
       final Node q = new Node(down.next);
 
       if (q.isLeaf())                                                             // Reached a leaf
@@ -1778,6 +1838,39 @@ abstract class BtreeSML extends Test                                            
        }
      }
    }
+  static void test_to_array()
+   {final BtreeSML t = btreeSML(2, 3);
+
+    final int M = 2;
+    for (int i = 1; i <= M; i++) t.put(i);
+    //stop(""+t.toArray());
+    ok(""+t.toArray(), """
+[ElementAt(index:0 key:1 data:1)
+, ElementAt(index:1 key:2 data:2)
+]""");
+
+    final int N = 16;
+    for (int i = M; i <= N; i++) t.put(i);
+    //stop(""+t.toArray());
+    ok(""+t.toArray(), """
+[ElementAt(index:0 key:1 data:1)
+, ElementAt(index:1 key:2 data:2)
+, ElementAt(index:0 key:3 data:3)
+, ElementAt(index:1 key:4 data:4)
+, ElementAt(index:0 key:5 data:5)
+, ElementAt(index:1 key:6 data:6)
+, ElementAt(index:0 key:7 data:7)
+, ElementAt(index:1 key:8 data:8)
+, ElementAt(index:0 key:9 data:9)
+, ElementAt(index:1 key:10 data:10)
+, ElementAt(index:0 key:11 data:11)
+, ElementAt(index:1 key:12 data:12)
+, ElementAt(index:0 key:13 data:13)
+, ElementAt(index:1 key:14 data:14)
+, ElementAt(index:0 key:15 data:15)
+, ElementAt(index:1 key:16 data:16)
+]""");
+   }
 
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_put_ascending();
@@ -1788,17 +1881,18 @@ abstract class BtreeSML extends Test                                            
     test_find();
     test_delete_ascending();
     test_delete_descending();
+    test_to_array();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    //test_delete_descending();
+    //test_to_array();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      //if (github_actions)                                                       // Coverage analysis
+      if (github_actions)                                                       // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
