@@ -150,9 +150,9 @@ abstract class StuckSML extends Test                                            
 
 //D1 Actions                                                                    // Place and remove data to/from stuck
 
-  void inc  (int base) {z(); assertNotFull (base); memoryLayout().set(currentSize, memoryLayout().getInt(currentSize, base)+1, base);}  // Increment the current size
-  void dec  (int base) {z(); assertNotEmpty(base); memoryLayout().set(currentSize, memoryLayout().getInt(currentSize, base)-1, base);}  // Decrement the current size
-  void clear(int base) {z();                       memoryLayout().set(currentSize, 0,                                          base);}  // Clear the stuck
+  void inc  (int base) {z(); assertNotFull (base); final int v = memoryLayout().getInt(currentSize, base)+1; memoryLayout().set(currentSize, v, base);}  // Increment the current size
+  void dec  (int base) {z(); assertNotEmpty(base); final int v = memoryLayout().getInt(currentSize, base)-1; memoryLayout().set(currentSize, v, base);}  // Decrement the current size
+  void clear(int base) {z();                       final int v = 0                                         ; memoryLayout().set(currentSize, v, base);}  // Clear the stuck
 
   void push(int base, int key, int data)                                        // Push an element onto the stuck
    {z();
@@ -244,6 +244,10 @@ abstract class StuckSML extends Test                                            
       c.index = index; c.key = key; c.data = data; c.base = base;
       return c;
      }
+    boolean equals(ElementAt e)
+     {z();
+      return index == e.index && key == e.key && data == e.data && base == e.base;
+     }
     public String toString()                                                    // Print
      {z();
       final StringBuilder s = new StringBuilder();
@@ -283,8 +287,8 @@ abstract class StuckSML extends Test                                            
     RemoveElementAt removeElementAt(int Base, int Index)
      {z(); index = Index; base = Base;
       assertInNormal(base, index);
-      key  = key (base, index);
-      data = data(base, index);
+      key     = key (base, index);
+      data    = data(base, index);
       for (int i = index, j = size(base)-1; i < j; i++)                         // Shift the stuck down one place
        {z(); copyKeyData(base, i, i+1);
        }
@@ -633,6 +637,8 @@ ElementAt(index:2 key:6 data:3)
     ok(E, """
 ElementAt(index:3 key:8 data:4)
 """);
+    ElementAt f = e.copy();
+    ok(e.equals(f));
    }
 
   static void test_insert_element_at()
