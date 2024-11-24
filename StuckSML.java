@@ -163,7 +163,7 @@ abstract class StuckSML extends Test                                            
   void push(int base, int key, int data)                                        // Push an element onto the stuck
    {z();
     assertNotFull(base);
-    final int cs = memoryLayout().getInt(currentSize, base);
+    final int cs = getInt(currentSize, base);
     setKeyData(base, cs, key, data);
     inc(base);
    }
