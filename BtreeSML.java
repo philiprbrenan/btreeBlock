@@ -658,16 +658,16 @@ abstract class BtreeSML extends Test                                            
        {z();
         if (l.leafSize() + r.leafSize() <= maxKeysPerLeaf())
          {z(); Leaf.clear(bb);
-          final int nl = l.leafSize();
+          final int nl = l.leafSize(), llb = l.leafBase(), rlb = r.leafBase();
           for (int i = 0; i < nl; ++i)
            {z();
-            final StuckSML.Shift f = Leaf.shift1(l.leafBase());
+            final StuckSML.Shift f = Leaf.shift1(llb);
             Leaf.push(ll, f.key, f.data);
            }
           final int nr = r.leafSize();
           for (int i = 0; i < nr; ++i)
            {z();
-            final StuckSML.Shift f = Leaf.shift1(r.leafBase());
+            final StuckSML.Shift f = Leaf.shift1(rlb);
             Leaf.push(ll, f.key, f.data);
            }
           isLeaf(true);
