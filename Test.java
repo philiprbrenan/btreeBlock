@@ -204,12 +204,9 @@ public class Test                                                               
 //D2 Coverage                                                                   // Analyze code coverage
 
   static final TreeMap<String, Integer> coverage = new TreeMap<>();             // Count of how many times each line has been executed
-  static final TreeSet<        Integer> executed = new TreeSet<>();             // Which lines have been executed
 
   static void z()                                                               // A line that is being executed
    {final String s = callerFileAndLine2();                                      // File method line
-    final int l = Integer.parseInt(s.split("\s")[2]);                           // Line number
-    executed.add(l);                                                            // Line numbers executed
     Integer c = coverage.get(s);
     coverage.put(s, c == null ? 1 : c+1);
    }
@@ -226,13 +223,21 @@ public class Test                                                               
    }
 
   static void coverageAnalysis(String source, int top)                          // Coverage analysis: unexecuted lines and lines most frequently executed in a Geany clickable format
-   {final Stack<String> sourceLines = readFile(source);
-    final Stack<String> notExecuted = new Stack<>();
+   {final Stack<String> sourceLines = readFile(source);                         // Lines of source from indicated file
+    final Stack<String> notExecuted = new Stack<>();                            // Lines not executed
+    final TreeSet<Integer> executed = new TreeSet<>();                          // Lines executed
 
-    for (int i = 1; i <= sourceLines.size(); i++)                               // Not executed lines
+    for (String s : coverage.keySet())                                          // Find lines executed in this file
+     {final String[]fml = s.split("\\s+");
+      if (fml[0].equals(source)) executed.add(Integer.parseInt(fml[2]));
+     }
+
+    for (int i = 1; i <= sourceLines.size(); i++)                               // Lines not executed in this file
      {final String line = sourceLines.elementAt(i-1);
-      if (line.contains("z();") && !executed.contains(i))
-       {notExecuted.push(""+source+":"+i+":");
+      if (line.contains("z();"))                                                // Line has been marked as executable
+       {if (!executed.contains(i))                                              // Line has not been executed
+         {notExecuted.push(""+source+":"+i+":");
+         }
        }
      }
     if (notExecuted.size() > 0)                                                 // Lines not executed
