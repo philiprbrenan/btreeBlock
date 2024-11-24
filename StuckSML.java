@@ -130,12 +130,18 @@ abstract class StuckSML extends Test                                            
 
 //D1 Memory                                                                     // Actions on memory of stuck
 
-  int  key     (int base, int Index)              {return memoryLayout().getInt(key,  base, Index);}
-  int  data    (int base, int Index)              {return memoryLayout().getInt(data, base, Index);}
-  void setKey  (int base, int Index,  int Value)  {memoryLayout().set(key,  Value,    base, Index);}
-  void setData (int base, int Index,  int Value)  {memoryLayout().set(data, Value,    base, Index);}
-  void copyKey (int base, int Target, int Source) {setKey (base, Target, key (base, Source));}
-  void copyData(int base, int Target, int Source) {setData(base, Target, data(base, Source));}
+  int  getInt(Layout.Field field,            int base)            {z(); return memoryLayout().getInt(field, base);}
+  int  getInt(Layout.Field field,            int base, int index) {z(); return memoryLayout().getInt(field, base, index);}
+
+  void setInt(Layout.Field field, int value, int base)            {z(); memoryLayout().set(field, value, base);}
+  void setInt(Layout.Field field, int value, int base, int index) {z(); memoryLayout().set(field, value, base, index);}
+
+  int  key     (int base, int Index)              {z(); return getInt(key,    base, Index);}
+  int  data    (int base, int Index)              {z(); return getInt(data,   base, Index);}
+  void setKey  (int base, int Index,  int Value)  {z(); setInt (key,  Value,  base, Index);}
+  void setData (int base, int Index,  int Value)  {z(); setInt (data, Value,  base, Index);}
+  void copyKey (int base, int Target, int Source) {z(); setKey (base, Target, key (base, Source));}
+  void copyData(int base, int Target, int Source) {z(); setData(base, Target, data(base, Source));}
 
   void  setKeyData(int base, int Index, int Key, int Data)
    {z();
@@ -150,9 +156,9 @@ abstract class StuckSML extends Test                                            
 
 //D1 Actions                                                                    // Place and remove data to/from stuck
 
-  void inc  (int base) {z(); assertNotFull (base); final int v = memoryLayout().getInt(currentSize, base)+1; memoryLayout().set(currentSize, v, base);}  // Increment the current size
-  void dec  (int base) {z(); assertNotEmpty(base); final int v = memoryLayout().getInt(currentSize, base)-1; memoryLayout().set(currentSize, v, base);}  // Decrement the current size
-  void clear(int base) {z();                       final int v = 0                                         ; memoryLayout().set(currentSize, v, base);}  // Clear the stuck
+  void inc  (int base) {z(); assertNotFull (base); final int v = getInt(currentSize, base)+1; setInt(currentSize, v, base);}  // Increment the current size
+  void dec  (int base) {z(); assertNotEmpty(base); final int v = getInt(currentSize, base)-1; setInt(currentSize, v, base);}  // Decrement the current size
+  void clear(int base) {z();                       final int v = 0                          ; setInt(currentSize, v, base);}  // Clear the stuck
 
   void push(int base, int key, int data)                                        // Push an element onto the stuck
    {z();
