@@ -55,9 +55,9 @@ abstract class BtreeSML extends Test                                            
     memory       = memoryLayout.memory;
     for (int i = maxSize(); i > 0; --i)                                         // Put all the nodes on the free chain at the start with low nodes first
      {final Node n = new Node(i-1); n.clear();
-      final int  f = memoryLayout.getInt(freedChain,         0);
-                     memoryLayout.set   (free,       f,      0, n.node);
-                     memoryLayout.set   (freedChain, n.node, 0);
+      final int  f = getInt(freedChain,         0);
+                     setInt(free,       f,      0, n.node);
+                     setInt(freedChain, n.node, 0);
      }
     root  = allocate(false);                                                    // The root is always at zero, which frees zero to act as the end of list marker on the free chain
     root.isLeaf(true);                                                          // The root starts as a leaf
@@ -116,13 +116,21 @@ abstract class BtreeSML extends Test                                            
   void stop()              {Test.stop(toString());}                             // Stop after printing the tree
   public String toString() {return print();}                                    // Print the tree
 
+//D1 Memory access                                                              // Access to memory
+
+  int  getInt(Layout.Field field,            int base)            {z(); return memoryLayout.getInt(field, base);}
+  int  getInt(Layout.Field field,            int base, int index) {z(); return memoryLayout.getInt(field, base, index);}
+
+  void setInt(Layout.Field field, int value, int base)            {z(); memoryLayout.set(field, value, base);}
+  void setInt(Layout.Field field, int value, int base, int index) {z(); memoryLayout.set(field, value, base, index);}
+
 //D1 Memory allocation                                                          // Allocate and free memory
 
   Node allocate(boolean check)                                                  // Allocate a node with or without checking for sufficient free space
-   {z(); final int  f = memoryLayout.getInt(freedChain,    0);                  // Last freed node
+   {z(); final int  f = getInt(freedChain,    0);                               // Last freed node
     z(); if (check && f == 0) stop("No more memory available");                 // No more free nodes available
-    z(); final int  F = memoryLayout.getInt(free,          0, f);               // Second to last freed node
-                        memoryLayout.set   (freedChain, F, 0);                  // Make second to last freed node the forst freed nod to liberate the existeing first free node
+    z(); final int  F = getInt(free,          0, f);                            // Second to last freed node
+                        setInt(freedChain, F, 0);                               // Make second to last freed node the forst freed nod to liberate the existeing first free node
     final Node n = new Node(f); n.clear();                                      // Construct and clear the node
     maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                                // Number of nodes in use
     return n;
@@ -133,9 +141,9 @@ abstract class BtreeSML extends Test                                            
   void freeNode(int node)                                                       // Free a node by number
    {z(); if (node == 0) stop("Cannot free root");                               // The root is never freed
     z(); new Node(node).erase();                                                // Clear the node to encourage erroneous frees to do damage that shows up quickly.
-    final int  f = memoryLayout.getInt(freedChain,       0);                    // Last freed node from head of free chain
-                   memoryLayout.set   (free,          f, 0, node);              // Chain this node in front of the last freed node
-                   memoryLayout.set   (freedChain, node, 0);                    // Make this node the head of the free chain
+    final int  f = getInt(freedChain,       0);                                 // Last freed node from head of free chain
+                   setInt(free,          f, 0, node);                           // Chain this node in front of the last freed node
+                   setInt(freedChain, node, 0);                                 // Make this node the head of the free chain
     maxNodeUsed  = max(maxNodeUsed, --nodeUsed);                                // Number of nodes in use
    }
 
@@ -145,12 +153,8 @@ abstract class BtreeSML extends Test                                            
    {final int node;                                                             // The number of the node
     Node(int Node) {node = Node;}                                               // Access an existing node
 
-    boolean isLeaf()                                                            // A leaf if true
-     {z(); return memoryLayout.getInt(isLeaf, 0, node) > 0;
-     }
-    void    isLeaf(boolean leaf)                                                // Set as leaf if true
-     {z(); memoryLayout.set(isLeaf, leaf ? 1 : 0, 0, node);
-     }
+    boolean isLeaf()             {z(); return getInt(isLeaf, 0, node) > 0;}     // A leaf if true
+    void    isLeaf(boolean leaf) {z(); setInt(isLeaf, leaf ? 1 : 0, 0, node);}  // Set as leaf if true
 
     void assertLeaf()   {if (!isLeaf()) stop("Leaf required");}
     void assertBranch() {if ( isLeaf()) stop("Branch required");}
@@ -1951,7 +1955,6 @@ abstract class BtreeSML extends Test                                            
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    //test_to_array();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
