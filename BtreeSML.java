@@ -350,7 +350,7 @@ abstract class BtreeSML extends Test                                            
          {z();
           final int next = Branch.elementAt1(branchBase(), i).data;             // Each key, next pair
           final Node n = new Node(next);
-          if (   n.isLeaf()) {z(); n.leafToArray(s);}
+          if (n.isLeaf()) {z(); n.leafToArray(s);}
           else
            {z();
             if (next == 0)
@@ -650,14 +650,15 @@ abstract class BtreeSML extends Test                                            
       z(); if (root.isLeaf() || branchSize() > 1) return false;
       z(); if (node != 0) stop("Expected root, got:", node);
       z();
+      final int bb = branchBase();
       final Node p = this;
-      final Node l = new Node(Branch.firstElement1(branchBase()).data);
-      final Node r = new Node(Branch. lastElement1(branchBase()).data);
+      final Node l = new Node(Branch.firstElement1(bb).data);
+      final Node r = new Node(Branch. lastElement1(bb).data);
 
       if (p.hasLeavesForChildren())                                             // Leaves
        {z();
         if (l.leafSize() + r.leafSize() <= maxKeysPerLeaf())
-         {z(); Leaf.clear(p.branchBase());
+         {z(); Leaf.clear(bb);
           final int nl = l.leafSize();
           for (int i = 0; i < nl; ++i)
            {z();
@@ -678,25 +679,25 @@ abstract class BtreeSML extends Test                                            
        }
       else if (l.branchSize() + 1 + r.branchSize() <= maxKeysPerBranch())       // Branches
        {z();
-        final StuckSML.FirstElement pkn = Branch.firstElement1(p.branchBase());
-        Branch.clear(p.branchBase());
-        final int nl = l.branchSize();
+        final StuckSML.FirstElement pkn = Branch.firstElement1(bb);
+        Branch.clear(bb);
+        final int nl = l.branchSize(), lb = l.branchBase(), rb = r.branchBase();
         for (int i = 0; i < nl; ++i)
          {z();
-          final StuckSML.Shift f = Branch.shift1(l.branchBase());
-          Branch.push(p.branchBase(), f.key, f.data);
+          final StuckSML.Shift f = Branch.shift1(lb);
+          Branch.push(bb, f.key, f.data);
 
          }
-        final int data = Branch.lastElement1(l.branchBase()).data;
-        Branch.push(p.branchBase(), pkn.key, data);
+        final int data = Branch.lastElement1(lb).data;
+        Branch.push(bb, pkn.key, data);
         final int nr = r.branchSize();
         for (int i = 0; i < nr; ++i)
          {z();
-          final StuckSML.Shift f = Branch.shift1(r.branchBase());
-          Branch.push(p.branchBase(), f.key, f.data);
+          final StuckSML.Shift f = Branch.shift1(rb);
+          Branch.push(bb, f.key, f.data);
          }
-        final int Data = Branch.lastElement2(r.branchBase()).data;              // Top next
-        Branch.push(p.branchBase(), 0, Data);                                   // Top so ignored by search ... except last
+        final int Data = Branch.lastElement2(rb).data;                          // Top next
+        Branch.push(bb, 0, Data);                                               // Top so ignored by search ... except last
         l.free();
         r.free();
         return true;
@@ -808,13 +809,13 @@ abstract class BtreeSML extends Test                                            
         Branch.setElementAt(l, Branch.elementAt1(p, index).key, le.data, nl);   // Re-key left top
 
         for (int i = 0; i < maxKeysPerBranch() && Branch.size(r) > 0; i++)      // Transfer right to left
-         {z();final StuckSML.Shift f = Branch.shift1(r);
+         {z(); final StuckSML.Shift f = Branch.shift1(r);
           Branch.push(l, f.key, f.data);
          }
         freeNode(R.data);                                                       // Free the empty right node
        }
 
-      final StuckSML.ElementAt pkn = Branch.elementAt1(p, index+1);             // Key of right sibling
+      final StuckSML.ElementAt pkn =  Branch.elementAt1(p, index+1);            // Key of right sibling
       Branch.setElementAt(p, pkn.key, Branch.elementAt2(p, index).data, index); // Install key of right sibling in this child
       Branch.removeElementAt1(p, index+1);                                      // Reduce parent on right
       return true;
