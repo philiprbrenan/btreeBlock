@@ -1149,8 +1149,8 @@ abstract class BtreeSML extends Test                                            
       z();
       for (int j = 0; j < p.branchSize(); j++)                                  // Try merging each sibling pair which might change the size of the parent
        {z();
-        if (p.mergeLeftSibling(j)) --j;                                         // A successful merge of the left sibling reduces the current index
-        p.mergeRightSibling(j);
+        if (p.mergeLeftSibling(j)) --j;                                         // A successful merge of the left  sibling reduces the current index and the upper limit
+        p.mergeRightSibling(j);                                                 // A successful merge of the right sibling maintains the current position but reduces the upper limit
        }
 
       final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
