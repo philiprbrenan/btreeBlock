@@ -650,12 +650,11 @@ abstract class BtreeSML extends Test                                            
       z(); if (root.isLeaf() || branchSize() > 1) return false;
       z(); if (node != 0) stop("Expected root, got:", node);
       z();
-      final int bb = branchBase();
-      final Node p = this;
+      final int bb = branchBase(), ll = leafBase();
       final Node l = new Node(Branch.firstElement1(bb).data);
       final Node r = new Node(Branch. lastElement1(bb).data);
 
-      if (p.hasLeavesForChildren())                                             // Leaves
+      if (hasLeavesForChildren())                                               // Leaves
        {z();
         if (l.leafSize() + r.leafSize() <= maxKeysPerLeaf())
          {z(); Leaf.clear(bb);
@@ -663,13 +662,13 @@ abstract class BtreeSML extends Test                                            
           for (int i = 0; i < nl; ++i)
            {z();
             final StuckSML.Shift f = Leaf.shift1(l.leafBase());
-            Leaf.push(p.leafBase(), f.key, f.data);
+            Leaf.push(ll, f.key, f.data);
            }
           final int nr = r.leafSize();
           for (int i = 0; i < nr; ++i)
            {z();
             final StuckSML.Shift f = Leaf.shift1(r.leafBase());
-            Leaf.push(p.leafBase(), f.key, f.data);
+            Leaf.push(ll, f.key, f.data);
            }
           isLeaf(true);
           l.free();
