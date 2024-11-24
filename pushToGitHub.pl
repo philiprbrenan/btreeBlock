@@ -11,7 +11,7 @@ use Data::Table::Text qw(:all);
 use GitHub::Crud qw(:all);
 use feature qw(say current_sub);
 
-my $home = currentDirectory;                                                    # Local files
+my $home = q(/home/phil/btreeBlock/);                                           # Home folder
 my $user = q(philiprbrenan);                                                    # User
 my $repo = q(btreeBlock);                                                       # Repo
 my $wf   = q(.github/workflows/main.yml);                                       # Work flow on Ubuntu
