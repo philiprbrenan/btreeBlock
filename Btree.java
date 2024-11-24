@@ -108,6 +108,8 @@ class Btree extends Test                                                        
       return s.toString();
      }
 
+//D2 Search                                                                     // Search within a node
+
     class FindEqualInLeaf                                                       // Find the first key in the leaf that is equal to the search key
      {final Node     leaf;                                                      // The leaf being searched
       final int    search;                                                      // Search key
@@ -222,6 +224,41 @@ class Btree extends Test                                                        
        }
      }
 
+//D2 Array                                                                      // Represent the contents of the tree as an array
+
+    void leafToArray(Stack<KeyData>s)                                           // Leaf as an array
+     {z(); assertLeaf();
+      final int K = leafSize();
+      for  (int i = 0; i < K; i++) {z(); s.push(keyData.elementAt(i));}
+     }
+
+    void branchToArray(Stack<KeyData>s)                                         // Branch to array
+     {z(); assertBranch();
+      final int K = branchSize() + 1;                                           // To allow for top next
+
+      if (K > 0)                                                                // Branch has key, next pairs
+       {z();
+        for  (int i = 0; i < K; i++)
+         {z();
+          final int next = keyNext.elementAt(i).next;                           // Each key, next pair
+          if (nodes.elementAt(next).isLeaf)
+           {z(); nodes.elementAt(next).leafToArray(s);
+           }
+          else
+           {z();
+            if (next == 0)
+             {say("Cannot descend through root from index", i,
+                  "in branch", node);
+              break;
+             }
+            z(); nodes.elementAt(next).branchToArray(s);
+           }
+         }
+       }
+     }
+
+//D2 Print                                                                      // Print the contents of the tree
+
     void printLeaf(Stack<StringBuilder>S, int level)                            // Print leaf horizontally
      {assertLeaf();
       padStrings(S, level);
@@ -232,12 +269,6 @@ class Btree extends Test                                                        
       s.append("="+node+" ");
       S.elementAt(level*linesToPrintABranch).append(s.toString());
       padStrings(S, level);
-     }
-
-    void leafToArray(Stack<KeyData>s)                                           // Leaf as an array
-     {z(); assertLeaf();
-      final int K = leafSize();
-      for  (int i = 0; i < K; i++) {z(); s.push(keyData.elementAt(i));}
      }
 
     void printBranch(Stack<StringBuilder>S, int level)                          // Print branch horizontally
@@ -286,30 +317,7 @@ class Btree extends Test                                                        
       padStrings(S, level);
      }
 
-    void branchToArray(Stack<KeyData>s)                                         // Branch to array
-     {z(); assertBranch();
-      final int K = branchSize() + 1;                                           // To allow for top next
-
-      if (K > 0)                                                                // Branch has key, next pairs
-       {z();
-        for  (int i = 0; i < K; i++)
-         {z();
-          final int next = keyNext.elementAt(i).next;                           // Each key, next pair
-          if (nodes.elementAt(next).isLeaf)
-           {z(); nodes.elementAt(next).leafToArray(s);
-           }
-          else
-           {z();
-            if (next == 0)
-             {say("Cannot descend through root from index", i,
-                  "in branch", node);
-              break;
-             }
-            z(); nodes.elementAt(next).branchToArray(s);
-           }
-         }
-       }
-     }
+//D2 Split                                                                      // Split nodes in half to increase the number of nodes in the tree
 
     void splitLeafRoot()                                                        // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
      {z(); assertLeaf();
@@ -418,74 +426,7 @@ class Btree extends Test                                                        
       parent.keyNext.insertElementAt(new KeyNext(split.key, l.node), index);
      }
 
-    boolean mergeRoot()                                                         // Merge into the root
-     {z();
-      if (root.isLeaf || branchSize() > 1) return false;
-      if (node != 0) stop("Expected root, got:", node);
-      final Node p = this;
-      final Node l = nodes.elementAt(keyNext.firstElement().next);
-      final Node r = nodes.elementAt(keyNext. lastElement().next);
-
-      if (p.hasLeavesForChildren())                                             // Leaves
-       {z();
-        if (l.leafSize() + r.leafSize() <= maxKeysPerLeaf)
-         {z(); p.keyData.clear();
-          final int nl = l.leafSize();
-          for (int i = 0; i < nl; ++i)
-           {z();
-            p.keyData.push(l.keyData.elementAt(0));
-                           l.keyData.removeElementAt(0);
-           }
-          final int nr = r.leafSize();
-          for (int i = 0; i < nr; ++i)
-           {z();
-            p.keyData.push(r.keyData.elementAt(0));
-                           r.keyData.removeElementAt(0);
-           }
-          p.keyNext.clear();
-          isLeaf = true;
-          return true;
-         }
-       }
-      else if (l.branchSize() + 1 + r.branchSize() <= maxKeysPerBranch)         // Branches
-       {z();
-        final KeyNext pkn = p.keyNext.firstElement();
-        p.keyNext.clear();
-        final int nl = l.branchSize();
-        for (int i = 0; i < nl; ++i)
-         {z();
-          p.keyNext.push(l.keyNext.elementAt(0));
-                         l.keyNext.removeElementAt(0);
-
-         }
-        p.keyNext.push(new KeyNext(pkn.key, l.keyNext.lastElement().next));
-        final int nr = r.branchSize();
-        for (int i = 0; i < nr; ++i)
-         {z();
-          p.keyNext.push(r.keyNext.elementAt(0));
-                         r.keyNext.removeElementAt(0);
-         }
-        p.keyNext.push(new KeyNext(r.keyNext.lastElement().next));
-        return true;
-       }
-      return false;
-     }
-
-    void augment(int index)                                                     // Augment the indexed child so it has at least two children in its body
-     {z(); assertBranch();
-      if (index < 0)            stop("Index", index, "too small");
-      if (index > branchSize()) stop("Index", index, "too big");
-      if (isLow() && node != root.node) stop("Parent:", node, "must not be low on children");
-
-      final KeyNext p = nodes.elementAt(node).keyNext.elementAt(index);
-      final Node    c = nodes.elementAt(p.next);
-      if (!c.isLow())               return;
-      if (stealFromLeft    (index)) return;
-      if (stealFromRight   (index)) return;
-      if (mergeLeftSibling (index)) return;
-      if (mergeRightSibling(index)) return;
-      stop("Unable to augment child:", c.node);
-     }
+//D2 Steal                                                                      // Steal children from left or sibling to balance tree
 
     boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
      {z(); assertBranch();
@@ -572,6 +513,61 @@ class Btree extends Test                                                        
         r.removeElementAt(0);                                                   // Reduce right
        }
       return true;
+     }
+
+//D2 Merge                                                                      // Merge  two nodes together and free the resulting free node
+
+    boolean mergeRoot()                                                         // Merge into the root
+     {z();
+      if (root.isLeaf || branchSize() > 1) return false;
+      if (node != 0) stop("Expected root, got:", node);
+      final Node p = this;
+      final Node l = nodes.elementAt(keyNext.firstElement().next);
+      final Node r = nodes.elementAt(keyNext. lastElement().next);
+
+      if (p.hasLeavesForChildren())                                             // Leaves
+       {z();
+        if (l.leafSize() + r.leafSize() <= maxKeysPerLeaf)
+         {z(); p.keyData.clear();
+          final int nl = l.leafSize();
+          for (int i = 0; i < nl; ++i)
+           {z();
+            p.keyData.push(l.keyData.elementAt(0));
+                           l.keyData.removeElementAt(0);
+           }
+          final int nr = r.leafSize();
+          for (int i = 0; i < nr; ++i)
+           {z();
+            p.keyData.push(r.keyData.elementAt(0));
+                           r.keyData.removeElementAt(0);
+           }
+          p.keyNext.clear();
+          isLeaf = true;
+          return true;
+         }
+       }
+      else if (l.branchSize() + 1 + r.branchSize() <= maxKeysPerBranch)         // Branches
+       {z();
+        final KeyNext pkn = p.keyNext.firstElement();
+        p.keyNext.clear();
+        final int nl = l.branchSize();
+        for (int i = 0; i < nl; ++i)
+         {z();
+          p.keyNext.push(l.keyNext.elementAt(0));
+                         l.keyNext.removeElementAt(0);
+
+         }
+        p.keyNext.push(new KeyNext(pkn.key, l.keyNext.lastElement().next));
+        final int nr = r.branchSize();
+        for (int i = 0; i < nr; ++i)
+         {z();
+          p.keyNext.push(r.keyNext.elementAt(0));
+                         r.keyNext.removeElementAt(0);
+         }
+        p.keyNext.push(new KeyNext(r.keyNext.lastElement().next));
+        return true;
+       }
+      return false;
      }
 
     boolean mergeLeftSibling(int index)                                         // Merge the left sibling
@@ -663,6 +659,24 @@ class Btree extends Test                                                        
       p.setElementAt(new KeyNext(pkn.key, p.elementAt(index).next), index);     // Install key of right sibling in this child
       p.removeElementAt(index+1);                                               // Reduce parent on right
       return true;
+     }
+
+//D2 Balance                                                                    // Balance the tree by merging and stealing
+
+    void balance(int index)                                                     // Augment the indexed child so it has at least two children in its body
+     {z(); assertBranch();
+      if (index < 0)            stop("Index", index, "too small");
+      if (index > branchSize()) stop("Index", index, "too big");
+      if (isLow() && node != root.node) stop("Parent:", node, "must not be low on children");
+
+      final KeyNext p = nodes.elementAt(node).keyNext.elementAt(index);
+      final Node    c = nodes.elementAt(p.next);
+      if (!c.isLow())               return;
+      if (stealFromLeft    (index)) return;
+      if (stealFromRight   (index)) return;
+      if (mergeLeftSibling (index)) return;
+      if (mergeRightSibling(index)) return;
+      stop("Unable to balance child:", c.node);
      }
    }  // Node
 
@@ -919,7 +933,7 @@ class Btree extends Test                                                        
       final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
       down = p.new FindFirstGreaterThanOrEqualInBranch(Key);
 
-      p.augment(down.first);
+      p.balance(down.first);
       final Node q = nodes.elementAt(down.next);
 
       if (q.isLeaf)                                                             // Reached a leaf
