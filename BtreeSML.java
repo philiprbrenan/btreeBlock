@@ -180,8 +180,8 @@ abstract class BtreeSML extends Test                                            
       memory.ones(at, w);
      }
 
-    int leafBase()   {z(); return leaf  .at(node);}                             // Base of leaf stuck in memeory of this node
-    int branchBase() {z(); return branch.at(node);}                             // Base of branch stuck inmemory of this node
+    int leafBase()   {z(); return leaf  .at(node);}                             // Base of leaf stuck in memory
+    int branchBase() {z(); return branch.at(node);}                             // Base of branch stuck in memory
 
     int leafSize()   {z(); final int b = leafBase();   return Leaf  .size(b);}  // Number of children in body of leaf
     int branchSize() {z(); final int b = branchBase(); return Branch.size(b)-1;}// Number of children in body of branch
@@ -239,7 +239,7 @@ abstract class BtreeSML extends Test                                            
       int     index;                                                            // Index of first such key if found
       int      base;                                                            // Base of the leaf
 
-      FindEqualInLeaf() {}                                                      // Find the first key in the leaf that is equal to the search key
+      FindEqualInLeaf() {}                                                      // Create finder
 
       FindEqualInLeaf findEqualInLeaf(int Search)                               // Find the first key in the leaf that is equal to the search key
        {z(); assertLeaf();
@@ -658,7 +658,7 @@ abstract class BtreeSML extends Test                                            
       return true;
      }
 
-//D2 Merge                                                                      // Merge  two nodes together and free the resulting free node
+//D2 Merge                                                                      // Merge two nodes together and free the resulting free node
 
     boolean mergeRoot()                                                         // Merge into the root
      {z();
@@ -835,8 +835,8 @@ abstract class BtreeSML extends Test                                            
         freeNode(R.data);                                                       // Free the empty right node
        }
 
-      final StuckSML.ElementAt pkn =  Branch.elementAt1(p, index+1);            // One up from dividing point in parent
-      final StuckSML.ElementAt dkn =  Branch.elementAt2(p, index);              // Dividing point in parent
+      final StuckSML.ElementAt pkn = Branch.elementAt1(p, index+1);             // One up from dividing point in parent
+      final StuckSML.ElementAt dkn = Branch.elementAt2(p, index);               // Dividing point in parent
       Branch.setElementAt(p, pkn.key, dkn.data, index);                         // Install key of right sibling in this child
       Branch.removeElementAt1(p, index+1);                                      // Reduce parent on right
       return true;
