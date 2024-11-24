@@ -1146,8 +1146,8 @@ abstract class BtreeSML extends Test                                            
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
      {z(); if (p.isLeaf()) return;
-      z(); final int N = p.branchSize();                                        // Number of pairs
-      for (int j = 0; j < N; j++)                                               // Try merging each sibling pair
+      z();
+      for (int j = 0; j < p.branchSize(); j++)                                  // Try merging each sibling pair
        {z();
         p.mergeLeftSibling (j);
         p.mergeRightSibling(j);
