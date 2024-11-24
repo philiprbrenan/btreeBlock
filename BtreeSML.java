@@ -631,9 +631,9 @@ abstract class BtreeSML extends Test                                            
         z(); if (nl >= maxKeysPerLeaf()) return false;                          // Steal not possible because there is no where to put the steal
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
         z();
-        final int k = Leaf.firstElement1(r).key;
-        Leaf.push            (l, k, Leaf.firstElement1(r).data);                // Increase left
-        Branch.setElementAt  (p, k, L.data, index);                             // Swap key of parent
+        final StuckSML.FirstElement f = Leaf.firstElement1(r);                  // First element of right child
+        Leaf.push            (l, f.key, f.data);                                // Increase left
+        Branch.setElementAt  (p, f.key, L.data, index);                         // Swap key of parent
         Leaf.removeElementAt1(r, 0);                                            // Reduce right
        }
       else                                                                      // Children are branches
@@ -648,9 +648,11 @@ abstract class BtreeSML extends Test                                            
         z(); if (nl >= maxKeysPerBranch()) return false;                        // Steal not possible because there is no where to put the steal
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
         z();
-        Branch.setElementAt(l, L.key, Branch.lastElement1(l).data, nl);         // Left top becomes real
-        Branch.push(l, 0, Branch.firstElement1(r).data);                        // New top for left is ignored by search ,.. except last
-        Branch.setElementAt(p, Branch.firstElement1(r).key, L.data, index);     // Swap key of parent
+        final StuckSML.LastElement  le = Branch.lastElement1(l);                // Last element of left child
+        Branch.setElementAt(l, L.key, le.data, nl);                             // Left top becomes real
+        final StuckSML.FirstElement fe = Branch.firstElement1(r);               // First element of  right child
+        Branch.push(l, 0,      fe.data);                                        // New top for left is ignored by search ,.. except last
+        Branch.setElementAt(p, fe.key, L.data, index);                          // Swap key of parent
         Branch.removeElementAt1(r, 0);                                          // Reduce right
        }
       return true;
@@ -743,7 +745,8 @@ abstract class BtreeSML extends Test                                            
 
         if (nl + nr >= maxKeysPerLeaf()) return false;                          // Combined body would be too big
         z();
-        for (int i = 0; i < maxKeysPerLeaf() && Leaf.size(l) > 0; i++)          // Transfer left to right
+        final int N = Leaf.size(l);                                             // Number of entries to remove
+        for (int i = 0; i < N; i++)                                             // Transfer left to right
          {z(); final StuckSML.Pop q = Leaf.pop(l);
           Leaf.insertElementAt(r, q.key, q.data, 0);
          }
@@ -761,10 +764,12 @@ abstract class BtreeSML extends Test                                            
         if (nl + 1 + nr > maxKeysPerBranch()) return false;                     // Merge not possible because there is not enough room for the combined result
         z();
         final int t = Branch.elementAt1(p, index-1).key;                        // Top key
-        Branch.insertElementAt(r, t, Branch.lastElement1(l).data, 0);           // Left top to right
+        final StuckSML.LastElement le = Branch.lastElement1(l);                 // Last element of left child
+        Branch.insertElementAt(r, t, le.data, 0);                               // Left top to right
 
         Branch.pop(l);                                                          // Remove left top
-        for (int i = 0; i < maxKeysPerBranch() && Branch.size(l) > 0; i++)      // Transfer left to right
+        final int N = Branch.size(l);                                           // Number of entries to remove
+        for (int i = 0; i < N; i++)                                             // Transfer left to right
          {z();
           final StuckSML.Pop q = Branch.pop(l);
           Branch.insertElementAt(r, q.key, q.data, 0);
@@ -800,7 +805,8 @@ abstract class BtreeSML extends Test                                            
 
         if (nl + nr > maxKeysPerLeaf()) return false;                           // Combined body would be too big
         z();
-        for (int i = 0; i < maxKeysPerLeaf() && Leaf.size(r) > 0; i++)          // Transfer right to left
+        final int N = Leaf.size(r);                                             // Number of entries to remove
+        for (int i = 0; i < N; i++)                                             // Transfer right to left
          {z();
           final StuckSML.Shift q = Leaf.shift1(r);
           Leaf.push(l, q.key, q.data);
@@ -817,18 +823,21 @@ abstract class BtreeSML extends Test                                            
         final int  nr = rr.branchSize();
 
         if (nl + 1 + nr > maxKeysPerBranch()) return false;                     // Merge not possible because there is no where to put the steal
-        z(); final StuckSML.LastElement le = Branch.lastElement1(l);
-        Branch.setElementAt(l, Branch.elementAt1(p, index).key, le.data, nl);   // Re-key left top
+        z(); final StuckSML.LastElement le = Branch.lastElement1(l);            // Last element of left child
+        z(); final StuckSML.ElementAt   ea = Branch.elementAt1(p, index);       // Parent dividing element
+        Branch.setElementAt(l, ea.key, le.data, nl);                            // Re-key left top
 
-        for (int i = 0; i < maxKeysPerBranch() && Branch.size(r) > 0; i++)      // Transfer right to left
+        final int N = Branch.size(r);                                           // Number of entries to remove
+        for (int i = 0; i < N; i++)                                             // Transfer right to left
          {z(); final StuckSML.Shift f = Branch.shift1(r);
           Branch.push(l, f.key, f.data);
          }
         freeNode(R.data);                                                       // Free the empty right node
        }
 
-      final StuckSML.ElementAt pkn =  Branch.elementAt1(p, index+1);            // Key of right sibling
-      Branch.setElementAt(p, pkn.key, Branch.elementAt2(p, index).data, index); // Install key of right sibling in this child
+      final StuckSML.ElementAt pkn =  Branch.elementAt1(p, index+1);            // One up from dividing point in parent
+      final StuckSML.ElementAt dkn =  Branch.elementAt2(p, index);              // Dividing point in parent
+      Branch.setElementAt(p, pkn.key, dkn.data, index);                         // Install key of right sibling in this child
       Branch.removeElementAt1(p, index+1);                                      // Reduce parent on right
       return true;
      }
@@ -985,7 +994,8 @@ abstract class BtreeSML extends Test                                            
 
       if (found())                                                              // Found the key in the leaf so update it with the new data
        {z();
-        Leaf.setElementAt(leaf().leafBase(), Key, Data, index());
+        final int lb = leaf().leafBase();                                       // Base of leaf
+        Leaf.setElementAt(lb, Key, Data, index());
         success = true; inserted = false;
         return this;
        }
@@ -994,13 +1004,12 @@ abstract class BtreeSML extends Test                                            
        {z();
         final Node.FindFirstGreaterThanOrEqualInLeaf f =
           leaf().findFirstGreaterThanOrEqualInLeaf1(Key);
+        final int lb = leaf().leafBase();                                       // Base of leaf
         if (f.found)                                                            // Overwrite existing key
-         {z();
-          Leaf.insertElementAt(leaf().leafBase(), Key, Data, f.first);
+         {z(); Leaf.insertElementAt(lb, Key, Data, f.first);
          }
         else                                                                    // Insert into position
-         {z();
-          Leaf.push(leaf().leafBase(), Key, Data);
+         {z(); Leaf.push(lb, Key, Data);
          }
         success = true;
         return this;
@@ -1092,8 +1101,9 @@ abstract class BtreeSML extends Test                                            
     z(); if (!f.found()) return null;                                           // Inserted or updated successfully
     z(); final Node     l = f.leaf();                                           // The leaf that contains the key
     z(); final int      i = f.index();                                          // Position in the leaf of the key
-    z(); final StuckSML.ElementAt kd = Leaf.elementAt1(l.leafBase(), i);        // Key, data pairs in the leaf
-    z(); Leaf.removeElementAt1(l.leafBase(), i);                                // Remove the key, data pair from the leaf
+    z(); final int     lb = l.leafBase();                                       // Leaf base
+    z(); final StuckSML.ElementAt kd = Leaf.elementAt1(lb, i);                  // Key, data pairs in the leaf
+    z(); Leaf.removeElementAt1(lb, i);                                          // Remove the key, data pair from the leaf
     z(); return kd.data;
    }
 
@@ -1136,8 +1146,8 @@ abstract class BtreeSML extends Test                                            
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
      {z(); if (p.isLeaf()) return;
-      z();
-      for (int j = 0; j < p.branchSize(); j++)                                  // Try merging each sibling pair
+      z(); final int N = p.branchSize();                                        // Number of pairs
+      for (int j = 0; j < N; j++)                                               // Try merging each sibling pair
        {z();
         p.mergeLeftSibling (j);
         p.mergeRightSibling(j);
