@@ -130,11 +130,11 @@ abstract class StuckSML extends Test                                            
 
 //D1 Memory                                                                     // Actions on memory of stuck
 
-  int  getInt(Layout.Field field,            int base)            {z(); return memoryLayout().getInt(field, base);}
-  int  getInt(Layout.Field field,            int base, int index) {z(); return memoryLayout().getInt(field, base, index);}
+  int  getInt(Layout.Field field,            int base)            {z(); return memoryLayout().getInt(field,        base);}
+  int  getInt(Layout.Field field,            int base, int index) {z(); return memoryLayout().getInt(field,        base, index);}
 
-  void setInt(Layout.Field field, int value, int base)            {z(); memoryLayout().set(field, value, base);}
-  void setInt(Layout.Field field, int value, int base, int index) {z(); memoryLayout().set(field, value, base, index);}
+  void setInt(Layout.Field field, int value, int base)            {z();        memoryLayout().setInt(field, value, base);}
+  void setInt(Layout.Field field, int value, int base, int index) {z();        memoryLayout().setInt(field, value, base, index);}
 
   int  key     (int base, int Index)              {z(); return getInt(key,    base, Index);}
   int  data    (int base, int Index)              {z(); return getInt(data,   base, Index);}
