@@ -68,20 +68,38 @@ class MemoryLayout extends Test                                                 
     final int  delta;                                                           // Delta due to indices
     final int  at;                                                              // Location in memory
     final int  result;                                                          // The contents of memory at this location
+    At(int constant)                                                            // Constant
+     {z(); field = null; indices = null; width = base = delta = at = 0;
+      result = constant;
+     }
     At(Layout.Field Field, int Base, int...Indices)
      {z(); field = Field; indices = Indices; width = field.width; base = Base;
       delta  = field.locator.at(indices);
       at     = base + delta;
       result = memory.getInt(at, width);
      }
-    boolean sameSize(At b)
-     {z(); field.sameSize(b.field);
+    boolean sameSize(At b)                                                      // Check two fields are the same size
+     {if (field == null) return true;                                           // Constants match any size
+      z(); field.sameSize(b.field);
       z(); if (MemoryLayout.this != b.ml()) stop("Different memory layout");
       z(); return true;
      }
-    int   width()          {z(); return field.width();}                         // Width of the field in memory
-    int  getInt()          {z(); return result;}                                // The value in memory, at the indicated location, treated as an integer
-    void setInt(int value) {z(); memory.set(at, width, value);}                 // Set the value in memory at the indicated location, treated as an integer
+
+    int width()                                                                 // Width of the field in memory
+      {z();
+       if (field == null) stop("A constant does not have any specific width");
+       return field.width();
+      }
+
+    int  getInt() {z(); return result;}                                         // The value in memory, at the indicated location, treated as an integer or the value of the constant
+
+    void setInt(int value)                                                      // Set the value in memory at the indicated location, treated as an integer
+     {z();
+      if (field == null)
+       {stop("Constants cannot be reset constants after their creation");
+       }
+      memory.set(at, width, value);
+     }
 
     public String toString()                                                    // Print field name(indices)=value or name=value if there are no indices
      {final StringBuilder s = new StringBuilder();
@@ -102,6 +120,16 @@ class MemoryLayout extends Test                                                 
 
   At at(Layout.Field Field, int Base, int...Indices)
    {return new At(Field, Base, Indices);
+   }
+
+  class Constant extends At                                                     // A constant integer
+   {Constant(int constant)
+     {super(constant);
+     }
+   }
+
+  Constant constant(int constant)
+   {return new Constant(constant);
    }
 
 //D2 Composite                                                                  // Composite memory access
@@ -145,32 +173,38 @@ class MemoryLayout extends Test                                                 
    }
 
   boolean equal(At a, At b)                                                     // Whether  a == b
-   {z(); a.sameSize(b);
+   {z(); if (a.field == null || b.field == null) {z(); return a.result == b.result;} // Constant comparison
+    z(); a.sameSize(b);
     z(); return memory.equals(a.at, b.at, a.width);
    }
 
   boolean notEqual(At a, At b)                                                  // Whether a != b
-   {z(); a.sameSize(b);
+   {z(); if (a.field == null || b.field == null) {z(); return a.result != b.result;} // Constant comparison
+    z(); a.sameSize(b);
     return memory.notEquals(a.at, b.at, a.width);
    }
 
   boolean lessThan(At a, At b)                                                  // Whether a < b
-   {z(); a.sameSize(b);
+   {z(); if (a.field == null || b.field == null) {z(); return a.result <  b.result;} // Constant comparison
+    z(); a.sameSize(b);
     return memory.lessThan(a.at, b.at, a.width);
    }
 
   boolean lessThanOrEqual(At a, At b)                                           // Whether a <= b
-   {z(); a.sameSize(b);
+   {z(); if (a.field == null || b.field == null) {z(); return a.result <= b.result;} // Constant comparison
+    z(); a.sameSize(b);
     return memory.lessThanOrEqual(a.at, b.at, a.width);
    }
 
   boolean greaterThan(At a, At b)                                               // Whether a > b
-   {z(); a.sameSize(b);
+   {z(); if (a.field == null || b.field == null) {z(); return a.result > b.result;} // Constant comparison
+    z(); a.sameSize(b);
     return memory.greaterThan(a.at, b.at, a.width);
    }
 
   boolean greaterThanOrEqual(At a, At b)                                        // Whether a >= b
-   {z(); a.sameSize(b);
+   {z(); if (a.field == null || b.field == null) {z(); return a.result >= b.result;} // Constant comparison
+    z(); a.sameSize(b);
     return memory.greaterThanOrEqual(a.at, b.at, a.width);
    }
 
@@ -502,6 +536,28 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(m.at(b, 0).getInt(), 2);
    }
 
+  static void test_boolean_constant()
+   {Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    l.compile();
+
+    MemoryLayout     m = new MemoryLayout(l);
+    m.at(a, 0).setInt(1);
+
+    MemoryLayout.At A = m.at(a, 0),
+     c0 = m.constant(0), c1 = m.constant(1), c2 = m.constant(2);
+    final boolean T = true, F = false;
+
+    ok(m.equal   (A, c0), F); ok(m.equal   (A, c1), T); ok(m.equal   (A, c2), F);
+    ok(m.notEqual(A, c0), T); ok(m.notEqual(A, c1), F); ok(m.notEqual(A, c2), T);
+
+    ok(m.lessThan       (A, c0), F); ok(m.lessThan       (A, c1), F); ok(m.lessThan       (A, c2), T);
+    ok(m.lessThanOrEqual(A, c0), F); ok(m.lessThanOrEqual(A, c1), T); ok(m.lessThanOrEqual(A, c2), T);
+
+    ok(m.greaterThan       (A, c0), T); ok(m.greaterThan       (A, c1), F); ok(m.greaterThan       (A, c2), F);
+    ok(m.greaterThanOrEqual(A, c0), T); ok(m.greaterThanOrEqual(A, c1), T); ok(m.greaterThanOrEqual(A, c2), F);
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_get_set();
     test_boolean();
@@ -513,7 +569,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_boolean_constant();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
