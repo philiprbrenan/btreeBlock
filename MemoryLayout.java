@@ -25,6 +25,162 @@ class MemoryLayout extends Test                                                 
     base   = Base;
    }
 
+//D1 Control                                                                    // Testing, control and integrity
+
+  void stop()              {Test.stop(toString());}                             // Stop after printing
+
+  void ok(String Lines)                                                         // Check that specified lines are present in the memory layout
+   {final String  m = toString();                                               // Memory as string
+    final String[]L = Lines.split("\\n");                                       // Lines of expected
+    int p = 0;
+    for(int i = 0; i < L.length; ++i)                                           // Each expected
+     {final String l = L[i];
+      final int    q = m.indexOf(l, p);                                         // Check specified lines are present
+      if (q == -1)                                                              // Line missing
+       {err("Layout does not contain line:", i+1, "\n"+l+"\n");
+        ++Layout.testsFailed;
+        return;
+       }
+      p = q;
+     }
+    ++Layout.testsPassed;                                                       // Lines found
+   }
+
+//D1 Get and Set                                                                // Get and set values in memory
+
+  int  getInt(Layout.Field field, int Base,            int...indices)           // Get a value from memory
+   {z(); return new At(field, Base, indices).result;
+   }
+
+  void setInt(Layout.Field field, int value, int Base, int...indices)           // Set a value in memory
+   {z();
+    final At a = new At(field, Base, indices);
+    memory.set(a.at, a.width, value);
+   }
+
+//D1 Components                                                                 // Locate a variable in memory via its indices
+
+  class At
+   {final Layout.Field field;                                                   // Field description in layout
+    final int[]indices;                                                         // Indices to be applied to field
+    final int  width;                                                           // Width of element in memory
+    final int  base;                                                            // Base address of memory
+    final int  delta;                                                           // Delta due to indices
+    final int  at;                                                              // Location in memory
+    final int  result;                                                          // The contents of memory at this location
+    At(Layout.Field Field, int Base, int...Indices)
+     {z(); field = Field; indices = Indices; width = field.width; base = Base;
+      delta  = field.locator.at(indices);
+      at     = base + delta;
+      result = memory.getInt(at, width);
+     }
+    boolean sameSize(At b)
+     {z(); field.sameSize(b.field);
+      z(); if (MemoryLayout.this != b.ml()) stop("Different memory layout");
+      z(); return true;
+     }
+    int   width()          {z(); return field.width();}                         // Width of the field in memory
+    int  getInt()          {z(); return result;}                                // The value in memory, at the indicated location, treated as an integer
+    void setInt(int value) {z(); memory.set(at, width, value);}                 // Set the value in memory at the indicated location, treated as an integer
+
+    public String toString()                                                    // Print field name(indices)=value or name=value if there are no indices
+     {final StringBuilder s = new StringBuilder();
+      s.append(field.name);
+      if (indices.length > 0)
+       {s.append("[");
+        for (int i = 0, N = indices.length; i < N; i++)
+         {s.append(indices[i]);
+          if (i < N-1) s.append(",");
+         }
+        s.append("]("+base+"+"+delta+")"+at);
+       }
+      s.append("="+result);
+      return s.toString();
+     }
+    MemoryLayout ml() {return MemoryLayout.this;}
+   }
+
+  At at(Layout.Field Field, int Base, int...Indices)
+   {return new At(Field, Base, Indices);
+   }
+
+//D2 Composite                                                                  // Composite memory access
+
+  void zero(At a)                                                               // Zero some memory
+   {z(); memory.zero(a.at, a.width);
+   }
+
+  void ones(At a)                                                               // Ones some memory
+   {z(); memory.ones(a.at, a.width);
+   }
+
+  void copy(At target, At source)                                               // Copy the specified number of bits from source to target low bits first
+   {z(); target.sameSize(source);
+    memory.copy(target.at, source.at, source.width);
+   }
+
+  void copyHigh(At target, At source)                                           // Copy the specified number of bits from source to target high bits first
+   {z(); target.sameSize(source);
+    memory.copyHigh(target.at, source.at, source.width);
+   }
+
+  void move(At target, At source, At buffer)                                    // Copy the specified number of bits from source to target via a buffer to allow the operation to proceed in bit parallel
+   {z(); target.sameSize(source); target.sameSize(buffer);
+    memory.copy(buffer.at, source.at, source.width);
+    memory.copy(target.at, buffer.at, source.width);
+   }
+
+  void invert(At a)                                                             // Invert the specified bits
+   {z(); memory.invert(a.result, a.width());
+   }
+
+//D1 Boolean                                                                    // Boolean operations on fields held in memeory
+
+  boolean isAllZero(At a)                                                       // Check that the specified memory is all zeros
+   {z(); return memory.isAllZero(a.at, a.width);
+   }
+
+  boolean isAllOnes(At a)                                                       // Check that  the specified memory is all ones
+   {z(); return memory.isAllOnes(a.at, a.width);
+   }
+
+  boolean equal(At a, At b)                                                     // Whether  a == b
+   {z(); a.sameSize(b);
+    z(); return memory.equals(a.at, b.at, a.width);
+   }
+
+  boolean notEqual(At a, At b)                                                  // Whether a != b
+   {z(); a.sameSize(b);
+    return memory.notEquals(a.at, b.at, a.width);
+   }
+
+  boolean lessThan(At a, At b)                                                  // Whether a < b
+   {z(); a.sameSize(b);
+    return memory.lessThan(a.at, b.at, a.width);
+   }
+
+  boolean lessThanOrEqual(At a, At b)                                           // Whether a <= b
+   {z(); a.sameSize(b);
+    return memory.lessThanOrEqual(a.at, b.at, a.width);
+   }
+
+  boolean greaterThan(At a, At b)                                               // Whether a > b
+   {z(); a.sameSize(b);
+    return memory.greaterThan(a.at, b.at, a.width);
+   }
+
+  boolean greaterThanOrEqual(At a, At b)                                        // Whether a >= b
+   {z(); a.sameSize(b);
+    return memory.greaterThanOrEqual(a.at, b.at, a.width);
+   }
+
+//D1 Arithmetic                                                                 // Arithmetic on integers
+
+//D2 Binary                                                                     // Arithmetic on binary integers
+
+  void inc(At a) {z(); a.setInt(a.getInt()+1);}                                 // Increment a variable treated as an signed binary integer with wrap around on overflow
+  void dec(At a) {z(); a.setInt(a.getInt()-1);}                                 // Decrement a variable treated as an signed binary integer with wrap around on underflow
+
 //D1 Print                                                                      // Print a memory layout
 
   class PrintPosition                                                           // Position in print
@@ -104,148 +260,6 @@ class MemoryLayout extends Test                                                 
        }
       default -> stop("Unknown field type:", field);
      };
-   }
-
-//D1 Control                                                                    // Testing, control and integrity
-
-  void stop()              {Test.stop(toString());}                             // Stop after printing
-
-  void ok(String Lines)                                                         // Check that specified lines are present in the memory layout
-   {final String  m = toString();                                               // Memory as string
-    final String[]L = Lines.split("\\n");                                       // Lines of expected
-    int p = 0;
-    for(int i = 0; i < L.length; ++i)                                           // Each expected
-     {final String l = L[i];
-      final int    q = m.indexOf(l, p);                                         // Check specified lines are present
-      if (q == -1)                                                              // Line missing
-       {err("Layout does not contain line:", i+1, "\n"+l+"\n");
-        ++Layout.testsFailed;
-        return;
-       }
-      p = q;
-     }
-    ++Layout.testsPassed;                                                       // Lines found
-   }
-
-//D1 Get and Set                                                                // Get and set values in memory
-
-  int  getInt(Layout.Field field, int Base,            int...indices)           // Get a value from memory
-   {z(); return new At(field, Base, indices).result;
-   }
-
-  void setInt(Layout.Field field, int value, int Base, int...indices)           // Set a value in memory
-   {z();
-    final At a = new At(field, Base, indices);
-    memory.set(a.at, a.width, value);
-   }
-
-//D1 Components                                                                 // Locate a variable in memory via its indices
-
-  class At
-   {final Layout.Field field;
-    final int[]indices;
-    final int  width;
-    final int  base;
-    final int  delta;
-    final int  at;
-    final int  result;
-    At(Layout.Field Field, int Base, int...Indices)
-     {z(); field = Field; indices = Indices; width = field.width; base = Base;
-      delta  = field.locator.at(indices);
-      at     = base + delta;
-      result = memory.getInt(at, width);
-     }
-    int     width()        {z(); return field.width();}
-    boolean sameSize(At b)
-     {z(); field.sameSize(b.field);
-      z(); if (MemoryLayout.this != b.ml()) stop("Different memory layout");
-      z(); return true;
-     }
-
-    public String toString()                                                    // Print field name(indices)=value or name=value if there are no indices
-     {final StringBuilder s = new StringBuilder();
-      s.append(field.name);
-      if (indices.length > 0)
-       {s.append("[");
-        for (int i = 0, N = indices.length; i < N; i++)
-         {s.append(indices[i]);
-          if (i < N-1) s.append(",");
-         }
-        s.append("]("+base+"+"+delta+")"+at);
-       }
-      s.append("="+result);
-      return s.toString();
-     }
-    MemoryLayout ml() {return MemoryLayout.this;}
-   }
-
-  At at(Layout.Field Field, int Base, int...Indices)
-   {return new At(Field, Base, Indices);
-   }
-
-
-//D2 Composite                                                                  // Composite memory access
-
-  void zero(At a)                                                               // Zero some memory
-   {z(); memory.zero(a.at, a.width);
-   }
-
-  void ones(At a)                                                               // Ones some memory
-   {z(); memory.ones(a.at, a.width);
-   }
-
-  void copy(At target, At source)                                               // Copy the specified number of bits from source to target low bits first
-   {z(); target.sameSize(source);
-    memory.copy(target.at, source.at, source.width);
-   }
-
-  void copyHigh(At target, At source)                                                      // Copy the specified number of bits from source to target high bits first
-   {z(); target.sameSize(source);
-    memory.copyHigh(target.at, source.at, source.width);
-   }
-
-  void invert(At a)                                                             // Invert the specified bits
-   {z(); memory.invert(a.result, a.width());
-   }
-
-//D1 Boolean                                                                    // Boolean operations on fields held in memeory
-
-  boolean isAllZero(At a)                                                       // Check that the specified memory is all zeros
-   {z(); return memory.isAllZero(a.at, a.width);
-   }
-
-  boolean isAllOnes(At a)                                                       // Check that  the specified memory is all ones
-   {z(); return memory.isAllOnes(a.at, a.width);
-   }
-
-  boolean equal(At a, At b)                                                     // Whether  a == b
-   {z(); a.sameSize(b);
-    z(); return memory.equals(a.at, b.at, a.width);
-   }
-
-  boolean notEqual(At a, At b)                                                  // Whether a != b
-   {z(); a.sameSize(b);
-    return memory.notEquals(a.at, b.at, a.width);
-   }
-
-  boolean lessThan(At a, At b)                                                  // Whether a < b
-   {z(); a.sameSize(b);
-    return memory.lessThan(a.at, b.at, a.width);
-   }
-
-  boolean lessThanOrEqual(At a, At b)                                           // Whether a <= b
-   {z(); a.sameSize(b);
-    return memory.lessThanOrEqual(a.at, b.at, a.width);
-   }
-
-  boolean greaterThan(At a, At b)                                               // Whether a > b
-   {z(); a.sameSize(b);
-    return memory.greaterThan(a.at, b.at, a.width);
-   }
-
-  boolean greaterThanOrEqual(At a, At b)                                        // Whether a >= b
-   {z(); a.sameSize(b);
-    return memory.greaterThanOrEqual(a.at, b.at, a.width);
    }
 
 //D0 Tests                                                                      // Testing
@@ -423,7 +437,70 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
+  static void test_move()
+   {Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Variable  c = l.variable ("c", 4);
+    Layout.Variable  d = l.variable ("d", 4);
+    Layout.Structure s = l.structure("s", a, b, c, d);
+    l.compile();
 
+    MemoryLayout     m = new MemoryLayout(l);
+    m.memory.alternating(4);
+    //stop(m);
+    m.ok("""
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        16                                      s
+   2 V        0         4                                  0     a
+   3 V        4         4                                 15     b
+   4 V        8         4                                  0     c
+   5 V       12         4                                 15     d
+""");
+    m.move(m.at(d, 0), m.at(a, 0),  m.at(b, 0));
+
+    //stop(m);
+    m.ok("""
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        16                                      s
+   2 V        0         4                                  0     a
+   3 V        4         4                                  0     b
+   4 V        8         4                                  0     c
+   5 V       12         4                                  0     d
+""");
+   }
+
+  static void test_set_inc_dec_get()
+   {Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Structure s = l.structure("s", a, b);
+    l.compile();
+
+    MemoryLayout     m = new MemoryLayout(l);
+    m.at(a, 0).setInt(1);
+    m.at(b, 0).setInt(3);
+    //stop(m);
+    m.ok("""
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0         8                                      s
+   2 V        0         4                                  1     a
+   3 V        4         4                                  3     b
+""");
+    m.inc(m.new At(a, 0));
+    m.dec(m.new At(b, 0));
+
+    //stop(m);
+    m.ok("""
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0         8                                      s
+   2 V        0         4                                  2     a
+   3 V        4         4                                  2     b
+""");
+
+    ok(m.at(a, 0).getInt(), 2);
+    ok(m.at(b, 0).getInt(), 2);
+   }
 
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_get_set();
@@ -431,6 +508,8 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_copy();
     test_base();
     test_based_array();
+    test_move();
+    test_set_inc_dec_get();
    }
 
   static void newTests()                                                        // Tests being worked on
