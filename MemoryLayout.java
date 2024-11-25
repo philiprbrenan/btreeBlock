@@ -129,17 +129,17 @@ class MemoryLayout extends Test                                                 
 
 //D1 Get and Set                                                                // Get and set values in memory
 
-  int getInt(Layout.Field field, int Base,            int...indices)            // Get a value from memory
+  int  getInt(Layout.Field field, int Base,            int...indices)           // Get a value from memory
    {z(); return new At(field, Base, indices).result;
    }
 
-  void set  (Layout.Field field, int value, int Base, int...indices)            // Set a value in memory
+  void setInt(Layout.Field field, int value, int Base, int...indices)           // Set a value in memory
    {z();
     final At a = new At(field, Base, indices);
     memory.set(a.at, a.width, value);
    }
 
-//D1 Components                                                                 // A branch or leaf in the tree
+//D1 Components                                                                 // Locate a variable in memory via its indices
 
   class At
    {final Layout.Field field;
@@ -275,33 +275,33 @@ class MemoryLayout extends Test                                                 
         MemoryLayout m = t.M;
               Layout l = m.layout;
    ok(m.at(t.c,     0, 0, 0, 0), "c[0,0,0](0+12)12=15");
-   m.set  (t.c, 11, 0, 0, 0, 0);
+   m.setInt(t.c, 11, 0, 0, 0, 0);
    ok(m.at(t.c,     0, 0, 0, 0), "c[0,0,0](0+12)12=11");
 
    ok(m.at(t.c,     0, 0, 0, 1), "c[0,0,1](0+24)24=0");
-   m.set  (t.c, 11, 0, 0, 0, 1);
+   m.setInt(t.c, 11, 0, 0, 0, 1);
    ok(m.at(t.c,     0, 0, 0, 1), "c[0,0,1](0+24)24=11");
 
    ok(m.at(t.a,     0, 0, 2, 2), "a[0,2,2](0+116)116=15");
-   m.set  (t.a,  5, 0, 0, 2, 2);
+   m.setInt(t.a,  5, 0, 0, 2, 2);
    ok(m.at(t.a,     0, 0, 2, 2), "a[0,2,2](0+116)116=5");
 
    ok(m.at(t.b,     0, 1, 2, 2), "b[1,2,2](0+252)252=15");
-   m.set  (t.b,  7, 0, 1, 2, 2);
+   m.setInt(t.b,  7, 0, 1, 2, 2);
    ok(m.at(t.b,     0, 1, 2, 2), "b[1,2,2](0+252)252=7");
 
     ok(m.at(t.e,     0, 1, 2), "e[1,2](0+260)260=15");
-    m.set  (t.e, 11, 0, 1, 2);
+    m.setInt(t.e, 11, 0, 1, 2);
     ok(m.at(t.e,     0, 1, 2), "e[1,2](0+260)260=11");
    }
 
   static void test_boolean()
    {TestMemoryLayout t = new TestMemoryLayout();
         MemoryLayout m = t.M;
-    m.set  (t.a, 1, 0, 0, 1, 1);
-    m.set  (t.a, 2, 0, 0, 1, 2);
-    m.set  (t.a, 1, 0, 0, 2, 1);
-    m.set  (t.a, 2, 0, 0, 2, 2);
+    m.setInt(t.a, 1, 0, 0, 1, 1);
+    m.setInt(t.a, 2, 0, 0, 1, 2);
+    m.setInt(t.a, 1, 0, 0, 2, 1);
+    m.setInt(t.a, 2, 0, 0, 2, 2);
 
     ok( m.equal   (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 2, 1)));
     ok(!m.equal   (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 1, 2)));
@@ -324,9 +324,9 @@ class MemoryLayout extends Test                                                 
   static void test_copy()
    {TestMemoryLayout t = new TestMemoryLayout();
         MemoryLayout m = t.M;
-    m.set  (t.a, 1, 0, 0, 0, 0);
-    m.set  (t.a, 2, 0, 0, 0, 1);
-    m.set  (t.a, 3, 0, 0, 0, 2);
+    m.setInt(t.a, 1, 0, 0, 0, 0);
+    m.setInt(t.a, 2, 0, 0, 0, 1);
+    m.setInt(t.a, 3, 0, 0, 0, 2);
 
     ok(m.at(t.a, 0, 0, 0, 0), "a[0,0,0](0+4)4=1");
     ok(m.at(t.a, 0, 0, 0, 1), "a[0,0,1](0+16)16=2");
@@ -362,10 +362,10 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
     ok(m.getInt(a, 0),  0);
     ok(m.getInt(a, 4), 15);
-    m.set(a,  9,  0);
-    m.set(a, 10,  4);
-    m.set(b, 11,  4);
-    m.set(a, 12, 12);
+    m.setInt(a,  9,  0);
+    m.setInt(a, 10,  4);
+    m.setInt(b, 11,  4);
+    m.setInt(a, 12, 12);
 
     //stop(m);
     m.ok("""
@@ -401,10 +401,10 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
     ok(m.getInt(a, 0, 0), 15);
     ok(m.getInt(a, 4, 0),  0);
-    m.set(a,  9,  0, 0);
-    m.set(a, 10,  4, 0);
-    m.set(a, 11,  8, 0);
-    m.set(a, 12, 12, 0);
+    m.setInt(a,  9,  0, 0);
+    m.setInt(a, 10,  4, 0);
+    m.setInt(a, 11,  8, 0);
+    m.setInt(a, 12, 12, 0);
     ok(m.getInt(a, 0, 0),  9);
     ok(m.getInt(a, 4, 0), 10);
     ok(m.getInt(a, 4, 1), 11);
