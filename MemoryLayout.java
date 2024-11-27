@@ -62,35 +62,51 @@ class MemoryLayout extends Test                                                 
 
   class At
    {final Layout.Field field;                                                   // Field description in layout
-    final int[]indices;                                                         // Indices to be applied to field
+    enum Type {constant, direct, indirect};                                     // Type of memory reference. Constant a known constant value. Direct: a field with indioces known at compile time. Indirect: a field whose indices are other fields whose indices are known at compile time.
+    final Type type;                                                            // Type of memory reference
+    final int[]indices;                                                         // Known indices to be applied directly to locate the field in memeory
+    final Layout.Field[]indirects;                                              // Fields that do not need to be indexed whose values containg the indices to be applied to locate the field in memeory
     final int  width;                                                           // Width of element in memory
     final int  base;                                                            // Base address of memory
-    final int  delta;                                                           // Delta due to indices
-    final int  at;                                                              // Location in memory
-    final int  result;                                                          // The contents of memory at this location
+    int  delta;                                                                 // Delta due to indices
+    int  at;                                                                    // Location in memory
+    int  result;                                                                // The contents of memory at this location
     At(int constant)                                                            // Constant
      {z(); field = null; indices = null; width = base = delta = at = 0;
-      result = constant;
+      indirects = null;
+      type = Type.constant; result = constant;
      }
+
+    void locateDirectAddress()                                                  // Locate a direct address and its content
+     {delta  = field.locator.at(indices);
+      at     = base + delta;
+      result = memory.getInt(at, width);
+     }
+
+    void locateInDirectAddress()                                                // Locate an indirect address and its content
+     {for (int i = 0; i < indirects.length; i++)
+       {indices[i] = MemoryLayout.this.getInt(indirects[i], 0);
+       }
+      locateDirectAddress();                                                    // Loacate the address directly now that its indices are known
+     }
+
+    At(Layout.Field Field)                                                      // No indices or base
+     {z(); field = Field; indices = new int[0]; width = field.width; base = 0;
+      type = Type.direct; indirects = null;
+      locateDirectAddress();                                                    // The indices are constant so the address will not change over time
+     }
+
     At(Layout.Field Field, int Base, int...Indices)                             // Constant indices
      {z(); field = Field; indices = Indices; width = field.width; base = Base;
-      delta  = field.locator.at(indices);
-      at     = base + delta;
-      result = memory.getInt(at, width);
+      type = Type.direct; indirects = null;
+      locateDirectAddress();                                                    // The indices are constant so the address will not change over time
      }
-    At(Layout.Field Field, Layout.Field Base, Layout.Field...Indices)           // Variable base and indices
-     {z(); field = Field; width = field.width;
-      base = MemoryLayout.this.getInt(Base, 0);
+    At(Layout.Field Field, int Base, Layout.Field...Indirects)                  // Variable indices
+     {z(); field = Field; width = field.width; base = Base;
+      type = Type.indirect; indirects = Indirects;
+      indices = new int[Indirects.length];
+      }
 
-      indices = new int[Indices.length];
-      for (int i = 0; i < Indices.length; i++)
-       {indices[i] = MemoryLayout.this.getInt(Indices[i], 0);
-       }
-
-      delta  = field.locator.at(indices);
-      at     = base + delta;
-      result = memory.getInt(at, width);
-     }
     boolean sameSize(At b)                                                      // Check two fields are the same size
      {if (field == null) return true;                                           // Constants match any size
       z(); field.sameSize(b.field);
@@ -99,21 +115,26 @@ class MemoryLayout extends Test                                                 
      }
 
     int width()                                                                 // Width of the field in memory
-      {z();
-       if (field == null) stop("A constant does not have any specific width");
-       return field.width();
-      }
-
-    int  getOff() {z(); return at;}                                             // The address of the field
-    int  getInt() {z(); return result;}                                         // The value in memory, at the indicated location, treated as an integer or the value of the constant
-
-    void setInt(int value)                                                      // Set the value in memory at the indicated location, treated as an integer
-     {z();
-      if (field == null)
-       {stop("Constants cannot be reset constants after their creation");
-       }
-      memory.set(at, width, value);
+     {z(); if (type == Type.constant) stop("A constant does not have any specific width");
+      z(); return field.width();
      }
+
+    int  getOff()                                                               // The address of the field
+     {z();
+      switch(type)
+       {case constant -> {return 0;}                                            // Constants can have any address
+        case direct   -> {return at;}                                           // Precomputed address
+        case indirect ->
+         {locateInDirectAddress();                                              // Evaluate indices - possible because the indices themselves have no indices, else we would be asking "Qui indexe ipso indexes"?
+          return at;
+         }
+        default -> {stop("Unknown addressing mode:", type); return 0;}
+       }
+     }
+
+    int  getInt() {z(); getOff(); return result;}                               // The value in memory, at the indicated location, treated as an integer or the value of the constant
+
+    void setInt(int value)  {z(); getOff(); memory.set(at, width, value);}      // Set the value in memory at the indicated location, treated as an integer
 
     public String toString()                                                    // Print field name(indices)=value or name=value if there are no indices
      {final StringBuilder s = new StringBuilder();
@@ -132,11 +153,15 @@ class MemoryLayout extends Test                                                 
     MemoryLayout ml() {return MemoryLayout.this;}
    }
 
-  At at(Layout.Field Field, int Base, int...Indices)
+  At at(Layout.Field Field)                                                     // A field without indices or base addressing
+   {return new At(Field);
+   }
+
+  At at(Layout.Field Field, int Base, int...Indices)                            // A field with base and constant indices
    {return new At(Field, Base, Indices);
    }
 
-  At at(Layout.Field Field, Layout.Field Base, Layout.Field ...Indices)
+  At at(Layout.Field Field, int Base, Layout.Field ...Indices)                  // A field with base and variable indices, each variable index being a field with no base and no indices
    {return new At(Field, Base, Indices);
    }
 
@@ -509,7 +534,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    4 V        8         4                                  0     c
    5 V       12         4                                 15     d
 """);
-    m.move(m.at(d, 0), m.at(a, 0),  m.at(b, 0));
+    m.move(m.at(d), m.at(a),  m.at(b));
 
     //stop(m);
     m.ok("""
@@ -530,8 +555,8 @@ Line T       At      Wide       Size    Indices        Value   Name
     l.compile();
 
     MemoryLayout     m = new MemoryLayout(l);
-    m.at(a, 0).setInt(1);
-    m.at(b, 0).setInt(3);
+    m.at(a).setInt(1);
+    m.at(b).setInt(3);
     //stop(m);
     m.ok("""
 Line T       At      Wide       Size    Indices        Value   Name
@@ -539,8 +564,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    2 V        0         4                                  1     a
    3 V        4         4                                  3     b
 """);
-    m.inc(m.new At(a, 0));
-    m.dec(m.new At(b, 0));
+    m.inc(m.new At(a));
+    m.dec(m.new At(b));
 
     //stop(m);
     m.ok("""
@@ -550,8 +575,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    3 V        4         4                                  2     b
 """);
 
-    ok(m.at(a, 0).getInt(), 2);
-    ok(m.at(b, 0).getInt(), 2);
+    ok(m.at(a).getInt(), 2);
+    ok(m.at(b).getInt(), 2);
    }
 
   static void test_boolean_constant()
@@ -560,9 +585,9 @@ Line T       At      Wide       Size    Indices        Value   Name
     l.compile();
 
     MemoryLayout     m = new MemoryLayout(l);
-    m.at(a, 0).setInt(1);
+    m.at(a).setInt(1);
 
-    MemoryLayout.At A = m.at(a, 0),
+    MemoryLayout.At A = m.at(a),
      c0 = m.constant(0), c1 = m.constant(1), c2 = m.constant(2);
     final boolean T = true, F = false;
 
@@ -587,9 +612,9 @@ Line T       At      Wide       Size    Indices        Value   Name
     l.compile();
 
     MemoryLayout     m = new MemoryLayout(l);
-    m.at(i, 0).setInt(1);
-    m.at(j, 0).setInt(2);
-    m.at(a, z, j).setInt(m.at(i, 0).getInt());
+    m.at(i).setInt(1);
+    m.at(j).setInt(2);
+    m.at(a, 0, j).setInt(m.at(i).getInt());
     ok(""+m, """
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        28                                      S
@@ -602,7 +627,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    8 V       20         4               2                  1       a
    9 V       24         4               3                  0       a
 """);
-    ok(m.at(a, z, j).getOff(), 20);
+    ok(m.at(a, 0, j).getOff(), 20);
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
