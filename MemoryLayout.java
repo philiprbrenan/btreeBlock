@@ -72,8 +72,21 @@ class MemoryLayout extends Test                                                 
      {z(); field = null; indices = null; width = base = delta = at = 0;
       result = constant;
      }
-    At(Layout.Field Field, int Base, int...Indices)
+    At(Layout.Field Field, int Base, int...Indices)                             // Constant indices
      {z(); field = Field; indices = Indices; width = field.width; base = Base;
+      delta  = field.locator.at(indices);
+      at     = base + delta;
+      result = memory.getInt(at, width);
+     }
+    At(Layout.Field Field, Layout.Field Base, Layout.Field...Indices)           // Variable base and indices
+     {z(); field = Field; width = field.width;
+      base = MemoryLayout.this.getInt(Base, 0);
+
+      indices = new int[Indices.length];
+      for (int i = 0; i < Indices.length; i++)
+       {indices[i] = MemoryLayout.this.getInt(Indices[i], 0);
+       }
+
       delta  = field.locator.at(indices);
       at     = base + delta;
       result = memory.getInt(at, width);
@@ -91,6 +104,7 @@ class MemoryLayout extends Test                                                 
        return field.width();
       }
 
+    int  getOff() {z(); return at;}                                             // The address of the field
     int  getInt() {z(); return result;}                                         // The value in memory, at the indicated location, treated as an integer or the value of the constant
 
     void setInt(int value)                                                      // Set the value in memory at the indicated location, treated as an integer
@@ -119,6 +133,10 @@ class MemoryLayout extends Test                                                 
    }
 
   At at(Layout.Field Field, int Base, int...Indices)
+   {return new At(Field, Base, Indices);
+   }
+
+  At at(Layout.Field Field, Layout.Field Base, Layout.Field ...Indices)
    {return new At(Field, Base, Indices);
    }
 
@@ -558,6 +576,35 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(m.greaterThanOrEqual(A, c0), T); ok(m.greaterThanOrEqual(A, c1), T); ok(m.greaterThanOrEqual(A, c2), F);
    }
 
+  static void test_addressing()
+   {Layout           l = Layout.layout();
+    Layout.Variable  z = l.variable ("z", 4);
+    Layout.Variable  i = l.variable ("i", 4);
+    Layout.Variable  j = l.variable ("j", 4);
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Array     A = l.array    ("A", a, 4);
+    Layout.Structure S = l.structure("S", z, i, j, A);
+    l.compile();
+
+    MemoryLayout     m = new MemoryLayout(l);
+    m.at(i, 0).setInt(1);
+    m.at(j, 0).setInt(2);
+    m.at(a, z, j).setInt(m.at(i, 0).getInt());
+    ok(""+m, """
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        28                                      S
+   2 V        0         4                                  0     z
+   3 V        4         4                                  1     i
+   4 V        8         4                                  2     j
+   5 A       12        16          4                             A
+   6 V       12         4               0                  0       a
+   7 V       16         4               1                  0       a
+   8 V       20         4               2                  1       a
+   9 V       24         4               3                  0       a
+""");
+    ok(m.at(a, z, j).getOff(), 20);
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_get_set();
     test_boolean();
@@ -566,11 +613,12 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_based_array();
     test_move();
     test_set_inc_dec_get();
+    test_boolean_constant();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_boolean_constant();
+   {oldTests();
+    test_addressing();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
