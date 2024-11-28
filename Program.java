@@ -7,12 +7,12 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 class Program extends Test                                                      // A progam that manipulates a memory layout via si instructions
- {final Stack<I>       code = new Stack<>();                                    // Code of the program
-  final int         maxTime = 1000;                                             // Code of the program
-  int                  step = 0;                                                // Execution step
-  int                  time = 0;                                                // Execution time
-  boolean       ifCondition = true;                                             // Execute the then part of the next if statement if true, else the else part if present
-  Stack<Label>       labels = new Stack<>();                                    // Labels for some instructions
+ {final Stack<I> code = new Stack<>();                                          // Code of the program
+  final int   maxTime = 1000;                                                   // Code of the program
+  int            step = 0;                                                      // Execution step
+  int            time = 0;                                                      // Execution time
+  boolean ifCondition = true;                                                   // Execute the then part of the next if statement if true, else the else part if present
+  Stack<Label> labels = new Stack<>();                                          // Labels for some instructions
 
   class Label                                                                   // Label definition
    {int instruction;                                                            // The instruction to which this labels applies
@@ -78,6 +78,8 @@ class Program extends Test                                                      
     p.new I() {void a() {if (p.time < time) p.Goto(start);}};
     p.execute();
     ok(f, "[1, 2, 3, 5, 8, 13, 21, 34]");
+    p.execute();
+    ok(f, "[1, 2, 3, 5, 8, 13, 21, 34, 1, 2, 3, 5, 8, 13, 21, 34]");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
