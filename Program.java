@@ -7,15 +7,16 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 class Program extends Test                                                      // A progam that manipulates a memory layout via si instructions
- {final Stack<Instruction> code = new Stack<>();                                // Code of the program
+ {final Stack<I> code = new Stack<>();                                          // Code of the program
   final int maxTime = 1000;                                                     // Code of the program
   //final MemoryLayout memoryLayout;                                            // Memory layout
   int   step = 0;                                                               // Execution step
   int   time = 0;                                                               // Execution time
   boolean go = true;                                                            // Execute instructions while true
 
-  class Instruction                                                             // Instruction definition
+  class I                                                                       // Instruction definition
    {int in;                                                                     // Instruction number
+    I() {code.push(this);}
     void action() {};
    }
 
@@ -27,7 +28,7 @@ class Program extends Test                                                      
    {go = true;
     final int N = code.size();
     for (step = 0, time = 0; step < N && time < maxTime && go; step++, time++)
-     {final Instruction c = code.elementAt(step);
+     {final I c = code.elementAt(step);
       c.action();
      }
    }
@@ -46,24 +47,23 @@ class Program extends Test                                                      
     final Program          p = new Program();
     final Stack<Integer>   f = new Stack<>();
 
-    p.code.push(p.new Instruction() {void action() {m.at(a).setInt(0);}});
-    p.code.push(p.new Instruction() {void action() {m.at(b).setInt(1);}});
-    p.code.push(p.new Instruction() {void action() {m.at(c).setInt(m.at(a).getInt() + m.at(b).getInt());}});
-    p.code.push(p.new Instruction() {void action() {m.at(a).setInt(m.at(b).getInt());}});
-    p.code.push(p.new Instruction() {void action() {m.at(b).setInt(m.at(c).getInt());}});
-    p.code.push(p.new Instruction() {void action() {f.push(m.at(c).getInt());}});
-    p.code.push(p.new Instruction() {void action() {if (p.time > time) p.go = false; else p.step = 1;}});
+    p.new I() {void action() {m.at(a).setInt(0);}};
+    p.new I() {void action() {m.at(b).setInt(1);}};
+    p.new I() {void action() {m.at(c).setInt(m.at(a).getInt() + m.at(b).getInt());}};
+    p.new I() {void action() {m.at(a).setInt(m.at(b).getInt());}};
+    p.new I() {void action() {m.at(b).setInt(m.at(c).getInt());}};
+    p.new I() {void action() {f.push(m.at(c).getInt());}};
+    p.new I() {void action() {if (p.time > time) p.go = false; else p.step = 1;}};
     p.execute();
     ok(""+f, "[1, 2, 3, 5, 8, 13, 21, 34]");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
-   {
+   {test_fibonacci();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_fibonacci();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
