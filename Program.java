@@ -16,8 +16,8 @@ class Program extends Test                                                      
 
   class I                                                                       // Instruction definition
    {int in;                                                                     // Instruction number
-    I() {code.push(this);}
-    void action() {};
+    I() {code.push(this);}                                                      // Can always be removed from this position if needed and placed some where else
+    void a() {};                                                                // Action for action
    }
 
 //D1 Constructor                                                                // Memory provided in bits
@@ -29,7 +29,7 @@ class Program extends Test                                                      
     final int N = code.size();
     for (step = 0, time = 0; step < N && time < maxTime && go; step++, time++)
      {final I c = code.elementAt(step);
-      c.action();
+      c.a();
      }
    }
 
@@ -47,13 +47,13 @@ class Program extends Test                                                      
     final Program          p = new Program();
     final Stack<Integer>   f = new Stack<>();
 
-    p.new I() {void action() {m.at(a).setInt(0);}};
-    p.new I() {void action() {m.at(b).setInt(1);}};
-    p.new I() {void action() {m.at(c).setInt(m.at(a).getInt() + m.at(b).getInt());}};
-    p.new I() {void action() {m.at(a).setInt(m.at(b).getInt());}};
-    p.new I() {void action() {m.at(b).setInt(m.at(c).getInt());}};
-    p.new I() {void action() {f.push(m.at(c).getInt());}};
-    p.new I() {void action() {if (p.time > time) p.go = false; else p.step = 1;}};
+    p.new I() {void a() {m.at(a).setInt(0);}};
+    p.new I() {void a() {m.at(b).setInt(1);}};
+    p.new I() {void a() {m.at(c).setInt(m.at(a).getInt() + m.at(b).getInt());}};
+    p.new I() {void a() {m.at(a).setInt(m.at(b).getInt());}};
+    p.new I() {void a() {m.at(b).setInt(m.at(c).getInt());}};
+    p.new I() {void a() {f.push(m.at(c).getInt());}};
+    p.new I() {void a() {if (p.time > time) p.go = false; else p.step = 1;}};
     p.execute();
     ok(""+f, "[1, 2, 3, 5, 8, 13, 21, 34]");
    }
