@@ -630,6 +630,9 @@ Line T       At      Wide       Size    Indices        Value   Name
    9 V       24         4               3                  0       a
 """);
     ok(m.at(a, z, j).getOff(), 20);
+    m.at(z).setInt(4);                                                          // Rebase
+    ok(m.at(a, z, i).getInt(), 1);
+    ok(m.at(a, z, j).getInt(), 0);
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
