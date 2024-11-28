@@ -67,7 +67,8 @@ class MemoryLayout extends Test                                                 
     final int[]indices;                                                         // Known indices to be applied directly to locate the field in memeory
     final Layout.Field[]indirects;                                              // Fields that do not need to be indexed whose values containg the indices to be applied to locate the field in memeory
     final int  width;                                                           // Width of element in memory
-    final int  base;                                                            // Base address of memory
+    int  base;                                                                  // Base address of memory
+    Layout.Field baseField;                                                     // Field used to locate base of data being addressed
     int  delta;                                                                 // Delta due to indices
     int  at;                                                                    // Location in memory
     int  result;                                                                // The contents of memory at this location
@@ -87,6 +88,7 @@ class MemoryLayout extends Test                                                 
      {for (int i = 0; i < indirects.length; i++)
        {indices[i] = MemoryLayout.this.getInt(indirects[i], 0);
        }
+      base = MemoryLayout.this.getInt(baseField, 0);
       locateDirectAddress();                                                    // Loacate the address directly now that its indices are known
      }
 
@@ -101,8 +103,8 @@ class MemoryLayout extends Test                                                 
       type = Type.direct; indirects = null;
       locateDirectAddress();                                                    // The indices are constant so the address will not change over time
      }
-    At(Layout.Field Field, int Base, Layout.Field...Indirects)                  // Variable indices
-     {z(); field = Field; width = field.width; base = Base;
+    At(Layout.Field Field, Layout.Field BaseField, Layout.Field...Indirects)    // Variable indices
+     {z(); field = Field; width = field.width; baseField = BaseField;
       type = Type.indirect; indirects = Indirects;
       indices = new int[Indirects.length];
       }
@@ -161,7 +163,7 @@ class MemoryLayout extends Test                                                 
    {return new At(Field, Base, Indices);
    }
 
-  At at(Layout.Field Field, int Base, Layout.Field ...Indices)                  // A field with base and variable indices, each variable index being a field with no base and no indices
+  At at(Layout.Field Field, Layout.Field Base, Layout.Field ...Indices)         // A field with base and variable indices, each variable index being a field with no base and no indices
    {return new At(Field, Base, Indices);
    }
 
@@ -614,7 +616,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     MemoryLayout     m = new MemoryLayout(l);
     m.at(i).setInt(1);
     m.at(j).setInt(2);
-    m.at(a, 0, j).setInt(m.at(i).getInt());
+    m.at(a, z, j).setInt(m.at(i).getInt());
     ok(""+m, """
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        28                                      S
@@ -627,7 +629,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    8 V       20         4               2                  1       a
    9 V       24         4               3                  0       a
 """);
-    ok(m.at(a, 0, j).getOff(), 20);
+    ok(m.at(a, z, j).getOff(), 20);
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
