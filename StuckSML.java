@@ -179,12 +179,17 @@ abstract class StuckSML extends Test                                            
     inc(base);
    }
 
-  class Pop                                                                     // Pop a key, data pair from the stuck
-   {int index;                                                                  // The index of the popped element
-    int key;                                                                    // The popped key
-    int data;                                                                   // The popped data
+  class Result                                                                  // Result of a stuck operation
+   {int    search;                                                              // Search key
+    boolean found;                                                              // Whether a matcbing element was found
+    int index;                                                                  // The index from which the key, data pair were retrieved
+    int key;                                                                    // The retrieved key
+    int data;                                                                   // The retrieved data
     int base;                                                                   // The base of the stuck
-    Pop pop(int Base)
+   }
+
+  class Pop extends Result                                                      // Pop a key, data pair from the stuck
+   {Pop pop(int Base)
      {z(); base = Base;
       assertNotEmpty(base);
       dec(base);
@@ -204,11 +209,8 @@ abstract class StuckSML extends Test                                            
    }
   Pop pop(int base) {return Pop1.pop(base);}
 
-  class Shift                                                                   // Shift a key, data pair from the stuck
-   {int key;                                                                    // The shifted key
-    int data;                                                                   // The shifted data
-    int base;                                                                   // The base of the stuck
-    Shift shift(int Base)
+  class Shift extends Result                                                    // Shift a key, data pair from the stuck
+   {Shift shift(int Base)
      {z(); base = Base;
       assertNotEmpty(base);
       key   = key (base, 0);
@@ -232,12 +234,8 @@ abstract class StuckSML extends Test                                            
   Shift shift2(int base) {z(); return Shift2.shift(base);}
   Shift shift3(int base) {z(); return Shift3.shift(base);}
 
-  class ElementAt                                                               // Get the indexed element
-   {int index;                                                                  // The index from which the key, data pair were retrieved
-    int key;                                                                    // The shifted key
-    int data;                                                                   // The shifted data
-    int base;                                                                   // The base of the stuck
-    ElementAt() {}
+  class ElementAt extends Result                                                // Get the indexed element
+   {ElementAt() {}
     ElementAt elementAt(int Base, int Index)                                    // Look up key and data associated with the index in the stuck at the specified base offset in memory
      {z(); index = Index; base = Base;
       assertInNormal(base, index);
@@ -285,12 +283,8 @@ abstract class StuckSML extends Test                                            
     inc(base);
    }
 
-  class RemoveElementAt                                                         // Remove the indicated element
-   {int index;                                                                  // The index from which the key, data pair were retrieved
-    int key;                                                                    // The shifted key
-    int data;                                                                   // The shifted data
-    int base;                                                                   // The base of the stuck
-    RemoveElementAt removeElementAt(int Base, int Index)
+  class RemoveElementAt extends Result                                          // Remove the indicated element
+   {RemoveElementAt removeElementAt(int Base, int Index)
      {z(); index = Index; base = Base;
       assertInNormal(base, index);
       key     = key (base, index);
@@ -313,13 +307,8 @@ abstract class StuckSML extends Test                                            
    }
   RemoveElementAt removeElementAt1(int Base, int Index) {z(); return RemoveElementAt1.removeElementAt(Base, Index);} // Remove the indicated element
 
-  class FirstElement                                                            // First element
-   {boolean found;                                                              // Whether there was a first element
-    int index;                                                                  // The index from which the key, data pair were retrieved
-    int key;                                                                    // The shifted key
-    int data;                                                                   // The shifted data
-    int base;                                                                   // The base of the stuck
-    FirstElement firstElement(int Base)
+  class FirstElement extends Result                                             // First element
+   {FirstElement firstElement(int Base)
      {z(); base = Base;
       found = !isEmpty(base);
       if (found)
@@ -343,13 +332,8 @@ abstract class StuckSML extends Test                                            
   FirstElement firstElement1(int base) {z(); return FirstElement1.firstElement(base);} // First element
   FirstElement firstElement2(int base) {z(); return FirstElement2.firstElement(base);} // First element
 
-  class LastElement                                                             // Last element
-   {boolean found;                                                              // Whether there was a last element
-    int index;                                                                  // The index from which the key, data pair were retrieved
-    int key;                                                                    // The shifted key
-    int data;                                                                   // The shifted data
-    int base;                                                                   // The base of the stuck
-    LastElement lastElement(int Base)
+  class LastElement extends Result                                              // Last element
+   {LastElement lastElement(int Base)
      {z(); base = Base;
       found = !isEmpty(base);
       final int s = size(base)-1;
@@ -376,19 +360,14 @@ abstract class StuckSML extends Test                                            
 
 //D1 Search                                                                     // Search a stuck.
 
-  class Limit                                                                   // Search all of the stuck
+  class Limit extends Result                                                    // Search all of the stuck
    {Limit() {z();}
     String name() {return "Limit";}                                             // Name of limit
     int   limit(int base) {z(); return size(base);}                             // How far to check
    }
 
   class Search extends Limit                                                    // Search for an element within all elements of the stuck
-   {int key;                                                                    // Search key
-    boolean found;                                                              // Whether the key was found
-    int index ;                                                                 // Index of the located key if any
-    int data;                                                                   // Located data if key was found
-    int base;                                                                   // The base of the stuck
-    String name() {return "Search";}                                            // Name of the search
+   {String name() {return "Search";}                                            // Name of the search
 
     Search()                     {z();}                                         // Search for an element within all elements of the stuck
 
