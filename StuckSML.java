@@ -315,6 +315,7 @@ abstract class StuckSML extends Test                                            
 
   class FirstElement                                                            // First element
    {boolean found;                                                              // Whether there was a first element
+    int index;                                                                  // The index from which the key, data pair were retrieved
     int key;                                                                    // The shifted key
     int data;                                                                   // The shifted data
     int base;                                                                   // The base of the stuck
@@ -323,8 +324,9 @@ abstract class StuckSML extends Test                                            
       found = !isEmpty(base);
       if (found)
        {z();
-        key  = key (base, 0);
-        data = data(base, 0);
+        index = 0;
+        key   = key (base, 0);
+        data  = data(base, 0);
        }
       else {z(); key = data = 0;}
       return this;
@@ -343,6 +345,7 @@ abstract class StuckSML extends Test                                            
 
   class LastElement                                                             // Last element
    {boolean found;                                                              // Whether there was a last element
+    int index;                                                                  // The index from which the key, data pair were retrieved
     int key;                                                                    // The shifted key
     int data;                                                                   // The shifted data
     int base;                                                                   // The base of the stuck
@@ -352,8 +355,9 @@ abstract class StuckSML extends Test                                            
       final int s = size(base)-1;
       if (found)
        {z();
-        key  = key (base, s);
-        data = data(base, s);
+        index = s;
+        key   = key (base, s);
+        data  = data(base, s);
        }
       else {z(); key = data = 0;}
       return this;
@@ -383,12 +387,13 @@ abstract class StuckSML extends Test                                            
     boolean found;                                                              // Whether the key was found
     int index ;                                                                 // Index of the located key if any
     int data;                                                                   // Located data if key was found
+    int base;                                                                   // The base of the stuck
     String name() {return "Search";}                                            // Name of the search
 
     Search()                     {z();}                                         // Search for an element within all elements of the stuck
 
-    Search search(int base, int Search)                                         // Search for an element within all elements of the stuck
-     {z();
+    Search search(int Base, int Search)                                         // Search for an element within all elements of the stuck
+     {z(); base = Base;
       boolean looking = true;
       key = Search;
       int i = 0, j = limit(base);
@@ -427,11 +432,12 @@ abstract class StuckSML extends Test                                            
     int     index;                                                              // Index of the located key if any
     int       key;                                                              // Located key if the search key was found
     int      data;                                                              // Located data if search key was found
+    int      base;                                                              // The base of the stuck
     String name() {return "SearchFirstGreaterThanOrEqual";}                     // Name of the search
 
     SearchFirstGreaterThanOrEqual searchFirstGreaterThanOrEqual                 // Search for first greater than or equal
-     (int base, int Search)
-     {z();
+     (int Base, int Search)
+     {z(); base = Base;
       boolean looking = true;
       search = Search;
       int i = 0, j = limit(base);
