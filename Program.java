@@ -57,16 +57,16 @@ class Program extends Test                                                      
 //D1 Tests                                                                      // Tests
 
   static void test_fibonacci()                                                  // The fibonacci numbers
-   {final int           time = 40;
-    final Layout           l = Layout.layout();
-    final Layout.Variable  a = l.variable ("a", 8);
-    final Layout.Variable  b = l.variable ("b", 8);
-    final Layout.Variable  c = l.variable ("c", 8);
-    final Layout.Structure s = l.structure("s", a, b, c);
+   {int           time = 40;
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 8);
+    Layout.Variable  b = l.variable ("b", 8);
+    Layout.Variable  c = l.variable ("c", 8);
+    Layout.Structure s = l.structure("s", a, b, c);
 
-    final MemoryLayout     m = new MemoryLayout(l.compile());
-    final Program          p = new Program();
-    final Stack<Integer>   f = new Stack<>();
+    MemoryLayout     m = new MemoryLayout(l.compile());
+    Program          p = new Program();
+    Stack<Integer>   f = new Stack<>();
 
     p.new I() {void a() {m.at(a).setInt(0);}};
     p.new I() {void a() {m.at(b).setInt(1);}};
@@ -80,6 +80,18 @@ class Program extends Test                                                      
     ok(f, "[1, 2, 3, 5, 8, 13, 21, 34]");
     p.execute();
     ok(f, "[1, 2, 3, 5, 8, 13, 21, 34, 1, 2, 3, 5, 8, 13, 21, 34]");
+
+    Program          q = new Program();
+    q.new I() {void a() {m.at(s).ones();}};
+    q.execute();
+    //stop(m);
+    ok(m, """
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        24                                      s
+   2 V        0         8                                255     a
+   3 V        8         8                                255     b
+   4 V       16         8                                255     c
+""");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
