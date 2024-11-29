@@ -54,6 +54,15 @@ class Program extends Test                                                      
     abstract void Else();
    }
 
+  abstract class Block                                                          // A block that can be continued or exited
+   {final Label start = new Label(), end = new Label();                         // Labels at start and end of block to facilitate continuing or exiting
+    Block()
+     {code();
+      end.set();
+     }
+    abstract void code();
+   }
+
 //D1 Tests                                                                      // Tests
 
   static void test_fibonacci()                                                  // The fibonacci numbers
@@ -94,8 +103,39 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
+  static void test_fizz_buzz()
+   {int           time = 40;
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 8);
+    Layout.Variable  b = l.variable ("b", 8);
+    Layout.Variable  c = l.variable ("c", 8);
+    Layout.Structure s = l.structure("s", a, b, c);
+
+    MemoryLayout     m = new MemoryLayout(l.compile());
+    Program          p = new Program();
+    Stack<String>    f = new Stack<>();
+
+    p.new I() {void a() {m.at(a).setInt(0);}};
+    p.new Block()
+     {void code()
+       {p.new Block()
+         {void code()
+           {p.new I() {void a() {final int i = m.at(a).getInt(); if (i % 6 == 0) {f.push(""+i+" fizzbuzz"); p.Goto(end);}}};
+            p.new I() {void a() {final int i = m.at(a).getInt(); if (i % 2 == 0) {f.push(""+i+" fizz");     p.Goto(end);}}};
+            p.new I() {void a() {final int i = m.at(a).getInt(); if (i % 3 == 0) {f.push(""+i+" buzz");     p.Goto(end);}}};
+           }
+         };
+        p.new I() {void a() {if (m.at(a).inc() > 15) p.Goto(end);}};
+        p.new I() {void a() {p.Goto(start);}};
+       }
+     };
+    p.execute();
+    ok(f, "[0 fizzbuzz, 2 fizz, 3 buzz, 4 fizz, 6 fizzbuzz, 8 fizz, 9 buzz, 10 fizz, 12 fizzbuzz, 14 fizz, 15 buzz]");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_fibonacci();
+    test_fizz_buzz();
    }
 
   static void newTests()                                                        // Tests being worked on
