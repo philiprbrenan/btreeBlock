@@ -242,8 +242,10 @@ class MemoryLayout extends Test                                                 
 
 //D2 Binary                                                                     // Arithmetic on binary integers
 
-    void inc() {z(); setInt(getInt()+1);}                                       // Increment a variable treated as an signed binary integer with wrap around on overflow
-    void dec() {z(); setInt(getInt()-1);}                                       // Decrement a variable treated as an signed binary integer with wrap around on underflow
+    int inc()     {z(); final int i = getInt()+1; setInt(i);   return i;}       // Increment a variable treated as an signed binary integer with wrap around on overflow.  Return the result after  the increment.
+    int dec()     {z(); final int i = getInt()-1; setInt(i);   return i;}       // Decrement a variable treated as an signed binary integer with wrap around on underflow. Return the result after  the decrement.
+    int incPost() {z(); final int i = getInt();   setInt(i+1); return i;}       // Increment a variable treated as an signed binary integer with wrap around on overflow.  Return the result before the increment.
+    int decPost() {z(); final int i = getInt();   setInt(i-1); return i;}       // Decrement a variable treated as an signed binary integer with wrap around on underflow. Return the result before the decrement.
    }
 
   At at(Layout.Field Field)                                                     // A field without indices or base addressing
@@ -573,8 +575,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    2 V        0         4                                  1     a
    3 V        4         4                                  3     b
 """);
-    m.new At(a).inc();
-    m.new At(b).dec();
+    ok(m.new At(a).inc(), 2);
+    ok(m.new At(b).dec(), 2);
 
     //stop(m);
     m.ok("""
@@ -586,6 +588,12 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     ok(m.at(a).getInt(), 2);
     ok(m.at(b).getInt(), 2);
+
+    ok(m.new At(a).decPost(), 2);
+    ok(m.new At(b).incPost(), 2);
+
+    ok(m.at(a).getInt(), 1);
+    ok(m.at(b).getInt(), 3);
    }
 
   static void test_boolean_constant()
