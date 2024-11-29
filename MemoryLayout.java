@@ -153,6 +153,97 @@ class MemoryLayout extends Test                                                 
       return s.toString();
      }
     MemoryLayout ml() {return MemoryLayout.this;}
+
+
+//D2 Composite                                                                  // Composite memory access
+
+    void zero()                                                                 // Zero some memory
+     {z(); memory.zero(at, width);
+     }
+
+    void ones()                                                                 // Ones some memory
+     {z(); memory.ones(at, width);
+     }
+
+    void copy(At source)                                                        // Copy the specified number of bits from source to target low bits first
+     {z(); sameSize(source);
+      memory.copy(at, source.at, width);
+     }
+
+    void copyHigh(At source)                                                    // Copy the specified number of bits from source to target high bits first
+     {z(); sameSize(source);
+      memory.copyHigh(at, source.at, width);
+     }
+
+    void move(At source, At buffer)                                             // Copy the specified number of bits from source to target via a buffer to allow the operation to proceed in bit parallel
+     {z(); sameSize(source); sameSize(buffer);
+      memory.copy(buffer.at, source.at, source.width);
+      memory.copy(at, buffer.at, source.width);
+     }
+
+    void invert(At a)                                                           // Invert the specified bits
+     {z(); memory.invert(a.result, a.width());
+     }
+
+//D1 Boolean                                                                    // Boolean operations on fields held in memeory
+
+    boolean isAllZero()                                                         // Check that the specified memory is all zeros
+     {z(); return memory.isAllZero(at, width);
+     }
+
+    boolean isAllOnes()                                                         // Check that  the specified memory is all ones
+     {z(); return memory.isAllOnes(at, width);
+     }
+
+    boolean equal(At b)                                                         // Whether  a == b
+     {z(); if (field == null || b.field == null)                                // Constant comparison
+       {z(); return result == b.result;
+       }
+      z(); sameSize(b);
+      z(); return memory.equals(at, b.at, width);
+     }
+
+    boolean notEqual(At b)                                                      // Whether a != b
+     {z();
+      if (field == null || b.field == null) {z(); return result != b.result;}   // Constant comparison
+      z(); sameSize(b);
+      return memory.notEquals(at, b.at, width);
+     }
+
+    boolean lessThan(At b)                                                      // Whether a < b
+     {z();
+      if (field == null || b.field == null) {z(); return result <  b.result;}   // Constant comparison
+      z(); sameSize(b);
+      return memory.lessThan(at, b.at, width);
+     }
+
+    boolean lessThanOrEqual(At b)                                               // Whether a <= b
+     {z();
+      if (field == null || b.field == null) {z(); return result <= b.result;}   // Constant comparison
+      z(); sameSize(b);
+      return memory.lessThanOrEqual(at, b.at, width);
+     }
+
+    boolean greaterThan(At b)                                                   // Whether a > b
+     {z();
+      if (field == null || b.field == null) {z(); return result > b.result;}    // Constant comparison
+      z(); sameSize(b);
+      return memory.greaterThan(at, b.at, width);
+     }
+
+    boolean greaterThanOrEqual(At b)                                            // Whether a >= b
+     {z();
+      if (field == null || b.field == null) {z(); return result >= b.result;}   // Constant comparison
+      z(); sameSize(b);
+      return memory.greaterThanOrEqual(at, b.at, width);
+     }
+
+//D1 Arithmetic                                                                 // Arithmetic on integers
+
+//D2 Binary                                                                     // Arithmetic on binary integers
+
+    void inc() {z(); setInt(getInt()+1);}                                       // Increment a variable treated as an signed binary integer with wrap around on overflow
+    void dec() {z(); setInt(getInt()-1);}                                       // Decrement a variable treated as an signed binary integer with wrap around on underflow
    }
 
   At at(Layout.Field Field)                                                     // A field without indices or base addressing
@@ -176,90 +267,6 @@ class MemoryLayout extends Test                                                 
   Constant constant(int constant)
    {return new Constant(constant);
    }
-
-//D2 Composite                                                                  // Composite memory access
-
-  void zero(At a)                                                               // Zero some memory
-   {z(); memory.zero(a.at, a.width);
-   }
-
-  void ones(At a)                                                               // Ones some memory
-   {z(); memory.ones(a.at, a.width);
-   }
-
-  void copy(At target, At source)                                               // Copy the specified number of bits from source to target low bits first
-   {z(); target.sameSize(source);
-    memory.copy(target.at, source.at, source.width);
-   }
-
-  void copyHigh(At target, At source)                                           // Copy the specified number of bits from source to target high bits first
-   {z(); target.sameSize(source);
-    memory.copyHigh(target.at, source.at, source.width);
-   }
-
-  void move(At target, At source, At buffer)                                    // Copy the specified number of bits from source to target via a buffer to allow the operation to proceed in bit parallel
-   {z(); target.sameSize(source); target.sameSize(buffer);
-    memory.copy(buffer.at, source.at, source.width);
-    memory.copy(target.at, buffer.at, source.width);
-   }
-
-  void invert(At a)                                                             // Invert the specified bits
-   {z(); memory.invert(a.result, a.width());
-   }
-
-//D1 Boolean                                                                    // Boolean operations on fields held in memeory
-
-  boolean isAllZero(At a)                                                       // Check that the specified memory is all zeros
-   {z(); return memory.isAllZero(a.at, a.width);
-   }
-
-  boolean isAllOnes(At a)                                                       // Check that  the specified memory is all ones
-   {z(); return memory.isAllOnes(a.at, a.width);
-   }
-
-  boolean equal(At a, At b)                                                     // Whether  a == b
-   {z(); if (a.field == null || b.field == null) {z(); return a.result == b.result;} // Constant comparison
-    z(); a.sameSize(b);
-    z(); return memory.equals(a.at, b.at, a.width);
-   }
-
-  boolean notEqual(At a, At b)                                                  // Whether a != b
-   {z(); if (a.field == null || b.field == null) {z(); return a.result != b.result;} // Constant comparison
-    z(); a.sameSize(b);
-    return memory.notEquals(a.at, b.at, a.width);
-   }
-
-  boolean lessThan(At a, At b)                                                  // Whether a < b
-   {z(); if (a.field == null || b.field == null) {z(); return a.result <  b.result;} // Constant comparison
-    z(); a.sameSize(b);
-    return memory.lessThan(a.at, b.at, a.width);
-   }
-
-  boolean lessThanOrEqual(At a, At b)                                           // Whether a <= b
-   {z(); if (a.field == null || b.field == null) {z(); return a.result <= b.result;} // Constant comparison
-    z(); a.sameSize(b);
-    return memory.lessThanOrEqual(a.at, b.at, a.width);
-   }
-
-  boolean greaterThan(At a, At b)                                               // Whether a > b
-   {z(); if (a.field == null || b.field == null) {z(); return a.result > b.result;} // Constant comparison
-    z(); a.sameSize(b);
-    return memory.greaterThan(a.at, b.at, a.width);
-   }
-
-  boolean greaterThanOrEqual(At a, At b)                                        // Whether a >= b
-   {z(); if (a.field == null || b.field == null) {z(); return a.result >= b.result;} // Constant comparison
-    z(); a.sameSize(b);
-    return memory.greaterThanOrEqual(a.at, b.at, a.width);
-   }
-
-//D1 Arithmetic                                                                 // Arithmetic on integers
-
-//D2 Binary                                                                     // Arithmetic on binary integers
-
-  void inc(At a) {z(); a.setInt(a.getInt()+1);}                                 // Increment a variable treated as an signed binary integer with wrap around on overflow
-  void dec(At a) {z(); a.setInt(a.getInt()-1);}                                 // Decrement a variable treated as an signed binary integer with wrap around on underflow
-
 //D1 Print                                                                      // Print a memory layout
 
   class PrintPosition                                                           // Position in print
@@ -396,22 +403,22 @@ class MemoryLayout extends Test                                                 
     m.setInt(t.a, 1, 0, 0, 2, 1);
     m.setInt(t.a, 2, 0, 0, 2, 2);
 
-    ok( m.equal   (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 2, 1)));
-    ok(!m.equal   (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 1, 2)));
-    ok(!m.notEqual(m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 2, 1)));
-    ok( m.notEqual(m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 1, 2)));
+    ok( m.at(t.a, 0, 0, 1, 1).equal   (m.at(t.a, 0, 0, 2, 1)));
+    ok(!m.at(t.a, 0, 0, 1, 1).equal   (m.at(t.a, 0, 0, 1, 2)));
+    ok(!m.at(t.a, 0, 0, 1, 1).notEqual(m.at(t.a, 0, 0, 2, 1)));
+    ok( m.at(t.a, 0, 0, 1, 1).notEqual(m.at(t.a, 0, 0, 1, 2)));
 
-    ok( m.lessThan          (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 1, 2)));
-    ok(!m.lessThan          (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 2, 1)));
-    ok( m.lessThanOrEqual   (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 1, 2)));
-    ok( m.lessThanOrEqual   (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 2, 1)));
-    ok(!m.lessThanOrEqual   (m.at(t.a, 0, 0, 1, 2), m.at(t.a, 0, 0, 2, 1)));
+    ok( m.at(t.a, 0, 0, 1, 1).lessThan       (m.at(t.a, 0, 0, 1, 2)));
+    ok(!m.at(t.a, 0, 0, 1, 1).lessThan       (m.at(t.a, 0, 0, 2, 1)));
+    ok( m.at(t.a, 0, 0, 1, 1).lessThanOrEqual(m.at(t.a, 0, 0, 1, 2)));
+    ok( m.at(t.a, 0, 0, 1, 1).lessThanOrEqual(m.at(t.a, 0, 0, 2, 1)));
+    ok(!m.at(t.a, 0, 0, 1, 2).lessThanOrEqual(m.at(t.a, 0, 0, 2, 1)));
 
-    ok(!m.greaterThan       (m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 1, 2)));
-    ok( m.greaterThan       (m.at(t.a, 0, 0, 1, 2), m.at(t.a, 0, 0, 1, 1)));
-    ok( m.greaterThanOrEqual(m.at(t.a, 0, 0, 2, 1), m.at(t.a, 0, 0, 1, 1)));
-    ok( m.greaterThanOrEqual(m.at(t.a, 0, 0, 1, 1), m.at(t.a, 0, 0, 2, 1)));
-    ok(!m.greaterThanOrEqual(m.at(t.a, 0, 0, 2, 1), m.at(t.a, 0, 0, 1, 2)));
+    ok(!m.at(t.a, 0, 0, 1, 1).greaterThan       (m.at(t.a, 0, 0, 1, 2)));
+    ok( m.at(t.a, 0, 0, 1, 2).greaterThan       (m.at(t.a, 0, 0, 1, 1)));
+    ok( m.at(t.a, 0, 0, 2, 1).greaterThanOrEqual(m.at(t.a, 0, 0, 1, 1)));
+    ok( m.at(t.a, 0, 0, 1, 1).greaterThanOrEqual(m.at(t.a, 0, 0, 2, 1)));
+    ok(!m.at(t.a, 0, 0, 2, 1).greaterThanOrEqual(m.at(t.a, 0, 0, 1, 2)));
    }
 
   static void test_copy()
@@ -425,8 +432,8 @@ class MemoryLayout extends Test                                                 
     ok(m.at(t.a, 0, 0, 0, 1), "a[0,0,1](0+16)16=2");
     ok(m.at(t.a, 0, 0, 0, 2), "a[0,0,2](0+28)28=3");
 
-    m.copy(m.at(t.a, 0, 0, 0, 1), m.at(t.a, 0, 0, 0, 0));
-    m.copy(m.at(t.a, 4, 0, 0, 1), m.at(t.a, 0, 0, 0, 1));
+    m.at(t.a, 0, 0, 0, 1).copy(m.at(t.a, 0, 0, 0, 0));
+    m.at(t.a, 4, 0, 0, 1).copy(m.at(t.a, 0, 0, 0, 1));
 
     ok(m.at(t.a, 0, 0, 0, 0), "a[0,0,0](0+4)4=1");
     ok(m.at(t.a, 4, 0, 0, 0), "a[0,0,0](4+4)8=0");
@@ -536,7 +543,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    4 V        8         4                                  0     c
    5 V       12         4                                 15     d
 """);
-    m.move(m.at(d), m.at(a),  m.at(b));
+    m.at(d).move(m.at(a),  m.at(b));
 
     //stop(m);
     m.ok("""
@@ -566,8 +573,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    2 V        0         4                                  1     a
    3 V        4         4                                  3     b
 """);
-    m.inc(m.new At(a));
-    m.dec(m.new At(b));
+    m.new At(a).inc();
+    m.new At(b).dec();
 
     //stop(m);
     m.ok("""
@@ -593,14 +600,14 @@ Line T       At      Wide       Size    Indices        Value   Name
      c0 = m.constant(0), c1 = m.constant(1), c2 = m.constant(2);
     final boolean T = true, F = false;
 
-    ok(m.equal   (A, c0), F); ok(m.equal   (A, c1), T); ok(m.equal   (A, c2), F);
-    ok(m.notEqual(A, c0), T); ok(m.notEqual(A, c1), F); ok(m.notEqual(A, c2), T);
+    ok(A.equal   (c0), F); ok(A.equal   (c1), T); ok(A.equal   (c2), F);
+    ok(A.notEqual(c0), T); ok(A.notEqual(c1), F); ok(A.notEqual(c2), T);
 
-    ok(m.lessThan       (A, c0), F); ok(m.lessThan       (A, c1), F); ok(m.lessThan       (A, c2), T);
-    ok(m.lessThanOrEqual(A, c0), F); ok(m.lessThanOrEqual(A, c1), T); ok(m.lessThanOrEqual(A, c2), T);
+    ok(A.lessThan       (c0), F); ok(A.lessThan       (c1), F); ok(A.lessThan       (c2), T);
+    ok(A.lessThanOrEqual(c0), F); ok(A.lessThanOrEqual(c1), T); ok(A.lessThanOrEqual(c2), T);
 
-    ok(m.greaterThan       (A, c0), T); ok(m.greaterThan       (A, c1), F); ok(m.greaterThan       (A, c2), F);
-    ok(m.greaterThanOrEqual(A, c0), T); ok(m.greaterThanOrEqual(A, c1), T); ok(m.greaterThanOrEqual(A, c2), F);
+    ok(A.greaterThan       (c0), T); ok(A.greaterThan       (c1), F); ok(A.greaterThan       (c2), F);
+    ok(A.greaterThanOrEqual(c0), T); ok(A.greaterThanOrEqual(c1), T); ok(A.greaterThanOrEqual(c2), F);
    }
 
   static void test_addressing()
