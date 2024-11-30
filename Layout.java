@@ -316,9 +316,10 @@ public class Layout extends Test                                                
     return l.compile();
    }
 
-  Field duplicate(Layout L)                                                     // Duplicate the specified layout inside this layout
+  Field duplicate(Layout Layout)                                                // Duplicate the specified layout inside this layout
    {z();
-    final Layout l = L.duplicate();
+    if (Layout == this) stop("Cannot duplicate self into self");
+    final Layout l = Layout.duplicate();
     final Field  f = l.top;
 
     for(Field lf: l.fields) fields.push(lf);                                    // Add all the duplicated fields in the correct order
@@ -352,7 +353,7 @@ public class Layout extends Test                                                
     Locator(Field Field)                                                        // Locate a field
      {z();
       field = Field;
-      for(Field f = field; f != null; f = f.up)                                 // Convolute path to field with indices
+      for(Field f = field.up; f != null; f = f.up)                              // Convolute path to field with indices of the arrays encountered in the path down to the element but not including the element (which might be an array definition which should be indexed by its parent arrays but not by itself.)
        {z();
         if (f instanceof Array)
          {z();
