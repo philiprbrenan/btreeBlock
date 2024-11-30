@@ -317,7 +317,6 @@ abstract class StuckSML extends Test                                            
         key   = key (base, 0);
         data  = data(base, 0);
        }
-      else {z(); key = data = 0;}
       return this;
      }
     public String toString()                                                    // Print
@@ -343,7 +342,6 @@ abstract class StuckSML extends Test                                            
         key   = key (base, s);
         data  = data(base, s);
        }
-      else {z(); key = data = 0;}
       return this;
      }
     public String toString()                                                    // Print
@@ -406,13 +404,7 @@ abstract class StuckSML extends Test                                            
   SearchExceptLast searchExceptLast2(int base, int Search) {z(); return SearchExceptLast2.searchExceptLast(base, Search);}  // Search for a key ignoring the last element on the stuck
 
   class SearchFirstGreaterThanOrEqual extends Limit                             // Search for the first key that is greater than or equal
-   {int    search;                                                              // Search key
-    boolean found;                                                              // Whether the search key was found
-    int     index;                                                              // Index of the located key if any
-    int       key;                                                              // Located key if the search key was found
-    int      data;                                                              // Located data if search key was found
-    int      base;                                                              // The base of the stuck
-    String name() {return "SearchFirstGreaterThanOrEqual";}                     // Name of the search
+   {String name() {return "SearchFirstGreaterThanOrEqual";}                     // Name of the search
 
     SearchFirstGreaterThanOrEqual searchFirstGreaterThanOrEqual                 // Search for first greater than or equal
      (int Base, int Search)
