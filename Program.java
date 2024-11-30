@@ -23,16 +23,22 @@ class Program extends Test                                                      
   class I                                                                       // Instruction definition
    {int instructionNumber;                                                      // Instruction number
     I() {instructionNumber = code.size(); code.push(this);}                     // Can always be removed from this position if needed and placed some where else
-    void a() {};                                                                // Action for action
+    void   a() {}                                                               // Action performed by instruction
+    void   i() {}                                                               // Initialization for instruction
+    String n() {return "instruction";}                                          // Instruction name
    }
 
 //D1 Execute                                                                    // Execute the program
 
+  void initialize()                                                             // Initialize each instruction
+   {z(); for (I i : code) {z(); i.i();}
+   }
+
   void execute()
-   {final int N = code.size();
+   {z(); initialize();
+    final int N = code.size();
     for (step = 0, time = 0; step < N && time < maxTime; step++, time++)
-     {final I c = code.elementAt(step);
-      c.a();
+     {z(); code.elementAt(step).a();
      }
    }
 
