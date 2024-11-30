@@ -170,15 +170,32 @@ class MemoryLayout extends Test                                                 
 
     void moveUp(At Index, At buffer)                                            // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.
      {z(); sameSize(buffer);
-      if (!(field instanceof Layout.Array))  stop("Array required");
+      if (!(field instanceof Layout.Array))  stop("Array required for moveUp");
       z(); setOff();                                                            // Sets the offset of the target
       z(); buffer.setOff().move(this);                                          // Gets the offset of the buffer and copies the source
 
-      final Layout.Array A = field.toArray();
-      for   (int i = Index.result+1; i < A.size;          i++)                  // Each element
-       {for (int j = 0;              j < A.element.width; j++)                  // Each bit in each element
-         {final boolean b = buffer.getBit((i-1)*A.element.width + j);
-          setBit(i*A.element.width+j, b);
+      final Layout.Array A = field.toArray();                                   // Address field to be moved as an array
+      final  int w =     A.element.width;                                       // Width of array element
+      for   (int i = Index.result+1; i < A.size; i++)                           // Each element
+       {for (int j = 0;              j < w;      j++)                           // Each bit in each element
+         {final boolean b = buffer.getBit((i-1)*w + j);
+          setBit(i*w+j, b);
+         }
+       }
+     }
+
+    void moveDown(At Index, At buffer)                                          // Move the elements of an array down one position deleting the indexed element.  A buffer of the same size is used to permit copy in parallel.
+     {z(); sameSize(buffer);
+      if (!(field instanceof Layout.Array)) stop("Array required for moveDown");
+      z(); setOff();                                                            // Sets the offset of the target
+      z(); buffer.setOff().move(this);                                          // Gets the offset of the buffer and copies the source
+
+      final Layout.Array A = field.toArray();                                   // Address field to be moved as an array
+      final  int w =     A.element.width;                                       // Width of array element
+      for   (int i = Index.result; i < A.size-1; i++)                           // Each element
+       {for (int j = 0;            j < w;        j++)                           // Each bit in each element
+         {final boolean b = buffer.getBit((i+1)*w + j);
+          setBit(i*w+j, b);
          }
        }
      }
@@ -722,6 +739,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     W.at(i).setInt(2);
     L.at(A).moveUp(W.at(i), W.at(B));
+  //L.at(A, W.at(z)).moveUp(W.at(i), W.at(B, W.at(z)));
     //stop(L);
     ok(L, """
 Line T       At      Wide       Size    Indices        Value   Name
@@ -732,6 +750,55 @@ Line T       At      Wide       Size    Indices        Value   Name
    5 V       24         8               3                 12     a
    6 V       32         8               4                 13     a
    7 V       40         8               5                 14     a
+""");
+
+  //stop(W);
+  ok(W, """
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        64                                      S
+   2 V        0         8                                  0     z
+   3 V        8         8                                  2     i
+   4 A       16        48          6                             A
+   5 V       16         8               0                 10       a
+   6 V       24         8               1                 11       a
+   7 V       32         8               2                 12       a
+   8 V       40         8               3                 13       a
+   9 V       48         8               4                 14       a
+  10 V       56         8               5                 15       a
+""");
+   }
+
+  static void test_move_down()
+   {final int        N = 8;
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", N);
+    Layout.Array     A = l.array    ("A", a, 6);
+    l.compile();
+
+    Layout           w = Layout.layout();
+    Layout.Variable  z = w.variable ("z", N);
+    Layout.Variable  i = w.variable ("i", N);
+    Layout.Field     B = w.duplicate("A", l);
+    Layout.Structure S = w.structure("S", z, i, B);
+    w.compile();
+
+    MemoryLayout     L = new MemoryLayout(l);
+    MemoryLayout     W = new MemoryLayout(w);
+    for (int j = 0; j < A.size; j++) L.at(a, 0, j).setInt(10+j);
+
+    W.at(i).setInt(2);
+    L.at(A).moveDown(W.at(i), W.at(B));
+  //L.at(A, W.at(z)).moveUp(W.at(i), W.at(B, W.at(z)));
+    //stop(L);
+    ok(L, """
+Line T       At      Wide       Size    Indices        Value   Name
+   1 A        0        48          6                           A
+   2 V        0         8               0                 10     a
+   3 V        8         8               1                 11     a
+   4 V       16         8               2                 13     a
+   5 V       24         8               3                 14     a
+   6 V       32         8               4                 15     a
+   7 V       40         8               5                 15     a
 """);
 
   //stop(W);
@@ -763,11 +830,12 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_boolean_constant();
     test_addressing();
     test_move_up();
+    test_move_down();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_move_up();
+    test_move_down();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
