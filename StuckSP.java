@@ -578,6 +578,10 @@ Transaction(action:firstElement search:0 limit:0 found:true index:0 key:2 data:1
     ok(r, """
 Transaction(action:lastElement search:0 limit:0 found:true index:3 key:8 data:4 base:16 size:4 isFull:false isEmpty:false)
 """);
+
+    r.clear();
+    sayThisOrStop("Empty");
+    try {r.firstElement();} catch(RuntimeException e) {}
    }
 
   static void test_search()
