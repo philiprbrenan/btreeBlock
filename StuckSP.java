@@ -464,6 +464,10 @@ Transaction(action:elementAt search:0 limit:0 found:true index:2 key:6 data:3 ba
     r.index = -2;
     sayThisOrStop("Out of normal range -2 for size 4");
     try {r.elementAt();} catch(RuntimeException e) {}
+
+    r.index = 4;
+    sayThisOrStop("Out of normal range 4 for size 4");
+    try {r.elementAt();} catch(RuntimeException e) {}
    }
 
   static void test_set_element_at()
@@ -491,6 +495,14 @@ StuckSP(maxSize:8 size:5)
   3 key:8 data:4
   4 key:88 data:99
 """);
+
+    r.index = -2;
+    sayThisOrStop("Out of normal range -2 for size 5");
+    try {r.setElementAt();} catch(RuntimeException e) {}
+
+    r.index = 6;
+    sayThisOrStop("Out of normal range 6 for size 5");
+    try {r.setElementAt();} catch(RuntimeException e) {}
    }
 
   static void test_insert_element_at()
@@ -520,6 +532,10 @@ StuckSP(maxSize:8 size:6)
   4 key:8 data:4
   5 key:7 data:7
 """);
+
+    r.index = 7;
+    sayThisOrStop("Out of extended range 7 for size 6");
+    try {r.insertElementAt();} catch(RuntimeException e) {}
    }
 
   static void test_remove_element_at()
@@ -540,6 +556,10 @@ StuckSP(maxSize:8 size:3)
   1 key:4 data:2
   2 key:8 data:4
 """);
+
+    r.index = 3;
+    sayThisOrStop("Out of normal range 3 for size 3");
+    try {r.removeElementAt();} catch(RuntimeException e) {}
    }
 
   static void test_first_last()
