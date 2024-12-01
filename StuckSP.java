@@ -391,6 +391,7 @@ StuckSP(maxSize:8 size:3)
   1 key:4 data:2
   2 key:6 data:3
 """);
+
     ok(!r.isEmpty);
     r.clear();
     ok( r.isEmpty);
@@ -415,6 +416,7 @@ StuckSP(maxSize:8 size:3)
   1 key:6 data:3
   2 key:8 data:4
 """);
+
     ok(!r.isEmpty);
     r.clear();
     ok( r.isEmpty);
@@ -441,6 +443,7 @@ StuckSP(maxSize:8 size:5)
   3 key:6 data:3
   4 key:8 data:4
 """);
+
     ok(!r.isFull);
     r.unshift(); r.unshift(); r.unshift();
     ok( r.isFull);
@@ -457,6 +460,10 @@ StuckSP(maxSize:8 size:5)
     ok(r, """
 Transaction(action:elementAt search:0 limit:0 found:true index:2 key:6 data:3 base:16 size:4 isFull:false isEmpty:false)
 """);
+
+    r.index = -2;
+    sayThisOrStop("Out of normal range -2 for size 4");
+    try {r.elementAt();} catch(RuntimeException e) {}
    }
 
   static void test_set_element_at()
