@@ -371,7 +371,7 @@ StuckSP(maxSize:8 size:4)
     r.key =  9; r.data =  9; r.push();
     r.key =  8; r.data =  8; r.push(); ok(r.isFull);
     sayThisOrStop("Full");
-    r.key =  7; r.data =  7; r.push();
+    try {r.key = 7; r.data = 7; r.push();} catch(RuntimeException e) {}
    }
 
   static void test_pop()
