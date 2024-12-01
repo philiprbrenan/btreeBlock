@@ -441,6 +441,11 @@ StuckSP(maxSize:8 size:5)
   3 key:6 data:3
   4 key:8 data:4
 """);
+    ok(!r.isFull);
+    r.unshift(); r.unshift(); r.unshift();
+    ok( r.isFull);
+    sayThisOrStop("Full");
+    try {r.unshift();} catch(RuntimeException e) {}
    }
 
   static void test_elementAt()
