@@ -392,7 +392,7 @@ StuckSP(maxSize:8 size:3)
   2 key:6 data:3
 """);
     ok(!r.isEmpty);
-    r.pop(); r.pop(); r.pop();
+    r.clear();
     ok( r.isEmpty);
     sayThisOrStop("Empty");
     try {r.pop();} catch(RuntimeException e) {}
@@ -415,7 +415,11 @@ StuckSP(maxSize:8 size:3)
   1 key:6 data:3
   2 key:8 data:4
 """);
-    ;
+    ok(!r.isEmpty);
+    r.clear();
+    ok( r.isEmpty);
+    sayThisOrStop("Empty");
+    try {r.pop();} catch(RuntimeException e) {}
    }
 
   static void test_unshift()
