@@ -303,12 +303,10 @@ public class Test                                                               
 
   static void say(Object...O)                                                   // Say something
    {final StringBuilder b = new StringBuilder();                                // Print as a series of whitespace separated items
-System.err.println("AAAA "+sayThisOrStop.size());
     for (int i = 0; i <  O.length; ++i)
      {final Object o = O[i];
       if (o == null) {b.append("(null)"); continue;}
       final String s = o.toString();
-System.err.println("BBBB "+sayThisOrStop.size());
 
       if (b.length() > 0 && s.length() > 0 && s.charAt(s.length()-1) == '\n')   // Print a string that has a new line at the end indocating it is vertially aligned
        {b.append("\n"+s);
@@ -320,22 +318,17 @@ System.err.println("BBBB "+sayThisOrStop.size());
       else b.append(s);
      }
 
-System.err.println("CCCC "+sayThisOrStop.size());
     if (sayThisOrStop.size() > 0)                                               // Convert the say into a stop if the expected message does not eventuate
      {final String act = b.toString() .replace("\n", "\\n").trim();             // Message we actually got
       final String exp = sayThisOrStop.removeFirst().replace("\n", "\\n").trim();// Message we expected
-System.err.println("DDDD exp="+exp+ " actual="+act);
-
       if (!exp.equals(act))                                                     // Expected message does not match what we have got
        {stop("Actual message does not equal expected message:\n"+
-          act+" length("+act.length()+")\n"+
-          exp+" length("+exp.length()+")\n");
+          "Actual  :"+act+" length("+act.length()+")\n"+
+          "Expected:"+exp+" length("+exp.length()+")\n");
        }
      }
 
     else if (b.length() > 0) System.err.println(b.toString());
-System.err.println("EEEE "+sayThisOrStop.size());
-
    }
 
   static StringBuilder say(StringBuilder b, Object...O)                         // Say something in a string builder
@@ -383,9 +376,15 @@ System.err.println("EEEE "+sayThisOrStop.size());
    }
 
   static void stop(Object...O)                                                  // Say something, provide an error trace and stop
-   {say(O);
-    System.err.println(traceBack());
-    System.exit(1);
+   {final boolean sos = sayThisOrStop.size() > 0;                               // Say or stop checking in effect
+    say(O);
+    if (sos)
+     {throw new RuntimeException("Stopping after say an error message");
+     }
+    else
+     {System.err.println(traceBack());
+      System.exit(1);
+     }
    }
 
   static void sayThisOrStop(Object...O)                                         // The next things to be said
