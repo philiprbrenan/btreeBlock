@@ -391,7 +391,13 @@ StuckSP(maxSize:8 size:3)
   1 key:4 data:2
   2 key:6 data:3
 """);
+    ok(!r.isEmpty);
+    r.pop(); r.pop(); r.pop();
+    ok( r.isEmpty);
+    sayThisOrStop("Empty");
+    try {r.pop();} catch(RuntimeException e) {}
    }
+
 
   static void test_shift()
    {StuckSP t = test_load();
