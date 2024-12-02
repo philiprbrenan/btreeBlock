@@ -130,7 +130,7 @@ abstract class StuckSP extends Test                                             
       size(); isFull(); assertNotFull();
       found = true;
       final MemoryLayout M = memoryLayout(), T = tmp;
-      T.memory.zero();
+      T.zero();
       M.at(Keys, base).moveUp(T.at(currentSize), T.at(Keys));
       M.at(Data, base).moveUp(T.at(currentSize), T.at(Data));
       M.at(currentSize, base).inc();
@@ -158,10 +158,11 @@ abstract class StuckSP extends Test                                             
       data();
 
       final MemoryLayout M = memoryLayout(), T = tmp;
-      tmp.memory.zero();
+      T.zero();
       M.at(Keys, base).moveDown(T.at(currentSize), T.at(Keys));
       M.at(Data, base).moveDown(T.at(currentSize), T.at(Data));
       M.at(currentSize, base).dec();
+
       size(); isEmpty(); isFull();
      }
 
@@ -189,9 +190,14 @@ abstract class StuckSP extends Test                                             
      {z(); action = "insertElementAt";
       size(); isFull();
       assertInExtended();
-      for (int i = size; i > index; --i)                                        // Shift the stuck up one place
-       {z(); copyKeyData(base, i, i-1);
-       }
+
+      final MemoryLayout M = memoryLayout(), T = tmp;
+      T.zero();
+      T.at(currentSize).setInt(index);
+      M.at(Keys, base).moveUp(T.at(currentSize), T.at(Keys));
+      M.at(Data, base).moveUp(T.at(currentSize), T.at(Data));
+      M.at(currentSize, base).inc();
+
       setKeyData(base, index, key, data);
       inc();
       size(); isEmpty(); isFull();
@@ -203,10 +209,13 @@ abstract class StuckSP extends Test                                             
       found = true;
       key ();
       data();
-      for (int i = index, j = size-1; i < j; i++)                               // Shift the stuck down one place
-       {z(); copyKeyData(base, i, i+1);
-       }
-      dec();
+      final MemoryLayout M = memoryLayout(), T = tmp;
+      T.zero();
+      T.at(currentSize).setInt(index);
+      M.at(Keys, base).moveDown(T.at(currentSize), T.at(Keys));
+      M.at(Data, base).moveDown(T.at(currentSize), T.at(Data));
+      M.at(currentSize, base).dec();
+
       size(); isEmpty(); isFull();
      }
 
@@ -678,8 +687,8 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:false in
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
-    test_shift();
+   {//oldTests();
+    test_remove_element_at();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
