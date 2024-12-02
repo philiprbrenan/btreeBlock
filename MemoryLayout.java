@@ -307,6 +307,7 @@ class MemoryLayout extends Test                                                 
   Constant constant(int constant)
    {return new Constant(constant);
    }
+
 //D1 Print                                                                      // Print a memory layout
 
   class PrintPosition                                                           // Position in print
