@@ -103,6 +103,9 @@ class Memory extends Test                                                       
 
 //D2 Composite                                                                  // Composite memory access
 
+  void zero() {z(); for(int i = 0; i < bits.length; ++i) {z(); set(i, false);}} // Zero all memory
+  void ones() {z(); for(int i = 0; i < bits.length; ++i) {z(); set(i, true);}}  // Ones all memory
+
   void zero(int start, int width)                                               // Zero some memory
    {z(); for(int i = 0; i < width; ++i) {z(); set(start+i, false);}
    }
@@ -303,6 +306,25 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 """);
    }
 
+  static void test_all_zeros_and_ones()
+   {Memory m = memory(256);
+    m.alternating(4);
+    m.ones();
+    //stop(m);
+    ok(""+m, """
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  ffff ffff ffff ffff ffff ffff ffff ffff ffff ffff ffff ffff ffff ffff ffff ffff
+""");
+    m.zero();
+    //stop(m);
+    ok(""+m, """
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_set_get();
     test_zero_ones();
@@ -310,10 +332,12 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
     test_invert();
     test_boolean();
     test_alternating();
+    test_all_zeros_and_ones();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_all_zeros_and_ones();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
