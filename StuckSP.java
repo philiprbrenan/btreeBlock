@@ -4,13 +4,15 @@
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
 // Full and Empty stuck tests needed
-abstract class StuckSP extends Test                                            // A fixed size stack of ordered key, data pairs with null deemed highest
+abstract class StuckSP extends Test                                             // A fixed size stack of ordered key, data pairs with null deemed highest
  {abstract Memory memory();                                                     // Memory containing the stuck
   MemoryLayout memoryLayout() {return new MemoryLayout(memory(), layout);};     // The memory layout of this stuck
   abstract int maxSize();                                                       // The maximum number of entries in the stuck.
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
   abstract int bitsPerSize();                                                   // The number of bits in size field
+  final MemoryLayout tmp = new MemoryLayout(layout());                          // Temporary storage to hold intermediate results
+
   int baseAt() {return 0;}                                                      // Offset the meory for the stuck by this amount
 
   Layout layout;                                                                // Layout of memory containing the stuck
@@ -112,7 +114,7 @@ abstract class StuckSP extends Test                                            /
     void clear()                                                                // Clear the stuck
      {z();
       memoryLayout().setInt(currentSize, 0, base);
-      size = 0; isFull(); isEmpty();
+      size(); isFull(); isEmpty();
      }
 
     void push()                                                                 // Push an element onto the stuck
@@ -120,20 +122,19 @@ abstract class StuckSP extends Test                                            /
       size(); isFull(); assertNotFull();
       setKeyData(base, size, key, data);
       inc();
-      ++size; isEmpty = false; isFull();
+      size(); isFull(); isEmpty();
      }
 
     void unshift()                                                              // Unshift an element onto the stuck
      {z(); action = "unshift";
       size(); isFull(); assertNotFull();
       found = true;
-      for (int i = size; i > 0; --i)                                            // Shift the stuck up one place
-       {z();
-        copyKeyData(base, i, i-1);
-       }
-      setKeyData(base, 0, key, data);
-      inc();
-      ++size; isEmpty = false; isFull();
+      final MemoryLayout M = memoryLayout(), T = tmp;
+      T.memory.zero();
+      M.at(Keys, base).moveUp(T.at(currentSize), T.at(Keys));
+      M.at(Data, base).moveUp(T.at(currentSize), T.at(Data));
+      M.at(currentSize, base).inc();
+      size(); isFull(); isEmpty();
      }
 
     void pop()
@@ -144,7 +145,7 @@ abstract class StuckSP extends Test                                            /
       index = --size;
       key ();
       data();
-      isEmpty(); isFull = false;
+      size(); isFull(); isEmpty();
      }
 
     void shift()
@@ -155,12 +156,13 @@ abstract class StuckSP extends Test                                            /
       key ();
       data();
 
-      for (int i = 0, j = size-1; i < j; i++)                                   // Shift the stuck down one place
-       {z(); copyKeyData(base, i, i+1);
-       }
-      dec();
-      --size; isEmpty(); isFull = false;
-      }
+      final MemoryLayout M = memoryLayout(), T = tmp;
+      tmp.memory.zero();
+      M.at(Keys, base).moveDown(T.at(currentSize), T.at(Keys));
+      M.at(Data, base).moveDown(T.at(currentSize), T.at(Data));
+      M.at(currentSize, base).dec();
+      size(); isEmpty(); isFull();
+     }
 
     void elementAt()                                                            // Look up key and data associated with the index in the stuck at the specified base offset in memory
      {z(); action = "elementAt";
@@ -191,8 +193,7 @@ abstract class StuckSP extends Test                                            /
        }
       setKeyData(base, index, key, data);
       inc();
-      ++size;
-      isEmpty = false; isFull();
+      size(); isEmpty(); isFull();
      }
 
     void removeElementAt()
@@ -205,7 +206,7 @@ abstract class StuckSP extends Test                                            /
        {z(); copyKeyData(base, i, i+1);
        }
       dec();
-      --size; isEmpty(); isFull = false;
+      size(); isEmpty(); isFull();
      }
 
     void firstElement()                                                         // First element
@@ -677,7 +678,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:false in
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_pop();
+    test_shift();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
