@@ -58,6 +58,11 @@ class MemoryLayout extends Test                                                 
     memory.set(a.at, a.width, value);
    }
 
+  void zero()                                                                   // Clear the memory associated with the layout to zeros
+   {z();
+    memory.set(0, memory.size(), 0);
+   }
+
 //D1 Components                                                                 // Locate a variable in memory via its indices
 
   class At
@@ -817,6 +822,39 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
+  static void test_zero()
+   {Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Array     A = l.array    ("A", a, 6);
+    l.compile();
+
+    MemoryLayout     L = new MemoryLayout(l);
+    L.memory.alternating(4);
+    //stop(L);
+    ok(L, """
+Line T       At      Wide       Size    Indices        Value   Name
+   1 A        0        24          6                           A
+   2 V        0         4               0                  0     a
+   3 V        4         4               1                 15     a
+   4 V        8         4               2                  0     a
+   5 V       12         4               3                 15     a
+   6 V       16         4               4                  0     a
+   7 V       20         4               5                 15     a
+""");
+
+    L.zero();
+    //stop(L);
+    ok(L, """
+Line T       At      Wide       Size    Indices        Value   Name
+   1 A        0        24          6                           A
+   2 V        0         4               0                  0     a
+   3 V        4         4               1                  0     a
+   4 V        8         4               2                  0     a
+   5 V       12         4               3                  0     a
+   6 V       16         4               4                  0     a
+   7 V       20         4               5                  0     a
+""");
+   }
 
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_get_set();
@@ -831,11 +869,12 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_addressing();
     test_move_up();
     test_move_down();
+    test_zero();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_move_down();
+    test_zero();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
