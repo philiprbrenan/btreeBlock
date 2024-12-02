@@ -60,16 +60,10 @@ abstract class StuckSP extends Test                                            /
 
 //D1 Memory                                                                     // Actions on memory of stuck
 
-  int  getInt(Layout.Field field,            int base)            {z(); return memoryLayout().getInt(field,        base);}
-  int  getInt(Layout.Field field,            int base, int index) {z(); return memoryLayout().getInt(field,        base, index);}
-
-  void setInt(Layout.Field field, int value, int base)            {z();        memoryLayout().setInt(field, value, base);}
-  void setInt(Layout.Field field, int value, int base, int index) {z();        memoryLayout().setInt(field, value, base, index);}
-
-  int  key     (int base, int Index)              {z(); return getInt(key,    base, Index);}
-  int  data    (int base, int Index)              {z(); return getInt(data,   base, Index);}
-  void setKey  (int base, int Index,  int Value)  {z(); setInt (key,  Value,  base, Index);}
-  void setData (int base, int Index,  int Value)  {z(); setInt (data, Value,  base, Index);}
+  int  key     (int base, int Index)              {z(); return memoryLayout().getInt(key,    base, Index);}
+  int  data    (int base, int Index)              {z(); return memoryLayout().getInt(data,   base, Index);}
+  void setKey  (int base, int Index,  int Value)  {z(); memoryLayout().setInt (key,  Value,  base, Index);}
+  void setData (int base, int Index,  int Value)  {z(); memoryLayout().setInt (data, Value,  base, Index);}
   void copyKey (int base, int Target, int Source) {z(); setKey (base, Target, key (base, Source));}
   void copyData(int base, int Target, int Source) {z(); setData(base, Target, data(base, Source));}
 
@@ -99,24 +93,25 @@ abstract class StuckSP extends Test                                            /
     int      base;                                                              // The base of the stuck
     int      size;                                                              // The current size of the stuck
 
-    void size()                                                                 // The current number of key elements in the stuck
-     {z(); size = memoryLayout().getInt(currentSize, base);
-     }
+    void size() {z(); size = memoryLayout().getInt(currentSize, base);}         // The current number of key elements in the stuck
 
     void isFull () {z(); isFull  = size >= maxSize();}                          // Check the stuck is full
     void isEmpty() {z(); isEmpty = size == 0;}                                  // Check the stuck is empty
 
     void assertNotFull   () {z(); if (isFull ) stop("Full") ;}                  // Assert the stuck is not full
     void assertNotEmpty  () {z(); if (isEmpty) stop("Empty");}                  // Assert the stuck is not empty
-    void assertInNormal  () {z(); final int s = size, i = index; if (i < 0 || i >= s) stop("Out of normal range",   i, "for size", s);} // Check that the index would yield a valid element
-    void assertInExtended() {z(); final int s = size, i = index; if (i < 0 || i >  s) stop("Out of extended range", i, "for size", s);} // Check that the index would yield a valid element
+    void assertInNormal  () {z(); if (index < 0 || index >= size) stop("Out of normal range",   index, "for size", size);} // Check that the index would yield a valid element
+    void assertInExtended() {z(); if (index < 0 || index >  size) stop("Out of extended range", index, "for size", size);} // Check that the index would yield a valid element
 
-    void inc() {z(); final int v = getInt(currentSize, base)+1; setInt(currentSize, v, base);}  // Increment the current size
-    void dec() {z(); final int v = getInt(currentSize, base)-1; setInt(currentSize, v, base);}  // Decrement the current size
+    void inc() {z(); assertNotFull (); final int v = size+1; memoryLayout().setInt(currentSize, v, base);}  // Increment the current size
+    void dec() {z(); assertNotEmpty(); final int v = size-1; memoryLayout().setInt(currentSize, v, base);}  // Decrement the current size
+
+    void key () {z(); key  = memoryLayout().getInt(StuckSP.this.key,  base, index);}           // Get key
+    void data() {z(); data = memoryLayout().getInt(StuckSP.this.data, base, index);}           // Get data
 
     void clear()                                                                // Clear the stuck
      {z();
-      setInt(currentSize, 0, base);
+      memoryLayout().setInt(currentSize, 0, base);
       size = 0; isFull(); isEmpty();
      }
 
@@ -147,8 +142,8 @@ abstract class StuckSP extends Test                                            /
       dec();
       found = true;
       index = --size;
-      key   = key (base, index);
-      data  = data(base, index);
+      key ();
+      data();
       isEmpty(); isFull = false;
      }
 
@@ -157,8 +152,8 @@ abstract class StuckSP extends Test                                            /
       size(); isEmpty(); assertNotEmpty();
       found = true;
       index = 0;
-      key   = key (base, 0);
-      data  = data(base, 0);
+      key ();
+      data();
 
       for (int i = 0, j = size-1; i < j; i++)                                   // Shift the stuck down one place
        {z(); copyKeyData(base, i, i+1);
@@ -171,8 +166,8 @@ abstract class StuckSP extends Test                                            /
      {z(); action = "elementAt";
       size(); assertInNormal();
       found = true;
-      key   = key   (base, index);
-      data  = data  (base, index);
+      key ();
+      data();
      }
 
     void setElementAt()                                                         // Set an element either in range or one above the current range
@@ -204,8 +199,8 @@ abstract class StuckSP extends Test                                            /
      {z(); action = "removeElementAt";
       size(); assertInNormal();
       found = true;
-      key   = key (base, index);
-      data  = data(base, index);
+      key ();
+      data();
       for (int i = index, j = size-1; i < j; i++)                               // Shift the stuck down one place
        {z(); copyKeyData(base, i, i+1);
        }
@@ -218,8 +213,8 @@ abstract class StuckSP extends Test                                            /
       size(); isEmpty(); assertNotEmpty();
       found = true;
       index = 0;
-      key   = key (base, 0);
-      data  = data(base, 0);
+      key ();
+      data();
      }
 
     void lastElement()                                                          // Last element
@@ -227,32 +222,32 @@ abstract class StuckSP extends Test                                            /
       size(); isEmpty(); assertNotEmpty();
       found = true;
       index = size-1;
-      key   = key (base, index);
-      data  = data(base, index);
+      key ();
+      data();
      }
 
     void search()                                                               // Search for an element within all elements of the stuck
      {z(); action = "search";
       size();
       boolean looking = true;
-      int i = 0, j = size-limit;                                                // Limit search if requested
-      for (; i < j && looking; i++)                                             // Search
-       {z(); if (key(base, i) == search) {z(); looking = false; break;}
+      final int j = size-limit;                                                // Limit search if requested
+      for (index = 0; index < j && looking; index++)                                             // Search
+       {z(); key(); if (key == search) {z(); looking = false; break;}
        }
-      index = i; found = !looking;
-      if (found) {z(); key = search; data = data(base, i);}                     // Get data associated with equal key
+      found = !looking;
+      if (found) {z(); data();}                                                 // Get data associated with equal key
      }
 
     void searchFirstGreaterThanOrEqual()                                        // Search for first greater than or equal
      {z();  action = "searchFirstGreaterThanOrEqual";
       size();
       boolean looking = true;
-      int i = 0, j = size-limit;                                                // Limit search if requested
-      for (; i < j && looking; i++)                                             // Search
-       {z(); if (key(base, i) >= search) {z(); looking = false; break;}         // Search key is equal or greater to the current key
+      final int j = size-limit;                                                 // Limit search if requested
+      for (index = 0; index < j && looking; index++)                            // Search
+       {z(); key(); if (key >= search) {z(); looking = false; break;}           // Search key is equal or greater to the current key
        }
-      index = i; found = !looking;
-      if (found) {z(); key = key(base, i); data = data(base, i);}               // Key greater than or equal to and its associated data
+      found = !looking;
+      if (found) {z(); key(); data();}                                          // Key greater than or equal to and its associated data
      }
 
     public String toString()
@@ -280,10 +275,11 @@ abstract class StuckSP extends Test                                            /
    {final StringBuilder s = new StringBuilder();                                //
     z();
     final Transaction r = new Transaction(); r.base = Base; r.size();
+    final int N = r.size;
     s.append("StuckSP(maxSize:"+maxSize());
-    s.append(" size:"+r.size+")\n");
-    for (int i = 0, j = r.size; i < j; i++)                                     // Search
-     {z(); s.append("  "+i+" key:"+key(Base, i)+" data:"+data(Base, i)+"\n");
+    s.append(" size:"+N+")\n");
+    for (r.index = 0; r.index < N; r.index++)                                         // Search
+     {z(); r.key(); r.data(); s.append("  "+r.index+" key:"+r.key+" data:"+r.data+"\n");
      }
     return s.toString();
    }
@@ -598,9 +594,8 @@ Transaction(action:search search:2 limit:0 found:true index:0 key:2 data:1 base:
     r.search = 3;  r.search();
     //stop(r);
     ok(r, """
-Transaction(action:search search:3 limit:0 found:false index:4 key:2 data:1 base:16 size:4 isFull:false isEmpty:false)
+Transaction(action:search search:3 limit:0 found:false index:4 key:8 data:1 base:16 size:4 isFull:false isEmpty:false)
 """);
-
     r.search = 8;  r.search();
     //stop(r);
     ok(r, """
@@ -623,7 +618,7 @@ Transaction(action:search search:4 limit:1 found:true index:1 key:4 data:2 base:
     r.search = 8; r.search();
     //stop(r);
     ok(r, """
-Transaction(action:search search:8 limit:1 found:false index:3 key:4 data:2 base:16 size:4 isFull:false isEmpty:false)
+Transaction(action:search search:8 limit:1 found:false index:3 key:6 data:2 base:16 size:4 isFull:false isEmpty:false)
 """);
    }
 
