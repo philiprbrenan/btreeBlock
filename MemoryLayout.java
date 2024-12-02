@@ -176,7 +176,7 @@ class MemoryLayout extends Test                                                 
     void moveUp(At Index, At buffer)                                            // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.
      {z(); sameSize(buffer);
       if (!(field instanceof Layout.Array))  stop("Array required for moveUp");
-      z(); setOff();                                                            // Sets the offset of the target
+      z(); setOff();                                                            // Sets the offset of the source/target
       z(); buffer.setOff().move(this);                                          // Gets the offset of the buffer and copies the source
 
       final Layout.Array A = field.toArray();                                   // Address field to be moved as an array
