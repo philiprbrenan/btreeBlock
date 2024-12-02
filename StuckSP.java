@@ -60,29 +60,9 @@ abstract class StuckSP extends Test                                             
 
   public void ok(String expected) {ok(toString(), expected);}                   // Check the stuck
 
-//D1 Memory                                                                     // Actions on memory of stuck
-
-  int  key     (int base, int Index)              {z(); return memoryLayout().getInt(key,    base, Index);}
-  int  data    (int base, int Index)              {z(); return memoryLayout().getInt(data,   base, Index);}
-  void setKey  (int base, int Index,  int Value)  {z(); memoryLayout().setInt (key,  Value,  base, Index);}
-  void setData (int base, int Index,  int Value)  {z(); memoryLayout().setInt (data, Value,  base, Index);}
-  void copyKey (int base, int Target, int Source) {z(); setKey (base, Target, key (base, Source));}
-  void copyData(int base, int Target, int Source) {z(); setData(base, Target, data(base, Source));}
-
-  void  setKeyData(int base, int Index, int Key, int Data)
-   {z();
-    setKey (base, Index, Key);
-    setData(base, Index, Data);
-   }
-
-  void copyKeyData(int base, int Target, int Source)
-   {copyKey (base, Target, Source);
-    copyData(base, Target, Source);
-   }
-
 //D1 Transactions                                                               // Transactions on the stuck
 
-  class Transaction                                                                  // Transaction of a stuck operation
+  class Transaction                                                             // Transaction on a stuck. Kept seprate from teh stuck itself because instances of this class are only needed when performing a transaction, they do not need to be stored for the long term like the stuck.
    {String action;                                                              // Action performed
     int    search;                                                              // Search key
     int     limit;                                                              // Limit of search
@@ -111,6 +91,15 @@ abstract class StuckSP extends Test                                             
     void key () {z(); key  = memoryLayout().getInt(StuckSP.this.key,  base, index);}           // Get key
     void data() {z(); data = memoryLayout().getInt(StuckSP.this.data, base, index);}           // Get data
 
+    void setKey  ()  {z(); memoryLayout().setInt (StuckSP.this.key,  key,  base, index);}
+    void setData ()  {z(); memoryLayout().setInt (StuckSP.this.data, data, base, index);}
+
+    void  setKeyData()                                                          // Set a key, data element in the stuck
+     {z();
+      setKey ();
+      setData();
+     }
+
     void clear()                                                                // Clear the stuck
      {z();
       memoryLayout().setInt(currentSize, 0, base);
@@ -120,7 +109,8 @@ abstract class StuckSP extends Test                                             
     void push()                                                                 // Push an element onto the stuck
      {z(); action = "push";
       size(); isFull(); assertNotFull();
-      setKeyData(base, size, key, data);
+      index = size;
+      setKeyData();
       inc();
       size(); isFull(); isEmpty();
      }
@@ -134,11 +124,12 @@ abstract class StuckSP extends Test                                             
       M.at(Keys, base).moveUp(T.at(currentSize), T.at(Keys));
       M.at(Data, base).moveUp(T.at(currentSize), T.at(Data));
       M.at(currentSize, base).inc();
-      setKeyData(base, 0, key, data);
+      index = 0;
+      setKeyData();
       size(); isFull(); isEmpty();
      }
 
-    void pop()
+    void pop()                                                                  // Pop an element from the stuck
      {z(); action = "pop";
       size(); isEmpty(); assertNotEmpty();
       dec();
@@ -149,7 +140,7 @@ abstract class StuckSP extends Test                                             
       size(); isFull(); isEmpty();
      }
 
-    void shift()
+    void shift()                                                                // Shift an element from the stuck
      {z(); action = "shift";
       size(); isEmpty(); assertNotEmpty();
       found = true;
@@ -178,10 +169,10 @@ abstract class StuckSP extends Test                                             
      {z(); action = "setElementAt";
       size();
       if (index == size)                                                        // Extended range
-       {z(); setKeyData(base, index, key, data); inc(); ++size;
+       {z(); setKeyData(); inc(); ++size;
        }
       else                                                                      // In range
-       {z(); assertInNormal(); setKeyData(base, index, key, data);
+       {z(); assertInNormal(); setKeyData();
        }
       found = true;
      }
@@ -198,12 +189,12 @@ abstract class StuckSP extends Test                                             
       M.at(Data, base).moveUp(T.at(currentSize), T.at(Data));
       M.at(currentSize, base).inc();
 
-      setKeyData(base, index, key, data);
+      setKeyData();
       inc();
       size(); isEmpty(); isFull();
      }
 
-    void removeElementAt()
+    void removeElementAt()                                                      // Remove an element at the indicated location from the stuck
      {z(); action = "removeElementAt";
       size(); assertInNormal();
       found = true;
@@ -241,8 +232,8 @@ abstract class StuckSP extends Test                                             
      {z(); action = "search";
       size();
       boolean looking = true;
-      final int j = size-limit;                                                // Limit search if requested
-      for (index = 0; index < j && looking; index++)                                             // Search
+      final int j = size-limit;                                                 // Limit search if requested
+      for (index = 0; index < j && looking; index++)                            // Search
        {z(); key(); if (key == search) {z(); looking = false; break;}
        }
       found = !looking;
@@ -282,14 +273,14 @@ abstract class StuckSP extends Test                                             
 
 //D1 Print                                                                      // Print a stuck
 
-  public String toString(int Base)
-   {final StringBuilder s = new StringBuilder();                                //
+  public String toString(int Base)                                              // Print a stuck
+   {final StringBuilder s = new StringBuilder();
     z();
     final Transaction r = new Transaction(); r.base = Base; r.size();
     final int N = r.size;
     s.append("StuckSP(maxSize:"+maxSize());
     s.append(" size:"+N+")\n");
-    for (r.index = 0; r.index < N; r.index++)                                         // Search
+    for (r.index = 0; r.index < N; r.index++)                                   // Each element of stuck
      {z(); r.key(); r.data(); s.append("  "+r.index+" key:"+r.key+" data:"+r.data+"\n");
      }
     return s.toString();
@@ -687,8 +678,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:false in
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_remove_element_at();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
