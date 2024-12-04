@@ -10,6 +10,7 @@ class MemoryLayout extends Test                                                 
  {final Layout layout;                                                          // Layout of part of memory
   final Memory memory;                                                          // Memory containing layout
   final int      base;                                                          // Base of layout in memory
+  boolean debug;                                                                // Debug if true
 
 //D1 Construction                                                               // Address memory via a layout
 
@@ -110,10 +111,18 @@ class MemoryLayout extends Test                                                 
       locateDirectAddress();                                                    // The indices are constant so the address will not change over time
      }
     At(Layout.Field Field, At BaseField, At...Directs)                          // Variable indices used for obtaining run time values
-     {z(); field = Field; width = field.width; baseField = BaseField;
+     {z();
+      if (BaseField != null && BaseField.type != Type.direct)                   // Check that the base field, if present, does have recursive dependencies
+       {stop("Base field must not have a base or indices");
+       }
+      for (int i = 0; i < Directs.length; i++)
+       {if (Directs[i].type != Type.direct) stop("Index:", i, "must not have a base or indices");
+       }
+
+      field = Field; width = field.width; baseField = BaseField;
       type = Type.indirect; directs = Directs;
       indices = new int[Directs.length];
-      }
+     }
 
     boolean sameSize(At b)                                                      // Check two fields are the same size
      {if (field == null) return true;                                           // Constants match any size
@@ -137,20 +146,24 @@ class MemoryLayout extends Test                                                 
     void    setBit(int i, boolean b) {       memory.set(at+i, b);}              // Set a bit in memory  assuming that setOff() has been called to fix the location of the field containing the bit
 
     int  getInt()          {z(); return result;}                                // The value in memory, at the indicated location, treated as an integer or the value of the constant
-    void setInt(int value) {z(); memory.set(at, width, value);}                 // Set the value in memory at the indicated location, treated as an integer
+    void setInt(int value) {z();
+if (debug) err("DDDD", this);
+
+      memory.set(at, width, value);}                 // Set the value in memory at the indicated location, treated as an integer
 
     public String toString()                                                    // Print field name(indices)=value or name=value if there are no indices
      {final StringBuilder s = new StringBuilder();
       s.append(field.name);
       if (indices.length > 0)
-       {s.append("[");
+       {setOff();
+        s.append("[");
         for (int i = 0, N = indices.length; i < N; i++)
          {s.append(indices[i]);
           if (i < N-1) s.append(",");
          }
-        s.append("]("+base+"+"+delta+")"+at);
+        s.append("]");
        }
-      s.append("="+result);
+      s.append("("+base+"+"+delta+")"+at+"="+result);
       return s.toString();
      }
 
@@ -176,8 +189,8 @@ class MemoryLayout extends Test                                                 
     void moveUp(At Index, At buffer)                                            // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.
      {z(); sameSize(buffer);
       if (!(field instanceof Layout.Array))  stop("Array required for moveUp");
-      z(); setOff();                                                            // Sets the offset of the source/target
-      z(); buffer.setOff().move(this);                                          // Gets the offset of the buffer and copies the source
+      z(); setOff();                                                            // Set the offset of the source/target
+      z(); buffer.setOff().move(this);                                          // Set the offset of the buffer and copies the source
 
       final Layout.Array A = field.toArray();                                   // Address field to be moved as an array
       final  int w =     A.element.width;                                       // Width of array element
@@ -192,8 +205,8 @@ class MemoryLayout extends Test                                                 
     void moveDown(At Index, At buffer)                                          // Move the elements of an array down one position deleting the indexed element.  A buffer of the same size is used to permit copy in parallel.
      {z(); sameSize(buffer);
       if (!(field instanceof Layout.Array)) stop("Array required for moveDown");
-      z(); setOff();                                                            // Sets the offset of the target
-      z(); buffer.setOff().move(this);                                          // Gets the offset of the buffer and copies the source
+      z(); setOff();                                                            // Set the offset of the target
+      z(); buffer.setOff().move(this);                                          // Set the offset of the buffer and copies the source
 
       final Layout.Array A = field.toArray();                                   // Address field to be moved as an array
       final  int w =     A.element.width;                                       // Width of array element
@@ -204,6 +217,27 @@ class MemoryLayout extends Test                                                 
          }
        }
      }
+
+//D2 Search                                                                     // Search an array
+
+//    void findEqual(At key, At limit, At found)                                  // Search an array up to a specified limit for a element that is equal to the supplied search key. Found is set to 1 if the key is found else 0.  The index of the located key is set in limit.
+//     {z(); sameSize(buffer);
+//      if (!(field instanceof Layout.Array)) stop("Array required for findEqual");
+//      Layout.Array A = field.toArray();                                         // The array to be searched
+//      final int w = A.element.width;                                            // Width of array element
+//      z(); setOff();                                                            // Set the offset of the array to be searched
+//      z(); key.setOff();                                                        // Set the offset of the key to search for
+//      z(); limit.setOff();                                                      // Set the offset of the index limititing the smount of array to search
+//
+//      boolean looking = true;
+//      final int j = min(w, limit.result);                                       // Upper limit of search
+//      int i;
+//      for (i = 0; i < j && looking; i++)                                        // Search
+//       {z(); key(); if ( == search) {z(); looking = false; break;}
+//       }
+//      found.setInt(looking ? 0 : 1);                                            // Show result
+//      if (found) {z(); limit.setInt(i);}                                        // Save index of result
+//     }
 
 //D2 Bits                                                                       // Bit operations in a memory.
 
@@ -230,7 +264,8 @@ class MemoryLayout extends Test                                                 
 //D1 Boolean                                                                    // Boolean operations on fields held in memories.
 
     boolean equal(At b)                                                         // Whether  a == b
-     {z(); if (field == null || b.field == null)
+     {z();
+      if (field == null || b.field == null)
        {z(); return result == b.result;
        }
 
@@ -242,7 +277,17 @@ class MemoryLayout extends Test                                                 
       z(); return true;
      }
 
+    void    equal(At b, At result)                                              // Whether  a == b
+     {z();
+      result.setInt(equal(b) ? 1 : 0);
+     }
+
     boolean notEqual(At b) {return !equal(b);}                                  // Whether a != b
+
+    void    notEqual(At b, At result)                                           // Whether  a != b
+     {z();
+      result.setInt(equal(b) ? 1 : 0);
+     }
 
     boolean lessThan(At b)                                                      // Whether a < b
      {z();
@@ -257,11 +302,21 @@ class MemoryLayout extends Test                                                 
        z(); return false;
      }
 
+    void    lessThan(At b, At result)                                           // Whether  a < b
+     {z();
+      result.setInt(lessThan(b) ? 1 : 0);
+     }
+
     boolean lessThanOrEqual(At b)                                               // Whether a <= b
      {z();
       if (field == null || b.field == null) {z(); return result <= b.result;}
       z(); sameSize(b);
       return lessThan(b) || equal(b);
+     }
+
+    void    lessThanOrEqual(At b, At result)                                    // Whether  a <= b
+     {z();
+      result.setInt(lessThanOrEqual(b) ? 1 : 0);
      }
 
     boolean greaterThan(At b)                                                   // Whether a > b
@@ -271,9 +326,19 @@ class MemoryLayout extends Test                                                 
       return !lessThan(b) && !equal(b);
      }
 
+    void    greaterThan(At b, At result)                                        // Whether  a > b
+     {z();
+      result.setInt(greaterThan(b) ? 1 : 0);
+     }
+
     boolean greaterThanOrEqual(At b)                                            // Whether a >= b
      {z();
       return !lessThan(b);
+     }
+
+    void    greaterThanOrEqual(At b, At result)                                 // Whether  a >= b
+     {z();
+      result.setInt(greaterThanOrEqual(b) ? 1 : 0);
      }
 
 //D1 Arithmetic                                                                 // Arithmetic on integers
@@ -415,25 +480,25 @@ class MemoryLayout extends Test                                                 
    {TestMemoryLayout t = new TestMemoryLayout();
         MemoryLayout m = t.M;
               Layout l = m.layout;
-   ok(m.at(t.c,     0, 0, 0, 0), "c[0,0,0](0+12)12=15");
+   ok(m.at(t.c,      0, 0, 0, 0), "c[0,0,0](0+12)12=15");
    m.setInt(t.c, 11, 0, 0, 0, 0);
-   ok(m.at(t.c,     0, 0, 0, 0), "c[0,0,0](0+12)12=11");
+   ok(m.at(t.c,      0, 0, 0, 0), "c[0,0,0](0+12)12=11");
 
-   ok(m.at(t.c,     0, 0, 0, 1), "c[0,0,1](0+24)24=0");
+   ok(m.at(t.c,      0, 0, 0, 1), "c[0,0,1](0+24)24=0");
    m.setInt(t.c, 11, 0, 0, 0, 1);
-   ok(m.at(t.c,     0, 0, 0, 1), "c[0,0,1](0+24)24=11");
+   ok(m.at(t.c,      0, 0, 0, 1), "c[0,0,1](0+24)24=11");
 
-   ok(m.at(t.a,     0, 0, 2, 2), "a[0,2,2](0+116)116=15");
+   ok(m.at(t.a,      0, 0, 2, 2), "a[0,2,2](0+116)116=15");
    m.setInt(t.a,  5, 0, 0, 2, 2);
-   ok(m.at(t.a,     0, 0, 2, 2), "a[0,2,2](0+116)116=5");
+   ok(m.at(t.a,      0, 0, 2, 2), "a[0,2,2](0+116)116=5");
 
-   ok(m.at(t.b,     0, 1, 2, 2), "b[1,2,2](0+252)252=15");
+   ok(m.at(t.b,      0, 1, 2, 2), "b[1,2,2](0+252)252=15");
    m.setInt(t.b,  7, 0, 1, 2, 2);
-   ok(m.at(t.b,     0, 1, 2, 2), "b[1,2,2](0+252)252=7");
+   ok(m.at(t.b,      0, 1, 2, 2), "b[1,2,2](0+252)252=7");
 
-    ok(m.at(t.e,     0, 1, 2), "e[1,2](0+260)260=15");
+    ok(m.at(t.e,      0, 1, 2), "e[1,2](0+260)260=15");
     m.setInt(t.e, 11, 0, 1, 2);
-    ok(m.at(t.e,     0, 1, 2), "e[1,2](0+260)260=11");
+    ok(m.at(t.e,      0, 1, 2), "e[1,2](0+260)260=11");
    }
 
   static void test_boolean()
@@ -706,7 +771,8 @@ Line T       At      Wide       Size    Indices        Value   Name
     MemoryLayout     m = new MemoryLayout(l);
     m.at(i).setInt(1);
     m.at(j).setInt(2);
-    m.at(a, null, m.at(j)).setOff().setInt(m.at(i).getInt());
+    MemoryLayout.At I = m.at(i), J = m.at(j);
+    m.at(a, null, J).setOff().setInt(I.getInt());
     ok(""+m, """
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        28                                      S
@@ -857,6 +923,23 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
+  static void test_boolean_result()
+   {Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Variable  r = l.bit      ("c");
+    Layout.Structure s = l.structure("s", a, b, r);
+    l.compile();
+
+    MemoryLayout     m = new MemoryLayout(l);
+
+    m.at(a).setInt(1);
+    m.at(b).setInt(2);
+
+    m.at(a).lessThan(m.at(b), m.at(r)); ok( m.at(r).getInt(), 1);
+    m.at(b).lessThan(m.at(a), m.at(r)); ok( m.at(r).getInt(), 0);
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_get_set();
     test_boolean();
@@ -871,11 +954,12 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_move_up();
     test_move_down();
     test_zero();
+    test_boolean_result();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_zero();
+    test_boolean_result();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
