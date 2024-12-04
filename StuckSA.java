@@ -195,10 +195,10 @@ abstract class StuckSA extends Test                                             
      {z(); action = "unshift";
       size(); isFull(); assertNotFull();
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
-      m.at(found, t.at(base)).setInt(1);
+      t.at(found).setInt(1);
       t.zero();
-      m.at(Keys,        t.at(base)).moveUp(t.at(currentSize), t.at(Keys));
-      m.at(Data,        t.at(base)).moveUp(t.at(currentSize), t.at(Data));
+      m.at(Keys,        t.at(base)).moveUp(t.at(currentSize), c.at(Keys));
+      m.at(Data,        t.at(base)).moveUp(t.at(currentSize), c.at(Data));
       inc();
       m.at(index,       t.at(base)).setInt(0);
       setKeyData();
@@ -239,9 +239,9 @@ abstract class StuckSA extends Test                                             
      {z(); action = "elementAt";
       size(); assertInNormal();
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
-      m.at(found, t.at(base)).setInt(1);
-      key ();
-      data();
+      t.at(found).setInt(1);
+      t.at(tKey ).move(key ().setOff());
+      t.at(tData).move(data().setOff());
      }
 
     void setElementAt()                                                         // Set an element either in range or one above the current range
@@ -541,20 +541,20 @@ StuckSA(maxSize:8 size:3)
     try {t.pop();} catch(RuntimeException e) {}
    }
 
-
-/*
   static void test_unshift()
-   {StuckSA t = test_load();
-    final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
+   {StuckSA            s = test_load();
+    final Transaction  t = s.new Transaction();
+    final MemoryLayout m = t.trn;
+    m.at(t.base).setInt(s.baseAt());
 
-    r.key = 9; r.data = 9; r.unshift();
-    //stop(r);
-    ok(r, """
-Transaction(action:unshift search:0 limit:0 found:true index:0 key:9 data:9 base:16 size:5 isFull:false isEmpty:false)
+    m.at(t.tKey).setInt(9); m.at(t.tData).setInt(9);
+    t.unshift();
+    //stop(t);
+    ok(t, """
+Transaction(action:unshift search:0 limit:0 found:1 index:0 key:9 data:9 base:16 size:5 isFull:0 isEmpty:0)
 """);
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    //stop(s.toString(s.baseAt()));
+    ok(s.toString(s.baseAt()), """
 StuckSA(maxSize:8 size:5)
   0 key:9 data:9
   1 key:2 data:1
@@ -563,32 +563,36 @@ StuckSA(maxSize:8 size:5)
   4 key:8 data:4
 """);
 
-    ok(!r.isFull);
-    r.unshift(); r.unshift(); r.unshift();
-    ok( r.isFull);
+    ok(m.at(t.isFull).getInt() == 0);
+    t.unshift(); t.unshift(); t.unshift();
+    ok(m.at(t.isFull).getInt() == 1);
     sayThisOrStop("Full");
-    try {r.unshift();} catch(RuntimeException e) {}
+    try {t.unshift();} catch(RuntimeException e) {}
    }
 
   static void test_elementAt()
-   {StuckSA     t = test_load();
-    final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
-    r.index = 2; r.elementAt();
-    //stop(r);
-    ok(r, """
-Transaction(action:elementAt search:0 limit:0 found:true index:2 key:6 data:3 base:16 size:4 isFull:false isEmpty:false)
+   {StuckSA            s = test_load();
+    final Transaction  t = s.new Transaction();
+    final MemoryLayout m = t.trn;
+    m.at(t.base).setInt(s.baseAt());
+
+    m.at(t.index).setInt(2);
+    t.elementAt();
+    //stop(t);
+    ok(t, """
+Transaction(action:elementAt search:0 limit:0 found:1 index:2 key:6 data:3 base:16 size:4 isFull:0 isEmpty:0)
 """);
 
-    r.index = -2;
-    sayThisOrStop("Out of normal range -2 for size 4");
-    try {r.elementAt();} catch(RuntimeException e) {}
+    m.at(t.index).setInt(-2);
+    sayThisOrStop("Out of normal range 65534 for size 4");
+    try {t.elementAt();} catch(RuntimeException e) {}
 
-    r.index = 4;
+    m.at(t.index).setInt(4);
     sayThisOrStop("Out of normal range 4 for size 4");
-    try {r.elementAt();} catch(RuntimeException e) {}
+    try {t.elementAt();} catch(RuntimeException e) {}
    }
 
+/*
   static void test_set_element_at()
    {StuckSA  t = test_load();
     final Transaction r = t.new Transaction();
@@ -788,8 +792,8 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:false in
     test_push();
     test_pop();
     test_shift();
-    //test_unshift();
-    //test_elementAt();
+    test_unshift();
+    test_elementAt();
     //test_set_element_at();
     //test_insert_element_at();
     //test_remove_element_at();
