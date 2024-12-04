@@ -365,7 +365,8 @@ public class Layout extends Test                                                
     int at(int...Indices)                                                       // The address of an element in memory including any array indices
      {z();
       if (Indices.length != arrays.size())                                      // Check number of indices
-       {stop("Wrong number of indices, expected:", arrays.size(),
+       {stop("Wrong number of indices for:", field.name,
+         ", expected:", arrays.size(),
          "but got:", Indices.length);
        }
 
