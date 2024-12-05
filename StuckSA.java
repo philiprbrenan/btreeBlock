@@ -279,14 +279,14 @@ abstract class StuckSA extends Test                                             
      {z(); action = "removeElementAt";
       size(); assertInNormal();
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
-      m.at(found, t.at(base)).setInt(1);
-      key ();
-      data();
+      t.at(found).setInt(1);
+      t.at(tKey ).move(key ().setOff());
+      t.at(tData).move(data().setOff());
 
       t.zero();
       m.at(Keys, t.at(base)).moveDown(t.at(index), c.at(Keys));
       m.at(Data, t.at(base)).moveDown(t.at(index), c.at(Data));
-      m.at(currentSize, t.at(base)).dec();
+      m.at(currentSize, t.at(base)).setOff().dec();
 
       size(); isEmpty(); isFull();
      }
@@ -295,38 +295,39 @@ abstract class StuckSA extends Test                                             
      {z(); action = "firstElement";
       size(); isEmpty(); assertNotEmpty();
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
-      m.at(found, t.at(base)).setInt(1);
+      t.at(found).setInt(1);
       m.at(index, t.at(base)).setInt(0);
-      key ();
-      data();
+      t.at(tKey ).move(key ().setOff());
+      t.at(tData).move(data().setOff());
      }
 
     void lastElement()                                                          // Last element
      {z(); action = "lastElement";
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
       size(); isEmpty(); assertNotEmpty();
-      m.at(found, t.at(base)).setInt(1);
-      t.at(index).move(m.at(currentSize, t.at(base)));
+      t.at(found).setInt(1);
+      t.at(index).move(m.at(currentSize, t.at(base)).setOff());
       t.at(index).dec();
-      key ();
-      data();
+      t.at(tKey ).move(key ().setOff());
+      t.at(tData).move(data().setOff());
      }
 
     void search()                                                               // Search for an element within all elements of the stuck
      {z(); action = "search";
       size();
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+
       final int s = t.at(size).getInt(), l = t.at(limit).getInt(), L = s-l;     // Limit search if requested
-      final int S = t.at(search).getInt();
+
       for (int i = 0; i < L; i++)                                               // Search
        {z();
         t.at(index).setInt(i);
-        key();
+        t.at(tKey ).move(key ().setOff());
         t.at(tKey).equal(t.at(search), t.at(equal));
         if (t.at(equal).getInt() > 0)
          {z();
           t.at(found).setInt(1);
-          data();
+          t.at(tData).move(data().setOff());
           return;
          }
        }
@@ -343,13 +344,13 @@ abstract class StuckSA extends Test                                             
       for (int i = 0; i < L; i++)                                               // Search
        {z();
         t.at(index).setInt(i);
-        key();
+        t.at(tKey ).move(key ().setOff());
         t.at(tKey).greaterThanOrEqual(t.at(search), t.at(equal));
         if (t.at(equal).getInt() > 0)
          {z();
           t.at(found).setInt(1);
-          key();
-          data();
+          t.at(tKey ).move(key ().setOff());
+          t.at(tData).move(data().setOff());
           return;
          }
        }
@@ -662,7 +663,6 @@ StuckSA(maxSize:8 size:6)
     sayThisOrStop("Out of extended range 7 for size 6");
     try {t.insertElementAt();} catch(RuntimeException e) {}
    }
-/*
 
   static void test_remove_element_at()
    {StuckSA            s = test_load();
@@ -671,9 +671,9 @@ StuckSA(maxSize:8 size:6)
     m.at(t.base).setInt(s.baseAt());
 
     m.at(t.index).setInt(2); t.removeElementAt();
-    //stop(r);
-    ok(r, """
-Transaction(action:removeElementAt search:0 limit:0 found:true index:2 key:6 data:3 base:16 size:3 isFull:false isEmpty:false)
+    //stop(t);
+    ok(t, """
+Transaction(action:removeElementAt search:0 limit:0 found:1 index:2 key:6 data:3 base:16 size:3 isFull:0 isEmpty:0)
 """);
 
     //stop(s.toString(s.baseAt()));
@@ -696,15 +696,15 @@ StuckSA(maxSize:8 size:3)
     m.at(t.base).setInt(s.baseAt());
 
     t.firstElement();
-    //stop(r);
-    ok(r, """
-Transaction(action:firstElement search:0 limit:0 found:true index:0 key:2 data:1 base:16 size:4 isFull:false isEmpty:false)
+    //stop(t);
+    ok(t, """
+Transaction(action:firstElement search:0 limit:0 found:1 index:0 key:2 data:1 base:16 size:4 isFull:0 isEmpty:0)
 """);
 
     t.lastElement();
-    //stop(r);
-    ok(r, """
-Transaction(action:lastElement search:0 limit:0 found:true index:3 key:8 data:4 base:16 size:4 isFull:false isEmpty:false)
+    //stop(t);
+    ok(t, """
+Transaction(action:lastElement search:0 limit:0 found:1 index:3 key:8 data:4 base:16 size:4 isFull:0 isEmpty:0)
 """);
 
     t.clear();
@@ -719,20 +719,20 @@ Transaction(action:lastElement search:0 limit:0 found:true index:3 key:8 data:4 
     m.at(t.base).setInt(s.baseAt());
 
     m.at(t.search).setInt(2); t.search();
-    //stop(r);
-    ok(r, """
-Transaction(action:search search:2 limit:0 found:true index:0 key:2 data:1 base:16 size:4 isFull:false isEmpty:false)
+    //stop(t);
+    ok(t, """
+Transaction(action:search search:2 limit:0 found:1 index:0 key:2 data:1 base:16 size:4 isFull:0 isEmpty:0)
 """);
 
     m.at(t.search).setInt(3);  t.search();
-    //stop(r);
-    ok(r, """
-Transaction(action:search search:3 limit:0 found:false index:4 key:8 data:1 base:16 size:4 isFull:false isEmpty:false)
+    //stop(t);
+    ok(t, """
+Transaction(action:search search:3 limit:0 found:0 index:3 key:8 data:1 base:16 size:4 isFull:0 isEmpty:0)
 """);
     m.at(t.search).setInt(8);  t.search();
-    //stop(r);
-    ok(r, """
-Transaction(action:search search:8 limit:0 found:true index:3 key:8 data:4 base:16 size:4 isFull:false isEmpty:false)
+    //stop(t);
+    ok(t, """
+Transaction(action:search search:8 limit:0 found:1 index:3 key:8 data:4 base:16 size:4 isFull:0 isEmpty:0)
 """);
    }
 
@@ -745,15 +745,15 @@ Transaction(action:search search:8 limit:0 found:true index:3 key:8 data:4 base:
     m.at(t.limit).setInt(1);
 
     m.at(t.search).setInt(4);  t.search();
-    //stop(r);
-    ok(r, """
-Transaction(action:search search:4 limit:1 found:true index:1 key:4 data:2 base:16 size:4 isFull:false isEmpty:false)
+    //stop(t);
+    ok(t, """
+Transaction(action:search search:4 limit:1 found:1 index:1 key:4 data:2 base:16 size:4 isFull:0 isEmpty:0)
 """);
 
-    t.search = 8; t.search();
-    //stop(r);
-    ok(r, """
-Transaction(action:search search:8 limit:1 found:false index:3 key:6 data:2 base:16 size:4 isFull:false isEmpty:false)
+    m.at(t.search).setInt(8); t.search();
+    //stop(t);
+    ok(t, """
+Transaction(action:search search:8 limit:1 found:0 index:2 key:6 data:2 base:16 size:4 isFull:0 isEmpty:0)
 """);
    }
 
@@ -764,15 +764,15 @@ Transaction(action:search search:8 limit:1 found:false index:3 key:6 data:2 base
     m.at(t.base).setInt(s.baseAt());
 
     m.at(t.search).setInt(5); t.searchFirstGreaterThanOrEqual();
-    //stop(r);
-    ok(r, """
-Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:0 found:true index:2 key:6 data:3 base:16 size:4 isFull:false isEmpty:false)
+    //stop(t);
+    ok(t, """
+Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:0 found:1 index:2 key:6 data:3 base:16 size:4 isFull:0 isEmpty:0)
 """);
 
     m.at(t.search).setInt(7); t.searchFirstGreaterThanOrEqual();
-    //stop(r);
-    ok(r, """
-Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:0 found:true index:3 key:8 data:4 base:16 size:4 isFull:false isEmpty:false)
+    //stop(t);
+    ok(t, """
+Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:0 found:1 index:3 key:8 data:4 base:16 size:4 isFull:0 isEmpty:0)
 """);
    }
 
@@ -784,18 +784,17 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:0 found:true ind
 
     m.at(t.limit).setInt(1);
     m.at(t.search).setInt(5); t.searchFirstGreaterThanOrEqual();
-    //stop(r);
-    ok(r, """
-Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:1 found:true index:2 key:6 data:3 base:16 size:4 isFull:false isEmpty:false)
+    //stop(t);
+    ok(t, """
+Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:1 found:1 index:2 key:6 data:3 base:16 size:4 isFull:0 isEmpty:0)
 """);
 
     m.at(t.search).setInt(7); t.searchFirstGreaterThanOrEqual();
-    //stop(r);
-    ok(r, """
-Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:false index:3 key:6 data:3 base:16 size:4 isFull:false isEmpty:false)
+    //stop(t);
+    ok(t, """
+Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:2 key:6 data:3 base:16 size:4 isFull:0 isEmpty:0)
 """);
    }
-*/
 
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_load();
@@ -807,12 +806,12 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:false in
     test_elementAt();
     test_set_element_at();
     test_insert_element_at();
-    //test_remove_element_at();
-    //test_first_last();
-    //test_search();
-    //test_search_except_last();
-    //test_search_first_greater_than_or_equal();
-    //test_search_first_greater_than_or_equal_except_last();
+    test_remove_element_at();
+    test_first_last();
+    test_search();
+    test_search_except_last();
+    test_search_first_greater_than_or_equal();
+    test_search_first_greater_than_or_equal_except_last();
    }
 
   static void newTests()                                                        // Tests being worked on
