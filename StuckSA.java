@@ -236,7 +236,7 @@ abstract class StuckSA extends Test                                             
       m.at(Data, t.at(base)).setOff().moveDown(t.constant(0), c.at(Data));
       dec();
 
-      size(); isEmpty(); isFull();
+      sizeFullEmpty();
      }
 
     void elementAt()                                                            // Look up key and data associated with the index in the stuck at the specified base offset in memory
@@ -275,7 +275,7 @@ abstract class StuckSA extends Test                                             
 
       setKeyData();
       inc();
-      size(); isEmpty(); isFull();
+      sizeFullEmpty();
      }
 
     void removeElementAt()                                                      // Remove an element at the indicated location from the stuck
@@ -290,7 +290,7 @@ abstract class StuckSA extends Test                                             
       m.at(Data, t.at(base)).moveDown(t.at(index), c.at(Data));
       m.at(currentSize, t.at(base)).setOff().dec();
 
-      size(); isEmpty(); isFull();
+      sizeFullEmpty();
      }
 
     void firstElement()                                                         // First element
@@ -320,9 +320,7 @@ abstract class StuckSA extends Test                                             
       final int s = t.at(size).getInt(), l = t.at(limit).getInt(), L = s-l;     // Limit search if requested
 
       for (int i = 0; i < L; i++)                                               // Search
-       {z();
-        t.at(index).setInt(i);
-        moveKey();
+       {z(); t.at(index).setInt(i); moveKey();
         t.at(key).equal(t.at(search), t.at(equal));
         if (t.at(equal).getInt() > 0)
          {z();
@@ -342,9 +340,7 @@ abstract class StuckSA extends Test                                             
       final int s = t.at(size).getInt(), l = t.at(limit).getInt(), L = s-l;     // Limit search if requested
       final int S = t.at(search).getInt();
       for (int i = 0; i < L; i++)                                               // Search
-       {z();
-        t.at(index).setInt(i);
-        moveKey();
+       {z(); t.at(index).setInt(i); moveKey();
         t.at(key).greaterThanOrEqual(t.at(search), t.at(equal));
         if (t.at(equal).getInt() > 0)
          {z();
