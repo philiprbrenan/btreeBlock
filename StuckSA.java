@@ -3,7 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
-// rename Transaction key, data to this.key, this.data where needed
+
 abstract class StuckSA extends Test                                             // A fixed size stack of ordered key, data pairs with null deemed highest
  {abstract Memory memory();                                                     // Memory containing the stuck
   MemoryLayout memoryLayout() {return new MemoryLayout(memory(), layout);};     // The memory layout of this stuck
