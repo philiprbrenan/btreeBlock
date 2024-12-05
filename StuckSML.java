@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// A fixed size stack of ordered key, data pairs in a static bit memory
+// StuckStatic in bit memory
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
