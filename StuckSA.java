@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// A fixed size stack in a bit memory parameterized by a structure in bit memory
+// StuckSP parameterized by a single structure in bit memory
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
