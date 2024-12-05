@@ -63,19 +63,19 @@ abstract class StuckSA extends Test                                             
 
   class Transaction                                                             // Transaction on a stuck. Kept seprate from teh stuck itself because instances of this class are only needed when performing a transaction, they do not need to be stored for the long term like the stuck.
    {String action;                                                              // Action performed
-    Layout             tLayout;                                                 // Layout of a transaction against a stuck
-    Layout.Variable     search;                                                 // Search key
-    Layout.Variable      limit;                                                 // Limit of search
-    Layout.Bit          isFull;                                                 // Whether the stuck is currently full
-    Layout.Bit         isEmpty;                                                 // Whether the stuck is currently empty
-    Layout.Bit           found;                                                 // Whether a matching element was found
-    Layout.Variable      index;                                                 // The index from which the key, data pair were retrieved
-    Layout.Variable        key;                                                 // The retrieved key
-    Layout.Variable       data;                                                 // The retrieved data
-    Layout.Variable       base;                                                 // The base of the stuck
-    Layout.Variable       size;                                                 // The current size of the stuck
-    Layout.Bit           equal;                                                 // The result of an equal operation
-    Layout.Structure      temp;                                                 // Transaction intermediate fields
+    Layout         tLayout;                                                     // Layout of a transaction against a stuck
+    Layout.Variable search;                                                     // Search key
+    Layout.Variable  limit;                                                     // Limit of search
+    Layout.Bit      isFull;                                                     // Whether the stuck is currently full
+    Layout.Bit     isEmpty;                                                     // Whether the stuck is currently empty
+    Layout.Bit       found;                                                     // Whether a matching element was found
+    Layout.Variable  index;                                                     // The index from which the key, data pair were retrieved
+    Layout.Variable    key;                                                     // The retrieved key
+    Layout.Variable   data;                                                     // The retrieved data
+    Layout.Variable   base;                                                     // The base of the stuck
+    Layout.Variable   size;                                                     // The current size of the stuck
+    Layout.Bit       equal;                                                     // The result of an equal operation
+    Layout.Structure  temp;                                                     // Transaction intermediate fields
     final MemoryLayout trn = new MemoryLayout(layout());                        // Memory for transaction intemediates
     final MemoryLayout cpy = new MemoryLayout(StuckSA.this.layout);             // Buffer for stuck being manipulated
 
@@ -98,102 +98,102 @@ abstract class StuckSA extends Test                                             
      }
 
     void size()                                                                 // The current number of key elements in the stuck
-     {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
-      t.at(size).move(m.at(currentSize, t.at(base)).setOff());
+     {z(); final MemoryLayout t = trn;
+      t.at(size).move(memoryLayout().at(currentSize, t.at(base)).setOff());
      }
 
-    void isFull ()                                                              // Check the stuck is full
-     {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+    void isFull()                                                               // Check the stuck is full
+     {z(); final MemoryLayout t = trn;
       t.at(size).greaterThanOrEqual(t.constant(maxSize()), t.at(isFull));
      }
 
     void isEmpty()                                                              // Check the stuck is empty
-     {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+     {z(); final MemoryLayout t = trn;
       t.at(size).equal(t.constant(0), t.at(isEmpty));
      }
 
-    void assertNotFull   ()                                                     // Assert the stuck is not full
-     {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+    void assertNotFull()                                                        // Assert the stuck is not full
+     {z(); final MemoryLayout t = trn;
       if (t.at(isFull).getInt() > 0) stop("Full");
      }
 
-    void assertNotEmpty   ()                                                    // Assert the stuck is not empty
-     {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+    void assertNotEmpty()                                                       // Assert the stuck is not empty
+     {z(); final MemoryLayout t = trn;
       if (t.at(isEmpty).getInt() > 0) stop("Empty");
      }
 
-    void assertInNormal  ()                                                     // Check that the index would yield a valid element
-     {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+    void assertInNormal()                                                       // Check that the index would yield a valid element
+     {z(); final MemoryLayout t = trn;
       final int i = t.at(index).getInt();
       final int s = t.at(size) .getInt();
       if (i < 0 || i >= s) stop("Out of normal range",   i, "for size", s);
      }
 
     void assertInExtended()                                                     // Check that the index would yield a valid element
-     {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+     {z(); final MemoryLayout t = trn;
       final int i = t.at(index).getInt();
       final int s = t.at(size) .getInt();
       if (i < 0 || i > s) stop("Out of extended range", i, "for size", s);
      }
 
     void inc()                                                                  // Increment the current size
-     {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+     {z(); final MemoryLayout m = memoryLayout(), t = trn;
       z(); assertNotFull();
       z(); final int s = m.at(currentSize, t.at(base)).setOff().getInt();
                          m.at(currentSize, t.at(base)).setOff().setInt(s+1);
      }
 
     void dec()                                                                  // Decrement the current size
-     {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+     {z(); final MemoryLayout m = memoryLayout(), t = trn;
       z(); assertNotEmpty();
       z(); final int s = m.at(currentSize, t.at(base)).setOff().getInt();
                          m.at(currentSize, t.at(base)).setOff().setInt(s-1);
      }
 
     void clear()                                                                // Zero the current size to clear the stuck
-     {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+     {z(); final MemoryLayout m = memoryLayout(), t = trn;
       z(); assertNotEmpty();
       z(); m.at(currentSize, t.at(base)).setOff().setInt(0);
       size(); isFull(); isEmpty();
      }
 
     MemoryLayout.At key()                                                       // Refer to key
-     {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+     {z(); final MemoryLayout m = memoryLayout(), t = trn;
       return m.at(StuckSA.this.key,  t.at(base), t.at(index));
      }
 
     MemoryLayout.At data()                                                      // Refer to data
-     {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+     {z(); final MemoryLayout m = memoryLayout(), t = trn;
       return m.at(StuckSA.this.data, t.at(base), t.at(index));
      }
 
     void moveKey()                                                              // Move a key from the stuck to this transaction
-     {z(); final MemoryLayout m = memoryLayout(), t = trn;
+     {z(); final MemoryLayout t = trn;
       t.at(key ).move(key ().setOff());
      }
 
     void moveData()                                                             // Move a key from the stuck to this transaction
-     {z(); final MemoryLayout m = memoryLayout(), t = trn;
+     {z(); final MemoryLayout t = trn;
       t.at(data).move(data().setOff());
      }
 
     void setKey  ()                                                             // Set the indexed key
-     {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+     {z(); final MemoryLayout t = trn;
       z(); key().setOff().move(t.at(key));
      }
 
     void setData ()                                                             // Set the indexed data
-     {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+     {z(); final MemoryLayout t = trn;
       z(); data().setOff().move(t.at(data));
      }
 
-    void  setKeyData()                                                          // Set a key, data element in the stuck
+    void setKeyData()                                                           // Set a key, data element in the stuck
      {z(); setKey(); setData();
      }
 
     void push()                                                                 // Push an element onto the stuck
      {z(); action = "push";
-      final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+      final MemoryLayout t = trn;
       size(); isFull(); assertNotFull();
       t.at(index).move(t.at(size));
       setKeyData();
@@ -207,10 +207,10 @@ abstract class StuckSA extends Test                                             
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
       t.at(found).setInt(1);
       t.zero();
-      m.at(Keys,        t.at(base)).moveUp(t.at(currentSize), c.at(Keys));
-      m.at(Data,        t.at(base)).moveUp(t.at(currentSize), c.at(Data));
+      m.at(Keys,  t.at(base)).moveUp(t.at(currentSize), c.at(Keys));
+      m.at(Data,  t.at(base)).moveUp(t.at(currentSize), c.at(Data));
       inc();
-      m.at(index,       t.at(base)).setInt(0);
+      m.at(index, t.at(base)).setInt(0);
       setKeyData();
       size(); isFull(); isEmpty();
      }
@@ -219,7 +219,7 @@ abstract class StuckSA extends Test                                             
      {z(); action = "pop";
       size(); isEmpty(); assertNotEmpty();
       dec();
-      final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+      final MemoryLayout t = trn;
       t.at(found).setInt(1);
       t.at(size).dec();
       t.at(index).move(t.at(size));
@@ -248,7 +248,7 @@ abstract class StuckSA extends Test                                             
     void elementAt()                                                            // Look up key and data associated with the index in the stuck at the specified base offset in memory
      {z(); action = "elementAt";
       size(); assertInNormal();
-      final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+      final MemoryLayout t = trn;
       t.at(found).setInt(1);
       moveKey();
       moveData();
@@ -257,7 +257,7 @@ abstract class StuckSA extends Test                                             
     void setElementAt()                                                         // Set an element either in range or one above the current range
      {z(); action = "setElementAt";
       size();
-      final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+      final MemoryLayout t = trn;
       t.at(index).equal(t.at(size), t.at(equal));                               // Extended range
       if (t.at(equal).getInt() > 0)
        {z(); setKeyData(); inc();
@@ -304,7 +304,7 @@ abstract class StuckSA extends Test                                             
     void firstElement()                                                         // First element
      {z(); action = "firstElement";
       size(); isEmpty(); assertNotEmpty();
-      final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+      final MemoryLayout m = memoryLayout(), t = trn;
       t.at(found).setInt(1);
       m.at(index, t.at(base)).setInt(0);
       moveKey();
@@ -313,7 +313,7 @@ abstract class StuckSA extends Test                                             
 
     void lastElement()                                                          // Last element
      {z(); action = "lastElement";
-      final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+      final MemoryLayout m = memoryLayout(), t = trn;
       size(); isEmpty(); assertNotEmpty();
       t.at(found).setInt(1);
       t.at(index).move(m.at(currentSize, t.at(base)).setOff());
@@ -325,7 +325,7 @@ abstract class StuckSA extends Test                                             
     void search()                                                               // Search for an element within all elements of the stuck
      {z(); action = "search";
       size();
-      final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+      final MemoryLayout t = trn;
 
       final int s = t.at(size).getInt(), l = t.at(limit).getInt(), L = s-l;     // Limit search if requested
 
@@ -348,7 +348,7 @@ abstract class StuckSA extends Test                                             
      {z(); action = "searchFirstGreaterThanOrEqual";
       size();
 
-      final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
+      final MemoryLayout t = trn;
       final int s = t.at(size).getInt(), l = t.at(limit).getInt(), L = s-l;     // Limit search if requested
       final int S = t.at(search).getInt();
       for (int i = 0; i < L; i++)                                               // Search
