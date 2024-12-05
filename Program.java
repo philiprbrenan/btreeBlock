@@ -47,11 +47,14 @@ class Program extends Test                                                      
   void Goto(Label label) {step = label.instruction-1;}                          // The program execution for loop will increment first
 
   abstract class If                                                             // An if statement
-   {final Label Else = new Label(), End = new Label();                          // Components of an if statement
-    If()
-     {new I() {void a() {if (!ifCondition) Goto(Else);}};                       // Branch on the current value of if condition
+   {final MemoryLayout.At condition;                                            // Then if this field is non zero at run time, else Else
+    final Label Else = new Label(), End = new Label();                          // Components of an if statement
+
+    If (MemoryLayout.At Condition)                                              // If a condition
+     {condition = Condition;
+      new I() {void a() {if (condition.setOff().getInt() == 0) Goto(Else);}};   // Branch on the current value of if condition
       Then();
-      Goto(End);
+      new I() {void a() {Goto(End);}};
       Else.set();
       Else();
       End.set();
@@ -139,13 +142,41 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(f, "[0 fizzbuzz, 2 fizz, 3 buzz, 4 fizz, 6 fizzbuzz, 8 fizz, 9 buzz, 10 fizz, 12 fizzbuzz, 14 fizz, 15 buzz]");
    }
 
+  static void test_if()
+   {int           time = 40;
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Structure s = l.structure("s", a, b);
+
+    MemoryLayout     m = new MemoryLayout(l.compile());
+    Program          p = new Program();
+    Stack<Integer>   f = new Stack<>();
+
+    m.at(a).setInt(1);
+
+    p.new If (m.at(a))
+     {void Then() {p.new I() {void a() {f.push(1);}};}
+      void Else() {p.new I() {void a() {f.push(2);}};}
+     };
+
+    p.new If (m.at(b))
+     {void Then() {p.new I() {void a() {f.push(3);}};}
+      void Else() {p.new I() {void a() {f.push(4);}};}
+     };
+    p.execute();
+    ok(f, "[1, 4]");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_fibonacci();
     test_fizz_buzz();
+    test_if();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    test_if();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
