@@ -223,8 +223,7 @@ abstract class StuckSA extends Test                                             
       t.at(found).setInt(1);
       t.at(size).dec();
       t.at(index).move(t.at(size));
-      moveKey();
-      moveData();
+      moveKey(); moveData();
       size(); isFull(); isEmpty();
      }
 
@@ -234,8 +233,7 @@ abstract class StuckSA extends Test                                             
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
       t.at(found).setInt(1);
       t.at(index).setInt(0);
-      moveKey();
-      moveData();
+      moveKey(); moveData();
 
       t.zero();
       m.at(Keys, t.at(base)).setOff().moveDown(t.constant(0), c.at(Keys));
@@ -250,8 +248,7 @@ abstract class StuckSA extends Test                                             
       size(); assertInNormal();
       final MemoryLayout t = trn;
       t.at(found).setInt(1);
-      moveKey();
-      moveData();
+      moveKey(); moveData();
      }
 
     void setElementAt()                                                         // Set an element either in range or one above the current range
@@ -290,8 +287,7 @@ abstract class StuckSA extends Test                                             
       size(); assertInNormal();
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
       t.at(found).setInt(1);
-      moveKey();
-      moveData();
+      moveKey(); moveData();
 
       t.zero();
       m.at(Keys, t.at(base)).moveDown(t.at(index), c.at(Keys));
@@ -307,8 +303,7 @@ abstract class StuckSA extends Test                                             
       final MemoryLayout m = memoryLayout(), t = trn;
       t.at(found).setInt(1);
       m.at(index, t.at(base)).setInt(0);
-      moveKey();
-      moveData();
+      moveKey(); moveData();
      }
 
     void lastElement()                                                          // Last element
@@ -318,8 +313,7 @@ abstract class StuckSA extends Test                                             
       t.at(found).setInt(1);
       t.at(index).move(m.at(currentSize, t.at(base)).setOff());
       t.at(index).dec();
-      moveKey();
-      moveData();
+      moveKey(); moveData();
      }
 
     void search()                                                               // Search for an element within all elements of the stuck
