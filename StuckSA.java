@@ -3,7 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
-// rename Transaction tKey, tData to this.key, this.data where needed
+// rename Transaction key, data to this.key, this.data where needed
 abstract class StuckSA extends Test                                             // A fixed size stack of ordered key, data pairs with null deemed highest
  {abstract Memory memory();                                                     // Memory containing the stuck
   MemoryLayout memoryLayout() {return new MemoryLayout(memory(), layout);};     // The memory layout of this stuck
@@ -70,8 +70,8 @@ abstract class StuckSA extends Test                                             
     Layout.Bit         isEmpty;                                                 // Whether the stuck is currently empty
     Layout.Bit           found;                                                 // Whether a matching element was found
     Layout.Variable      index;                                                 // The index from which the key, data pair were retrieved
-    Layout.Variable      tKey;                                                  // The retrieved key
-    Layout.Variable      tData;                                                 // The retrieved data
+    Layout.Variable        key;                                                 // The retrieved key
+    Layout.Variable       data;                                                 // The retrieved data
     Layout.Variable       base;                                                 // The base of the stuck
     Layout.Variable       size;                                                 // The current size of the stuck
     Layout.Bit           equal;                                                 // The result of an equal operation
@@ -88,12 +88,12 @@ abstract class StuckSA extends Test                                             
       isEmpty = tLayout.bit      ("isEmpty");
         found = tLayout.bit      (  "found");
         index = tLayout.variable (  "index", bitsPerSize());
-         tKey = tLayout.variable (    "key", bitsPerKey());
-        tData = tLayout.variable (   "data", bitsPerData());
+          key = tLayout.variable (    "key", bitsPerKey());
+         data = tLayout.variable (   "data", bitsPerData());
          base = tLayout.variable (   "base", bitsPerSize());
          size = tLayout.variable (   "size", bitsPerSize());
         equal = tLayout.bit      (  "equal");
-         temp = tLayout.structure("temp", search, limit, isFull, isEmpty, found, index, tKey, tData, base, size, equal);
+         temp = tLayout.structure("temp", search, limit, isFull, isEmpty, found, index, key, data, base, size, equal);
       return tLayout.compile();
      }
 
@@ -157,24 +157,34 @@ abstract class StuckSA extends Test                                             
       size(); isFull(); isEmpty();
      }
 
-    MemoryLayout.At key ()                                                      // Refer to key
+    MemoryLayout.At key()                                                       // Refer to key
      {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
-      return m.at(key,  t.at(base), t.at(index));
+      return m.at(StuckSA.this.key,  t.at(base), t.at(index));
      }
 
     MemoryLayout.At data()                                                      // Refer to data
      {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
-      return m.at(data, t.at(base), t.at(index));
+      return m.at(StuckSA.this.data, t.at(base), t.at(index));
+     }
+
+    void moveKey()                                                              // Move a key from the stuck to this transaction
+     {z(); final MemoryLayout m = memoryLayout(), t = trn;
+      t.at(key ).move(key ().setOff());
+     }
+
+    void moveData()                                                             // Move a key from the stuck to this transaction
+     {z(); final MemoryLayout m = memoryLayout(), t = trn;
+      t.at(data).move(data().setOff());
      }
 
     void setKey  ()                                                             // Set the indexed key
      {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
-      z(); key().setOff().move(t.at(tKey));
+      z(); key().setOff().move(t.at(key));
      }
 
     void setData ()                                                             // Set the indexed data
      {z(); final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
-      z(); data().setOff().move(t.at(tData));
+      z(); data().setOff().move(t.at(data));
      }
 
     void  setKeyData()                                                          // Set a key, data element in the stuck
@@ -213,8 +223,8 @@ abstract class StuckSA extends Test                                             
       t.at(found).setInt(1);
       t.at(size).dec();
       t.at(index).move(t.at(size));
-      t.at(tKey ).move(key ().setOff());
-      t.at(tData).move(data().setOff());
+      moveKey();
+      moveData();
       size(); isFull(); isEmpty();
      }
 
@@ -224,8 +234,8 @@ abstract class StuckSA extends Test                                             
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
       t.at(found).setInt(1);
       t.at(index).setInt(0);
-      t.at(tKey ).move(key ().setOff());
-      t.at(tData).move(data().setOff());
+      moveKey();
+      moveData();
 
       t.zero();
       m.at(Keys, t.at(base)).setOff().moveDown(t.constant(0), c.at(Keys));
@@ -240,8 +250,8 @@ abstract class StuckSA extends Test                                             
       size(); assertInNormal();
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
       t.at(found).setInt(1);
-      t.at(tKey ).move(key ().setOff());
-      t.at(tData).move(data().setOff());
+      moveKey();
+      moveData();
      }
 
     void setElementAt()                                                         // Set an element either in range or one above the current range
@@ -280,8 +290,8 @@ abstract class StuckSA extends Test                                             
       size(); assertInNormal();
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
       t.at(found).setInt(1);
-      t.at(tKey ).move(key ().setOff());
-      t.at(tData).move(data().setOff());
+      moveKey();
+      moveData();
 
       t.zero();
       m.at(Keys, t.at(base)).moveDown(t.at(index), c.at(Keys));
@@ -297,8 +307,8 @@ abstract class StuckSA extends Test                                             
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
       t.at(found).setInt(1);
       m.at(index, t.at(base)).setInt(0);
-      t.at(tKey ).move(key ().setOff());
-      t.at(tData).move(data().setOff());
+      moveKey();
+      moveData();
      }
 
     void lastElement()                                                          // Last element
@@ -308,8 +318,8 @@ abstract class StuckSA extends Test                                             
       t.at(found).setInt(1);
       t.at(index).move(m.at(currentSize, t.at(base)).setOff());
       t.at(index).dec();
-      t.at(tKey ).move(key ().setOff());
-      t.at(tData).move(data().setOff());
+      moveKey();
+      moveData();
      }
 
     void search()                                                               // Search for an element within all elements of the stuck
@@ -322,12 +332,12 @@ abstract class StuckSA extends Test                                             
       for (int i = 0; i < L; i++)                                               // Search
        {z();
         t.at(index).setInt(i);
-        t.at(tKey ).move(key ().setOff());
-        t.at(tKey).equal(t.at(search), t.at(equal));
+        moveKey();
+        t.at(key).equal(t.at(search), t.at(equal));
         if (t.at(equal).getInt() > 0)
          {z();
           t.at(found).setInt(1);
-          t.at(tData).move(data().setOff());
+          moveData();
           return;
          }
        }
@@ -344,13 +354,13 @@ abstract class StuckSA extends Test                                             
       for (int i = 0; i < L; i++)                                               // Search
        {z();
         t.at(index).setInt(i);
-        t.at(tKey ).move(key ().setOff());
-        t.at(tKey).greaterThanOrEqual(t.at(search), t.at(equal));
+        moveKey();
+        t.at(key).greaterThanOrEqual(t.at(search), t.at(equal));
         if (t.at(equal).getInt() > 0)
          {z();
           t.at(found).setInt(1);
-          t.at(tKey ).move(key ().setOff());
-          t.at(tData).move(data().setOff());
+          moveKey();
+          moveData();
           return;
          }
        }
@@ -366,8 +376,8 @@ abstract class StuckSA extends Test                                             
       s.append(  " limit:"+t.at(limit)  .getInt());
       s.append(  " found:"+t.at(found)  .getInt());
       s.append(  " index:"+t.at(index)  .getInt());
-      s.append(    " key:"+t.at(tKey)   .getInt());
-      s.append(   " data:"+t.at(tData)  .getInt());
+      s.append(    " key:"+t.at(key)   .getInt());
+      s.append(   " data:"+t.at(data)  .getInt());
       s.append(   " base:"+t.at(base)   .getInt());
       s.append(   " size:"+t.at(size)   .getInt());
       s.append( " isFull:"+t.at(isFull) .getInt());
@@ -406,8 +416,8 @@ abstract class StuckSA extends Test                                             
     final MemoryLayout m = t.trn;
     m.at(t.base).setInt(s.baseAt());
     for (int i = 0; i < 4; i++)
-     {m.at(t.tKey ).setInt(2 + 2 * i);
-      m.at(t.tData).setInt(1 + 1 * i);
+     {m.at(t.key ).setInt(2 + 2 * i);
+      m.at(t.data).setInt(1 + 1 * i);
       t.push();
      }
     //stop(s.toString(s.baseAt()));
@@ -438,10 +448,10 @@ StuckSA(maxSize:8 size:4)
     final Transaction  t = s.new Transaction();
     final MemoryLayout m = t.trn;
     m.at(t.base).setInt(s.baseAt());
-    m.at(t.tKey).setInt(15); m.at(t.tData).setInt( 9); t.push();
-    m.at(t.tKey).setInt(14); m.at(t.tData).setInt(10); t.push();
-    m.at(t.tKey).setInt(13); m.at(t.tData).setInt(11); t.push();
-    m.at(t.tKey).setInt(12); m.at(t.tData).setInt(12); t.push();
+    m.at(t.key).setInt(15); m.at(t.data).setInt( 9); t.push();
+    m.at(t.key).setInt(14); m.at(t.data).setInt(10); t.push();
+    m.at(t.key).setInt(13); m.at(t.data).setInt(11); t.push();
+    m.at(t.key).setInt(12); m.at(t.data).setInt(12); t.push();
     //stop(s.memoryLayout());
     ok(s.memoryLayout(), """
 Line T       At      Wide       Size    Indices        Value   Name
@@ -483,12 +493,12 @@ StuckSA(maxSize:8 size:4)
   3 key:12 data:12
 """);
 
-    m.at(t.tKey).setInt(11); m.at(t.tData).setInt(11); t.push(); ok(m.at(t.isFull).getInt() == 0); ok(m.at(t.isEmpty).getInt() == 0);
-    m.at(t.tKey).setInt(10); m.at(t.tData).setInt(10); t.push();
-    m.at(t.tKey).setInt( 9); m.at(t.tData).setInt( 9); t.push();
-    m.at(t.tKey).setInt( 8); m.at(t.tData).setInt( 8); t.push(); ok(m.at(t.isFull).getInt() == 1);
+    m.at(t.key).setInt(11); m.at(t.data).setInt(11); t.push(); ok(m.at(t.isFull).getInt() == 0); ok(m.at(t.isEmpty).getInt() == 0);
+    m.at(t.key).setInt(10); m.at(t.data).setInt(10); t.push();
+    m.at(t.key).setInt( 9); m.at(t.data).setInt( 9); t.push();
+    m.at(t.key).setInt( 8); m.at(t.data).setInt( 8); t.push(); ok(m.at(t.isFull).getInt() == 1);
     sayThisOrStop("Full");
-    try {m.at(t.tKey).setInt(7); m.at(t.tData).setInt(7); t.push();} catch(RuntimeException e) {}
+    try {m.at(t.key).setInt(7); m.at(t.data).setInt(7); t.push();} catch(RuntimeException e) {}
    }
 
   static void test_pop()
@@ -548,7 +558,7 @@ StuckSA(maxSize:8 size:3)
     final MemoryLayout m = t.trn;
     m.at(t.base).setInt(s.baseAt());
 
-    m.at(t.tKey).setInt(9); m.at(t.tData).setInt(9);
+    m.at(t.key).setInt(9); m.at(t.data).setInt(9);
     t.unshift();
     //stop(t);
     ok(t, """
@@ -599,7 +609,7 @@ Transaction(action:elementAt search:0 limit:0 found:1 index:2 key:6 data:3 base:
     final MemoryLayout m = t.trn;
     m.at(t.base).setInt(s.baseAt());
 
-    m.at(t.tKey).setInt(22); m.at(t.tData).setInt(33); m.at(t.index).setInt(2);
+    m.at(t.key).setInt(22); m.at(t.data).setInt(33); m.at(t.index).setInt(2);
     t.setElementAt();
     //stop(s.toString(s.baseAt()));
     ok(s.toString(s.baseAt()), """
@@ -610,7 +620,7 @@ StuckSA(maxSize:8 size:4)
   3 key:8 data:4
 """);
 
-    m.at(t.tKey).setInt(88); m.at(t.tData).setInt(99); m.at(t.index).setInt(4); t.setElementAt();
+    m.at(t.key).setInt(88); m.at(t.data).setInt(99); m.at(t.index).setInt(4); t.setElementAt();
     //stop(s.toString(s.baseAt()));
     ok(s.toString(s.baseAt()), """
 StuckSA(maxSize:8 size:5)
@@ -636,7 +646,7 @@ StuckSA(maxSize:8 size:5)
     final MemoryLayout m = t.trn;
     m.at(t.base).setInt(s.baseAt());
 
-    m.at(t.tKey).setInt(9); m.at(t.tData).setInt(9); m.at(t.index).setInt(2); t.insertElementAt();
+    m.at(t.key).setInt(9); m.at(t.data).setInt(9); m.at(t.index).setInt(2); t.insertElementAt();
     //stop(s.toString(s.baseAt()));
     ok(s.toString(s.baseAt()), """
 StuckSA(maxSize:8 size:5)
@@ -647,7 +657,7 @@ StuckSA(maxSize:8 size:5)
   4 key:8 data:4
 """);
 
-    m.at(t.tKey).setInt(7); m.at(t.tData).setInt(7); m.at(t.index).setInt(5); t.insertElementAt();
+    m.at(t.key).setInt(7); m.at(t.data).setInt(7); m.at(t.index).setInt(5); t.insertElementAt();
     //stop(s.toString(s.baseAt()));
     ok(s.toString(s.baseAt()), """
 StuckSA(maxSize:8 size:6)
