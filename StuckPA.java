@@ -271,22 +271,22 @@ abstract class StuckPA extends Test                                             
      {z(); action = "setElementAt";
       final MemoryLayout t = trn;
       final Program      p = new Program();
-      size();
-      t.at(index).equal(t.at(size), t.at(equal));                               // Extended range
-      new If(t.at(equal).getInt() > 0)
+      p.new I() {void a() {size();}};
+      p.new I() {void a() {t.at(index).equal(t.at(size), t.at(equal));}};       // Extended range
+      p.new If(t.at(equal))
        {void Then()
          {z();
-          setKeyData();
-          inc();
-          t.at(size).inc();
+          p.new I() {void a() {setKeyData();}};
+          p.new I() {void a() {inc();}};
+          p.new I() {void a() {t.at(size).inc();}};
          }
         void Else()                                                             // In range
          {z();
-          assertInNormal();
-          setKeyData();
+          p.new I() {void a() {assertInNormal();}};
+          p.new I() {void a() {setKeyData();}};
          }
        };
-      setFound();
+      p.new I() {void a() {setFound();}};
       p.execute();
      }
 
@@ -294,17 +294,17 @@ abstract class StuckPA extends Test                                             
      {z(); action = "insertElementAt";
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
       final Program      p = new Program();
-      size();
-      isFull();
-      assertInExtended();
+      p.new I() {void a() {size();}};
+      p.new I() {void a() {isFull();}};
+      p.new I() {void a() {assertInExtended();}};
 
-      t.zero();
-      m.at(Keys, t.at(base)).moveUp(t.at(index), c.at(Keys));
-      m.at(Data, t.at(base)).moveUp(t.at(index), c.at(Data));
-      m.at(currentSize, t.at(base)).inc();
-      setKeyData();
-      inc();
-      sizeFullEmpty();
+      p.new I() {void a() {t.zero();}};
+      p.new I() {void a() {m.at(Keys, t.at(base)).moveUp(t.at(index), c.at(Keys));}};
+      p.new I() {void a() {m.at(Data, t.at(base)).moveUp(t.at(index), c.at(Data));}};
+      p.new I() {void a() {m.at(currentSize, t.at(base)).inc();}};
+      p.new I() {void a() {setKeyData();}};
+      p.new I() {void a() {inc();}};
+      p.new I() {void a() {sizeFullEmpty();}};
       p.execute();
      }
 
@@ -312,18 +312,18 @@ abstract class StuckPA extends Test                                             
      {z(); action = "removeElementAt";
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
       final Program      p = new Program();
-      size();
-      assertInNormal();
-      setFound();
-      moveKey();
-      moveData();
+      p.new I() {void a() {size();}};
+      p.new I() {void a() {assertInNormal();}};
+      p.new I() {void a() {setFound();}};
+      p.new I() {void a() {moveKey();}};
+      p.new I() {void a() {moveData();}};
 
-      t.zero();
-      m.at(Keys, t.at(base)).moveDown(t.at(index), c.at(Keys));
-      m.at(Data, t.at(base)).moveDown(t.at(index), c.at(Data));
-      m.at(currentSize, t.at(base)).setOff().dec();
+      p.new I() {void a() {t.zero();}};
+      p.new I() {void a() {m.at(Keys, t.at(base)).moveDown(t.at(index), c.at(Keys));}};
+      p.new I() {void a() {m.at(Data, t.at(base)).moveDown(t.at(index), c.at(Data));}};
+      p.new I() {void a() {m.at(currentSize, t.at(base)).setOff().dec();}};
 
-      sizeFullEmpty();
+      p.new I() {void a() {sizeFullEmpty();}};
       p.execute();
      }
 
@@ -331,13 +331,13 @@ abstract class StuckPA extends Test                                             
      {z(); action = "firstElement";
       final MemoryLayout m = memoryLayout(), t = trn;
       final Program      p = new Program();
-      size();
-      isEmpty();
-      assertNotEmpty();
-      setFound();
-      m.at(index, t.at(base)).setInt(0);
-      moveKey();
-      moveData();
+      p.new I() {void a() {size();}};
+      p.new I() {void a() {isEmpty();}};
+      p.new I() {void a() {assertNotEmpty();}};
+      p.new I() {void a() {setFound();}};
+      p.new I() {void a() {m.at(index, t.at(base)).setInt(0);}};
+      p.new I() {void a() {moveKey();}};
+      p.new I() {void a() {moveData();}};
       p.execute();
      }
 
@@ -345,13 +345,13 @@ abstract class StuckPA extends Test                                             
      {z(); action = "lastElement";
       final MemoryLayout m = memoryLayout(), t = trn;
       final Program      p = new Program();
-      size();
-      isEmpty();
-      assertNotEmpty();
-      setFound();
-      t.at(index).move(m.at(currentSize, t.at(base)).setOff());
-      t.at(index).dec();
-      moveKey(); moveData();
+      p.new I() {void a() {size();}};
+      p.new I() {void a() {isEmpty();}};
+      p.new I() {void a() {assertNotEmpty();}};
+      p.new I() {void a() {setFound();}};
+      p.new I() {void a() {t.at(index).move(m.at(currentSize, t.at(base)).setOff());}};
+      p.new I() {void a() {t.at(index).dec();}};
+      p.new I() {void a() {moveKey(); moveData();}};
       p.execute();
      }
 
