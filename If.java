@@ -11,21 +11,15 @@ abstract class If extends Test                                                  
 
 //D1 Construction                                                               // Create a modular if statement
 
-  If(boolean condition)
+  If (boolean condition)
    {if (condition) Then(); else Else();
    }
   void Then() {}
   void Else() {}
 
-//D1 Control                                                                    // Testing, control and integrity
-
-// void ok(String expected) {Test.ok(toString(), expected);}                     // Confirm tree is as expected
-// void stop()              {Test.stop(toString());}                             // Stop after printing the tree
-// public String toString() {return print();}                                    // Print the tree
-
 //D0 Tests                                                                      // Testing
 
-  int a = 0;
+  int a = 0;                                                                    // A value that can be reached from inside a method
 
   static void test_if_then()                                                    // Tests thought to be in good shape
    {final If i = new If(true)
