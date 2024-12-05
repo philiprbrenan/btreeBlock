@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Btree in the pure java paradigm using a static Stuck instead of Stack
+// BtreeStuck using a static Stuck instead of Stack
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout a btree in a block on the surface of a silicon chip.
