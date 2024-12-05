@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// A fixed size stack of ordered key, data pairs
+// Stuck with reduced use of new
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
