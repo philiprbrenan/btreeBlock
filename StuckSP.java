@@ -4,7 +4,7 @@
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
 
-abstract class StuckSP extends Test                                             // A fixed size stack of ordered key, data pairs with null deemed highest
+abstract class StuckSP extends Test                                             // A fixed size stack of ordered key, data pairs
  {abstract Memory memory();                                                     // Memory containing the stuck
   MemoryLayout memoryLayout() {return new MemoryLayout(memory(), layout);};     // The memory layout of this stuck
   abstract int maxSize();                                                       // The maximum number of entries in the stuck.
