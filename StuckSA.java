@@ -248,15 +248,15 @@ abstract class StuckSA extends Test                                             
      {z(); action = "setElementAt";
       size();
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
-      m.at(index, t.at(base)).equal(m.at(size, t.at(base)), t.at(equal));       // Extended range
+      t.at(index).equal(t.at(size), t.at(equal));                               // Extended range
       if (t.at(equal).getInt() > 0)
        {z(); setKeyData(); inc();
-        m.at(size, t.at(base)).inc();
+        t.at(size).inc();
        }
       else                                                                      // In range
        {z(); assertInNormal(); setKeyData();
        }
-      m.at(found, t.at(base)).setInt(1);
+      t.at(found).setInt(1);
      }
 
     void insertElementAt()                                                      // Insert an element at the indicated location shifting all the remaining elements up one
@@ -592,15 +592,16 @@ Transaction(action:elementAt search:0 limit:0 found:1 index:2 key:6 data:3 base:
     try {t.elementAt();} catch(RuntimeException e) {}
    }
 
-/*
   static void test_set_element_at()
-   {StuckSA  t = test_load();
-    final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
+   {StuckSA            s = test_load();
+    final Transaction  t = s.new Transaction();
+    final MemoryLayout m = t.trn;
+    m.at(t.base).setInt(s.baseAt());
 
-    r.key = 22; r.data = 33; r.index = 2; r.setElementAt();
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    m.at(t.tKey).setInt(22); m.at(t.tData).setInt(33); m.at(t.index).setInt(2);
+    t.setElementAt();
+    //stop(s.toString(s.baseAt()));
+    ok(s.toString(s.baseAt()), """
 StuckSA(maxSize:8 size:4)
   0 key:2 data:1
   1 key:4 data:2
@@ -608,9 +609,9 @@ StuckSA(maxSize:8 size:4)
   3 key:8 data:4
 """);
 
-    r.key = 88; r.data = 99; r.index = 4; r.setElementAt();
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    m.at(t.tKey).setInt(88); m.at(t.tData).setInt(99); m.at(t.index).setInt(4); t.setElementAt();
+    //stop(s.toString(s.baseAt()));
+    ok(s.toString(s.baseAt()), """
 StuckSA(maxSize:8 size:5)
   0 key:2 data:1
   1 key:4 data:2
@@ -619,23 +620,25 @@ StuckSA(maxSize:8 size:5)
   4 key:88 data:99
 """);
 
-    r.index = -2;
-    sayThisOrStop("Out of normal range -2 for size 5");
-    try {r.setElementAt();} catch(RuntimeException e) {}
+    m.at(t.index).setInt(-2);
+    sayThisOrStop("Out of normal range 65534 for size 5");
+    try {t.setElementAt();} catch(RuntimeException e) {}
 
-    r.index = 6;
+    m.at(t.index).setInt(6);
     sayThisOrStop("Out of normal range 6 for size 5");
-    try {r.setElementAt();} catch(RuntimeException e) {}
+    try {t.setElementAt();} catch(RuntimeException e) {}
    }
+/*
 
   static void test_insert_element_at()
-   {StuckSA t = test_load();
-    final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
+   {StuckSA            s = test_load();
+    final Transaction  t = s.new Transaction();
+    final MemoryLayout m = t.trn;
+    m.at(t.base).setInt(s.baseAt());
 
-    r.key = 9; r.data = 9; r.index = 2; r.insertElementAt();
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    m.at(t.tKey).setInt(9); m.at(t.tData).setInt(9); m.at(t.index).setInt(2); t.insertElementAt();
+    //stop(s.toString(s.baseAt()));
+    ok(s.toString(s.baseAt()), """
 StuckSA(maxSize:8 size:5)
   0 key:2 data:1
   1 key:4 data:2
@@ -644,9 +647,9 @@ StuckSA(maxSize:8 size:5)
   4 key:8 data:4
 """);
 
-    r.key = 7; r.data = 7; r.index = 5; r.insertElementAt();
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    m.at(t.tKey).setInt(7); m.at(t.tData).setInt(7); m.at(t.index).setInt(5); t.insertElementAt();
+    //stop(s.toString(s.baseAt()));
+    ok(s.toString(s.baseAt()), """
 StuckSA(maxSize:8 size:6)
   0 key:2 data:1
   1 key:4 data:2
@@ -656,74 +659,77 @@ StuckSA(maxSize:8 size:6)
   5 key:7 data:7
 """);
 
-    r.index = 7;
+    m.at(t.index).setInt(7);
     sayThisOrStop("Out of extended range 7 for size 6");
-    try {r.insertElementAt();} catch(RuntimeException e) {}
+    try {t.insertElementAt();} catch(RuntimeException e) {}
    }
 
   static void test_remove_element_at()
-   {StuckSA t = test_load();
-    final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
+   {StuckSA            s = test_load();
+    final Transaction  t = s.new Transaction();
+    final MemoryLayout m = t.trn;
+    m.at(t.base).setInt(s.baseAt());
 
-    r.index = 2; r.removeElementAt();
+    m.at(t.index).setInt(2); t.removeElementAt();
     //stop(r);
     ok(r, """
 Transaction(action:removeElementAt search:0 limit:0 found:true index:2 key:6 data:3 base:16 size:3 isFull:false isEmpty:false)
 """);
 
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    //stop(s.toString(s.baseAt()));
+    ok(s.toString(s.baseAt()), """
 StuckSA(maxSize:8 size:3)
   0 key:2 data:1
   1 key:4 data:2
   2 key:8 data:4
 """);
 
-    r.index = 3;
+    m.at(t.index).setInt(3);
     sayThisOrStop("Out of normal range 3 for size 3");
-    try {r.removeElementAt();} catch(RuntimeException e) {}
+    try {t.removeElementAt();} catch(RuntimeException e) {}
    }
 
   static void test_first_last()
-   {StuckSA t = test_load();
-    final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
+   {StuckSA            s = test_load();
+    final Transaction  t = s.new Transaction();
+    final MemoryLayout m = t.trn;
+    m.at(t.base).setInt(s.baseAt());
 
-    r.firstElement();
+    t.firstElement();
     //stop(r);
     ok(r, """
 Transaction(action:firstElement search:0 limit:0 found:true index:0 key:2 data:1 base:16 size:4 isFull:false isEmpty:false)
 """);
 
-    r.lastElement();
+    t.lastElement();
     //stop(r);
     ok(r, """
 Transaction(action:lastElement search:0 limit:0 found:true index:3 key:8 data:4 base:16 size:4 isFull:false isEmpty:false)
 """);
 
-    r.clear();
+    t.clear();
     sayThisOrStop("Empty");
-    try {r.firstElement();} catch(RuntimeException e) {}
+    try {t.firstElement();} catch(RuntimeException e) {}
    }
 
   static void test_search()
-   {StuckSA  t = test_load();
-    final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
+   {StuckSA            s = test_load();
+    final Transaction  t = s.new Transaction();
+    final MemoryLayout m = t.trn;
+    m.at(t.base).setInt(s.baseAt());
 
-    r.search = 2; r.search();
+    m.at(t.search).setInt(2); t.search();
     //stop(r);
     ok(r, """
 Transaction(action:search search:2 limit:0 found:true index:0 key:2 data:1 base:16 size:4 isFull:false isEmpty:false)
 """);
 
-    r.search = 3;  r.search();
+    m.at(t.search).setInt(3);  t.search();
     //stop(r);
     ok(r, """
 Transaction(action:search search:3 limit:0 found:false index:4 key:8 data:1 base:16 size:4 isFull:false isEmpty:false)
 """);
-    r.search = 8;  r.search();
+    m.at(t.search).setInt(8);  t.search();
     //stop(r);
     ok(r, """
 Transaction(action:search search:8 limit:0 found:true index:3 key:8 data:4 base:16 size:4 isFull:false isEmpty:false)
@@ -731,18 +737,20 @@ Transaction(action:search search:8 limit:0 found:true index:3 key:8 data:4 base:
    }
 
   static void test_search_except_last()
-   {StuckSA  t = test_load();
-    final Transaction r = t.new Transaction();
-    r.base  = t.baseAt();
-    r.limit = 1;
+   {StuckSA            s = test_load();
+    final Transaction  t = s.new Transaction();
+    final MemoryLayout m = t.trn;
+    m.at(t.base).setInt(s.baseAt());
 
-    r.search = 4;  r.search();
+    m.at(t.limit).setInt(1);
+
+    m.at(t.search).setInt(4);  t.search();
     //stop(r);
     ok(r, """
 Transaction(action:search search:4 limit:1 found:true index:1 key:4 data:2 base:16 size:4 isFull:false isEmpty:false)
 """);
 
-    r.search = 8; r.search();
+    t.search = 8; t.search();
     //stop(r);
     ok(r, """
 Transaction(action:search search:8 limit:1 found:false index:3 key:6 data:2 base:16 size:4 isFull:false isEmpty:false)
@@ -750,17 +758,18 @@ Transaction(action:search search:8 limit:1 found:false index:3 key:6 data:2 base
    }
 
   static void test_search_first_greater_than_or_equal()
-   {StuckSA  t = test_load();
-    final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
+   {StuckSA            s = test_load();
+    final Transaction  t = s.new Transaction();
+    final MemoryLayout m = t.trn;
+    m.at(t.base).setInt(s.baseAt());
 
-    r.search = 5; r.searchFirstGreaterThanOrEqual();
+    m.at(t.search).setInt(5); t.searchFirstGreaterThanOrEqual();
     //stop(r);
     ok(r, """
 Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:0 found:true index:2 key:6 data:3 base:16 size:4 isFull:false isEmpty:false)
 """);
 
-    r.search = 7; r.searchFirstGreaterThanOrEqual();
+    m.at(t.search).setInt(7); t.searchFirstGreaterThanOrEqual();
     //stop(r);
     ok(r, """
 Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:0 found:true index:3 key:8 data:4 base:16 size:4 isFull:false isEmpty:false)
@@ -768,17 +777,19 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:0 found:true ind
    }
 
   static void test_search_first_greater_than_or_equal_except_last()
-   {StuckSA      t = test_load();
-    final Transaction r = t.new Transaction();
-    r.base   = t.baseAt();
-    r.limit  = 1;
-    r.search = 5; r.searchFirstGreaterThanOrEqual();
+   {StuckSA            s = test_load();
+    final Transaction  t = s.new Transaction();
+    final MemoryLayout m = t.trn;
+    m.at(t.base).setInt(s.baseAt());
+
+    m.at(t.limit).setInt(1);
+    m.at(t.search).setInt(5); t.searchFirstGreaterThanOrEqual();
     //stop(r);
     ok(r, """
 Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:1 found:true index:2 key:6 data:3 base:16 size:4 isFull:false isEmpty:false)
 """);
 
-    r.search   = 7; r.searchFirstGreaterThanOrEqual();
+    m.at(t.search).setInt(7); t.searchFirstGreaterThanOrEqual();
     //stop(r);
     ok(r, """
 Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:false index:3 key:6 data:3 base:16 size:4 isFull:false isEmpty:false)
@@ -794,7 +805,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:false in
     test_shift();
     test_unshift();
     test_elementAt();
-    //test_set_element_at();
+    test_set_element_at();
     //test_insert_element_at();
     //test_remove_element_at();
     //test_first_last();
