@@ -628,7 +628,6 @@ StuckSA(maxSize:8 size:5)
     sayThisOrStop("Out of normal range 6 for size 5");
     try {t.setElementAt();} catch(RuntimeException e) {}
    }
-/*
 
   static void test_insert_element_at()
    {StuckSA            s = test_load();
@@ -663,6 +662,7 @@ StuckSA(maxSize:8 size:6)
     sayThisOrStop("Out of extended range 7 for size 6");
     try {t.insertElementAt();} catch(RuntimeException e) {}
    }
+/*
 
   static void test_remove_element_at()
    {StuckSA            s = test_load();
@@ -806,7 +806,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:false in
     test_unshift();
     test_elementAt();
     test_set_element_at();
-    //test_insert_element_at();
+    test_insert_element_at();
     //test_remove_element_at();
     //test_first_last();
     //test_search();
