@@ -110,6 +110,7 @@ class MemoryLayout extends Test                                                 
       type = Type.direct; directs = null;
       locateDirectAddress();                                                    // The indices are constant so the address will not change over time
      }
+
     At(Layout.Field Field, At BaseField, At...Directs)                          // Variable indices used for obtaining run time values
      {z();
       if (BaseField != null && BaseField.type != Type.direct)                   // Check that the base field, if present, does have recursive dependencies
@@ -139,6 +140,7 @@ class MemoryLayout extends Test                                                 
     At setOff()                                                                 // Set the base address of the field
      {z();
       if (type == Type.indirect) {z(); locateInDirectAddress();}                // Evaluate indirect indices
+      else                       {z(); locateDirectAddress();}                  // Evaluate direct indices
       return this;
      }
 
