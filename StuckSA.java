@@ -333,10 +333,10 @@ abstract class StuckSA extends Test                                             
     void searchFirstGreaterThanOrEqual()                                        // Search for first greater than or equal
      {z(); action = "searchFirstGreaterThanOrEqual";
       size();
-
       final MemoryLayout t = trn;
+
       final int s = t.at(size).getInt(), l = t.at(limit).getInt(), L = s-l;     // Limit search if requested
-      final int S = t.at(search).getInt();
+
       for (int i = 0; i < L; i++)                                               // Search
        {z(); t.at(index).setInt(i); moveKey();
         t.at(key).greaterThanOrEqual(t.at(search), t.at(equal));
