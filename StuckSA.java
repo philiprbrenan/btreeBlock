@@ -185,7 +185,7 @@ abstract class StuckSA extends Test                                             
 
     void setKeyData()    {z(); setKey(); setData();}                            // Set a key, data element in the stuck
     void sizeFullEmpty() {z(); size(); isFull(); isEmpty();}                    // Status
-
+    void setFound()      {z(); trn.at(found).setInt(1);}                        // Set found to true
 
     void push()                                                                 // Push an element onto the stuck
      {z(); action = "push";
@@ -201,7 +201,7 @@ abstract class StuckSA extends Test                                             
      {z(); action = "unshift";
       size(); isFull(); assertNotFull();
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
-      t.at(found).setInt(1);
+      setFound();
       t.zero();
       m.at(Keys,  t.at(base)).moveUp(t.at(currentSize), c.at(Keys));
       m.at(Data,  t.at(base)).moveUp(t.at(currentSize), c.at(Data));
@@ -216,7 +216,7 @@ abstract class StuckSA extends Test                                             
       size(); isEmpty(); assertNotEmpty();
       dec();
       final MemoryLayout t = trn;
-      t.at(found).setInt(1);
+      setFound();
       t.at(size).dec();
       t.at(index).move(t.at(size));
       moveKey(); moveData();
@@ -227,7 +227,7 @@ abstract class StuckSA extends Test                                             
      {z(); action = "shift";
       size(); isEmpty(); assertNotEmpty();
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
-      t.at(found).setInt(1);
+      setFound();
       t.at(index).setInt(0);
       moveKey(); moveData();
 
@@ -243,7 +243,7 @@ abstract class StuckSA extends Test                                             
      {z(); action = "elementAt";
       size(); assertInNormal();
       final MemoryLayout t = trn;
-      t.at(found).setInt(1);
+      setFound();
       moveKey(); moveData();
      }
 
@@ -252,14 +252,16 @@ abstract class StuckSA extends Test                                             
       size();
       final MemoryLayout t = trn;
       t.at(index).equal(t.at(size), t.at(equal));                               // Extended range
-      if (t.at(equal).getInt() > 0)
-       {z(); setKeyData(); inc();
-        t.at(size).inc();
-       }
-      else                                                                      // In range
-       {z(); assertInNormal(); setKeyData();
-       }
-      t.at(found).setInt(1);
+      new If(t.at(equal).getInt() > 0)
+       {void Then()
+         {z(); setKeyData(); inc();
+          t.at(size).inc();
+         }
+        void Else()                                                             // In range
+         {z(); assertInNormal(); setKeyData();
+         }
+       };
+      setFound();
      }
 
     void insertElementAt()                                                      // Insert an element at the indicated location shifting all the remaining elements up one
@@ -282,7 +284,7 @@ abstract class StuckSA extends Test                                             
      {z(); action = "removeElementAt";
       size(); assertInNormal();
       final MemoryLayout m = memoryLayout(), t = trn, c = cpy;
-      t.at(found).setInt(1);
+      setFound();
       moveKey(); moveData();
 
       t.zero();
@@ -297,7 +299,7 @@ abstract class StuckSA extends Test                                             
      {z(); action = "firstElement";
       size(); isEmpty(); assertNotEmpty();
       final MemoryLayout m = memoryLayout(), t = trn;
-      t.at(found).setInt(1);
+      setFound();
       m.at(index, t.at(base)).setInt(0);
       moveKey(); moveData();
      }
@@ -306,7 +308,7 @@ abstract class StuckSA extends Test                                             
      {z(); action = "lastElement";
       final MemoryLayout m = memoryLayout(), t = trn;
       size(); isEmpty(); assertNotEmpty();
-      t.at(found).setInt(1);
+      setFound();
       t.at(index).move(m.at(currentSize, t.at(base)).setOff());
       t.at(index).dec();
       moveKey(); moveData();
@@ -323,7 +325,7 @@ abstract class StuckSA extends Test                                             
        {z(); t.at(index).setInt(i); moveKey();
         t.at(key).equal(t.at(search), t.at(equal));
         if (t.at(equal).getInt() > 0)
-         {z(); t.at(found).setInt(1); moveData();
+         {z(); setFound(); moveData();
           return;
          }
        }
@@ -341,7 +343,7 @@ abstract class StuckSA extends Test                                             
        {z(); t.at(index).setInt(i); moveKey();
         t.at(key).greaterThanOrEqual(t.at(search), t.at(equal));
         if (t.at(equal).getInt() > 0)
-         {z(); t.at(found).setInt(1); moveKey(); moveData();
+         {z(); setFound(); moveKey(); moveData();
           return;
          }
        }
