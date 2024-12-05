@@ -323,9 +323,7 @@ abstract class StuckSA extends Test                                             
        {z(); t.at(index).setInt(i); moveKey();
         t.at(key).equal(t.at(search), t.at(equal));
         if (t.at(equal).getInt() > 0)
-         {z();
-          t.at(found).setInt(1);
-          moveData();
+         {z(); t.at(found).setInt(1); moveData();
           return;
          }
        }
@@ -343,10 +341,7 @@ abstract class StuckSA extends Test                                             
        {z(); t.at(index).setInt(i); moveKey();
         t.at(key).greaterThanOrEqual(t.at(search), t.at(equal));
         if (t.at(equal).getInt() > 0)
-         {z();
-          t.at(found).setInt(1);
-          moveKey();
-          moveData();
+         {z(); t.at(found).setInt(1); moveKey(); moveData();
           return;
          }
        }
