@@ -154,6 +154,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Stack<Integer>   f = new Stack<>();
 
     m.at(a).setInt(1);
+    m.at(b).setInt(0);
 
     p.new If (m.at(a))
      {void Then() {p.new I() {void a() {f.push(1);}};}
@@ -166,6 +167,11 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
     p.execute();
     ok(f, "[1, 4]");
+
+    m.at(a).setInt(0);
+    m.at(b).setInt(1);
+    p.execute();
+    ok(f, "[1, 4, 2, 3]");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -175,7 +181,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
     test_if();
    }
 
