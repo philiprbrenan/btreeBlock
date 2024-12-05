@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Btree in a block of static bit memory
+// BtreeStuckStatic in bit memory
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout a btree in a block on the surface of a silicon chip.
