@@ -44,7 +44,13 @@ class Program extends Test                                                      
 
 //D1 Blocks                                                                     // Blocks of code used to implement if statements and for loops
 
-  void Goto(Label label) {step = label.instruction-1;}                          // The program execution for loop will increment first
+  void Goto(Label label) {z(); step = label.instruction-1;}                     // The program execution for loop will increment first
+  void GoOn(Label label, MemoryLayout.At condition)                             // Go to a specified label if a memory location is on, i.e. not zero
+   {z(); if (condition.setOff().getInt() > 0) Goto(label);
+   }
+  void GoOff(Label label, MemoryLayout.At condition)                            // Go to a specified label if a memory location is on, i.e. not zero
+   {z(); if (condition.setOff().getInt() == 0) Goto(label);
+   }
 
   abstract class If                                                             // An if statement
    {final MemoryLayout.At condition;                                            // Then if this field is non zero at run time, else Else
@@ -113,8 +119,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_fizz_buzz()
-   {int           time = 40;
-    Layout           l = Layout.layout();
+   {Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 8);
     Layout.Variable  b = l.variable ("b", 8);
     Layout.Variable  c = l.variable ("c", 8);
@@ -143,8 +148,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_if()
-   {int           time = 40;
-    Layout           l = Layout.layout();
+   {Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
@@ -174,15 +178,74 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(f, "[1, 4, 2, 3]");
    }
 
+  static void test_goOn()
+   {Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Structure s = l.structure("s", a, b);
+
+    MemoryLayout     m = new MemoryLayout(l.compile());
+    Program          p = new Program();
+    Stack<Integer>   f = new Stack<>();
+
+    m.at(a).setInt(1);
+    m.at(b).setInt(0);
+
+    p.new Block()
+     {void code()
+       {p.new I() {void a() {f.push(1);}};
+        p.new I() {void a() {p.GoOn(end, m.at(a));}};
+        p.new I() {void a() {f.push(2);}};
+       }
+     };
+
+    p.execute();
+    ok(f, "[1]");
+    m.at(a).setInt(0);
+
+    p.execute();
+    ok(f, "[1, 1, 2]");
+   }
+
+  static void test_goOff()
+   {Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Structure s = l.structure("s", a, b);
+
+    MemoryLayout     m = new MemoryLayout(l.compile());
+    Program          p = new Program();
+    Stack<Integer>   f = new Stack<>();
+
+    m.at(a).setInt(1);
+    m.at(b).setInt(0);
+
+    p.new Block()
+     {void code()
+       {p.new I() {void a() {f.push(1);}};
+        p.new I() {void a() {p.GoOff(end, m.at(a));}};
+        p.new I() {void a() {f.push(2);}};
+       }
+     };
+
+    p.execute();
+    ok(f, "[1, 2]");
+    m.at(a).setInt(0);
+
+    p.execute();
+    ok(f, "[1, 2, 1]");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_fibonacci();
     test_fizz_buzz();
     test_if();
+    test_goOn();
+    test_goOff();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_if();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
