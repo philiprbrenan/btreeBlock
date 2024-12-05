@@ -31,10 +31,12 @@ dot.edge('SSML', 'SSP')
 dot.edge('SSP',  'SSA')
 dot.edge('SSA',  'SPA')
 
-dot.edge('L',    'SSML')
-dot.edge('M',    'SSML')
-dot.edge('L',    'BSML')
-dot.edge('M',    'BSML')
+dot.edge('L',    'SSML'); dot.edge('M',    'SSML')
+dot.edge('L',    'BSML'); dot.edge('M',    'BSML')
+
+dot.edge('L',    'SSP');  dot.edge('M',    'SSP')
+dot.edge('L',    'SSA');  dot.edge('M',    'SSA')
+dot.edge('L',    'SPA');  dot.edge('M',    'SPA')
 
 dot.render('DevelopmentFlowChart', format='png', cleanup=True)                  # Display
 dot.view('flowchart_output')
