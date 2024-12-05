@@ -154,7 +154,7 @@ abstract class StuckSA extends Test                                             
      {z(); final MemoryLayout m = memoryLayout(), t = trn;
       z(); assertNotEmpty();
       z(); m.at(currentSize, t.at(base)).setOff().setInt(0);
-      size(); isFull(); isEmpty();
+      sizeFullEmpty();
      }
 
     MemoryLayout.At key()                                                       // Refer to key
@@ -168,28 +168,24 @@ abstract class StuckSA extends Test                                             
      }
 
     void moveKey()                                                              // Move a key from the stuck to this transaction
-     {z(); final MemoryLayout t = trn;
-      t.at(key ).move(key ().setOff());
+     {z(); final MemoryLayout t = trn; t.at(key ).move(key ().setOff());
      }
 
     void moveData()                                                             // Move a key from the stuck to this transaction
-     {z(); final MemoryLayout t = trn;
-      t.at(data).move(data().setOff());
+     {z(); final MemoryLayout t = trn; t.at(data).move(data().setOff());
      }
 
     void setKey  ()                                                             // Set the indexed key
-     {z(); final MemoryLayout t = trn;
-      z(); key().setOff().move(t.at(key));
+     {z(); final MemoryLayout t = trn;  key().setOff().move(t.at(key));
      }
 
     void setData ()                                                             // Set the indexed data
-     {z(); final MemoryLayout t = trn;
-      z(); data().setOff().move(t.at(data));
+     {z(); final MemoryLayout t = trn; data().setOff().move(t.at(data));
      }
 
-    void setKeyData()                                                           // Set a key, data element in the stuck
-     {z(); setKey(); setData();
-     }
+    void setKeyData()    {z(); setKey(); setData();}                            // Set a key, data element in the stuck
+    void sizeFullEmpty() {z(); size(); isFull(); isEmpty();}                    // Status
+
 
     void push()                                                                 // Push an element onto the stuck
      {z(); action = "push";
@@ -198,7 +194,7 @@ abstract class StuckSA extends Test                                             
       t.at(index).move(t.at(size));
       setKeyData();
       inc();
-      size(); isFull(); isEmpty();
+      sizeFullEmpty();
      }
 
     void unshift()                                                              // Unshift an element onto the stuck
@@ -212,7 +208,7 @@ abstract class StuckSA extends Test                                             
       inc();
       m.at(index, t.at(base)).setInt(0);
       setKeyData();
-      size(); isFull(); isEmpty();
+      sizeFullEmpty();
      }
 
     void pop()                                                                  // Pop an element from the stuck
@@ -224,7 +220,7 @@ abstract class StuckSA extends Test                                             
       t.at(size).dec();
       t.at(index).move(t.at(size));
       moveKey(); moveData();
-      size(); isFull(); isEmpty();
+      sizeFullEmpty();
      }
 
     void shift()                                                                // Shift an element from the stuck
