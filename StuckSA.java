@@ -12,7 +12,7 @@ abstract class StuckSA extends Test                                             
   abstract int bitsPerData();                                                   // The number of bits per data
   abstract int bitsPerSize();                                                   // The number of bits in size field
 
-  int baseAt() {return 0;}                                                      // Offset the meory for the stuck by this amount
+  int baseAt() {return 0;}                                                      // Offset the memory for the stuck by this amount
 
   Layout layout;                                                                // Layout of memory containing the stuck
   Layout.Variable  key;                                                         // Key in a stuck
