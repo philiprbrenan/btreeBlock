@@ -65,8 +65,8 @@ class Program extends Test                                                      
       Else();
       End.set();
      }
-    abstract void Then();
-    abstract void Else();
+    void Then() {}
+    void Else() {}
    }
 
   abstract class Block                                                          // A block that can be continued or exited
