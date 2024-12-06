@@ -54,7 +54,7 @@ abstract class BtreeSML extends Test                                            
     memoryLayout = new MemoryLayout(layout);
     memory       = memoryLayout.memory;
     for (int i = maxSize(); i > 0; --i)                                         // Put all the nodes on the free chain at the start with low nodes first
-     {final Node n = new Node(i-1); n.clear();
+     {final Node n = node(i-1); n.clear();
       final int  f = getInt(freedChain,         0);
                      setInt(free,       f,      0, n.node);
                      setInt(freedChain, n.node, 0);
@@ -131,7 +131,7 @@ abstract class BtreeSML extends Test                                            
     z(); if (check && f == 0) stop("No more memory available");                 // No more free nodes available
     z(); final int  F = getInt(free,          0, f);                            // Second to last freed node
                         setInt(freedChain, F, 0);                               // Make second to last freed node the forst freed nod to liberate the existeing first free node
-    final Node n = new Node(f); n.clear();                                      // Construct and clear the node
+    final Node n = node(f); n.clear();                                      // Construct and clear the node
     maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                                // Number of nodes in use
     return n;
    }
@@ -140,7 +140,7 @@ abstract class BtreeSML extends Test                                            
 
   void freeNode(int node)                                                       // Free a node by number
    {z(); if (node == 0) stop("Cannot free root");                               // The root is never freed
-    z(); new Node(node).erase();                                                // Clear the node to encourage erroneous frees to do damage that shows up quickly.
+    z(); node(node).erase();                                                // Clear the node to encourage erroneous frees to do damage that shows up quickly.
     final int  f = getInt(freedChain,       0);                                 // Last freed node from head of free chain
                    setInt(free,          f, 0, node);                           // Chain this node in front of the last freed node
                    setInt(freedChain, node, 0);                                 // Make this node the head of the free chain
@@ -200,7 +200,7 @@ abstract class BtreeSML extends Test                                            
     boolean hasLeavesForChildren()                                              // The node has leaves for children
      {z(); assertBranch();
       final int b = branchBase(), last = Branch.lastElement1(b).data;
-      return new Node(last).isLeaf();
+      return node(last).isLeaf();
      }
 
     int top()                                                                   // The top next element of a branch
@@ -358,7 +358,7 @@ abstract class BtreeSML extends Test                                            
         for  (int i = 0; i < K; i++)
          {z();
           final int next = Branch.elementAt1(bb, i).data;                       // Each key, next pair
-          final Node n = new Node(next);
+          final Node n = node(next);
           if (n.isLeaf()) {z(); n.leafToArray(s);}
           else
            {z();
@@ -400,7 +400,7 @@ abstract class BtreeSML extends Test                                            
       if (K > 0)                                                                // Branch has key, next pairs
        {for  (int i = 0; i < K; i++)
          {final int next = Branch.elementAt1(B, i).data;                        // Each key, next pair
-          final Node n = new Node(next);
+          final Node n = node(next);
           if (n.isLeaf())
            {n.printLeaf(S, level+1);
            }
@@ -424,7 +424,7 @@ abstract class BtreeSML extends Test                                            
       final int top = top();                                                    // Top next will always be present
       S.elementAt(L+3).append(top);                                             // Append top next
 
-      final Node n = new Node(top);
+      final Node n = node(top);
       if (n.isLeaf())                                                           // Print leaf
        {n.printLeaf(S, level+1);
        }
@@ -571,8 +571,8 @@ abstract class BtreeSML extends Test                                            
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final Node ll = new Node(L.data);
-        final Node rr = new Node(R.data);
+        final Node ll = node(L.data);
+        final Node rr = node(R.data);
         final int   l = ll.leafBase();
         final int   r = rr.leafBase();
         final int  nl = ll.leafSize();
@@ -589,8 +589,8 @@ abstract class BtreeSML extends Test                                            
        }
       else                                                                      // Children are branches
        {z();
-        final Node ll = new Node(L.data);
-        final Node rr = new Node(R.data);
+        final Node ll = node(L.data);
+        final Node rr = node(R.data);
         final int  pb =    branchBase();
         final int   l = ll.branchBase();
         final int   r = rr.branchBase();
@@ -625,8 +625,8 @@ abstract class BtreeSML extends Test                                            
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final Node ll = new Node(L.data);
-        final Node rr = new Node(R.data);
+        final Node ll = node(L.data);
+        final Node rr = node(R.data);
         final int   l = ll.leafBase();
         final int   r = rr.leafBase();
         final int  nl = ll.leafSize();
@@ -642,8 +642,8 @@ abstract class BtreeSML extends Test                                            
        }
       else                                                                      // Children are branches
        {z();
-        final Node ll = new Node(L.data);
-        final Node rr = new Node(R.data);
+        final Node ll = node(L.data);
+        final Node rr = node(R.data);
         final int   l = ll.branchBase();
         final int   r = rr.branchBase();
         final int  nl = ll.branchSize();
@@ -670,8 +670,8 @@ abstract class BtreeSML extends Test                                            
       z(); if (node != 0) stop("Expected root, got:", node);
       z();
       final int bb = branchBase(), ll = leafBase();
-      final Node l = new Node(Branch.firstElement1(bb).data);
-      final Node r = new Node(Branch. lastElement1(bb).data);
+      final Node l = node(Branch.firstElement1(bb).data);
+      final Node r = node(Branch. lastElement1(bb).data);
 
       if (hasLeavesForChildren())                                               // Leaves
        {z();
@@ -740,8 +740,8 @@ abstract class BtreeSML extends Test                                            
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final Node ll = new Node(L.data);
-        final Node rr = new Node(R.data);
+        final Node ll = node(L.data);
+        final Node rr = node(R.data);
         final  int  l = ll.leafBase();
         final  int  r = rr.leafBase();
         final  int nl = ll.leafSize();
@@ -758,8 +758,8 @@ abstract class BtreeSML extends Test                                            
        }
       else                                                                      // Children are branches
        {z();
-        final Node ll = new Node(L.data);
-        final Node rr = new Node(R.data);
+        final Node ll = node(L.data);
+        final Node rr = node(R.data);
         final int   l = ll.branchBase();
         final int   r = rr.branchBase();
         final int  nl = ll.branchSize();
@@ -800,8 +800,8 @@ abstract class BtreeSML extends Test                                            
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final Node ll = new Node(L.data);
-        final Node rr = new Node(R.data);
+        final Node ll = node(L.data);
+        final Node rr = node(R.data);
         final int   l = ll.leafBase();
         final int   r = rr.leafBase();
         final int  nl = ll.leafSize();
@@ -819,8 +819,8 @@ abstract class BtreeSML extends Test                                            
        }
       else                                                                      // Children are branches
        {z();
-        final Node ll = new Node(L.data);
-        final Node rr = new Node(R.data);
+        final Node ll = node(L.data);
+        final Node rr = node(R.data);
         final int   l = ll.branchBase();
         final int   r = rr.branchBase();
         final int  nl = ll.branchSize();
@@ -857,9 +857,9 @@ abstract class BtreeSML extends Test                                            
             }
       z();
 
-      final int               bb = new Node(node).branchBase();
+      final int               bb = node(node).branchBase();
       final StuckSML.ElementAt p = Branch.elementAt1(bb, index);
-      final Node               c = new Node(p.data);
+      final Node               c = node(p.data);
 
       z(); if (!c.isLow())               return;
       z(); if (stealFromLeft    (index)) return;
@@ -869,6 +869,8 @@ abstract class BtreeSML extends Test                                            
       stop("Unable to balance child:", c.node);
      }
    }  // Node
+
+  Node node(int node) {return new Node(node);}                                  // Refer to a node by number
 
 //D1 Array                                                                      // Key, data pairs in the tree as an array
 
@@ -950,7 +952,7 @@ abstract class BtreeSML extends Test                                            
        {z();
         final Node.FindFirstGreaterThanOrEqualInBranch down =                   // Find next child in search path of key
           parent.findFirstGreaterThanOrEqualInBranch1(Key);
-        final Node n = new Node(down.next);
+        final Node n = node(down.next);
         if (n.isLeaf())                                                         // Found the containing search
          {z();
           search  = n.findEqualInLeaf1(Key);
@@ -1068,7 +1070,7 @@ abstract class BtreeSML extends Test                                            
      {z();
       final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
       down = p.findFirstGreaterThanOrEqualInBranch1(Key);
-      final Node q = new Node(down.next);
+      final Node q = node(down.next);
       if (q.isLeaf())                                                           // Reached a leaf
        {z();
         q.splitLeaf(p, down.first);
@@ -1082,7 +1084,7 @@ abstract class BtreeSML extends Test                                            
         q.splitBranch(p, down.first);                                           // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
         final Node.FindFirstGreaterThanOrEqualInBranch                          // Step down again as the split will have altered the local layout
         Down = p.findFirstGreaterThanOrEqualInBranch1(Key);
-        p = new Node(Down.next);
+        p = node(Down.next);
        }
       else
        {z();
@@ -1127,7 +1129,7 @@ abstract class BtreeSML extends Test                                            
       down = p.findFirstGreaterThanOrEqualInBranch1(Key);
 
       p.balance(down.first);
-      final Node q = new Node(down.next);
+      final Node q = node(down.next);
 
       if (q.isLeaf())                                                           // Reached a leaf
        {z();
@@ -1159,7 +1161,7 @@ abstract class BtreeSML extends Test                                            
 
       final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
       down = p.findFirstGreaterThanOrEqualInBranch1(Key);
-      p = new Node(down.next);
+      p = node(down.next);
      }
     stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
    }
