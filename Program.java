@@ -42,6 +42,9 @@ class Program extends Test                                                      
      }
    }
 
+  void clear() {z(); code.clear();}                                             // Clear the program code
+
+
 //D1 Blocks                                                                     // Blocks of code used to implement if statements and for loops
 
   void Goto(Label label) {z(); step = label.instruction-1;}                     // The program execution for loop will increment first
