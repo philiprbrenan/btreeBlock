@@ -13,7 +13,7 @@ abstract class StuckSP extends Test                                             
   abstract int bitsPerSize();                                                   // The number of bits in size field
   final MemoryLayout tmp = new MemoryLayout(layout());                          // Temporary storage to hold intermediate results
 
-  int baseAt() {return 0;}                                                      // Offset the meory for the stuck by this amount
+  int baseAt() {return 0;}                                                      // Offset the memory for the stuck by this amount
 
   Layout layout;                                                                // Layout of memory containing the stuck
   Layout.Variable  key;                                                         // Key in a stuck
