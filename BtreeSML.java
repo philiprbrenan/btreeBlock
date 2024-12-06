@@ -59,8 +59,8 @@ abstract class BtreeSML extends Test                                            
                      setInt(free,       f,      0, n.node);
                      setInt(freedChain, n.node, 0);
      }
-    root  = allocate(false);                                                    // The root is always at zero, which frees zero to act as the end of list marker on the free chain
-    root.isLeaf(true);                                                          // The root starts as a leaf
+    root = allocate(false);                                                     // The root is always at zero, which frees zero to act as the end of list marker on the free chain
+    root.setLeaf();                                                             // The root starts as a leaf
    }
 
   static BtreeSML btreeSML(final int leafKeys, int branchKeys)                  // Define a test BTree with the specified dimensions
@@ -131,7 +131,7 @@ abstract class BtreeSML extends Test                                            
     z(); if (check && f == 0) stop("No more memory available");                 // No more free nodes available
     z(); final int  F = getInt(free,          0, f);                            // Second to last freed node
                         setInt(freedChain, F, 0);                               // Make second to last freed node the forst freed nod to liberate the existeing first free node
-    final Node n = node(f); n.clear();                                      // Construct and clear the node
+    final Node n = node(f); n.clear();                                          // Construct and clear the node
     maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                                // Number of nodes in use
     return n;
    }
@@ -140,7 +140,7 @@ abstract class BtreeSML extends Test                                            
 
   void freeNode(int node)                                                       // Free a node by number
    {z(); if (node == 0) stop("Cannot free root");                               // The root is never freed
-    z(); node(node).erase();                                                // Clear the node to encourage erroneous frees to do damage that shows up quickly.
+    z(); node(node).erase();                                                    // Clear the node to encourage erroneous frees to do damage that shows up quickly.
     final int  f = getInt(freedChain,       0);                                 // Last freed node from head of free chain
                    setInt(free,          f, 0, node);                           // Chain this node in front of the last freed node
                    setInt(freedChain, node, 0);                                 // Make this node the head of the free chain
@@ -153,18 +153,19 @@ abstract class BtreeSML extends Test                                            
    {final int node;                                                             // The number of the node
     Node(int Node) {node = Node;}                                               // Access an existing node
 
-    boolean isLeaf()             {z(); return getInt(isLeaf, 0, node) > 0;}     // A leaf if true
-    void    isLeaf(boolean leaf) {z(); setInt(isLeaf, leaf ? 1 : 0, 0, node);}  // Set as leaf if true
+    boolean isLeaf() {z(); return getInt(isLeaf,    0, node) > 0;}              // A leaf if true
+    void   setLeaf() {z();        setInt(isLeaf, 1, 0, node);}                  // Set as leaf
+    void setBranch() {z();        setInt(isLeaf, 0, 0, node);}                  // Set as branch
 
     void assertLeaf()   {if (!isLeaf()) stop("Leaf required");}
     void assertBranch() {if ( isLeaf()) stop("Branch required");}
 
     Node allocLeaf()                                                            // Allocate leaf
-     {z(); final Node n = allocate(); n.isLeaf(true);
+     {z(); final Node n = allocate(); n.setLeaf();
       return n;
      }
     Node allocBranch()                                                          // Allocate branch
-     {z(); final Node n = allocate(); n.isLeaf(false);
+     {z(); final Node n = allocate(); n.setBranch();
       return n;
      }
 
@@ -445,7 +446,7 @@ abstract class BtreeSML extends Test                                            
      {z(); assertLeaf();
       z(); if (node != 0) stop("Wanted root, but got node:", node);
       z(); if (!isFull()) stop("Root is not full, but has size:", leafSize());
-      z(); isLeaf(false);
+      z(); setBranch();
 
       final Node l = allocLeaf();                                               // New left leaf
       final Node r = allocLeaf();                                               // New right leaf
@@ -689,7 +690,7 @@ abstract class BtreeSML extends Test                                            
             final StuckSML.Shift f = Leaf.shift1(rlb);
             Leaf.push(ll, f.key, f.data);
            }
-          isLeaf(true);
+          setLeaf();
           l.free();
           r.free();
           return true;
@@ -1944,19 +1945,20 @@ abstract class BtreeSML extends Test                                            
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
-   {test_put_ascending();
-    test_put_ascending_wide();
-    test_put_descending();
-    test_put_small_random();
-    test_put_large_random();
-    test_find();
-    test_delete_ascending();
-    test_delete_descending();
-    test_to_array();
+   {test_put_ascending();                                                       //  7.99
+    test_put_ascending_wide();                                                  //  5.33
+    test_put_descending();                                                      // 12.98
+    test_put_small_random();                                                    //  8.72
+    test_put_large_random();                                                    //  0
+    test_find();                                                                //  4.62
+    test_delete_ascending();                                                    //  7.27
+    test_delete_descending();                                                   //  7.66
+    test_to_array();                                                            //  2.52
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_to_array();                                                            //  2.52
    }
 
   public static void main(String[] args)                                        // Test if called as a program
