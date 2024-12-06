@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// StuckPA in Psuedo assembler
+// StuckPA in Psuedo Assembler
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
@@ -12,7 +12,7 @@ abstract class StuckPA extends Test                                             
   abstract int bitsPerData();                                                   // The number of bits per data
   abstract int bitsPerSize();                                                   // The number of bits in size field
 
-  int baseAt() {return 0;}                                                      // Offset the meory for the stuck by this amount
+  int baseAt() {return 0;}                                                      // Offset the memory for the stuck by this amount
 
   Layout layout;                                                                // Layout of memory containing the stuck
   Layout.Variable  key;                                                         // Key in a stuck
@@ -76,6 +76,7 @@ abstract class StuckPA extends Test                                             
     Layout.Variable   base;                                                     // The base of the stuck
     Layout.Variable   size;                                                     // The current size of the stuck
     Layout.Bit       equal;                                                     // The result of an equal operation
+    Layout.Variable   slit;                                                     // The current search limit
     Layout.Structure  temp;                                                     // Transaction intermediate fields
     final MemoryLayout trn = new MemoryLayout(layout());                        // Memory for transaction intemediates
     final MemoryLayout cpy = new MemoryLayout(StuckPA.this.layout);             // Buffer for stuck being manipulated
@@ -94,7 +95,8 @@ abstract class StuckPA extends Test                                             
          base = tLayout.variable (   "base", bitsPerSize());
          size = tLayout.variable (   "size", bitsPerSize());
         equal = tLayout.bit      (  "equal");
-         temp = tLayout.structure("temp", search, limit, isFull, isEmpty, found, index, key, data, base, size, equal);
+         slit = tLayout.variable (   "slit", bitsPerSize());
+         temp = tLayout.structure("temp", search, limit, isFull, isEmpty, found, index, key, data, base, size, equal, slit);
       return tLayout.compile();
      }
 
@@ -361,17 +363,40 @@ abstract class StuckPA extends Test                                             
       final MemoryLayout t = trn;
       final Program      p = new Program();
 
-      final int s = t.at(size).getInt(), l = t.at(limit).getInt(), L = s-l;     // Limit search if requested
-
-      for (int i = 0; i < L; i++)                                               // Search
-       {z(); t.at(index).setInt(i); moveKey();
-        t.at(key).equal(t.at(search), t.at(equal));
-        if (t.at(equal).getInt() > 0)
-         {z(); setFound(); moveData();
-          return;
+      p.new I()                                                                 // Search limit
+       {void a()
+         {final int s = t.at(size).getInt(), l = t.at(limit).getInt(), L = s-l;
+          t.at(slit).setInt(L);
          }
-       }
-      t.at(found).setInt(0);
+       };
+
+      p.new Block()                                                             // Search each active element. Jump out when we find a match or we process all the active elements.
+       {void code()
+         {final Program.Label endSearch = this.end;
+          final int N = maxSize();                                              // Upper limit on search
+          p.new I() {void a() {t.at(found).setInt(0);}};                        // Assume that the search will fail
+
+          for (int I = 0; I < N; I++)                                           // Search loop unrolled
+           {z();
+            final int i = I;                                                    // Fix the  current loop iteration
+            p.new I() {void a() {t.constant(i).greaterThanOrEqual(t.at(slit), t.at(equal));}};
+            p.new I() {void a() {p.GoOn(endSearch, t.at(equal));}};             // Jump out if all the active elements have been checked
+
+            p.new I() {void a() {t.at(index).setInt(i);}};                      // Set index
+            p.new I() {void a() {moveKey();}};                                  // Key at this index
+            p.new I() {void a() {t.at(key).equal(t.at(search), t.at(equal));}}; // Check for a match between indexed key and search key
+
+            p.new If (t.at(equal))                                              // Found a match
+             {void Then()
+               {z();
+                p.new I() {void a() {setFound();}};                             // Show found
+                p.new I() {void a() {moveData();}};                             // Matching data
+                p.new I() {void a() {p.Goto(endSearch);}};                      // End the search
+               }
+             };
+           }
+         }
+       };
       p.execute();
      }
 
@@ -381,17 +406,40 @@ abstract class StuckPA extends Test                                             
       final MemoryLayout t = trn;
       final Program      p = new Program();
 
-      final int s = t.at(size).getInt(), l = t.at(limit).getInt(), L = s-l;     // Limit search if requested
-
-      for (int i = 0; i < L; i++)                                               // Search
-       {z(); t.at(index).setInt(i); moveKey();
-        t.at(key).greaterThanOrEqual(t.at(search), t.at(equal));
-        if (t.at(equal).getInt() > 0)
-         {z(); setFound(); moveKey(); moveData();
-          return;
+      p.new I()                                                                 // Search limit
+       {void a()
+         {final int s = t.at(size).getInt(), l = t.at(limit).getInt(), L = s-l;
+          t.at(slit).setInt(L);
          }
-       }
-      t.at(found).setInt(0);
+       };
+
+      p.new Block()                                                             // Search each active element. Jump out when we find a match or we process all the active elements.
+       {void code()
+         {final Program.Label endSearch = this.end;
+          final int N = maxSize();                                              // Upper limit on search
+          p.new I() {void a() {t.at(found).setInt(0);}};                        // Assume that the search will fail
+
+          for (int I = 0; I < N; I++)                                           // Search loop unrolled
+           {z();
+            final int i = I;                                                    // Fix the  current loop iteration
+            p.new I() {void a() {t.constant(i).greaterThanOrEqual(t.at(slit), t.at(equal));}};
+            p.new I() {void a() {p.GoOn(endSearch, t.at(equal));}};             // Jump out if all the active elements have been checked
+
+            p.new I() {void a() {t.at(index).setInt(i);}};                      // Set index
+            p.new I() {void a() {moveKey();}};                                  // Key at this index
+            p.new I() {void a() {t.at(key).greaterThanOrEqual(t.at(search), t.at(equal));}}; // Check for a match between indexed key and search key
+
+            p.new If (t.at(equal))                                              // Found a match
+             {void Then()
+               {z();
+                p.new I() {void a() {setFound();}};                             // Show found
+                p.new I() {void a() {moveData();}};                             // Matching data
+                p.new I() {void a() {p.Goto(endSearch);}};                      // End the search
+               }
+             };
+           }
+         }
+       };
       p.execute();
      }
 
@@ -754,6 +802,7 @@ Transaction(action:lastElement search:0 limit:0 found:1 index:3 key:8 data:4 bas
    {StuckPA            s = test_load();
     final Transaction  t = s.new Transaction();
     final MemoryLayout m = t.trn;
+
     m.at(t.base).setInt(s.baseAt());
 
     m.at(t.search).setInt(2); t.search();
@@ -762,11 +811,20 @@ Transaction(action:lastElement search:0 limit:0 found:1 index:3 key:8 data:4 bas
 Transaction(action:search search:2 limit:0 found:1 index:0 key:2 data:1 base:16 size:4 isFull:0 isEmpty:0)
 """);
 
-    m.at(t.search).setInt(3);  t.search();
+    m.at(t.search).setInt(3);
+    t.search();
     //stop(t);
     ok(t, """
 Transaction(action:search search:3 limit:0 found:0 index:3 key:8 data:1 base:16 size:4 isFull:0 isEmpty:0)
 """);
+
+    m.at(t.search).setInt(7);
+    t.search();
+    //stop(t);
+    ok(t, """
+Transaction(action:search search:7 limit:0 found:0 index:3 key:8 data:1 base:16 size:4 isFull:0 isEmpty:0)
+""");
+
     m.at(t.search).setInt(8);  t.search();
     //stop(t);
     ok(t, """
@@ -859,7 +917,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      //if (github_actions)                                                       // Coverage analysis
+      if (github_actions)                                                       // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
