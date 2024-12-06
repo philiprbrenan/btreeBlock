@@ -34,7 +34,7 @@ class Program extends Test                                                      
    {z(); for (I i : code) {z(); i.i();}
    }
 
-  void execute()
+  void run()                                                                    // Run the program
    {z(); initialize();
     final int N = code.size();
     for (step = 0, time = 0; step < N && time < maxTime; step++, time++)
@@ -43,7 +43,6 @@ class Program extends Test                                                      
    }
 
   void clear() {z(); code.clear();}                                             // Clear the program code
-
 
 //D1 Blocks                                                                     // Blocks of code used to implement if statements and for loops
 
@@ -103,14 +102,14 @@ class Program extends Test                                                      
     p.new I() {void a() {m.at(b).setInt(m.at(c).getInt());}};
     p.new I() {void a() {f.push(m.at(c).getInt());}};
     p.new I() {void a() {if (p.time < time) p.Goto(start);}};
-    p.execute();
+    p.run();
     ok(f, "[1, 2, 3, 5, 8, 13, 21, 34]");
-    p.execute();
+    p.run();
     ok(f, "[1, 2, 3, 5, 8, 13, 21, 34, 1, 2, 3, 5, 8, 13, 21, 34]");
 
     Program          q = new Program();
     q.new I() {void a() {m.at(s).ones();}};
-    q.execute();
+    q.run();
     //stop(m);
     ok(m, """
 Line T       At      Wide       Size    Indices        Value   Name
@@ -146,7 +145,7 @@ Line T       At      Wide       Size    Indices        Value   Name
         p.new I() {void a() {p.Goto(start);}};
        }
      };
-    p.execute();
+    p.run();
     ok(f, "[0 fizzbuzz, 2 fizz, 3 buzz, 4 fizz, 6 fizzbuzz, 8 fizz, 9 buzz, 10 fizz, 12 fizzbuzz, 14 fizz, 15 buzz]");
    }
 
@@ -172,12 +171,12 @@ Line T       At      Wide       Size    Indices        Value   Name
      {void Then() {p.new I() {void a() {f.push(3);}};}
       void Else() {p.new I() {void a() {f.push(4);}};}
      };
-    p.execute();
+    p.run();
     ok(f, "[1, 4]");
 
     m.at(a).setInt(0);
     m.at(b).setInt(1);
-    p.execute();
+    p.run();
     ok(f, "[1, 4, 2, 3]");
    }
 
@@ -202,11 +201,11 @@ Line T       At      Wide       Size    Indices        Value   Name
        }
      };
 
-    p.execute();
+    p.run();
     ok(f, "[1]");
     m.at(a).setInt(0);
 
-    p.execute();
+    p.run();
     ok(f, "[1, 1, 2]");
    }
 
@@ -231,11 +230,11 @@ Line T       At      Wide       Size    Indices        Value   Name
        }
      };
 
-    p.execute();
+    p.run();
     ok(f, "[1, 2]");
     m.at(a).setInt(0);
 
-    p.execute();
+    p.run();
     ok(f, "[1, 2, 1]");
    }
 
