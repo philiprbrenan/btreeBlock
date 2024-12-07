@@ -1,12 +1,11 @@
 //------------------------------------------------------------------------------
-// StuckSML parameterized by a structure
+// StuckSML parameterized by a single structure
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
 
 abstract class StuckSP extends Test                                             // A fixed size stack of ordered key, data pairs
  {abstract Memory memory();                                                     // Memory containing the stuck
-  MemoryLayout memoryLayout() {return new MemoryLayout(memory(), layout);};     // The memory layout of this stuck
   abstract int maxSize();                                                       // The maximum number of entries in the stuck.
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -31,6 +30,10 @@ abstract class StuckSP extends Test                                             
    {z();
     layout = layout();
    }
+
+  MemoryLayout memoryLayout()                                                   // The memory layout of this stuck
+   {return new MemoryLayout(memory(), layout, baseAt());
+   };
 
   Layout layout()                                                               // Layout describing stuck
    {z();
@@ -72,10 +75,9 @@ abstract class StuckSP extends Test                                             
     int     index;                                                              // The index from which the key, data pair were retrieved
     int       key;                                                              // The retrieved key
     int      data;                                                              // The retrieved data
-    int      base;                                                              // The base of the stuck
     int      size;                                                              // The current size of the stuck
 
-    void size() {z(); size = memoryLayout().getInt(currentSize, base);}         // The current number of key elements in the stuck
+    void size() {z(); size = memoryLayout().getInt(currentSize);}               // The current number of key elements in the stuck
 
     void isFull () {z(); isFull  = size >= maxSize();}                          // Check the stuck is full
     void isEmpty() {z(); isEmpty = size == 0;}                                  // Check the stuck is empty
@@ -85,14 +87,14 @@ abstract class StuckSP extends Test                                             
     void assertInNormal  () {z(); if (index < 0 || index >= size) stop("Out of normal range",   index, "for size", size);} // Check that the index would yield a valid element
     void assertInExtended() {z(); if (index < 0 || index >  size) stop("Out of extended range", index, "for size", size);} // Check that the index would yield a valid element
 
-    void inc() {z(); assertNotFull (); final int v = size+1; memoryLayout().setInt(currentSize, v, base);}  // Increment the current size
-    void dec() {z(); assertNotEmpty(); final int v = size-1; memoryLayout().setInt(currentSize, v, base);}  // Decrement the current size
+    void inc() {z(); assertNotFull (); final int v = size+1; memoryLayout().setInt(currentSize, v);}  // Increment the current size
+    void dec() {z(); assertNotEmpty(); final int v = size-1; memoryLayout().setInt(currentSize, v);}  // Decrement the current size
 
-    void key () {z(); key  = memoryLayout().getInt(StuckSP.this.key,  base, index);}           // Get key
-    void data() {z(); data = memoryLayout().getInt(StuckSP.this.data, base, index);}           // Get data
+    void key () {z(); key  = memoryLayout().getInt(StuckSP.this.key,  index);}  // Get key
+    void data() {z(); data = memoryLayout().getInt(StuckSP.this.data, index);}  // Get data
 
-    void setKey  ()  {z(); memoryLayout().setInt (StuckSP.this.key,  key,  base, index);}
-    void setData ()  {z(); memoryLayout().setInt (StuckSP.this.data, data, base, index);}
+    void setKey  ()  {z(); memoryLayout().setInt (StuckSP.this.key,  key,  index);}
+    void setData ()  {z(); memoryLayout().setInt (StuckSP.this.data, data, index);}
 
     void  setKeyData()                                                          // Set a key, data element in the stuck
      {z();
@@ -102,7 +104,7 @@ abstract class StuckSP extends Test                                             
 
     void clear()                                                                // Clear the stuck
      {z();
-      memoryLayout().setInt(currentSize, 0, base);
+      memoryLayout().setInt(currentSize, 0);
       size(); isFull(); isEmpty();
      }
 
@@ -121,9 +123,9 @@ abstract class StuckSP extends Test                                             
       found = true;
       final MemoryLayout M = memoryLayout(), T = tmp;
       T.zero();
-      M.at(Keys, base).moveUp(T.at(currentSize), T.at(Keys));
-      M.at(Data, base).moveUp(T.at(currentSize), T.at(Data));
-      M.at(currentSize, base).inc();
+      M.at(Keys).moveUp(T.at(currentSize), T.at(Keys));
+      M.at(Data).moveUp(T.at(currentSize), T.at(Data));
+      M.at(currentSize).inc();
       index = 0;
       setKeyData();
       size(); isFull(); isEmpty();
@@ -150,9 +152,9 @@ abstract class StuckSP extends Test                                             
 
       final MemoryLayout M = memoryLayout(), T = tmp;
       T.zero();
-      M.at(Keys, base).moveDown(T.at(currentSize), T.at(Keys));
-      M.at(Data, base).moveDown(T.at(currentSize), T.at(Data));
-      M.at(currentSize, base).dec();
+      M.at(Keys).moveDown(T.at(currentSize), T.at(Keys));
+      M.at(Data).moveDown(T.at(currentSize), T.at(Data));
+      M.at(currentSize).dec();
 
       size(); isEmpty(); isFull();
      }
@@ -185,9 +187,9 @@ abstract class StuckSP extends Test                                             
       final MemoryLayout M = memoryLayout(), T = tmp;
       T.zero();
       T.at(currentSize).setInt(index);
-      M.at(Keys, base).moveUp(T.at(currentSize), T.at(Keys));
-      M.at(Data, base).moveUp(T.at(currentSize), T.at(Data));
-      M.at(currentSize, base).inc();
+      M.at(Keys).moveUp(T.at(currentSize), T.at(Keys));
+      M.at(Data).moveUp(T.at(currentSize), T.at(Data));
+      M.at(currentSize).inc();
 
       setKeyData();
       inc();
@@ -203,9 +205,9 @@ abstract class StuckSP extends Test                                             
       final MemoryLayout M = memoryLayout(), T = tmp;
       T.zero();
       T.at(currentSize).setInt(index);
-      M.at(Keys, base).moveDown(T.at(currentSize), T.at(Keys));
-      M.at(Data, base).moveDown(T.at(currentSize), T.at(Data));
-      M.at(currentSize, base).dec();
+      M.at(Keys).moveDown(T.at(currentSize), T.at(Keys));
+      M.at(Data).moveDown(T.at(currentSize), T.at(Data));
+      M.at(currentSize).dec();
 
       size(); isEmpty(); isFull();
      }
@@ -262,7 +264,6 @@ abstract class StuckSP extends Test                                             
       s.append(  " index:"+index);
       s.append(    " key:"+key);
       s.append(   " data:"+data);
-      s.append(   " base:"+base);
       s.append(   " size:"+size);
       s.append( " isFull:"+isFull);
       s.append(" isEmpty:"+isEmpty);
@@ -273,10 +274,10 @@ abstract class StuckSP extends Test                                             
 
 //D1 Print                                                                      // Print a stuck
 
-  public String toString(int Base)                                              // Print a stuck
+  public String toString()                                                      // Print a stuck
    {final StringBuilder s = new StringBuilder();
     z();
-    final Transaction r = new Transaction(); r.base = Base; r.size();
+    final Transaction r = new Transaction(); r.size();
     final int N = r.size;
     s.append("StuckSP(maxSize:"+maxSize());
     s.append(" size:"+N+")\n");
@@ -291,13 +292,12 @@ abstract class StuckSP extends Test                                             
   static StuckSP test_load()
    {StuckSP t = stuckStatic();
     final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
     for (int i = 0; i < 4; i++)
      {r.key = 2 + 2 * i; r.data = 1 + i;
       r.push();
      }
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    //stop(t);
+    ok(t, """
 StuckSP(maxSize:8 size:4)
   0 key:2 data:1
   1 key:4 data:2
@@ -310,7 +310,6 @@ StuckSP(maxSize:8 size:4)
   static void test_clear()
    {StuckSP t = test_load();
     final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
     r.clear();
     ok(r.size,   0);
    }
@@ -318,7 +317,6 @@ StuckSP(maxSize:8 size:4)
   static void test_push()
    {StuckSP t = stuckStatic();
     final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
     r.key = 15; r.data =  9; r.push();
     r.key = 14; r.data = 10; r.push();
     r.key = 13; r.data = 11; r.push();
@@ -355,8 +353,8 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
    1  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
 """);
 
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    //stop(t));
+    ok(t, """
 StuckSP(maxSize:8 size:4)
   0 key:15 data:9
   1 key:14 data:10
@@ -375,15 +373,14 @@ StuckSP(maxSize:8 size:4)
   static void test_pop()
    {StuckSP      t = test_load();
     final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
 
     r.pop();
     //stop(r);
     ok(r, """
-Transaction(action:pop search:0 limit:0 found:true index:3 key:8 data:4 base:16 size:3 isFull:false isEmpty:false)
+Transaction(action:pop search:0 limit:0 found:true index:3 key:8 data:4 size:3 isFull:false isEmpty:false)
 """);
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    //stop(t);
+    ok(t, """
 StuckSP(maxSize:8 size:3)
   0 key:2 data:1
   1 key:4 data:2
@@ -401,14 +398,13 @@ StuckSP(maxSize:8 size:3)
   static void test_shift()
    {StuckSP t = test_load();
     final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
 
     r.shift();
     ok(r, """
-Transaction(action:shift search:0 limit:0 found:true index:0 key:2 data:1 base:16 size:3 isFull:false isEmpty:false)
+Transaction(action:shift search:0 limit:0 found:true index:0 key:2 data:1 size:3 isFull:false isEmpty:false)
 """);
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    //stop(t);
+    ok(t, """
 StuckSP(maxSize:8 size:3)
   0 key:4 data:2
   1 key:6 data:3
@@ -425,15 +421,14 @@ StuckSP(maxSize:8 size:3)
   static void test_unshift()
    {StuckSP t = test_load();
     final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
 
     r.key = 9; r.data = 9; r.unshift();
     //stop(r);
     ok(r, """
-Transaction(action:unshift search:0 limit:0 found:true index:0 key:9 data:9 base:16 size:5 isFull:false isEmpty:false)
+Transaction(action:unshift search:0 limit:0 found:true index:0 key:9 data:9 size:5 isFull:false isEmpty:false)
 """);
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    //stop(t);
+    ok(t, """
 StuckSP(maxSize:8 size:5)
   0 key:9 data:9
   1 key:2 data:1
@@ -452,11 +447,10 @@ StuckSP(maxSize:8 size:5)
   static void test_elementAt()
    {StuckSP     t = test_load();
     final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
     r.index = 2; r.elementAt();
     //stop(r);
     ok(r, """
-Transaction(action:elementAt search:0 limit:0 found:true index:2 key:6 data:3 base:16 size:4 isFull:false isEmpty:false)
+Transaction(action:elementAt search:0 limit:0 found:true index:2 key:6 data:3 size:4 isFull:false isEmpty:false)
 """);
 
     r.index = -2;
@@ -471,11 +465,10 @@ Transaction(action:elementAt search:0 limit:0 found:true index:2 key:6 data:3 ba
   static void test_set_element_at()
    {StuckSP  t = test_load();
     final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
 
     r.key = 22; r.data = 33; r.index = 2; r.setElementAt();
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    //stop(t);
+    ok(t, """
 StuckSP(maxSize:8 size:4)
   0 key:2 data:1
   1 key:4 data:2
@@ -484,8 +477,8 @@ StuckSP(maxSize:8 size:4)
 """);
 
     r.key = 88; r.data = 99; r.index = 4; r.setElementAt();
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    //stop(t);
+    ok(t, """
 StuckSP(maxSize:8 size:5)
   0 key:2 data:1
   1 key:4 data:2
@@ -506,11 +499,10 @@ StuckSP(maxSize:8 size:5)
   static void test_insert_element_at()
    {StuckSP t = test_load();
     final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
 
     r.key = 9; r.data = 9; r.index = 2; r.insertElementAt();
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    //stop(t);
+    ok(t, """
 StuckSP(maxSize:8 size:5)
   0 key:2 data:1
   1 key:4 data:2
@@ -520,8 +512,8 @@ StuckSP(maxSize:8 size:5)
 """);
 
     r.key = 7; r.data = 7; r.index = 5; r.insertElementAt();
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    //stop(t);
+    ok(t, """
 StuckSP(maxSize:8 size:6)
   0 key:2 data:1
   1 key:4 data:2
@@ -539,16 +531,15 @@ StuckSP(maxSize:8 size:6)
   static void test_remove_element_at()
    {StuckSP t = test_load();
     final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
 
     r.index = 2; r.removeElementAt();
     //stop(r);
     ok(r, """
-Transaction(action:removeElementAt search:0 limit:0 found:true index:2 key:6 data:3 base:16 size:3 isFull:false isEmpty:false)
+Transaction(action:removeElementAt search:0 limit:0 found:true index:2 key:6 data:3 size:3 isFull:false isEmpty:false)
 """);
 
-    //stop(t.toString(r.base));
-    ok(t.toString(r.base), """
+    //stop(t);
+    ok(t, """
 StuckSP(maxSize:8 size:3)
   0 key:2 data:1
   1 key:4 data:2
@@ -563,18 +554,17 @@ StuckSP(maxSize:8 size:3)
   static void test_first_last()
    {StuckSP t = test_load();
     final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
 
     r.firstElement();
     //stop(r);
     ok(r, """
-Transaction(action:firstElement search:0 limit:0 found:true index:0 key:2 data:1 base:16 size:4 isFull:false isEmpty:false)
+Transaction(action:firstElement search:0 limit:0 found:true index:0 key:2 data:1 size:4 isFull:false isEmpty:false)
 """);
 
     r.lastElement();
     //stop(r);
     ok(r, """
-Transaction(action:lastElement search:0 limit:0 found:true index:3 key:8 data:4 base:16 size:4 isFull:false isEmpty:false)
+Transaction(action:lastElement search:0 limit:0 found:true index:3 key:8 data:4 size:4 isFull:false isEmpty:false)
 """);
 
     r.clear();
@@ -585,78 +575,74 @@ Transaction(action:lastElement search:0 limit:0 found:true index:3 key:8 data:4 
   static void test_search()
    {StuckSP  t = test_load();
     final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
 
     r.search = 2; r.search();
     //stop(r);
     ok(r, """
-Transaction(action:search search:2 limit:0 found:true index:0 key:2 data:1 base:16 size:4 isFull:false isEmpty:false)
+Transaction(action:search search:2 limit:0 found:true index:0 key:2 data:1 size:4 isFull:false isEmpty:false)
 """);
 
     r.search = 3;  r.search();
     //stop(r);
     ok(r, """
-Transaction(action:search search:3 limit:0 found:false index:4 key:8 data:1 base:16 size:4 isFull:false isEmpty:false)
+Transaction(action:search search:3 limit:0 found:false index:4 key:8 data:1 size:4 isFull:false isEmpty:false)
 """);
     r.search = 8;  r.search();
     //stop(r);
     ok(r, """
-Transaction(action:search search:8 limit:0 found:true index:3 key:8 data:4 base:16 size:4 isFull:false isEmpty:false)
+Transaction(action:search search:8 limit:0 found:true index:3 key:8 data:4 size:4 isFull:false isEmpty:false)
 """);
    }
 
   static void test_search_except_last()
    {StuckSP  t = test_load();
     final Transaction r = t.new Transaction();
-    r.base  = t.baseAt();
     r.limit = 1;
 
     r.search = 4;  r.search();
     //stop(r);
     ok(r, """
-Transaction(action:search search:4 limit:1 found:true index:1 key:4 data:2 base:16 size:4 isFull:false isEmpty:false)
+Transaction(action:search search:4 limit:1 found:true index:1 key:4 data:2 size:4 isFull:false isEmpty:false)
 """);
 
     r.search = 8; r.search();
     //stop(r);
     ok(r, """
-Transaction(action:search search:8 limit:1 found:false index:3 key:6 data:2 base:16 size:4 isFull:false isEmpty:false)
+Transaction(action:search search:8 limit:1 found:false index:3 key:6 data:2 size:4 isFull:false isEmpty:false)
 """);
    }
 
   static void test_search_first_greater_than_or_equal()
    {StuckSP  t = test_load();
     final Transaction r = t.new Transaction();
-    r.base = t.baseAt();
 
     r.search = 5; r.searchFirstGreaterThanOrEqual();
     //stop(r);
     ok(r, """
-Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:0 found:true index:2 key:6 data:3 base:16 size:4 isFull:false isEmpty:false)
+Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:0 found:true index:2 key:6 data:3 size:4 isFull:false isEmpty:false)
 """);
 
     r.search = 7; r.searchFirstGreaterThanOrEqual();
     //stop(r);
     ok(r, """
-Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:0 found:true index:3 key:8 data:4 base:16 size:4 isFull:false isEmpty:false)
+Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:0 found:true index:3 key:8 data:4 size:4 isFull:false isEmpty:false)
 """);
    }
 
   static void test_search_first_greater_than_or_equal_except_last()
    {StuckSP      t = test_load();
     final Transaction r = t.new Transaction();
-    r.base   = t.baseAt();
     r.limit  = 1;
     r.search = 5; r.searchFirstGreaterThanOrEqual();
     //stop(r);
     ok(r, """
-Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:1 found:true index:2 key:6 data:3 base:16 size:4 isFull:false isEmpty:false)
+Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:1 found:true index:2 key:6 data:3 size:4 isFull:false isEmpty:false)
 """);
 
     r.search   = 7; r.searchFirstGreaterThanOrEqual();
     //stop(r);
     ok(r, """
-Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:false index:3 key:6 data:3 base:16 size:4 isFull:false isEmpty:false)
+Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:false index:3 key:6 data:3 size:4 isFull:false isEmpty:false)
 """);
    }
 
