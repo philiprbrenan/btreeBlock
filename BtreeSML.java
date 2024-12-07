@@ -150,8 +150,7 @@ abstract class BtreeSML extends Test                                            
 //D1 Components                                                                 // A branch or leaf in the tree
 
   class Node                                                                    // A branch or leaf in the tree
-   {final int node;                                                             // The number of the node
-    Node(int Node) {node = Node;}                                               // Access an existing node
+   {int node;                                                                   // The number of the node
 
     boolean isLeaf() {z(); return getInt(isLeaf,    0, node) > 0;}              // A leaf if true
     void   setLeaf() {z();        setInt(isLeaf, 1, 0, node);}                  // Set as leaf
@@ -871,7 +870,7 @@ abstract class BtreeSML extends Test                                            
      }
    }  // Node
 
-  Node node(int node) {return new Node(node);}                                  // Refer to a node by number
+  Node node(int node) {final Node n = new Node(); n.node = node; return n;}     // Refer to a node by number
 
 //D1 Array                                                                      // Key, data pairs in the tree as an array
 
@@ -1957,8 +1956,7 @@ abstract class BtreeSML extends Test                                            
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_to_array();                                                            //  2.52
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
