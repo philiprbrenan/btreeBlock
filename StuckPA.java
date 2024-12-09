@@ -34,6 +34,27 @@ abstract class StuckPA extends Test                                             
    {return new MemoryLayout(memory(), layout, baseAt());
    };
 
+  StuckPA at(int Base)                                                          // Reference a stuck at an offset in memory by copying all the details of a stuck and applying a new base address to make this description reentrant.
+   {z();
+    final StuckPA  parent = this;
+    final int        base = Base;
+    final StuckPA   child = new StuckPA()
+     {int baseAt     () {return base;}
+      int maxSize    () {return parent.maxSize    ();}
+      int bitsPerKey () {return parent.bitsPerKey ();}
+      int bitsPerData() {return parent.bitsPerData();}
+      int bitsPerSize() {return parent.bitsPerSize();}
+      Memory memory  () {return parent.memory();}
+     };
+    child.key         = parent.key;
+    child.Keys        = parent.Keys;
+    child.data        = parent.data;
+    child.Data        = parent.Data;
+    child.currentSize = parent.currentSize;
+    child.stuck       = parent.stuck;
+    return child;
+   }
+
   Layout layout()                                                               // Layout describing stuck
    {z();
     layout      = Layout.layout();
@@ -890,7 +911,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:0 found:1 index:
     final Program      p = t.program;
     t.searchFirstGreaterThanOrEqual();
 
-    m.at(t.limit).setInt(1);
+    m.at(t.limit) .setInt(1);
     m.at(t.search).setInt(5); p.run();
     //stop(t);
     ok(t, """
@@ -901,6 +922,80 @@ Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:1 found:1 index:
     //stop(t);
     ok(t, """
 Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:2 key:6 data:3 size:4 isFull:0 isEmpty:0)
+""");
+   }
+
+  static void test_at()
+   {final int     N = 16;
+    final StuckPA S = new StuckPA()
+     {final Memory memory = new Memory(layout.size()*2);
+      int maxSize     () {return 4;}
+      int bitsPerKey  () {return 8;}
+      int bitsPerData () {return 8;}
+      int bitsPerSize () {return 8;}
+      int baseAt      () {return 0;}
+      Memory memory   () {return memory;}
+     };
+
+    final StuckPA       s = S.at(0);
+    final Transaction  st = s.new Transaction();
+    final MemoryLayout sm = st.trn;
+
+    st.push();
+    sm.at(st.key).setInt(2); sm.at(st.data).setInt(1); st.program.run();
+    sm.at(st.key).setInt(4); sm.at(st.data).setInt(2); st.program.run();
+    sm.at(st.key).setInt(6); sm.at(st.data).setInt(3); st.program.run();
+    sm.at(st.key).setInt(8); sm.at(st.data).setInt(4); st.program.run();
+
+    final StuckPA       t = S.at(S.layout.size());
+    final Transaction  tt = t.new Transaction();
+    final MemoryLayout tm = tt.trn;
+
+    tt.push();
+    tm.at(st.key).setInt(1); tm.at(st.data).setInt(2); tt.program.run();
+    tm.at(st.key).setInt(2); tm.at(st.data).setInt(4); tt.program.run();
+    tm.at(st.key).setInt(3); tm.at(st.data).setInt(6); tt.program.run();
+    tm.at(st.key).setInt(4); tm.at(st.data).setInt(8); tt.program.run();
+
+    //stop(s.memoryLayout());
+    ok(s.memoryLayout(), """
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        72                                      stuck
+   2 V        0         8                                  4     currentSize
+   3 A        8        32          4                             Keys
+   4 V        8         8               0                  2       key
+   5 V       16         8               1                  4       key
+   6 V       24         8               2                  6       key
+   7 V       32         8               3                  8       key
+   8 A       40        32          4                             Data
+   9 V       40         8               0                  1       data
+  10 V       48         8               1                  2       data
+  11 V       56         8               2                  3       data
+  12 V       64         8               3                  4       data
+""");
+
+    //stop(t.memoryLayout());
+    ok(t.memoryLayout(), """
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S       72        72                                      stuck
+   2 V       72         8                                  4     currentSize
+   3 A       80        32          4                             Keys
+   4 V       80         8               0                  1       key
+   5 V       88         8               1                  2       key
+   6 V       96         8               2                  3       key
+   7 V      104         8               3                  4       key
+   8 A      112        32          4                             Data
+   9 V      112         8               0                  2       data
+  10 V      120         8               1                  4       data
+  11 V      128         8               2                  6       data
+  12 V      136         8               3                  8       data
+""");
+
+    //stop(S.memory());
+    ok(S.memory(), """
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0000 0000 0000 0806 0402 0403 0201 0404 0302 0108 0604 0204
 """);
    }
 
@@ -920,10 +1015,12 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:
     test_search_except_last();
     test_search_first_greater_than_or_equal();
     test_search_first_greater_than_or_equal_except_last();
+    test_at();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    test_at();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
