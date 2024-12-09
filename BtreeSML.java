@@ -55,12 +55,15 @@ abstract class BtreeSML extends Test                                            
     memory       = memoryLayout.memory;
     for (int i = maxSize(); i > 0; --i)                                         // Put all the nodes on the free chain at the start with low nodes first
      {final Node n = node(i-1); n.clear();
-      final int  f = getInt(freedChain,         0);
-                     setInt(free,       f,      0, n.node);
-                     setInt(freedChain, n.node, 0);
+      final int  f = getInt(freedChain);
+                     setInt(free, f,    n.node);
+                     setInt(freedChain, n.node);
      }
     root = allocate(false);                                                     // The root is always at zero, which frees zero to act as the end of list marker on the free chain
     root.setLeaf();                                                             // The root starts as a leaf
+    root.Leaf   = Leaf.at(leaf.at(root.node));                                  // Create the root leaf stuck
+    root.Branch = Branch.at(leaf.at(root.node));                                // Create the root branch stuck
+
    }
 
   static BtreeSML btreeSML(final int leafKeys, int branchKeys)                  // Define a test BTree with the specified dimensions
@@ -85,7 +88,6 @@ abstract class BtreeSML extends Test                                            
       int           bitsPerData() {return btree.bitsPerData();}
       int           bitsPerSize() {return btree.bitsPerSize();}
       Memory             memory() {return btree.memory;}
-      MemoryLayout memoryLayout() {return btree.memoryLayout;}
      };
 
     Branch = new StuckSML()                                                     // Branch
@@ -94,7 +96,6 @@ abstract class BtreeSML extends Test                                            
       int           bitsPerData() {return btree.bitsPerNext();}
       int           bitsPerSize() {return btree.bitsPerSize();}
       Memory             memory() {return btree.memory;}
-      MemoryLayout memoryLayout() {return btree.memoryLayout;}
      };
 
     layout       = Layout.layout();
@@ -118,21 +119,23 @@ abstract class BtreeSML extends Test                                            
 
 //D1 Memory access                                                              // Access to memory
 
-  int  getInt(Layout.Field field,            int base)            {z(); return memoryLayout.getInt(field,        base);}
-  int  getInt(Layout.Field field,            int base, int index) {z(); return memoryLayout.getInt(field,        base, index);}
+  int  getInt(Layout.Field field)            {z(); return memoryLayout.getInt(field);}
+  int  getInt(Layout.Field field, int index) {z(); return memoryLayout.getInt(field, index);}
 
-  void setInt(Layout.Field field, int value, int base)            {z();        memoryLayout.setInt(field, value, base);}
-  void setInt(Layout.Field field, int value, int base, int index) {z();        memoryLayout.setInt(field, value, base, index);}
+  void setInt(Layout.Field field, int value)            {z(); memoryLayout.setInt(field, value);}
+  void setInt(Layout.Field field, int value, int index) {z(); memoryLayout.setInt(field, value, index);}
 
 //D1 Memory allocation                                                          // Allocate and free memory
 
   Node allocate(boolean check)                                                  // Allocate a node with or without checking for sufficient free space
-   {z(); final int  f = getInt(freedChain,    0);                               // Last freed node
+   {z(); final int  f = getInt(freedChain);                                     // Last freed node
     z(); if (check && f == 0) stop("No more memory available");                 // No more free nodes available
-    z(); final int  F = getInt(free,          0, f);                            // Second to last freed node
-                        setInt(freedChain, F, 0);                               // Make second to last freed node the forst freed nod to liberate the existeing first free node
+    z(); final int  F = getInt(free,       f);                                  // Second to last freed node
+                        setInt(freedChain, F);                                  // Make second to last freed node the forst freed nod to liberate the existeing first free node
     final Node n = node(f); n.clear();                                          // Construct and clear the node
     maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                                // Number of nodes in use
+    n.Leaf       = Leaf.at(n.leafBase());                                       // Address the leaf stuck
+    n.Branch     = Branch.at(n.branchBase());                                   // Address the branch stuck
     return n;
    }
 
@@ -141,9 +144,9 @@ abstract class BtreeSML extends Test                                            
   void freeNode(int node)                                                       // Free a node by number
    {z(); if (node == 0) stop("Cannot free root");                               // The root is never freed
     z(); node(node).erase();                                                    // Clear the node to encourage erroneous frees to do damage that shows up quickly.
-    final int  f = getInt(freedChain,       0);                                 // Last freed node from head of free chain
-                   setInt(free,          f, 0, node);                           // Chain this node in front of the last freed node
-                   setInt(freedChain, node, 0);                                 // Make this node the head of the free chain
+    final int  f = getInt(freedChain);                                          // Last freed node from head of free chain
+                   setInt(free,    f, node);                                    // Chain this node in front of the last freed node
+                   setInt(freedChain, node);                                    // Make this node the head of the free chain
     maxNodeUsed  = max(maxNodeUsed, --nodeUsed);                                // Number of nodes in use
    }
 
@@ -151,10 +154,11 @@ abstract class BtreeSML extends Test                                            
 
   class Node                                                                    // A branch or leaf in the tree
    {int node;                                                                   // The number of the node
+    StuckSML Leaf, Branch;                                                      // Stucks used in this node with their base addresses set corrctly to allow addressing of the fields in the stuck
 
-    boolean isLeaf() {z(); return getInt(isLeaf,    0, node) > 0;}              // A leaf if true
-    void   setLeaf() {z();        setInt(isLeaf, 1, 0, node);}                  // Set as leaf
-    void setBranch() {z();        setInt(isLeaf, 0, 0, node);}                  // Set as branch
+    boolean isLeaf() {z(); return getInt(isLeaf,    node) > 0;}                 // A leaf if true
+    void   setLeaf() {z();        setInt(isLeaf, 1, node);}                     // Set as leaf
+    void setBranch() {z();        setInt(isLeaf, 0, node);}                     // Set as branch
 
     void assertLeaf()   {if (!isLeaf()) stop("Leaf required");}
     void assertBranch() {if ( isLeaf()) stop("Branch required");}
@@ -168,7 +172,7 @@ abstract class BtreeSML extends Test                                            
       return n;
      }
 
-    void free() {z(); freeNode(node);}                                          // Clear a new node to zeros ready for use
+    void free() {z(); freeNode(node);}                                          // Free a new node to make it avialable for reuse
 
     void clear()                                                                // Clear a new node to zeros ready for use
      {z();
@@ -187,8 +191,8 @@ abstract class BtreeSML extends Test                                            
     int leafBase()   {z(); return leaf  .at(node);}                             // Base of leaf stuck in memory
     int branchBase() {z(); return branch.at(node);}                             // Base of branch stuck in memory
 
-    int leafSize()   {z(); final int b = leafBase();   return Leaf  .size(b);}  // Number of children in body of leaf
-    int branchSize() {z(); final int b = branchBase(); return Branch.size(b)-1;}// Number of children in body of branch
+    int leafSize()   {z(); return Leaf.size();}                                 // Number of children in body of leaf
+    int branchSize() {z(); return Branch.size()-1;}                             // Number of children in body of branch taking top for granted as it is always there
 
     boolean isFull()                                                            // The node is full
      {z(); return isLeaf() ? leafSize() == maxKeysPerLeaf  ():
@@ -199,23 +203,23 @@ abstract class BtreeSML extends Test                                            
 
     boolean hasLeavesForChildren()                                              // The node has leaves for children
      {z(); assertBranch();
-      final int b = branchBase(), last = Branch.lastElement1(b).data;
+      final int last = Branch.lastElement1().data;
       return node(last).isLeaf();
      }
 
     int top()                                                                   // The top next element of a branch
      {z(); assertBranch();
-      final int b = branchBase(), s = branchSize();
-      return Branch.elementAt1(b, s).data;
+      final int s = branchSize();
+      return Branch.elementAt1(s).data;
      }
 
     public String toString()                                                    // Print a node
      {final StringBuilder s = new StringBuilder();
       if (isLeaf())                                                             // Print a leaf
        {s.append("Leaf(node:"+node+" size:"+leafSize()+")\n");
-        final int lb = leafBase();
-        for (int i = 0; i < Leaf.size(lb); i++)                                 // Each element in the leaf
-         {final StuckSML.ElementAt kd = Leaf.elementAt1(lb, i);
+        final int N  = leafSize();                                              // Number of elements in leaf
+        for (int i = 0; i < N; i++)                                             // Each element in the leaf
+         {final StuckSML.ElementAt kd = Leaf.elementAt1(i);
           s.append("  "+(i+1)+" key:"+kd.key+" data:"+kd.data+"\n");
          }
        }
@@ -224,9 +228,9 @@ abstract class BtreeSML extends Test                                            
                        " size:"+branchSize()+
                         " top:"+top()+"\n");
 
-        final int bb = branchBase(), bs = Branch.size(bb);
-        for (int i = 0; i < bs; i++)
-         {final StuckSML.ElementAt kn = Branch.elementAt1(bb, i);
+        final int N = Branch.size();                                            // Number of elements in branch including top
+        for (int i = 0; i < N; i++)
+         {final StuckSML.ElementAt kn = Branch.elementAt1(i);
           s.append("  "+(i+1)+" key:"+kn.key+" next:"+kn.data+"\n");
          }
        }
@@ -250,8 +254,10 @@ abstract class BtreeSML extends Test                                            
         leaf   = Node.this;
         search = Search;
         base   = leafBase();
-        final StuckSML.Search s = Leaf.search1(base, Search);
+say("BBBB11", Leaf);
+        final StuckSML.Search s = Leaf.search1(Search);
         found  = s.found;
+say("BBBB22", found);
         index  = s.index;
         data   = s.data;
         return this;
@@ -284,7 +290,7 @@ abstract class BtreeSML extends Test                                            
         search = Search;
         base   = leafBase();
         final StuckSML.SearchFirstGreaterThanOrEqual s =
-        Leaf.searchFirstGreaterThanOrEqual1(base, Search);
+        Leaf.searchFirstGreaterThanOrEqual1(Search);
         found = s.found;
         first = s.index;
         return this;
@@ -317,10 +323,10 @@ abstract class BtreeSML extends Test                                            
         search = Search;
         base   = branchBase();
         final StuckSML.SearchFirstGreaterThanOrEqualExceptLast s =
-            Branch.searchFirstGreaterThanOrEqualExceptLast1(base, Search);
+            Branch.searchFirstGreaterThanOrEqualExceptLast1(Search);
         found = s.found;
         first = s.index;
-        next  = s.found ? s.data : Branch.lastElement1(base).data;              // Next if no key matches
+        next  = s.found ? s.data : Branch.lastElement1().data;                  // Next if no key matches
         return this;
        }
 
@@ -340,24 +346,23 @@ abstract class BtreeSML extends Test                                            
 
     void leafToArray(Stack<StuckSML.ElementAt>s)                                // Leaf as an array
      {z(); assertLeaf();
-      final int K = leafSize(), lb = leafBase();
+      final int K = leafSize();
       for  (int i = 0; i < K; i++)
        {z();
-        final StuckSML.ElementAt e = Leaf.elementAt1(lb, i), E = e.copy();
+        final StuckSML.ElementAt e = Leaf.elementAt1(i), E = e.copy();
         s.push(E);
        }
      }
 
     void branchToArray(Stack<StuckSML.ElementAt>s)                              // Branch to array
      {z(); assertBranch();
-      final int K = branchSize() + 1;                                           // To allow for top next
+      final int K = Branch.size();                                              // Include top next
 
       if (K > 0)                                                                // Branch has key, next pairs
        {z();
-        final int bb = branchBase();                                            // Each key, next pair
         for  (int i = 0; i < K; i++)
          {z();
-          final int next = Branch.elementAt1(bb, i).data;                       // Each key, next pair
+          final int next = Branch.elementAt1(i).data;                           // Each key, next pair
           final Node n = node(next);
           if (n.isLeaf()) {z(); n.leafToArray(s);}
           else
@@ -381,7 +386,7 @@ abstract class BtreeSML extends Test                                            
       final StringBuilder s = new StringBuilder();                              // String builder
       final int K = leafSize();
       for  (int i = 0; i < K; i++)
-       {s.append(""+Leaf.elementAt1(leafBase(), i).key+",");
+       {s.append(""+Leaf.elementAt1(i).key+",");
        }
       if (s.length() > 0) s.setLength(s.length()-1);                            // Remove trailing comma if present
       s.append("="+node+" ");
@@ -395,11 +400,10 @@ abstract class BtreeSML extends Test                                            
       padStrings(S, level);
       final int L = level * linesToPrintABranch;
       final int K = branchSize();
-      final int B = branchBase();
 
       if (K > 0)                                                                // Branch has key, next pairs
        {for  (int i = 0; i < K; i++)
-         {final int next = Branch.elementAt1(B, i).data;                        // Each key, next pair
+         {final int next = Branch.elementAt1(i).data;                           // Each key, next pair
           final Node n = node(next);
           if (n.isLeaf())
            {n.printLeaf(S, level+1);
@@ -413,9 +417,9 @@ abstract class BtreeSML extends Test                                            
             n.printBranch(S, level+1);
            }
 
-          S.elementAt(L+0).append(""+Branch.elementAt1(B, i).key);              // Key
+          S.elementAt(L+0).append(""+Branch.elementAt1(i).key);                 // Key
           S.elementAt(L+1).append(""+node+(i > 0 ?  "."+i : ""));               // Branch,key, next pair
-          S.elementAt(L+2).append(""+Branch.elementAt1(B, i).data);
+          S.elementAt(L+2).append(""+Branch.elementAt1(i).data);
          }
        }
       else                                                                      // Branch is empty so print just the index of the branch
@@ -445,31 +449,30 @@ abstract class BtreeSML extends Test                                            
      {z(); assertLeaf();
       z(); if (node != 0) stop("Wanted root, but got node:", node);
       z(); if (!isFull()) stop("Root is not full, but has size:", leafSize());
-      z(); setBranch();
 
       final Node l = allocLeaf();                                               // New left leaf
       final Node r = allocLeaf();                                               // New right leaf
-      final int pb = leafBase(), lb = l.leafBase(), rb = r.leafBase();
+      final Node p = this;                                                      // Root is the parent
       final int sl = splitLeafSize();
 
-      for (int i = 0; i < sl; i++)                                              // Build left leaf
+      for (int i = 0; i < sl; i++)                                              // Build left leaf from parent
        {z();
-        final StuckSML.Shift f = Leaf.shift1(pb);
-        Leaf.push(lb, f.key, f.data);
+        final StuckSML.Shift f = p.Leaf.shift1();
+        l.Leaf.push(f.key, f.data);
        }
-      for (int i = 0; i < sl; i++)                                              // Build right leaf
+      for (int i = 0; i < sl; i++)                                              // Build right leaf from parent
        {z();
-        final StuckSML.Shift f = Leaf.shift1(pb);
-        Leaf.push(rb, f.key, f.data);
+        final StuckSML.Shift f = p.Leaf.shift1();
+        r.Leaf.push(f.key, f.data);
        }
 
-      final int first = Leaf.firstElement1(rb).key;                             // First of right leaf
-      final int last  = Leaf. lastElement1(lb).key;                             // Last of left leaf
-      final int kv    = (last + first) / 2;                                     // Insert left leaf into root
-      final int bb    = branchBase();                                           // Base of branch
-      Branch.clear(bb);                                                         // Clear the branch
-      Branch.push (bb, kv, l.node);                                             // Insert left leaf into root
-      Branch.push (bb, 0,  r.node);                                             // Insert right into root. This will be the top node and so ignored by search ... except last.
+      final int first = r.Leaf.firstElement1().key;                             // First of right leaf
+      final int last  = l.Leaf. lastElement1().key;                             // Last of left leaf
+      final int kv    = (last + first) / 2;                                     // Mid key
+      setBranch();
+      p.Branch.clear();                                                         // Clear the branch
+      p.Branch.push (kv, l.node);                                               // Insert left leaf into root
+      p.Branch.push (0,  r.node);                                               // Insert right into root. This will be the top node and so ignored by search ... except last.
      }
 
     void splitBranchRoot()                                                      // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
@@ -479,29 +482,29 @@ abstract class BtreeSML extends Test                                            
       z();
       final Node l = allocBranch();                                             // New left branch
       final Node r = allocBranch();                                             // New right branch
-      final int bb = branchBase(), lb = l.branchBase(), rb = r.branchBase();    // Base of branch, base of left child, base of right child
+      final Node p = this;                                                      // Root is the parent
       final int sb = splitBranchSize();                                         // Branch split size
 
-      for (int i = 0; i < sb; i++)                                              // Left
+      for (int i = 0; i < sb; i++)                                              // Build left child from parent
        {z();
-        final StuckSML.Shift f = Branch.shift1(bb);
-        Branch.push(lb, f.key, f.data);
+        final StuckSML.Shift f = p.Branch.shift1();
+        l.Branch.push(f.key, f.data);
        }
-      final StuckSML.Shift  pl = Branch.shift2(bb);                             // This key, next pair will be part of the root
-      Branch.push(lb, 0, pl.data);                                              // Becomes top and so ignored by search ... except last
+      final StuckSML.Shift  pl = Branch.shift2();                               // This key, next pair will be part of the root
+      l.Branch.push(0, pl.data);                                                // Becomes top and so ignored by search ... except last
 
-      for(int i = 0; i < sb; i++)                                               // Right
+      for(int i = 0; i < sb; i++)                                               // Build right child from parent
        {z();
-        final StuckSML.Shift f = Branch.shift1(bb);
-        Branch.push(rb, f.key, f.data);
+        final StuckSML.Shift f = p.Branch.shift1();
+        r.Branch.push(f.key, f.data);
        }
 
-      final StuckSML.Shift  pr = Branch.shift3(bb);                             // Top of root
-      Branch.push(rb,  0, pr.data);                                             // Becomes top and so ignored by search ... except last
+      final StuckSML.Shift  pr = Branch.shift3();                               // Top of root
+      r.Branch.push(0, pr.data);                                                // Becomes top and so ignored by search ... except last
 
-      Branch.clear(bb);                                                         // Refer to new branches from root
-      Branch.push (bb, pl.key, l.node);
-      Branch.push (bb, 0,      r.node);                                         // Becomes top and so ignored by search ... except last
+      p.Branch.clear();                                                         // Refer to new branches from root
+      p.Branch.push (pl.key, l.node);
+      p.Branch.push (0,      r.node);                                           // Becomes top and so ignored by search ... except last
      }
 
     void splitLeaf(Node parent, int index)                                      // Split a leaf which is not the root
@@ -517,18 +520,17 @@ abstract class BtreeSML extends Test                                            
       final Node p = parent;                                                    // Parent
       final Node l = allocLeaf();                                               // New  split out leaf
       final Node r = this;                                                      // Existing  leaf
-      final int pb = p.branchBase(), lb = l.leafBase(), rb = r.leafBase();      // Base of left child, base of right child
       final int sl = splitLeafSize();
 
       for (int i = 0; i < sl; i++)                                              // Build left leaf
        {z();
-        final StuckSML.Shift f = Leaf.shift1(rb);
-        Leaf.push(lb, f.key, f.data);
+        final StuckSML.Shift f = r.Leaf.shift1();
+        l.Leaf.push(f.key, f.data);
        }
-      final int F = Leaf.firstElement1(rb).key;
-      final int L = Leaf. lastElement1(lb).key;
+      final int F = r.Leaf.firstElement1().key;
+      final int L = l.Leaf. lastElement1().key;
       final int splitKey = (F + L) / 2;
-      Branch.insertElementAt(pb, splitKey, l.node, index);                      // Insert new key, next pair in parent
+      p.Branch.insertElementAt(splitKey, l.node, index);                        // Insert new key, next pair in parent
      }
 
     void splitBranch(Node parent, int index)                                    // Split a branch which is not the root by splitting right to left
@@ -549,14 +551,14 @@ abstract class BtreeSML extends Test                                            
                 lb = l.branchBase(), rb = r.branchBase();
       final int sb = splitBranchSize();
 
-      for (int i = 0; i < sb; i++)                                              // Build left branch
-       {z(); final StuckSML.Shift f = Branch.shift1(rb);
-        Branch.push(lb, f.key, f.data);
+      for (int i = 0; i < sb; i++)                                              // Build left branch from right
+       {z(); final StuckSML.Shift f = r.Branch.shift1();
+        l.Branch.push(f.key, f.data);
        }
 
-      final StuckSML.Shift split = Branch.shift1(rb);                           // Build right branch
-      Branch.push           (lb, 0, split.data);                                // Becomes top and so is ignored by search ... except last
-      Branch.insertElementAt(pb, split.key, l.node, index);
+      final StuckSML.Shift split = r.Branch.shift1();                           // Build right branch
+      l.Branch.push           (0, split.data);                                  // Becomes top and so is ignored by search ... except last
+      p.Branch.insertElementAt(split.key, l.node, index);
      }
 
     boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
@@ -565,50 +567,45 @@ abstract class BtreeSML extends Test                                            
       z(); if (index < 0)            stop("Index", index, "too small");
       z(); if (index > branchSize()) stop("Index", index, "too big");
       z();
-      final int                 p = branchBase();
-      final StuckSML.ElementAt  L = Branch.elementAt1(p, index-1);
-      final StuckSML.ElementAt  R = Branch.elementAt2(p, index+0);
+      final Node                P = this;
+      final StuckSML.ElementAt  L = P.Branch.elementAt1(index-1);
+      final StuckSML.ElementAt  R = P.Branch.elementAt2(index+0);
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final Node ll = node(L.data);
-        final Node rr = node(R.data);
-        final int   l = ll.leafBase();
-        final int   r = rr.leafBase();
-        final int  nl = ll.leafSize();
-        final int  nr = rr.leafSize();
+        final Node  l = node(L.data);
+        final Node  r = node(R.data);
+        final int  nl = l.leafSize();
+        final int  nr = r.leafSize();
 
         z(); if (nr >= maxKeysPerLeaf()) return false;                          // Steal not possible because there is no where to put the steal
         z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the leaf sibling empty
         z();
-        final StuckSML.LastElement le = Leaf.lastElement1(l);
-        Leaf.insertElementAt(r, le.key, le.data, 0);                            // Increase right
-        Leaf.pop(l);                                                            // Reduce left
-        final int lk = Leaf.elementAt1(l, nl-2).key;                            // Last key on left
-        Branch.setElementAt(p, lk, L.data, index-1);                            // Swap key of parent
+        final StuckSML.LastElement le = l.Leaf.lastElement1();
+        r.Leaf.insertElementAt(le.key, le.data, 0);                             // Increase right
+        l.Leaf.pop();                                                           // Reduce left
+        final int lk = l.Leaf.elementAt1(nl-2).key;                             // Last key on left
+        P.Branch.setElementAt(lk, L.data, index-1);                             // Swap key of parent
        }
       else                                                                      // Children are branches
        {z();
-        final Node ll = node(L.data);
-        final Node rr = node(R.data);
-        final int  pb =    branchBase();
-        final int   l = ll.branchBase();
-        final int   r = rr.branchBase();
-        final int  nl = ll.branchSize();
-        final int  nr = rr.branchSize();
+        final Node l  = node(L.data);
+        final Node r  = node(R.data);
+        final int  nl = l.branchSize();
+        final int  nr = r.branchSize();
 
         z(); if (nr >= maxKeysPerBranch()) return false;                        // Steal not possible because there is no where to put the steal
         z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the left sibling empty
         z();
-        final StuckSML.LastElement  t = Branch.lastElement1(l);                 // Increase right with left top
-        final int key = Branch.elementAt1(pb, index).key;                       // Top key
-        Branch.insertElementAt(r, key, t.data, 0);                              // Increase right with left top
-        Branch.pop(l);                                                          // Remove left top
-        final StuckSML.FirstElement b = Branch.firstElement1(r);                // Increase right with left top
-        final int pk = Branch.elementAt1 (p, index-1).key;                      // Parent key
-        Branch.setElementAt              (r, pk, b.data, 0);                    // Reduce key of parent of right
-        final int lk = Branch.lastElement1(l).key;                              // Last keft key
-        Branch.setElementAt(p, lk, L.data, index-1);                            // Reduce key of parent of left
+        final StuckSML.LastElement  t = l.Branch.lastElement1();                // Increase right with left top
+        final int key = P.Branch.elementAt1(index).key;                         // Top key
+        r.Branch.insertElementAt(key, t.data, 0);                               // Increase right with left top
+        l.Branch.pop();                                                         // Remove left top
+        final StuckSML.FirstElement b = r.Branch.firstElement1();               // Increase right with left top
+        final int pk = P.Branch.elementAt1(index-1).key;                        // Parent key
+        r.Branch.setElementAt             (pk, b.data, 0);                      // Reduce key of parent of right
+        final int lk = l.Branch.lastElement1().key;                             // Last left key
+        P.Branch.setElementAt(lk, L.data, index-1);                             // Reduce key of parent of left
        }
       return true;
      }
@@ -619,45 +616,41 @@ abstract class BtreeSML extends Test                                            
       z(); if (index < 0)             stop("Index", index, "too small");
       z(); if (index >= branchSize()) stop("Index", index, "too big");
       z();
-      final int                p = branchBase();
-      final StuckSML.ElementAt L = Branch.elementAt1(p, index+0);
-      final StuckSML.ElementAt R = Branch.elementAt2(p, index+1);
+      final Node               P = this;
+      final StuckSML.ElementAt L = P.Branch.elementAt1(index+0);
+      final StuckSML.ElementAt R = P.Branch.elementAt2(index+1);
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final Node ll = node(L.data);
-        final Node rr = node(R.data);
-        final int   l = ll.leafBase();
-        final int   r = rr.leafBase();
-        final int  nl = ll.leafSize();
-        final int  nr = rr.leafSize();
+        final Node  l = node(L.data);
+        final Node  r = node(R.data);
+        final int  nl = l.leafSize();
+        final int  nr = r.leafSize();
 
         z(); if (nl >= maxKeysPerLeaf()) return false;                          // Steal not possible because there is no where to put the steal
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
         z();
-        final StuckSML.FirstElement f = Leaf.firstElement1(r);                  // First element of right child
-        Leaf.push            (l, f.key, f.data);                                // Increase left
-        Branch.setElementAt  (p, f.key, L.data, index);                         // Swap key of parent
-        Leaf.removeElementAt1(r, 0);                                            // Reduce right
+        final StuckSML.FirstElement f = r.Leaf.firstElement1();                 // First element of right child
+        l.Leaf.push            (f.key, f.data);                                 // Increase left
+        P.Branch.setElementAt  (f.key, L.data, index);                          // Swap key of parent
+        r.Leaf.removeElementAt1(0);                                             // Reduce right
        }
       else                                                                      // Children are branches
        {z();
-        final Node ll = node(L.data);
-        final Node rr = node(R.data);
-        final int   l = ll.branchBase();
-        final int   r = rr.branchBase();
-        final int  nl = ll.branchSize();
-        final int  nr = rr.branchSize();
+        final Node  l = node(L.data);
+        final Node  r = node(R.data);
+        final int  nl = l.branchSize();
+        final int  nr = r.branchSize();
 
         z(); if (nl >= maxKeysPerBranch()) return false;                        // Steal not possible because there is no where to put the steal
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
         z();
-        final StuckSML.LastElement  le = Branch.lastElement1(l);                // Last element of left child
-        Branch.setElementAt(l, L.key, le.data, nl);                             // Left top becomes real
-        final StuckSML.FirstElement fe = Branch.firstElement1(r);               // First element of  right child
-        Branch.push(l, 0,      fe.data);                                        // New top for left is ignored by search ,.. except last
-        Branch.setElementAt(p, fe.key, L.data, index);                          // Swap key of parent
-        Branch.removeElementAt1(r, 0);                                          // Reduce right
+        final StuckSML.LastElement le = l.Branch.lastElement1();                // Last element of left child
+        l.Branch.setElementAt(L.key, le.data, nl);                              // Left top becomes real
+        final StuckSML.FirstElement fe = r.Branch.firstElement1();              // First element of  right child
+        l.Branch.push(0,      fe.data);                                         // New top for left is ignored by search ,.. except last
+        P.Branch.setElementAt(fe.key, L.data, index);                           // Swap key of parent
+        r.Branch.removeElementAt1(0);                                           // Reduce right
        }
       return true;
      }
@@ -669,25 +662,25 @@ abstract class BtreeSML extends Test                                            
       z(); if (root.isLeaf() || branchSize() > 1) return false;
       z(); if (node != 0) stop("Expected root, got:", node);
       z();
-      final int bb = branchBase(), ll = leafBase();
-      final Node l = node(Branch.firstElement1(bb).data);
-      final Node r = node(Branch. lastElement1(bb).data);
+      final Node p = this;
+      final Node l = node(p.Branch.firstElement1().data);
+      final Node r = node(p.Branch. lastElement1().data);
 
       if (hasLeavesForChildren())                                               // Leaves
        {z();
         if (l.leafSize() + r.leafSize() <= maxKeysPerLeaf())
-         {z(); Leaf.clear(bb);
-          final int nl = l.leafSize(), llb = l.leafBase(), rlb = r.leafBase();
+         {z(); p.Leaf.clear();
+          final int nl = l.leafSize();
           for (int i = 0; i < nl; ++i)
            {z();
-            final StuckSML.Shift f = Leaf.shift1(llb);
-            Leaf.push(ll, f.key, f.data);
+            final StuckSML.Shift f = l.Leaf.shift1();
+            p.Leaf.push(f.key, f.data);
            }
           final int nr = r.leafSize();
           for (int i = 0; i < nr; ++i)
            {z();
-            final StuckSML.Shift f = Leaf.shift1(rlb);
-            Leaf.push(ll, f.key, f.data);
+            final StuckSML.Shift f = r.Leaf.shift1();
+            p.Leaf.push(f.key, f.data);
            }
           setLeaf();
           l.free();
@@ -697,25 +690,25 @@ abstract class BtreeSML extends Test                                            
        }
       else if (l.branchSize() + 1 + r.branchSize() <= maxKeysPerBranch())       // Branches
        {z();
-        final StuckSML.FirstElement pkn = Branch.firstElement1(bb);
-        Branch.clear(bb);
-        final int nl = l.branchSize(), lb = l.branchBase(), rb = r.branchBase();
+        final StuckSML.FirstElement pkn = p.Branch.firstElement1();
+        p.Branch.clear();
+        final int nl = l.branchSize();
         for (int i = 0; i < nl; ++i)
          {z();
-          final StuckSML.Shift f = Branch.shift1(lb);
-          Branch.push(bb, f.key, f.data);
+          final StuckSML.Shift f = l.Branch.shift1();
+          p.Branch.push(f.key, f.data);
 
          }
-        final int data = Branch.lastElement1(lb).data;
-        Branch.push(bb, pkn.key, data);
+        final int data = l.Branch.lastElement1().data;
+        p.Branch.push(pkn.key, data);
         final int nr = r.branchSize();
         for (int i = 0; i < nr; ++i)
          {z();
-          final StuckSML.Shift f = Branch.shift1(rb);
-          Branch.push(bb, f.key, f.data);
+          final StuckSML.Shift f = r.Branch.shift1();
+          p.Branch.push(f.key, f.data);
          }
-        final int Data = Branch.lastElement2(rb).data;                          // Top next
-        Branch.push(bb, 0, Data);                                               // Top so ignored by search ... except last
+        final int Data = r.Branch.lastElement2().data;                          // Top next
+        p.Branch.push(0, Data);                                                 // Top so ignored by search ... except last
         l.free();
         r.free();
         return true;
@@ -734,53 +727,49 @@ abstract class BtreeSML extends Test                                            
       //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
       z(); if (bs    < 2 ) return false;
       z();
-      final int                p = branchBase();
-      final StuckSML.ElementAt L = Branch.elementAt1(p, index-1);
-      final StuckSML.ElementAt R = Branch.elementAt2(p, index-0);
+      final Node               p = this;
+      final StuckSML.ElementAt L = p.Branch.elementAt1(index-1);
+      final StuckSML.ElementAt R = p.Branch.elementAt2(index-0);
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final Node ll = node(L.data);
-        final Node rr = node(R.data);
-        final  int  l = ll.leafBase();
-        final  int  r = rr.leafBase();
-        final  int nl = ll.leafSize();
-        final  int nr = rr.leafSize();
+        final Node  l = node(L.data);
+        final Node  r = node(R.data);
+        final  int nl = l.leafSize();
+        final  int nr = r.leafSize();
 
         if (nl + nr >= maxKeysPerLeaf()) return false;                          // Combined body would be too big
         z();
-        final int N = Leaf.size(l);                                             // Number of entries to remove
+        final int N = l.Leaf.size();                                            // Number of entries to remove
         for (int i = 0; i < N; i++)                                             // Transfer left to right
-         {z(); final StuckSML.Pop q = Leaf.pop(l);
-          Leaf.insertElementAt(r, q.key, q.data, 0);
+         {z(); final StuckSML.Pop q = l.Leaf.pop();
+          r.Leaf.insertElementAt(q.key, q.data, 0);
          }
         freeNode(L.data);                                                       // Free the empty left node
        }
       else                                                                      // Children are branches
        {z();
-        final Node ll = node(L.data);
-        final Node rr = node(R.data);
-        final int   l = ll.branchBase();
-        final int   r = rr.branchBase();
-        final int  nl = ll.branchSize();
-        final int  nr = rr.branchSize();
+        final Node  l = node(L.data);
+        final Node  r = node(R.data);
+        final int  nl = l.branchSize();
+        final int  nr = r.branchSize();
 
         if (nl + 1 + nr > maxKeysPerBranch()) return false;                     // Merge not possible because there is not enough room for the combined result
         z();
-        final int t = Branch.elementAt1(p, index-1).key;                        // Top key
-        final StuckSML.LastElement le = Branch.lastElement1(l);                 // Last element of left child
-        Branch.insertElementAt(r, t, le.data, 0);                               // Left top to right
+        final int t = p.Branch.elementAt1(index-1).key;                         // Top key
+        final StuckSML.LastElement le = l.Branch.lastElement1();                // Last element of left child
+        r.Branch.insertElementAt(t, le.data, 0);                                // Left top to right
 
-        Branch.pop(l);                                                          // Remove left top
-        final int N = Branch.size(l);                                           // Number of entries to remove
+        l.Branch.pop();                                                         // Remove left top
+        final int N = l.Branch.size();                                          // Number of entries to remove
         for (int i = 0; i < N; i++)                                             // Transfer left to right
          {z();
-          final StuckSML.Pop q = Branch.pop(l);
-          Branch.insertElementAt(r, q.key, q.data, 0);
+          final StuckSML.Pop q = l.Branch.pop();
+          r.Branch.insertElementAt(q.key, q.data, 0);
          }
         freeNode(L.data);                                                       // Free the empty left node
        }
-      Branch.removeElementAt1(p, index-1);                                      // Reduce parent on left
+      p.Branch.removeElementAt1(index-1);                                       // Reduce parent on left
       return true;
      }
 
@@ -794,55 +783,51 @@ abstract class BtreeSML extends Test                                            
       //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
       z(); if (bs < 2) return false;
       z();
-      final int                p = branchBase();
-      final StuckSML.ElementAt L = Branch.elementAt1(p, index+0);
-      final StuckSML.ElementAt R = Branch.elementAt2(p, index+1);
+      final Node               p = this;
+      final StuckSML.ElementAt L = p.Branch.elementAt1(index+0);
+      final StuckSML.ElementAt R = p.Branch.elementAt2(index+1);
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final Node ll = node(L.data);
-        final Node rr = node(R.data);
-        final int   l = ll.leafBase();
-        final int   r = rr.leafBase();
-        final int  nl = ll.leafSize();
-        final int  nr = rr.leafSize();
+        final Node  l = node(L.data);
+        final Node  r = node(R.data);
+        final int  nl = l.leafSize();
+        final int  nr = r.leafSize();
 
         if (nl + nr > maxKeysPerLeaf()) return false;                           // Combined body would be too big
         z();
-        final int N = Leaf.size(r);                                             // Number of entries to remove
+        final int N = r.Leaf.size();                                            // Number of entries to remove
         for (int i = 0; i < N; i++)                                             // Transfer right to left
          {z();
-          final StuckSML.Shift q = Leaf.shift1(r);
-          Leaf.push(l, q.key, q.data);
+          final StuckSML.Shift q = r.Leaf.shift1();
+          l.Leaf.push(q.key, q.data);
          }
         freeNode(R.data);                                                       // Free the empty right node
        }
       else                                                                      // Children are branches
        {z();
-        final Node ll = node(L.data);
-        final Node rr = node(R.data);
-        final int   l = ll.branchBase();
-        final int   r = rr.branchBase();
-        final int  nl = ll.branchSize();
-        final int  nr = rr.branchSize();
+        final Node  l = node(L.data);
+        final Node  r = node(R.data);
+        final int  nl = l.branchSize();
+        final int  nr = r.branchSize();
 
         if (nl + 1 + nr > maxKeysPerBranch()) return false;                     // Merge not possible because there is no where to put the steal
-        z(); final StuckSML.LastElement le = Branch.lastElement1(l);            // Last element of left child
-        z(); final StuckSML.ElementAt   ea = Branch.elementAt1(p, index);       // Parent dividing element
-        Branch.setElementAt(l, ea.key, le.data, nl);                            // Re-key left top
+        z(); final StuckSML.LastElement le = l.Branch.lastElement1();           // Last element of left child
+        z(); final StuckSML.ElementAt   ea = p.Branch.elementAt1(index);        // Parent dividing element
+        l.Branch.setElementAt(ea.key, le.data, nl);                             // Re-key left top
 
-        final int N = Branch.size(r);                                           // Number of entries to remove
+        final int N = r.Branch.size();                                          // Number of entries to remove
         for (int i = 0; i < N; i++)                                             // Transfer right to left
-         {z(); final StuckSML.Shift f = Branch.shift1(r);
-          Branch.push(l, f.key, f.data);
+         {z(); final StuckSML.Shift f = r.Branch.shift1();
+          l.Branch.push(f.key, f.data);
          }
         freeNode(R.data);                                                       // Free the empty right node
        }
 
-      final StuckSML.ElementAt pkn = Branch.elementAt1(p, index+1);             // One up from dividing point in parent
-      final StuckSML.ElementAt dkn = Branch.elementAt2(p, index);               // Dividing point in parent
-      Branch.setElementAt(p, pkn.key, dkn.data, index);                         // Install key of right sibling in this child
-      Branch.removeElementAt1(p, index+1);                                      // Reduce parent on right
+      final StuckSML.ElementAt pkn = p.Branch.elementAt1(index+1);              // One up from dividing point in parent
+      final StuckSML.ElementAt dkn = p.Branch.elementAt2(index);                // Dividing point in parent
+      p.Branch.setElementAt(pkn.key, dkn.data, index);                          // Install key of right sibling in this child
+      p.Branch.removeElementAt1(index+1);                                       // Reduce parent on right
       return true;
      }
 
@@ -857,8 +842,7 @@ abstract class BtreeSML extends Test                                            
             }
       z();
 
-      final int               bb = node(node).branchBase();
-      final StuckSML.ElementAt p = Branch.elementAt1(bb, index);
+      final StuckSML.ElementAt p = Branch.elementAt1(index);
       final Node               c = node(p.data);
 
       z(); if (!c.isLow())               return;
@@ -953,6 +937,7 @@ abstract class BtreeSML extends Test                                            
         final Node.FindFirstGreaterThanOrEqualInBranch down =                   // Find next child in search path of key
           parent.findFirstGreaterThanOrEqualInBranch1(Key);
         final Node n = node(down.next);
+if (Key == 5) stop("DDDD", down.next, n.isLeaf());
         if (n.isLeaf())                                                         // Found the containing search
          {z();
           search  = n.findEqualInLeaf1(Key);
@@ -994,14 +979,15 @@ abstract class BtreeSML extends Test                                            
 
     FindAndInsert() {}
     FindAndInsert findAndInsert(int Key, int Data)                              // Find the leaf that should contain this key and insert or update it is possible
-     {find(Key);                                                                // Find the leaf that should contain this key
+     {
+say("CCCC", Key);
+      find(Key);                                                                // Find the leaf that should contain this key
       z();
       key = Key; data = Data;
 
       if (found())                                                              // Found the key in the leaf so update it with the new data
        {z();
-        final int lb = leaf().leafBase();                                       // Base of leaf
-        Leaf.setElementAt(lb, Key, Data, index());
+        root.Leaf.setElementAt(Key, Data, index());
         success = true; inserted = false;
         return this;
        }
@@ -1010,12 +996,12 @@ abstract class BtreeSML extends Test                                            
        {z();
         final Node.FindFirstGreaterThanOrEqualInLeaf f =
           leaf().findFirstGreaterThanOrEqualInLeaf1(Key);
-        final int lb = leaf().leafBase();                                       // Base of leaf
         if (f.found)                                                            // Overwrite existing key
-         {z(); Leaf.insertElementAt(lb, Key, Data, f.first);
+         {z(); root.Leaf.insertElementAt(Key, Data, f.first);
          }
         else                                                                    // Insert into position
-         {z(); Leaf.push(lb, Key, Data);
+         {z();
+           root.Leaf.push(Key, Data);
          }
         success = true;
         return this;
@@ -1051,14 +1037,8 @@ abstract class BtreeSML extends Test                                            
     z();
     if (root.isFull())                                                          // Start the insertion at the root, after splitting it if necessary
      {z();
-      if (root.isLeaf())
-       {z();
-        root.splitLeafRoot();
-       }
-      else
-       {z();
-        root.splitBranchRoot();
-       }
+      if (root.isLeaf()) {z(); root.splitLeafRoot();}
+      else               {z(); root.splitBranchRoot();}
       z();
       final FindAndInsert F = findAndInsert2(Key, Data);                        // Splitting the root might have been enough
       if (F.success) return;                                                    // Inserted or updated successfully
@@ -1096,7 +1076,9 @@ abstract class BtreeSML extends Test                                            
 
   void put(int Key)                                                             // Put some test data into the tree
    {z();
+say("AAAA", Key);
     put(Key, Key);
+if (Key == 5) stop(memoryLayout);
    }
 
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
@@ -1107,9 +1089,8 @@ abstract class BtreeSML extends Test                                            
     z(); if (!f.found()) return null;                                           // Inserted or updated successfully
     z(); final Node     l = f.leaf();                                           // The leaf that contains the key
     z(); final int      i = f.index();                                          // Position in the leaf of the key
-    z(); final int     lb = l.leafBase();                                       // Leaf base
-    z(); final StuckSML.ElementAt kd = Leaf.elementAt1(lb, i);                  // Key, data pairs in the leaf
-    z(); Leaf.removeElementAt1(lb, i);                                          // Remove the key, data pair from the leaf
+    z(); final StuckSML.ElementAt kd = Leaf.elementAt1(i);                      // Key, data pairs in the leaf
+    z(); Leaf.removeElementAt1(i);                                              // Remove the key, data pair from the leaf
     z(); return kd.data;
    }
 
