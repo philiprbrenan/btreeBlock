@@ -818,8 +818,8 @@ class BtreeStuckStatic extends Test                                             
 
     FindAndInsert() {}
     FindAndInsert findAndInsert(int Key, int Data)                              // Find the leaf that should contain this key and insert or update it is possible
-     {find(Key);                                                                // Find the leaf that should contain this key
-      z();
+     {z();
+      find(Key);                                                                // Find the leaf that should contain this key
       key = Key; data = Data;
 
       if (found())                                                              // Found the key in the leaf so update it with the new data
