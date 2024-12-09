@@ -7,6 +7,7 @@ dot.node('B',    'Btree\nnormal java')                                          
 dot.node('BS',   'BtreeStuck\nfixed key/value stack')
 dot.node('BSS',  'BtreeStuckStatic\nreduced use of new')
 dot.node('BSML', 'BtreeSML\nstatic bit memory')
+dot.node('BSP',  'BtreeSP\nparameterized by a single structure')
 
 dot.node('S',    'Stuck\nfixed key/value stack in normal java')
 dot.node('SS',   'StuckStatic\nreduced use of new')
@@ -18,9 +19,10 @@ dot.node('SPA',  'StuckPA\npsuedo assembler')
 dot.node('L',    'Layout\nmemory layout in normal java')
 dot.node('M',    'Memory\nbit memory in normal java')
 
-dot.edge('B',   'BS')                                                           # Edges between nodes
-dot.edge('BS',  'BSS')
-dot.edge('BSS', 'BSML')
+dot.edge('B',    'BS')                                                          # Edges between nodes
+dot.edge('BS',   'BSS')
+dot.edge('BSS',  'BSML')
+dot.edge('BSML', 'BSP')
 
 dot.edge('S',    'SS')
 dot.edge('S',    'BS')
@@ -30,6 +32,7 @@ dot.edge('SSML', 'BSML')
 dot.edge('SSML', 'SSP')
 dot.edge('SSP',  'SSA')
 dot.edge('SSA',  'SPA')
+dot.edge('SSP',  'BSP')
 
 dot.edge('L',    'SSML'); dot.edge('M',    'SSML')
 dot.edge('L',    'BSML'); dot.edge('M',    'BSML')
