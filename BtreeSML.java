@@ -61,9 +61,7 @@ abstract class BtreeSML extends Test                                            
      }
     root = allocate(false);                                                     // The root is always at zero, which frees zero to act as the end of list marker on the free chain
     root.setLeaf();                                                             // The root starts as a leaf
-    root.Leaf   = Leaf.at(leaf.at(root.node));                                  // Create the root leaf stuck
-    root.Branch = Branch.at(leaf.at(root.node));                                // Create the root branch stuck
-
+    root.setStucks();                                                           // Describe stucks addressable fronm the root
    }
 
   static BtreeSML btreeSML(final int leafKeys, int branchKeys)                  // Define a test BTree with the specified dimensions
@@ -134,8 +132,6 @@ abstract class BtreeSML extends Test                                            
                         setInt(freedChain, F);                                  // Make second to last freed node the forst freed nod to liberate the existeing first free node
     final Node n = node(f); n.clear();                                          // Construct and clear the node
     maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                                // Number of nodes in use
-    n.Leaf       = Leaf.at(n.leafBase());                                       // Address the leaf stuck
-    n.Branch     = Branch.at(n.branchBase());                                   // Address the branch stuck
     return n;
    }
 
@@ -170,6 +166,11 @@ abstract class BtreeSML extends Test                                            
     Node allocBranch()                                                          // Allocate branch
      {z(); final Node n = allocate(); n.setBranch();
       return n;
+     }
+
+    void setStucks()                                                            // Descriptions of the stucks addressed by this node setting their base offsets
+     {Leaf   = BtreeSML.this.Leaf  .at(leafBase());                             // Address the leaf stuck
+      Branch = BtreeSML.this.Branch.at(branchBase());                           // Address the branch stuck
      }
 
     void free() {z(); freeNode(node);}                                          // Free a new node to make it avialable for reuse
@@ -254,10 +255,8 @@ abstract class BtreeSML extends Test                                            
         leaf   = Node.this;
         search = Search;
         base   = leafBase();
-say("BBBB11", Leaf);
         final StuckSML.Search s = Leaf.search1(Search);
         found  = s.found;
-say("BBBB22", found);
         index  = s.index;
         data   = s.data;
         return this;
@@ -854,7 +853,12 @@ say("BBBB22", found);
      }
    }  // Node
 
-  Node node(int node) {final Node n = new Node(); n.node = node; return n;}     // Refer to a node by number
+  Node node(int node)                                                           // Refer to a node by number
+   {final Node n = new Node();
+    n.node = node;
+    n.setStucks();
+    return n;
+   }     // Refer to a node by number
 
 //D1 Array                                                                      // Key, data pairs in the tree as an array
 
@@ -937,7 +941,7 @@ say("BBBB22", found);
         final Node.FindFirstGreaterThanOrEqualInBranch down =                   // Find next child in search path of key
           parent.findFirstGreaterThanOrEqualInBranch1(Key);
         final Node n = node(down.next);
-if (Key == 5) stop("DDDD", down.next, n.isLeaf());
+if (debug) say("FFFF", n);
         if (n.isLeaf())                                                         // Found the containing search
          {z();
           search  = n.findEqualInLeaf1(Key);
@@ -979,15 +983,12 @@ if (Key == 5) stop("DDDD", down.next, n.isLeaf());
 
     FindAndInsert() {}
     FindAndInsert findAndInsert(int Key, int Data)                              // Find the leaf that should contain this key and insert or update it is possible
-     {
-say("CCCC", Key);
-      find(Key);                                                                // Find the leaf that should contain this key
-      z();
+     {z(); find(Key);                                                           // Find the leaf that should contain this key
       key = Key; data = Data;
 
       if (found())                                                              // Found the key in the leaf so update it with the new data
        {z();
-        root.Leaf.setElementAt(Key, Data, index());
+        leaf().Leaf.setElementAt(Key, Data, index());
         success = true; inserted = false;
         return this;
        }
@@ -997,11 +998,11 @@ say("CCCC", Key);
         final Node.FindFirstGreaterThanOrEqualInLeaf f =
           leaf().findFirstGreaterThanOrEqualInLeaf1(Key);
         if (f.found)                                                            // Overwrite existing key
-         {z(); root.Leaf.insertElementAt(Key, Data, f.first);
+         {z(); leaf().Leaf.insertElementAt(Key, Data, f.first);
          }
         else                                                                    // Insert into position
          {z();
-           root.Leaf.push(Key, Data);
+           leaf().Leaf.push(Key, Data);
          }
         success = true;
         return this;
@@ -1075,10 +1076,7 @@ say("CCCC", Key);
    }
 
   void put(int Key)                                                             // Put some test data into the tree
-   {z();
-say("AAAA", Key);
-    put(Key, Key);
-if (Key == 5) stop(memoryLayout);
+   {z(); put(Key, Key);
    }
 
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
@@ -1089,8 +1087,8 @@ if (Key == 5) stop(memoryLayout);
     z(); if (!f.found()) return null;                                           // Inserted or updated successfully
     z(); final Node     l = f.leaf();                                           // The leaf that contains the key
     z(); final int      i = f.index();                                          // Position in the leaf of the key
-    z(); final StuckSML.ElementAt kd = Leaf.elementAt1(i);                      // Key, data pairs in the leaf
-    z(); Leaf.removeElementAt1(i);                                              // Remove the key, data pair from the leaf
+    z(); final StuckSML.ElementAt kd = l.Leaf.elementAt1(i);                      // Key, data pairs in the leaf
+    z(); l.Leaf.removeElementAt1(i);                                              // Remove the key, data pair from the leaf
     z(); return kd.data;
    }
 
@@ -1278,6 +1276,7 @@ if (Key == 5) stop(memoryLayout);
                       3                                                       2                           |
 2,4,6,8,10,12,14,16=1   18,20,22,24,26,28,30,32=3   34,36,38,40,42,44,46,48=4   50,52,54,56,58,60,62,64=2 |
 """);
+
     for (int i = 0; i <= 2*N+1; i++)                                            // Update
      {Find f = t.find1(i);
       if (i > 0 && i % 2 == 0)
@@ -1287,6 +1286,7 @@ if (Key == 5) stop(memoryLayout);
        }
       else ok(f.found(), false);
      }
+
     for (int i = 0; i <= 2*N+1; i++)
      {Find f = t.find2(i);
       if (i > 0 && i % 2 == 0)
