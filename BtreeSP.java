@@ -690,7 +690,7 @@ abstract class BtreeSP extends Test                                            /
         z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the leaf sibling empty
         z();
 
-        tl.lastElement1();
+        tl.lastElement();
         r.Leaf.insertElementAt(tl.key, tl.data, 0);                             // Increase right
         tl.pop();                                                               // Reduce left
         final int lk = l.Leaf.elementAt1(nl-2).key;                             // Last key on left
