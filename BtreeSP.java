@@ -602,27 +602,17 @@ abstract class BtreeSP extends Test                                            /
       final Node p = parent;                                                    // Parent
       final Node l = allocLeaf(leftNode);                                       // New  split out leaf
       final Node r = this;                                                      // Existing  leaf
-      final StuckSP.Transaction tp = p.spLeaf.new Transaction();
-      final StuckSP.Transaction tl = l.spLeaf.new Transaction();
-      final StuckSP.Transaction tr = r.spLeaf.new Transaction();
       final int sl = splitLeafSize();
 
       for (int i = 0; i < sl; i++)                                              // Build left leaf
        {z();
-        tr.shift();
-        tl.key  = tr.key;
-        tl.data = tr.data;
-        tl.push();
+        final StuckSML.Shift f = r.Leaf.shift1();
+        l.Leaf.push(f.key, f.data);
        }
-      tr.firstElement();
-      tl.lastElement();
-      final int F = tr.key;
-      final int L = tl.key;
+      final int F = r.Leaf.firstElement1().key;
+      final int L = l.Leaf. lastElement1().key;
       final int splitKey = (F + L) / 2;
-      tp.key   = (F + L) / 2;                                                   // The splitting key
-      tp.data  = l.node;                                                        // The node referenced by the splitting key
-      tp.index = index;                                                         // The index of the splitting key in the parent
-      tp.insertElementAt();                                                     // Insert new key, next pair in parent
+      p.Branch.insertElementAt(splitKey, l.node, index);                        // Insert new key, next pair in parent
      }
 
     void splitBranch(Node parent, int index)                                    // Split a branch which is not the root by splitting right to left
