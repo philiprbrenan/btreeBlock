@@ -394,30 +394,27 @@ abstract class BtreeSP extends Test                                            /
 
 //D2 Array                                                                      // Represent the contents of the tree as an array
 
-    void leafToArray(Stack<StuckSML.ElementAt>s)                                // Leaf as an array
+    void leafToArray(Stack<ArrayElement> s)                                     // Leaf as an array
      {z(); assertLeaf();
       final int K = leafSize();
+      final StuckSP.Transaction t = spLeaf.new Transaction();
       for  (int i = 0; i < K; i++)
        {z();
-        final StuckSP.Transaction t = spLeaf.new Transaction();
         t.index = i;
         t.elementAt();
-        final StuckSML.ElementAt  E = Leaf.new ElementAt();
-        E.key  = t.key;
-        E.data = t.data;
-        s.push(E);
+        s.push(new ArrayElement(i, t.key, t.data));
        }
      }
 
-    void branchToArray(Stack<StuckSML.ElementAt>s)                              // Branch to array
+    void branchToArray(Stack<ArrayElement> s)                                   // Branch to array
      {z(); assertBranch();
-      final int K = Branch.size();                                              // Include top next
+      final int K = branchSize()+1;                                             // Include top next
 
       if (K > 0)                                                                // Branch has key, next pairs
        {z();
+        final StuckSP.Transaction t = spBranch.new Transaction();
         for  (int i = 0; i < K; i++)
          {z();
-          final StuckSP.Transaction t = spBranch.new Transaction();
           t.index = i;                                                          // Each node in the branch
           t.elementAt();                                                        // Each key, next pair
           final int next = t.data;                                              // Each key, next pair
@@ -1054,9 +1051,19 @@ abstract class BtreeSP extends Test                                            /
 
 //D1 Array                                                                      // Key, data pairs in the tree as an array
 
-  Stack<StuckSML.ElementAt> toArray()                                           // Key, data pairs in the tree as an array
+  class ArrayElement                                                            // A key, data pair inthe btree as an array element
+   {final int i, key, data;
+    ArrayElement(int I, int Key, int Data)
+     {i = I; key = Key; data = Data;
+     }
+    public String toString()
+     {return "("+i+", key:"+key+" data:"+data+")\n";
+     }
+   }
+
+  Stack<ArrayElement> toArray()                                                 // Key, data pairs in the tree as an array
    {z();
-    final Stack<StuckSML.ElementAt> s = new Stack<>();
+    final Stack<ArrayElement> s = new Stack<>();
 
     if (root.isLeaf()) {z(); root.  leafToArray(s);}
     else               {z(); root.branchToArray(s);}
@@ -2089,30 +2096,30 @@ abstract class BtreeSP extends Test                                            /
     for (int i = 1; i <= M; i++) t.put(i);
     //stop(""+t.toArray());
     ok(""+t.toArray(), """
-[ElementAt(index:0 key:1 data:1)
-, ElementAt(index:1 key:2 data:2)
+[(0, key:1 data:1)
+, (1, key:2 data:2)
 ]""");
 
     final int N = 16;
     for (int i = M; i <= N; i++) t.put(i);
     //stop(""+t.toArray());
     ok(""+t.toArray(), """
-[ElementAt(index:0 key:1 data:1)
-, ElementAt(index:1 key:2 data:2)
-, ElementAt(index:0 key:3 data:3)
-, ElementAt(index:1 key:4 data:4)
-, ElementAt(index:0 key:5 data:5)
-, ElementAt(index:1 key:6 data:6)
-, ElementAt(index:0 key:7 data:7)
-, ElementAt(index:1 key:8 data:8)
-, ElementAt(index:0 key:9 data:9)
-, ElementAt(index:1 key:10 data:10)
-, ElementAt(index:0 key:11 data:11)
-, ElementAt(index:1 key:12 data:12)
-, ElementAt(index:0 key:13 data:13)
-, ElementAt(index:1 key:14 data:14)
-, ElementAt(index:0 key:15 data:15)
-, ElementAt(index:1 key:16 data:16)
+[(0, key:1 data:1)
+, (1, key:2 data:2)
+, (0, key:3 data:3)
+, (1, key:4 data:4)
+, (0, key:5 data:5)
+, (1, key:6 data:6)
+, (0, key:7 data:7)
+, (1, key:8 data:8)
+, (0, key:9 data:9)
+, (1, key:10 data:10)
+, (0, key:11 data:11)
+, (1, key:12 data:12)
+, (0, key:13 data:13)
+, (1, key:14 data:14)
+, (0, key:15 data:15)
+, (1, key:16 data:16)
 ]""");
    }
 
@@ -2121,16 +2128,16 @@ abstract class BtreeSP extends Test                                            /
     test_put_ascending_wide();                                                  //  5.33
     test_put_descending();                                                      // 12.98
     test_put_small_random();                                                    //  8.72
-//    test_put_large_random();                                                    //  0
+    test_put_large_random();                                                    //  0
     test_find();                                                                //  4.62
     test_delete_ascending();                                                    //  7.27
     test_delete_descending();                                                   //  7.66
-//  test_to_array();                                                            //  2.52
+    test_to_array();                                                            //  2.52
    }
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_put_ascending();                                                       //  7.99
+    test_to_array();                                                            //  2.52
    }
 
   public static void main(String[] args)                                        // Test if called as a program
