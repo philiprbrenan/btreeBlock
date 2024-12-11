@@ -755,21 +755,25 @@ abstract class BtreeSP extends Test                                            /
        {z();
         final Node  l = node( leftNode, ld);
         final Node  r = node(rightNode, rd);
+        final StuckSP.Transaction tl = l.spLeaf.new Transaction();
+        final StuckSP.Transaction tr = r.spLeaf.new Transaction();
         final int  nl = l.leafSize();
         final int  nr = r.leafSize();
 
         z(); if (nl >= maxKeysPerLeaf()) return false;                          // Steal not possible because there is no where to put the steal
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
         z();
-        final StuckSML.FirstElement f = r.Leaf.firstElement1();                 // First element of right child
-        l.Leaf.push            (f.key, f.data);                                 // Increase left
-        P.Branch.setElementAt  (f.key, ld, index);                              // Swap key of parent
-        r.Leaf.removeElementAt1(0);                                             // Reduce right
+        tr.firstElement();                                                      // First element of right child
+        l.Leaf.push            (tr.key, tr.data);                               // Increase left
+        P.Branch.setElementAt  (tr.key, ld, index);                             // Swap key of parent
+        tr.shift();                                                             // Reduce right
        }
       else                                                                      // Children are branches
        {z();
         final Node  l = node( leftNode, ld);
         final Node  r = node(rightNode, rd);
+        final StuckSP.Transaction tl = l.spBranch.new Transaction();
+        final StuckSP.Transaction tr = r.spBranch.new Transaction();
         final int  nl = l.branchSize();
         final int  nr = r.branchSize();
 
@@ -781,7 +785,7 @@ abstract class BtreeSP extends Test                                            /
         final StuckSML.FirstElement fe = r.Branch.firstElement1();              // First element of  right child
         l.Branch.push(0,      fe.data);                                         // New top for left is ignored by search ,.. except last
         P.Branch.setElementAt(fe.key, ld, index);                               // Swap key of parent
-        r.Branch.removeElementAt1(0);                                           // Reduce right
+        tr.shift();                                                             // Reduce right
        }
       return true;
      }
