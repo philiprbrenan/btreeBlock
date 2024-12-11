@@ -639,22 +639,18 @@ abstract class BtreeSP extends Test                                            /
       final Node p = parent;
       final Node l = allocBranch(leftNode);
       final Node r = this;
-      final StuckSP.Transaction tp = p.spBranch.new Transaction();
-      final StuckSP.Transaction tl = l.spBranch.new Transaction();
-      final StuckSP.Transaction tr = r.spBranch.new Transaction();
-      final int                 sb = splitBranchSize();
+      final int pb = parent.branchBase(),
+                lb = l.branchBase(), rb = r.branchBase();
+      final int sb = splitBranchSize();
 
       for (int i = 0; i < sb; i++)                                              // Build left branch from right
-       {z();
-        tr.shift();
-        tl.key  = tr.key;
-        tl.data = tr.data;
-        tl.push();
+       {z(); final StuckSML.Shift f = r.Branch.shift1();
+        l.Branch.push(f.key, f.data);
        }
 
-      tr.shift();
-      l.Branch.push           (0, tr.data);                                     // Becomes top and so is ignored by search ... except last
-      p.Branch.insertElementAt(tr.key, l.node, index);
+      final StuckSML.Shift split = r.Branch.shift1();                           // Build right branch
+      l.Branch.push           (0, split.data);                                  // Becomes top and so is ignored by search ... except last
+      p.Branch.insertElementAt(split.key, l.node, index);
      }
 
     boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
