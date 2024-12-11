@@ -714,10 +714,15 @@ abstract class BtreeSP extends Test                                            /
         z(); if (nr >= maxKeysPerBranch()) return false;                        // Steal not possible because there is no where to put the steal
         z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the left sibling empty
         z();
-        final StuckSML.LastElement  t = l.Branch.lastElement1();                // Increase right with left top
-        final int key = P.Branch.elementAt1(index).key;                         // Top key
-        r.Branch.insertElementAt(key, t.data, 0);                               // Increase right with left top
-        l.Branch.pop();                                                         // Remove left top
+
+        tl.lastElement();                                                       // Increase right with left top
+        T.index = index;                                                        // Top key
+        T.elementAt();                                                          // Top key
+        tr.key  = T.key;                                                        // Increase right with left top
+        tr.data = tl.data;                                                      // Increase right with left top
+        tr.unshift();                                                           // Increase right with left top
+        tl.pop();                                                               // Remove left top
+
         final StuckSML.FirstElement b = r.Branch.firstElement1();               // Increase right with left top
         final int pk = P.Branch.elementAt1(index-1).key;                        // Parent key
         r.Branch.setElementAt             (pk, b.data, 0);                      // Reduce key of parent of right
