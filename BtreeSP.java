@@ -961,37 +961,45 @@ abstract class BtreeSP extends Test                                            /
       //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
       z(); if (bs < 2) return false;
       z();
-      final Node               p = this;
-      final StuckSML.ElementAt L = p.Branch.elementAt1(index+0);
-      final StuckSML.ElementAt R = p.Branch.elementAt2(index+1);
+      final Node                P = this;
+      final StuckSP.Transaction T = P.spBranch.new Transaction();
+      T.index = index+0; T.elementAt(); final int L = T.data;
+      T.index = index+1; T.elementAt(); final int R = T.data;
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final Node  l = node( leftNode, L.data);
-        final Node  r = node(rightNode, R.data);
+        final Node  l = node( leftNode, L);
+        final Node  r = node(rightNode, R);
+        final StuckSP.Transaction tl = l.spLeaf.new Transaction();
+        final StuckSP.Transaction tr = r.spLeaf.new Transaction();
         final int  nl = l.leafSize();
         final int  nr = r.leafSize();
 
         if (nl + nr > maxKeysPerLeaf()) return false;                           // Combined body would be too big
         z();
-        final int N = r.Leaf.size();                                            // Number of entries to remove
-        for (int i = 0; i < N; i++)                                             // Transfer right to left
+        for (int i = 0; i < nr; i++)                                            // Transfer right to left
          {z();
-          final StuckSML.Shift q = r.Leaf.shift1();
-          l.Leaf.push(q.key, q.data);
+          tr.shift();
+          tl.key  = tr.key;
+          tl.data = tr.data;
+          tl.push();
          }
         r.free();                                                               // Free the empty right node
        }
       else                                                                      // Children are branches
        {z();
-        final Node  l = node( leftNode, L.data);
-        final Node  r = node(rightNode, R.data);
+        final Node  l = node( leftNode, L);
+        final Node  r = node(rightNode, R);
+        final StuckSP.Transaction tl = l.spBranch.new Transaction();
+        final StuckSP.Transaction tr = r.spBranch.new Transaction();
         final int  nl = l.branchSize();
         final int  nr = r.branchSize();
 
         if (nl + 1 + nr > maxKeysPerBranch()) return false;                     // Merge not possible because there is no where to put the steal
+
         z(); final StuckSML.LastElement le = l.Branch.lastElement1();           // Last element of left child
-        z(); final StuckSML.ElementAt   ea = p.Branch.elementAt1(index);        // Parent dividing element
+        z(); final StuckSML.ElementAt   ea = P.Branch.elementAt1(index);        // Parent dividing element
+
         l.Branch.setElementAt(ea.key, le.data, nl);                             // Re-key left top
 
         final int N = r.Branch.size();                                          // Number of entries to remove
@@ -1002,10 +1010,10 @@ abstract class BtreeSP extends Test                                            /
         r.free();                                                               // Free the empty right node
        }
 
-      final StuckSML.ElementAt pkn = p.Branch.elementAt1(index+1);              // One up from dividing point in parent
-      final StuckSML.ElementAt dkn = p.Branch.elementAt2(index);                // Dividing point in parent
-      p.Branch.setElementAt(pkn.key, dkn.data, index);                          // Install key of right sibling in this child
-      p.Branch.removeElementAt1(index+1);                                       // Reduce parent on right
+      final StuckSML.ElementAt pkn = P.Branch.elementAt1(index+1);              // One up from dividing point in parent
+      final StuckSML.ElementAt dkn = P.Branch.elementAt2(index);                // Dividing point in parent
+      P.Branch.setElementAt(pkn.key, dkn.data, index);                          // Install key of right sibling in this child
+      P.Branch.removeElementAt1(index+1);                                       // Reduce parent on right
       return true;
      }
 
