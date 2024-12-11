@@ -577,16 +577,18 @@ abstract class BtreeSP extends Test                                            /
 
       for(int i = 0; i < sb; i++)                                               // Build right child from parent
        {z();
-        final StuckSML.Shift f = p.Branch.shift1();
-        r.Branch.push(f.key, f.data);
+        tp.shift();
+        tr.key  = tp.key;
+        tr.data = tp.data;
+        tr.push();
        }
 
-      final StuckSML.Shift  pr = Branch.shift3();                               // Top of root
-      r.Branch.push(0, pr.data);                                                // Becomes top and so ignored by search ... except last
+      tp.shift();
+      r.Branch.push(0, tp.data);                                                // Becomes top and so ignored by search ... except last
 
-      p.Branch.clear();                                                         // Refer to new branches from root
-      p.Branch.push(pk, l.node);
-      p.Branch.push(0,  r.node);                                                // Becomes top and so ignored by search ... except last
+      tp.clear();                                                               // Refer to new branches from root
+      tp.key  = pk; tp.data = l.node; tp.push();
+      tp.key  =  0; tp.data = r.node; tp.push();                                // Becomes top and so ignored by search ... except last
      }
 
     void splitLeaf(Node parent, int index)                                      // Split a leaf which is not the root
