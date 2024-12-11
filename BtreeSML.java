@@ -23,7 +23,6 @@ abstract class BtreeSML extends Test                                            
   StuckSML Leaf;                                                                // Leaf definition
   StuckSML Branch;                                                              // Branch defintion
 
-//final Node       root;                                                        // The root of the tree is always node zero
   Layout           l;                                                           // Layout of memory used by btree
   Layout.Field     leaf;                                                        // Layout of a leaf in the memory used by btree
   Layout.Field     branch;                                                      // Layout of a branch in the memory used by btree
@@ -860,14 +859,13 @@ abstract class BtreeSML extends Test                                            
       z(); if (mergeRightSibling(index))        return;
       stop("Unable to balance child:", p.data);
      }
-   }  // Node
+   } // Node
 
   Node node(Node Node, int node)                                                // Refer to a node by number
-   {//final Node n = new Node();
-    Node.node = node;
+   {Node.node = node;
     Node.setStucks();
     return Node;
-   }     // Refer to a node by number
+   }
 
 //D1 Array                                                                      // Key, data pairs in the tree as an array
 
@@ -1096,8 +1094,8 @@ abstract class BtreeSML extends Test                                            
     z(); if (!f.found()) return null;                                           // Inserted or updated successfully
     z(); final Node     l = f.leaf();                                           // The leaf that contains the key
     z(); final int      i = f.index();                                          // Position in the leaf of the key
-    z(); final StuckSML.ElementAt kd = l.Leaf.elementAt1(i);                      // Key, data pairs in the leaf
-    z(); l.Leaf.removeElementAt1(i);                                              // Remove the key, data pair from the leaf
+    z(); final StuckSML.ElementAt kd = l.Leaf.elementAt1(i);                    // Key, data pairs in the leaf
+    z(); l.Leaf.removeElementAt1(i);                                            // Remove the key, data pair from the leaf
     z(); return kd.data;
    }
 
