@@ -602,17 +602,27 @@ abstract class BtreeSP extends Test                                            /
       final Node p = parent;                                                    // Parent
       final Node l = allocLeaf(leftNode);                                       // New  split out leaf
       final Node r = this;                                                      // Existing  leaf
+      final StuckSP.Transaction tp = p.spLeaf.new Transaction();
+      final StuckSP.Transaction tl = l.spLeaf.new Transaction();
+      final StuckSP.Transaction tr = r.spLeaf.new Transaction();
       final int sl = splitLeafSize();
 
       for (int i = 0; i < sl; i++)                                              // Build left leaf
        {z();
-        final StuckSML.Shift f = r.Leaf.shift1();
-        l.Leaf.push(f.key, f.data);
+        tr.shift();
+        tl.key  = tr.key;
+        tl.data = tr.data;
+        tl.push();
        }
-      final int F = r.Leaf.firstElement1().key;
-      final int L = l.Leaf. lastElement1().key;
+      tr.firstElement();
+      tl.lastElement();
+      final int F = tr.key;
+      final int L = tl.key;
       final int splitKey = (F + L) / 2;
-      p.Branch.insertElementAt(splitKey, l.node, index);                        // Insert new key, next pair in parent
+      tp.key   = (F + L) / 2;                                                   // The splitting key
+      tp.data  = l.node;                                                        // The node referenced by the splitting key
+      tp.index = index;                                                         // The index of the splitting key in the parent
+      tp.insertElementAt();                                                     // Insert new key, next pair in parent
      }
 
     void splitBranch(Node parent, int index)                                    // Split a branch which is not the root by splitting right to left
@@ -629,18 +639,22 @@ abstract class BtreeSP extends Test                                            /
       final Node p = parent;
       final Node l = allocBranch(leftNode);
       final Node r = this;
-      final int pb = parent.branchBase(),
-                lb = l.branchBase(), rb = r.branchBase();
-      final int sb = splitBranchSize();
+      final StuckSP.Transaction tp = p.spBranch.new Transaction();
+      final StuckSP.Transaction tl = l.spBranch.new Transaction();
+      final StuckSP.Transaction tr = r.spBranch.new Transaction();
+      final int                 sb = splitBranchSize();
 
       for (int i = 0; i < sb; i++)                                              // Build left branch from right
-       {z(); final StuckSML.Shift f = r.Branch.shift1();
-        l.Branch.push(f.key, f.data);
+       {z();
+        tr.shift();
+        tl.key  = tr.key;
+        tl.data = tr.data;
+        tl.push();
        }
 
-      final StuckSML.Shift split = r.Branch.shift1();                           // Build right branch
-      l.Branch.push           (0, split.data);                                  // Becomes top and so is ignored by search ... except last
-      p.Branch.insertElementAt(split.key, l.node, index);
+      tr.shift();
+      l.Branch.push           (0, tr.data);                                     // Becomes top and so is ignored by search ... except last
+      p.Branch.insertElementAt(tr.key, l.node, index);
      }
 
     boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
