@@ -745,14 +745,16 @@ abstract class BtreeSP extends Test                                            /
       z(); if (index < 0)             stop("Index", index, "too small");
       z(); if (index >= branchSize()) stop("Index", index, "too big");
       z();
-      final Node               P = this;
-      final StuckSML.ElementAt L = P.Branch.elementAt1(index+0);
-      final StuckSML.ElementAt R = P.Branch.elementAt2(index+1);
+      final Node                P = this;
+      final StuckSP.Transaction T = P.spBranch.new Transaction();
+      T.index = index+0; T.elementAt(); final int lk = T.key, ld = T.data;
+      T.index = index+1; T.elementAt(); final int rk = T.key, rd = T.data;
+      final StuckSML.ElementAt  R = P.Branch.elementAt2(index+1);
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final Node  l = node( leftNode, L.data);
-        final Node  r = node(rightNode, R.data);
+        final Node  l = node( leftNode, ld);
+        final Node  r = node(rightNode, rd);
         final int  nl = l.leafSize();
         final int  nr = r.leafSize();
 
@@ -761,13 +763,13 @@ abstract class BtreeSP extends Test                                            /
         z();
         final StuckSML.FirstElement f = r.Leaf.firstElement1();                 // First element of right child
         l.Leaf.push            (f.key, f.data);                                 // Increase left
-        P.Branch.setElementAt  (f.key, L.data, index);                          // Swap key of parent
+        P.Branch.setElementAt  (f.key, ld, index);                              // Swap key of parent
         r.Leaf.removeElementAt1(0);                                             // Reduce right
        }
       else                                                                      // Children are branches
        {z();
-        final Node  l = node( leftNode, L.data);
-        final Node  r = node(rightNode, R.data);
+        final Node  l = node( leftNode, ld);
+        final Node  r = node(rightNode, rd);
         final int  nl = l.branchSize();
         final int  nr = r.branchSize();
 
@@ -775,10 +777,10 @@ abstract class BtreeSP extends Test                                            /
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
         z();
         final StuckSML.LastElement le = l.Branch.lastElement1();                // Last element of left child
-        l.Branch.setElementAt(L.key, le.data, nl);                              // Left top becomes real
+        l.Branch.setElementAt(lk, le.data, nl);                                 // Left top becomes real
         final StuckSML.FirstElement fe = r.Branch.firstElement1();              // First element of  right child
         l.Branch.push(0,      fe.data);                                         // New top for left is ignored by search ,.. except last
-        P.Branch.setElementAt(fe.key, L.data, index);                           // Swap key of parent
+        P.Branch.setElementAt(fe.key, ld, index);                               // Swap key of parent
         r.Branch.removeElementAt1(0);                                           // Reduce right
        }
       return true;
