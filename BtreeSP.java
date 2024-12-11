@@ -798,21 +798,12 @@ abstract class BtreeSP extends Test                                            /
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
         z();
 
-        tl.lastElement();                                                       // Last element of left child
-        tl.key   = plk;
-        tl.index = nl;
-        tl.setElementAt();                                                      // Left top becomes real
-        tr.firstElement();                                                      // First element of  right child
-        tl.key   = 0;
-        tl.data  = tr.data;
-        tl.push();                                                              // New top for left is ignored by search ,.. except last
-
-        T.key   = tr.key;                                                       // Swap key of parent
-        T.data  = pld;                                                          // Swap key of parent
-        T.index = index;                                                        // Swap key of parent
-        T.setElementAt();                                                       // Swap key of parent
-
-        tr.shift();                                                             // Reduce right
+        final StuckSML.LastElement le = l.Branch.lastElement1();                // Last element of left child
+        l.Branch.setElementAt(plk, le.data, nl);                              // Left top becomes real
+        final StuckSML.FirstElement fe = r.Branch.firstElement1();              // First element of  right child
+        l.Branch.push(0,      fe.data);                                         // New top for left is ignored by search ,.. except last
+        P.Branch.setElementAt(fe.key, pld, index);                           // Swap key of parent
+        r.Branch.removeElementAt1(0);                                           // Reduce right
        }
       return true;
      }
