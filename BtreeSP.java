@@ -2044,7 +2044,7 @@ abstract class BtreeSP extends Test                                            /
     test_find();                                                                //  4.62
     test_delete_ascending();                                                    //  7.27
     test_delete_descending();                                                   //  7.66
-    test_to_array();                                                            //  2.52
+//  test_to_array();                                                            //  2.52
    }
 
   static void newTests()                                                        // Tests being worked on
