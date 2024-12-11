@@ -716,19 +716,25 @@ abstract class BtreeSP extends Test                                            /
         z();
 
         tl.lastElement();                                                       // Increase right with left top
-        T.index = index;                                                        // Top key
+        T.index  = index;                                                       // Top key
         T.elementAt();                                                          // Top key
-        tr.key  = T.key;                                                        // Increase right with left top
-        tr.data = tl.data;                                                      // Increase right with left top
+        tr.key   = T.key;                                                       // Increase right with left top
+        tr.data  = tl.data;                                                     // Increase right with left top
         tr.unshift();                                                           // Increase right with left top
         tl.pop();                                                               // Remove left top
 
         tr.firstElement();                                                      // Increase right with left top
 
-        final int pk = P.Branch.elementAt1(index-1).key;                        // Parent key
-        r.Branch.setElementAt             (pk, tr.data, 0);                     // Reduce key of parent of right
+        T.index  = index-1;                                                     // Parent key
+        T.elementAt();                                                          // Parent key
+        tr.key   = T.key;                                                       // Reduce key of parent of right
+        tr.index = 0;                                                           // Reduce key of parent of right
+        tr.setElementAt();                                                      // Reduce key of parent of right
         tl.lastElement();                                                       // Last left key
-        P.Branch.setElementAt(tl.key, L, index-1);                              // Reduce key of parent of left
+        T.key    = tl.key;                                                      // Reduce key of parent of left
+        T.data   = L;                                                           // Reduce key of parent of left
+        T.index  = index-1;                                                     // Reduce key of parent of left
+        T.setElementAt();                                                       // Reduce key of parent of left
        }
       return true;
      }
