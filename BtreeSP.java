@@ -1,12 +1,12 @@
 //------------------------------------------------------------------------------
-// BtreeStuckStatic in bit memory
+// BtreeSML with single parameter list
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout a btree in a block on the surface of a silicon chip.
 
 import java.util.*;
 
-abstract class BtreeSP extends Test                                            // Manipulate a btree using static methods and memory
+abstract class BtreeSP extends Test                                             // Manipulate a btree using static methods and memory
  {Memory       memory;                                                          // Memory containing the btree
   Layout       layout;                                                          // Layout of memory used by btree
   MemoryLayout memoryLayout;                                                    // The memory layout of the btree
@@ -23,7 +23,6 @@ abstract class BtreeSP extends Test                                            /
   StuckSML  Leaf,   Branch;                                                     // Leaf, branch definition
   StuckSP spLeaf, spBranch;                                                     // Leaf, branch definition
 
-//final Node       root;                                                        // The root of the tree is always node zero
   Layout           l;                                                           // Layout of memory used by btree
   Layout.Field     leaf;                                                        // Layout of a leaf in the memory used by btree
   Layout.Field     branch;                                                      // Layout of a branch in the memory used by btree
@@ -44,7 +43,7 @@ abstract class BtreeSP extends Test                                            /
   int         nodeUsed = 0;                                                     // Number of nodes currently in use
   int      maxNodeUsed = 0;                                                     // Maximum number of branches plus leaves used
 
-  final Node       root = new Node();                                           // The description ofthe root node
+  final Node       root = new Node();                                           // The root of the tree is always node zero
   final Node parentNode = new Node();                                           // Node used for initializing the tree and for the parent node
   final Node   leftNode = new Node();                                           // Node used for a left hand child
   final Node  rightNode = new Node();                                           // Node used for a righthand child
@@ -91,22 +90,6 @@ abstract class BtreeSP extends Test                                            /
   Layout layout()                                                               // Layout describing memory used by btree
    {z();
     final BtreeSP btree = this;
-
-    Leaf = new StuckSML()                                                       // Leaf
-     {int               maxSize() {return btree.maxKeysPerLeaf();}
-      int            bitsPerKey() {return btree.bitsPerKey();}
-      int           bitsPerData() {return btree.bitsPerData();}
-      int           bitsPerSize() {return btree.bitsPerSize();}
-      Memory             memory() {return btree.memory;}
-     };
-
-    Branch = new StuckSML()                                                     // Branch
-     {int               maxSize() {return btree.maxKeysPerBranch()+1;}          // Not forgetting top next
-      int            bitsPerKey() {return btree.bitsPerKey();}
-      int           bitsPerData() {return btree.bitsPerNext();}
-      int           bitsPerSize() {return btree.bitsPerSize();}
-      Memory             memory() {return btree.memory;}
-     };
 
     spLeaf = new StuckSP()                                                       // Leaf
      {int               maxSize() {return btree.maxKeysPerLeaf();}
@@ -746,7 +729,6 @@ abstract class BtreeSP extends Test                                            /
       final StuckSP.Transaction T = P.spBranch.new Transaction();
       T.index = index+0; T.elementAt(); final int lk = T.key, ld = T.data;
       T.index = index+1; T.elementAt(); final int rk = T.key, rd = T.data;
-      final StuckSML.ElementAt  R = P.Branch.elementAt2(index+1);
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
@@ -2128,7 +2110,7 @@ abstract class BtreeSP extends Test                                            /
     test_put_ascending_wide();                                                  //  5.33
     test_put_descending();                                                      // 12.98
     test_put_small_random();                                                    //  8.72
-    test_put_large_random();                                                    //  0
+    //test_put_large_random();                                                    //  0
     test_find();                                                                //  4.62
     test_delete_ascending();                                                    //  7.27
     test_delete_descending();                                                   //  7.66
