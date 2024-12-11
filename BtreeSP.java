@@ -764,8 +764,13 @@ abstract class BtreeSP extends Test                                            /
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
         z();
         tr.firstElement();                                                      // First element of right child
-        l.Leaf.push            (tr.key, tr.data);                               // Increase left
-        P.Branch.setElementAt  (tr.key, ld, index);                             // Swap key of parent
+        tl.key   = tr.key;
+        tl.data  = tr.data;
+        tl.push();                                                              // Increase left
+        T.key    = tr.key;                                                      // Swap key of parent
+        T.data   = ld;                                                          // Swap key of parent
+        T.index  = index;                                                       // Swap key of parent
+        T.setElementAt();                                                       // Swap key of parent
         tr.shift();                                                             // Reduce right
        }
       else                                                                      // Children are branches
