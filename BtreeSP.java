@@ -693,8 +693,9 @@ abstract class BtreeSP extends Test                                            /
         tl.lastElement();
         r.Leaf.insertElementAt(tl.key, tl.data, 0);                             // Increase right
         tl.pop();                                                               // Reduce left
-        final int lk = l.Leaf.elementAt1(nl-2).key;                             // Last key on left
-        P.Branch.setElementAt(lk, L, index-1);                                  // Swap key of parent
+        tl.index = nl-2;                                                        // Last key on left
+        tl.elementAt();                                                         // Last key on left
+        P.Branch.setElementAt(tl.key, L, index-1);                              // Swap key of parent
        }
       else                                                                      // Children are branches
        {z();
