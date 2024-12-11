@@ -690,9 +690,9 @@ abstract class BtreeSP extends Test                                            /
         z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the leaf sibling empty
         z();
 
-        final StuckSML.LastElement le = l.Leaf.lastElement1();
-        r.Leaf.insertElementAt(le.key, le.data, 0);                             // Increase right
-        l.Leaf.pop();                                                           // Reduce left
+        tl.lastElement1();
+        r.Leaf.insertElementAt(tl.key, tl.data, 0);                             // Increase right
+        tl.pop();                                                               // Reduce left
         final int lk = l.Leaf.elementAt1(nl-2).key;                             // Last key on left
         P.Branch.setElementAt(lk, L, index-1);                                  // Swap key of parent
        }
