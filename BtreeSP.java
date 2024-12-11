@@ -826,12 +826,16 @@ abstract class BtreeSP extends Test                                            /
           for (int i = 0; i < nl; ++i)
            {z();
             tl.shift();
-            P.Leaf.push(tl.key, tl.data);
+            T.key  = tl.key;
+            T.data = tl.data;
+            T.push();
            }
           for (int i = 0; i < nr; ++i)
            {z();
             tr.shift();
-            P.Leaf.push(tr.key, tr.data);
+            T.key  = tr.key;
+            T.data = tr.data;
+            T.push();
            }
           setLeaf();
           l.free();
@@ -854,17 +858,25 @@ abstract class BtreeSP extends Test                                            /
           for (int i = 0; i < nl; ++i)
            {z();
             tl.shift();
-            P.Branch.push(tl.key, tl.data);
+            T.key  = tl.key;
+            T.data = tl.data;
+            T.push();
            }
           tl.lastElement();
-          P.Branch.push(pkn, tl.data);
+          T.key  = pkn;
+          T.data = tl.data;
+          T.push();
           for (int i = 0; i < nr; ++i)
            {z();
             tr.shift();
-            P.Branch.push(tr.key, tr.data);
+            T.key  = tr.key;
+            T.data = tr.data;
+            T.push();
            }
           tr.lastElement();                                                     // Top next
-          P.Branch.push(0, tr.data);                                            // Top so ignored by search ... except last
+          T.key  = 0;
+          T.data = tr.data;
+          T.push();                                                             // Top so ignored by search ... except last
           l.free();
           r.free();
           z(); return true;
