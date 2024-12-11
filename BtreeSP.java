@@ -821,15 +821,17 @@ abstract class BtreeSP extends Test                                            /
         final int nr = r.leafSize();
         if (nl + nr <= maxKeysPerLeaf())
          {z(); T.clear();
+          final StuckSP.Transaction tl = l.spLeaf.new Transaction();
+          final StuckSP.Transaction tr = r.spLeaf.new Transaction();
           for (int i = 0; i < nl; ++i)
            {z();
-            final StuckSML.Shift f = l.Leaf.shift1();
-            P.Leaf.push(f.key, f.data);
+            tl.shift();
+            P.Leaf.push(tl.key, tl.data);
            }
           for (int i = 0; i < nr; ++i)
            {z();
-            final StuckSML.Shift f = r.Leaf.shift1();
-            P.Leaf.push(f.key, f.data);
+            tr.shift();
+            P.Leaf.push(tr.key, tr.data);
            }
           setLeaf();
           l.free();
@@ -838,29 +840,31 @@ abstract class BtreeSP extends Test                                            /
          }
         z(); return false;
        }
-      else                                                                     // Branches
+      else                                                                      // Branches
        {final int nl = l.branchSize();
         final int nr = r.branchSize();
 
-         if (nl + 1 + nr <= maxKeysPerBranch())
+        if (nl + 1 + nr <= maxKeysPerBranch())
          {z();
-          final StuckSML.FirstElement pkn = P.Branch.firstElement1();
+          final StuckSP.Transaction tl = l.spBranch.new Transaction();
+          final StuckSP.Transaction tr = r.spBranch.new Transaction();
+          T.firstElement();
+          final int pkn = T.key;
           T.clear();
           for (int i = 0; i < nl; ++i)
            {z();
-            final StuckSML.Shift f = l.Branch.shift1();
-            P.Branch.push(f.key, f.data);
-
+            tl.shift();
+            P.Branch.push(tl.key, tl.data);
            }
-          final int data = l.Branch.lastElement1().data;
-          P.Branch.push(pkn.key, data);
+          tl.lastElement();
+          P.Branch.push(pkn, tl.data);
           for (int i = 0; i < nr; ++i)
            {z();
-            final StuckSML.Shift f = r.Branch.shift1();
-            P.Branch.push(f.key, f.data);
+            tr.shift();
+            P.Branch.push(tr.key, tr.data);
            }
-          final int Data = r.Branch.lastElement2().data;                          // Top next
-          P.Branch.push(0, Data);                                                 // Top so ignored by search ... except last
+          tr.lastElement();                                                     // Top next
+          P.Branch.push(0, tr.data);                                            // Top so ignored by search ... except last
           l.free();
           r.free();
           z(); return true;
