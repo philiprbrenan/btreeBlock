@@ -997,15 +997,18 @@ abstract class BtreeSP extends Test                                            /
 
         if (nl + 1 + nr > maxKeysPerBranch()) return false;                     // Merge not possible because there is no where to put the steal
 
-        z(); final StuckSML.LastElement le = l.Branch.lastElement1();           // Last element of left child
-        z(); final StuckSML.ElementAt   ea = P.Branch.elementAt1(index);        // Parent dividing element
+        z(); tl.lastElement();                                                  // Last element of left child
+        z(); T.index = index;
+        z(); T.elementAt();                                                     // Parent dividing element
 
-        l.Branch.setElementAt(ea.key, le.data, nl);                             // Re-key left top
+        l.Branch.setElementAt(T.key, tl.data, nl);                              // Re-key left top
 
-        final int N = r.Branch.size();                                          // Number of entries to remove
-        for (int i = 0; i < N; i++)                                             // Transfer right to left
-         {z(); final StuckSML.Shift f = r.Branch.shift1();
-          l.Branch.push(f.key, f.data);
+        for (int i = 0; i < nr; i++)                                            // Transfer right to left
+         {z();
+          tr.shift();
+          tl.key  = tr.key;
+          tl.data = tr.data;
+          tl.push();
          }
         r.free();                                                               // Free the empty right node
        }
