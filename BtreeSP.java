@@ -791,12 +791,12 @@ abstract class BtreeSP extends Test                                            /
         tl.index = nl;                                                          // Left top becomes real
         tl.setElementAt();                                                      // Left top becomes real
         tr.firstElement();                                                      // First element of  right child
-        tl.key  = 0;                                                            // New top for left is ignored by search ,.. except last
-        tl.data = tr.data;                                                      // New top for left is ignored by search ,.. except last
+        tl.key   = 0;                                                           // New top for left is ignored by search ,.. except last
+        tl.data  = tr.data;                                                     // New top for left is ignored by search ,.. except last
         tl.push();                                                              // New top for left is ignored by search ,.. except last
-        T.key   = tr.key;                                                       // Swap key of parent
-        T.data  = ld;                                                           // Swap key of parent
-        T.index = index;                                                        // Swap key of parent
+        T.key    = tr.key;                                                      // Swap key of parent
+        T.data   = ld;                                                          // Swap key of parent
+        T.index  = index;                                                       // Swap key of parent
         T.setElementAt();                                                       // Swap key of parent
         tr.shift();                                                             // Reduce right
        }
@@ -810,59 +810,63 @@ abstract class BtreeSP extends Test                                            /
       z(); if (root.isLeaf() || branchSize() > 1) return false;
       z(); if (node != 0) stop("Expected root, got:", node);
       z();
-      final Node p = this;
-      final Node l = node( leftNode, p.Branch.firstElement1().data);
-      final Node r = node(rightNode, p.Branch. lastElement1().data);
+      final Node                   P = this;
+      final StuckSP.Transaction    T = P.spBranch.new Transaction();
+      T.firstElement(); final Node l = node( leftNode, T.data);
+      T. lastElement(); final Node r = node(rightNode, T.data);
 
       if (hasLeavesForChildren())                                               // Leaves
        {z();
-        if (l.leafSize() + r.leafSize() <= maxKeysPerLeaf())
-         {z(); p.Leaf.clear();
-          final int nl = l.leafSize();
+        final int nl = l.leafSize();
+        final int nr = r.leafSize();
+        if (nl + nr <= maxKeysPerLeaf())
+         {z(); T.clear();
           for (int i = 0; i < nl; ++i)
            {z();
             final StuckSML.Shift f = l.Leaf.shift1();
-            p.Leaf.push(f.key, f.data);
+            P.Leaf.push(f.key, f.data);
            }
-          final int nr = r.leafSize();
           for (int i = 0; i < nr; ++i)
            {z();
             final StuckSML.Shift f = r.Leaf.shift1();
-            p.Leaf.push(f.key, f.data);
+            P.Leaf.push(f.key, f.data);
            }
           setLeaf();
           l.free();
           r.free();
-          return true;
+          z(); return true;
          }
+        z(); return false;
        }
-      else if (l.branchSize() + 1 + r.branchSize() <= maxKeysPerBranch())       // Branches
-       {z();
-        final StuckSML.FirstElement pkn = p.Branch.firstElement1();
-        p.Branch.clear();
-        final int nl = l.branchSize();
-        for (int i = 0; i < nl; ++i)
-         {z();
-          final StuckSML.Shift f = l.Branch.shift1();
-          p.Branch.push(f.key, f.data);
-
-         }
-        final int data = l.Branch.lastElement1().data;
-        p.Branch.push(pkn.key, data);
+      else                                                                     // Branches
+       {final int nl = l.branchSize();
         final int nr = r.branchSize();
-        for (int i = 0; i < nr; ++i)
+
+         if (nl + 1 + nr <= maxKeysPerBranch())
          {z();
-          final StuckSML.Shift f = r.Branch.shift1();
-          p.Branch.push(f.key, f.data);
+          final StuckSML.FirstElement pkn = P.Branch.firstElement1();
+          T.clear();
+          for (int i = 0; i < nl; ++i)
+           {z();
+            final StuckSML.Shift f = l.Branch.shift1();
+            P.Branch.push(f.key, f.data);
+
+           }
+          final int data = l.Branch.lastElement1().data;
+          P.Branch.push(pkn.key, data);
+          for (int i = 0; i < nr; ++i)
+           {z();
+            final StuckSML.Shift f = r.Branch.shift1();
+            P.Branch.push(f.key, f.data);
+           }
+          final int Data = r.Branch.lastElement2().data;                          // Top next
+          P.Branch.push(0, Data);                                                 // Top so ignored by search ... except last
+          l.free();
+          r.free();
+          z(); return true;
          }
-        final int Data = r.Branch.lastElement2().data;                          // Top next
-        p.Branch.push(0, Data);                                                 // Top so ignored by search ... except last
-        l.free();
-        r.free();
-        return true;
+        z(); return false;
        }
-      z();
-      return false;
      }
 
     boolean mergeLeftSibling(int index)                                         // Merge the left sibling
@@ -1002,11 +1006,10 @@ abstract class BtreeSP extends Test                                            /
    }  // Node
 
   Node node(Node Node, int node)                                                // Refer to a node by number
-   {//final Node n = new Node();
-    Node.node = node;
+   {Node.node = node;
     Node.setStucks();
     return Node;
-   }     // Refer to a node by number
+   }
 
 //D1 Array                                                                      // Key, data pairs in the tree as an array
 
