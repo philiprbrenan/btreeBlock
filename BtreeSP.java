@@ -678,20 +678,22 @@ abstract class BtreeSP extends Test                                            /
       z();
       final Node                P = this;
       final StuckSML.ElementAt  L = P.Branch.elementAt1(index-1);
+
       final StuckSML.ElementAt  R = P.Branch.elementAt2(index+0);
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
         final Node  l = node( leftNode,L.data);
         final Node  r = node(rightNode,R.data);
-      final StuckSP.Transaction tl = l.spBranch.new Transaction();
-      final StuckSP.Transaction tr = r.spBranch.new Transaction();
+        final StuckSP.Transaction tl = l.spLeaf.new Transaction();
+        final StuckSP.Transaction tr = r.spLeaf.new Transaction();
         final int  nl = l.leafSize();
         final int  nr = r.leafSize();
 
         z(); if (nr >= maxKeysPerLeaf()) return false;                          // Steal not possible because there is no where to put the steal
         z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the leaf sibling empty
         z();
+
         final StuckSML.LastElement le = l.Leaf.lastElement1();
         r.Leaf.insertElementAt(le.key, le.data, 0);                             // Increase right
         l.Leaf.pop();                                                           // Reduce left
