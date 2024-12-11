@@ -1005,6 +1005,7 @@ abstract class BtreeSP extends Test                                            /
 
         for (int i = 0; i < nr+1; i++)                                          // Transfer right to left
          {z();
+          tr.shift();
           tl.key  = tr.key;
           tl.data = tr.data;
           tl.push();
