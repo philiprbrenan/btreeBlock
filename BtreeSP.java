@@ -785,11 +785,19 @@ abstract class BtreeSP extends Test                                            /
         z(); if (nl >= maxKeysPerBranch()) return false;                        // Steal not possible because there is no where to put the steal
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
         z();
-        final StuckSML.LastElement le = l.Branch.lastElement1();                // Last element of left child
-        l.Branch.setElementAt(lk, le.data, nl);                                 // Left top becomes real
-        final StuckSML.FirstElement fe = r.Branch.firstElement1();              // First element of  right child
-        l.Branch.push(0,      fe.data);                                         // New top for left is ignored by search ,.. except last
-        P.Branch.setElementAt(fe.key, ld, index);                               // Swap key of parent
+
+        tl.lastElement();                                                       // Last element of left child
+        tl.key   = lk;                                                          // Left top becomes real
+        tl.index = nl;                                                          // Left top becomes real
+        tl.setElementAt();                                                      // Left top becomes real
+        tr.firstElement();                                                      // First element of  right child
+        tl.key  = 0;                                                            // New top for left is ignored by search ,.. except last
+        tl.data = tr.data;                                                      // New top for left is ignored by search ,.. except last
+        tl.push();                                                              // New top for left is ignored by search ,.. except last
+        T.key   = tr.key;                                                       // Swap key of parent
+        T.data  = ld;                                                           // Swap key of parent
+        T.index = index;                                                        // Swap key of parent
+        T.setElementAt();                                                       // Swap key of parent
         tr.shift();                                                             // Reduce right
        }
       return true;
