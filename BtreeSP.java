@@ -655,10 +655,6 @@ abstract class BtreeSP extends Test                                            /
         tl.push();
        }
 
-//    final StuckSML.Shift split = r.Branch.shift1();                           // Build right branch
-//    l.Branch.push           (0, split.data);                                  // Becomes top and so is ignored by search ... except last
-//    p.Branch.insertElementAt(split.key, l.node, index);
-
       tr.shift();                                                               // Build right branch
       tl.key = 0;
       tl.data = tr.data;
@@ -677,44 +673,87 @@ abstract class BtreeSP extends Test                                            /
       z(); if (index > branchSize()) stop("Index", index, "too big");
       z();
       final Node                P = this;
-      final StuckSML.ElementAt  L = P.Branch.elementAt1(index-1);
-      final StuckSML.ElementAt  R = P.Branch.elementAt2(index+0);
+      final StuckSP.Transaction T = P.spBranch.new Transaction();
+
+      T.index = index-1;
+      T.elementAt();
+      final int L = T.data;
+
+      T.index = index;
+      T.elementAt();
+      final int R = T.data;
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final Node  l = node( leftNode,L.data);
-        final Node  r = node(rightNode,R.data);
+        final Node  l = node( leftNode, L);
+        final Node  r = node(rightNode, R);
+        final StuckSP.Transaction tl = l.spLeaf.new Transaction();
+        final StuckSP.Transaction tr = r.spLeaf.new Transaction();
         final int  nl = l.leafSize();
         final int  nr = r.leafSize();
 
         z(); if (nr >= maxKeysPerLeaf()) return false;                          // Steal not possible because there is no where to put the steal
         z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the leaf sibling empty
         z();
-        final StuckSML.LastElement le = l.Leaf.lastElement1();
-        r.Leaf.insertElementAt(le.key, le.data, 0);                             // Increase right
-        l.Leaf.pop();                                                           // Reduce left
-        final int lk = l.Leaf.elementAt1(nl-2).key;                             // Last key on left
-        P.Branch.setElementAt(lk, L.data, index-1);                             // Swap key of parent
+
+        tl.lastElement();
+        tr.key   = tl.key;
+        tr.data  = tr.data;
+        tr.unshift();                                                           // Increase right
+
+        tl.pop();                                                               // Reduce left
+        tl.index = nl - 2;
+        tl.elementAt();
+        T.key    = tl.key;
+        T.data   = L;
+        T.index  = index-1;
+        T.setElementAt();                                                       // Swap key of parent
+
        }
       else                                                                      // Children are branches
        {z();
-        final Node l  = node( leftNode, L.data);
-        final Node r  = node(rightNode, R.data);
+        final Node l  = node( leftNode, L);
+        final Node r  = node(rightNode, R);
+        final StuckSP.Transaction tl = l.spBranch.new Transaction();
+        final StuckSP.Transaction tr = r.spBranch.new Transaction();
         final int  nl = l.branchSize();
         final int  nr = r.branchSize();
 
         z(); if (nr >= maxKeysPerBranch()) return false;                        // Steal not possible because there is no where to put the steal
         z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the left sibling empty
         z();
-        final StuckSML.LastElement  t = l.Branch.lastElement1();                // Increase right with left top
-        final int key = P.Branch.elementAt1(index).key;                         // Top key
-        r.Branch.insertElementAt(key, t.data, 0);                               // Increase right with left top
-        l.Branch.pop();                                                         // Remove left top
-        final StuckSML.FirstElement b = r.Branch.firstElement1();               // Increase right with left top
-        final int pk = P.Branch.elementAt1(index-1).key;                        // Parent key
-        r.Branch.setElementAt             (pk, b.data, 0);                      // Reduce key of parent of right
-        final int lk = l.Branch.lastElement1().key;                             // Last left key
-        P.Branch.setElementAt(lk, L.data, index-1);                             // Reduce key of parent of left
+
+//       final StuckSML.LastElement  t = l.Branch.lastElement1();                // Increase right with left top
+//       final int key = P.Branch.elementAt1(index).key;                         // Top key
+//       r.Branch.insertElementAt(key, t.data, 0);                               // Increase right with left top
+//       l.Branch.pop();                                                         // Remove left top
+//       final StuckSML.FirstElement b = r.Branch.firstElement1();               // Increase right with left top
+//       final int pk = P.Branch.elementAt1(index-1).key;                        // Parent key
+//       r.Branch.setElementAt             (pk, b.data, 0);                      // Reduce key of parent of right
+//      final int lk = l.Branch.lastElement1().key;                             // Last left key
+//      P.Branch.setElementAt(lk, L, index-1);                                  // Reduce key of parent of left
+
+        tl.lastElement();
+
+        T.index = index;                                                        // Top key
+        T.elementAt();                                                          // Top key
+        tr.key  = T.key;                                                        // Top key
+        tr.data = tl.data;                                                      // Increase right with left top
+        tr.unshift();                                                           // Increase right with left top
+
+        tl.pop();                                                               // Remove left top
+
+        tr.firstElement();                                                      // Increase right with left top
+        T.index = index - 1;                                                    // Parent key
+        T.elementAt();
+        tr.key  = T.key;                                                        // Parent key
+        tr.unshift();                                                           // Reduce key of parent of right
+
+        tl.lastElement();                                                       // Last left key
+        T.key   = tl.key;
+        T.data  = L;
+        T.index = index - 1;
+        T.setElementAt();                                                       // Reduce key of parent of left
        }
       return true;
      }
