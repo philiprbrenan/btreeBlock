@@ -1013,10 +1013,12 @@ abstract class BtreeSP extends Test                                            /
         r.free();                                                               // Free the empty right node
        }
 
-      final StuckSML.ElementAt pkn = P.Branch.elementAt1(index+1);              // One up from dividing point in parent
-      final StuckSML.ElementAt dkn = P.Branch.elementAt2(index);                // Dividing point in parent
-      P.Branch.setElementAt(pkn.key, dkn.data, index);                          // Install key of right sibling in this child
-      P.Branch.removeElementAt1(index+1);                                       // Reduce parent on right
+      T.index = index+1; T.elementAt(); final int pkn = T.key;                  // One up from dividing point in parent
+      T.index = index;   T.elementAt(); final int dkn = T.data;                 // Dividing point in parent
+      T.key   = pkn;
+      T.setElementAt();                                                         // Install key of right sibling in this child
+      T.index = index+1;                                                        // Reduce parent on right
+      T.removeElementAt();                                                      // Reduce parent on right
       return true;
      }
 
