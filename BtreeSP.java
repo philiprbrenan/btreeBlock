@@ -1033,14 +1033,16 @@ abstract class BtreeSP extends Test                                            /
             }
       z();
 
-      final StuckSML.ElementAt p = Branch.elementAt1(index);
+      final StuckSP.Transaction T = spBranch.new Transaction();
+      T.index = index;
+      T.elementAt();
 
-      z(); if (!node(tempNode, p.data).isLow()) return;
+      z(); if (!node(tempNode, T.data).isLow()) return;
       z(); if (stealFromLeft    (index))        return;
       z(); if (stealFromRight   (index))        return;
       z(); if (mergeLeftSibling (index))        return;
       z(); if (mergeRightSibling(index))        return;
-      stop("Unable to balance child:", p.data);
+      stop("Unable to balance child:", T.data);
      }
    }  // Node
 
