@@ -1003,10 +1003,11 @@ abstract class BtreeSP extends Test                                            /
 
         l.Branch.setElementAt(T.key, tl.data, nl);                              // Re-key left top
 
-        final int N = r.Branch.size();                                          // Number of entries to remove
-        for (int i = 0; i < N; i++)                                             // Transfer right to left
-         {z(); final StuckSML.Shift f = r.Branch.shift1();
-          l.Branch.push(f.key, f.data);
+        for (int i = 0; i < nr+1; i++)                                          // Transfer right to left
+         {z();
+          tl.key  = tr.key;
+          tl.data = tr.data;
+          tl.push();
          }
         r.free();                                                               // Free the empty right node
        }
