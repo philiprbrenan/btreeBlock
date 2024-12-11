@@ -723,11 +723,12 @@ abstract class BtreeSP extends Test                                            /
         tr.unshift();                                                           // Increase right with left top
         tl.pop();                                                               // Remove left top
 
-        final StuckSML.FirstElement b = r.Branch.firstElement1();               // Increase right with left top
+        tr.firstElement();                                                      // Increase right with left top
+
         final int pk = P.Branch.elementAt1(index-1).key;                        // Parent key
-        r.Branch.setElementAt             (pk, b.data, 0);                      // Reduce key of parent of right
-        final int lk = l.Branch.lastElement1().key;                             // Last left key
-        P.Branch.setElementAt(lk, L, index-1);                                  // Reduce key of parent of left
+        r.Branch.setElementAt             (pk, tr.data, 0);                     // Reduce key of parent of right
+        tl.lastElement();                                                       // Last left key
+        P.Branch.setElementAt(tl.key, L, index-1);                              // Reduce key of parent of left
        }
       return true;
      }
