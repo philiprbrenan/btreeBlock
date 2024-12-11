@@ -616,15 +616,10 @@ abstract class BtreeSP extends Test                                            /
         tl.data = tr.data;
         tl.push();
        }
-      tr.firstElement();
-      tl. lastElement();
-      final int F = tr.key;
-      final int L = tl.key;
+      final int F = r.Leaf.firstElement1().key;
+      final int L = l.Leaf. lastElement1().key;
       final int splitKey = (F + L) / 2;
-      tp.key   = splitKey;
-      tp.data  = l.node;
-      tp.index = index;
-      tp.insertElementAt();
+      p.Branch.insertElementAt(splitKey, l.node, index);                        // Insert new key, next pair in parent
      }
 
     void splitBranch(Node parent, int index)                                    // Split a branch which is not the root by splitting right to left
