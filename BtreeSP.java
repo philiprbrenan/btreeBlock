@@ -595,7 +595,7 @@ abstract class BtreeSP extends Test                                             
       tp.key = tr.key; tp.data = l.node; tp.index = index; tp.insertElementAt();
      }
 
-    boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
+    boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right. He steals from the left, to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
      {z(); assertBranch();
       z(); if (index == 0) return false;
       z(); if (index < 0)            stop("Index", index, "too small");
@@ -613,8 +613,8 @@ abstract class BtreeSP extends Test                                             
         final StuckSP.Transaction tl = l.Leaf.new Transaction();
         final StuckSP.Transaction tr = r.Leaf.new Transaction();
 
-        z(); if (tr.size() >= maxKeysPerLeaf()) return false;                   // Steal not possible because there is no where to put the steal
-        z(); if (tl.size() <= 1) return false;                                  // Steal not allowed because it would leave the leaf sibling empty
+        z(); if (tr.size >= maxKeysPerLeaf()) return false;                     // Steal not possible because there is no where to put the steal
+        z(); if (tl.size <= 1) return false;                                    // Steal not allowed because it would leave the leaf sibling empty
         z();
 
         tl.lastElement(); tr.key = tl.key; tr.data = tl.data; tr.unshift();     // Increase right
@@ -631,8 +631,8 @@ abstract class BtreeSP extends Test                                             
         final StuckSP.Transaction tl = l.Branch.new Transaction();
         final StuckSP.Transaction tr = r.Branch.new Transaction();
 
-        z(); if (tr.size() >= maxKeysPerBranch()) return false;                 // Steal not possible because there is no where to put the steal
-        z(); if (tl.size() <= 1) return false;                                  // Steal not allowed because it would leave the left sibling empty
+        z(); if (tr.size >= maxKeysPerBranch()) return false;                   // Steal not possible because there is no where to put the steal
+        z(); if (tl.size <= 1) return false;                                    // Steal not allowed because it would leave the left sibling empty
         z();
 
         tl.lastElement();                                                       // Increase right with left top
