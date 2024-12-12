@@ -595,7 +595,7 @@ abstract class BtreeSP extends Test                                             
       tp.key = tr.key; tp.data = l.node; tp.index = index; tp.insertElementAt();
      }
 
-    boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right. He steals from the left, to give to the right - Dennis Moore, Mr Moore, Mr Moore.
+    boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, etc. etc.
      {z(); assertBranch();
       z(); if (index == 0) return false;
       z(); if (index < 0)            stop("Index", index, "too small");
@@ -612,15 +612,19 @@ abstract class BtreeSP extends Test                                             
         final Node  r = node(rightNode, R);
         final StuckSP.Transaction tl = l.Leaf.new Transaction();
         final StuckSP.Transaction tr = r.Leaf.new Transaction();
+        final int  nl = l.leafSize();
+        final int  nr = r.leafSize();
 
-        z(); if (tr.size >= maxKeysPerLeaf()) return false;                     // Steal not possible because there is no where to put the steal
-        z(); if (tl.size <= 1) return false;                                    // Steal not allowed because it would leave the leaf sibling empty
+        z(); if (nr >= maxKeysPerLeaf()) return false;                          // Steal not possible because there is no where to put the steal
+        z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the leaf sibling empty
         z();
 
         tl.lastElement(); tr.key = tl.key; tr.data = tl.data; tr.unshift();     // Increase right
 
         tl.pop();                                                               // Reduce left
-        tl.index = tl.size-1; tl.elementAt();                                   // Last key on left
+//tl.size();
+say("AAAA", nl, tl.size);
+        tl.index = tl.size-1; tl.elementAt();                                        // Last key on left
 
         T.key = tl.key; T.data = L; T.index = index-1; T.setElementAt();        // Swap key of parent
        }
@@ -630,9 +634,11 @@ abstract class BtreeSP extends Test                                             
         final Node r  = node(rightNode, R);
         final StuckSP.Transaction tl = l.Branch.new Transaction();
         final StuckSP.Transaction tr = r.Branch.new Transaction();
+        final int  nl = l.branchSize();
+        final int  nr = r.branchSize();
 
-        z(); if (tr.size >= maxKeysPerBranch()) return false;                   // Steal not possible because there is no where to put the steal
-        z(); if (tl.size <= 1) return false;                                    // Steal not allowed because it would leave the left sibling empty
+        z(); if (nr >= maxKeysPerBranch()) return false;                        // Steal not possible because there is no where to put the steal
+        z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the left sibling empty
         z();
 
         tl.lastElement();                                                       // Increase right with left top
@@ -2008,7 +2014,8 @@ abstract class BtreeSP extends Test                                             
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_to_array();                                                            //  2.52
+    //test_to_array();                                                            //  2.52
+    test_delete_descending();                                                   //  7.66
    }
 
   public static void main(String[] args)                                        // Test if called as a program
