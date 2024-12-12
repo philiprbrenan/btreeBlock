@@ -203,14 +203,14 @@ abstract class BtreeSP extends Test                                             
 
     int leafSize()                                                              // Number of children in body of leaf
      {z();
-      final StuckSP.Transaction t = Leaf.new Transaction();
+      final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Leaf;
       t.size();
       return t.size;
      }
 
     int branchSize()                                                            // Number of children in body of branch taking top for granted as it is always there
      {z();
-      final StuckSP.Transaction t = Branch.new Transaction();
+      final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Branch;
       t.size();
       return t.size-1;
      }
@@ -224,14 +224,14 @@ abstract class BtreeSP extends Test                                             
 
     boolean hasLeavesForChildren()                                              // The node has leaves for children
      {z(); assertBranch();
-      final StuckSP.Transaction t = Branch.new Transaction();
+      final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Branch;
       t.lastElement();
       return node(tempNode, t.data).isLeaf();
      }
 
     int top()                                                                   // The top next element of a branch
      {z(); assertBranch();
-      final StuckSP.Transaction t = Branch.new Transaction();
+      final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Branch;
       t.index = branchSize();
       t.elementAt();
       return t.data;
@@ -242,7 +242,7 @@ abstract class BtreeSP extends Test                                             
       if (isLeaf())                                                             // Print a leaf
        {final int N  = leafSize();                                              // Number of elements in leaf
         s.append("Leaf(node:"+node+" size:"+N+")\n");
-        final StuckSP.Transaction t = Leaf.new Transaction();
+        final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Leaf;
         for (int i = 0; i < N; i++)                                             // Each element in the leaf
          {t.index = i;
           t.elementAt();
@@ -255,7 +255,7 @@ abstract class BtreeSP extends Test                                             
                         " top:"+top()+"\n");
 
         final int N = branchSize()+1;                                           // Number of elements in branch including top
-        final StuckSP.Transaction t = Branch.new Transaction();
+        final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Branch;
         for (int i = 0; i < N; i++)
          {t.index = i; t.elementAt();
           s.append("  "+(i+1)+" key:"+t.key+" next:"+t.data+"\n");
@@ -281,7 +281,7 @@ abstract class BtreeSP extends Test                                             
         leaf     = Node.this;
         search   = Search;
         base     = leafBase();
-        final StuckSP.Transaction t = Leaf.new Transaction();
+        final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Leaf;
         t.search = Search; t.search();
         found    = t.found;
         index    = t.index;
@@ -315,7 +315,7 @@ abstract class BtreeSP extends Test                                             
         leaf     = Node.this;
         search   = Search;
         base     = leafBase();
-        final StuckSP.Transaction t = Leaf.new Transaction();
+        final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Leaf;
         t.search = Search; t.searchFirstGreaterThanOrEqual();
         found    = t.found;
         first    = t.index;
@@ -348,7 +348,7 @@ abstract class BtreeSP extends Test                                             
         branch   = Node.this;
         search   = Search;
         base     = branchBase();
-        final StuckSP.Transaction t = Branch.new Transaction();
+        final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Branch;
         t.search = Search; t.limit  = 1; t.searchFirstGreaterThanOrEqual();
         found    = t.found;
         first    = t.index;
@@ -373,7 +373,7 @@ abstract class BtreeSP extends Test                                             
     void leafToArray(Stack<ArrayElement> s)                                     // Leaf as an array
      {z(); assertLeaf();
       final int K = leafSize();
-      final StuckSP.Transaction t = Leaf.new Transaction();
+      final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Leaf;
       for  (int i = 0; i < K; i++)
        {z();
         t.index = i; t.elementAt();
@@ -387,7 +387,7 @@ abstract class BtreeSP extends Test                                             
 
       if (K > 0)                                                                // Branch has key, next pairs
        {z();
-        final StuckSP.Transaction t = Branch.new Transaction();
+        final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Branch;
         for  (int i = 0; i < K; i++)
          {z();
           t.index = i; t.elementAt();                                           // Each node in the branch
@@ -413,7 +413,7 @@ abstract class BtreeSP extends Test                                             
       padStrings(S, level);
       final StringBuilder s = new StringBuilder();                              // String builder
       final int K = leafSize();
-      final StuckSP.Transaction t = Leaf.new Transaction();
+      final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Leaf;;
 
       for  (int i = 0; i < K; i++)
        {t.index = i; t.elementAt();                                             // Each node in the branch
@@ -433,7 +433,7 @@ abstract class BtreeSP extends Test                                             
       final int K = branchSize();
 
       if (K > 0)                                                                // Branch has key, next pairs
-       {final StuckSP.Transaction t = Branch.new Transaction();
+       {final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Branch;
         for  (int i = 0; i < K; i++)
          {t.index = i; t.elementAt();                                           // Each node in the branch
           final Node n = node(new Node(), t.data);                              // printing will not be part of the chip so we can use recursionand create new nodes as needed
@@ -485,9 +485,9 @@ abstract class BtreeSP extends Test                                             
       final Node l = allocLeaf(leftNode);                                       // New left leaf
       final Node r = allocLeaf(rightNode);                                      // New right leaf
       final Node p = this;                                                      // Root is the parent
-      final StuckSP.Transaction tp = p.Leaf.new Transaction();
-      final StuckSP.Transaction tl = l.Leaf.new Transaction();
-      final StuckSP.Transaction tr = r.Leaf.new Transaction();
+      final StuckSP.Transaction tp = new StuckSP.Transaction();  tp.s = p.Leaf;
+      final StuckSP.Transaction tl = new StuckSP.Transaction();  tl.s = l.Leaf;
+      final StuckSP.Transaction tr = new StuckSP.Transaction();  tr.s = r.Leaf;
 
       final int sl = splitLeafSize();
       for (int i = 0; i < sl; i++)                                              // Build left leaf from parent
@@ -503,7 +503,7 @@ abstract class BtreeSP extends Test                                             
       final int last  = tl.key;                                                 // Last of left leaf
       final int kv    = (last + first) / 2;                                     // Mid key
       setBranch();
-      final StuckSP.Transaction T = p.Branch.new Transaction();
+      final StuckSP.Transaction T = new StuckSP.Transaction(); T.s = p.Branch;
       T.clear();                                                                // Clear the branch
       T.key = kv; T.data = l.node; T.push();                                    // Insert left leaf into root
       T.key  = 0; T.data = r.node; T.push();                                    // Insert right into root. This will be the top node and so ignored by search ... except last.
@@ -517,9 +517,9 @@ abstract class BtreeSP extends Test                                             
       final Node p = this;                                                      // Root is the parent
       final Node l = allocBranch(leftNode);                                     // New left branch
       final Node r = allocBranch(rightNode);                                    // New right branch
-      final StuckSP.Transaction tp = p.Branch.new Transaction();
-      final StuckSP.Transaction tl = l.Branch.new Transaction();
-      final StuckSP.Transaction tr = r.Branch.new Transaction();
+      final StuckSP.Transaction tp = new StuckSP.Transaction(); tp.s = p.Branch;
+      final StuckSP.Transaction tl = new StuckSP.Transaction(); tl.s = l.Branch;
+      final StuckSP.Transaction tr = new StuckSP.Transaction(); tr.s = r.Branch;
 
       final int sb = splitBranchSize();                                         // Branch split size
       for (int i = 0; i < sb; i++)                                              // Build left child from parent
@@ -553,9 +553,9 @@ abstract class BtreeSP extends Test                                             
       final Node p = parent;                                                    // Parent
       final Node l = allocLeaf(leftNode);                                       // New  split out leaf
       final Node r = this;                                                      // Existing  leaf
-      final StuckSP.Transaction tp = p.Branch.new Transaction();
-      final StuckSP.Transaction tl = l.Leaf  .new Transaction();
-      final StuckSP.Transaction tr = r.Leaf  .new Transaction();
+      final StuckSP.Transaction tp = new StuckSP.Transaction(); tp.s = p.Branch;
+      final StuckSP.Transaction tl = new StuckSP.Transaction(); tl.s = l.Leaf;
+      final StuckSP.Transaction tr = new StuckSP.Transaction(); tr.s = r.Leaf;
 
       final int sl = splitLeafSize();
       for (int i = 0; i < sl; i++)                                              // Build left leaf
@@ -583,9 +583,9 @@ abstract class BtreeSP extends Test                                             
       final Node p = parent;
       final Node l = allocBranch(leftNode);
       final Node r = this;
-      final StuckSP.Transaction tp = p.Branch.new Transaction();
-      final StuckSP.Transaction tl = l.Branch.new Transaction();
-      final StuckSP.Transaction tr = r.Branch.new Transaction();
+      final StuckSP.Transaction tp = new StuckSP.Transaction(); tp.s = p.Branch;
+      final StuckSP.Transaction tl = new StuckSP.Transaction(); tl.s = l.Branch;
+      final StuckSP.Transaction tr = new StuckSP.Transaction(); tr.s = r.Branch;
 
       final int sb = splitBranchSize();
       for (int i = 0; i < sb; i++)                                              // Build left branch from right
@@ -595,14 +595,14 @@ abstract class BtreeSP extends Test                                             
       tp.key = tr.key; tp.data = l.node; tp.index = index; tp.insertElementAt();
      }
 
-    boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, etc. etc.
+    boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
      {z(); assertBranch();
       z(); if (index == 0) return false;
       z(); if (index < 0)            stop("Index", index, "too small");
       z(); if (index > branchSize()) stop("Index", index, "too big");
       z();
       final Node                P = this;
-      final StuckSP.Transaction T = P.Branch.new Transaction();
+      final StuckSP.Transaction T = new StuckSP.Transaction(); T.s = P.Branch;
       T.index = index - 1; T.elementAt(); final int L = T.data;
       T.index = index - 0; T.elementAt(); final int R = T.data;
 
@@ -610,8 +610,8 @@ abstract class BtreeSP extends Test                                             
        {z();
         final Node  l = node( leftNode, L);
         final Node  r = node(rightNode, R);
-        final StuckSP.Transaction tl = l.Leaf.new Transaction();
-        final StuckSP.Transaction tr = r.Leaf.new Transaction();
+        final StuckSP.Transaction tl = new StuckSP.Transaction(); tl.s = l.Leaf;
+        final StuckSP.Transaction tr = new StuckSP.Transaction(); tr.s = r.Leaf;
         final int  nl = l.leafSize();
         final int  nr = r.leafSize();
 
@@ -630,8 +630,8 @@ abstract class BtreeSP extends Test                                             
        {z();
         final Node l  = node( leftNode, L);
         final Node r  = node(rightNode, R);
-        final StuckSP.Transaction tl = l.Branch.new Transaction();
-        final StuckSP.Transaction tr = r.Branch.new Transaction();
+        final StuckSP.Transaction tl = new StuckSP.Transaction();  tl.s = l.Branch;
+        final StuckSP.Transaction tr = new StuckSP.Transaction();  tr.s = r.Branch;
         final int  nl = l.branchSize();
         final int  nr = r.branchSize();
 
@@ -661,7 +661,7 @@ abstract class BtreeSP extends Test                                             
       z(); if (index >= branchSize()) stop("Index", index, "too big");
       z();
       final Node                P = this;
-      final StuckSP.Transaction T = P.Branch.new Transaction();
+      final StuckSP.Transaction T = new StuckSP.Transaction(); T.s = P.Branch;
       T.index = index+0; T.elementAt(); final int lk = T.key, ld = T.data;
       T.index = index+1; T.elementAt(); final int rk = T.key, rd = T.data;
 
@@ -669,8 +669,8 @@ abstract class BtreeSP extends Test                                             
        {z();
         final Node  l = node( leftNode, ld);
         final Node  r = node(rightNode, rd);
-        final StuckSP.Transaction tl = l.Leaf.new Transaction();
-        final StuckSP.Transaction tr = r.Leaf.new Transaction();
+        final StuckSP.Transaction tl = new StuckSP.Transaction(); tl.s = l.Leaf;
+        final StuckSP.Transaction tr = new StuckSP.Transaction(); tr.s = r.Leaf;
         final int  nl = l.leafSize();
         final int  nr = r.leafSize();
 
@@ -686,8 +686,8 @@ abstract class BtreeSP extends Test                                             
        {z();
         final Node  l = node( leftNode, ld);
         final Node  r = node(rightNode, rd);
-        final StuckSP.Transaction tl = l.Branch.new Transaction();
-        final StuckSP.Transaction tr = r.Branch.new Transaction();
+        final StuckSP.Transaction tl = new StuckSP.Transaction(); tl.s = l.Branch;
+        final StuckSP.Transaction tr = new StuckSP.Transaction(); tr.s = r.Branch;
         final int  nl = l.branchSize();
         final int  nr = r.branchSize();
 
@@ -716,7 +716,7 @@ abstract class BtreeSP extends Test                                             
       z(); if (node != 0) stop("Expected root, got:", node);
       z();
       final Node                   P = this;
-      final StuckSP.Transaction    T = P.Branch.new Transaction();
+      final StuckSP.Transaction    T = new StuckSP.Transaction(); T.s = P.Branch;
       T.firstElement(); final Node l = node( leftNode, T.data);
       T. lastElement(); final Node r = node(rightNode, T.data);
 
@@ -726,8 +726,8 @@ abstract class BtreeSP extends Test                                             
         final int nr = r.leafSize();
         if (nl + nr <= maxKeysPerLeaf())
          {z(); T.clear();
-          final StuckSP.Transaction tl = l.Leaf.new Transaction();
-          final StuckSP.Transaction tr = r.Leaf.new Transaction();
+          final StuckSP.Transaction tl = new StuckSP.Transaction(); tl.s = l.Leaf;
+          final StuckSP.Transaction tr = new StuckSP.Transaction(); tr.s = r.Leaf;
           for (int i = 0; i < nl; ++i)                                          // Merge in left child leaf
            {z(); tl.shift(); T.key = tl.key; T.data = tl.data; T.push();
            }
@@ -747,8 +747,8 @@ abstract class BtreeSP extends Test                                             
 
         if (nl + 1 + nr <= maxKeysPerBranch())
          {z();
-          final StuckSP.Transaction tl = l.Branch.new Transaction();
-          final StuckSP.Transaction tr = r.Branch.new Transaction();
+          final StuckSP.Transaction tl = new StuckSP.Transaction(); tl.s = l.Branch;
+          final StuckSP.Transaction tr = new StuckSP.Transaction(); tr.s = r.Branch;
           T.firstElement();
           final int pkn = T.key;
           T.clear();
@@ -785,7 +785,7 @@ abstract class BtreeSP extends Test                                             
       z(); if (bs    < 2 ) return false;
       z();
       final Node                P = this;
-      final StuckSP.Transaction T = P.Branch.new Transaction();
+      final StuckSP.Transaction T = new StuckSP.Transaction(); T.s = P.Branch;
       T.index = index-1; T.elementAt(); final int L = T.data;
       T.index = index-0; T.elementAt(); final int R = T.data;
 
@@ -793,8 +793,8 @@ abstract class BtreeSP extends Test                                             
        {z();
         final Node l = node( leftNode, L);
         final Node r = node(rightNode, R);
-        final StuckSP.Transaction tl = l.Leaf.new Transaction();
-        final StuckSP.Transaction tr = r.Leaf.new Transaction();
+        final StuckSP.Transaction tl = new StuckSP.Transaction(); tl.s = l.Leaf;
+        final StuckSP.Transaction tr = new StuckSP.Transaction(); tr.s = r.Leaf;
         final  int nl = l.leafSize();
         final  int nr = r.leafSize();
 
@@ -809,8 +809,8 @@ abstract class BtreeSP extends Test                                             
        {z();
         final Node l = node( leftNode, L);
         final Node r = node(rightNode, R);
-        final StuckSP.Transaction tl = l.Branch.new Transaction();
-        final StuckSP.Transaction tr = r.Branch.new Transaction();
+        final StuckSP.Transaction tl = new StuckSP.Transaction();  tl.s = l.Branch;
+        final StuckSP.Transaction tr = new StuckSP.Transaction();  tr.s = r.Branch;
         final int nl = l.branchSize();
         final int nr = r.branchSize();
 
@@ -843,7 +843,7 @@ abstract class BtreeSP extends Test                                             
       z(); if (bs < 2) return false;
       z();
       final Node                P = this;
-      final StuckSP.Transaction T = P.Branch.new Transaction();
+      final StuckSP.Transaction T = new StuckSP.Transaction(); T.s = P.Branch;
       T.index = index+0; T.elementAt(); final int L = T.data;
       T.index = index+1; T.elementAt(); final int R = T.data;
 
@@ -851,8 +851,8 @@ abstract class BtreeSP extends Test                                             
        {z();
         final Node  l = node( leftNode, L);
         final Node  r = node(rightNode, R);
-        final StuckSP.Transaction tl = l.Leaf.new Transaction();
-        final StuckSP.Transaction tr = r.Leaf.new Transaction();
+        final StuckSP.Transaction tl = new StuckSP.Transaction(); tl.s = l.Leaf;
+        final StuckSP.Transaction tr = new StuckSP.Transaction(); tr.s = r.Leaf;
         final int  nl = l.leafSize();
         final int  nr = r.leafSize();
 
@@ -867,8 +867,8 @@ abstract class BtreeSP extends Test                                             
        {z();
         final Node  l = node( leftNode, L);
         final Node  r = node(rightNode, R);
-        final StuckSP.Transaction tl = l.Branch.new Transaction();
-        final StuckSP.Transaction tr = r.Branch.new Transaction();
+        final StuckSP.Transaction tl = new StuckSP.Transaction(); tl.s = l.Branch;
+        final StuckSP.Transaction tr = new StuckSP.Transaction(); tr.s = r.Branch;
         final int  nl = l.branchSize();
         final int  nr = r.branchSize();
 
@@ -907,7 +907,7 @@ abstract class BtreeSP extends Test                                             
             }
       z();
 
-      final StuckSP.Transaction T = Branch.new Transaction();
+      final StuckSP.Transaction T = new StuckSP.Transaction(); T.s = Branch;
       T.index = index;
       T.elementAt();
 
@@ -1060,7 +1060,7 @@ abstract class BtreeSP extends Test                                             
      {z(); find(Key);                                                           // Find the leaf that should contain this key
       key = Key; data = Data;
 
-      final StuckSP.Transaction T = leaf().Leaf.new Transaction();
+      final StuckSP.Transaction T = new StuckSP.Transaction(); T.s = leaf().Leaf;
 
       if (found())                                                              // Found the key in the leaf so update it with the new data
        {z(); T.key = Key; T.data = Data; T.index = index(); T.setElementAt();
@@ -1159,7 +1159,7 @@ abstract class BtreeSP extends Test                                             
    {z(); final Find           f = find1(Key);                                   // Try direct insertion with no modifications to the shape of the tree
     if (!f.found()) return null;                                                // Inserted or updated successfully
     z();
-    final StuckSP.Transaction T = f.leaf().Leaf.new Transaction();              // The leaf that contains the key
+    final StuckSP.Transaction T = new StuckSP.Transaction(); T.s = f.leaf().Leaf; // The leaf that contains the key
                               T.index = f.index();                              // Position in the leaf of the key
                               T.elementAt();
     final int d = T.data;                                                       // Key, data pairs in the leaf
@@ -2011,8 +2011,7 @@ abstract class BtreeSP extends Test                                             
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_to_array();                                                            //  2.52
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
