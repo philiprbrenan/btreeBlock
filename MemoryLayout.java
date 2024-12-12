@@ -146,7 +146,7 @@ class MemoryLayout extends Test                                                 
     void    setBit(int i, boolean b) {       memory.set(at+i, b);}              // Set a bit in memory  assuming that setOff() has been called to fix the location of the field containing the bit
 
     int  getInt()          {z(); return result;}                                // The value in memory, at the indicated location, treated as an integer or the value of the constant
-    void setInt(int value) {z(); memory.set(at, width, value);}                 // Set the value in memory at the indicated location, treated as an integer
+    void setInt(int value) {z(); if (debug) say("BBBB", at, value);memory.set(at, width, value);}                 // Set the value in memory at the indicated location, treated as an integer
 
     public String toString()                                                    // Print field name(indices)=value or name=value if there are no indices
      {final StringBuilder s = new StringBuilder();
