@@ -54,9 +54,9 @@ abstract class BtreeSP extends Test                                             
 
   static boolean debug = false;                                                 // Debugging enabled
 
-//D1 Construction                                                               // Create a BTree from nodes which can be branches or leaves.  The data associated with the BTree is stored only in the leaves opposite the keys
+//D1 Construction                                                               // Create a Btree from nodes which can be branches or leaves.  The data associated with the BTree is stored only in the leaves opposite the keys
 
-  BtreeSP()                                                                    // Define a BTree with user specified dimensions
+  BtreeSP()                                                                     // Define a Btree with user specified dimensions
    {z();
     layout       = layout();
     memoryLayout = new MemoryLayout(layout);
@@ -74,7 +74,7 @@ abstract class BtreeSP extends Test                                             
     root.setStucks();                                                           // Describe stucks addressable fronm the root
    }
 
-  static BtreeSP btreeSML(final int leafKeys, int branchKeys)                  // Define a test BTree with the specified dimensions
+  static BtreeSP btreeSML(final int leafKeys, int branchKeys)                   // Define a test btree with the specified dimensions
    {return  new BtreeSP()
      {int maxSize         () {return testMaxSize;}
       int maxKeysPerLeaf  () {return    leafKeys;}
@@ -151,7 +151,7 @@ abstract class BtreeSP extends Test                                             
 
   class Node                                                                    // A branch or leaf in the tree
    {int node;                                                                   // The number of the node
-    StuckSP Leaf, Branch;                                                       // Stucks used in this node with their base addresses set corrctly to allow addressing of the fields in the stuck
+    StuckSP Leaf, Branch;                                                       // Stucks used in this node with their base addresses set correctly to allow addressing of the fields in the stuck
 
     boolean isLeaf() {z(); return getInt(isLeaf,    node) > 0;}                 // A leaf if true
     void   setLeaf() {z();        setInt(isLeaf, 1, node);}                     // Set as leaf
@@ -257,8 +257,7 @@ abstract class BtreeSP extends Test                                             
         final int N = branchSize()+1;                                           // Number of elements in branch including top
         final StuckSP.Transaction t = Branch.new Transaction();
         for (int i = 0; i < N; i++)
-         {t.index = i;
-          t.elementAt();
+         {t.index = i; t.elementAt();
           s.append("  "+(i+1)+" key:"+t.key+" next:"+t.data+"\n");
          }
        }
@@ -279,15 +278,14 @@ abstract class BtreeSP extends Test                                             
 
       FindEqualInLeaf findEqualInLeaf(int Search)                               // Find the first key in the leaf that is equal to the search key
        {z(); assertLeaf();
-        leaf   = Node.this;
-        search = Search;
-        base   = leafBase();
+        leaf     = Node.this;
+        search   = Search;
+        base     = leafBase();
         final StuckSP.Transaction t = Leaf.new Transaction();
-        t.search = Search;
-        t.search();
-        found  = t.found;
-        index  = t.index;
-        data   = t.data;
+        t.search = Search; t.search();
+        found    = t.found;
+        index    = t.index;
+        data     = t.data;
         return this;
        }
 
@@ -314,14 +312,13 @@ abstract class BtreeSP extends Test                                             
       FindFirstGreaterThanOrEqualInLeaf                                         // Find the first key in the  leaf that is equal to or greater than the search key
       findFirstGreaterThanOrEqualInLeaf(int Search)                             // Find the first key in the  leaf that is equal to or greater than the search key
        {z(); assertLeaf();
-        leaf   = Node.this;
-        search = Search;
-        base   = leafBase();
+        leaf     = Node.this;
+        search   = Search;
+        base     = leafBase();
         final StuckSP.Transaction t = Leaf.new Transaction();
-        t.search = Search;
-        t.searchFirstGreaterThanOrEqual();
-        found = t.found;
-        first = t.index;
+        t.search = Search; t.searchFirstGreaterThanOrEqual();
+        found    = t.found;
+        first    = t.index;
         return this;
        }
 
@@ -348,17 +345,14 @@ abstract class BtreeSP extends Test                                             
       FindFirstGreaterThanOrEqualInBranch                                       // Find the first key in the branch that is equal to or greater than the search key
       findFirstGreaterThanOrEqualInBranch(int Search)                           // Find the first key in the branch that is equal to or greater than the search key
        {z(); assertBranch();
-        branch = Node.this;
-        search = Search;
-        base   = branchBase();
+        branch   = Node.this;
+        search   = Search;
+        base     = branchBase();
         final StuckSP.Transaction t = Branch.new Transaction();
-        t.search = Search;
-        t.limit  = 1;
-        t.searchFirstGreaterThanOrEqual();
-        found = t.found;
-        first = t.index;
-        if (t.found) next = t.data;                                             // Next if key matches
-        else {t.lastElement(); next = t.data;}                                  // Top  if no key matches
+        t.search = Search; t.limit  = 1; t.searchFirstGreaterThanOrEqual();
+        found    = t.found;
+        first    = t.index;
+        if (t.found) next = t.data; else {t.lastElement(); next = t.data;}      // Next if key matches else top
         return this;
        }
 
@@ -382,8 +376,7 @@ abstract class BtreeSP extends Test                                             
       final StuckSP.Transaction t = Leaf.new Transaction();
       for  (int i = 0; i < K; i++)
        {z();
-        t.index = i;
-        t.elementAt();
+        t.index = i; t.elementAt();
         s.push(new ArrayElement(i, t.key, t.data));
        }
      }
@@ -397,14 +390,12 @@ abstract class BtreeSP extends Test                                             
         final StuckSP.Transaction t = Branch.new Transaction();
         for  (int i = 0; i < K; i++)
          {z();
-          t.index = i;                                                          // Each node in the branch
-          t.elementAt();                                                        // Each key, next pair
-          final int next = t.data;                                              // Each key, next pair
-          final Node n = node(new Node(), next);                                // Using recursion here is unsatisfactory.
+          t.index = i; t.elementAt();                                           // Each node in the branch
+          final Node n = node(new Node(), t.data);                              // Using recursion here is unsatisfactory.
           if (n.isLeaf()) {z(); n.leafToArray(s);}
           else
            {z();
-            if (next == 0)
+            if (t.data == 0)
              {say("Cannot descend through root from index", i,
                   "in branch", node);
               break;
@@ -425,8 +416,7 @@ abstract class BtreeSP extends Test                                             
       final StuckSP.Transaction t = Leaf.new Transaction();
 
       for  (int i = 0; i < K; i++)
-       {t.index = i;                                                            // Each node in the branch
-        t.elementAt();
+       {t.index = i; t.elementAt();                                             // Each node in the branch
         s.append(""+t.key+",");
        }
       if (s.length() > 0) s.setLength(s.length()-1);                            // Remove trailing comma if present
@@ -445,15 +435,13 @@ abstract class BtreeSP extends Test                                             
       if (K > 0)                                                                // Branch has key, next pairs
        {final StuckSP.Transaction t = Branch.new Transaction();
         for  (int i = 0; i < K; i++)
-         {t.index = i;                                                          // Each node in the branch
-          t.elementAt();                                                        // Each key, next pair
-          final int next = t.data;                                              // Each key, next pair
-          final Node n = node(new Node(), next);                                // printing will not be part of the chip so we can use recursionand create new nodes as needed
+         {t.index = i; t.elementAt();                                           // Each node in the branch
+          final Node n = node(new Node(), t.data);                              // printing will not be part of the chip so we can use recursionand create new nodes as needed
           if (n.isLeaf())
            {n.printLeaf(S, level+1);
            }
           else
-           {if (next == 0)
+           {if (t.data == 0)
              {say("Cannot descend through root from index", i,
                   "in branch", node);
               break;
@@ -503,34 +491,22 @@ abstract class BtreeSP extends Test                                             
       final StuckSP.Transaction tr = r.Leaf.new Transaction();
 
       for (int i = 0; i < sl; i++)                                              // Build left leaf from parent
-       {z();
-        tp.shift();
-        tl.key  = tp.key;
-        tl.data = tp.data;
-        tl.push();
+       {z(); tp.shift(); tl.key = tp.key; tl.data = tp.data; tl.push();
        }
       for (int i = 0; i < sl; i++)                                              // Build right leaf from parent
-       {z();
-        tp.shift();
-        tr.key  = tp.key;
-        tr.data = tp.data;
-        tr.push();
+       {z(); tp.shift(); tr.key = tp.key; tr.data = tp.data; tr.push();
        }
 
       tr.firstElement();
-      tl.lastElement();
+      tl. lastElement();
       final int first = tr.key;                                                 // First of right leaf
       final int last  = tl.key;                                                 // Last of left leaf
       final int kv    = (last + first) / 2;                                     // Mid key
       setBranch();
       final StuckSP.Transaction T = p.Branch.new Transaction();
       T.clear();                                                                // Clear the branch
-      T. key = kv; T.data = l.node;                                             // Insert left leaf into root
-      T.push();                                                                 // Insert left leaf into root
-
-      T.key  = 0;
-      T.data = r.node;                                                          // Insert right into root. This will be the top node and so ignored by search ... except last.
-      T.push();                                                                 // Insert right into root. This will be the top node and so ignored by search ... except last.
+      T.key = kv; T.data = l.node; T.push();                                    // Insert left leaf into root
+      T.key  = 0; T.data = r.node; T.push();                                    // Insert right into root. This will be the top node and so ignored by search ... except last.
      }
 
     void splitBranchRoot()                                                      // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
@@ -547,29 +523,17 @@ abstract class BtreeSP extends Test                                             
       final int sb = splitBranchSize();                                         // Branch split size
 
       for (int i = 0; i < sb; i++)                                              // Build left child from parent
-       {z();
-        tp.shift();
-        tl.key  = tp.key;
-        tl.data = tp.data;
-        tl.push();
+       {z(); tp.shift(); tl.key = tp.key; tl.data = tp.data; tl.push();
        }
       tp.shift();                                                               // This key, next pair will be part of the root
       final int pk = tp.key;
-      tl.key  = 0;
-      tl.data = tp.data;
-      tl.push();                                                                // Becomes top and so ignored by search ... except last
+      tl.key = 0; tl.data = tp.data; tl.push();                                 // Becomes top and so ignored by search ... except last
 
       for(int i = 0; i < sb; i++)                                               // Build right child from parent
-       {z();
-        tp.shift();
-        tr.key  = tp.key;
-        tr.data = tp.data;
-        tr.push();
+       {z(); tp.shift(); tr.key = tp.key; tr.data = tp.data; tr.push();
        }
 
-      tp.shift();
-      tr.key = 0; tr.data = tp.data;                                            // Becomes top and so ignored by search ... except last
-      tr.push();                                                                // Becomes top and so ignored by search ... except last
+      tp.shift(); tr.key = 0; tr.data = tp.data;  tr.push();                    // Becomes top and so ignored by search ... except last
 
       tp.clear();                                                               // Refer to new branches from root
       tp.key  = pk; tp.data = l.node; tp.push();
@@ -595,21 +559,13 @@ abstract class BtreeSP extends Test                                             
       final int sl = splitLeafSize();
 
       for (int i = 0; i < sl; i++)                                              // Build left leaf
-       {z();
-        tr.shift();
-        tl.key  = tr.key;
-        tl.data = tr.data;
-        tl.push();
+       {z(); tr.shift(); tl.key = tr.key; tl.data = tr.data; tl.push();
        }
       tr.firstElement();
       tl. lastElement();
-      final int F = tr.key;
-      final int L = tl.key;
-      final int splitKey = (F + L) / 2;
-      tp.key   = splitKey;
+      tp.key   = (tr.key + tl.key) / 2;                                         // Splitting key
       tp.data  = l.node;
       tp.index = index;
-
       tp.insertElementAt();                                                     // Insert new key, next pair in parent
      }
 
@@ -633,22 +589,10 @@ abstract class BtreeSP extends Test                                             
       final int sb = splitBranchSize();
 
       for (int i = 0; i < sb; i++)                                              // Build left branch from right
-       {z();
-        tr.shift();
-        tl.key  = tr.key;
-        tl.data = tr.data;
-        tl.push();
+       {z(); tr.shift(); tl.key  = tr.key; tl.data = tr.data; tl.push();
        }
-
-      tr.shift();                                                               // Build right branch
-      tl.key = 0;
-      tl.data = tr.data;
-      tl.push();                                                                // Becomes top and so is ignored by search ... except last
-
-      tp.key   = tr.key;
-      tp.data  = l.node;
-      tp.index = index;
-      tp.insertElementAt();
+      tr.shift(); tl.key = 0; tl.data = tr.data; tl.push();                     // Build right branch - becomes top and so is ignored by search ... except last
+      tp.key = tr.key; tp.data = l.node; tp.index = index; tp.insertElementAt();
      }
 
     boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
@@ -675,17 +619,12 @@ abstract class BtreeSP extends Test                                             
         z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the leaf sibling empty
         z();
 
-        tl.lastElement();
-        tr.key   = tl.key;
-        tr.data  = tl.data;
-        tr.unshift();                                                           // Increase right
+        tl.lastElement(); tr.key = tl.key; tr.data = tl.data; tr.unshift();     // Increase right
+
         tl.pop();                                                               // Reduce left
-        tl.index = nl-2;                                                        // Last key on left
-        tl.elementAt();                                                         // Last key on left
-        T.key    = tl.key;
-        T.data   = L;
-        T.index  = index-1;                                                     // Swap key of parent
-        T.setElementAt();                                                       // Swap key of parent
+        tl.index = nl-2; tl.elementAt();                                        // Last key on left
+
+        T.key = tl.key; T.data = L; T.index = index-1; T.setElementAt();        // Swap key of parent
        }
       else                                                                      // Children are branches
        {z();
@@ -701,25 +640,16 @@ abstract class BtreeSP extends Test                                             
         z();
 
         tl.lastElement();                                                       // Increase right with left top
-        T.index  = index;                                                       // Top key
-        T.elementAt();                                                          // Top key
-        tr.key   = T.key;                                                       // Increase right with left top
-        tr.data  = tl.data;                                                     // Increase right with left top
-        tr.unshift();                                                           // Increase right with left top
+        T.index = index; T.elementAt();                                         // Top key
+        tr.key  = T.key; tr.data = tl.data; tr.unshift();                       // Increase right with left top
         tl.pop();                                                               // Remove left top
 
         tr.firstElement();                                                      // Increase right with left top
 
-        T.index  = index-1;                                                     // Parent key
-        T.elementAt();                                                          // Parent key
-        tr.key   = T.key;                                                       // Reduce key of parent of right
-        tr.index = 0;                                                           // Reduce key of parent of right
-        tr.setElementAt();                                                      // Reduce key of parent of right
+        T.index = index-1; T.elementAt();                                       // Parent key
+        tr.key  = T.key; tr.index = 0; tr.setElementAt();                       // Reduce key of parent of right
         tl.lastElement();                                                       // Last left key
-        T.key    = tl.key;                                                      // Reduce key of parent of left
-        T.data   = L;                                                           // Reduce key of parent of left
-        T.index  = index-1;                                                     // Reduce key of parent of left
-        T.setElementAt();                                                       // Reduce key of parent of left
+        T.key = tl.key; T.data = L; T.index = index-1; T.setElementAt();        // Reduce key of parent of left
        }
       return true;
      }
@@ -748,13 +678,8 @@ abstract class BtreeSP extends Test                                             
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
         z();
         tr.firstElement();                                                      // First element of right child
-        tl.key   = tr.key;
-        tl.data  = tr.data;
-        tl.push();                                                              // Increase left
-        T.key    = tr.key;                                                      // Swap key of parent
-        T.data   = ld;                                                          // Swap key of parent
-        T.index  = index;                                                       // Swap key of parent
-        T.setElementAt();                                                       // Swap key of parent
+        tl.key = tr.key; tl.data = tr.data; tl.push();                          // Increase left
+        T.key  = tr.key; T .data = ld; T.index = index; T.setElementAt();       // Swap key of parent
         tr.shift();                                                             // Reduce right
        }
       else                                                                      // Children are branches
@@ -771,17 +696,13 @@ abstract class BtreeSP extends Test                                             
         z();
 
         tl.lastElement();                                                       // Last element of left child
-        tl.key   = lk;                                                          // Left top becomes real
-        tl.index = nl;                                                          // Left top becomes real
-        tl.setElementAt();                                                      // Left top becomes real
+        tl.key = lk;    tl.index = nl; tl.setElementAt();                       // Left top becomes real
+
         tr.firstElement();                                                      // First element of  right child
-        tl.key   = 0;                                                           // New top for left is ignored by search ,.. except last
-        tl.data  = tr.data;                                                     // New top for left is ignored by search ,.. except last
-        tl.push();                                                              // New top for left is ignored by search ,.. except last
-        T.key    = tr.key;                                                      // Swap key of parent
-        T.data   = ld;                                                          // Swap key of parent
-        T.index  = index;                                                       // Swap key of parent
-        T.setElementAt();                                                       // Swap key of parent
+
+        tl.key = 0;     tl.data = tr.data; tl.push();                           // New top for left is ignored by search ,.. except last
+        T.key = tr.key; T .data = ld; T.index = index; T.setElementAt();        // Swap key of parent
+
         tr.shift();                                                             // Reduce right
        }
       return true;
@@ -807,22 +728,14 @@ abstract class BtreeSP extends Test                                             
          {z(); T.clear();
           final StuckSP.Transaction tl = l.Leaf.new Transaction();
           final StuckSP.Transaction tr = r.Leaf.new Transaction();
-          for (int i = 0; i < nl; ++i)
-           {z();
-            tl.shift();
-            T.key  = tl.key;
-            T.data = tl.data;
-            T.push();
+          for (int i = 0; i < nl; ++i)                                          // Merge in left child leaf
+           {z(); tl.shift(); T.key = tl.key; T.data = tl.data; T.push();
            }
-          for (int i = 0; i < nr; ++i)
-           {z();
-            tr.shift();
-            T.key  = tr.key;
-            T.data = tr.data;
-            T.push();
+          for (int i = 0; i < nr; ++i)                                          // Merge in right child leaf
+           {z(); tr.shift(); T.key  = tr.key; T.data = tr.data; T.push();
            }
-          setLeaf();
-          l.free();
+          setLeaf();                                                            // The root is now a leaf
+          l.free();                                                             // Free the children
           r.free();
           z(); return true;
          }
@@ -839,29 +752,21 @@ abstract class BtreeSP extends Test                                             
           T.firstElement();
           final int pkn = T.key;
           T.clear();
-          for (int i = 0; i < nl; ++i)
-           {z();
-            tl.shift();
-            T.key  = tl.key;
-            T.data = tl.data;
-            T.push();
+          for (int i = 0; i < nl; ++i)                                          // Merge left child branch
+           {z(); tl.shift(); T.key  = tl.key; T.data = tl.data; T.push();
            }
+
           tl.lastElement();
-          T.key  = pkn;
-          T.data = tl.data;
-          T.push();
-          for (int i = 0; i < nr; ++i)
-           {z();
-            tr.shift();
-            T.key  = tr.key;
-            T.data = tr.data;
-            T.push();
+          T.key = pkn; T.data = tl.data; T.push();
+
+          for (int i = 0; i < nr; ++i)                                          // Merge right child branch
+           {z(); tr.shift(); T.key  = tr.key; T.data = tr.data; T.push();
            }
+
           tr.lastElement();                                                     // Top next
-          T.key  = 0;
-          T.data = tr.data;
-          T.push();                                                             // Top so ignored by search ... except last
-          l.free();
+
+          T.key = 0; T.data = tr.data; T.push();                                // Top so ignored by search ... except last
+          l.free();                                                             // Free the children
           r.free();
           z(); return true;
          }
@@ -896,10 +801,7 @@ abstract class BtreeSP extends Test                                             
         if (nl + nr >= maxKeysPerLeaf()) return false;                          // Combined body would be too big
         z();
         for (int i = 0; i < nl; i++)                                            // Transfer left to right
-         {z(); tl.pop();
-          tr.key  = tl.key;
-          tr.data = tl.data;
-          tr.unshift();
+         {z(); tl.pop(); tr.key  = tl.key; tr.data = tl.data; tr.unshift();
          }
         l.free();                                                               // Free the empty left node
        }
@@ -917,17 +819,11 @@ abstract class BtreeSP extends Test                                             
         T.index = index-1;                                                      // Top key
         T.elementAt();                                                          // Top key
         tl.lastElement();                                                       // Last element of left child
-        tr.key  = T.key;
-        tr.data = tl.data;
-        tr.unshift();                                                           // Left top to right
+        tr.key = T.key; tr.data = tl.data; tr.unshift();                        // Left top to right
 
         tl.pop();                                                               // Remove left top
         for (int i = 0; i < nl; i++)                                            // Transfer left to right
-         {z();
-          tl.pop();
-          tr.key  = tl.key;
-          tr.data = tl.data;
-          tr.unshift();
+         {z(); tl.pop(); tr.key = tl.key; tr.data = tl.data; tr.unshift();
          }
         l.free();                                                               // Free the empty left node
        }
@@ -963,11 +859,7 @@ abstract class BtreeSP extends Test                                             
         if (nl + nr > maxKeysPerLeaf()) return false;                           // Combined body would be too big
         z();
         for (int i = 0; i < nr; i++)                                            // Transfer right to left
-         {z();
-          tr.shift();
-          tl.key  = tr.key;
-          tl.data = tr.data;
-          tl.push();
+         {z(); tr.shift(); tl.key  = tr.key; tl.data = tr.data; tl.push();
          }
         r.free();                                                               // Free the empty right node
        }
@@ -990,11 +882,7 @@ abstract class BtreeSP extends Test                                             
         tl.setElementAt();                                                      // Re-key left top
 
         for (int i = 0; i < nr+1; i++)                                          // Transfer right to left
-         {z();
-          tr.shift();
-          tl.key  = tr.key;
-          tl.data = tr.data;
-          tl.push();
+         {z(); tr.shift(); tl.key  = tr.key; tl.data = tr.data; tl.push();
          }
         r.free();                                                               // Free the empty right node
        }
@@ -1099,12 +987,10 @@ abstract class BtreeSP extends Test                                             
     final Stack<StringBuilder> S = new Stack<>();
 
     if (root.isLeaf())
-     {z();
-      root.printLeaf(S, 0);
+     {z(); root.printLeaf(S, 0);
      }
     else
-     {z();
-      root.printBranch(S, 0);
+     {z(); root.printBranch(S, 0);
      }
     return printCollapsed(S);
    }
@@ -1177,9 +1063,7 @@ abstract class BtreeSP extends Test                                             
       final StuckSP.Transaction T = leaf().Leaf.new Transaction();
 
       if (found())                                                              // Found the key in the leaf so update it with the new data
-       {z();
-        T.key = Key; T.data = Data; T.index = index();
-        T.setElementAt();
+       {z(); T.key = Key; T.data = Data; T.index = index(); T.setElementAt();
         success = true; inserted = false;
         return this;
        }
@@ -1190,13 +1074,10 @@ abstract class BtreeSP extends Test                                             
           leaf().findFirstGreaterThanOrEqualInLeaf1(Key);
         if (f.found)                                                            // Overwrite existing key
          {z();
-          T.key = Key; T.data = Data; T.index = f.first;
-          T.insertElementAt();
+          T.key = Key; T.data = Data; T.index = f.first; T.insertElementAt();
          }
         else                                                                    // Insert into position
-         {z();
-          T.key = Key; T.data = Data;
-          T.push();
+         {z(); T.key = Key; T.data = Data; T.push();
          }
         success = true;
         return this;
