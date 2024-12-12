@@ -595,7 +595,7 @@ abstract class BtreeSP extends Test                                             
       tp.key = tr.key; tp.data = l.node; tp.index = index; tp.insertElementAt();
      }
 
-    boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right. He steals from the left, to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
+    boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right. He steals from the left, to give to the right - Dennis Moore, Mr Moore, Mr Moore.
      {z(); assertBranch();
       z(); if (index == 0) return false;
       z(); if (index < 0)            stop("Index", index, "too small");
@@ -620,7 +620,7 @@ abstract class BtreeSP extends Test                                             
         tl.lastElement(); tr.key = tl.key; tr.data = tl.data; tr.unshift();     // Increase right
 
         tl.pop();                                                               // Reduce left
-        tl.index = nl-2; tl.elementAt();                                        // Last key on left
+        tl.index = tl.size-1; tl.elementAt();                                   // Last key on left
 
         T.key = tl.key; T.data = L; T.index = index-1; T.setElementAt();        // Swap key of parent
        }
