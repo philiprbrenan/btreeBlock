@@ -622,9 +622,7 @@ abstract class BtreeSP extends Test                                             
         tl.lastElement(); tr.key = tl.key; tr.data = tl.data; tr.unshift();     // Increase right
 
         tl.pop();                                                               // Reduce left
-//tl.size();
-say("AAAA", nl, tl.size);
-        tl.index = tl.size-1; tl.elementAt();                                        // Last key on left
+        tl.index = nl-2; tl.elementAt();                                        // Last key on left
 
         T.key = tl.key; T.data = L; T.index = index-1; T.setElementAt();        // Swap key of parent
        }
@@ -2014,8 +2012,7 @@ say("AAAA", nl, tl.size);
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    //test_to_array();                                                            //  2.52
-    test_delete_descending();                                                   //  7.66
+    test_to_array();                                                            //  2.52
    }
 
   public static void main(String[] args)                                        // Test if called as a program
