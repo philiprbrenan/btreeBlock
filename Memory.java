@@ -63,12 +63,12 @@ class Memory extends Test                                                       
 
   void set(int start, boolean value)                                            // Set a bit from a boolean
    {z();
-    check(start, 1);
+    //check(start, 1);
     bits[start] = value;
    }
 
   void set(int start, int width, int value)                                     // Set some memory from an integer
-   {check(start, width);
+   {//check(start, width);
     z();
     final int w = min(Integer.SIZE-1, width);
     for(int i = 0; i < w; ++i)
@@ -81,12 +81,12 @@ class Memory extends Test                                                       
 //D3 Get                                                                        // Get a bit
 
   boolean getBit(int start)                                                     // Get a boolean from memory
-   {check(start, 1);
+   {//check(start, 1);
     z(); return bits[start];
    }
 
   int getInt(int start, int width)                                              // Get an int from memory
-   {check(start, width);
+   {//check(start, width);
     z();
     if (start < 0 || start + width  > size()) stop("Out of range");
     z();
