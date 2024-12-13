@@ -250,7 +250,7 @@ public class Test                                                               
     else say("All lines executed");                                             // All lines were executed
 
     if (top > 0)                                                                // Most frequently executed
-     {final Stack<LineCount> lc = new Stack<>();                                // Lines executed most frequqntly
+     {final Stack<LineCount> lc = new Stack<>();                                // Lines executed most frequently
       coverage.entrySet().stream()                                              // Find most frequently executed lines
        .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))              // Sort by value in descending order
        .limit(top)                                                              // Take the most frequent elements
@@ -258,13 +258,13 @@ public class Test                                                               
 
       int w = 1; for (LineCount l: lc) w = max(w, l.line.length());             // Maximum width of line executed specification
       final String f = "%-" + w + "s";
-      say(String.format(f+"  %6s  %8s", "Most Executed", "Count", "#"));
+      say(String.format(f+"  %12s  %4s", "Most Executed", "Count", "#"));
 
       final int N = min(w, lc.size());
       for (int i = 1; i <= N; i++)                                              // Print lines executed most frequently
        {final LineCount l = lc.elementAt(i-1);
         final String    c = NumberFormat.getInstance().format(l.count);
-        say(String.format(f+"  %6d  %8s", l.line, c, i));
+        say(String.format(f+"  %12s  %4d", l.line, c, i));
        }
      }
    }
