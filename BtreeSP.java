@@ -681,8 +681,8 @@ abstract class BtreeSP extends Test                                             
        {z();
         tl.s = l.Leaf;
         tr.s = r.Leaf;
-        final int  nl = l.leafSize();
-        final int  nr = r.leafSize();
+        final int nl = l.leafSize();
+        final int nr = r.leafSize();
 
         z(); if (nl >= maxKeysPerLeaf()) return false;                          // Steal not possible because there is no where to put the steal
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
@@ -694,8 +694,8 @@ abstract class BtreeSP extends Test                                             
        {z();
         tl.s = l.Branch;
         tr.s = r.Branch;
-        final int  nl = l.branchSize();
-        final int  nr = r.branchSize();
+        final int nl = l.branchSize();
+        final int nr = r.branchSize();
 
         z(); if (nl >= maxKeysPerBranch()) return false;                        // Steal not possible because there is no where to put the steal
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
@@ -794,30 +794,25 @@ abstract class BtreeSP extends Test                                             
       T.index = index-1; T.elementAt(); final int L = T.data;
       T.index = index-0; T.elementAt(); final int R = T.data;
 
+      final Node l = node(leftNode, L), r = node(rightNode, R);
+      final StuckSP.Transaction tl = stuckLeft, tr = stuckRight;
+
+      int nl, nr;
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final Node l = node( leftNode, L);
-        final Node r = node(rightNode, R);
-        final StuckSP.Transaction tl = stuckLeft;   tl.s = l.Leaf;
-        final StuckSP.Transaction tr = stuckRight;  tr.s = r.Leaf;
-        final  int nl = l.leafSize();
-        final  int nr = r.leafSize();
+        tl.s = l.Leaf;
+        tr.s = r.Leaf;
+        nl   = l.leafSize();
+        nr   = r.leafSize();
 
         if (nl + nr >= maxKeysPerLeaf()) return false;                          // Combined body would be too big
-        z();
-        for (int i = 0; i < nl; i++)                                            // Transfer left to right
-         {z(); tl.pop(); tr.key  = tl.key; tr.data = tl.data; tr.unshift();
-         }
-        l.free();                                                               // Free the empty left node
        }
       else                                                                      // Children are branches
        {z();
-        final Node l = node( leftNode, L);
-        final Node r = node(rightNode, R);
-        final StuckSP.Transaction tl = stuckLeft;  tl.s = l.Branch;
-        final StuckSP.Transaction tr = stuckRight; tr.s = r.Branch;
-        final int nl = l.branchSize();
-        final int nr = r.branchSize();
+        tl.s = l.Branch;
+        tr.s = r.Branch;
+        nl   = l.branchSize();
+        nr   = r.branchSize();
 
         if (nl + 1 + nr > maxKeysPerBranch()) return false;                     // Merge not possible because there is not enough room for the combined result
         z();
@@ -827,11 +822,12 @@ abstract class BtreeSP extends Test                                             
         tr.key = T.key; tr.data = tl.data; tr.unshift();                        // Left top to right
 
         tl.pop();                                                               // Remove left top
-        for (int i = 0; i < nl; i++)                                            // Transfer left to right
-         {z(); tl.pop(); tr.key = tl.key; tr.data = tl.data; tr.unshift();
-         }
-        l.free();                                                               // Free the empty left node
        }
+      z();
+      for (int i = 0; i < nl; i++)                                              // Transfer left to right
+       {z(); tl.pop(); tr.key = tl.key; tr.data = tl.data; tr.unshift();
+       }
+      l.free();                                                                 // Free the empty left node
       T.index = index - 1;
       T.removeElementAt();                                                      // Reduce parent on left
       return true;
@@ -852,30 +848,25 @@ abstract class BtreeSP extends Test                                             
       T.index = index+0; T.elementAt(); final int L = T.data;
       T.index = index+1; T.elementAt(); final int R = T.data;
 
+      final Node l = node(leftNode, L), r = node(rightNode, R);
+      final StuckSP.Transaction tl = stuckLeft, tr = stuckRight;
+
+      int nl, nr;
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final Node  l = node( leftNode, L);
-        final Node  r = node(rightNode, R);
-        final StuckSP.Transaction tl = stuckLeft;   tl.s = l.Leaf;
-        final StuckSP.Transaction tr = stuckRight;  tr.s = r.Leaf;
-        final int  nl = l.leafSize();
-        final int  nr = r.leafSize();
+        tl.s = l.Leaf;
+        tr.s = r.Leaf;
+        nl   = l.leafSize();
+        nr   = r.leafSize();
 
         if (nl + nr > maxKeysPerLeaf()) return false;                           // Combined body would be too big
-        z();
-        for (int i = 0; i < nr; i++)                                            // Transfer right to left
-         {z(); tr.shift(); tl.key  = tr.key; tl.data = tr.data; tl.push();
-         }
-        r.free();                                                               // Free the empty right node
        }
       else                                                                      // Children are branches
        {z();
-        final Node  l = node( leftNode, L);
-        final Node  r = node(rightNode, R);
-        final StuckSP.Transaction tl = stuckLeft;   tl.s = l.Branch;
-        final StuckSP.Transaction tr = stuckRight;  tr.s = r.Branch;
-        final int  nl = l.branchSize();
-        final int  nr = r.branchSize();
+        tl.s = l.Branch;
+        tr.s = r.Branch;
+        nl   = l.branchSize();
+        nr   = r.branchSize();
 
         if (nl + 1 + nr > maxKeysPerBranch()) return false;                     // Merge not possible because there is no where to put the steal
 
@@ -886,11 +877,13 @@ abstract class BtreeSP extends Test                                             
         tl.key = T.key; tl.index = nl;                                          // Re-key left top
         tl.setElementAt();                                                      // Re-key left top
 
-        for (int i = 0; i < nr+1; i++)                                          // Transfer right to left
-         {z(); tr.shift(); tl.key  = tr.key; tl.data = tr.data; tl.push();
-         }
-        r.free();                                                               // Free the empty right node
+        ++nr;                                                                   // Include top
        }
+      z();
+      for (int i = 0; i < nr; i++)                                              // Transfer right to left
+       {z(); tr.shift(); tl.key  = tr.key; tl.data = tr.data; tl.push();
+       }
+      r.free();                                                                 // Free the empty right node
 
       T.index = index+1; T.elementAt(); final int pkn = T.key;                  // One up from dividing point in parent
       T.index = index;   T.elementAt(); final int dkn = T.data;                 // Dividing point in parent
