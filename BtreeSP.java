@@ -618,12 +618,13 @@ abstract class BtreeSP extends Test                                             
       T.index = index - 1; T.elementAt(); final int L = T.data;
       T.index = index - 0; T.elementAt(); final int R = T.data;
 
+      final Node l = node(leftNode, L), r = node(rightNode, R);
+      final StuckSP.Transaction tl = stuckLeft, tr = stuckRight;
+
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final Node  l = node( leftNode, L);
-        final Node  r = node(rightNode, R);
-        final StuckSP.Transaction tl = stuckLeft;  tl.s = l.Leaf;
-        final StuckSP.Transaction tr = stuckRight; tr.s = r.Leaf;
+        tl.s = l.Leaf;
+        tr.s = r.Leaf;
         final int  nl = l.leafSize();
         final int  nr = r.leafSize();
 
@@ -635,17 +636,13 @@ abstract class BtreeSP extends Test                                             
 
         tl.pop();                                                               // Reduce left
         tl.index = nl-2; tl.elementAt();                                        // Last key on left
-
-        T.key = tl.key; T.data = L; T.index = index-1; T.setElementAt();        // Swap key of parent
        }
       else                                                                      // Children are branches
        {z();
-        final Node l  = node( leftNode, L);
-        final Node r  = node(rightNode, R);
-        final StuckSP.Transaction tl = stuckLeft;  tl.s = l.Branch;
-        final StuckSP.Transaction tr = stuckRight; tr.s = r.Branch;
-        final int  nl = l.branchSize();
-        final int  nr = r.branchSize();
+        tl.s = l.Branch;
+        tr.s = r.Branch;
+        final int nl = l.branchSize();
+        final int nr = r.branchSize();
 
         z(); if (nr >= maxKeysPerBranch()) return false;                        // Steal not possible because there is no where to put the steal
         z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the left sibling empty
@@ -661,8 +658,8 @@ abstract class BtreeSP extends Test                                             
         T.index = index-1; T.elementAt();                                       // Parent key
         tr.key  = T.key; tr.index = 0; tr.setElementAt();                       // Reduce key of parent of right
         tl.lastElement();                                                       // Last left key
-        T.key = tl.key; T.data = L; T.index = index-1; T.setElementAt();        // Reduce key of parent of left
        }
+      T.key = tl.key; T.data = L; T.index = index-1; T.setElementAt();          // Reduce key of parent of left
       return true;
      }
 
@@ -677,12 +674,13 @@ abstract class BtreeSP extends Test                                             
       T.index = index+0; T.elementAt(); final int lk = T.key, ld = T.data;
       T.index = index+1; T.elementAt(); final int rk = T.key, rd = T.data;
 
+      final Node l = node( leftNode, ld), r = node(rightNode, rd);
+      final StuckSP.Transaction tl = stuckLeft, tr = stuckRight;
+
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        final Node  l = node( leftNode, ld);
-        final Node  r = node(rightNode, rd);
-        final StuckSP.Transaction tl = stuckLeft;    tl.s = l.Leaf;
-        final StuckSP.Transaction tr = stuckRight;   tr.s = r.Leaf;
+        tl.s = l.Leaf;
+        tr.s = r.Leaf;
         final int  nl = l.leafSize();
         final int  nr = r.leafSize();
 
@@ -691,15 +689,11 @@ abstract class BtreeSP extends Test                                             
         z();
         tr.firstElement();                                                      // First element of right child
         tl.key = tr.key; tl.data = tr.data; tl.push();                          // Increase left
-        T.key  = tr.key; T .data = ld; T.index = index; T.setElementAt();       // Swap key of parent
-        tr.shift();                                                             // Reduce right
        }
       else                                                                      // Children are branches
        {z();
-        final Node  l = node( leftNode, ld);
-        final Node  r = node(rightNode, rd);
-        final StuckSP.Transaction tl = stuckLeft;    tl.s = l.Branch;
-        final StuckSP.Transaction tr = stuckRight;   tr.s = r.Branch;
+        tl.s = l.Branch;
+        tr.s = r.Branch;
         final int  nl = l.branchSize();
         final int  nr = r.branchSize();
 
@@ -713,10 +707,9 @@ abstract class BtreeSP extends Test                                             
         tr.firstElement();                                                      // First element of  right child
 
         tl.key = 0;     tl.data = tr.data; tl.push();                           // New top for left is ignored by search ,.. except last
-        T.key = tr.key; T .data = ld; T.index = index; T.setElementAt();        // Swap key of parent
-
-        tr.shift();                                                             // Reduce right
        }
+      T.key  = tr.key; T.data = ld; T.index = index; T.setElementAt();        // Swap key of parent
+      tr.shift();                                                             // Reduce right
       return true;
      }
 
