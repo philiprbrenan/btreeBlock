@@ -52,17 +52,17 @@ abstract class BtreeSP extends Test                                             
   final Node    putNode = new Node();                                           // Put node
   final Node deleteNode = new Node();                                           // Delete node
 
-  final StuckSP.Transaction stuckion         = new StuckSP.Transaction();       // A transaction for processing a Stuck
-  final StuckSP.Transaction stuckSize        = new StuckSP.Transaction();       // A transaction for getting the size of a stuck
-  final StuckSP.Transaction stuckLeaf        = new StuckSP.Transaction();       // A transaction for checking whether a node has leaves for childrn
-  final StuckSP.Transaction stuckTop         = new StuckSP.Transaction();       // A transaction for getting the size of a stuck
-  final StuckSP.Transaction stuckEqual       = new StuckSP.Transaction();       // A transaction for locating an equal key
-  final StuckSP.Transaction stuckFirstLeaf   = new StuckSP.Transaction();       // A transaction for locating the first greater or equal key in a leaf
-  final StuckSP.Transaction stuckFirstBranch = new StuckSP.Transaction();       // A transaction for locating the first greater or equal key in a branch
-  final StuckSP.Transaction stuckLeafArray   = new StuckSP.Transaction();       // A transaction for unpacking a leaf into an array
-  final StuckSP.Transaction stuckParent      = new StuckSP.Transaction();       // A transaction for processing a parent node
-  final StuckSP.Transaction stuckLeft        = new StuckSP.Transaction();       // A transaction for processing a left node
-  final StuckSP.Transaction stuckRight       = new StuckSP.Transaction();       // A transaction for processing a right node
+  final StuckSP.Transaction stuckion         = new StuckSP.Transaction();       // Process a Stuck
+  final StuckSP.Transaction stuckSize        = new StuckSP.Transaction();       // Get the size of a stuck
+  final StuckSP.Transaction stuckLeaf        = new StuckSP.Transaction();       // Check whether a node has leaves for childrn
+  final StuckSP.Transaction stuckTop         = new StuckSP.Transaction();       // Get the size of a stuck
+  final StuckSP.Transaction stuckEqual       = new StuckSP.Transaction();       // Locate an equal key
+  final StuckSP.Transaction stuckFirstLeaf   = new StuckSP.Transaction();       // Locate the first greater or equal key in a leaf
+  final StuckSP.Transaction stuckFirstBranch = new StuckSP.Transaction();       // Locate the first greater or equal key in a branch
+  final StuckSP.Transaction stuckLeafArray   = new StuckSP.Transaction();       // Unpack a leaf into an array
+  final StuckSP.Transaction stuckParent      = new StuckSP.Transaction();       // Process a parent node
+  final StuckSP.Transaction stuckLeft        = new StuckSP.Transaction();       // Process a left node
+  final StuckSP.Transaction stuckRight       = new StuckSP.Transaction();       // Process a right node
 
   boolean debug = false;                                                        // Debugging enabled
 
@@ -262,9 +262,7 @@ abstract class BtreeSP extends Test                                             
          }
        }
       else                                                                      // Print a branch
-       {s.append("Branch(node:"+node+
-                       " size:"+branchSize()+
-                        " top:"+top()+"\n");
+       {s.append("Branch(node:"+node+" size:"+branchSize()+" top:"+top()+"\n");
 
         final int N = branchSize()+1;                                           // Number of elements in branch including top
         final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Branch;
@@ -623,10 +621,8 @@ abstract class BtreeSP extends Test                                             
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        tl.s = l.Leaf;
-        tr.s = r.Leaf;
-        final int  nl = l.leafSize();
-        final int  nr = r.leafSize();
+        tl.s = l.Leaf; final int nl = l.leafSize();
+        tr.s = r.Leaf; final int nr = r.leafSize();
 
         z(); if (nr >= maxKeysPerLeaf()) return false;                          // Steal not possible because there is no where to put the steal
         z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the leaf sibling empty
@@ -639,10 +635,8 @@ abstract class BtreeSP extends Test                                             
        }
       else                                                                      // Children are branches
        {z();
-        tl.s = l.Branch;
-        tr.s = r.Branch;
-        final int nl = l.branchSize();
-        final int nr = r.branchSize();
+        tl.s = l.Branch; final int nl = l.branchSize();
+        tr.s = r.Branch; final int nr = r.branchSize();
 
         z(); if (nr >= maxKeysPerBranch()) return false;                        // Steal not possible because there is no where to put the steal
         z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the left sibling empty
@@ -679,10 +673,8 @@ abstract class BtreeSP extends Test                                             
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        tl.s = l.Leaf;
-        tr.s = r.Leaf;
-        final int nl = l.leafSize();
-        final int nr = r.leafSize();
+        tl.s = l.Leaf; final int nl = l.leafSize();
+        tr.s = r.Leaf; final int nr = r.leafSize();
 
         z(); if (nl >= maxKeysPerLeaf()) return false;                          // Steal not possible because there is no where to put the steal
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
@@ -692,10 +684,8 @@ abstract class BtreeSP extends Test                                             
        }
       else                                                                      // Children are branches
        {z();
-        tl.s = l.Branch;
-        tr.s = r.Branch;
-        final int nl = l.branchSize();
-        final int nr = r.branchSize();
+        tl.s = l.Branch; final int nl = l.branchSize();
+        tr.s = r.Branch; final int nr = r.branchSize();
 
         z(); if (nl >= maxKeysPerBranch()) return false;                        // Steal not possible because there is no where to put the steal
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
@@ -800,19 +790,15 @@ abstract class BtreeSP extends Test                                             
       int nl, nr;
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        tl.s = l.Leaf;
-        tr.s = r.Leaf;
-        nl   = l.leafSize();
-        nr   = r.leafSize();
+        tl.s = l.Leaf; nl = l.leafSize();
+        tr.s = r.Leaf; nr = r.leafSize();
 
         if (nl + nr >= maxKeysPerLeaf()) return false;                          // Combined body would be too big
        }
       else                                                                      // Children are branches
        {z();
-        tl.s = l.Branch;
-        tr.s = r.Branch;
-        nl   = l.branchSize();
-        nr   = r.branchSize();
+        tl.s = l.Branch; nl = l.branchSize();
+        tr.s = r.Branch; nr = r.branchSize();
 
         if (nl + 1 + nr > maxKeysPerBranch()) return false;                     // Merge not possible because there is not enough room for the combined result
         z();
@@ -854,19 +840,15 @@ abstract class BtreeSP extends Test                                             
       int nl, nr;
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        tl.s = l.Leaf;
-        tr.s = r.Leaf;
-        nl   = l.leafSize();
-        nr   = r.leafSize();
+        tl.s = l.Leaf; nl = l.leafSize();
+        tr.s = r.Leaf; nr = r.leafSize();
 
         if (nl + nr > maxKeysPerLeaf()) return false;                           // Combined body would be too big
        }
       else                                                                      // Children are branches
        {z();
-        tl.s = l.Branch;
-        tr.s = r.Branch;
-        nl   = l.branchSize();
-        nr   = r.branchSize();
+        tl.s = l.Branch; nl = l.branchSize();
+        tr.s = r.Branch; nr = r.branchSize();
 
         if (nl + 1 + nr > maxKeysPerBranch()) return false;                     // Merge not possible because there is no where to put the steal
 
