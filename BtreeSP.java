@@ -166,6 +166,16 @@ abstract class BtreeSP extends Test                                             
     StuckSP Leaf, Branch;                                                       // Stucks used in this node with their base addresses set correctly to allow addressing of the fields in the stuck
     Node P, l, r;
     StuckSP.Transaction T, tl, tr;
+    int splitLeafSize;                                                          // Where to split a full leaf
+    int splitBranchSize;                                                        // Branch split size
+    int firstKey;                                                               // First of right leaf
+    int lastKey;                                                                // Last of left leaf
+    int flKey;                                                                  // Key mid way between last of left and first of right
+    int parentKey;                                                              // Parent key
+    int L, R;                                                                   // Refence to left, right child
+    int nl, nr;                                                                 // Number in the left child, number in the right child
+    int lk, ld;                                                                 // Left  child reference: key and data
+    int rk, rd;                                                                 // Right child reference: key and data
 
     boolean isLeaf() {z(); return getInt(isLeaf,    node) > 0;}                 // A leaf if true
     void   setLeaf() {z();        setInt(isLeaf, 1, node);}                     // Set as leaf
@@ -494,31 +504,31 @@ abstract class BtreeSP extends Test                                             
       z(); if (node != 0) stop("Wanted root, but got node:", node);
       z(); if (!isFull()) stop("Root is not full, but has size:", leafSize());
 
-      final Node l = allocLeaf(leftNode);                                       // New left leaf
-      final Node r = allocLeaf(rightNode);                                      // New right leaf
-      final Node p = this;                                                      // Root is the parent
-      final StuckSP.Transaction tp = stuckParent;  tp.s = p.Leaf;
-      final StuckSP.Transaction tl = stuckLeft;    tl.s = l.Leaf;
-      final StuckSP.Transaction tr = stuckRight;   tr.s = r.Leaf;
+      l  = allocLeaf(leftNode);                                                 // New left leaf
+      r  = allocLeaf(rightNode);                                                // New right leaf
+      P  = this;                                                                // Root is the parent
+      T  = stuckParent;   T.s = P.Leaf;
+      tl = stuckLeft;    tl.s = l.Leaf;
+      tr = stuckRight;   tr.s = r.Leaf;
 
-      final int sl = splitLeafSize();
-      for (int i = 0; i < sl; i++)                                              // Build left leaf from parent
-       {z(); tp.shift(); tl.key = tp.key; tl.data = tp.data; tl.push();
+      splitLeafSize = splitLeafSize();
+      for (int i = 0; i < splitLeafSize; i++)                                   // Build left leaf from parent
+       {z(); T.shift(); tl.key = T.key; tl.data = T.data; tl.push();
        }
-      for (int i = 0; i < sl; i++)                                              // Build right leaf from parent
-       {z(); tp.shift(); tr.key = tp.key; tr.data = tp.data; tr.push();
+      for (int i = 0; i < splitLeafSize; i++)                                   // Build right leaf from parent
+       {z(); T.shift(); tr.key = T.key; tr.data = T.data; tr.push();
        }
 
       tr.firstElement();
       tl. lastElement();
-      final int first = tr.key;                                                 // First of right leaf
-      final int last  = tl.key;                                                 // Last of left leaf
-      final int kv    = (last + first) / 2;                                     // Mid key
       setBranch();
-      final StuckSP.Transaction T = stuckParent; T.s = p.Branch;
+      T = stuckParent; T.s = P.Branch;
       T.clear();                                                                // Clear the branch
-      T.key = kv; T.data = l.node; T.push();                                    // Insert left leaf into root
-      T.key  = 0; T.data = r.node; T.push();                                    // Insert right into root. This will be the top node and so ignored by search ... except last.
+      firstKey = tr.key;                                                        // First of right leaf
+      lastKey  = tl.key;                                                        // Last of left leaf
+      flKey    = (lastKey + firstKey) / 2;                                      // Mid key
+      T.key    = flKey; T.data = l.node; T.push();                              // Insert left leaf into root
+      T.key    =     0; T.data = r.node; T.push();                              // Insert right into root. This will be the top node and so ignored by search ... except last.
      }
 
     void splitBranchRoot()                                                      // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
@@ -526,30 +536,30 @@ abstract class BtreeSP extends Test                                             
       z(); if (node != 0) stop("Not root, but node:", node);
       z(); if (!isFull()) stop("Root is not full, but has size:", branchSize());
       z();
-      final Node p = this;                                                      // Root is the parent
-      final Node l = allocBranch(leftNode);                                     // New left branch
-      final Node r = allocBranch(rightNode);                                    // New right branch
-      final StuckSP.Transaction tp = stuckParent;  tp.s = p.Branch;
-      final StuckSP.Transaction tl = stuckLeft;    tl.s = l.Branch;
-      final StuckSP.Transaction tr = stuckRight;   tr.s = r.Branch;
+      P  = this;                                                                // Root is the parent
+      l  = allocBranch(leftNode);                                               // New left branch
+      r  = allocBranch(rightNode);                                              // New right branch
+      T  = stuckParent;   T.s = P.Branch;
+      tl = stuckLeft;    tl.s = l.Branch;
+      tr = stuckRight;   tr.s = r.Branch;
 
-      final int sb = splitBranchSize();                                         // Branch split size
-      for (int i = 0; i < sb; i++)                                              // Build left child from parent
-       {z(); tp.shift(); tl.key = tp.key; tl.data = tp.data; tl.push();
+      splitBranchSize = splitBranchSize();                                      // Branch split size
+      for (int i = 0; i < splitBranchSize; i++)                                 // Build left child from parent
+       {z(); T.shift(); tl.key = T.key; tl.data = T.data; tl.push();
        }
-      tp.shift();                                                               // This key, next pair will be part of the root
-      final int pk = tp.key;
-      tl.key = 0; tl.data = tp.data; tl.push();                                 // Becomes top and so ignored by search ... except last
+      T.shift();                                                                // This key, next pair will be part of the root
+      parentKey = T.key;
+      tl.key = 0; tl.data = T.data; tl.push();                                  // Becomes top and so ignored by search ... except last
 
-      for(int i = 0; i < sb; i++)                                               // Build right child from parent
-       {z(); tp.shift(); tr.key = tp.key; tr.data = tp.data; tr.push();
+      for(int i = 0; i < splitBranchSize; i++)                                  // Build right child from parent
+       {z(); T.shift(); tr.key = T.key; tr.data = T.data; tr.push();
        }
 
-      tp.shift(); tr.key = 0; tr.data = tp.data;  tr.push();                    // Becomes top and so ignored by search ... except last
+      T.shift(); tr.key = 0; tr.data = T.data;  tr.push();                      // Becomes top and so ignored by search ... except last
 
-      tp.clear();                                                               // Refer to new branches from root
-      tp.key  = pk; tp.data = l.node; tp.push();
-      tp.key  =  0; tp.data = r.node; tp.push();                                // Becomes top and so ignored by search ... except last
+      T.clear();                                                                // Refer to new branches from root
+      T.key  = parentKey; T.data = l.node; T.push();
+      T.key  =         0; T.data = r.node; T.push();                            // Becomes top and so ignored by search ... except last
      }
 
     void splitLeaf(Node parent, int index)                                      // Split a leaf which is not the root
@@ -562,23 +572,23 @@ abstract class BtreeSP extends Test                                             
       z(); if (I < 0) stop("Index", I, "too small");
       z(); if (I > S) stop("Index", I, "too big for leaf with:", S);
       z();
-      final Node p = parent;                                                    // Parent
-      final Node l = allocLeaf(leftNode);                                       // New  split out leaf
-      final Node r = this;                                                      // Existing  leaf
-      final StuckSP.Transaction tp = stuckParent;  tp.s = p.Branch;
-      final StuckSP.Transaction tl = stuckLeft;    tl.s = l.Leaf;
-      final StuckSP.Transaction tr = stuckRight;   tr.s = r.Leaf;
+      P = parent;                                                               // Parent
+      l = allocLeaf(leftNode);                                                  // New  split out leaf
+      r = this;                                                                 // Existing  leaf
+      T  = stuckParent;   T.s = P.Branch;
+      tl = stuckLeft;    tl.s = l.Leaf;
+      tr = stuckRight;   tr.s = r.Leaf;
 
-      final int sl = splitLeafSize();
-      for (int i = 0; i < sl; i++)                                              // Build left leaf
+      splitLeafSize = splitLeafSize();
+      for (int i = 0; i < splitLeafSize; i++)                                   // Build left leaf
        {z(); tr.shift(); tl.key = tr.key; tl.data = tr.data; tl.push();
        }
       tr.firstElement();
       tl. lastElement();
-      tp.key   = (tr.key + tl.key) / 2;                                         // Splitting key
-      tp.data  = l.node;
-      tp.index = index;
-      tp.insertElementAt();                                                     // Insert new key, next pair in parent
+      T.key   = (tr.key + tl.key) / 2;                                          // Splitting key
+      T.data  = l.node;
+      T.index = index;
+      T.insertElementAt();                                                      // Insert new key, next pair in parent
      }
 
     void splitBranch(Node parent, int index)                                    // Split a branch which is not the root by splitting right to left
@@ -592,19 +602,19 @@ abstract class BtreeSP extends Test                                             
       z(); if (I > bs)  stop("Index", I, "too big for branch with:",
                               bs, "in node:", nd);
       z();
-      final Node p = parent;
-      final Node l = allocBranch(leftNode);
-      final Node r = this;
-      final StuckSP.Transaction tp = stuckParent;  tp.s = p.Branch;
-      final StuckSP.Transaction tl = stuckLeft;    tl.s = l.Branch;
-      final StuckSP.Transaction tr = stuckRight;   tr.s = r.Branch;
+      P = parent;
+      l = allocBranch(leftNode);
+      r = this;
+      T  = stuckParent;   T.s = P.Branch;
+      tl = stuckLeft;    tl.s = l.Branch;
+      tr = stuckRight;   tr.s = r.Branch;
 
-      final int sb = splitBranchSize();
-      for (int i = 0; i < sb; i++)                                              // Build left branch from right
+      splitBranchSize = splitBranchSize();
+      for (int i = 0; i < splitBranchSize; i++)                                 // Build left branch from right
        {z(); tr.shift(); tl.key  = tr.key; tl.data = tr.data; tl.push();
        }
       tr.shift(); tl.key = 0; tl.data = tr.data; tl.push();                     // Build right branch - becomes top and so is ignored by search ... except last
-      tp.key = tr.key; tp.data = l.node; tp.index = index; tp.insertElementAt();
+      T.key = tr.key; T.data = l.node; T.index = index; T.insertElementAt();
      }
 
     boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
@@ -613,18 +623,19 @@ abstract class BtreeSP extends Test                                             
       z(); if (index < 0)            stop("Index", index, "too small");
       z(); if (index > branchSize()) stop("Index", index, "too big");
       z();
-      final Node                P = this;
-      final StuckSP.Transaction T = stuckParent; T.s = P.Branch;
-      T.index = index - 1; T.elementAt(); final int L = T.data;
-      T.index = index - 0; T.elementAt(); final int R = T.data;
 
-      final Node l = node(leftNode, L), r = node(rightNode, R);
-      final StuckSP.Transaction tl = stuckLeft, tr = stuckRight;
+      P = this;
+      T = stuckParent; T.s = P.Branch;
+      T.index = index - 1; T.elementAt(); L = T.data;
+      T.index = index - 0; T.elementAt(); R = T.data;
+
+      l = node( leftNode, L); tl = stuckLeft;
+      r = node(rightNode, R); tr = stuckRight;
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        tl.s = l.Leaf; final int nl = l.leafSize();
-        tr.s = r.Leaf; final int nr = r.leafSize();
+        tl.s = l.Leaf; nl = l.leafSize();
+        tr.s = r.Leaf; nr = r.leafSize();
 
         z(); if (nr >= maxKeysPerLeaf()) return false;                          // Steal not possible because there is no where to put the steal
         z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the leaf sibling empty
@@ -637,8 +648,8 @@ abstract class BtreeSP extends Test                                             
        }
       else                                                                      // Children are branches
        {z();
-        tl.s = l.Branch; final int nl = l.branchSize();
-        tr.s = r.Branch; final int nr = r.branchSize();
+        tl.s = l.Branch; nl = l.branchSize();
+        tr.s = r.Branch; nr = r.branchSize();
 
         z(); if (nr >= maxKeysPerBranch()) return false;                        // Steal not possible because there is no where to put the steal
         z(); if (nl <= 1) return false;                                         // Steal not allowed because it would leave the left sibling empty
@@ -665,18 +676,18 @@ abstract class BtreeSP extends Test                                             
       z(); if (index < 0)             stop("Index", index, "too small");
       z(); if (index >= branchSize()) stop("Index", index, "too big");
       z();
-      final Node                P = this;
-      final StuckSP.Transaction T = stuckParent; T.s = P.Branch;
-      T.index = index+0; T.elementAt(); final int lk = T.key, ld = T.data;
-      T.index = index+1; T.elementAt(); final int rk = T.key, rd = T.data;
+      P = this;
+      T = stuckParent; T.s = P.Branch;
+      T.index = index+0; T.elementAt(); lk = T.key; ld = T.data;
+      T.index = index+1; T.elementAt(); rk = T.key; rd = T.data;
 
-      final Node l = node( leftNode, ld), r = node(rightNode, rd);
-      final StuckSP.Transaction tl = stuckLeft, tr = stuckRight;
+       l = node( leftNode, ld); tl = stuckLeft;
+       r = node(rightNode, rd); tr = stuckRight;
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        tl.s = l.Leaf; final int nl = l.leafSize();
-        tr.s = r.Leaf; final int nr = r.leafSize();
+        tl.s = l.Leaf; nl = l.leafSize();
+        tr.s = r.Leaf; nr = r.leafSize();
 
         z(); if (nl >= maxKeysPerLeaf()) return false;                          // Steal not possible because there is no where to put the steal
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
@@ -686,8 +697,8 @@ abstract class BtreeSP extends Test                                             
        }
       else                                                                      // Children are branches
        {z();
-        tl.s = l.Branch; final int nl = l.branchSize();
-        tr.s = r.Branch; final int nr = r.branchSize();
+        tl.s = l.Branch; nl = l.branchSize();
+        tr.s = r.Branch; nr = r.branchSize();
 
         z(); if (nl >= maxKeysPerBranch()) return false;                        // Steal not possible because there is no where to put the steal
         z(); if (nr <= 1) return false;                                         // Steal not allowed because it would leave the right sibling empty
@@ -698,10 +709,10 @@ abstract class BtreeSP extends Test                                             
 
         tr.firstElement();                                                      // First element of  right child
 
-        tl.key = 0;     tl.data = tr.data; tl.push();                           // New top for left is ignored by search ,.. except last
+        tl.key = 0;   tl.data = tr.data; tl.push();                             // New top for left is ignored by search ,.. except last
        }
-      T.key  = tr.key; T.data = ld; T.index = index; T.setElementAt();        // Swap key of parent
-      tr.shift();                                                             // Reduce right
+      T.key  = tr.key; T.data = ld; T.index = index; T.setElementAt();          // Swap key of parent
+      tr.shift();                                                               // Reduce right
       return true;
      }
 
@@ -712,19 +723,19 @@ abstract class BtreeSP extends Test                                             
       z(); if (root.isLeaf() || branchSize() > 1) return false;
       z(); if (node != 0) stop("Expected root, got:", node);
       z();
-      final Node                   P = this;
-      final StuckSP.Transaction    T = stuckParent; T.s = P.Branch;
-      T.firstElement(); final Node l = node( leftNode, T.data);
-      T. lastElement(); final Node r = node(rightNode, T.data);
+      P = this;
+      T = stuckParent; T.s = P.Branch;
+      T.firstElement(); l = node( leftNode, T.data);
+      T. lastElement(); r = node(rightNode, T.data);
 
       if (hasLeavesForChildren())                                               // Leaves
        {z();
-        final int nl = l.leafSize();
-        final int nr = r.leafSize();
+        nl = l.leafSize();
+        nr = r.leafSize();
         if (nl + nr <= maxKeysPerLeaf())
          {z(); T.clear();
-          final StuckSP.Transaction tl = stuckLeft;   tl.s = l.Leaf;
-          final StuckSP.Transaction tr = stuckRight;  tr.s = r.Leaf;
+          tl = stuckLeft;   tl.s = l.Leaf;
+          tr = stuckRight;  tr.s = r.Leaf;
           for (int i = 0; i < nl; ++i)                                          // Merge in left child leaf
            {z(); tl.shift(); T.key = tl.key; T.data = tl.data; T.push();
            }
@@ -739,22 +750,22 @@ abstract class BtreeSP extends Test                                             
         z(); return false;
        }
       else                                                                      // Branches
-       {final int nl = l.branchSize();
-        final int nr = r.branchSize();
+       {nl = l.branchSize();
+        nr = r.branchSize();
 
         if (nl + 1 + nr <= maxKeysPerBranch())
          {z();
-          final StuckSP.Transaction tl = stuckLeft;   tl.s = l.Branch;
-          final StuckSP.Transaction tr = stuckRight;  tr.s = r.Branch;
+          tl = stuckLeft;   tl.s = l.Branch;
+          tr = stuckRight;  tr.s = r.Branch;
           T.firstElement();
-          final int pkn = T.key;
+          parentKey = T.key;
           T.clear();
           for (int i = 0; i < nl; ++i)                                          // Merge left child branch
            {z(); tl.shift(); T.key  = tl.key; T.data = tl.data; T.push();
            }
 
           tl.lastElement();
-          T.key = pkn; T.data = tl.data; T.push();
+          T.key = parentKey; T.data = tl.data; T.push();
 
           for (int i = 0; i < nr; ++i)                                          // Merge right child branch
            {z(); tr.shift(); T.key  = tr.key; T.data = tr.data; T.push();
@@ -781,15 +792,14 @@ abstract class BtreeSP extends Test                                             
       //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
       z(); if (bs    < 2 ) return false;
       z();
-      final Node                P = this;
-      final StuckSP.Transaction T = stuckParent; T.s = P.Branch;
-      T.index = index-1; T.elementAt(); final int L = T.data;
-      T.index = index-0; T.elementAt(); final int R = T.data;
+      P = this;
+      T = stuckParent; T.s = P.Branch;
+      T.index = index-1; T.elementAt(); L = T.data;
+      T.index = index-0; T.elementAt(); R = T.data;
 
-      final Node l = node(leftNode, L), r = node(rightNode, R);
-      final StuckSP.Transaction tl = stuckLeft, tr = stuckRight;
+      l = node( leftNode, L); tl = stuckLeft;
+      r = node(rightNode, R); tr = stuckRight;
 
-      int nl, nr;
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
         tl.s = l.Leaf; nl = l.leafSize();
@@ -831,15 +841,14 @@ abstract class BtreeSP extends Test                                             
       //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
       z(); if (bs < 2) return false;
       z();
-      final Node                P = this;
-      final StuckSP.Transaction T = stuckParent; T.s = P.Branch;
-      T.index = index+0; T.elementAt(); final int L = T.data;
-      T.index = index+1; T.elementAt(); final int R = T.data;
+      P = this;
+      T = stuckParent; T.s = P.Branch;
+      T.index = index+0; T.elementAt(); L = T.data;
+      T.index = index+1; T.elementAt(); R = T.data;
 
-      final Node l = node(leftNode, L), r = node(rightNode, R);
-      final StuckSP.Transaction tl = stuckLeft, tr = stuckRight;
+      l = node( leftNode, L); tl = stuckLeft;
+      r = node(rightNode, R); tr = stuckRight;
 
-      int nl, nr;
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
         tl.s = l.Leaf; nl = l.leafSize();
@@ -869,9 +878,9 @@ abstract class BtreeSP extends Test                                             
        }
       r.free();                                                                 // Free the empty right node
 
-      T.index = index+1; T.elementAt(); final int pkn = T.key;                  // One up from dividing point in parent
-      T.index = index;   T.elementAt(); final int dkn = T.data;                 // Dividing point in parent
-      T.key   = pkn;
+      T.index = index+1; T.elementAt(); parentKey = T.key;                      // One up from dividing point in parent
+      T.index = index;   T.elementAt();                                         // Dividing point in parent
+      T.key   = parentKey;
       T.setElementAt();                                                         // Install key of right sibling in this child
       T.index = index+1;                                                        // Reduce parent on right
       T.removeElementAt();                                                      // Reduce parent on right
