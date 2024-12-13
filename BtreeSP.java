@@ -183,6 +183,8 @@ abstract class BtreeSP extends Test                                             
     int      data;                                                              // Data associated with the  key
     int      base;                                                              // Base of the leaf
 
+    int     first;                                                              // Index of first key greater than or equal to the search key
+
     boolean isLeaf() {z(); return getInt(isLeaf,    node) > 0;}                 // A leaf if true
     void   setLeaf() {z();        setInt(isLeaf, 1, node);}                     // Set as leaf
     void setBranch() {z();        setInt(isLeaf, 0, node);}                     // Set as branch
@@ -309,37 +311,26 @@ abstract class BtreeSP extends Test                                             
       return s.toString();
      }
 
-    class FindFirstGreaterThanOrEqualInLeaf                                     // Find the first key in the leaf that is equal to or greater than the search key
-     {Node     leaf;                                                            // The leaf being searched
-      int    search;                                                            // Search key
-      boolean found;                                                            // Whether the key was found
-      int     first;                                                            // Index of first such key if found
-      int      base;                                                            // Base of the leaf
-
-      FindFirstGreaterThanOrEqualInLeaf                                         // Find the first key in the  leaf that is equal to or greater than the search key
-      findFirstGreaterThanOrEqualInLeaf(int Search)                             // Find the first key in the  leaf that is equal to or greater than the search key
-       {z(); assertLeaf();
-        leaf     = Node.this;
-        search   = Search;
-        base     = leafBase();
-        final StuckSP.Transaction t = stuckFirstLeaf; t.s = Leaf;
-        t.search = Search; t.searchFirstGreaterThanOrEqual();
-        found    = t.found;
-        first    = t.index;
-        return this;
-       }
-
-      public String toString()                                                  // Print results of search
-       {final StringBuilder s = new StringBuilder();
-        s.append("FindFirstGreaterThanOrEqualInLeaf(Leaf:"+leaf.node);
-        s.append(" Key:"+search+" found:"+found);
-        if (found) s.append(" first:"+first);
-        s.append(")\n");
-        return s.toString();
-       }
+    void findFirstGreaterThanOrEqualInLeaf(int Search)                          // Find the first key in the  leaf that is equal to or greater than the search key
+     {z(); assertLeaf();
+      //leaf     = Node.this;
+      search   = Search;
+      base     = leafBase();
+      final StuckSP.Transaction t = stuckFirstLeaf; t.s = Leaf;
+      t.search = Search; t.searchFirstGreaterThanOrEqual();
+      found    = t.found;
+      first    = t.index;
+      //return this;
      }
-    final FindFirstGreaterThanOrEqualInLeaf FindFirstGreaterThanOrEqualInLeaf1 =                    new FindFirstGreaterThanOrEqualInLeaf();
-          FindFirstGreaterThanOrEqualInLeaf findFirstGreaterThanOrEqualInLeaf1(int Search) {z(); return FindFirstGreaterThanOrEqualInLeaf1.findFirstGreaterThanOrEqualInLeaf(Search);}
+
+    public String findFirstGreaterThanOrEqualInLeaf_toString()                                                  // Print results of search
+     {final StringBuilder s = new StringBuilder();
+      s.append("FindFirstGreaterThanOrEqualInLeaf(Leaf:"+node);
+      s.append(" Key:"+search+" found:"+found);
+      if (found) s.append(" first:"+first);
+      s.append(")\n");
+      return s.toString();
+     }
 
     class FindFirstGreaterThanOrEqualInBranch                                   // Find the first key in the branch that is equal to or greater than the search key
      {Node     branch;                                                          // The branch being searched
@@ -1049,8 +1040,8 @@ abstract class BtreeSP extends Test                                             
 
       if (!leaf().isFull())                                                     // Leaf is not full so we can insert immediately
        {z();
-        final Node.FindFirstGreaterThanOrEqualInLeaf f =
-          leaf().findFirstGreaterThanOrEqualInLeaf1(Key);
+        final Node f = leaf();
+        f.findFirstGreaterThanOrEqualInLeaf(Key);
         if (f.found)                                                            // Overwrite existing key
          {z();
           T.key = Key; T.data = Data; T.index = f.first; T.insertElementAt();
