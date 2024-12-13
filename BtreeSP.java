@@ -164,6 +164,8 @@ abstract class BtreeSP extends Test                                             
   class Node                                                                    // A branch or leaf in the tree
    {int node;                                                                   // The number of the node
     StuckSP Leaf, Branch;                                                       // Stucks used in this node with their base addresses set correctly to allow addressing of the fields in the stuck
+    Node P, l, r;
+    StuckSP.Transaction T, tl, tr;
 
     boolean isLeaf() {z(); return getInt(isLeaf,    node) > 0;}                 // A leaf if true
     void   setLeaf() {z();        setInt(isLeaf, 1, node);}                     // Set as leaf
