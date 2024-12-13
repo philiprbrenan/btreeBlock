@@ -164,7 +164,7 @@ abstract class BtreeSP extends Test                                             
   class Node                                                                    // A branch or leaf in the tree
    {int node;                                                                   // The number of the node
     StuckSP Leaf, Branch;                                                       // Stucks used in this node with their base addresses set correctly to allow addressing of the fields in the stuck
-    Node parent, P, l, r;
+    Node parent, anode, P, l, r;                                                // Parameters and relative positions in a tree
     StuckSP.Transaction T, tl, tr;
     int splitLeafSize;                                                          // Where to split a full leaf
     int splitBranchSize;                                                        // Branch split size
@@ -185,15 +185,8 @@ abstract class BtreeSP extends Test                                             
     void assertLeaf()   {if (!isLeaf()) stop("Leaf required");}
     void assertBranch() {if ( isLeaf()) stop("Branch required");}
 
-    Node allocLeaf(Node node)                                                   // Allocate leaf
-     {z(); allocate(node); node.setLeaf(); node.setStucks();
-      return node;
-     }
-
-    Node allocBranch(Node node)                                                 // Allocate branch
-     {z(); allocate(node); node.setBranch(); node.setStucks();
-      return node;
-     }
+    void allocLeaf()  {z(); allocate(anode); anode.setLeaf();   anode.setStucks();} // Allocate leaf
+    void allocBranch(){z(); allocate(anode); anode.setBranch(); anode.setStucks();} // Allocate branch
 
     void setStucks()                                                            // Descriptions of the stucks addressed by this node setting their base offsets
      {Leaf     = BtreeSP.this.Leaf  .at(leafBase());                            // Address the leaf stuck
@@ -505,8 +498,8 @@ abstract class BtreeSP extends Test                                             
       z(); if (node != 0) stop("Wanted root, but got node:", node);
       z(); if (!isFull()) stop("Root is not full, but has size:", leafSize());
 
-      l  = allocLeaf(leftNode);                                                 // New left leaf
-      r  = allocLeaf(rightNode);                                                // New right leaf
+      l = anode = leftNode;  allocLeaf();                                       // New left leaf
+      r = anode = rightNode; allocLeaf();                                       // New right leaf
       P  = this;                                                                // Root is the parent
       T  = stuckParent;   T.s = P.Leaf;
       tl = stuckLeft;    tl.s = l.Leaf;
@@ -538,8 +531,8 @@ abstract class BtreeSP extends Test                                             
       z(); if (!isFull()) stop("Root is not full, but has size:", branchSize());
       z();
       P  = this;                                                                // Root is the parent
-      l  = allocBranch(leftNode);                                               // New left branch
-      r  = allocBranch(rightNode);                                              // New right branch
+      l  = anode = leftNode;  allocBranch();                                    // New left branch
+      r  = anode = rightNode; allocBranch();                                    // New right branch
       T  = stuckParent;   T.s = P.Branch;
       tl = stuckLeft;    tl.s = l.Branch;
       tr = stuckRight;   tr.s = r.Branch;
@@ -574,7 +567,7 @@ abstract class BtreeSP extends Test                                             
       z(); if (I > S) stop("Index", I, "too big for leaf with:", S);
       z();
       P = parent;                                                               // Parent
-      l = allocLeaf(leftNode);                                                  // New  split out leaf
+      l = anode = leftNode; allocLeaf();                                        // New  split out leaf
       r = this;                                                                 // Existing  leaf
       T  = stuckParent;   T.s = P.Branch;
       tl = stuckLeft;    tl.s = l.Leaf;
@@ -604,7 +597,7 @@ abstract class BtreeSP extends Test                                             
                               bs, "in node:", nd);
       z();
       P = parent;
-      l = allocBranch(leftNode);
+      l = anode = leftNode; allocBranch();
       r = this;
       T  = stuckParent;   T.s = P.Branch;
       tl = stuckLeft;    tl.s = l.Branch;
