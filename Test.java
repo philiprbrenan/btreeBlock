@@ -8,6 +8,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.*;
+import java.text.*;
 
 //D1 Construct                                                                  // Develop and test a java program
 
@@ -257,12 +258,13 @@ public class Test                                                               
 
       int w = 1; for (LineCount l: lc) w = max(w, l.line.length());             // Maximum width of line executed specification
       final String f = "%-" + w + "s";
-      say(String.format(f+"  %6s  %4s", "Most Executed", "Count", "#"));
+      say(String.format(f+"  %6s  %8s", "Most Executed", "Count", "#"));
 
       final int N = min(w, lc.size());
-      for (int i = 1; i <= N; i++)                                            // Print lines executed most frequently
+      for (int i = 1; i <= N; i++)                                              // Print lines executed most frequently
        {final LineCount l = lc.elementAt(i-1);
-        say(String.format(f+"  %6d  %4d", l.line, l.count, i));
+        final String    c = NumberFormat.getInstance().format(l.count);
+        say(String.format(f+"  %6d  %8s", l.line, c, i));
        }
      }
    }
