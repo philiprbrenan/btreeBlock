@@ -164,7 +164,7 @@ abstract class BtreeSP extends Test                                             
   class Node                                                                    // A branch or leaf in the tree
    {int node;                                                                   // The number of the node
     StuckSP Leaf, Branch;                                                       // Stucks used in this node with their base addresses set correctly to allow addressing of the fields in the stuck
-    Node P, l, r;
+    Node parent, P, l, r;
     StuckSP.Transaction T, tl, tr;
     int splitLeafSize;                                                          // Where to split a full leaf
     int splitBranchSize;                                                        // Branch split size
@@ -176,6 +176,7 @@ abstract class BtreeSP extends Test                                             
     int nl, nr;                                                                 // Number in the left child, number in the right child
     int lk, ld;                                                                 // Left  child reference: key and data
     int rk, rd;                                                                 // Right child reference: key and data
+    int index;                                                                  // Index of a slot in a node
 
     boolean isLeaf() {z(); return getInt(isLeaf,    node) > 0;}                 // A leaf if true
     void   setLeaf() {z();        setInt(isLeaf, 1, node);}                     // Set as leaf
@@ -562,7 +563,7 @@ abstract class BtreeSP extends Test                                             
       T.key  =         0; T.data = r.node; T.push();                            // Becomes top and so ignored by search ... except last
      }
 
-    void splitLeaf(Node parent, int index)                                      // Split a leaf which is not the root
+    void splitLeaf()                                                            // Split a leaf which is not the root
      {z(); assertLeaf();
       z(); if (node == 0) stop("Cannot split root with this method");
       z(); final int S = leafSize(), I = index;
@@ -591,7 +592,7 @@ abstract class BtreeSP extends Test                                             
       T.insertElementAt();                                                      // Insert new key, next pair in parent
      }
 
-    void splitBranch(Node parent, int index)                                    // Split a branch which is not the root by splitting right to left
+    void splitBranch()                                                          // Split a branch which is not the root by splitting right to left
      {z(); assertBranch();
       z(); final int bs = branchSize(), I = index, pn = parent.node, nd = node;
       z(); final boolean nif = !isFull(), pif = parent.isFull();
@@ -617,7 +618,7 @@ abstract class BtreeSP extends Test                                             
       T.key = tr.key; T.data = l.node; T.index = index; T.insertElementAt();
      }
 
-    boolean stealFromLeft(int index)                                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
+    boolean stealFromLeft()                                                     // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
      {z(); assertBranch();
       z(); if (index == 0) return false;
       z(); if (index < 0)            stop("Index", index, "too small");
@@ -670,7 +671,7 @@ abstract class BtreeSP extends Test                                             
       return true;
      }
 
-    boolean stealFromRight(int index)                                           // Steal from the right sibling of the indicated child if possible
+    boolean stealFromRight()                                                    // Steal from the right sibling of the indicated child if possible
      {z(); assertBranch();
       z(); if (index == branchSize()) return false;
       z(); if (index < 0)             stop("Index", index, "too small");
@@ -782,7 +783,7 @@ abstract class BtreeSP extends Test                                             
        }
      }
 
-    boolean mergeLeftSibling(int index)                                         // Merge the left sibling
+    boolean mergeLeftSibling()                                                  // Merge the left sibling
      {z(); assertBranch();
       z(); if (index == 0) return false;
       final int bs = branchSize();
@@ -831,7 +832,7 @@ abstract class BtreeSP extends Test                                             
       return true;
      }
 
-    boolean mergeRightSibling(int index)                                        // Merge the right sibling
+    boolean mergeRightSibling()                                                 // Merge the right sibling
      {z(); assertBranch();
       final int bs = branchSize();
       final String bss = "for branch of size:";
@@ -889,7 +890,7 @@ abstract class BtreeSP extends Test                                             
 
 //D2 Balance                                                                    // Balance the tree by merging and stealing
 
-    void balance(int index)                                                     // Augment the indexed child so it has at least two children in its body
+    void balance()                                                              // Augment the indexed child so it has at least two children in its body
      {z(); assertBranch();
       z(); if (index < 0)            stop("Index", index, "too small");
       z(); if (index > branchSize()) stop("Index", index, "too big");
@@ -902,11 +903,12 @@ abstract class BtreeSP extends Test                                             
       T.index = index;
       T.elementAt();
 
+      z();
       z(); if (!node(tempNode, T.data).isLow()) return;
-      z(); if (stealFromLeft    (index))        return;
-      z(); if (stealFromRight   (index))        return;
-      z(); if (mergeLeftSibling (index))        return;
-      z(); if (mergeRightSibling(index))        return;
+      z(); if (stealFromLeft    ())             return;
+      z(); if (stealFromRight   ())             return;
+      z(); if (mergeLeftSibling ())             return;
+      z(); if (mergeRightSibling())             return;
       stop("Unable to balance child:", T.data);
      }
    }  // Node
@@ -1119,7 +1121,7 @@ abstract class BtreeSP extends Test                                             
       final Node q = node(putNode, down.next);
       if (q.isLeaf())                                                           // Reached a leaf
        {z();
-        q.splitLeaf(p, down.first);
+        q.parent = p; q.index = down.first; q.splitLeaf();
         findAndInsert3(Key, Data);
         merge(Key);
         return;
@@ -1127,7 +1129,7 @@ abstract class BtreeSP extends Test                                             
       z();
       if (q.isFull())
        {z();
-        q.splitBranch(p, down.first);                                           // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
+        q.parent = p; q.index = down.first; q.splitBranch();                    // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
         final Node.FindFirstGreaterThanOrEqualInBranch                          // Step down again as the split will have altered the local layout
         Down = p.findFirstGreaterThanOrEqualInBranch1(Key);
         p = node(parentNode, Down.next);
@@ -1172,7 +1174,7 @@ abstract class BtreeSP extends Test                                             
      {z(); final Node.FindFirstGreaterThanOrEqualInBranch                       // Step down
       down =        p.findFirstGreaterThanOrEqualInBranch1(Key);
 
-      p.balance(down.first);
+      p.index = down.first; p.balance();
       final Node q = node(deleteNode, down.next);
 
       if (q.isLeaf())                                                           // Reached a leaf
@@ -1199,8 +1201,8 @@ abstract class BtreeSP extends Test                                             
       z();
       for (int j = 0; j < p.branchSize(); j++)                                  // Try merging each sibling pair which might change the size of the parent
        {z();
-        if (p.mergeLeftSibling(j)) --j;                                         // A successful merge of the left  sibling reduces the current index and the upper limit
-        p.mergeRightSibling(j);                                                 // A successful merge of the right sibling maintains the current position but reduces the upper limit
+        p.index = j; if (p.mergeLeftSibling ()) --j;                            // A successful merge of the left  sibling reduces the current index and the upper limit
+        p.index = j;     p.mergeRightSibling();                                 // A successful merge of the right sibling maintains the current position but reduces the upper limit
        }
 
       final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
