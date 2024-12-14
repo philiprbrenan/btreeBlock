@@ -161,7 +161,7 @@ abstract class BtreeSP extends Test                                             
 
 //D1 Components                                                                 // A branch or leaf in the tree
 
-  class Node                                                                    // A branch or leaf in the tree
+  class Node                                                                    // A transient description of a branch or leaf in the tree - the actual data is contained in the bit memory
    {int node;                                                                   // The number of the node
     StuckSP Leaf, Branch;                                                       // Stucks used in this node with their base addresses set correctly to allow addressing of the fields in the stuck
     Node parent, anode, P, l, r, foundNode;                                     // Parameters and relative positions in a tree
@@ -201,8 +201,8 @@ abstract class BtreeSP extends Test                                             
     void allocBranch(){z(); allocate(anode); anode.setBranch(); anode.setStucks();} // Allocate branch
 
     void setStucks()                                                            // Descriptions of the stucks addressed by this node setting their base offsets
-     {Leaf     = BtreeSP.this.Leaf  .at(leafBase());                            // Address the leaf stuck
-      Branch   = BtreeSP.this.Branch.at(branchBase());                          // Address the branch stuck
+     {Leaf   = BtreeSP.this.Leaf  .at(leafBase());                              // Address the leaf stuck
+      Branch = BtreeSP.this.Branch.at(branchBase());                            // Address the branch stuck
      }
 
     void free()                                                                 // Free a new node to make it available for reuse
@@ -292,11 +292,10 @@ abstract class BtreeSP extends Test                                             
       return s.toString();
      }
 
-//D2 Search - transform to return a node                                        // Search within a node
+//D2 Search                                                                     // Search within a node and update the node description with the results
 
     void findEqualInLeaf(int Search)                                            // Find the first key in the leaf that is equal to the search key
      {z(); assertLeaf();
-      //leaf     = Node.this;
       search   = Search;
       base     = leafBase();
       final StuckSP.Transaction t = stuckEqual; t.s = Leaf;
@@ -304,10 +303,9 @@ abstract class BtreeSP extends Test                                             
       found    = t.found;
       index    = t.index;
       data     = t.data;
-      //return this;
      }
 
-    public String findEqualInLeaf_toString()                                    // Print details of find equal in leaf
+    public String findEqualInLeaf_toString()                                    // Print details of find equal in leaf node
      {final StringBuilder s = new StringBuilder();
       s.append("FindEqualInLeaf(Leaf:"+node);
       s.append(" Key:"+search+" found:"+found);
@@ -318,19 +316,16 @@ abstract class BtreeSP extends Test                                             
 
     void findFirstGreaterThanOrEqualInLeaf(int Search)                          // Find the first key in the  leaf that is equal to or greater than the search key
      {z(); assertLeaf();
-      //leaf     = Node.this;
       search   = Search;
       base     = leafBase();
       final StuckSP.Transaction t = stuckFirstLeaf; t.s = Leaf;
       t.search = Search; t.searchFirstGreaterThanOrEqual();
       found    = t.found;
       first    = t.index;
-      //return this;
      }
 
     void findFirstGreaterThanOrEqualInBranch(int Search)                        // Find the first key in the branch that is equal to or greater than the search key
      {z(); assertBranch();
-      //branch   = Node.this;
       search   = Search;
       base     = branchBase();
       final StuckSP.Transaction t = stuckFirstBranch; t.s = Branch;
@@ -338,7 +333,6 @@ abstract class BtreeSP extends Test                                             
       found    = t.found;
       first    = t.index;
       if (t.found) next = t.data; else {t.lastElement(); next = t.data;}        // Next if key matches else top
-      //return this;
      }
 
 //D2 Array                                                                      // Represent the contents of the tree as an array
@@ -982,8 +976,7 @@ abstract class BtreeSP extends Test                                             
   Node find(int Key)                                                            // Find the data associated with a key in the tree
    {z();
     if (root.isLeaf())                                                          // The root is a leaf
-     {z();
-      root.findEqualInLeaf(Key);
+     {z();   root.findEqualInLeaf(Key);
       return root;
      }
 
@@ -995,8 +988,7 @@ abstract class BtreeSP extends Test                                             
       final Node n = node(findNode, parent.next);
 
       if (n.isLeaf())                                                           // Found the containing search
-       {z();
-        n.findEqualInLeaf(Key);
+       {z();   n.findEqualInLeaf(Key);
         return n;
        }
       parent = node(parentNode, n.node);                                        // Step down to lower branch
