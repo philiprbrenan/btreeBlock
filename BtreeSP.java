@@ -164,7 +164,7 @@ abstract class BtreeSP extends Test                                             
   class Node                                                                    // A branch or leaf in the tree
    {int node;                                                                   // The number of the node
     StuckSP Leaf, Branch;                                                       // Stucks used in this node with their base addresses set correctly to allow addressing of the fields in the stuck
-    Node parent, anode, P, l, r;                                                // Parameters and relative positions in a tree
+    Node parent, anode, P, l, r, foundNode;                                     // Parameters and relative positions in a tree
     StuckSP.Transaction T, tl, tr;
     int splitLeafSize;                                                          // Where to split a full leaf
     int splitBranchSize;                                                        // Branch split size
@@ -180,10 +180,15 @@ abstract class BtreeSP extends Test                                             
                                                                                 // Find equal in leaf
     int    search;                                                              // Search key
     boolean found;                                                              // Whether the key was found
+    int       key;                                                              // Key to insert
     int      data;                                                              // Data associated with the  key
     int      base;                                                              // Base of the leaf
 
     int     first;                                                              // Index of first key greater than or equal to the search key
+    int      next;                                                              // The corresponding next field or top if no such key was found
+
+    boolean  success;                                                           // Inserted or updated if true
+    boolean inserted;                                                           // Inserted if true
 
     boolean isLeaf() {z(); return getInt(isLeaf,    node) > 0;}                 // A leaf if true
     void   setLeaf() {z();        setInt(isLeaf, 1, node);}                     // Set as leaf
@@ -323,48 +328,18 @@ abstract class BtreeSP extends Test                                             
       //return this;
      }
 
-    public String findFirstGreaterThanOrEqualInLeaf_toString()                                                  // Print results of search
-     {final StringBuilder s = new StringBuilder();
-      s.append("FindFirstGreaterThanOrEqualInLeaf(Leaf:"+node);
-      s.append(" Key:"+search+" found:"+found);
-      if (found) s.append(" first:"+first);
-      s.append(")\n");
-      return s.toString();
+    void findFirstGreaterThanOrEqualInBranch(int Search)                        // Find the first key in the branch that is equal to or greater than the search key
+     {z(); assertBranch();
+      //branch   = Node.this;
+      search   = Search;
+      base     = branchBase();
+      final StuckSP.Transaction t = stuckFirstBranch; t.s = Branch;
+      t.search = Search; t.limit  = 1; t.searchFirstGreaterThanOrEqual();
+      found    = t.found;
+      first    = t.index;
+      if (t.found) next = t.data; else {t.lastElement(); next = t.data;}        // Next if key matches else top
+      //return this;
      }
-
-    class FindFirstGreaterThanOrEqualInBranch                                   // Find the first key in the branch that is equal to or greater than the search key
-     {Node     branch;                                                          // The branch being searched
-      int     search;                                                           // Search key
-      boolean  found;                                                           // Whether the key was found
-      int      first;                                                           // Index of first such key if found
-      int       next;                                                           // The corresponding next field or top if no such key was found
-      int       base;                                                           // Base of the branch
-
-      FindFirstGreaterThanOrEqualInBranch                                       // Find the first key in the branch that is equal to or greater than the search key
-      findFirstGreaterThanOrEqualInBranch(int Search)                           // Find the first key in the branch that is equal to or greater than the search key
-       {z(); assertBranch();
-        branch   = Node.this;
-        search   = Search;
-        base     = branchBase();
-        final StuckSP.Transaction t = stuckFirstBranch; t.s = Branch;
-        t.search = Search; t.limit  = 1; t.searchFirstGreaterThanOrEqual();
-        found    = t.found;
-        first    = t.index;
-        if (t.found) next = t.data; else {t.lastElement(); next = t.data;}      // Next if key matches else top
-        return this;
-       }
-
-      public String toString()                                                  // Print search results
-       {final StringBuilder s = new StringBuilder();
-        s.append("FindFirstGreaterThanOrEqualInBranch(branch:"+branch.node);
-        s.append(" Key:"+search+" found:"+found+" next:"+next);
-        if (found) s.append(" first:"+first);
-        s.append(")\n");
-        return s.toString();
-       }
-     }
-    final FindFirstGreaterThanOrEqualInBranch FindFirstGreaterThanOrEqualInBranch1 =                    new FindFirstGreaterThanOrEqualInBranch();
-          FindFirstGreaterThanOrEqualInBranch findFirstGreaterThanOrEqualInBranch1(int Search) {z(); return FindFirstGreaterThanOrEqualInBranch1.findFirstGreaterThanOrEqualInBranch(Search);}
 
 //D2 Array                                                                      // Represent the contents of the tree as an array
 
@@ -471,6 +446,45 @@ abstract class BtreeSP extends Test                                             
        }
 
       padStrings(S, level);
+     }
+
+    public String find_toString()                                               // Print find result
+     {final StringBuilder s = new StringBuilder();
+      s.append("Find(search:"+node);
+      s.append( " search:"+search);
+      s.append(  " found:"+found);
+      s.append(   " data:"+data);
+      s.append(  " index:"+index);
+      s.append(")\n");
+      return s.toString();
+     }
+
+    public String findAndInsert_toString()                                      // Print find and insert result
+     {final StringBuilder s = new StringBuilder();
+      s.append("FindAndInsert(key:"+key);
+      s.append(" data:"+data);
+      s.append(" success:"+success);
+      if (success) s.append(" inserted:"+inserted);
+      s.append(")\n" );
+      return s.toString();
+     }
+
+    public String findFirstGreaterThanOrEqualInLeaf_toString()                  // Print results of search
+     {final StringBuilder s = new StringBuilder();
+      s.append("FindFirstGreaterThanOrEqualInLeaf(Leaf:"+node);
+      s.append(" Key:"+search+" found:"+found);
+      if (found) s.append(" first:"+first);
+      s.append(")\n");
+      return s.toString();
+     }
+
+    public String findFirstGreaterThanOrEqualInBranch_toString()                // Print search results
+     {final StringBuilder s = new StringBuilder();
+      s.append("FindFirstGreaterThanOrEqualInBranch(branch:"+node);
+      s.append(" Key:"+search+" found:"+found+" next:"+next);
+      if (found) s.append(" first:"+first);
+      s.append(")\n");
+      return s.toString();
      }
 
 //D2 Split                                                                      // Split nodes in half to increase the number of nodes in the tree
@@ -965,119 +979,67 @@ abstract class BtreeSP extends Test                                             
 
 //D1 Find                                                                       // Find the data associated with a key
 
-  class Find                                                                    // Find the data associated with a key in the tree
-   {Node search;                                                                // Details of the search of the containing leaf
-
-    Find find(int Key)                                                          // Find the data associated with a key in the tree
+  Node find(int Key)                                                            // Find the data associated with a key in the tree
+   {z();
+    if (root.isLeaf())                                                          // The root is a leaf
      {z();
-      if (root.isLeaf())                                                        // The root is a leaf
+      root.findEqualInLeaf(Key);
+      return root;
+     }
+
+    Node parent = root;                                                         // Parent starts at root which is known to be a branch
+
+    for (int i = 0; i < maxDepth; i++)                                          // Step down through tree
+     {z();
+      parent.findFirstGreaterThanOrEqualInBranch(Key);                          // Find next child in search path of key
+      final Node n = node(findNode, parent.next);
+
+      if (n.isLeaf())                                                           // Found the containing search
        {z();
-        search = root;
-                 root.findEqualInLeaf(Key);
-        return this;
+        n.findEqualInLeaf(Key);
+        return n;
        }
-
-      Node parent = root;                                                       // Parent starts at root which is known to be a branch
-
-      for (int i = 0; i < maxDepth; i++)                                        // Step down through tree
-       {z();
-        final Node.FindFirstGreaterThanOrEqualInBranch down =                   // Find next child in search path of key
-          parent.findFirstGreaterThanOrEqualInBranch1(Key);
-        final Node n = node(findNode, down.next);
-
-        if (n.isLeaf())                                                         // Found the containing search
-         {z();
-          search  = n;
-                    n.findEqualInLeaf(Key);
-          return this;
-         }
-        parent = node(parentNode, n.node);                                      // Step down to lower branch
-       }
-      stop("Search did not terminate in a leaf");
-      return this;
+      parent = node(parentNode, n.node);                                        // Step down to lower branch
      }
-
-    Node     leaf()  {z(); return search;}
-    boolean  found() {z(); return search.found;}
-    int      index() {z(); return search.index;}
-    int       data() {z(); return search.data;}
-
-    public String toString()                                                    // Print find result
-     {final StringBuilder s = new StringBuilder();
-      s.append("Find(search:"+search);
-      s.append( " search:"+index());
-      if (found())
-       {s.append( " data:"+data());
-        s.append(" index:"+index());
-       }
-      s.append(")\n");
-      return s.toString();
-     }
-   }
-  final Find Find1 =                    new Find();
-  final Find Find2 =                    new Find();
-        Find find1(int Search) {z(); return Find1.find(Search);}
-        Find find2(int Search) {z(); return Find2.find(Search);}
-
-  class FindAndInsert extends Find                                              // Insert the specified key and data into the tree if there is room in the target leaf,or update the key with the data if the key already exists
-   {int          key;                                                           // Key to insert
-    int         data;                                                           // Data being inserted or updated
-    boolean  success;                                                           // Inserted or updated if true
-    boolean inserted;                                                           // Inserted if true
-
-    FindAndInsert() {}
-    FindAndInsert findAndInsert(int Key, int Data)                              // Find the leaf that should contain this key and insert or update it is possible
-     {z(); find(Key);                                                           // Find the leaf that should contain this key
-      key = Key; data = Data;
-
-      final StuckSP.Transaction T = stuckion; T.s = leaf().Leaf;
-
-      if (found())                                                              // Found the key in the leaf so update it with the new data
-       {z(); T.key = Key; T.data = Data; T.index = index(); T.setElementAt();
-        success = true; inserted = false;
-        return this;
-       }
-
-      if (!leaf().isFull())                                                     // Leaf is not full so we can insert immediately
-       {z();
-        final Node f = leaf();
-        f.findFirstGreaterThanOrEqualInLeaf(Key);
-        if (f.found)                                                            // Overwrite existing key
-         {z();
-          T.key = Key; T.data = Data; T.index = f.first; T.insertElementAt();
-         }
-        else                                                                    // Insert into position
-         {z(); T.key = Key; T.data = Data; T.push();
-         }
-        success = true;
-        return this;
-       }
-      z(); success = false;
-      return this;
-     }
-
-    public String toString()                                                    // Print find and insert
-     {final StringBuilder s = new StringBuilder();
-      s.append("FindAndInsert(key:"+key);
-      s.append(" data:"+data);
-      s.append(" success:"+success);
-      if (success) s.append(" inserted:"+inserted);
-      s.append(")\n" );
-      return s.toString();
-     }
+    stop("Search did not terminate in a leaf");
+    return null;
    }
 
-  final FindAndInsert FindAndInsert1 =                           new FindAndInsert();
-  final FindAndInsert FindAndInsert2 =                           new FindAndInsert();
-  final FindAndInsert FindAndInsert3 =                           new FindAndInsert();
-        FindAndInsert findAndInsert1(int Key, int Data) {z(); return FindAndInsert1.findAndInsert(Key, Data);}
-        FindAndInsert findAndInsert2(int Key, int Data) {z(); return FindAndInsert2.findAndInsert(Key, Data);}
-        FindAndInsert findAndInsert3(int Key, int Data) {z(); return FindAndInsert3.findAndInsert(Key, Data);}
+  Node findAndInsert(int Key, int Data)                                         // Find the leaf that should contain this key and insert or update it is possible
+   {z();
+    final Node leaf = find(Key);                                                // Find the leaf that should contain this key
+    //key = Key; data = Data;
+
+    final StuckSP.Transaction T = stuckion; T.s = leaf.Leaf;
+
+    if (leaf.found)                                                             // Found the key in the leaf so update it with the new data
+     {z(); T.key = Key; T.data = Data; T.index = leaf.index; T.setElementAt();
+      leaf.success = true; leaf.inserted = false;
+      return leaf;
+     }
+
+    if (!leaf.isFull())                                                         // Leaf is not full so we can insert immediately
+     {z();
+      final Node f = leaf;
+      leaf.findFirstGreaterThanOrEqualInLeaf(Key);
+      if (leaf.found)                                                           // Overwrite existing key
+       {z();
+        T.key = Key; T.data = Data; T.index = leaf.first; T.insertElementAt();
+       }
+      else                                                                      // Insert into position
+       {z(); T.key = Key; T.data = Data; T.push();
+       }
+      leaf.success = true;
+      return leaf;
+     }
+    z(); leaf.success = false;
+    return leaf;
+   }
 
 //D1 Insertion                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
 
   void put(int Key, int Data)                                                   // Insert a key, data pair into the tree or update and existing key with a new datum
-   {z(); final FindAndInsert f = findAndInsert1(Key, Data);                     // Try direct insertion with no modifications to the shape of the tree
+   {z(); final Node f = findAndInsert(Key, Data);                               // Try direct insertion with no modifications to the shape of the tree
     if (f.success) return;                                                      // Inserted or updated successfully
     z();
     if (root.isFull())                                                          // Start the insertion at the root, after splitting it if necessary
@@ -1085,7 +1047,7 @@ abstract class BtreeSP extends Test                                             
       if (root.isLeaf()) {z(); root.splitLeafRoot();}
       else               {z(); root.splitBranchRoot();}
       z();
-      final FindAndInsert F = findAndInsert2(Key, Data);                        // Splitting the root might have been enough
+      final Node F = findAndInsert(Key, Data);                                  // Splitting the root might have been enough
       if (F.success) return;                                                    // Inserted or updated successfully
      }
     z();
@@ -1093,25 +1055,23 @@ abstract class BtreeSP extends Test                                             
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
      {z();
-      final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
-      down = p.findFirstGreaterThanOrEqualInBranch1(Key);
-      final Node q = node(putNode, down.next);
+      p.findFirstGreaterThanOrEqualInBranch(Key);
+      final Node q = node(putNode, p.next);
       if (q.isLeaf())                                                           // Reached a leaf
        {z();
-        q.parent = p; q.index = down.first; q.splitLeaf();
-        findAndInsert3(Key, Data);
+        q.parent = p; q.index = p.first; q.splitLeaf();
+        findAndInsert(Key, Data);
         merge(Key);
         return;
        }
       z();
       if (q.isFull())
        {z();
-        q.parent = p; q.index = down.first; q.splitBranch();                    // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
-        final Node.FindFirstGreaterThanOrEqualInBranch                          // Step down again as the split will have altered the local layout
-        Down = p.findFirstGreaterThanOrEqualInBranch1(Key);
-        p = node(parentNode, Down.next);
+        q.parent = p; q.index = p.first; q.splitBranch();                       // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
+        p.findFirstGreaterThanOrEqualInBranch(Key);                             // Perform the step down again as the split will have altered the local layout
+        p = node(parentNode, p.next);
        }
-      else
+      else                                                                      // Step down directly as no split was required
        {z();
         p = node(parentNode, q.node);
        }
@@ -1126,11 +1086,11 @@ abstract class BtreeSP extends Test                                             
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
 
   Integer findAndDelete(int Key)                                                // Delete a key from the tree and returns its data if present without modifying the shape of tree
-   {z(); final Find           f = find1(Key);                                   // Try direct insertion with no modifications to the shape of the tree
-    if (!f.found()) return null;                                                // Inserted or updated successfully
+   {z(); final Node f = find(Key);                                              // Try direct insertion with no modifications to the shape of the tree
+    if (!f.found) return null;                                                  // Inserted or updated successfully
     z();
-    final StuckSP.Transaction T = stuckLeaf; T.s = f.leaf().Leaf;               // The leaf that contains the key
-                              T.index = f.index();                              // Position in the leaf of the key
+    final StuckSP.Transaction T = stuckLeaf; T.s = f.Leaf;                      // The leaf that contains the key
+                              T.index = f.index;                                // Position in the leaf of the key
                               T.elementAt();
     final int d = T.data;                                                       // Key, data pairs in the leaf
     T.removeElementAt();                                                        // Remove the key, data pair from the leaf
@@ -1148,11 +1108,10 @@ abstract class BtreeSP extends Test                                             
     Node p = root;                                                              // Start at root
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-     {z(); final Node.FindFirstGreaterThanOrEqualInBranch                       // Step down
-      down =        p.findFirstGreaterThanOrEqualInBranch1(Key);
+     {z(); p.findFirstGreaterThanOrEqualInBranch(Key);                          // Step down
 
-      p.index = down.first; p.balance();
-      final Node q = node(deleteNode, down.next);
+      p.index = p.first; p.balance();
+      final Node q = node(deleteNode, p.next);
 
       if (q.isLeaf())                                                           // Reached a leaf
        {z();
@@ -1182,9 +1141,8 @@ abstract class BtreeSP extends Test                                             
         p.index = j;     p.mergeRightSibling();                                 // A successful merge of the right sibling maintains the current position but reduces the upper limit
        }
 
-      final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
-      down = p.findFirstGreaterThanOrEqualInBranch1(Key);
-      p = node(parentNode, down.next);
+      p.findFirstGreaterThanOrEqualInBranch(Key);                               // Step down
+      p = node(parentNode, p.next);
      }
     stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
    }
@@ -1293,13 +1251,13 @@ abstract class BtreeSP extends Test                                             
     final int a = s.firstKey(), b = s.lastKey();
     for (int i = a-1; i < b + 1; ++i)
      {if (s.containsKey(i))
-       {Find f = t.find1(i);
-        ok(f.found());
-        ok(f.data(), s.get(i));
+       {Node f = t.find(i);
+        ok(f.found);
+        ok(f.data, s.get(i));
        }
       else
-       {Find f = t.find1(i);
-        ok(!f.found());
+       {Node f = t.find(i);
+        ok(!f.found);
        }
      }
    }
@@ -1322,22 +1280,22 @@ abstract class BtreeSP extends Test                                             
 """);
 
     for (int i = 0; i <= 2*N+1; i++)                                            // Update
-     {Find f = t.find1(i);
+     {Node f = t.find(i);
       if (i > 0 && i % 2 == 0)
-       {ok(f.found(), true);
-        ok(f.data(),  i);
+       {ok(f.found, true);
+        ok(f.data,  i);
         t.put(i, i-1);
        }
-      else ok(f.found(), false);
+      else ok(f.found, false);
      }
 
     for (int i = 0; i <= 2*N+1; i++)
-     {Find f = t.find2(i);
+     {Node f = t.find(i);
       if (i > 0 && i % 2 == 0)
-       {ok(f.found(), true);
-        ok(f.data(),  i-1);
+       {ok(f.found, true);
+        ok(f.data,  i-1);
        }
-      else ok(f.found(), false);
+      else ok(f.found, false);
      }
    }
 
