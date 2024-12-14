@@ -20,15 +20,14 @@ abstract class BtreeSP extends Test                                             
   int splitLeafSize  () {return maxKeysPerLeaf()   >> 1;}                       // The number of key, data pairs to split out of a leaf
   int splitBranchSize() {return maxKeysPerBranch() >> 1;}                       // The number of key, next pairs to split out of a branch
 
-  StuckSP Leaf, Branch;                                                         // Leaf, branch definition
+  StuckSP leafStuck, branchStuck;                                               // Leaf, branch definition
 
-  Layout           l;                                                           // Layout of memory used by btree
   Layout.Field     leaf;                                                        // Layout of a leaf in the memory used by btree
   Layout.Field     branch;                                                      // Layout of a branch in the memory used by btree
   Layout.Union     branchOrLeaf;                                                // Layout of either a leaf or a branch in the memory used by btree
   Layout.Bit       isLeaf;                                                      // Whether the current node is a leaf or a branch
   Layout.Variable  free;                                                        // Free list chain
-  Layout.Structure node;                                                        // Layout of a node in the memory used by btree
+  Layout.Structure Node;                                                        // Layout of a node in the memory used by btree
   Layout.Array     nodes;                                                       // Layout of an array of nodes in the memory used by btree
   Layout.Variable  freedChain;                                                  // Single linked list of freed nodes
   Layout.Structure bTree;                                                       // Btree
@@ -102,7 +101,7 @@ abstract class BtreeSP extends Test                                             
    {z();
     final BtreeSP btree = this;
 
-    Leaf = new StuckSP()                                                        // Leaf
+    leafStuck = new StuckSP()                                                  // Leaf
      {int               maxSize() {return btree.maxKeysPerLeaf();}
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerData();}
@@ -110,7 +109,7 @@ abstract class BtreeSP extends Test                                             
       Memory             memory() {return btree.memory;}
      };
 
-    Branch = new StuckSP()                                                      // Branch
+    branchStuck = new StuckSP()                                                 // Branch
      {int               maxSize() {return btree.maxKeysPerBranch()+1;}          // Not forgetting top next
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerNext();}
@@ -119,13 +118,13 @@ abstract class BtreeSP extends Test                                             
      };
 
     layout       = Layout.layout();
-    leaf         = layout.duplicate("leaf",         Leaf  .layout());
-    branch       = layout.duplicate("branch",       Branch.layout());
+    leaf         = layout.duplicate("leaf",         leafStuck.layout());
+    branch       = layout.duplicate("branch",       branchStuck.layout());
     branchOrLeaf = layout.union    ("branchOrLeaf", leaf,   branch);
     isLeaf       = layout.bit      ("isLeaf");
     free         = layout.variable ("free",         btree.bitsPerNext());
-    node         = layout.structure("node",         isLeaf, free, branchOrLeaf);
-    nodes        = layout.array    ("nodes",        node,         maxSize());
+    Node         = layout.structure("node",         isLeaf, free, branchOrLeaf);
+    nodes        = layout.array    ("nodes",        Node,         maxSize());
     freedChain   = layout.variable ("freedChain",   btree.bitsPerNext());
     bTree        = layout.structure("bTree",        freedChain  , nodes);
     return layout.compile();
@@ -201,8 +200,8 @@ abstract class BtreeSP extends Test                                             
     void allocBranch(){z(); allocate(anode); anode.setBranch(); anode.setStucks();} // Allocate branch
 
     void setStucks()                                                            // Descriptions of the stucks addressed by this node setting their base offsets
-     {Leaf   = BtreeSP.this.Leaf  .at(leafBase());                              // Address the leaf stuck
-      Branch = BtreeSP.this.Branch.at(branchBase());                            // Address the branch stuck
+     {Leaf   = BtreeSP.this.leafStuck  .at(leafBase());                         // Address the leaf stuck
+      Branch = BtreeSP.this.branchStuck.at(branchBase());                       // Address the branch stuck
      }
 
     void free()                                                                 // Free a new node to make it available for reuse
@@ -216,14 +215,14 @@ abstract class BtreeSP extends Test                                             
 
     void clear()                                                                // Clear a new node to zeros ready for use
      {z();
-      final Layout.Field n = BtreeSP.this.node;
+      final Layout.Field n = BtreeSP.this.Node;
       final int at = n.at(node), w = n.width;
       memory.zero(at, w);
      }
 
     void erase()                                                                // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
      {z();
-      final Layout.Field n = BtreeSP.this.node;
+      final Layout.Field n = BtreeSP.this.Node;
       final int at = n.at(node), w = n.width;
       memory.ones(at, w);
      }
@@ -978,7 +977,7 @@ abstract class BtreeSP extends Test                                             
     Integer delete;                                                             // Results of a deletion
     StuckSP.Transaction T;                                                      // Transaction against a stuck
 
-    Node find(int Key)                                                          // Find the data associated with a key in the tree
+    Node find()                                                                 // Find the data associated with a key in the tree
      {z();
       if (root.isLeaf())                                                        // The root is a leaf
        {z(); root.search = Key; root.findEqualInLeaf();
@@ -1002,9 +1001,9 @@ abstract class BtreeSP extends Test                                             
       return null;
      }
 
-    Node findAndInsert(int Key, int Data)                                       // Find the leaf that should contain this key and insert or update it is possible
+    Node findAndInsert()                                                        // Find the leaf that should contain this key and insert or update it is possible
      {z();
-      leaf = find(Key);                                                         // Find the leaf that should contain this key
+      leaf = find();                                                            // Find the leaf that should contain this key
 
       T = stuckion; T.s = leaf.Leaf;
 
@@ -1033,8 +1032,8 @@ abstract class BtreeSP extends Test                                             
 
 //D1 Insertion                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
 
-    void put(int Key, int Data)                                                 // Insert a key, data pair into the tree or update and existing key with a new datum
-     {z(); findAndInsert = findAndInsert(Key, Data);                            // Try direct insertion with no modifications to the shape of the tree
+    void put()                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
+     {z(); findAndInsert = findAndInsert();                                     // Try direct insertion with no modifications to the shape of the tree
       if (findAndInsert.success) return;                                        // Inserted or updated successfully
       z();
       if (root.isFull())                                                        // Start the insertion at the root, after splitting it if necessary
@@ -1042,7 +1041,7 @@ abstract class BtreeSP extends Test                                             
         if (root.isLeaf()) {z(); root.splitLeafRoot();}
         else               {z(); root.splitBranchRoot();}
         z();
-        findAndInsert = findAndInsert(Key, Data);                               // Splitting the root might have been enough
+        findAndInsert = findAndInsert();                                        // Splitting the root might have been enough
         if (findAndInsert.success) return;                                      // Inserted or updated successfully
        }
       z(); parent = root;
@@ -1054,8 +1053,8 @@ abstract class BtreeSP extends Test                                             
         if (child.isLeaf())                                                     // Reached a leaf
          {z();
           child.parent = parent; child.index = parent.first; child.splitLeaf();
-          findAndInsert(Key, Data);
-          merge(Key);
+          findAndInsert();
+          merge();
           return;
          }
         z();
@@ -1072,14 +1071,10 @@ abstract class BtreeSP extends Test                                             
       stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
      }
 
-    void put(int Key)                                                           // Put some test data into the tree
-     {z(); put(Key, Key);
-     }
-
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
 
-    Integer findAndDelete(int Key)                                              // Delete a key from the tree and returns its data if present without modifying the shape of tree
-     {z(); find = find(Key);                                                    // Try direct insertion with no modifications to the shape of the tree
+    Integer findAndDelete()                                                     // Delete a key from the tree and returns its data if present without modifying the shape of tree
+     {z(); find = find();                                                       // Try direct insertion with no modifications to the shape of the tree
       if (!find.found) return null;                                             // Inserted or updated successfully
       z();
       T = stuckLeaf; T.s = find.Leaf;                                           // The leaf that contains the key
@@ -1090,11 +1085,11 @@ abstract class BtreeSP extends Test                                             
       return Data;
      }
 
-    Integer delete(int Key)                                                     // Insert a key, data pair into the tree or update and existing key with a new datum
+    Integer delete()                                                            // Insert a key, data pair into the tree or update and existing key with a new datum
      {z(); root.mergeRoot();
 
       if (root.isLeaf())                                                        // Find and delete directly in root as a leaf
-       {z(); return findAndDelete(Key);
+       {z(); return findAndDelete();
        }
       z();
 
@@ -1108,8 +1103,8 @@ abstract class BtreeSP extends Test                                             
 
         if (child.isLeaf())                                                     // Reached a leaf
          {z();
-          final int data = findAndDelete(Key);
-          merge(Key);
+          final int data = findAndDelete();
+          merge();
           return data;
          }
         z(); parent = node(parentNode, child.node);
@@ -1120,7 +1115,7 @@ abstract class BtreeSP extends Test                                             
 
 //D1 Merge                                                                      // Merge along the specified search path
 
-    void merge(int Key)                                                         // Merge along the specified search path
+    void merge()                                                                // Merge along the specified search path
      {z();
       root.mergeRoot();
       parent = root;                                                            // Start at root
@@ -1150,7 +1145,7 @@ abstract class BtreeSP extends Test                                             
    {final BtreeSP     t = btreeSML(4, 3);
     final Transaction T = t.new Transaction();
     final int N = 64;
-    for (int i = 1; i <= N; i++) T.put(i);
+    for (int i = 1; i <= N; i++) {T.Key = T.Data = i; T.put();}
     //t.stop();
     t.ok("""
                                                                                                                             32                                                                                                                                           |
@@ -1174,7 +1169,7 @@ abstract class BtreeSP extends Test                                             
    {final BtreeSP     t = btreeSML(8, 7);
     final Transaction T = t.new Transaction();
     final int N = 64;
-    for (int i = 1; i <= N; ++i) T.put(i);
+    for (int i = 1; i <= N; ++i) {T.Key = T.Data = i; T.put();}
     //stop(t);
     t.ok("""
                                                                                                       32                                                                                                                  |
@@ -1194,7 +1189,7 @@ abstract class BtreeSP extends Test                                             
    {final BtreeSP     t = btreeSML(2, 3);
     final Transaction T = t.new Transaction();
     final int N = 64;
-    for (int i = N; i > 0; --i) T.put(i);
+    for (int i = N; i > 0; --i) {T.Key = T.Data = i; T.put();}
     //t.stop();
     t.ok("""
                                                                                   16                                                                                              32                                                                                                                                                                                          |
@@ -1218,7 +1213,10 @@ abstract class BtreeSP extends Test                                             
    {final BtreeSP     t = btreeSML(6, 3);
     final Transaction T = t.new Transaction();
 
-    for (int i = 0; i < random_small.length; ++i) T.put(random_small[i]);
+    for (int i = 0; i < random_small.length; ++i)
+     {T.Key = T.Data = random_small[i];
+      T.put();
+     }
     //stop(t);
     t.ok("""
                                                                                                                                                                                                                                                       476                                                                                                                                                                                                                                                                                     |
@@ -1247,17 +1245,18 @@ abstract class BtreeSP extends Test                                             
     for (int i = 0; i < random_large.length; ++i)
      {final int r = random_large[i];
       s.put(r, i);
-      T.put(r, i);
+      T.Key = r; T.Data = i; T.put();
      }
     final int a = s.firstKey(), b = s.lastKey();
     for (int i = a-1; i < b + 1; ++i)
-     {if (s.containsKey(i))
-       {Node f = T.find(i);
+     {T.Key = i;
+      if (s.containsKey(i))
+       {Node f = T.find();
         ok(f.found);
         ok(f.data, s.get(i));
        }
       else
-       {Node f = T.find(i);
+       {Node f = T.find();
         ok(!f.found);
        }
      }
@@ -1267,7 +1266,7 @@ abstract class BtreeSP extends Test                                             
    {final BtreeSP     t = btreeSML(8, 3);
     final Transaction T = t.new Transaction();
     final int N = 32;
-    for (int i = 1; i <= N; i++) T.put(2*i);                                    // Insert
+    for (int i = 1; i <= N; i++) {T.Key = T.Data = 2*i; T.put();}               // Insert
     //stop(t);
     t.ok("""
                                                   33                                                      |
@@ -1282,17 +1281,20 @@ abstract class BtreeSP extends Test                                             
 """);
 
     for (int i = 0; i <= 2*N+1; i++)                                            // Update
-     {Node f = T.find(i);
+     {T.Key = i;
+      Node f = T.find();
       if (i > 0 && i % 2 == 0)
        {ok(f.found, true);
         ok(f.data,  i);
-        T.put(i, i-1);
+        T.Data = i-1;
+        T.put();
        }
       else ok(f.found, false);
      }
 
     for (int i = 0; i <= 2*N+1; i++)
-     {Node f = T.find(i);
+     {T.Key = i;
+      Node f = T.find();
       if (i > 0 && i % 2 == 0)
        {ok(f.found, true);
         ok(f.data,  i-1);
@@ -1307,7 +1309,7 @@ abstract class BtreeSP extends Test                                             
 
     final int N = 32;
     final boolean box = false;                                                  // Print read me
-    for (int i = 1; i <= N; i++) T.put(i);
+    for (int i = 1; i <= N; i++) {T.Key = T.Data = i; T.put();}
     //t.stop();
     t.ok("""
                                                       16                               24                               |
@@ -1324,7 +1326,7 @@ abstract class BtreeSP extends Test                                             
     if (box) say("At start with", N, "elements", t.printBoxed());
 
     for (int i = 1; i <= N; i++)
-     {T.delete(i);
+     {T.Key = i; T.delete();
       //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
       if (box) say("After deleting:", i, t.printBoxed());
       switch(i) {
@@ -1605,7 +1607,7 @@ abstract class BtreeSP extends Test                                             
     final Transaction T = t.new Transaction();
     final int N = 32;
     final boolean box = false;                                                  // Print read me
-    for (int i = 1; i <= N; i++) T.put(i);
+    for (int i = 1; i <= N; i++) {T.Key = T.Data = i; T.put();}
     //t.stop();
     t.ok("""
                                                       16                               24                               |
@@ -1622,7 +1624,8 @@ abstract class BtreeSP extends Test                                             
     if (box) say("At start with", N, "elements", t.printBoxed());
 
     for (int i = N; i > 0; --i)
-     {T.delete(i);
+     {T.Key = i;
+      T.delete();
       //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
       if (box) say("After deleting:", i, t.printBoxed());
       switch(i) {
@@ -1902,7 +1905,7 @@ abstract class BtreeSP extends Test                                             
     final Transaction T = t.new Transaction();
 
     final int M = 2;
-    for (int i = 1; i <= M; i++) T.put(i);
+    for (int i = 1; i <= M; i++)  {T.Key = T.Data = i; T.put();}
     //stop(""+t.toArray());
     ok(""+t.toArray(), """
 [(0, key:1 data:1)
@@ -1910,7 +1913,7 @@ abstract class BtreeSP extends Test                                             
 ]""");
 
     final int N = 16;
-    for (int i = M; i <= N; i++) T.put(i);
+    for (int i = M; i <= N; i++)  {T.Key = T.Data = i; T.put();}
     //stop(""+t.toArray());
     ok(""+t.toArray(), """
 [(0, key:1 data:1)
