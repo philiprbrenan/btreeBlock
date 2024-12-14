@@ -2,7 +2,7 @@
 // BtreeSML with single parameter list
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
-package com.AppaApps.Silicon;                                                   // Design, simulate and layout a btree in a block on the surface of a silicon chip.
+package com.AppaApps.Silicon;                                                   // Design, layout and simulate a btree in a block on the surface of a silicon chip.
 
 import java.util.*;
 
@@ -294,7 +294,7 @@ abstract class BtreeSP extends Test                                             
 
 //D2 Search                                                                     // Search within a node and update the node description with the results
 
-    void findEqualInLeaf()                                            // Find the first key in the leaf that is equal to the search key
+    void findEqualInLeaf()                                                      // Find the first key in the leaf that is equal to the search key
      {z(); assertLeaf();
       base     = leafBase();
       final StuckSP.Transaction t = stuckEqual; t.s = Leaf;
@@ -618,8 +618,8 @@ abstract class BtreeSP extends Test                                             
         tl.s = l.Leaf; nl = l.leafSize();
         tr.s = r.Leaf; nr = r.leafSize();
 
-        z(); if (nr >= maxKeysPerLeaf()) {z(); return false;}                          // Steal not possible because there is no where to put the steal
-        z(); if (nl <= 1) {z(); return false;}                                         // Steal not allowed because it would leave the leaf sibling empty
+        z(); if (nr >= maxKeysPerLeaf()) {z(); return false;}                   // Steal not possible because there is no where to put the steal
+        z(); if (nl <= 1) {z(); return false;}                                  // Steal not allowed because it would leave the leaf sibling empty
         z();
 
         tl.lastElement(); tr.key = tl.key; tr.data = tl.data; tr.unshift();     // Increase right
@@ -632,8 +632,8 @@ abstract class BtreeSP extends Test                                             
         tl.s = l.Branch; nl = l.branchSize();
         tr.s = r.Branch; nr = r.branchSize();
 
-        z(); if (nr >= maxKeysPerBranch()) {z(); return false;}                        // Steal not possible because there is no where to put the steal
-        z(); if (nl <= 1) {z(); return false;}                                         // Steal not allowed because it would leave the left sibling empty
+        z(); if (nr >= maxKeysPerBranch()) {z(); return false;}                 // Steal not possible because there is no where to put the steal
+        z(); if (nl <= 1) {z(); return false;}                                  // Steal not allowed because it would leave the left sibling empty
         z();
 
         tl.lastElement();                                                       // Increase right with left top
@@ -670,8 +670,8 @@ abstract class BtreeSP extends Test                                             
         tl.s = l.Leaf; nl = l.leafSize();
         tr.s = r.Leaf; nr = r.leafSize();
 
-        z(); if (nl >= maxKeysPerLeaf()) {z(); return false;}                          // Steal not possible because there is no where to put the steal
-        z(); if (nr <= 1) {z(); return false;}                                         // Steal not allowed because it would leave the right sibling empty
+        z(); if (nl >= maxKeysPerLeaf()) {z(); return false;}                   // Steal not possible because there is no where to put the steal
+        z(); if (nr <= 1) {z(); return false;}                                  // Steal not allowed because it would leave the right sibling empty
         z();
         tr.firstElement();                                                      // First element of right child
         tl.key = tr.key; tl.data = tr.data; tl.push();                          // Increase left
@@ -681,8 +681,8 @@ abstract class BtreeSP extends Test                                             
         tl.s = l.Branch; nl = l.branchSize();
         tr.s = r.Branch; nr = r.branchSize();
 
-        z(); if (nl >= maxKeysPerBranch()) {z(); return false;}                        // Steal not possible because there is no where to put the steal
-        z(); if (nr <= 1) {z(); return false;}                                         // Steal not allowed because it would leave the right sibling empty
+        z(); if (nl >= maxKeysPerBranch()) {z(); return false;}                 // Steal not possible because there is no where to put the steal
+        z(); if (nr <= 1) {z(); return false;}                                  // Steal not allowed because it would leave the right sibling empty
         z();
 
         tl.lastElement();                                                       // Last element of left child
@@ -786,14 +786,14 @@ abstract class BtreeSP extends Test                                             
         tl.s = l.Leaf; nl = l.leafSize();
         tr.s = r.Leaf; nr = r.leafSize();
 
-        if (nl + nr >= maxKeysPerLeaf()) {z(); return false;}                          // Combined body would be too big
+        if (nl + nr >= maxKeysPerLeaf()) {z(); return false;}                   // Combined body would be too big
        }
       else                                                                      // Children are branches
        {z();
         tl.s = l.Branch; nl = l.branchSize();
         tr.s = r.Branch; nr = r.branchSize();
 
-        if (nl + 1 + nr > maxKeysPerBranch()) {z(); return false;}                     // Merge not possible because there is not enough room for the combined result
+        if (nl + 1 + nr > maxKeysPerBranch()) {z(); return false;}              // Merge not possible because there is not enough room for the combined result
         z();
         T.index = index-1;                                                      // Top key
         T.elementAt();                                                          // Top key
@@ -835,14 +835,14 @@ abstract class BtreeSP extends Test                                             
         tl.s = l.Leaf; nl = l.leafSize();
         tr.s = r.Leaf; nr = r.leafSize();
 
-        if (nl + nr > maxKeysPerLeaf()) {z(); return false;}                           // Combined body would be too big
+        if (nl + nr > maxKeysPerLeaf()) {z(); return false;}                    // Combined body would be too big
        }
       else                                                                      // Children are branches
        {z();
         tl.s = l.Branch; nl = l.branchSize();
         tr.s = r.Branch; nr = r.branchSize();
 
-        if (nl + 1 + nr > maxKeysPerBranch()) {z(); return false;}                     // Merge not possible because there is no where to put the steal
+        if (nl + 1 + nr > maxKeysPerBranch()) {z(); return false;}              // Merge not possible because there is no where to put the steal
 
         z(); tl.lastElement();                                                  // Last element of left child
         z(); T.index = index;
@@ -974,8 +974,9 @@ abstract class BtreeSP extends Test                                             
    {BtreeSP btree;                                                              // Btree being processed
     int       Key;                                                              // Key being found, inserted or deleted
     int      Data;                                                              // Data found, inserted or deleted
-    Node     find, findAndInsert;                                               // Results of a find operation
+    Node     find, findAndInsert, parent, child, leaf;                          // Results of a find operation
     Integer delete;                                                             // Results of a deletion
+    StuckSP.Transaction T;                                                      // Transaction against a stuck
 
     Node find(int Key)                                                          // Find the data associated with a key in the tree
      {z();
@@ -984,18 +985,18 @@ abstract class BtreeSP extends Test                                             
         return root;
        }
 
-      Node parent = root;                                                       // Parent starts at root which is known to be a branch
+      parent = root;                                                            // Parent starts at root which is known to be a branch
 
       for (int i = 0; i < maxDepth; i++)                                        // Step down through tree
        {z();
         parent.search = Key; parent.findFirstGreaterThanOrEqualInBranch();      // Find next child in search path of key
-        final Node n = node(findNode, parent.next);
+        child = node(findNode, parent.next);
 
-        if (n.isLeaf())                                                         // Found the containing search
-         {z(); n.search = Key; n.findEqualInLeaf();
-          return n;
+        if (child.isLeaf())                                                     // Found the containing search
+         {z(); child.search = Key; child.findEqualInLeaf();
+          return child;
          }
-        parent = node(parentNode, n.node);                                      // Step down to lower branch
+        parent = node(parentNode, child.node);                                  // Step down to lower branch
        }
       stop("Search did not terminate in a leaf");
       return null;
@@ -1003,10 +1004,9 @@ abstract class BtreeSP extends Test                                             
 
     Node findAndInsert(int Key, int Data)                                       // Find the leaf that should contain this key and insert or update it is possible
      {z();
-      final Node leaf = find(Key);                                              // Find the leaf that should contain this key
-      //key = Key; data = Data;
+      leaf = find(Key);                                                         // Find the leaf that should contain this key
 
-      final StuckSP.Transaction T = stuckion; T.s = leaf.Leaf;
+      T = stuckion; T.s = leaf.Leaf;
 
       if (leaf.found)                                                           // Found the key in the leaf so update it with the new data
        {z(); T.key = Key; T.data = Data; T.index = leaf.index; T.setElementAt();
@@ -1034,41 +1034,39 @@ abstract class BtreeSP extends Test                                             
 //D1 Insertion                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
 
     void put(int Key, int Data)                                                 // Insert a key, data pair into the tree or update and existing key with a new datum
-     {z(); final Node f = findAndInsert(Key, Data);                             // Try direct insertion with no modifications to the shape of the tree
-      if (f.success) return;                                                    // Inserted or updated successfully
+     {z(); findAndInsert = findAndInsert(Key, Data);                            // Try direct insertion with no modifications to the shape of the tree
+      if (findAndInsert.success) return;                                        // Inserted or updated successfully
       z();
       if (root.isFull())                                                        // Start the insertion at the root, after splitting it if necessary
        {z();
         if (root.isLeaf()) {z(); root.splitLeafRoot();}
         else               {z(); root.splitBranchRoot();}
         z();
-        final Node F = findAndInsert(Key, Data);                                // Splitting the root might have been enough
-        if (F.success) return;                                                  // Inserted or updated successfully
+        findAndInsert = findAndInsert(Key, Data);                               // Splitting the root might have been enough
+        if (findAndInsert.success) return;                                      // Inserted or updated successfully
        }
-      z();
-      Node p = root;
+      z(); parent = root;
 
       for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
        {z();
-        p.search = Key; p.findFirstGreaterThanOrEqualInBranch();
-        final Node q = node(putNode, p.next);
-        if (q.isLeaf())                                                         // Reached a leaf
+        parent.search = Key; parent.findFirstGreaterThanOrEqualInBranch();
+        child = node(putNode, parent.next);
+        if (child.isLeaf())                                                     // Reached a leaf
          {z();
-          q.parent = p; q.index = p.first; q.splitLeaf();
+          child.parent = parent; child.index = parent.first; child.splitLeaf();
           findAndInsert(Key, Data);
           merge(Key);
           return;
          }
         z();
-        if (q.isFull())
+        if (child.isFull())
          {z();
-          q.parent = p; q.index = p.first; q.splitBranch();                     // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
-          p.search = Key; p.findFirstGreaterThanOrEqualInBranch();              // Perform the step down again as the split will have altered the local layout
-          p = node(parentNode, p.next);
+          child.parent = parent; child.index = parent.first; child.splitBranch(); // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
+          parent.search = Key; parent.findFirstGreaterThanOrEqualInBranch();    // Perform the step down again as the split will have altered the local layout
+          parent = node(parentNode, parent.next);
          }
         else                                                                    // Step down directly as no split was required
-         {z();
-          p = node(parentNode, q.node);
+         {z(); parent = node(parentNode, child.node);
          }
        }
       stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
@@ -1081,15 +1079,15 @@ abstract class BtreeSP extends Test                                             
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
 
     Integer findAndDelete(int Key)                                              // Delete a key from the tree and returns its data if present without modifying the shape of tree
-     {z(); final Node f = find(Key);                                            // Try direct insertion with no modifications to the shape of the tree
-      if (!f.found) return null;                                                // Inserted or updated successfully
+     {z(); find = find(Key);                                                    // Try direct insertion with no modifications to the shape of the tree
+      if (!find.found) return null;                                             // Inserted or updated successfully
       z();
-      final StuckSP.Transaction T = stuckLeaf; T.s = f.Leaf;                    // The leaf that contains the key
-                                T.index = f.index;                              // Position in the leaf of the key
-                                T.elementAt();
-      final int d = T.data;                                                     // Key, data pairs in the leaf
+      T = stuckLeaf; T.s = find.Leaf;                                           // The leaf that contains the key
+      T.index = find.index; T.elementAt();                                      // Position in the leaf of the key
+
+      Data = T.data;                                                            // Key, data pairs in the leaf
       T.removeElementAt();                                                      // Remove the key, data pair from the leaf
-      return d;
+      return Data;
      }
 
     Integer delete(int Key)                                                     // Insert a key, data pair into the tree or update and existing key with a new datum
@@ -1100,21 +1098,21 @@ abstract class BtreeSP extends Test                                             
        }
       z();
 
-      Node p = root;                                                            // Start at root
+      parent = root;                                                            // Start at root
 
       for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-       {z(); p.search = Key; p.findFirstGreaterThanOrEqualInBranch();           // Step down
+       {z(); parent.search = Key; parent.findFirstGreaterThanOrEqualInBranch(); // Step down
 
-        p.index = p.first; p.balance();
-        final Node q = node(deleteNode, p.next);
+        parent.index = parent.first; parent.balance();
+        child = node(deleteNode, parent.next);
 
-        if (q.isLeaf())                                                         // Reached a leaf
+        if (child.isLeaf())                                                     // Reached a leaf
          {z();
           final int data = findAndDelete(Key);
           merge(Key);
           return data;
          }
-        z(); p = node(parentNode, q.node);
+        z(); parent = node(parentNode, child.node);
        }
       stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
       return null;
@@ -1125,19 +1123,19 @@ abstract class BtreeSP extends Test                                             
     void merge(int Key)                                                         // Merge along the specified search path
      {z();
       root.mergeRoot();
-      Node p = root;                                                            // Start at root
+      parent = root;                                                            // Start at root
 
       for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-       {z(); if (p.isLeaf()) return;
+       {z(); if (parent.isLeaf()) return;
         z();
-        for (int j = 0; j < p.branchSize(); j++)                                // Try merging each sibling pair which might change the size of the parent
+        for (int j = 0; j < parent.branchSize(); j++)                           // Try merging each sibling pair which might change the size of the parent
          {z();
-          p.index = j; if (p.mergeLeftSibling ()) --j;                          // A successful merge of the left  sibling reduces the current index and the upper limit
-          p.index = j;     p.mergeRightSibling();                               // A successful merge of the right sibling maintains the current position but reduces the upper limit
+          parent.index = j; if (parent.mergeLeftSibling ()) --j;                // A successful merge of the left  sibling reduces the current index and the upper limit
+          parent.index = j;     parent.mergeRightSibling();                     // A successful merge of the right sibling maintains the current position but reduces the upper limit
          }
 
-        p.search = Key; p.findFirstGreaterThanOrEqualInBranch();                // Step down
-        p = node(parentNode, p.next);
+        parent.search = Key; parent.findFirstGreaterThanOrEqualInBranch();      // Step down
+        parent = node(parentNode, parent.next);
        }
       stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
      }
