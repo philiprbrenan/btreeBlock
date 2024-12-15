@@ -50,7 +50,7 @@ abstract class StuckSA extends Test                                             
     return l.compile();
    }
 
-  Layout transactionLayout()                                                    // Layout of temporary memeory used by a transaction
+  Layout transactionLayout()                                                    // Layout of temporary memory used by a transaction
    {z();
     final Layout l = Layout.layout();
      search = l.variable ( "search", bitsPerKey());
