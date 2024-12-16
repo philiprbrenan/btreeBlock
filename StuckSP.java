@@ -1,20 +1,18 @@
 //------------------------------------------------------------------------------
-// StuckSML parameterized by a single structure
+// StuckSP parameterized by a single structure
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
 
 abstract class StuckSP extends Test                                             // A fixed size stack of ordered key, data pairs
- {abstract Memory memory();                                                     // Memory containing the stuck
-  abstract int maxSize();                                                       // The maximum number of entries in the stuck.
+ {abstract int maxSize();                                                       // The maximum number of entries in the stuck.
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
   abstract int bitsPerSize();                                                   // The number of bits in size field
-  final MemoryLayout tmp = new MemoryLayout(layout());                          // Temporary storage to hold intermediate results
 
-  int baseAt() {return 0;}                                                      // Offset the memory for the stuck by this amount
+  final MemoryLayout memoryLayout = new MemoryLayout();                         // Memory for stuck
+  final MemoryLayout cpy          = new MemoryLayout();                         // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
 
-  Layout layout;                                                                // Layout of memory containing the stuck
   Layout.Variable  key;                                                         // Key in a stuck
   Layout.Array     Keys;                                                        // Array of keys
   Layout.Variable  data;                                                        // Data associated with a key
@@ -28,24 +26,19 @@ abstract class StuckSP extends Test                                             
 
   StuckSP()                                                                     // Create the stuck with a maximum number of the specified elements
    {z();
-    layout = layout();
+    memoryLayout.layout(layout());
+    cpy.layout(memoryLayout.layout);
+    cpy.memory(new Memory(cpy.layout.size()));
    }
 
-  MemoryLayout memoryLayout()                                                   // The memory layout of this stuck
-   {z(); return new MemoryLayout(memory(), layout, baseAt());
-   };
-
-  StuckSP at(int Base)                                                          // Reference a stuck at an offset in memory by copying all the details of a stuck and applying a new base address to make this description reentrant.
+  StuckSP copy()                                                                // Copy a stuck definition
    {z();
-    final StuckSP  parent = this;
-    final int        base = Base;
-    final StuckSP   child = new StuckSP()
-     {int baseAt     () {return base;}
-      int maxSize    () {return parent.maxSize    ();}
+    final StuckSP parent = this;
+    final StuckSP  child = new StuckSP()
+     {int maxSize    () {return parent.maxSize    ();}
       int bitsPerKey () {return parent.bitsPerKey ();}
       int bitsPerData() {return parent.bitsPerData();}
       int bitsPerSize() {return parent.bitsPerSize();}
-      Memory memory  () {return parent.memory();}
      };
     child.key         = parent.key;
     child.Keys        = parent.Keys;
@@ -53,54 +46,54 @@ abstract class StuckSP extends Test                                             
     child.Data        = parent.Data;
     child.currentSize = parent.currentSize;
     child.stuck       = parent.stuck;
+    child.memoryLayout.memory(parent.memoryLayout.memory);
+    child.memoryLayout.layout(parent.memoryLayout.layout);
+    child.memoryLayout.base  (parent.memoryLayout.base);
     return child;
    }
 
   Layout layout()                                                               // Layout describing stuck
    {z();
-    layout      = Layout.layout();
-    key         = layout.variable ("key"        ,         bitsPerKey());
-    Keys        = layout.array    ("Keys"       , key,    maxSize());
-    data        = layout.variable ("data"       ,         bitsPerData());
-    Data        = layout.array    ("Data"       , data,   maxSize());
-    currentSize = layout.variable ("currentSize", bitsPerSize());
-    stuck       = layout.structure("stuck"      , currentSize, Keys, Data);
-    return layout.compile();
+    final Layout  l = Layout.layout();
+    key         = l.variable ("key"        ,         bitsPerKey());
+    Keys        = l.array    ("Keys"       , key,    maxSize());
+    data        = l.variable ("data"       ,         bitsPerData());
+    Data        = l.array    ("Data"       , data,   maxSize());
+    currentSize = l.variable ("currentSize", bitsPerSize());
+    stuck       = l.structure("stuck"      , currentSize, Keys, Data);
+    return l.compile();
    }
 
-  static StuckSP stuckStatic()                                                  // Create a sample stuck
-   {z();
-    return new StuckSP()
-     {final Memory memory = new Memory(layout.size()+baseAt());
-      int maxSize     () {return  8;}
-      int bitsPerKey  () {return 16;}
-      int bitsPerData () {return 16;}
-      int bitsPerSize () {return 16;}
-      int baseAt ()      {return 16;}                                           // Test an offset stuck
-      Memory       memory      () {return memory;}
-     };
+  void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
+   {z();  memoryLayout.base(Base);
    }
-
-  public void ok(String expected) {ok(toString(), expected);}                   // Check the stuck
 
 //D1 Transactions                                                               // Transactions on the stuck
 
   static class Transaction                                                      // Transaction on a stuck. Kept seperate from the stuck itself because instances of this class are only needed when performing a transaction, they do not need to be stored long term like the data in the stuck.  Made static so that we can create a supply of transactions up front rather then relying on creating new ones as needed.
-   {String action;                                                              // Action performed
-    int    search;                                                              // Search key
-    int     limit;                                                              // Limit of search
-    boolean isFull;                                                             // Whether the stuck is currently full
+   {String   action;                                                            // Action performed
+    int      search;                                                            // Search key
+    int       limit;                                                            // Limit of search
+    boolean  isFull;                                                            // Whether the stuck is currently full
     boolean isEmpty;                                                            // Whether the stuck is currently empty
-    boolean found;                                                              // Whether a matcbing element was found
-    int     index;                                                              // The index from which the key, data pair were retrieved
-    int       key;                                                              // The retrieved key
-    int      data;                                                              // The retrieved data
-    int      size;                                                              // The current size of the stuck
-    StuckSP     s;                                                              // The stuck we are manipulating with this transaction
+    boolean   found;                                                            // Whether a matcbing element was found
+    int       index;                                                            // The index from which the key, data pair were retrieved
+    int         key;                                                            // The retrieved key
+    int        data;                                                            // The retrieved data
+    int        size;                                                            // The current size of the stuck
+    StuckSP       S;                                                            // The stuck we are manipulating with this transaction
+    MemoryLayout  M;                                                            // Memory containing the stuck
+    MemoryLayout  C;                                                            // Temporary copy of stuck
 
-    void size() {z(); size = s.memoryLayout().getInt(s.currentSize);}           // The current number of key elements in the stuck
+    void setStuck(StuckSP stuck)                                                // Address stuck referenced by this transaction
+     {S = stuck;
+      M = S.memoryLayout;
+      C = S.cpy;
+     }
 
-    void isFull () {z(); isFull  = size >= s.maxSize();}                        // Check the stuck is full
+    void size() {z(); size = M.getInt(S.currentSize);}                           // The current number of key elements in the stuck
+
+    void isFull () {z(); isFull  = size >= S.maxSize();}                        // Check the stuck is full
     void isEmpty() {z(); isEmpty = size == 0;}                                  // Check the stuck is empty
 
     void assertNotFull   () {z(); if (isFull ) stop("Full") ;}                  // Assert the stuck is not full
@@ -108,14 +101,14 @@ abstract class StuckSP extends Test                                             
     void assertInNormal  () {z(); if (index < 0 || index >= size) stop("Out of normal range",   index, "for size", size);} // Check that the index would yield a valid element
     void assertInExtended() {z(); if (index < 0 || index >  size) stop("Out of extended range", index, "for size", size);} // Check that the index would yield a valid element
 
-    void inc() {z(); assertNotFull (); final int v = size+1; s.memoryLayout().setInt(s.currentSize, v);}  // Increment the current size
-    void dec() {z(); assertNotEmpty(); final int v = size-1; s.memoryLayout().setInt(s.currentSize, v);}  // Decrement the current size
+    void inc() {z(); assertNotFull (); final int v = size+1; M.setInt(S.currentSize, v);}  // Increment the current size
+    void dec() {z(); assertNotEmpty(); final int v = size-1; M.setInt(S.currentSize, v);}  // Decrement the current size
 
-    void key () {z(); key  = s.memoryLayout().getInt(s.key,  index);}           // Get key
-    void data() {z(); data = s.memoryLayout().getInt(s.data, index);}           // Get data
+    void key () {z(); key  = M.getInt(S.key,  index);}                          // Get key
+    void data() {z(); data = M.getInt(S.data, index);}                          // Get data
 
-    void setKey  ()  {z(); s.memoryLayout().setInt (s.key,  key,  index);}
-    void setData ()  {z(); s.memoryLayout().setInt (s.data, data, index);}
+    void setKey  ()  {z(); M.setInt (S.key,  key,  index);}
+    void setData ()  {z(); M.setInt (S.data, data, index);}
 
     void  setKeyData()                                                          // Set a key, data element in the stuck
      {z();
@@ -125,7 +118,7 @@ abstract class StuckSP extends Test                                             
 
     void clear()                                                                // Clear the stuck
      {z();
-      s.memoryLayout().setInt(s.currentSize, 0);
+      M.setInt(S.currentSize, 0);
       size(); isFull(); isEmpty();
      }
 
@@ -142,11 +135,10 @@ abstract class StuckSP extends Test                                             
      {z(); action = "unshift";
       size(); isFull(); assertNotFull();
       found = true;
-      final MemoryLayout M = s.memoryLayout(), T = s.tmp;
-      T.zero();
-      M.at(s.Keys).moveUp(T.at(s.currentSize), T.at(s.Keys));
-      M.at(s.Data).moveUp(T.at(s.currentSize), T.at(s.Data));
-      M.at(s.currentSize).inc();
+      C.zero();
+      M.at(S.Keys).moveUp(C.at(S.currentSize), C.at(S.Keys));
+      M.at(S.Data).moveUp(C.at(S.currentSize), C.at(S.Data));
+      M.at(S.currentSize).inc();
       index = 0;
       setKeyData();
       size(); isFull(); isEmpty();
@@ -171,11 +163,10 @@ abstract class StuckSP extends Test                                             
       key ();
       data();
 
-      final MemoryLayout M = s.memoryLayout(), T = s.tmp;
-      T.zero();
-      M.at(s.Keys).moveDown(T.at(s.currentSize), T.at(s.Keys));
-      M.at(s.Data).moveDown(T.at(s.currentSize), T.at(s.Data));
-      M.at(s.currentSize).dec();
+      C.zero();
+      M.at(S.Keys).moveDown(C.at(S.currentSize), C.at(S.Keys));
+      M.at(S.Data).moveDown(C.at(S.currentSize), C.at(S.Data));
+      M.at(S.currentSize).dec();
 
       size(); isEmpty(); isFull();
      }
@@ -205,12 +196,11 @@ abstract class StuckSP extends Test                                             
       size(); isFull();
       assertInExtended();
 
-      final MemoryLayout M = s.memoryLayout(), T = s.tmp;
-      T.zero();
-      T.at(s.currentSize).setInt(index);
-      M.at(s.Keys).moveUp(T.at(s.currentSize), T.at(s.Keys));
-      M.at(s.Data).moveUp(T.at(s.currentSize), T.at(s.Data));
-      M.at(s.currentSize).inc();
+      C.zero();
+      C.at(S.currentSize).setInt(index);
+      M.at(S.Keys).moveUp(C.at(S.currentSize), C.at(S.Keys));
+      M.at(S.Data).moveUp(C.at(S.currentSize), C.at(S.Data));
+      M.at(S.currentSize).inc();
 
       setKeyData();
       inc();
@@ -223,12 +213,11 @@ abstract class StuckSP extends Test                                             
       found = true;
       key ();
       data();
-      final MemoryLayout M = s.memoryLayout(), T = s.tmp;
-      T.zero();
-      T.at(s.currentSize).setInt(index);
-      M.at(s.Keys).moveDown(T.at(s.currentSize), T.at(s.Keys));
-      M.at(s.Data).moveDown(T.at(s.currentSize), T.at(s.Data));
-      M.at(s.currentSize).dec();
+      C.zero();
+      C.at(S.currentSize).setInt(index);
+      M.at(S.Keys).moveDown(C.at(S.currentSize), C.at(S.Keys));
+      M.at(S.Data).moveDown(C.at(S.currentSize), C.at(S.Data));
+      M.at(S.currentSize).dec();
 
       size(); isEmpty(); isFull();
      }
@@ -298,7 +287,8 @@ abstract class StuckSP extends Test                                             
   public String toString()                                                      // Print a stuck
    {final StringBuilder s = new StringBuilder();
     z();
-    final Transaction r = new Transaction(); r.s = this; r.size();
+    final Transaction r = new Transaction(); r.setStuck(this);
+    r.size();
     final int N = r.size;
     s.append("StuckSP(maxSize:"+maxSize());
     s.append(" size:"+N+")\n");
@@ -308,11 +298,29 @@ abstract class StuckSP extends Test                                             
     return s.toString();
    }
 
+//D1 Testing                                                                    // Test the stuck
+
+  static StuckSP stuckStatic()                                                  // Create a sample stuck
+   {z();
+    final int offset = 16;                                                      // To make testing more relevant
+    final StuckSP s =  new StuckSP()
+     {int maxSize     () {return  8;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+    s.memoryLayout.memory(new Memory(s.memoryLayout.layout.size()+offset));
+    s.base(offset);
+    return s;
+   }
+
+  public void ok(String expected) {ok(toString(), expected);}                   // Check the stuck
+
 //D0 Tests                                                                      // Test stuck
 
   static StuckSP test_load()
    {StuckSP t = stuckStatic();
-    final Transaction r = new Transaction(); r.s = t;
+    final Transaction r = new Transaction(); r.setStuck(t);
     for (int i = 0; i < 4; i++)
      {r.key = 2 + 2 * i; r.data = 1 + i;
       r.push();
@@ -330,20 +338,20 @@ StuckSP(maxSize:8 size:4)
 
   static void test_clear()
    {StuckSP t = test_load();
-    final Transaction r = new Transaction(); r.s = t;
+    final Transaction r = new Transaction(); r.setStuck(t);
     r.clear();
     ok(r.size,   0);
    }
 
   static void test_push()
    {StuckSP t = stuckStatic();
-    final Transaction r = new Transaction(); r.s = t;
+    final Transaction r = new Transaction(); r.setStuck(t);
     r.key = 15; r.data =  9; r.push();
     r.key = 14; r.data = 10; r.push();
     r.key = 13; r.data = 11; r.push();
     r.key = 12; r.data = 12; r.push();
     //stop(t.memoryLayout());
-    ok(t.memoryLayout(), """
+    ok(t.memoryLayout, """
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       16       272                                      stuck
    2 V       16        16                                  4     currentSize
@@ -367,7 +375,7 @@ Line T       At      Wide       Size    Indices        Value   Name
   20 V      272        16               7                  0       data
 """);
     //stop(t.memory());
-    ok(t.memory(), """
+    ok(t.memoryLayout.memory, """
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 000c 000b 000a 0009 0000 0000 0000 0000 000c 000d 000e 000f 0004 0000
@@ -393,7 +401,7 @@ StuckSP(maxSize:8 size:4)
 
   static void test_pop()
    {StuckSP      t = test_load();
-    final Transaction r = new Transaction(); r.s = t;
+    final Transaction r = new Transaction(); r.setStuck(t);
 
     r.pop();
     //stop(r);
@@ -418,7 +426,7 @@ StuckSP(maxSize:8 size:3)
 
   static void test_shift()
    {StuckSP t = test_load();
-    final Transaction r = new Transaction(); r.s = t;
+    final Transaction r = new Transaction(); r.setStuck(t);
 
     r.shift();
     ok(r, """
@@ -441,7 +449,7 @@ StuckSP(maxSize:8 size:3)
 
   static void test_unshift()
    {StuckSP t = test_load();
-    final Transaction r = new Transaction(); r.s = t;
+    final Transaction r = new Transaction(); r.setStuck(t);
 
     r.key = 9; r.data = 9; r.unshift();
     //stop(r);
@@ -467,7 +475,7 @@ StuckSP(maxSize:8 size:5)
 
   static void test_elementAt()
    {StuckSP     t = test_load();
-    final Transaction r = new Transaction(); r.s = t;
+    final Transaction r = new Transaction(); r.setStuck(t);
     r.index = 2; r.elementAt();
     //stop(r);
     ok(r, """
@@ -485,7 +493,7 @@ Transaction(action:elementAt search:0 limit:0 found:true index:2 key:6 data:3 si
 
   static void test_set_element_at()
    {StuckSP  t = test_load();
-    final Transaction r = new Transaction(); r.s = t;
+    final Transaction r = new Transaction(); r.setStuck(t);
 
     r.key = 22; r.data = 33; r.index = 2; r.setElementAt();
     //stop(t);
@@ -519,7 +527,7 @@ StuckSP(maxSize:8 size:5)
 
   static void test_insert_element_at()
    {StuckSP t = test_load();
-    final Transaction r = new Transaction(); r.s = t;
+    final Transaction r = new Transaction();  r.setStuck(t);
 
     r.key = 9; r.data = 9; r.index = 2; r.insertElementAt();
     //stop(t);
@@ -551,7 +559,7 @@ StuckSP(maxSize:8 size:6)
 
   static void test_remove_element_at()
    {StuckSP t = test_load();
-    final Transaction r = new Transaction(); r.s = t;
+    final Transaction r = new Transaction();  r.setStuck(t);
 
     r.index = 2; r.removeElementAt();
     //stop(r);
@@ -574,7 +582,7 @@ StuckSP(maxSize:8 size:3)
 
   static void test_first_last()
    {StuckSP t = test_load();
-    final Transaction r = new Transaction(); r.s = t;
+    final Transaction r = new Transaction();  r.setStuck(t);;
 
     r.firstElement();
     //stop(r);
@@ -595,7 +603,7 @@ Transaction(action:lastElement search:0 limit:0 found:true index:3 key:8 data:4 
 
   static void test_search()
    {StuckSP  t = test_load();
-    final Transaction r = new Transaction(); r.s = t;
+    final Transaction r = new Transaction();  r.setStuck(t);;
 
     r.search = 2; r.search();
     //stop(r);
@@ -617,7 +625,7 @@ Transaction(action:search search:8 limit:0 found:true index:3 key:8 data:4 size:
 
   static void test_search_except_last()
    {StuckSP  t = test_load();
-    final Transaction r = new Transaction(); r.s = t;
+    final Transaction r = new Transaction(); r.setStuck(t);
     r.limit = 1;
 
     r.search = 4;  r.search();
@@ -635,7 +643,7 @@ Transaction(action:search search:8 limit:1 found:false index:3 key:6 data:2 size
 
   static void test_search_first_greater_than_or_equal()
    {StuckSP  t = test_load();
-    final Transaction r = new Transaction();  r.s = t;
+    final Transaction r = new Transaction(); r.setStuck(t);
 
     r.search = 5; r.searchFirstGreaterThanOrEqual();
     //stop(r);
@@ -652,7 +660,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:0 found:true ind
 
   static void test_search_first_greater_than_or_equal_except_last()
    {StuckSP      t = test_load();
-    final Transaction r = new Transaction(); r.s = t;
+    final Transaction r = new Transaction(); r.setStuck(t);
     r.limit  = 1;
     r.search = 5; r.searchFirstGreaterThanOrEqual();
     //stop(r);
@@ -668,34 +676,34 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:false in
    }
 
   static void test_at()
-   {final int      N = 16;
+   {final int     N = 16;
     final StuckSP S = new StuckSP()
-     {final Memory memory = new Memory(layout.size()*2);
-      int maxSize     () {return 4;}
+     {int maxSize     () {return 4;}
       int bitsPerKey  () {return 8;}
       int bitsPerData () {return 8;}
       int bitsPerSize () {return 8;}
       int baseAt      () {return 0;}
-      Memory memory   () {return memory;}
      };
 
-    final StuckSP      s = S.at(0);
-    final Transaction st = new Transaction(); st.s = s;
+    S.memoryLayout.memory(new Memory(S.memoryLayout.layout.size()*2));
+
+    final StuckSP      s = S.copy(); s.base(0);
+    final Transaction st = new Transaction(); st.setStuck(s);
 
     st.key = 2; st.data = 1; st.push();
     st.key = 4; st.data = 2; st.push();
     st.key = 6; st.data = 3; st.push();
     st.key = 8; st.data = 4; st.push();
 
-    final StuckSP t = S.at(S.layout.size());
-    final Transaction tt = new Transaction(); tt.s = t;
+    final StuckSP t = S.copy(); t.base(S.memoryLayout.layout.size());
+    final Transaction tt = new Transaction(); tt.setStuck(t);
 
     tt.key = 1; tt.data = 2; tt.push();
     tt.key = 2; tt.data = 4; tt.push();
     tt.key = 3; tt.data = 6; tt.push();
     tt.key = 4; tt.data = 8; tt.push();
-    //stop(s.memoryLayout());
-    ok(s.memoryLayout(), """
+    //stop(st.M);
+    ok(st.M, """
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        72                                      stuck
    2 V        0         8                                  4     currentSize
@@ -711,8 +719,8 @@ Line T       At      Wide       Size    Indices        Value   Name
   12 V       64         8               3                  4       data
 """);
 
-    //stop(t.memoryLayout());
-    ok(t.memoryLayout(), """
+    //stop(tt.M);
+    ok(tt.M, """
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       72        72                                      stuck
    2 V       72         8                                  4     currentSize
@@ -728,8 +736,8 @@ Line T       At      Wide       Size    Indices        Value   Name
   12 V      136         8               3                  8       data
 """);
 
-    //stop(S.memory());
-    ok(S.memory(), """
+    //stop(S.memoryLayout.memory);
+    ok(S.memoryLayout.memory, """
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0806 0402 0403 0201 0404 0302 0108 0604 0204
