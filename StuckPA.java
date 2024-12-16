@@ -5,7 +5,7 @@
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
 
 abstract class StuckPA extends Test                                             // A fixed size stack of ordered key, data pairs
- {abstract Memory memory();                                                     // Memory containing the stuck
+ {/*abstract Memory memory();                                                     // Memory containing the stuck
   abstract int maxSize();                                                       // The maximum number of entries in the stuck.
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -1038,4 +1038,5 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
       System.exit(1);
      }
    }
+*/
  }
