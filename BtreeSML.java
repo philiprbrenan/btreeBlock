@@ -7,9 +7,7 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 abstract class BtreeSML extends Test                                            // Manipulate a btree using static methods and memory
- {Memory       memory;                                                          // Memory containing the btree
-  Layout       layout;                                                          // Layout of memory used by btree
-  MemoryLayout memoryLayout;                                                    // The memory layout of the btree
+ {MemoryLayout memoryLayout = new MemoryLayout();                               // The memory layout of the btree
   abstract int maxSize();                                                       // The maxuimum bunber of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -23,7 +21,6 @@ abstract class BtreeSML extends Test                                            
   StuckSML Leaf;                                                                // Leaf definition
   StuckSML Branch;                                                              // Branch defintion
 
-  Layout           l;                                                           // Layout of memory used by btree
   Layout.Field     leaf;                                                        // Layout of a leaf in the memory used by btree
   Layout.Field     branch;                                                      // Layout of a branch in the memory used by btree
   Layout.Union     branchOrLeaf;                                                // Layout of either a leaf or a branch in the memory used by btree
@@ -59,9 +56,8 @@ abstract class BtreeSML extends Test                                            
 
   BtreeSML()                                                                    // Define a BTree with user specified dimensions
    {z();
-    layout       = layout();
-    memoryLayout = new MemoryLayout(layout);
-    memory       = memoryLayout.memory;
+    memoryLayout.layout = layout();
+    memoryLayout.memory(new Memory(memoryLayout.layout.size()));
     for (int i = maxSize(); i > 0; --i)                                         // Put all the nodes on the free chain at the start with low nodes first
      {final Node n = parentNode;
       n.node = i - 1;
@@ -96,7 +92,6 @@ abstract class BtreeSML extends Test                                            
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerData();}
       int           bitsPerSize() {return btree.bitsPerSize();}
-      Memory             memory() {return btree.memory;}
      };
 
     Branch = new StuckSML()                                                     // Branch
@@ -104,20 +99,19 @@ abstract class BtreeSML extends Test                                            
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerNext();}
       int           bitsPerSize() {return btree.bitsPerSize();}
-      Memory             memory() {return btree.memory;}
      };
 
-    layout       = Layout.layout();
-    leaf         = layout.duplicate("leaf",         Leaf  .layout());
-    branch       = layout.duplicate("branch",       Branch.layout());
-    branchOrLeaf = layout.union    ("branchOrLeaf", leaf,   branch);
-    isLeaf       = layout.bit      ("isLeaf");
-    free         = layout.variable ("free",         btree.bitsPerNext());
-    node         = layout.structure("node",         isLeaf, free, branchOrLeaf);
-    nodes        = layout.array    ("nodes",        node,         maxSize());
-    freedChain   = layout.variable ("freedChain",   btree.bitsPerNext());
-    bTree        = layout.structure("bTree",        freedChain  , nodes);
-    return layout.compile();
+    final Layout l = Layout.layout();
+    leaf         = l.duplicate("leaf",         Leaf  .layout());
+    branch       = l.duplicate("branch",       Branch.layout());
+    branchOrLeaf = l.union    ("branchOrLeaf", leaf,   branch);
+    isLeaf       = l.bit      ("isLeaf");
+    free         = l.variable ("free",         btree.bitsPerNext());
+    node         = l.structure("node",         isLeaf, free, branchOrLeaf);
+    nodes        = l.array    ("nodes",        node,         maxSize());
+    freedChain   = l.variable ("freedChain",   btree.bitsPerNext());
+    bTree        = l.structure("bTree",        freedChain  , nodes);
+    return l.compile();
    }
 
 //D1 Control                                                                    // Testing, control and integrity
@@ -172,8 +166,12 @@ abstract class BtreeSML extends Test                                            
      }
 
     void setStucks()                                                            // Descriptions of the stucks addressed by this node setting their base offsets
-     {Leaf   = BtreeSML.this.Leaf  .at(leafBase());                             // Address the leaf stuck
-      Branch = BtreeSML.this.Branch.at(branchBase());                           // Address the branch stuck
+     {Leaf   = BtreeSML.this.Leaf.copy();                                       // Address the leaf stuck
+      Leaf.base(leafBase());
+      Leaf.memoryLayout.memory(BtreeSML.this.memoryLayout.memory);
+      Branch = BtreeSML.this.Branch.copy();                                            // Address the branch stuck
+      Branch.base(branchBase());
+      Branch.memoryLayout.memory(BtreeSML.this.memoryLayout.memory);
      }
 
     void free()                                                                 // Free a new node to make it available for reuse
@@ -189,14 +187,14 @@ abstract class BtreeSML extends Test                                            
      {z();
       final Layout.Field n = BtreeSML.this.node;
       final int at = n.at(node), w = n.width;
-      memory.zero(at, w);
+      BtreeSML.this.memoryLayout.memory.zero(at, w);
      }
 
     void erase()                                                                // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
      {z();
       final Layout.Field n = BtreeSML.this.node;
       final int at = n.at(node), w = n.width;
-      memory.ones(at, w);
+      BtreeSML.this.memoryLayout.memory.ones(at, w);
      }
 
     int leafBase()   {z(); return leaf  .at(node);}                             // Base of leaf stuck in memory
