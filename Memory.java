@@ -47,12 +47,6 @@ class Memory extends Test                                                       
 
   int size() {z(); return bits.length;}                                         // Size of memory
 
-//D1 Interfaces                                                                 // Operations on memory
-
-  interface Relocatable                                                         // A relocatable object has a base address
-   {default int get() {return 0;}                                               // The default relocation address is zero
-   }
-
 //D1 Operations                                                                 // Operations on memory
 
 //D2 Basic                                                                      // Basic memory access
@@ -331,13 +325,6 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 """);
    }
 
-  static void test_relocatable()
-   {Relocatable r = new Relocatable() {};
-    Relocatable s = new Relocatable() {public int get() {return 1;}};
-    ok(r.get(), 0);
-    ok(s.get(), 1);
-   }
-
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_set_get();
     test_zero_ones();
@@ -346,12 +333,10 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
     test_boolean();
     test_alternating();
     test_all_zeros_and_ones();
-    test_relocatable();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_relocatable();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
