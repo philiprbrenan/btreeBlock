@@ -7,9 +7,7 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 abstract class BtreeSP extends Test                                             // Manipulate a btree using static methods and memory
- {Memory       memory;                                                          // Memory containing the btree
-  Layout       layout;                                                          // Layout of memory used by btree
-  MemoryLayout memoryLayout;                                                    // The memory layout of the btree
+ {MemoryLayout memoryLayout = new MemoryLayout();                               // The memory layout of the btree
   abstract int maxSize();                                                       // The maxuimum bunber of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -67,9 +65,8 @@ abstract class BtreeSP extends Test                                             
 
   BtreeSP()                                                                     // Define a Btree with user specified dimensions
    {z();
-    layout       = layout();
-    memoryLayout = new MemoryLayout(layout);
-    memory       = memoryLayout.memory;
+    memoryLayout.layout(layout());
+    memoryLayout.memory(new Memory(memoryLayout.layout.size()));
     for (int i = maxSize(); i > 0; --i)                                         // Put all the nodes on the free chain at the start with low nodes first
      {final Node n = parentNode;
       n.node = i - 1;
@@ -104,7 +101,6 @@ abstract class BtreeSP extends Test                                             
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerData();}
       int           bitsPerSize() {return btree.bitsPerSize();}
-      Memory             memory() {return btree.memory;}
      };
 
     branchStuck = new StuckSP()                                                 // Branch
@@ -112,20 +108,19 @@ abstract class BtreeSP extends Test                                             
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerNext();}
       int           bitsPerSize() {return btree.bitsPerSize();}
-      Memory             memory() {return btree.memory;}
      };
 
-    layout       = Layout.layout();
-    leaf         = layout.duplicate("leaf",         leafStuck.layout());
-    branch       = layout.duplicate("branch",       branchStuck.layout());
-    branchOrLeaf = layout.union    ("branchOrLeaf", leaf,   branch);
-    isLeaf       = layout.bit      ("isLeaf");
-    free         = layout.variable ("free",         btree.bitsPerNext());
-    Node         = layout.structure("node",         isLeaf, free, branchOrLeaf);
-    nodes        = layout.array    ("nodes",        Node,         maxSize());
-    freedChain   = layout.variable ("freedChain",   btree.bitsPerNext());
-    bTree        = layout.structure("bTree",        freedChain  , nodes);
-    return layout.compile();
+    final Layout l = Layout.layout();
+    leaf         = l.duplicate("leaf",         leafStuck.layout());
+    branch       = l.duplicate("branch",       branchStuck.layout());
+    branchOrLeaf = l.union    ("branchOrLeaf", leaf,   branch);
+    isLeaf       = l.bit      ("isLeaf");
+    free         = l.variable ("free",         btree.bitsPerNext());
+    Node         = l.structure("node",         isLeaf, free, branchOrLeaf);
+    nodes        = l.array    ("nodes",        Node,         maxSize());
+    freedChain   = l.variable ("freedChain",   btree.bitsPerNext());
+    bTree        = l.structure("bTree",        freedChain  , nodes);
+    return l.compile();
    }
 
 //D1 Control                                                                    // Testing, control and integrity
@@ -197,8 +192,12 @@ abstract class BtreeSP extends Test                                             
     void allocBranch(){z(); allocate(anode); anode.setBranch(); anode.setStucks();} // Allocate branch
 
     void setStucks()                                                            // Descriptions of the stucks addressed by this node setting their base offsets
-     {Leaf   = BtreeSP.this.leafStuck  .at(leafBase());                         // Address the leaf stuck
-      Branch = BtreeSP.this.branchStuck.at(branchBase());                       // Address the branch stuck
+     {Leaf   = BtreeSP.this.leafStuck.copy();                                   // Address the leaf stuck
+      Leaf.base(leafBase());
+      Leaf.memoryLayout.memory(BtreeSP.this.memoryLayout.memory);
+      Branch = BtreeSP.this.branchStuck.copy();                                 // Address the branch stuck
+      Branch.base(branchBase());
+      Branch.memoryLayout.memory(BtreeSP.this.memoryLayout.memory);
      }
 
     void free()                                                                 // Free a new node to make it available for reuse
@@ -214,14 +213,14 @@ abstract class BtreeSP extends Test                                             
      {z();
       final Layout.Field n = BtreeSP.this.Node;
       final int at = n.at(node), w = n.width;
-      memory.zero(at, w);
+      memoryLayout.memory.zero(at, w);
      }
 
     void erase()                                                                // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
      {z();
       final Layout.Field n = BtreeSP.this.Node;
       final int at = n.at(node), w = n.width;
-      memory.ones(at, w);
+      memoryLayout.memory.ones(at, w);
      }
 
     int leafBase()   {z(); return leaf  .at(node);}                             // Base of leaf stuck in memory
@@ -229,14 +228,14 @@ abstract class BtreeSP extends Test                                             
 
     int leafSize()                                                              // Number of children in body of leaf
      {z();
-      stuckSize.s = Leaf;
+      stuckSize.setStuck(Leaf);
       stuckSize.size();
       return stuckSize.size;
      }
 
     int branchSize()                                                            // Number of children in body of branch taking top for granted as it is always there
      {z();
-      stuckSize.s = Branch;
+      stuckSize.setStuck(Branch);
       stuckSize.size();
       return stuckSize.size-1;
      }
@@ -250,14 +249,14 @@ abstract class BtreeSP extends Test                                             
 
     boolean hasLeavesForChildren()                                              // The node has leaves for children
      {z(); assertBranch();
-      stuckLeaf.s = Branch;
+      stuckLeaf.setStuck(Branch);
       stuckLeaf.lastElement();
       return node(tempNode, stuckLeaf.data).isLeaf();
      }
 
     int top()                                                                   // The top next element of a branch - only used in printing
      {z(); assertBranch();
-      stuckTop.s = Branch;
+      stuckTop.setStuck(Branch);
       stuckTop.index = branchSize();
       stuckTop.elementAt();
       return stuckTop.data;
@@ -268,7 +267,8 @@ abstract class BtreeSP extends Test                                             
       if (isLeaf())                                                             // Print a leaf
        {final int N  = leafSize();                                              // Number of elements in leaf
         s.append("Leaf(node:"+node+" size:"+N+")\n");
-        final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Leaf;
+        final StuckSP.Transaction t = new StuckSP.Transaction();
+        t.setStuck(Leaf);
         for (int i = 0; i < N; i++)                                             // Each element in the leaf
          {t.index = i;
           t.elementAt();
@@ -279,7 +279,8 @@ abstract class BtreeSP extends Test                                             
        {s.append("Branch(node:"+node+" size:"+branchSize()+" top:"+top()+"\n");
 
         final int N = branchSize()+1;                                           // Number of elements in branch including top
-        final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Branch;
+        final StuckSP.Transaction t = new StuckSP.Transaction();
+        t.setStuck(Branch);
         for (int i = 0; i < N; i++)
          {t.index = i; t.elementAt();
           s.append("  "+(i+1)+" key:"+t.key+" next:"+t.data+"\n");
@@ -293,7 +294,7 @@ abstract class BtreeSP extends Test                                             
     void findEqualInLeaf()                                                      // Find the first key in the leaf that is equal to the search key
      {z(); assertLeaf();
       base     = leafBase();
-      stuckEqual.s = Leaf;
+      stuckEqual.setStuck(Leaf);
       stuckEqual.search = search; stuckEqual.search();
       found    = stuckEqual.found;
       index    = stuckEqual.index;
@@ -312,7 +313,7 @@ abstract class BtreeSP extends Test                                             
     void findFirstGreaterThanOrEqualInLeaf()                                    // Find the first key in the  leaf that is equal to or greater than the search key
      {z(); assertLeaf();
       base     = leafBase();
-      stuckFirstLeaf.s = Leaf;
+      stuckFirstLeaf.setStuck(Leaf);
       stuckFirstLeaf.search = search; stuckFirstLeaf.searchFirstGreaterThanOrEqual();
       found    = stuckFirstLeaf.found;
       first    = stuckFirstLeaf.index;
@@ -321,7 +322,7 @@ abstract class BtreeSP extends Test                                             
     void findFirstGreaterThanOrEqualInBranch()                                  // Find the first key in the branch that is equal to or greater than the search key
      {z(); assertBranch();
       base     = branchBase();
-      stuckFirstBranch.s = Branch;
+      stuckFirstBranch.setStuck(Branch);
       stuckFirstBranch.search = search; stuckFirstBranch.limit = 1;
       stuckFirstBranch.searchFirstGreaterThanOrEqual();
       found    = stuckFirstBranch.found;
@@ -335,7 +336,8 @@ abstract class BtreeSP extends Test                                             
     void leafToArray(Stack<ArrayElement> s)                                     // Leaf as an array
      {z(); assertLeaf();
       final int K = leafSize();
-      final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Leaf;
+      final StuckSP.Transaction t = new StuckSP.Transaction();
+      t.setStuck(Leaf);
       for  (int i = 0; i < K; i++)
        {z();
         t.index = i; t.elementAt();
@@ -349,7 +351,8 @@ abstract class BtreeSP extends Test                                             
 
       if (K > 0)                                                                // Branch has key, next pairs
        {z();
-        final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Branch;
+        final StuckSP.Transaction t = new StuckSP.Transaction();
+        t.setStuck(Branch);
         for  (int i = 0; i < K; i++)
          {z();
           t.index = i; t.elementAt();                                           // Each node in the branch
@@ -375,7 +378,8 @@ abstract class BtreeSP extends Test                                             
       padStrings(S, level);
       final StringBuilder s = new StringBuilder();                              // String builder
       final int K = leafSize();
-      final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Leaf;;
+      final StuckSP.Transaction t = new StuckSP.Transaction();
+      t.setStuck(Leaf);
 
       for  (int i = 0; i < K; i++)
        {t.index = i; t.elementAt();                                             // Each node in the branch
@@ -395,7 +399,8 @@ abstract class BtreeSP extends Test                                             
       final int K = branchSize();
 
       if (K > 0)                                                                // Branch has key, next pairs
-       {final StuckSP.Transaction t = new StuckSP.Transaction(); t.s = Branch;
+       {final StuckSP.Transaction t = new StuckSP.Transaction();
+        t.setStuck(Branch);
         for  (int i = 0; i < K; i++)
          {t.index = i; t.elementAt();                                           // Each node in the branch
           final Node n = node(new Node(), t.data);                              // printing will not be part of the chip so we can use recursionand create new nodes as needed
@@ -486,7 +491,9 @@ abstract class BtreeSP extends Test                                             
       l = anode = leftNode;  allocLeaf();                                       // New left leaf
       r = anode = rightNode; allocLeaf();                                       // New right leaf
       P  = this;                                                                // Root is the parent
-      T.s = P.Leaf; tl.s = l.Leaf; tr.s = r.Leaf;
+      T .setStuck(P.Leaf);
+      tl.setStuck(l.Leaf);
+      tr.setStuck(r.Leaf);
 
       splitLeafSize = splitLeafSize();
       for (int i = 0; i < splitLeafSize; i++)                                   // Build left leaf from parent
@@ -499,7 +506,7 @@ abstract class BtreeSP extends Test                                             
       tr.firstElement();
       tl. lastElement();
       setBranch();
-      T.s = P.Branch;
+      T.setStuck(P.Branch);
       T.clear();                                                                // Clear the branch
       firstKey = tr.key;                                                        // First of right leaf
       lastKey  = tl.key;                                                        // Last of left leaf
@@ -516,7 +523,9 @@ abstract class BtreeSP extends Test                                             
       P  = this;                                                                // Root is the parent
       l  = anode = leftNode;  allocBranch();                                    // New left branch
       r  = anode = rightNode; allocBranch();                                    // New right branch
-      T.s = P.Branch; tl.s = l.Branch; tr.s = r.Branch;
+      T .setStuck(P.Branch);
+      tl.setStuck(l.Branch);
+      tr.setStuck(r.Branch);
 
       splitBranchSize = splitBranchSize();                                      // Branch split size
       for (int i = 0; i < splitBranchSize; i++)                                 // Build left child from parent
@@ -550,7 +559,9 @@ abstract class BtreeSP extends Test                                             
       P = parent;                                                               // Parent
       l = anode = leftNode; allocLeaf();                                        // New  split out leaf
       r = this;                                                                 // Existing  leaf
-      T.s = P.Branch; tl.s = l.Leaf; tr.s = r.Leaf;
+      T .setStuck(P.Branch);
+      tl.setStuck(l.Leaf);
+      tr.setStuck(r.Leaf);
 
       splitLeafSize = splitLeafSize();
       for (int i = 0; i < splitLeafSize; i++)                                   // Build left leaf
@@ -578,7 +589,9 @@ abstract class BtreeSP extends Test                                             
       P = parent;
       l = anode = leftNode; allocBranch();
       r = this;
-      T.s = P.Branch; tl.s = l.Branch; tr.s = r.Branch;
+      T .setStuck(P.Branch);
+      tl.setStuck(l.Branch);
+      tr.setStuck(r.Branch);
 
       splitBranchSize = splitBranchSize();
       for (int i = 0; i < splitBranchSize; i++)                                 // Build left branch from right
@@ -595,7 +608,7 @@ abstract class BtreeSP extends Test                                             
       z(); if (index > branchSize()) stop("Index", index, "too big");
       z();
 
-      P = this; T.s = P.Branch;
+      P = this; T.setStuck(P.Branch);
       T.index = index - 1; T.elementAt(); L = T.data;
       T.index = index - 0; T.elementAt(); R = T.data;
 
@@ -604,8 +617,8 @@ abstract class BtreeSP extends Test                                             
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        tl.s = l.Leaf; nl = l.leafSize();
-        tr.s = r.Leaf; nr = r.leafSize();
+        tl.setStuck(l.Leaf); nl = l.leafSize();
+        tr.setStuck(r.Leaf); nr = r.leafSize();
 
         z(); if (nr >= maxKeysPerLeaf()) {z(); return false;}                   // Steal not possible because there is no where to put the steal
         z(); if (nl <= 1) {z(); return false;}                                  // Steal not allowed because it would leave the leaf sibling empty
@@ -618,8 +631,8 @@ abstract class BtreeSP extends Test                                             
        }
       else                                                                      // Children are branches
        {z();
-        tl.s = l.Branch; nl = l.branchSize();
-        tr.s = r.Branch; nr = r.branchSize();
+        tl.setStuck(l.Branch); nl = l.branchSize();
+        tr.setStuck(r.Branch); nr = r.branchSize();
 
         z(); if (nr >= maxKeysPerBranch()) {z(); return false;}                 // Steal not possible because there is no where to put the steal
         z(); if (nl <= 1) {z(); return false;}                                  // Steal not allowed because it would leave the left sibling empty
@@ -646,7 +659,7 @@ abstract class BtreeSP extends Test                                             
       z(); if (index < 0)             stop("Index", index, "too small");
       z(); if (index >= branchSize()) stop("Index", index, "too big");
       z();
-      P = this; T.s = P.Branch;
+      P = this; T.setStuck(P.Branch);
       T.index = index+0; T.elementAt(); lk = T.key; ld = T.data;
       T.index = index+1; T.elementAt(); rk = T.key; rd = T.data;
 
@@ -655,8 +668,8 @@ abstract class BtreeSP extends Test                                             
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        tl.s = l.Leaf; nl = l.leafSize();
-        tr.s = r.Leaf; nr = r.leafSize();
+        tl.setStuck(l.Leaf); nl = l.leafSize();
+        tr.setStuck(r.Leaf); nr = r.leafSize();
 
         z(); if (nl >= maxKeysPerLeaf()) {z(); return false;}                   // Steal not possible because there is no where to put the steal
         z(); if (nr <= 1) {z(); return false;}                                  // Steal not allowed because it would leave the right sibling empty
@@ -666,8 +679,8 @@ abstract class BtreeSP extends Test                                             
        }
       else                                                                      // Children are branches
        {z();
-        tl.s = l.Branch; nl = l.branchSize();
-        tr.s = r.Branch; nr = r.branchSize();
+        tl.setStuck(l.Branch); nl = l.branchSize();
+        tr.setStuck(r.Branch); nr = r.branchSize();
 
         z(); if (nl >= maxKeysPerBranch()) {z(); return false;}                 // Steal not possible because there is no where to put the steal
         z(); if (nr <= 1) {z(); return false;}                                  // Steal not allowed because it would leave the right sibling empty
@@ -692,7 +705,7 @@ abstract class BtreeSP extends Test                                             
       z(); if (root.isLeaf() || branchSize() > 1) {z(); return false;}
       z(); if (node != 0) stop("Expected root, got:", node);
       z();
-      P = this; T.s = P.Branch;
+      P = this; T.setStuck(P.Branch);
       T.firstElement(); l = node( leftNode, T.data);
       T. lastElement(); r = node(rightNode, T.data);
 
@@ -702,8 +715,8 @@ abstract class BtreeSP extends Test                                             
         nr = r.leafSize();
         if (nl + nr <= maxKeysPerLeaf())
          {z(); T.clear();
-          tl.s = l.Leaf;
-          tr.s = r.Leaf;
+          tl.setStuck(l.Leaf);
+          tr.setStuck(r.Leaf);
           for (int i = 0; i < nl; ++i)                                          // Merge in left child leaf
            {z(); tl.shift(); T.key = tl.key; T.data = tl.data; T.push();
            }
@@ -723,8 +736,8 @@ abstract class BtreeSP extends Test                                             
 
         if (nl + 1 + nr <= maxKeysPerBranch())
          {z();
-          tl.s = l.Branch;
-          tr.s = r.Branch;
+          tl.setStuck(l.Branch);
+          tr.setStuck(r.Branch);
           T.firstElement();
           parentKey = T.key;
           T.clear();
@@ -760,7 +773,7 @@ abstract class BtreeSP extends Test                                             
       //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
       z(); if (bs    < 2 ) {z(); return false;}
       z();
-      P = this; T.s = P.Branch;
+      P = this; T.setStuck(P.Branch);
       T.index = index-1; T.elementAt(); L = T.data;
       T.index = index-0; T.elementAt(); R = T.data;
 
@@ -769,15 +782,15 @@ abstract class BtreeSP extends Test                                             
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        tl.s = l.Leaf; nl = l.leafSize();
-        tr.s = r.Leaf; nr = r.leafSize();
+        tl.setStuck(l.Leaf); nl = l.leafSize();
+        tr.setStuck(r.Leaf); nr = r.leafSize();
 
         if (nl + nr >= maxKeysPerLeaf()) {z(); return false;}                   // Combined body would be too big
        }
       else                                                                      // Children are branches
        {z();
-        tl.s = l.Branch; nl = l.branchSize();
-        tr.s = r.Branch; nr = r.branchSize();
+        tl.setStuck(l.Branch); nl = l.branchSize();
+        tr.setStuck(r.Branch); nr = r.branchSize();
 
         if (nl + 1 + nr > maxKeysPerBranch()) {z(); return false;}              // Merge not possible because there is not enough room for the combined result
         z();
@@ -808,7 +821,7 @@ abstract class BtreeSP extends Test                                             
       //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
       z(); if (bs < 2) {z(); return false;}
       z();
-      P = this; T.s = P.Branch;
+      P = this; T.setStuck(P.Branch);
       T.index = index+0; T.elementAt(); L = T.data;
       T.index = index+1; T.elementAt(); R = T.data;
 
@@ -817,15 +830,15 @@ abstract class BtreeSP extends Test                                             
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        tl.s = l.Leaf; nl = l.leafSize();
-        tr.s = r.Leaf; nr = r.leafSize();
+        tl.setStuck(l.Leaf); nl = l.leafSize();
+        tr.setStuck(r.Leaf); nr = r.leafSize();
 
         if (nl + nr > maxKeysPerLeaf()) {z(); return false;}                    // Combined body would be too big
        }
       else                                                                      // Children are branches
        {z();
-        tl.s = l.Branch; nl = l.branchSize();
-        tr.s = r.Branch; nr = r.branchSize();
+        tl.setStuck(l.Branch); nl = l.branchSize();
+        tr.setStuck(r.Branch); nr = r.branchSize();
 
         if (nl + 1 + nr > maxKeysPerBranch()) {z(); return false;}              // Merge not possible because there is no where to put the steal
 
@@ -864,7 +877,7 @@ abstract class BtreeSP extends Test                                             
             }
       z();
 
-      T.s = Branch;
+      T.setStuck(Branch);
       T.index = index;
       T.elementAt();
 
@@ -991,7 +1004,7 @@ abstract class BtreeSP extends Test                                             
      {z();
       leaf = find();                                                            // Find the leaf that should contain this key
 
-      T.s = leaf.Leaf;
+      T.setStuck(leaf.Leaf);
 
       if (leaf.found)                                                           // Found the key in the leaf so update it with the new data
        {z(); T.key = Key; T.data = Data; T.index = leaf.index; T.setElementAt();
@@ -1063,7 +1076,7 @@ abstract class BtreeSP extends Test                                             
      {z(); find = find();                                                       // Try direct insertion with no modifications to the shape of the tree
       if (!find.found) return null;                                             // Inserted or updated successfully
       z();
-      T.s = find.Leaf;                                                          // The leaf that contains the key
+      T.setStuck(find.Leaf);                                                          // The leaf that contains the key
       T.index = find.index; T.elementAt();                                      // Position in the leaf of the key
 
       Data = T.data;                                                            // Key, data pairs in the leaf
