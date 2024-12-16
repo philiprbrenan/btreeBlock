@@ -7,32 +7,16 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 class MemoryLayout extends Test                                                 // Memory layout
- {final Layout layout;                                                          // Layout of part of memory
-  final Memory memory;                                                          // Memory containing layout
-  final int      base;                                                          // Base of layout in memory - like located in Pl1
-  boolean       debug;                                                          // Debug if true
-
-//D1 Construction                                                               // Address memory via a layout
-
-  MemoryLayout(Layout Layout)                                                   // Memory is the same size as the layout
-   {this(new Memory(Layout.size()), Layout, 0);
-   }
-
-  MemoryLayout(Layout Layout, int base)                                         // Layout is at top of memory at the specified base
-   {this(new Memory(Layout.size()+base), Layout, base);
-   }
-
-  MemoryLayout(Memory Memory, Layout Layout) {this(Memory, Layout, 0);}         // Layout is at the start of the specified memory
-
-  MemoryLayout(Memory Memory, Layout Layout, int Base)                          // Layout is at the specified offset in the specified memory
-   {memory = Memory;
-    layout = Layout;
-    base   = Base;
-   }
+ {Layout layout;                                                                // Layout of part of memory
+  Memory memory;                                                                // Memory containing layout
+  int      base;                                                                // Base of layout in memory - like located in Pl1
+  boolean debug;                                                                // Debug if true
 
 //D1 Control                                                                    // Testing, control and integrity
 
-  void stop()              {Test.stop(toString());}                             // Stop after printing
+  void memory(Memory Memory) {memory = Memory;}                                 // Set the base of the layout in memory allowing such layouts to be relocated
+  void layout(Layout Layout) {layout = Layout;}                                 // Set the base of the layout in memory allowing such layouts to be relocated
+  void base  (int Base)      {base   = Base;}                                   // Set the base of the layout in memory allowing such layouts to be relocated
 
   void ok(String Lines)                                                         // Check that specified lines are present in the memory layout
    {final String  m = toString();                                               // Memory as string
@@ -447,7 +431,10 @@ class MemoryLayout extends Test                                                 
     MemoryLayout     M;
     TestMemoryLayout()
      {l.compile();
-      M = new MemoryLayout(l);
+      M = new MemoryLayout();
+      M.memory(new Memory(l.size()));
+      M.layout(l);
+      M.base(0);
       M.memory.alternating(4);
      }
    }
@@ -529,17 +516,22 @@ class MemoryLayout extends Test                                                 
     Layout.Variable  c = l.variable ("c", 4);
     Layout.Variable  d = l.variable ("d", 4);
     Layout.Structure s = l.structure("s", a, b, c, d);
+    l.compile();
+    final int        N = l.size();
 
-    MemoryLayout     m = new MemoryLayout(l.compile(), 8);
+    MemoryLayout     m = new MemoryLayout();
+    m.layout(l);
+    m.memory(new Memory(2*N));
+    m.base(N);
     m.memory.alternating(4);
     //stop(m);
     m.ok("""
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        8        16                                      s
-   2 V        8         4                                  0     a
-   3 V       12         4                                 15     b
-   4 V       16         4                                  0     c
-   5 V       20         4                                 15     d
+   1 S       16        16                                      s
+   2 V       16         4                                  0     a
+   3 V       20         4                                 15     b
+   4 V       24         4                                  0     c
+   5 V       28         4                                 15     d
 """);
     ok(m.getInt(a),  0);
     ok(m.getInt(b), 15);
@@ -551,20 +543,24 @@ Line T       At      Wide       Size    Indices        Value   Name
     //stop(m);
     m.ok("""
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        8        16                                      s
-   2 V        8         4                                  9     a
-   3 V       12         4                                 10     b
-   4 V       16         4                                 11     c
-   5 V       20         4                                 12     d
+   1 S       16        16                                      s
+   2 V       16         4                                  9     a
+   3 V       20         4                                 10     b
+   4 V       24         4                                 11     c
+   5 V       28         4                                 12     d
 """);
    }
 
   static void test_based_array()
-   {Layout           l = Layout.layout();
+   {final int        B = 8;
+    Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Array     A = l.array    ("A", a, 4);
-
-    MemoryLayout     m = new MemoryLayout(l.compile(), 8);
+    l.compile();
+    MemoryLayout     m = new MemoryLayout();
+    m.layout(l);
+    m.memory(new Memory(l.size()+B));
+    m.base(B);
     m.memory.alternating(4);
     //stop(m);
     m.ok("""
@@ -606,8 +602,11 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  c = l.variable ("c", 4);
     Layout.Variable  d = l.variable ("d", 4);
     Layout.Structure s = l.structure("s", a, b, c, d);
+    l.compile();
 
-    MemoryLayout     m = new MemoryLayout( l.compile());
+    MemoryLayout     m = new MemoryLayout();
+    m.layout(l);
+    m.memory(new Memory(l.size()));
     m.memory.alternating(4);
     //stop(m);
     m.ok("""
@@ -640,12 +639,19 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     Layout           l1 = Layout.layout();
     Layout.Field     s1 = l1.duplicate("s", l);
-
+    l1.compile();
     Layout           l2 = Layout.layout();
     Layout.Field     s2 = l2.duplicate("s", l);
+    l2.compile();
 
-    MemoryLayout     m1 = new MemoryLayout(l1.compile());
-    MemoryLayout     m2 = new MemoryLayout(l2.compile());
+    MemoryLayout     m1 = new MemoryLayout();
+    m1.layout(l1);
+    m1.memory(new Memory(l1.size()));
+
+    MemoryLayout     m2 = new MemoryLayout();
+    m2.layout(l2);
+    m2.memory(new Memory(l2.size()));
+
     m1.at(a).setInt(1);
     m2.at(b).move(m1.at(a));
     //stop(m1);
@@ -669,8 +675,12 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
+    l.compile();
 
-    MemoryLayout     m = new MemoryLayout(l.compile());
+    MemoryLayout     m = new MemoryLayout();
+    m.layout(l);
+    m.memory(new Memory(l.size()));
+
     m.at(a).setInt(1);
     m.at(b).setInt(3);
     //stop(m);
@@ -706,7 +716,9 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  a = l.variable ("a", 4);
     l.compile();
 
-    MemoryLayout     m = new MemoryLayout(l);
+    MemoryLayout     m = new MemoryLayout();
+    m.layout(l);
+    m.memory(new Memory(l.size()));
     m.at(a).setInt(1);
 
     MemoryLayout.At A = m.at(a),
@@ -732,8 +744,12 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  a = l.variable ("a", N);
     Layout.Array     A = l.array    ("A", a, N);
     Layout.Structure S = l.structure("S", z, i, j, A);
+    l.compile();
 
-    MemoryLayout     m = new MemoryLayout(l.compile());
+    MemoryLayout     m = new MemoryLayout();
+    m.layout(l);
+    m.memory(new Memory(l.size()));
+
     MemoryLayout.At  Z = m.at(z), I = m.at(i), J = m.at(j);
     Z.setOff().setInt(0);
     I.setOff().setInt(1);
@@ -809,8 +825,13 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Structure S = w.structure("S", z, i, B);
     w.compile();
 
-    MemoryLayout     L = new MemoryLayout(l);
-    MemoryLayout     W = new MemoryLayout(w);
+    MemoryLayout     L = new MemoryLayout();
+    L.layout(l);
+    L.memory(new Memory(l.size()));
+    MemoryLayout     W = new MemoryLayout();
+    W.layout(w);
+    W.memory(new Memory(w.size()));
+
     for (int j = 0; j < A.size; j++) L.at(a, j).setInt(10+j);
 
     W.at(i).setInt(2);
@@ -858,8 +879,13 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Structure S = w.structure("S", z, i, B);
     w.compile();
 
-    MemoryLayout     L = new MemoryLayout(l);
-    MemoryLayout     W = new MemoryLayout(w);
+    MemoryLayout     L = new MemoryLayout();
+    L.layout(l);
+    L.memory(new Memory(l.size()));
+    MemoryLayout     W = new MemoryLayout();
+    W.layout(w);
+    W.memory(new Memory(w.size()));
+
     for (int j = 0; j < A.size; j++) L.at(a, j).setInt(10+j);
 
     W.at(i).setInt(2);
@@ -899,7 +925,11 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Array     A = l.array    ("A", a, 6);
     l.compile();
 
-    MemoryLayout     L = new MemoryLayout(l, 16);
+    MemoryLayout     L = new MemoryLayout();
+    L.layout(l);
+    L.memory(new Memory(l.size()+16));
+    L.base(16);
+
     L.memory.alternating(4);
     //stop(L.memory);
     ok(L.memory, """
@@ -950,7 +980,9 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Structure s = l.structure("s", a, b, r);
     l.compile();
 
-    MemoryLayout     m = new MemoryLayout(l);
+    MemoryLayout     m = new MemoryLayout();
+    m.layout(l);
+    m.memory(new Memory(l.size()));
 
     m.at(a).setInt(1);
     m.at(b).setInt(2);
