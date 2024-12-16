@@ -89,8 +89,12 @@ class Program extends Test                                                      
     Layout.Variable  b = l.variable ("b", 8);
     Layout.Variable  c = l.variable ("c", 8);
     Layout.Structure s = l.structure("s", a, b, c);
+    l.compile();
 
-    MemoryLayout     m = new MemoryLayout(l.compile());
+    MemoryLayout     m = new MemoryLayout();
+    m.layout(l);
+    m.memory(new Memory(l.size()));
+
     Program          p = new Program();
     Stack<Integer>   f = new Stack<>();
 
@@ -126,8 +130,11 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  b = l.variable ("b", 8);
     Layout.Variable  c = l.variable ("c", 8);
     Layout.Structure s = l.structure("s", a, b, c);
+    l.compile();
 
-    MemoryLayout     m = new MemoryLayout(l.compile());
+    MemoryLayout     m = new MemoryLayout();
+    m.layout(l);
+    m.memory(new Memory(l.size()));
     Program          p = new Program();
     Stack<String>    f = new Stack<>();
 
@@ -154,8 +161,11 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
+    l.compile();
 
-    MemoryLayout     m = new MemoryLayout(l.compile());
+    MemoryLayout     m = new MemoryLayout();
+    m.layout(l);
+    m.memory(new Memory(l.size()));
     Program          p = new Program();
     Stack<Integer>   f = new Stack<>();
 
@@ -185,8 +195,11 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
+    l.compile();
+    MemoryLayout     m = new MemoryLayout();
+    m.layout(l);
+    m.memory(new Memory(l.size()));
 
-    MemoryLayout     m = new MemoryLayout(l.compile());
     Program          p = new Program();
     Stack<Integer>   f = new Stack<>();
 
@@ -214,8 +227,10 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
-
-    MemoryLayout     m = new MemoryLayout(l.compile());
+    l.compile();
+    MemoryLayout     m = new MemoryLayout();
+    m.layout(l);
+    m.memory(new Memory(l.size()));
     Program          p = new Program();
     Stack<Integer>   f = new Stack<>();
 
