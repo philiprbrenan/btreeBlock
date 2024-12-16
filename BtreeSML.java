@@ -40,15 +40,15 @@ abstract class BtreeSML extends Test                                            
   int         nodeUsed = 0;                                                     // Number of nodes currently in use
   int      maxNodeUsed = 0;                                                     // Maximum number of branches plus leaves used
 
-  final Node       root = new Node();                                           // The description ofthe root node
-  final Node parentNode = new Node();                                           // Node used for initializing the tree and for the parent node
-  final Node   leftNode = new Node();                                           // Node used for a left hand child
-  final Node  rightNode = new Node();                                           // Node used for a righthand child
-  final Node  childNode = new Node();                                           // Node used as a generic child
-  final Node   tempNode = new Node();                                           // Temporary node
-  final Node   findNode = new Node();                                           // Find node
-  final Node    putNode = new Node();                                           // Put node
-  final Node deleteNode = new Node();                                           // Delete node
+  final Node       root;                                                        // The description ofthe root node
+  final Node parentNode;                                                        // Node used for initializing the tree and for the parent node
+  final Node   leftNode;                                                        // Node used for a left hand child
+  final Node  rightNode;                                                        // Node used for a righthand child
+  final Node  childNode;                                                        // Node used as a generic child
+  final Node   tempNode;                                                        // Temporary node
+  final Node   findNode;                                                        // Find node
+  final Node    putNode;                                                        // Put node
+  final Node deleteNode;                                                        // Delete node
 
   static boolean debug = false;                                                 // Debugging enabled
 
@@ -58,6 +58,17 @@ abstract class BtreeSML extends Test                                            
    {z();
     memoryLayout.layout = layout();
     memoryLayout.memory(new Memory(memoryLayout.layout.size()));
+
+          root = new Node();                                                    // The description ofthe root node
+    parentNode = new Node();                                                    // Node used for initializing the tree and for the parent node
+      leftNode = new Node();                                                    // Node used for a left hand child
+     rightNode = new Node();                                                    // Node used for a righthand child
+     childNode = new Node();                                                    // Node used as a generic child
+      tempNode = new Node();                                                    // Temporary node
+      findNode = new Node();                                                    // Find node
+       putNode = new Node();                                                    // Put node
+    deleteNode = new Node();                                                    // Delete node
+
     for (int i = maxSize(); i > 0; --i)                                         // Put all the nodes on the free chain at the start with low nodes first
      {final Node n = parentNode;
       n.node = i - 1;
@@ -148,6 +159,13 @@ abstract class BtreeSML extends Test                                            
    {int node;                                                                   // The number of the node
     StuckSML Leaf, Branch;                                                      // Stucks used in this node with their base addresses set corrctly to allow addressing of the fields in the stuck
 
+    Node()
+     {Leaf   = BtreeSML.this.Leaf.copy();                                       // Address the leaf stuck
+      Leaf.memoryLayout.memory(BtreeSML.this.memoryLayout.memory);
+      Branch = BtreeSML.this.Branch.copy();                                            // Address the branch stuck
+      Branch.memoryLayout.memory(BtreeSML.this.memoryLayout.memory);
+     }
+
     boolean isLeaf() {z(); return getInt(isLeaf,    node) > 0;}                 // A leaf if true
     void   setLeaf() {z();        setInt(isLeaf, 1, node);}                     // Set as leaf
     void setBranch() {z();        setInt(isLeaf, 0, node);}                     // Set as branch
@@ -166,12 +184,8 @@ abstract class BtreeSML extends Test                                            
      }
 
     void setStucks()                                                            // Descriptions of the stucks addressed by this node setting their base offsets
-     {Leaf   = BtreeSML.this.Leaf.copy();                                       // Address the leaf stuck
-      Leaf.base(leafBase());
-      Leaf.memoryLayout.memory(BtreeSML.this.memoryLayout.memory);
-      Branch = BtreeSML.this.Branch.copy();                                            // Address the branch stuck
+     {Leaf.base(leafBase());
       Branch.base(branchBase());
-      Branch.memoryLayout.memory(BtreeSML.this.memoryLayout.memory);
      }
 
     void free()                                                                 // Free a new node to make it available for reuse
