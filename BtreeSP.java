@@ -5,7 +5,7 @@
 package com.AppaApps.Silicon;                                                   // Design, layout and simulate a btree in a block on the surface of a silicon chip.
 
 import java.util.*;
-
+// Replace enums with integers. Leaf and Branch in Node become arrays indexed like Node. Node should carry its index.
 abstract class BtreeSP extends Test                                             // Manipulate a btree using static methods and memory
  {MemoryLayout memoryLayout = new MemoryLayout();                               // The memory layout of the btree
   abstract int maxSize();                                                       // The maxuimum bunber of leaves plus branches in the bree
