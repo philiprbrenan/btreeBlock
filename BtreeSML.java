@@ -162,7 +162,7 @@ abstract class BtreeSML extends Test                                            
     Node()
      {Leaf   = BtreeSML.this.Leaf.copy();                                       // Address the leaf stuck
       Leaf.memoryLayout.memory(BtreeSML.this.memoryLayout.memory);
-      Branch = BtreeSML.this.Branch.copy();                                            // Address the branch stuck
+      Branch = BtreeSML.this.Branch.copy();                                     // Address the branch stuck
       Branch.memoryLayout.memory(BtreeSML.this.memoryLayout.memory);
      }
 
