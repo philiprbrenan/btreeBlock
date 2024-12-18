@@ -102,7 +102,7 @@ abstract class StuckSA extends Test                                             
 
 //D1 Transactions                                                               // Transactions on the stuck
 
-  static class Transaction                                                      // Transaction on a stuck. Kept seperate from teh stuck itself because instances of this class are only needed when performing a transaction, they do not need to be stored for the long term like the stuck.
+  static class Transaction                                                      // Transaction on a stuck. Kept seperate from the stuck itself because instances of this class are only needed when performing a transaction, they do not need to be stored for the long term like the stuck.
    {String action;                                                              // Action performed
     StuckSA      S;                                                             // The stuck we are transacting on, allowing this class to be static enabling preallocation followed by configuration rather than allocating memory each time which would require garbage colelction.
     MemoryLayout M;                                                             // Memory containing the stuck
