@@ -5,10 +5,10 @@
 package com.AppaApps.Silicon;                                                   // Design, layout and simulate a btree in a block on the surface of a silicon chip.
 
 import java.util.*;
-// Replace enums with integers. Leaf and Branch in Node become arrays indexed like Node. Node should carry its index.
+
 abstract class BtreeSP extends Test                                             // Manipulate a btree using static methods and memory
  {MemoryLayout memoryLayout = new MemoryLayout();                               // The memory layout of the btree
-  abstract int maxSize();                                                       // The maxuimum bunber of leaves plus branches in the bree
+  abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
   abstract int bitsPerNext();                                                   // The number of bits in a next field
@@ -34,15 +34,15 @@ abstract class BtreeSP extends Test                                             
    linesToPrintABranch =  4,                                                    // The number of lines required to print a branch
         maxPrintLevels = 10,                                                    // Maximum number of levels to print in a tree
               maxDepth = 99,                                                    // Maximum depth of any realistic tree
-           testMaxSize = github_actions ? 1000 : 50;                            // Maximum number of leaves plus branchs during testing
+           testMaxSize = github_actions ? 1000 : 50;                            // Maximum number of leaves plus branches during testing
 
   int         nodeUsed = 0;                                                     // Number of nodes currently in use
   int      maxNodeUsed = 0;                                                     // Maximum number of branches plus leaves used
 
   final int Node_root   = 0;                                                    // The root of the tree is always node zero
   final int Node_parent = 1;                                                    // Node used for initializing the tree and for the parent node
-  final int Node_left   = 2;                                                    // Node used for a left hand child
-  final int Node_right  = 3;                                                    // Node used for a righthand child
+  final int Node_left   = 2;                                                    // Node used for a left  hand child
+  final int Node_right  = 3;                                                    // Node used for a right hand child
   final int Node_child  = 4;                                                    // Node used as a generic child
   final int Node_temp   = 5;                                                    // Temporary node
   final int Node_find   = 6;                                                    // Find node
@@ -50,10 +50,10 @@ abstract class BtreeSP extends Test                                             
   final int Node_delete = 8;                                                    // Delete node
   final int Node_length = 9;                                                    // Number of node types
 
-  final Node[]nodeTypes;                                                        // One node of each type
+  final NodeTransaction[]nodeTypes;                                             // One node description for each type of transacton
 
   final int StuckTransaction_stuckSize        = 0;                              // Get the size of a stuck
-  final int StuckTransaction_stuckLeaf        = 1;                              // Check whether a node has leaves for childrn
+  final int StuckTransaction_stuckLeaf        = 1;                              // Check whether a node has leaves for children
   final int StuckTransaction_stuckTop         = 2;                              // Get the size of a stuck
   final int StuckTransaction_stuckEqual       = 3;                              // Locate an equal key
   final int StuckTransaction_stuckFirstLeaf   = 4;                              // Locate the first greater or equal key in a leaf
@@ -80,12 +80,12 @@ abstract class BtreeSP extends Test                                             
      }
 
      {final int N = Node_length;                                                // Preallocate nodes
-      nodeTypes = new Node[N];
-      for (int i = 0; i < N; i++) nodeTypes[i] = new Node();
+      nodeTypes = new NodeTransaction[N];
+      for (int i = 0; i < N; i++) nodeTypes[i] = new NodeTransaction();
      }
 
     for (int i = maxSize(); i > 0; --i)                                         // Put all the nodes on the free chain at the start with low nodes first
-     {final Node n = nodeTypes[0];                                              // Any node type will do at this point
+     {final NodeTransaction n = nodeTypes[0];                                   // Any node type will do at this point
       n.node = i - 1;
       n.clear();
       final int  f = getInt(freedChain);
@@ -93,10 +93,10 @@ abstract class BtreeSP extends Test                                             
                      setInt(freedChain, n.node);
      }
 
-     {final Node root = root();
+     {final NodeTransaction root = root();
       allocate(root, false);                                                    // The root is always at zero, which frees zero to act as the end of list marker on the free chain
       root.setLeaf();                                                           // The root starts as a leaf
-      root.setStucks();                                                         // Describe stucks addressable fronm the root
+      root.setStucks();                                                         // Describe stucks addressable from the root
      }
    }
 
@@ -143,7 +143,7 @@ abstract class BtreeSP extends Test                                             
     return l.compile();
    }
 
-  Node root() {return nodeTypes[Node_root];}                                    // The root of the tree
+  NodeTransaction root() {return nodeTypes[Node_root];}                         // The root of the tree
   StuckSP.Transaction stuckSize       () {return stuckTransactions[StuckTransaction_stuckSize       ];}
   StuckSP.Transaction stuckLeaf       () {return stuckTransactions[StuckTransaction_stuckLeaf       ];} // Check whether a node has leaves for childrn
   StuckSP.Transaction stuckTop        () {return stuckTransactions[StuckTransaction_stuckTop        ];} // Get the size of a stuck
@@ -170,7 +170,7 @@ abstract class BtreeSP extends Test                                             
 
 //D1 Memory allocation                                                          // Allocate and free memory
 
-  void allocate(Node node,  boolean check)                                       // Allocate a node with or without checking for sufficient free space
+  void allocate(NodeTransaction node,  boolean check)                           // Allocate a node with or without checking for sufficient free space
    {z(); final int  f = getInt(freedChain);                                     // Last freed node
     z(); if (check && f == 0) stop("No more memory available");                 // No more free nodes available
     z(); final int  F = getInt(free,       f);                                  // Second to last freed node
@@ -180,41 +180,38 @@ abstract class BtreeSP extends Test                                             
 //    return n;
    }
 
-  void allocate(Node node) {z(); allocate(node, true);}                          // Allocate a node checking for free space
+  void allocate(NodeTransaction node) {z(); allocate(node, true);}              // Allocate a node checking for free space
 
 //D1 Components                                                                 // A branch or leaf in the tree
 
-  class Node                                                                    // A transient description of a branch or leaf in the tree - the actual data is contained in the bit memory
+  class NodeTransaction                                                         // A transient description of a branch or leaf in the tree - the actual data is contained in the bit memory
    {int node;                                                                   // The number of the node
-//  int type;                                                                   // The number of this node in the preallocated block of node types so that we do not have to allocate and free nodes but instead can reuse an existing pool of them.
-    StuckSP Leaf;                                                               // Thus stuck is one-to-one with this node. Settings is base address allows this leaf stuck to be adressed as part of this node
-    StuckSP Branch;                                                             // Thus stuck is one-to-one with this node. Settings is base address allows this branch stuck to be adressed as part of this node
-    int parent;                                                                 // Parameters and relative positions in a tree
-    int anode;                                                                  // Parameters and relative positions in a tree
-    int P;                                                                      // Parameters and relative positions in a tree
-    int l;                                                                      // Parameters and relative positions in a tree
-    int r;                                                                      // Parameters and relative positions in a tree
+    int parent;                                                                 // Parent node
+    int anode;                                                                  // Node being allocated
+    int P;                                                                      // Parent node during a split, merge or steal operation
+    int l;                                                                      // Left node
+    int r;                                                                      // Right node
     int splitLeafSize;                                                          // Where to split a full leaf
     int splitBranchSize;                                                        // Branch split size
     int firstKey;                                                               // First of right leaf
     int lastKey;                                                                // Last of left leaf
     int flKey;                                                                  // Key mid way between last of left and first of right
     int parentKey;                                                              // Parent key
-    int L;                                                                      // Refence to left, right child
-    int R;                                                                      // Refence to left, right child
+    int L;                                                                      // Reference to left child
+    int R;                                                                      // Reference to right child
     int nl;                                                                     // Number in the left child, number in the right child
     int nr;                                                                     // Number in the left child, number in the right child
-    int lk;                                                                     // Left  child reference: key and data
-    int ld;                                                                     // Left  child reference: key and data
-    int rk;                                                                     // Right child reference: key and data
-    int rd;                                                                     // Right child reference: key and data
+    int lk;                                                                     // Left  child key
+    int ld;                                                                     // Left  child data
+    int rk;                                                                     // Right child key
+    int rd;                                                                     // Right child data
     int index;                                                                  // Index of a slot in a node
                                                                                 // Find equal in leaf
     int    search;                                                              // Search key
     boolean found;                                                              // Whether the key was found
     int       key;                                                              // Key to insert
     int      data;                                                              // Data associated with the  key
-    int      base;                                                              // Base of the leaf
+    int      base2;                                                              // Base of the leaf
 
     int     first;                                                              // Index of first key greater than or equal to the search key
     int      next;                                                              // The corresponding next field or top if no such key was found
@@ -222,10 +219,11 @@ abstract class BtreeSP extends Test                                             
     boolean  success;                                                           // Inserted or updated if true
     boolean inserted;                                                           // Inserted if true
 
-//    Node(int Type)                                                              // Preallocate a node recording its position in the preallocation pool
-    Node()                                                                      // Preallocate a node recording its position in the preallocation pool
-     {//type = Type;
-      Leaf   = BtreeSP.this.leafStuck.copy();                                   // Address the leaf stuck
+    StuckSP Leaf;                                                               // This stuck description is one-to-one with this node. The base address of the stuck description is set to enable this description to access the relevant leaf stuck in memory
+    StuckSP Branch;                                                             // This stuck description is one-to-one with this node. The base address of the stuck description is set to enable this description to access the relevant branch stuck in memory
+
+    NodeTransaction()                                                           // Preallocate a node recording its position in the preallocation pool
+     {Leaf   = BtreeSP.this.leafStuck.copy();                                   // Address the leaf stuck
       Leaf.memoryLayout.memory(BtreeSP.this.memoryLayout.memory);
       Branch = BtreeSP.this.branchStuck.copy();                                 // Address the branch stuck
       Branch.memoryLayout.memory(BtreeSP.this.memoryLayout.memory);
@@ -339,7 +337,6 @@ abstract class BtreeSP extends Test                                             
 
     void findEqualInLeaf()                                                      // Find the first key in the leaf that is equal to the search key
      {z(); assertLeaf();
-      base     = leafBase();
       stuckEqual().setStuck(Leaf);
       stuckEqual().search = search; stuckEqual().search();
       found    = stuckEqual().found;
@@ -358,7 +355,6 @@ abstract class BtreeSP extends Test                                             
 
     void findFirstGreaterThanOrEqualInLeaf()                                    // Find the first key in the  leaf that is equal to or greater than the search key
      {z(); assertLeaf();
-      base     = leafBase();
       stuckFirstLeaf().setStuck(Leaf);
       stuckFirstLeaf().search = search; stuckFirstLeaf().searchFirstGreaterThanOrEqual();
       found    = stuckFirstLeaf().found;
@@ -367,7 +363,6 @@ abstract class BtreeSP extends Test                                             
 
     void findFirstGreaterThanOrEqualInBranch()                                  // Find the first key in the branch that is equal to or greater than the search key
      {z(); assertBranch();
-      base     = branchBase();
       stuckFirstBranch().setStuck(Branch);
       stuckFirstBranch().search = search; stuckFirstBranch().limit = 1;
       stuckFirstBranch().searchFirstGreaterThanOrEqual();
@@ -402,7 +397,7 @@ abstract class BtreeSP extends Test                                             
         for  (int i = 0; i < K; i++)
          {z();
           t.index = i; t.elementAt();                                           // Each node in the branch
-          final Node n = node(new Node(), t.data);                              // Using recursion here is unsatisfactory.
+          final NodeTransaction n = node(new NodeTransaction(), t.data);        // Using recursion here is unsatisfactory.
           if (n.isLeaf()) {z(); n.leafToArray(s);}
           else
            {z();
@@ -449,7 +444,7 @@ abstract class BtreeSP extends Test                                             
         t.setStuck(Branch);
         for  (int i = 0; i < K; i++)
          {t.index = i; t.elementAt();                                           // Each node in the branch
-          final Node n = node(new Node(), t.data);                              // printing will not be part of the chip so we can use recursionand create new nodes as needed
+          final NodeTransaction n = node(new NodeTransaction(), t.data);        // Printing will not be part of the chip so we can use recursion and create new nodes as needed
           if (n.isLeaf())
            {n.printLeaf(S, level+1);
            }
@@ -473,7 +468,7 @@ abstract class BtreeSP extends Test                                             
       final int top = top();                                                    // Top next will always be present
       S.elementAt(L+3).append(top);                                             // Append top next
 
-      final Node n = node(new Node(), top);
+      final NodeTransaction n = node(new NodeTransaction(), top);
       if (n.isLeaf())                                                           // Print leaf
        {n.printLeaf(S, level+1);
        }
@@ -938,14 +933,14 @@ abstract class BtreeSP extends Test                                             
    }  // Node
 
   int node(int nodeType, int node)                                              // Refer to a node by number
-   {final Node n = nodeTypes[nodeType];
+   {final NodeTransaction n = nodeTypes[nodeType];
     n.node = node;
     n.setStucks();
     return nodeType;
    }
 
-  Node node(Node Node, int node)                                                // Refer to a node by number
-   {final Node n = Node;
+  NodeTransaction node(NodeTransaction Node, int node)                          // Refer to a node by number
+   {final NodeTransaction n = Node;
     n.node = node;
     n.setStucks();
     return n;
@@ -966,7 +961,7 @@ abstract class BtreeSP extends Test                                             
   Stack<ArrayElement> toArray()                                                 // Key, data pairs in the tree as an array
    {z();
     final Stack<ArrayElement> s = new Stack<>();
-    final Node root = root();
+    final NodeTransaction root = root();
     if (root.isLeaf()) {z(); root.  leafToArray(s);}
     else               {z(); root.branchToArray(s);}
     return s;
@@ -1032,7 +1027,6 @@ abstract class BtreeSP extends Test                                             
     int      child;                                                             // Results of a find operation
     int      leaf;                                                              // Results of a find operation
     Integer delete;                                                             // Results of a deletion
-    //StuckSP.Transaction T;                                                    // Transaction against a stuck
 
     int find()                                                                  // Find the data associated with a key in the tree
      {z();
@@ -1313,12 +1307,13 @@ abstract class BtreeSP extends Test                                             
     for (int i = a-1; i < b + 1; ++i)
      {T.Key = i;
       if (s.containsKey(i))
-       {Node f = t.nodeTypes[T.find()];
+       {NodeTransaction f = t.nodeTypes[T.find()];
+        assert f == t.nodeTypes[t.Node_find];
         ok(f.found);
         ok(f.data, s.get(i));
        }
       else
-       {Node f = t.nodeTypes[T.find()];
+       {NodeTransaction f = t.nodeTypes[T.find()];
         ok(!f.found);
        }
      }
@@ -1344,7 +1339,8 @@ abstract class BtreeSP extends Test                                             
 
     for (int i = 0; i <= 2*N+1; i++)                                            // Update
      {T.Key = i;
-      Node f = t.nodeTypes[T.find()];
+      NodeTransaction f = t.nodeTypes[T.find()];
+      assert f == t.nodeTypes[t.Node_find];
       if (i > 0 && i % 2 == 0)
        {ok(f.found, true);
         ok(f.data,  i);
@@ -1356,7 +1352,7 @@ abstract class BtreeSP extends Test                                             
 
     for (int i = 0; i <= 2*N+1; i++)
      {T.Key = i;
-      Node f = t.nodeTypes[T.find()];
+      NodeTransaction f = t.nodeTypes[T.find()];
       if (i > 0 && i % 2 == 0)
        {ok(f.found, true);
         ok(f.data,  i-1);
