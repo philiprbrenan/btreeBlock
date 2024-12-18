@@ -100,10 +100,13 @@ class Btree extends Test                                                        
                  " size:"+branchSize()+
                  " top:"+top()+"\n");
 
-        for (int i = 0; i < keyNext.size(); i++)
+        final int N = keyNext.size() - 1;
+        for (int i = 0; i < N; i++)
          {final KeyNext kn = keyNext.elementAt(i);
-          s.append("  "+(i+1)+" key:"+kn.key+" next:"+kn.next+"\n");
+          s.append(String.format("  %2d key:%2d next:%2d\n", i+1, kn.key, kn.next));
          }
+        final KeyNext kn = keyNext.elementAt(N);
+        s.append("             Top:"+kn.next+")\n");
        }
       return s.toString();
      }
@@ -199,7 +202,6 @@ class Btree extends Test                                                        
         boolean looking = true;
         final int N = branchSize();
         int i;
-
         for (i = 0; i < N && looking; i++)                                      // Check each key
          {z();
           if (keyNext.elementAt(i).key >= search)
