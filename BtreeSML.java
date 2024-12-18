@@ -250,11 +250,13 @@ abstract class BtreeSML extends Test                                            
                        " size:"+branchSize()+
                         " top:"+top()+"\n");
 
-        final int N = Branch.size();                                            // Number of elements in branch including top
+        final int N = Branch.size()-1;                                          // Number of elements in branch not including top
         for (int i = 0; i < N; i++)
          {final StuckSML.ElementAt kn = Branch.elementAt1(i);
-          s.append("  "+(i+1)+" key:"+kn.key+" next:"+kn.data+"\n");
+          s.append(String.format("  %2d key:%2d next:%2d\n", i+1, kn.key, kn.data));
          }
+        final StuckSML.ElementAt kn = Branch.elementAt1(N);
+        s.append("             Top:"+kn.data+")\n");
        }
       return s.toString();
      }
