@@ -376,13 +376,16 @@ abstract class BtreeSP extends Test                                             
       else                                                                      // Print a branch
        {s.append("Branch(node:"+node+" size:"+branchSize()+" top:"+top()+"\n");
 
-        final int N = branchSize()+1;                                           // Number of elements in branch including top
+        final int N = branchSize();                                             // Number of elements in branch not including top
         bLeaf.base(branchBase());
         for (int i = 0; i < N; i++)
          {bLeaf.index = i; bLeaf.elementAt();
-          s.append("  "+(i+1)+" key:"+bLeaf.tKey+" next:"+bLeaf.tData+"\n");
+          s.append(String.format("  %2d key:%2d next:%2d\n", i+1, bLeaf.tKey, bLeaf.tData));
          }
+        bLeaf.index = N; bLeaf.elementAt();
+        s.append("             Top:"+bLeaf.tData+")\n");
        }
+
       return s.toString();
      }
 
@@ -391,7 +394,6 @@ abstract class BtreeSP extends Test                                             
     void findEqualInLeaf()                                                      // Find the first key in the leaf that is equal to the search key
      {z(); assertLeaf();
       lEqual.base(leafBase());
-say("HHHH", search, lEqual.base);
 
       lEqual.search = search; lEqual.search();
       found         = lEqual.found;
@@ -733,6 +735,7 @@ say("HHHH", search, lEqual.base);
 
         lL.pop();                                                               // Reduce left
         lL.index = nl-2; lL.elementAt();                                        // Last key on left
+        bT.tKey  = lL.tKey; bT.tData = L; bT.index = index-1; bT.setElementAt();// Reduce key of parent of left
        }
       else                                                                      // Children are branches
        {z();
@@ -755,8 +758,8 @@ say("HHHH", search, lEqual.base);
         bT.index = index-1; bT.elementAt();                                     // Parent key
         bR.tKey  = bT.tKey; bR.index = 0; bR.setElementAt();                    // Reduce key of parent of right
         bL.lastElement();                                                       // Last left key
+        bT.tKey = bL.tKey; bT.tData = L; bT.index = index-1; bT.setElementAt(); // Reduce key of parent of left
        }
-      bT.tKey = bL.tKey; bT.tData = L; bT.index = index-1; bT.setElementAt();   // Reduce key of parent of left
       z(); return true;
      }
 
@@ -786,6 +789,8 @@ say("HHHH", search, lEqual.base);
         z();
         lR.firstElement();                                                      // First element of right child
         lL.tKey = lR.tKey; lL.tData = lR.tData; lL.push();                      // Increase left
+        bT.tKey = lR.tKey; bT.tData = ld; bT.index = index; bT.setElementAt();  // Swap key of parent
+        lR.shift();                                                             // Reduce right
        }
       else                                                                      // Children are branches
        {z();
@@ -803,10 +808,10 @@ say("HHHH", search, lEqual.base);
 
         bR.firstElement();                                                      // First element of  right child
 
-        bL.tKey = 0;   bL.tData = bR.tData; bL.push();                          // New top for left is ignored by search ,.. except last
+        bL.tKey = 0; bL.tData = bR.tData; bL.push();                            // New top for left is ignored by search ,.. except last
+        bT.tKey = bR.tKey; bT.tData = ld; bT.index = index; bT.setElementAt();  // Swap key of parent
+        bR.shift();                                                             // Reduce right
        }
-      bT.tKey  = bR.tKey; bT.tData = ld; bT.index = index; bT.setElementAt();   // Swap key of parent
-      bR.shift();                                                               // Reduce right
       z(); return true;
      }
 
@@ -969,25 +974,25 @@ say("HHHH", search, lEqual.base);
 
         if (nl + 1 + nr > maxKeysPerBranch()) {z(); return false;}              // Merge not possible because there is no where to put the steal
 
-        z(); bL.lastElement();                                                // Last element of left child
+        z(); bL.lastElement();                                                  // Last element of left child
         z(); bT.index = index;
-        z(); bT.elementAt();                                                   // Parent dividing element
+        z(); bT.elementAt();                                                    // Parent dividing element
 
-        bL.tKey = bT.tKey; bL.index = nl;                                    // Re-key left top
-        bL.setElementAt();                                                    // Re-key left top
+        bL.tKey = bT.tKey; bL.index = nl;                                       // Re-key left top
+        bL.setElementAt();                                                      // Re-key left top
 
-        for (int i = 0; i < nr+1; i++)                                              // Transfer right to left
+        for (int i = 0; i < nr+1; i++)                                          // Transfer right to left
          {z(); bR.shift(); bL.tKey  = bR.tKey; bL.tData = bR.tData; bL.push();
          }
        }
       nodeTypes[r].free();                                                      // Free the empty right node
 
-      bT.index = index+1; bT.elementAt(); parentKey = bT.tKey;                // One up from dividing point in parent
-      bT.index = index;   bT.elementAt();                                     // Dividing point in parent
+      bT.index = index+1; bT.elementAt(); parentKey = bT.tKey;                  // One up from dividing point in parent
+      bT.index = index;   bT.elementAt();                                       // Dividing point in parent
       bT.tKey   = parentKey;
-      bT.setElementAt();                                                       // Install key of right sibling in this child
-      bT.index = index+1;                                                      // Reduce parent on right
-      bT.removeElementAt();                                                    // Reduce parent on right
+      bT.setElementAt();                                                        // Install key of right sibling in this child
+      bT.index = index+1;                                                       // Reduce parent on right
+      bT.removeElementAt();                                                     // Reduce parent on right
       z(); return true;
      }
 
@@ -1002,7 +1007,7 @@ say("HHHH", search, lEqual.base);
             }
       z();
 
-      //bT.base(Branch);
+      bT.base(branchBase());
       bT.index = index;
       bT.elementAt();
 
@@ -1113,15 +1118,13 @@ say("HHHH", search, lEqual.base);
 
     int find()                                                                  // Find the data associated with a key in the tree
      {z();
-say("FFFF");
-      if (root.isLeaf())                                                          // The root is a leaf
+      if (root.isLeaf())                                                        // The root is a leaf
        {z(); root.search = Key; root.findEqualInLeaf();
         return Node_root;
        }
 
       parent = Node_root;                                                       // Parent starts at root which is known to be a branch
 
-say("GGGG");
       for (int i = 0; i < maxDepth; i++)                                        // Step down through tree
        {z();
         nodeTypes[parent].search = Key; nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();      // Find next child in search path of key
@@ -1218,12 +1221,8 @@ say("GGGG");
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
 
     Integer findAndDelete()                                                     // Delete a key from the tree and returns its data if present without modifying the shape of tree
-     {z();
-say("CCCC", Key, BtreeSP.this);
-     find = find();                                                       // Try direct insertion with no modifications to the shape of the tree
-say("DDDD");
+     {z(); find = find();                                                       // Try direct insertion with no modifications to the shape of the tree
       if (!nodeTypes[find].found) return null;                                  // Inserted or updated successfully
-say("EEEE");
       z();
       lT.base(nodeTypes[find].leafBase());                                      // The leaf that contains the key
       lT.index = nodeTypes[find].index; lT.elementAt();                         // Position in the leaf of the key
@@ -1244,18 +1243,19 @@ say("EEEE");
       parent = Node_root;                                                       // Start at root()
 
       for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-       {z(); nodeTypes[parent].search = Key; nodeTypes[parent].findFirstGreaterThanOrEqualInBranch(); // Step down
+       {z();                                                                    // Step down
+        nodeTypes[parent].search = Key;
+        nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();
 
-        nodeTypes[parent].index = nodeTypes[parent].first; nodeTypes[parent].balance();
+        nodeTypes[parent].index = nodeTypes[parent].first;
+say("AAAA", nodeTypes[parent].toString(), BtreeSP.this);
+        nodeTypes[parent].balance();
         child = node(Node_delete, nodeTypes[parent].next);
 
-        if (nodeTypes[child].isLeaf())                                                     // Reached a leaf
+        if (nodeTypes[child].isLeaf())                                          // Reached a leaf
          {z();
-if (debug) say("AAAA", BtreeSP.this);
           final Integer data = findAndDelete();
           merge();
-if (debug) say("BBBB", BtreeSP.this);
-if (debug) stop("");
           return data;
          }
         z(); parent = node(Node_parent, nodeTypes[child].node);
@@ -1479,10 +1479,9 @@ if (debug) stop("");
     if (box) say("At start with", N, "elements", t.printBoxed());
 
     for (int i = 1; i <= N; i++)
-     {debug = i >= 20;
-       T.Key = i; T.delete();
+     {T.Key = i; T.delete();
       //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
-      if (debug || box) say("After deleting:", i, t.printBoxed());
+      if (box) say("After deleting:", i, t.printBoxed());
       switch(i) {
         case 1 -> t.ok("""
                                                     16                                                                   |
@@ -2103,8 +2102,7 @@ if (debug) stop("");
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_delete_ascending();                                                    //  7.27
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
