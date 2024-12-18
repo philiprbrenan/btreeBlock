@@ -1,4 +1,4 @@
-# Test 2024-12-18 at 01:31:19
+# Test 2024-12-18 at 01:35:08
 
 name: Test
 run-name: btreeBlock
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        task: [Btree, BtreeSA, BtreeSML, BtreeSP, BtreeStuck, BtreeStuckStatic, If, Layout, Memory, MemoryLayout, Program, Stuck, StuckPA, StuckSA, StuckSML, StuckSP, StuckStatic, Test, ZZZTest, Btree, BtreeSML, BtreeSP, BtreeStuck, BtreeStuckStatic, If, Layout, Memory, MemoryLayout, Program, Stuck, StuckPA, StuckSA, StuckSML, StuckSP, StuckStatic, Test]
+        task: [Btree, BtreeSA, BtreeSML, BtreeSP, BtreeStuck, BtreeStuckStatic, If, Layout, Memory, MemoryLayout, Program, Stuck, StuckPA, StuckSA, StuckSML, StuckSP, StuckStatic, Test]
 
     steps:
     - uses: actions/checkout@v4
@@ -58,96 +58,6 @@ jobs:
       if: matrix.task == 'BtreeSA'
       run: |
         java -cp Classes com/AppaApps/Silicon/BtreeSA
-
-    - name: Test BtreeSML
-      if: matrix.task == 'BtreeSML'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeSML
-
-    - name: Test BtreeSP
-      if: matrix.task == 'BtreeSP'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeSP
-
-    - name: Test BtreeStuck
-      if: matrix.task == 'BtreeStuck'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeStuck
-
-    - name: Test BtreeStuckStatic
-      if: matrix.task == 'BtreeStuckStatic'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeStuckStatic
-
-    - name: Test If
-      if: matrix.task == 'If'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/If
-
-    - name: Test Layout
-      if: matrix.task == 'Layout'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Layout
-
-    - name: Test Memory
-      if: matrix.task == 'Memory'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Memory
-
-    - name: Test MemoryLayout
-      if: matrix.task == 'MemoryLayout'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/MemoryLayout
-
-    - name: Test Program
-      if: matrix.task == 'Program'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Program
-
-    - name: Test Stuck
-      if: matrix.task == 'Stuck'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Stuck
-
-    - name: Test StuckPA
-      if: matrix.task == 'StuckPA'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/StuckPA
-
-    - name: Test StuckSA
-      if: matrix.task == 'StuckSA'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/StuckSA
-
-    - name: Test StuckSML
-      if: matrix.task == 'StuckSML'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/StuckSML
-
-    - name: Test StuckSP
-      if: matrix.task == 'StuckSP'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/StuckSP
-
-    - name: Test StuckStatic
-      if: matrix.task == 'StuckStatic'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/StuckStatic
-
-    - name: Test Test
-      if: matrix.task == 'Test'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Test
-
-    - name: Test ZZZTest
-      if: matrix.task == 'ZZZTest'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/ZZZTest
-
-    - name: Test Btree
-      if: matrix.task == 'Btree'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Btree
 
     - name: Test BtreeSML
       if: matrix.task == 'BtreeSML'
