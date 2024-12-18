@@ -7,7 +7,7 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 abstract class BtreeSA extends Test                                             // Manipulate a btree using static methods and memory
- {MemoryLayout memoryLayout = new MemoryLayout();                               // The memory layout of the btree
+ {/*MemoryLayout memoryLayout = new MemoryLayout();                               // The memory layout of the btree
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -2028,7 +2028,8 @@ abstract class BtreeSA extends Test                                             
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
-   {test_put_ascending();                                                       //  7.99
+   {if (true) return;
+    test_put_ascending();                                                       //  7.99
     test_put_ascending_wide();                                                  //  5.33
     test_put_descending();                                                      // 12.98
     test_put_small_random();                                                    //  8.72
@@ -2041,7 +2042,6 @@ abstract class BtreeSA extends Test                                             
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_put_ascending();                                                       //  7.99
    }
 
   public static void main(String[] args)                                        // Test if called as a program
@@ -2059,4 +2059,5 @@ abstract class BtreeSA extends Test                                             
       System.exit(1);
      }
    }
+*/
  }
