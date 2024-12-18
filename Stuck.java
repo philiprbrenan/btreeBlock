@@ -19,7 +19,7 @@ abstract class Stuck extends Test                                               
     Data        = new int[maxSize()];
    }
 
-  static Stuck stuck(final int MaxSize)                                               // Create the stuck
+  static Stuck stuck(final int MaxSize)                                         // Create the stuck
    {z(); return new Stuck() {int maxSize() {return MaxSize;}};
    }
 
