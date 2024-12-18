@@ -98,7 +98,7 @@ abstract class BtreeSP extends Test                                             
   StuckSP lL;                                                                   // Process a left node
   StuckSP lR;                                                                   // Process a right node
 
-  boolean debug = false;                                                        // Debugging enabled
+  static boolean debug = false;                                                 // Debugging enabled
 
 //D1 Construction                                                               // Create a Btree from nodes which can be branches or leaves.  The data associated with the BTree is stored only in the leaves opposite the keys
 
@@ -391,6 +391,8 @@ abstract class BtreeSP extends Test                                             
     void findEqualInLeaf()                                                      // Find the first key in the leaf that is equal to the search key
      {z(); assertLeaf();
       lEqual.base(leafBase());
+say("HHHH", search, lEqual.base);
+
       lEqual.search = search; lEqual.search();
       found         = lEqual.found;
       index         = lEqual.index;
@@ -1111,6 +1113,7 @@ abstract class BtreeSP extends Test                                             
 
     int find()                                                                  // Find the data associated with a key in the tree
      {z();
+say("FFFF");
       if (root.isLeaf())                                                          // The root is a leaf
        {z(); root.search = Key; root.findEqualInLeaf();
         return Node_root;
@@ -1118,13 +1121,15 @@ abstract class BtreeSP extends Test                                             
 
       parent = Node_root;                                                       // Parent starts at root which is known to be a branch
 
+say("GGGG");
       for (int i = 0; i < maxDepth; i++)                                        // Step down through tree
        {z();
         nodeTypes[parent].search = Key; nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();      // Find next child in search path of key
         child = node(Node_find, nodeTypes[parent].next);
 
         if (nodeTypes[child].isLeaf())                                          // Found the containing search
-         {z(); nodeTypes[child].search = Key; nodeTypes[child].findEqualInLeaf();
+         {z(); nodeTypes[child].search = Key;
+          nodeTypes[child].findEqualInLeaf();
           return child;
          }
         parent = node(Node_parent, nodeTypes[child].node);                      // Step down to lower branch
@@ -1213,8 +1218,12 @@ abstract class BtreeSP extends Test                                             
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
 
     Integer findAndDelete()                                                     // Delete a key from the tree and returns its data if present without modifying the shape of tree
-     {z(); find = find();                                                       // Try direct insertion with no modifications to the shape of the tree
+     {z();
+say("CCCC", Key, BtreeSP.this);
+     find = find();                                                       // Try direct insertion with no modifications to the shape of the tree
+say("DDDD");
       if (!nodeTypes[find].found) return null;                                  // Inserted or updated successfully
+say("EEEE");
       z();
       lT.base(nodeTypes[find].leafBase());                                      // The leaf that contains the key
       lT.index = nodeTypes[find].index; lT.elementAt();                         // Position in the leaf of the key
@@ -1242,8 +1251,11 @@ abstract class BtreeSP extends Test                                             
 
         if (nodeTypes[child].isLeaf())                                                     // Reached a leaf
          {z();
+if (debug) say("AAAA", BtreeSP.this);
           final Integer data = findAndDelete();
           merge();
+if (debug) say("BBBB", BtreeSP.this);
+if (debug) stop("");
           return data;
          }
         z(); parent = node(Node_parent, nodeTypes[child].node);
@@ -1467,9 +1479,10 @@ abstract class BtreeSP extends Test                                             
     if (box) say("At start with", N, "elements", t.printBoxed());
 
     for (int i = 1; i <= N; i++)
-     {T.Key = i; T.delete();
+     {debug = i >= 20;
+       T.Key = i; T.delete();
       //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
-      if (box) say("After deleting:", i, t.printBoxed());
+      if (debug || box) say("After deleting:", i, t.printBoxed());
       switch(i) {
         case 1 -> t.ok("""
                                                     16                                                                   |
@@ -2090,7 +2103,8 @@ abstract class BtreeSP extends Test                                             
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_delete_ascending();                                                    //  7.27
    }
 
   public static void main(String[] args)                                        // Test if called as a program
