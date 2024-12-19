@@ -7,7 +7,7 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 abstract class BtreeSA extends Test                                             // Manipulate a btree using static methods and memory
- {/*MemoryLayout memoryLayout = new MemoryLayout();                               // The memory layout of the btree
+ {MemoryLayout memoryLayout = new MemoryLayout();                               // The memory layout of the btree
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -30,6 +30,76 @@ abstract class BtreeSA extends Test                                             
   Layout.Variable  freedChain;                                                  // Single linked list of freed nodes
   Layout.Structure bTree;                                                       // Btree
 
+  final static int
+   linesToPrintABranch  =  4,                                                   // The number of lines required to print a branch
+        maxPrintLevels  = 10,                                                   // Maximum number of levels to print in a tree
+              maxDepth  = 99,                                                   // Maximum depth of any realistic tree
+           testMaxSize  = github_actions ? 1000 : 50;                           // Maximum number of leaves plus branches during testing
+
+  int         nodeUsed  = 0;                                                    // Number of nodes currently in use
+  int      maxNodeUsed  = 0;                                                    // Maximum number of branches plus leaves used
+
+  final int Node_root   = 0;                                                    // The root of the tree is always node zero
+  final int Node_parent = 1;                                                    // Node used for initializing the tree and for the parent node
+  final int Node_left   = 2;                                                    // Node used for a left  hand child
+  final int Node_right  = 3;                                                    // Node used for a right hand child
+  final int Node_child  = 4;                                                    // Node used as a generic child
+  final int Node_temp   = 5;                                                    // Temporary node
+  final int Node_find   = 6;                                                    // Find node
+  final int Node_put    = 7;                                                    // Put node
+  final int Node_delete = 8;                                                    // Delete node
+  final int Node_length = 9;                                                    // Number of node types
+
+  final NodeTransaction[]nodeTypes;                                             // One node description for each type of transacton
+
+  final int Branch_Size        = 0;                                             // Get the size of a stuck
+  final int Branch_Leaf        = 1;                                             // Check whether a node has leaves for children
+  final int Branch_Top         = 2;                                             // Get the top element of a branch
+  final int Branch_Equal       = 3;                                             // Locate an equal key
+  final int Branch_FirstLeaf   = 4;                                             // Locate the first greater or equal key in a leaf
+  final int Branch_FirstBranch = 5;                                             // Locate the first greater or equal key in a branch
+  final int Branch_T           = 6;                                             // Process a parent node
+  final int Branch_tl          = 7;                                             // Process a left node
+  final int Branch_tr          = 8;                                             // Process a right node
+  final int Branch_length      = 9;                                             // Number of transaction types
+
+  final int Leaf_Size          = 0;                                             // Get the size of a stuck
+  final int Leaf_Leaf          = 1;                                             // Check whether a node has leaves for children
+  final int Leaf_Top           = 2;                                             // Get the top element of a branch
+  final int Leaf_Equal         = 3;                                             // Locate an equal key
+  final int Leaf_FirstLeaf     = 4;                                             // Locate the first greater or equal key in a leaf
+  final int Leaf_FirstBranch   = 5;                                             // Locate the first greater or equal key in a branch
+  final int Leaf_T             = 6;                                             // Process a parent node
+  final int Leaf_tl            = 7;                                             // Process a left node
+  final int Leaf_tr            = 8;                                             // Process a right node
+  final int Leaf_length        = 9;                                             // Number of transaction types
+
+  final StuckSP[]branchTransactions;                                            // Transactions to use on branch stucks
+  final StuckSP[]  leafTransactions;                                            // Transactions to use on leaf stucks
+
+  NodeTransaction root;                                                         // The root of the tree
+  StuckSP bSize;                                                                // Branch size
+  StuckSP bLeaf;                                                                // Check whether a node has leaves for childrn
+  StuckSP bTop;                                                                 // Get the size of a stuck
+  StuckSP bEqual;                                                               // Locate an equal key
+  StuckSP bFirstLeaf;                                                           // Locate the first greater or equal key in a leaf
+  StuckSP bFirstBranch;                                                         // Locate the first greater or equal key in a branch
+  StuckSP bT;                                                                   // Process a parent node
+  StuckSP bL;                                                                   // Process a left node
+  StuckSP bR;                                                                   // Process a right node
+
+  StuckSP lSize;                                                                // Branch size
+  StuckSP lLeaf;                                                                // Check whether a node has leaves for childrn
+  StuckSP lTop;                                                                 // Get the size of a stuck
+  StuckSP lEqual;                                                               // Locate an equal key
+  StuckSP lFirstLeaf;                                                           // Locate the first greater or equal key in a leaf
+  StuckSP lFirstBranch;                                                         // Locate the first greater or equal key in a branch
+  StuckSP lT;                                                                   // Process a parent node
+  StuckSP lL;                                                                   // Process a left node
+  StuckSP lR;                                                                   // Process a right node
+
+  static boolean debug = false;                                                 // Debugging enabled
+                                                                                // Temporary fields for performing a transaction against the Btree.
   Layout.Variable node;                                                         // The number of the node
   Layout.Variable parent;                                                       // Parent node
   Layout.Variable anode;                                                        // Node being allocated
@@ -52,54 +122,19 @@ abstract class BtreeSA extends Test                                             
   Layout.Variable rd;                                                           // Right child data
   Layout.Variable index;                                                        // Index of a slot in a node
                                                                                 // Find equal in leaf
-  Layout.Bit      search;                                                       // Search key
-  Layout.Bit      found;                                                        // Whether the key was found
-  Layout.Bit      key;                                                          // Key to insert
-  Layout.Variable data;                                                         // Data associated with the  key
+  Layout.Variable search;                                                       // Search key
+  Layout.Bit       found;                                                       // Whether the key was found
+  Layout.Variable    key;                                                       // Key to insert
+  Layout.Variable   data;                                                       // Data associated with the  key
 
-  Layout.Variable first;                                                        // Index of first key greater than or equal to the search key
-  Layout.Variable next;                                                         // The corresponding next field or top if no such key was found
+  Layout.Variable  first;                                                       // Index of first key greater than or equal to the search key
+  Layout.Variable   next;                                                       // The corresponding next field or top if no such key was found
 
-  Layout.Variable success;                                                      // Inserted or updated if true
-  Layout.Variable inserted;                                                     // Inserted if true
-  Layout.Structure NodeTransaction;                                             // Layout of a node transaction in bit memory
+  Layout.Bit  success;                                                          // Inserted or updated if true
+  Layout.Bit inserted;                                                          // Inserted if true
+  Layout.Structure nodeTransaction;                                             // Collection of fields used to perform a transaction against the btree
 
-  final static int
-   linesToPrintABranch =  4,                                                    // The number of lines required to print a branch
-        maxPrintLevels = 10,                                                    // Maximum number of levels to print in a tree
-              maxDepth = 99,                                                    // Maximum depth of any realistic tree
-           testMaxSize = github_actions ? 1000 : 50;                            // Maximum number of leaves plus branches during testing
-
-  int         nodeUsed = 0;                                                     // Number of nodes currently in use
-  int      maxNodeUsed = 0;                                                     // Maximum number of branches plus leaves used
-
-  final int Node_root   = 0;                                                    // The root of the tree is always node zero
-  final int Node_parent = 1;                                                    // Node used for initializing the tree and for the parent node
-  final int Node_left   = 2;                                                    // Node used for a left  hand child
-  final int Node_right  = 3;                                                    // Node used for a right hand child
-  final int Node_child  = 4;                                                    // Node used as a generic child
-  final int Node_temp   = 5;                                                    // Temporary node
-  final int Node_find   = 6;                                                    // Find node
-  final int Node_put    = 7;                                                    // Put node
-  final int Node_delete = 8;                                                    // Delete node
-  final int Node_length = 9;                                                    // Number of node types
-
-  final NodeTransaction[]nodeTypes;                                             // One node description for each type of transacton
-
-  final int StuckTransaction_stuckSize        = 0;                              // Get the size of a stuck
-  final int StuckTransaction_stuckLeaf        = 1;                              // Check whether a node has leaves for children
-  final int StuckTransaction_stuckTop         = 2;                              // Get the size of a stuck
-  final int StuckTransaction_stuckEqual       = 3;                              // Locate an equal key
-  final int StuckTransaction_stuckFirstLeaf   = 4;                              // Locate the first greater or equal key in a leaf
-  final int StuckTransaction_stuckFirstBranch = 5;                              // Locate the first greater or equal key in a branch
-  final int StuckTransaction_T                = 6;                              // Process a parent node
-  final int StuckTransaction_tl               = 7;                              // Process a left node
-  final int StuckTransaction_tr               = 8;                              // Process a right node
-  final int StuckTransaction_length           = 9;                              // Number of transaction types
-
-  final StuckSP.Transaction[]stuckTransactions;                                 // Transactions to use on stucks
-
-  boolean debug = false;                                                        // Debugging enabled
+  final MemoryLayout transactionMemory = new MemoryLayout();                    // Memory layout used to describe a trnasaction against the btree
 
 //D1 Construction                                                               // Create a Btree from nodes which can be branches or leaves.  The data associated with the BTree is stored only in the leaves opposite the keys
 
@@ -108,15 +143,59 @@ abstract class BtreeSA extends Test                                             
     memoryLayout.layout(layout());
     memoryLayout.memory(new Memory(memoryLayout.layout.size()));
 
-     {final int N = StuckTransaction_length;                                    // Preallocate transactions used on stucks
-      stuckTransactions = new StuckSP.Transaction[N];
-      for (int i = 0; i < N; i++) stuckTransactions[i] = new StuckSP.Transaction();
+     {final int N = Branch_length;                                              // Preallocate transactions used on branch stucks
+      branchTransactions = new StuckSP[N];
+
+      for (int i = 0; i < N; i++)
+       {final StuckSP b = branchTransactions[i] = new StuckSP()
+         {int     maxSize() {return BtreeSA.this.maxKeysPerBranch()+1;}         // Not forgetting top next
+          int  bitsPerKey() {return BtreeSA.this.bitsPerKey();}
+          int bitsPerData() {return BtreeSA.this.bitsPerNext();}
+          int bitsPerSize() {return BtreeSA.this.bitsPerSize();}
+         };
+         b.M.memory(memoryLayout.memory);
+        }
+      }
+
+     {final int N = Leaf_length;                                                // Preallocate transactions used on leaf stucks
+      leafTransactions = new StuckSP[N];
+
+      for (int i = 0; i < N; i++)
+       {final StuckSP l = leafTransactions[i] = new StuckSP()
+         {int     maxSize() {return BtreeSA.this.maxKeysPerLeaf();}
+          int  bitsPerKey() {return BtreeSA.this.bitsPerKey();}
+          int bitsPerData() {return BtreeSA.this.bitsPerData();}
+          int bitsPerSize() {return BtreeSA.this.bitsPerSize();}
+         };
+         l.M.memory(memoryLayout.memory);
+       }
      }
 
      {final int N = Node_length;                                                // Preallocate nodes
       nodeTypes = new NodeTransaction[N];
       for (int i = 0; i < N; i++) nodeTypes[i] = new NodeTransaction();
      }
+
+    root         = nodeTypes[Node_root];                                        // The root of the tree
+    bSize        = branchTransactions[Branch_Size       ];                      // Branch size
+    bLeaf        = branchTransactions[Branch_Leaf       ];                      // Check whether a node has leaves for childrn
+    bTop         = branchTransactions[Branch_Top        ];                      // Get the size of a stuck
+    bEqual       = branchTransactions[Branch_Equal      ];                      // Locate an equal key
+    bFirstLeaf   = branchTransactions[Branch_FirstLeaf  ];                      // Locate the first greater or equal key in a leaf
+    bFirstBranch = branchTransactions[Branch_FirstBranch];                      // Locate the first greater or equal key in a branch
+    bT           = branchTransactions[Branch_T          ];                      // Process a parent node
+    bL           = branchTransactions[Branch_tl         ];                      // Process a left node
+    bR           = branchTransactions[Branch_tr         ];                      // Process a right node
+
+    lSize        =   leafTransactions[Leaf_Size         ];                      // Branch size
+    lLeaf        =   leafTransactions[Leaf_Leaf         ];                      // Check whether a node has leaves for childrn
+    lTop         =   leafTransactions[Leaf_Top          ];                      // Get the size of a stuck
+    lEqual       =   leafTransactions[Leaf_Equal        ];                      // Locate an equal key
+    lFirstLeaf   =   leafTransactions[Leaf_FirstLeaf    ];                      // Locate the first greater or equal key in a leaf
+    lFirstBranch =   leafTransactions[Leaf_FirstBranch  ];                      // Locate the first greater or equal key in a branch
+    lT           =   leafTransactions[Leaf_T            ];                      // Process a parent node
+    lL           =   leafTransactions[Leaf_tl           ];                      // Process a left node
+    lR           =   leafTransactions[Leaf_tr           ];                      // Process a right node
 
     for (int i = maxSize(); i > 0; --i)                                         // Put all the nodes on the free chain at the start with low nodes first
      {final NodeTransaction n = nodeTypes[0];                                   // Any node type will do at this point
@@ -127,11 +206,13 @@ abstract class BtreeSA extends Test                                             
                      setInt(freedChain, n.node);
      }
 
-     {final NodeTransaction root = root();
-      allocate(root, false);                                                    // The root is always at zero, which frees zero to act as the end of list marker on the free chain
+     {allocate(root, false);                                                    // The root is always at zero, which frees zero to act as the end of list marker on the free chain
       root.setLeaf();                                                           // The root starts as a leaf
       root.setStucks();                                                         // Describe stucks addressable from the root
      }
+
+    transactionMemory.layout(transactionLayout());                              // Memory layout for a transaction against the btree
+    transactionMemory.memory(new Memory(transactionMemory.layout.size()));      // Memory for a transaction against the btree
    }
 
   static BtreeSA btreeSML(final int leafKeys, int branchKeys)                   // Define a test btree with the specified dimensions
@@ -177,16 +258,48 @@ abstract class BtreeSA extends Test                                             
     return l.compile();
    }
 
-  NodeTransaction root() {return nodeTypes[Node_root];}                         // The root of the tree
-  StuckSP.Transaction stuckSize       () {return stuckTransactions[StuckTransaction_stuckSize       ];}
-  StuckSP.Transaction stuckLeaf       () {return stuckTransactions[StuckTransaction_stuckLeaf       ];} // Check whether a node has leaves for childrn
-  StuckSP.Transaction stuckTop        () {return stuckTransactions[StuckTransaction_stuckTop        ];} // Get the size of a stuck
-  StuckSP.Transaction stuckEqual      () {return stuckTransactions[StuckTransaction_stuckEqual      ];} // Locate an equal key
-  StuckSP.Transaction stuckFirstLeaf  () {return stuckTransactions[StuckTransaction_stuckFirstLeaf  ];} // Locate the first greater or equal key in a leaf
-  StuckSP.Transaction stuckFirstBranch() {return stuckTransactions[StuckTransaction_stuckFirstBranch];} // Locate the first greater or equal key in a branch
-  StuckSP.Transaction T               () {return stuckTransactions[StuckTransaction_T               ];} // Process a parent node
-  StuckSP.Transaction tl              () {return stuckTransactions[StuckTransaction_tl              ];} // Process a left node
-  StuckSP.Transaction tr              () {return stuckTransactions[StuckTransaction_tr              ];} // Process a right node
+  Layout transactionLayout()                                                    // Layout describing memory used by btree
+   {z();
+    final Layout  t = new Layout();                                             // The layout of the memory used by a transaction against the btree
+    node            = t.variable ("node"           , bitsPerNext());            // The number of the node
+    parent          = t.variable ("parent"         , bitsPerNext());            // Parent node
+    anode           = t.variable ("anode"          , bitsPerNext());            // Node being allocated
+    P               = t.variable ("P"              , bitsPerNext());            // Parent node during a split, merge or steal operation
+    l               = t.variable ("l"              , bitsPerNext());            // Left node
+    r               = t.variable ("r"              , bitsPerNext());            // Right node
+    splitLeafSize   = t.variable ("splitLeafSize"  , bitsPerSize());            // Where to split a full leaf
+    splitBranchSize = t.variable ("splitBranchSize", bitsPerSize());            // Branch split size
+    firstKey        = t.variable ("firstKey"       , bitsPerKey());             // First of right leaf
+    lastKey         = t.variable ("lastKey"        , bitsPerKey());             // Last of left leaf
+    flKey           = t.variable ("flKey"          , bitsPerKey());             // Key mid way between last of left and first of right
+    parentKey       = t.variable ("parentKey"      , bitsPerKey());             // Parent key
+    L               = t.variable ("L"              , bitsPerNext());            // Reference to left child
+    R               = t.variable ("R"              , bitsPerNext());            // Reference to right child
+    nl              = t.variable ("nl"             , bitsPerSize());            // Number in the left child, number in the right child
+    nr              = t.variable ("nr"             , bitsPerSize());            // Number in the left child, number in the right child
+    lk              = t.variable ("lk"             , bitsPerKey());             // Left  child key
+    ld              = t.variable ("ld"             , bitsPerData());            // Left  child data
+    rk              = t.variable ("rk"             , bitsPerKey());             // Right child key
+    rd              = t.variable ("rd"             , bitsPerData());            // Right child data
+    index           = t.variable ("index"          , bitsPerSize());            // Index of a slot in a node
+                                                                                // Find in leaf
+    search          = t.variable ("search"         , bitsPerKey());             // Search key
+    found           = t.bit      ("found");                                     // Whether the key was found
+    key             = t.variable ("key"            , bitsPerKey());             // Key to insert
+    data            = t.variable ("data"           , bitsPerData());            // Data associated with the  key
+
+    first           = t.variable ("first"          , bitsPerSize());            // Index of first key greater than or equal to the search key
+    next            = t.variable ("next"           , bitsPerNext());            // The corresponding next field or top if no such key was found
+
+    success         = t.bit      ("success"        );                           // Inserted or updated if true
+    inserted        = t.bit      ("inserted"       );                           // Inserted if true
+    nodeTransaction = t.structure("nodeTransaction",                            // Collection of fields used to perform a transaction against the btree
+      node, parent, anode, P, l, r, splitLeafSize, splitBranchSize,
+      firstKey, lastKey, flKey, parentKey,
+      L, R, nl, nr, lk, ld, rk, rd,
+      index, search, found, key, data, first, next, success, inserted);
+    return  t.compile();
+   }
 
 //D1 Control                                                                    // Testing, control and integrity
 
@@ -253,16 +366,6 @@ abstract class BtreeSA extends Test                                             
     boolean  success;                                                           // Inserted or updated if true
     boolean inserted;                                                           // Inserted if true
 
-    StuckSP Leaf;                                                               // This stuck description is one-to-one with this node. The base address of the stuck description is set to enable this description to access the relevant leaf stuck in memory
-    StuckSP Branch;                                                             // This stuck description is one-to-one with this node. The base address of the stuck description is set to enable this description to access the relevant branch stuck in memory
-
-    NodeTransaction()                                                           // Preallocate a node recording its position in the preallocation pool
-     {Leaf   = BtreeSA.this.leafStuck.copy();                                   // Address the leaf stuck
-      Leaf.memoryLayout.memory(BtreeSA.this.memoryLayout.memory);
-      Branch = BtreeSA.this.branchStuck.copy();                                 // Address the branch stuck
-      Branch.memoryLayout.memory(BtreeSA.this.memoryLayout.memory);
-     }
-
     boolean isLeaf() {z(); return getInt(isLeaf,    node) > 0;}                 // A leaf if true
     void   setLeaf() {z();        setInt(isLeaf, 1, node);}                     // Set as leaf
     void setBranch() {z();        setInt(isLeaf, 0, node);}                     // Set as branch
@@ -274,8 +377,8 @@ abstract class BtreeSA extends Test                                             
     void allocBranch(){z(); allocate(nodeTypes[anode]); nodeTypes[anode].setBranch(); nodeTypes[anode].setStucks();} // Allocate branch
 
     void setStucks()                                                            // Descriptions of the stucks addressed by this node setting their base offsets
-     {Leaf.base(leafBase());
-      Branch.base(branchBase());
+     {//Leaf.base(leafBase());
+      //Branch.base(branchBase());
      }
 
     void free()                                                                 // Free a new node to make it available for reuse
@@ -306,16 +409,16 @@ abstract class BtreeSA extends Test                                             
 
     int leafSize()                                                              // Number of children in body of leaf
      {z();
-      stuckSize().setStuck(Leaf);
-      stuckSize().size();
-      return stuckSize().size;
+      lSize.base(leafBase());
+      lSize.size();
+      return lSize.size;
      }
 
     int branchSize()                                                            // Number of children in body of branch taking top for granted as it is always there
      {z();
-      stuckSize().setStuck(Branch);
-      stuckSize().size();
-      return stuckSize().size-1;
+      bSize.base(branchBase());
+      bSize.size();
+      return bSize.size-1;
      }
 
     boolean isFull()                                                            // The node is full
@@ -327,17 +430,17 @@ abstract class BtreeSA extends Test                                             
 
     boolean hasLeavesForChildren()                                              // The node has leaves for children
      {z(); assertBranch();
-      stuckLeaf().setStuck(Branch);
-      stuckLeaf().lastElement();
-      return nodeTypes[node(Node_temp, stuckLeaf().data)].isLeaf();
+      bLeaf.base(branchBase());
+      bLeaf.lastElement();
+      return nodeTypes[node(Node_temp, bLeaf.tData)].isLeaf();
      }
 
     int top()                                                                   // The top next element of a branch - only used in printing
      {z(); assertBranch();
-      stuckTop().setStuck(Branch);
-      stuckTop().index = branchSize();
-      stuckTop().elementAt();
-      return stuckTop().data;
+      bTop.base(branchBase());
+      bTop.index = branchSize();
+      bTop.elementAt();
+      return bTop.tData;
      }
 
     public String toString()                                                    // Print a node
@@ -345,25 +448,26 @@ abstract class BtreeSA extends Test                                             
       if (isLeaf())                                                             // Print a leaf
        {final int N  = leafSize();                                              // Number of elements in leaf
         s.append("Leaf(node:"+node+" size:"+N+")\n");
-        final StuckSP.Transaction t = new StuckSP.Transaction();
-        t.setStuck(Leaf);
+        lLeaf.base(leafBase());
         for (int i = 0; i < N; i++)                                             // Each element in the leaf
-         {t.index = i;
-          t.elementAt();
-          s.append("  "+(i+1)+" key:"+t.key+" data:"+t.data+"\n");
+         {lLeaf.index = i;
+          lLeaf.elementAt();
+          s.append("  "+(i+1)+" key:"+lLeaf.tKey+" data:"+lLeaf.tData+"\n");
          }
        }
       else                                                                      // Print a branch
        {s.append("Branch(node:"+node+" size:"+branchSize()+" top:"+top()+"\n");
 
-        final int N = branchSize()+1;                                           // Number of elements in branch including top
-        final StuckSP.Transaction t = new StuckSP.Transaction();
-        t.setStuck(Branch);
+        final int N = branchSize();                                             // Number of elements in branch not including top
+        bLeaf.base(branchBase());
         for (int i = 0; i < N; i++)
-         {t.index = i; t.elementAt();
-          s.append("  "+(i+1)+" key:"+t.key+" next:"+t.data+"\n");
+         {bLeaf.index = i; bLeaf.elementAt();
+          s.append(String.format("  %2d key:%2d next:%2d\n", i+1, bLeaf.tKey, bLeaf.tData));
          }
+        bLeaf.index = N; bLeaf.elementAt();
+        s.append("             Top:"+bLeaf.tData+")\n");
        }
+
       return s.toString();
      }
 
@@ -371,11 +475,12 @@ abstract class BtreeSA extends Test                                             
 
     void findEqualInLeaf()                                                      // Find the first key in the leaf that is equal to the search key
      {z(); assertLeaf();
-      stuckEqual().setStuck(Leaf);
-      stuckEqual().search = search; stuckEqual().search();
-      found    = stuckEqual().found;
-      index    = stuckEqual().index;
-      data     = stuckEqual().data;
+      lEqual.base(leafBase());
+
+      lEqual.search = search; lEqual.search();
+      found         = lEqual.found;
+      index         = lEqual.index;
+      data          = lEqual.tData;
      }
 
     public String findEqualInLeaf_toString()                                    // Print details of find equal in leaf node
@@ -389,34 +494,34 @@ abstract class BtreeSA extends Test                                             
 
     void findFirstGreaterThanOrEqualInLeaf()                                    // Find the first key in the  leaf that is equal to or greater than the search key
      {z(); assertLeaf();
-      stuckFirstLeaf().setStuck(Leaf);
-      stuckFirstLeaf().search = search; stuckFirstLeaf().searchFirstGreaterThanOrEqual();
-      found    = stuckFirstLeaf().found;
-      first    = stuckFirstLeaf().index;
+      lFirstLeaf.base(leafBase());
+      lFirstLeaf.search = search; lFirstLeaf.searchFirstGreaterThanOrEqual();
+      found = lFirstLeaf.found;
+      first = lFirstLeaf.index;
      }
 
     void findFirstGreaterThanOrEqualInBranch()                                  // Find the first key in the branch that is equal to or greater than the search key
      {z(); assertBranch();
-      stuckFirstBranch().setStuck(Branch);
-      stuckFirstBranch().search = search; stuckFirstBranch().limit = 1;
-      stuckFirstBranch().searchFirstGreaterThanOrEqual();
-      found    = stuckFirstBranch().found;
-      first    = stuckFirstBranch().index;
-      if (stuckFirstBranch().found) next = stuckFirstBranch().data;             // Next if key matches else top
-      else {stuckFirstBranch().lastElement(); next = stuckFirstBranch().data;}
+      bFirstBranch.base(branchBase());
+      bFirstBranch.search = search; bFirstBranch.limit = 1;
+      bFirstBranch.searchFirstGreaterThanOrEqual();
+      found = bFirstBranch.found;
+      first = bFirstBranch.index;
+      if (bFirstBranch.found) next = bFirstBranch.tData;                        // Next if key matches else top
+      else {bFirstBranch.lastElement(); next = bFirstBranch.tData;}
      }
 
 //D2 Array                                                                      // Represent the contents of the tree as an array
 
     void leafToArray(Stack<ArrayElement> s)                                     // Leaf as an array
      {z(); assertLeaf();
-      final int K = leafSize();
-      final StuckSP.Transaction t = new StuckSP.Transaction();
-      t.setStuck(Leaf);
+      final int     K = leafSize();
+      final StuckSP t = lLeaf.copy();
+      t.base(leafBase());
       for  (int i = 0; i < K; i++)
        {z();
         t.index = i; t.elementAt();
-        s.push(new ArrayElement(i, t.key, t.data));
+        s.push(new ArrayElement(i, t.tKey, t.tData));
        }
      }
 
@@ -426,16 +531,17 @@ abstract class BtreeSA extends Test                                             
 
       if (K > 0)                                                                // Branch has key, next pairs
        {z();
-        final StuckSP.Transaction t = new StuckSP.Transaction();
-        t.setStuck(Branch);
+        final StuckSP t = bLeaf.copy();
+        t.base(branchBase());
         for  (int i = 0; i < K; i++)
          {z();
           t.index = i; t.elementAt();                                           // Each node in the branch
-          final NodeTransaction n = node(new NodeTransaction(), t.data);        // Using recursion here is unsatisfactory.
+          final NodeTransaction n = node(new NodeTransaction(), t.tData);       // Using recursion here is unsatisfactory.
+
           if (n.isLeaf()) {z(); n.leafToArray(s);}
           else
            {z();
-            if (t.data == 0)
+            if (t.tData == 0)
              {say("Cannot descend through root from index", i,
                   "in branch", node);
               break;
@@ -452,13 +558,13 @@ abstract class BtreeSA extends Test                                             
      {assertLeaf();
       padStrings(S, level);
       final StringBuilder s = new StringBuilder();                              // String builder
-      final int K = leafSize();
-      final StuckSP.Transaction t = new StuckSP.Transaction();
-      t.setStuck(Leaf);
+      final int     K = leafSize();
+      final StuckSP t = lLeaf.copy();
+      t.base(leafBase());
 
       for  (int i = 0; i < K; i++)
        {t.index = i; t.elementAt();                                             // Each node in the branch
-        s.append(""+t.key+",");
+        s.append(""+t.tKey+",");
        }
       if (s.length() > 0) s.setLength(s.length()-1);                            // Remove trailing comma if present
       s.append("="+node+" ");
@@ -474,16 +580,16 @@ abstract class BtreeSA extends Test                                             
       final int K = branchSize();
 
       if (K > 0)                                                                // Branch has key, next pairs
-       {final StuckSP.Transaction t = new StuckSP.Transaction();
-        t.setStuck(Branch);
+       {final StuckSP t = bLeaf.copy();
+        t.base(branchBase());
         for  (int i = 0; i < K; i++)
          {t.index = i; t.elementAt();                                           // Each node in the branch
-          final NodeTransaction n = node(new NodeTransaction(), t.data);        // Printing will not be part of the chip so we can use recursion and create new nodes as needed
+          final NodeTransaction n = node(new NodeTransaction(), t.tData);       // Printing will not be part of the chip so we can use recursion and create new nodes as needed
           if (n.isLeaf())
            {n.printLeaf(S, level+1);
            }
           else
-           {if (t.data == 0)
+           {if (t.tData == 0)
              {say("Cannot descend through root from index", i,
                   "in branch", node);
               break;
@@ -491,9 +597,9 @@ abstract class BtreeSA extends Test                                             
             n.printBranch(S, level+1);
            }
 
-          S.elementAt(L+0).append(""+t.key);                                    // Key
+          S.elementAt(L+0).append(""+t.tKey);                                    // Key
           S.elementAt(L+1).append(""+node+(i > 0 ?  "."+i : ""));               // Index in node
-          S.elementAt(L+2).append(""+t.data);                                   // Next
+          S.elementAt(L+2).append(""+t.tData);                                   // Next
          }
        }
       else                                                                      // Branch is empty so print just the index of the branch
@@ -520,18 +626,19 @@ abstract class BtreeSA extends Test                                             
     public String find_toString()                                               // Print find result
      {final StringBuilder s = new StringBuilder();
       s.append("Find(search:"+node);
-      s.append( " search:"+search);
-      s.append(  " found:"+found);
-      s.append(   " data:"+data);
-      s.append(  " index:"+index);
+      s.append(    " search:"+search);
+      s.append(     " found:"+found);
+      s.append(      " data:"+data);
+      s.append(     " index:"+index);
       s.append(")\n");
       return s.toString();
      }
 
     public String findAndInsert_toString()                                      // Print find and insert result
      {final StringBuilder s = new StringBuilder();
-      s.append("FindAndInsert(key:"+key);
-      s.append(" data:"+data);
+      s.append("FindAndInsert(");
+      s.append(    " key:"+key);
+      s.append(   " data:"+data);
       s.append(" success:"+success);
       if (success) s.append(" inserted:"+inserted);
       s.append(")\n" );
@@ -540,8 +647,10 @@ abstract class BtreeSA extends Test                                             
 
     public String findFirstGreaterThanOrEqualInLeaf_toString()                  // Print results of search
      {final StringBuilder s = new StringBuilder();
-      s.append("FindFirstGreaterThanOrEqualInLeaf(Leaf:"+node);
-      s.append(" Key:"+search+" found:"+found);
+      s.append("FindFirstGreaterThanOrEqualInLeaf(");
+      s.append(  "Leaf:"+node);
+      s.append(  " Key:"+search);
+      s.append(" found:"+found);
       if (found) s.append(" first:"+first);
       s.append(")\n");
       return s.toString();
@@ -549,8 +658,11 @@ abstract class BtreeSA extends Test                                             
 
     public String findFirstGreaterThanOrEqualInBranch_toString()                // Print search results
      {final StringBuilder s = new StringBuilder();
-      s.append("FindFirstGreaterThanOrEqualInBranch(branch:"+node);
-      s.append(" Key:"+search+" found:"+found+" next:"+next);
+      s.append("FindFirstGreaterThanOrEqualInBranch(");
+      s.append("branch:"+node);
+      s.append(  " Key:"+search);
+      s.append(" found:"+found);
+      s.append( " next:"+next);
       if (found) s.append(" first:"+first);
       s.append(")\n");
       return s.toString();
@@ -563,31 +675,33 @@ abstract class BtreeSA extends Test                                             
       z(); if (node != 0) stop("Wanted root, but got node:", node);
       z(); if (!isFull()) stop("Root is not full, but has size:", leafSize());
 
+      P = Node_root;                                                            // Root is the parent
       l = anode = Node_left;  allocLeaf();                                      // New left leaf
       r = anode = Node_right; allocLeaf();                                      // New right leaf
-      P  = Node_root;                                                           // Root is the parent
-      T ().setStuck(nodeTypes[P].Leaf);
-      tl().setStuck(nodeTypes[l].Leaf);
-      tr().setStuck(nodeTypes[r].Leaf);
+
+      lT.base(nodeTypes[P].leafBase());                                         // Set address of the referenced leaf stuck
+      lL.base(nodeTypes[l].leafBase());                                         // Set address of the referenced leaf stuck
+      lR.base(nodeTypes[r].leafBase());                                         // Set address of the referenced leaf stuck
 
       splitLeafSize = splitLeafSize();
+
       for (int i = 0; i < splitLeafSize; i++)                                   // Build left leaf from parent
-       {z(); T().shift(); tl().key = T().key; tl().data = T().data; tl().push();
+       {z(); lT.shift(); lL.tKey = lT.tKey; lL.tData = lT.tData; lL.push();
        }
       for (int i = 0; i < splitLeafSize; i++)                                   // Build right leaf from parent
-       {z(); T().shift(); tr().key = T().key; tr().data = T().data; tr().push();
+       {z(); lT.shift(); lR.tKey = lT.tKey; lR.tData = lT.tData; lR.push();
        }
 
-      tr().firstElement();
-      tl(). lastElement();
+      lR.firstElement();
+      lL. lastElement();
       setBranch();
-      T().setStuck(nodeTypes[P].Branch);
-      T().clear();                                                              // Clear the branch
-      firstKey = tr().key;                                                      // First of right leaf
-      lastKey  = tl().key;                                                      // Last of left leaf
+      bT.base(nodeTypes[P].branchBase());                                       // Set address of the referenced leaf stuck
+      bT.clear();                                                               // Clear the branch
+      firstKey = lR.tKey;                                                       // First of right leaf
+      lastKey  = lL.tKey;                                                       // Last of left leaf
       flKey    = (lastKey + firstKey) / 2;                                      // Mid key
-      T().key    = flKey; T().data = nodeTypes[l].node; T().push();             // Insert left leaf into root
-      T().key    =     0; T().data = nodeTypes[r].node; T().push();             // Insert right into root. This will be the top node and so ignored by search ... except last.
+      bT.tKey  = flKey; bT.tData = nodeTypes[l].node; bT.push();                // Insert left leaf into root
+      bT.tKey  =     0; bT.tData = nodeTypes[r].node; bT.push();                // Insert right into root. This will be the top node and so ignored by search ... except last.
      }
 
     void splitBranchRoot()                                                      // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
@@ -595,30 +709,32 @@ abstract class BtreeSA extends Test                                             
       z(); if (node != 0) stop("Not root, but node:", node);
       z(); if (!isFull()) stop("Root is not full, but has size:", branchSize());
       z();
-      P  = Node_root;                                                           // Root is the parent
-      l  = anode = Node_left;  allocBranch();                                   // New left branch
-      r  = anode = Node_right; allocBranch();                                   // New right branch
-      T ().setStuck(nodeTypes[P].Branch);
-      tl().setStuck(nodeTypes[l].Branch);
-      tr().setStuck(nodeTypes[r].Branch);
+
+      P = Node_root;                                                            // Root is the parent
+      l = anode = Node_left;  allocBranch();                                    // New left branch
+      r = anode = Node_right; allocBranch();                                    // New right branch
+
+      bT.base(nodeTypes[P].branchBase());                                       // Set address of the referenced branch stuck
+      bL.base(nodeTypes[l].branchBase());                                       // Set address of the referenced branch stuck
+      bR.base(nodeTypes[r].branchBase());                                       // Set address of the referenced branch stuck
 
       splitBranchSize = splitBranchSize();                                      // Branch split size
       for (int i = 0; i < splitBranchSize; i++)                                 // Build left child from parent
-       {z(); T().shift(); tl().key = T().key; tl().data = T().data; tl().push();
+       {z(); bT.shift(); bL.tKey = bT.tKey; bL.tData = bT.tData; bL.push();
        }
-      T().shift();                                                              // This key, next pair will be part of the root
-      parentKey = T().key;
-      tl().key = 0; tl().data = T().data; tl().push();                          // Becomes top and so ignored by search ... except last
+      bT.shift();                                                               // This key, next pair will be part of the root
+      parentKey = bT.tKey;
+      bL.tKey = 0; bL.tData = bT.tData; bL.push();                              // Becomes top and so ignored by search ... except last
 
       for(int i = 0; i < splitBranchSize; i++)                                  // Build right child from parent
-       {z(); T().shift(); tr().key = T().key; tr().data = T().data; tr().push();
+       {z(); bT.shift(); bR.tKey = bT.tKey; bR.tData = bT.tData; bR.push();
        }
 
-      T().shift(); tr().key = 0; tr().data = T().data;  tr().push();            // Becomes top and so ignored by search ... except last
+      bT.shift(); bR.tKey = 0; bR.tData = bT.tData; bR.push();                  // Becomes top and so ignored by search ... except last
 
-      T().clear();                                                              // Refer to new branches from root
-      T().key  = parentKey; T().data = nodeTypes[l].node; T().push();
-      T().key  =         0; T().data = nodeTypes[r].node; T().push();           // Becomes top and so ignored by search ... except last
+      bT.clear();                                                               // Refer to new branches from root
+      bT.tKey = parentKey; bT.tData = nodeTypes[l].node; bT.push();
+      bT.tKey =         0; bT.tData = nodeTypes[r].node; bT.push();             // Becomes top and so ignored by search ... except last
      }
 
     void splitLeaf()                                                            // Split a leaf which is not the root
@@ -631,22 +747,23 @@ abstract class BtreeSA extends Test                                             
       z(); if (I < 0) stop("Index", I, "too small");
       z(); if (I > S) stop("Index", I, "too big for leaf with:", S);
       z();
-      P = parent;                                                               // Parent
       l = anode = Node_left; allocLeaf();                                       // New  split out leaf
-      T ().setStuck(nodeTypes[P].Branch);
-      tl().setStuck(nodeTypes[l].Leaf);
-      tr().setStuck(             Leaf);
+
+      lL.base(nodeTypes[l].leafBase());                                         // The leaf being split into
+      lR.base(             leafBase());                                         // The leaf being split on the right
 
       splitLeafSize = splitLeafSize();
       for (int i = 0; i < splitLeafSize; i++)                                   // Build left leaf
-       {z(); tr().shift(); tl().key = tr().key; tl().data = tr().data; tl().push();
+       {z(); lR.shift(); lL.tKey = lR.tKey; lL.tData = lR.tData; lL.push();
        }
-      tr().firstElement();
-      tl(). lastElement();
-      T().key   = (tr().key + tl().key) / 2;                                    // Splitting key
-      T().data  = nodeTypes[l].node;
-      T().index = index;
-      T().insertElementAt();                                                    // Insert new key, next pair in parent
+      lR.firstElement();
+      lL. lastElement();
+      P = parent;                                                               // Parent
+      bT.base(nodeTypes[P].branchBase());                                       // The parent branch
+      bT.tKey  = (lR.tKey + lL.tKey) / 2;                                       // Splitting key
+      bT.tData = nodeTypes[l].node;
+      bT.index = index;
+      bT.insertElementAt();                                                     // Insert new key, next pair in parent
      }
 
     void splitBranch()                                                          // Split a branch which is not the root by splitting right to left
@@ -662,16 +779,17 @@ abstract class BtreeSA extends Test                                             
       z();
       P = parent;
       l = anode = Node_left; allocBranch();
-      T ().setStuck(nodeTypes[P].Branch);
-      tl().setStuck(nodeTypes[l].Branch);
-      tr().setStuck(             Branch);
+
+      bT.base(nodeTypes[P].branchBase());                                       // The parent branch
+      bL.base(nodeTypes[l].branchBase());                                       // The branch being split into
+      bR.base(             branchBase());                                       // The branch being split
 
       splitBranchSize = splitBranchSize();
       for (int i = 0; i < splitBranchSize; i++)                                 // Build left branch from right
-       {z(); tr().shift(); tl().key  = tr().key; tl().data = tr().data; tl().push();
+       {z(); bR.shift(); bL.tKey = bR.tKey; bL.tData = bR.tData; bL.push();
        }
-      tr().shift(); tl().key = 0; tl().data = tr().data; tl().push();           // Build right branch - becomes top and so is ignored by search ... except last
-      T().key = tr().key; T().data = nodeTypes[l].node; T().index = index; T().insertElementAt();
+      bR.shift(); bL.tKey = 0; bL.tData = bR.tData; bL.push();                  // Build right branch - becomes top and so is ignored by search ... except last
+      bT.tKey = bR.tKey; bT.tData = nodeTypes[l].node; bT.index = index; bT.insertElementAt();
      }
 
     boolean stealFromLeft()                                                     // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
@@ -681,49 +799,55 @@ abstract class BtreeSA extends Test                                             
       z(); if (index > branchSize()) stop("Index", index, "too big");
       z();
 
-      T().setStuck(Branch);
-      T().index = index - 1; T().elementAt(); L = T().data;
-      T().index = index - 0; T().elementAt(); R = T().data;
+      bT.base(branchBase());
+      bT.index = index - 1; bT.elementAt(); L = bT.tData;
+      bT.index = index - 0; bT.elementAt(); R = bT.tData;
 
-      l = node(Node_left, L);
+      l = node(Node_left,  L);
       r = node(Node_right, R);
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        tl().setStuck(nodeTypes[l].Leaf); nl = nodeTypes[l].leafSize();
-        tr().setStuck(nodeTypes[r].Leaf); nr = nodeTypes[r].leafSize();
+        lL.base(nodeTypes[l].leafBase());
+        lR.base(nodeTypes[r].leafBase());
+
+        nl = nodeTypes[l].leafSize();
+        nr = nodeTypes[r].leafSize();
 
         z(); if (nr >= maxKeysPerLeaf()) {z(); return false;}                   // Steal not possible because there is no where to put the steal
-        z(); if (nl <= 1) {z(); return false;}                                  // Steal not allowed because it would leave the leaf sibling empty
+        z(); if (nl <= 1)                {z(); return false;}                   // Steal not allowed because it would leave the leaf sibling empty
         z();
 
-        tl().lastElement(); tr().key = tl().key; tr().data = tl().data; tr().unshift(); // Increase right
+        lL.lastElement(); lR.tKey = lL.tKey; lR.tData = lL.tData; lR.unshift(); // Increase right
 
-        tl().pop();                                                             // Reduce left
-        tl().index = nl-2; tl().elementAt();                                    // Last key on left
+        lL.pop();                                                               // Reduce left
+        lL.index = nl-2; lL.elementAt();                                        // Last key on left
+        bT.tKey  = lL.tKey; bT.tData = L; bT.index = index-1; bT.setElementAt();// Reduce key of parent of left
        }
       else                                                                      // Children are branches
        {z();
-        tl().setStuck(nodeTypes[l].Branch); nl = nodeTypes[l].branchSize();
-        tr().setStuck(nodeTypes[r].Branch); nr = nodeTypes[r].branchSize();
+        bL.base(nodeTypes[l].branchBase());
+        bR.base(nodeTypes[r].branchBase());
+        nl =    nodeTypes[l].branchSize();
+        nr =    nodeTypes[r].branchSize();
 
         z(); if (nr >= maxKeysPerBranch()) {z(); return false;}                 // Steal not possible because there is no where to put the steal
-        z(); if (nl <= 1) {z(); return false;}                                  // Steal not allowed because it would leave the left sibling empty
+        z(); if (nl <= 1)                  {z(); return false;}                 // Steal not allowed because it would leave the left sibling empty
         z();
 
-        tl().lastElement();                                                     // Increase right with left top
-        T().index = index; T().elementAt();                                     // Top key
-        tr().key  = T().key; tr().data = tl().data; tr().unshift();             // Increase right with left top
-        tl().pop();                                                             // Remove left top
+        bL.lastElement();                                                       // Increase right with left top
+        bT.index = index; bT.elementAt();                                       // Top key
+        bR.tKey  = bT.tKey; bR.tData = bL.tData; bR.unshift();                  // Increase right with left top
+        bL.pop();                                                               // Remove left top
 
-        tr().firstElement();                                                    // Increase right with left top
+        bR.firstElement();                                                      // Increase right with left top
 
-        T().index = index-1; T().elementAt();                                   // Parent key
-        tr().key  = T().key; tr().index = 0; tr().setElementAt();               // Reduce key of parent of right
-        tl().lastElement();                                                     // Last left key
+        bT.index = index-1; bT.elementAt();                                     // Parent key
+        bR.tKey  = bT.tKey; bR.index = 0; bR.setElementAt();                    // Reduce key of parent of right
+        bL.lastElement();                                                       // Last left key
+        bT.tKey = bL.tKey; bT.tData = L; bT.index = index-1; bT.setElementAt(); // Reduce key of parent of left
        }
-      T().key = tl().key; T().data = L; T().index = index-1; T().setElementAt();// Reduce key of parent of left
-      {z(); return true;}
+      z(); return true;
      }
 
     boolean stealFromRight()                                                    // Steal from the right sibling of the indicated child if possible
@@ -732,43 +856,50 @@ abstract class BtreeSA extends Test                                             
       z(); if (index < 0)             stop("Index", index, "too small");
       z(); if (index >= branchSize()) stop("Index", index, "too big");
       z();
-      T().setStuck(Branch);
-      T().index = index+0; T().elementAt(); lk = T().key; ld = T().data;
-      T().index = index+1; T().elementAt(); rk = T().key; rd = T().data;
 
-       l = node(Node_left,  ld);
-       r = node(Node_right, rd);
+      bT.base(branchBase());
+      bT.index = index+0; bT.elementAt(); lk = bT.tKey; ld = bT.tData;
+      bT.index = index+1; bT.elementAt(); rk = bT.tKey; rd = bT.tData;
+
+      l = node(Node_left,  ld);
+      r = node(Node_right, rd);
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        tl().setStuck(nodeTypes[l].Leaf); nl = nodeTypes[l].leafSize();
-        tr().setStuck(nodeTypes[r].Leaf); nr = nodeTypes[r].leafSize();
+        lL.base(nodeTypes[l].leafBase());
+        lR.base(nodeTypes[r].leafBase());
+        nl =    nodeTypes[l].leafSize();
+        nr =    nodeTypes[r].leafSize();
 
         z(); if (nl >= maxKeysPerLeaf()) {z(); return false;}                   // Steal not possible because there is no where to put the steal
-        z(); if (nr <= 1) {z(); return false;}                                  // Steal not allowed because it would leave the right sibling empty
+        z(); if (nr <= 1)                {z(); return false;}                   // Steal not allowed because it would leave the right sibling empty
         z();
-        tr().firstElement();                                                    // First element of right child
-        tl().key = tr().key; tl().data = tr().data; tl().push();                // Increase left
+        lR.firstElement();                                                      // First element of right child
+        lL.tKey = lR.tKey; lL.tData = lR.tData; lL.push();                      // Increase left
+        bT.tKey = lR.tKey; bT.tData = ld; bT.index = index; bT.setElementAt();  // Swap key of parent
+        lR.shift();                                                             // Reduce right
        }
       else                                                                      // Children are branches
        {z();
-        tl().setStuck(nodeTypes[l].Branch); nl = nodeTypes[l].branchSize();
-        tr().setStuck(nodeTypes[r].Branch); nr = nodeTypes[r].branchSize();
+        bL.base(nodeTypes[l].branchBase());
+        bR.base(nodeTypes[r].branchBase());
+        nl =    nodeTypes[l].branchSize();
+        nr =    nodeTypes[r].branchSize();
 
         z(); if (nl >= maxKeysPerBranch()) {z(); return false;}                 // Steal not possible because there is no where to put the steal
-        z(); if (nr <= 1) {z(); return false;}                                  // Steal not allowed because it would leave the right sibling empty
+        z(); if (nr <= 1)                  {z(); return false;}                 // Steal not allowed because it would leave the right sibling empty
         z();
 
-        tl().lastElement();                                                     // Last element of left child
-        tl().key = lk;    tl().index = nl; tl().setElementAt();                 // Left top becomes real
+        bL.lastElement();                                                       // Last element of left child
+        bL.tKey = lk; bL.index = nl; bL.setElementAt();                         // Left top becomes real
 
-        tr().firstElement();                                                    // First element of  right child
+        bR.firstElement();                                                      // First element of  right child
 
-        tl().key = 0;   tl().data = tr().data; tl().push();                     // New top for left is ignored by search ,.. except last
+        bL.tKey = 0; bL.tData = bR.tData; bL.push();                            // New top for left is ignored by search ,.. except last
+        bT.tKey = bR.tKey; bT.tData = ld; bT.index = index; bT.setElementAt();  // Swap key of parent
+        bR.shift();                                                             // Reduce right
        }
-      T().key  = tr().key; T().data = ld; T().index = index; T().setElementAt();// Swap key of parent
-      tr().shift();                                                             // Reduce right
-      {z(); return true;}
+      z(); return true;
      }
 
 //D2 Merge                                                                      // Merge two nodes together and free the resulting free node
@@ -780,30 +911,30 @@ abstract class BtreeSA extends Test                                             
        }
       z(); if (node != 0) stop("Expected root, got:", node);
       z();
-      T().setStuck(Branch);
-      T().firstElement(); l = node(Node_left,  T().data);
-      T(). lastElement(); r = node(Node_right, T().data);
+      bT.base(branchBase());
+      bT.firstElement(); l = node(Node_left,  bT.tData);
+      bT. lastElement(); r = node(Node_right, bT.tData);
 
       if (hasLeavesForChildren())                                               // Leaves
        {z();
         nl = nodeTypes[l].leafSize();
         nr = nodeTypes[r].leafSize();
         if (nl + nr <= maxKeysPerLeaf())
-         {z(); T().clear();
-          tl().setStuck(nodeTypes[l].Leaf);
-          tr().setStuck(nodeTypes[r].Leaf);
+         {z(); bT.clear();
+          lL.base(nodeTypes[l].leafBase());
+          lR.base(nodeTypes[r].leafBase());
           for (int i = 0; i < nl; ++i)                                          // Merge in left child leaf
-           {z(); tl().shift(); T().key = tl().key; T().data = tl().data; T().push();
+           {z(); lL.shift(); bT.tKey = lL.tKey; bT.tData = lL.tData; bT.push();
            }
           for (int i = 0; i < nr; ++i)                                          // Merge in right child leaf
-           {z(); tr().shift(); T().key  = tr().key; T().data = tr().data; T().push();
+           {z(); lR.shift(); bT.tKey  = lR.tKey; bT.tData = lR.tData; bT.push();
            }
           setLeaf();                                                            // The root is now a leaf
           nodeTypes[l].free();                                                  // Free the children
           nodeTypes[r].free();
-          z(); {z(); return true;}
+          z(); return true;
          }
-        z(); {z(); return false;}
+        z(); return false;
        }
       else                                                                      // Branches
        {nl = nodeTypes[l].branchSize();
@@ -811,30 +942,30 @@ abstract class BtreeSA extends Test                                             
 
         if (nl + 1 + nr <= maxKeysPerBranch())
          {z();
-          tl().setStuck(nodeTypes[l].Branch);
-          tr().setStuck(nodeTypes[r].Branch);
-          T().firstElement();
-          parentKey = T().key;
-          T().clear();
+          bL.base(nodeTypes[l].branchBase());
+          bR.base(nodeTypes[r].branchBase());
+          bT.firstElement();
+          parentKey = bT.tKey;
+          bT.clear();
           for (int i = 0; i < nl; ++i)                                          // Merge left child branch
-           {z(); tl().shift(); T().key  = tl().key; T().data = tl().data; T().push();
+           {z(); bL.shift(); bT.tKey  = bL.tKey; bT.tData = bL.tData; bT.push();
            }
 
-          tl().lastElement();
-          T().key = parentKey; T().data = tl().data; T().push();
+          bL.lastElement();
+          bT.tKey = parentKey; bT.tData = bL.tData; bT.push();
 
           for (int i = 0; i < nr; ++i)                                          // Merge right child branch
-           {z(); tr().shift(); T().key  = tr().key; T().data = tr().data; T().push();
+           {z(); bR.shift(); bT.tKey  = bR.tKey; bT.tData = bR.tData; bT.push();
            }
 
-          tr().lastElement();                                                   // Top next
+          bR.lastElement();                                                     // Top next
 
-          T().key = 0; T().data = tr().data; T().push();                        // Top so ignored by search ... except last
+          bT.tKey = 0; bT.tData = bR.tData; bT.push();                          // Top so ignored by search ... except last
           nodeTypes[l].free();                                                  // Free the children
           nodeTypes[r].free();
-          z(); {z(); return true;}
+          z(); return true;
          }
-        z(); {z(); return false;}
+        z(); return false;
        }
      }
 
@@ -842,102 +973,113 @@ abstract class BtreeSA extends Test                                             
      {z(); assertBranch();
       z(); if (index == 0) {z(); return false;}
       final int bs = branchSize();
-      final String bss = "for branch of size:";
-      z(); if (index < 0 ) stop("Index", index, "too small", bss, bs);
-      z(); if (index > bs) stop("Index", index, "too big",   bss, bs);
+      final String s = "for branch of size: "+bs;
+      z(); if (index < 0 ) stop("Index", index, "too small", s);
+      z(); if (index > bs) stop("Index", index, "too big",   s);
       //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
       z(); if (bs    < 2 ) {z(); return false;}
       z();
-      T().setStuck(Branch);
-      T().index = index-1; T().elementAt(); L = T().data;
-      T().index = index-0; T().elementAt(); R = T().data;
+      bT.base(branchBase());
+      bT.index = index-1; bT.elementAt(); L = bT.tData;
+      bT.index = index-0; bT.elementAt(); R = bT.tData;
 
       l = node(Node_left,  L);
       r = node(Node_right, R);
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        tl().setStuck(nodeTypes[l].Leaf); nl = nodeTypes[l].leafSize();
-        tr().setStuck(nodeTypes[r].Leaf); nr = nodeTypes[r].leafSize();
+        lL.base(nodeTypes[l].leafBase());
+        lR.base(nodeTypes[r].leafBase());
+        nl = nodeTypes[l].leafSize();
+        nr = nodeTypes[r].leafSize();
 
         if (nl + nr >= maxKeysPerLeaf()) {z(); return false;}                   // Combined body would be too big
+        for (int i = 0; i < nl; i++)                                            // Transfer left to right
+         {z(); lL.pop(); lR.tKey = lL.tKey; lR.tData = lL.tData; lR.unshift();
+         }
        }
       else                                                                      // Children are branches
        {z();
-        tl().setStuck(nodeTypes[l].Branch); nl = nodeTypes[l].branchSize();
-        tr().setStuck(nodeTypes[r].Branch); nr = nodeTypes[r].branchSize();
+        bL.base(nodeTypes[l].branchBase());
+        bR.base(nodeTypes[r].branchBase());
+        nl =    nodeTypes[l].branchSize();
+        nr =    nodeTypes[r].branchSize();
 
         if (nl + 1 + nr > maxKeysPerBranch()) {z(); return false;}              // Merge not possible because there is not enough room for the combined result
         z();
-        T().index = index-1;                                                    // Top key
-        T().elementAt();                                                        // Top key
-        tl().lastElement();                                                     // Last element of left child
-        tr().key = T().key; tr().data = tl().data; tr().unshift();              // Left top to right
+        bT.index = index-1;                                                     // Top key
+        bT.elementAt();                                                         // Top key
+        bL.lastElement();                                                       // Last element of left child
+        bR.tKey = bT.tKey; bR.tData = bL.tData; bR.unshift();                   // Left top to right
 
-        tl().pop();                                                             // Remove left top
-       }
-      z();
-      for (int i = 0; i < nl; i++)                                              // Transfer left to right
-       {z(); tl().pop(); tr().key = tl().key; tr().data = tl().data; tr().unshift();
+        bL.pop();                                                               // Remove left top
+        for (int i = 0; i < nl; i++)                                            // Transfer left to right
+         {z(); bL.pop(); bR.tKey = bL.tKey; bR.tData = bL.tData; bR.unshift();
+         }
        }
       nodeTypes[l].free();                                                      // Free the empty left node
-      T().index = index - 1;
-      T().removeElementAt();                                                    // Reduce parent on left
+      bT.index = index - 1;
+      bT.removeElementAt();                                                     // Reduce parent on left
       {z(); return true;}
      }
 
     boolean mergeRightSibling()                                                 // Merge the right sibling
      {z(); assertBranch();
       final int bs = branchSize();
-      final String bss = "for branch of size:";
+      final String s = "for branch of size: "+bs;
       z(); if (index >= bs) {z(); return false;}
-      z(); if (index <  0 ) stop("Index", index, "too small", bss, bs);
-      z(); if (index >  bs) stop("Index", index, "too big",   bss, bs);
+      z(); if (index <  0 ) stop("Index", index, "too small", s);
+      z(); if (index >  bs) stop("Index", index, "too big",   s);
       //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
       z(); if (bs < 2) {z(); return false;}
       z();
-      T().setStuck(Branch);
-      T().index = index+0; T().elementAt(); L = T().data;
-      T().index = index+1; T().elementAt(); R = T().data;
+      bT.base(branchBase());
+      bT.index = index+0; bT.elementAt(); L = bT.tData;
+      bT.index = index+1; bT.elementAt(); R = bT.tData;
 
       l = node(Node_left,  L);
       r = node(Node_right, R);
 
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
-        tl().setStuck(nodeTypes[l].Leaf); nl = nodeTypes[l].leafSize();
-        tr().setStuck(nodeTypes[r].Leaf); nr = nodeTypes[r].leafSize();
+        lL.base(nodeTypes[l].leafBase());
+        lR.base(nodeTypes[r].leafBase());
+        nl =    nodeTypes[l].leafSize();
+        nr =    nodeTypes[r].leafSize();
 
         if (nl + nr > maxKeysPerLeaf()) {z(); return false;}                    // Combined body would be too big
+        for (int i = 0; i < nr; i++)                                            // Transfer right to left
+         {z(); lR.shift(); lL.tKey  = lR.tKey; lL.tData = lR.tData; lL.push();
+         }
        }
       else                                                                      // Children are branches
        {z();
-        tl().setStuck(nodeTypes[l].Branch); nl = nodeTypes[l].branchSize();
-        tr().setStuck(nodeTypes[r].Branch); nr = nodeTypes[r].branchSize();
+        bL.base(nodeTypes[l].branchBase());
+        bR.base(nodeTypes[r].branchBase());
+        nl =    nodeTypes[l].branchSize();
+        nr =    nodeTypes[r].branchSize();
 
         if (nl + 1 + nr > maxKeysPerBranch()) {z(); return false;}              // Merge not possible because there is no where to put the steal
 
-        z(); tl().lastElement();                                                // Last element of left child
-        z(); T().index = index;
-        z(); T().elementAt();                                                   // Parent dividing element
+        z(); bL.lastElement();                                                  // Last element of left child
+        z(); bT.index = index;
+        z(); bT.elementAt();                                                    // Parent dividing element
 
-        tl().key = T().key; tl().index = nl;                                    // Re-key left top
-        tl().setElementAt();                                                    // Re-key left top
+        bL.tKey = bT.tKey; bL.index = nl;                                       // Re-key left top
+        bL.setElementAt();                                                      // Re-key left top
 
-        ++nr;                                                                   // Include top
-       }
-      z();
-      for (int i = 0; i < nr; i++)                                              // Transfer right to left
-       {z(); tr().shift(); tl().key  = tr().key; tl().data = tr().data; tl().push();
+        for (int i = 0; i < nr+1; i++)                                          // Transfer right to left
+         {z(); bR.shift(); bL.tKey  = bR.tKey; bL.tData = bR.tData; bL.push();
+         }
        }
       nodeTypes[r].free();                                                      // Free the empty right node
 
-      T().index = index+1; T().elementAt(); parentKey = T().key;                // One up from dividing point in parent
-      T().index = index;   T().elementAt();                                     // Dividing point in parent
-      T().key   = parentKey;
-      T().setElementAt();                                                       // Install key of right sibling in this child
-      T().index = index+1;                                                      // Reduce parent on right
-      T().removeElementAt();                                                    // Reduce parent on right
+      bT.index = index+1; bT.elementAt(); parentKey = bT.tKey;                  // One up from dividing point in parent
+      bT.index = index;   bT.elementAt();                                       // Dividing point in parent
+      bT.tKey  = parentKey;
+      bT.setElementAt();                                                        // Install key of right sibling in this child
+      bT.index = index+1;                                                       // Reduce parent on right
+      bT.removeElementAt();                                                     // Reduce parent on right
       z(); return true;
      }
 
@@ -947,22 +1089,22 @@ abstract class BtreeSA extends Test                                             
      {z(); assertBranch();
       z(); if (index < 0)            stop("Index", index, "too small");
       z(); if (index > branchSize()) stop("Index", index, "too big");
-      z(); if (isLow() && node != root().node)
+      z(); if (isLow() && node != root.node)
             {stop("Parent:", node, "must not be low on children");
             }
       z();
 
-      T().setStuck(Branch);
-      T().index = index;
-      T().elementAt();
+      bT.base(branchBase());
+      bT.index = index;
+      bT.elementAt();
 
       z();
-      z(); if (!node(nodeTypes[Node_temp], T().data).isLow()) return;
+      z(); if (!node(nodeTypes[Node_temp], bT.tData).isLow()) return;
       z(); if (stealFromLeft    ())                   return;
       z(); if (stealFromRight   ())                   return;
       z(); if (mergeLeftSibling ())                   return;
       z(); if (mergeRightSibling())                   return;
-      stop("Unable to balance child:", T().data);
+      stop("Unable to balance child:", bT.tData);
      }
    }  // Node
 
@@ -995,7 +1137,6 @@ abstract class BtreeSA extends Test                                             
   Stack<ArrayElement> toArray()                                                 // Key, data pairs in the tree as an array
    {z();
     final Stack<ArrayElement> s = new Stack<>();
-    final NodeTransaction root = root();
     if (root.isLeaf()) {z(); root.  leafToArray(s);}
     else               {z(); root.branchToArray(s);}
     return s;
@@ -1040,32 +1181,32 @@ abstract class BtreeSA extends Test                                             
    {z();
     final Stack<StringBuilder> S = new Stack<>();
 
-    if (root().isLeaf())
-     {z(); root().printLeaf(S, 0);
+    if (root.isLeaf())
+     {z(); root.printLeaf(S, 0);
      }
     else
-     {z(); root().printBranch(S, 0);
+     {z(); root.printBranch(S, 0);
      }
     return printCollapsed(S);
    }
 
-//D1 Find
+//D1 Find                                                                       // Find the data associeted with a key.
 
   class Transaction                                                             // A transaction on the btree
    {BtreeSA btree;                                                              // Btree being processed
-    int       Key;                                                              // Key being found, inserted or deleted
-    int      Data;                                                              // Data found, inserted or deleted
-    int      find;                                                              // Results of a find operation
-    int      findAndInsert;                                                     // Results of a find operation
-    int      parent;                                                            // Results of a find operation
-    int      child;                                                             // Results of a find operation
-    int      leaf;                                                              // Results of a find operation
-    Integer delete;                                                             // Results of a deletion
+    int           Key;                                                          // Key being found, inserted or deleted
+    int          Data;                                                          // Data found, inserted or deleted
+    int          find;                                                          // Results of a find operation
+    int findAndInsert;                                                          // Results of a find and insert operation
+    int        parent;                                                          // Parent node in a descent through the tree
+    int         child;                                                          // Child node in a descent through the tree
+    int          leaf;                                                          // Leaf found by find
+    Integer    delete;                                                          // Results of a deletion
 
     int find()                                                                  // Find the data associated with a key in the tree
      {z();
-      if (root().isLeaf())                                                      // The root is a leaf
-       {z(); root().search = Key; root().findEqualInLeaf();
+      if (root.isLeaf())                                                        // The root is a leaf
+       {z(); root.search = Key; root.findEqualInLeaf();
         return Node_root;
        }
 
@@ -1073,11 +1214,12 @@ abstract class BtreeSA extends Test                                             
 
       for (int i = 0; i < maxDepth; i++)                                        // Step down through tree
        {z();
-        nodeTypes[parent].search = Key; nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();      // Find next child in search path of key
+        nodeTypes[parent].search = Key; nodeTypes[parent].findFirstGreaterThanOrEqualInBranch(); // Find next child in search path of key
         child = node(Node_find, nodeTypes[parent].next);
 
         if (nodeTypes[child].isLeaf())                                          // Found the containing search
-         {z(); nodeTypes[child].search = Key; nodeTypes[child].findEqualInLeaf();
+         {z(); nodeTypes[child].search = Key;
+          nodeTypes[child].findEqualInLeaf();
           return child;
          }
         parent = node(Node_parent, nodeTypes[child].node);                      // Step down to lower branch
@@ -1090,28 +1232,29 @@ abstract class BtreeSA extends Test                                             
      {z();
       leaf = find();                                                            // Find the leaf that should contain this key
 
-      T().setStuck(nodeTypes[leaf].Leaf);
+      final NodeTransaction l = nodeTypes[leaf];
+      lT.base(l.leafBase());
 
-      if (nodeTypes[leaf].found)                                                // Found the key in the leaf so update it with the new data
-       {z(); T().key = Key; T().data = Data; T().index = nodeTypes[leaf].index; T().setElementAt();
-        nodeTypes[leaf].success = true; nodeTypes[leaf].inserted = false;
+      if (l.found)                                                              // Found the key in the leaf so update it with the new data
+       {z(); lT.tKey = Key; lT.tData = Data; lT.index = l.index; lT.setElementAt();
+        l.success = true; l.inserted = false;
         return leaf;
        }
 
-      if (!nodeTypes[leaf].isFull())                                            // Leaf is not full so we can insert immediately
+      if (!l.isFull())                                                          // Leaf is not full so we can insert immediately
        {z();
-        nodeTypes[leaf].search = Key; nodeTypes[leaf].findFirstGreaterThanOrEqualInLeaf();
-        if (nodeTypes[leaf].found)                                              // Overwrite existing key
+        l.search = Key; l.findFirstGreaterThanOrEqualInLeaf();
+        if (l.found)                                                            // Overwrite existing key
          {z();
-          T().key = Key; T().data = Data; T().index = nodeTypes[leaf].first; T().insertElementAt();
+          lT.tKey = Key; lT.tData = Data; lT.index = l.first; lT.insertElementAt();
          }
         else                                                                    // Insert into position
-         {z(); T().key = Key; T().data = Data; T().push();
+         {z(); lT.tKey = Key; lT.tData = Data; lT.push();
          }
-        nodeTypes[leaf].success = true;
+        l.success = true;
         return leaf;
        }
-      z(); nodeTypes[leaf].success = false;
+      z(); l.success = false;
       return leaf;
      }
 
@@ -1121,10 +1264,11 @@ abstract class BtreeSA extends Test                                             
      {z(); findAndInsert = findAndInsert();                                     // Try direct insertion with no modifications to the shape of the tree
       if (nodeTypes[findAndInsert].success) return;                             // Inserted or updated successfully
       z();
-      if (root().isFull())                                                      // Start the insertion at the root(), after splitting it if necessary
+
+      if (root.isFull())                                                        // Start the insertion at the root(), after splitting it if necessary
        {z();
-        if (root().isLeaf()) {z(); root().splitLeafRoot();}
-        else                 {z(); root().splitBranchRoot();}
+        if (root.isLeaf()) {z(); root.splitLeafRoot();}
+        else               {z(); root.splitBranchRoot();}
         z();
         findAndInsert = findAndInsert();                                        // Splitting the root() might have been enough
         if (nodeTypes[findAndInsert].success) return;                           // Inserted or updated successfully
@@ -1133,13 +1277,14 @@ abstract class BtreeSA extends Test                                             
 
       for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
        {z();
-        nodeTypes[parent].search = Key; nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();
+        nodeTypes[parent].search = Key;
+        nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();
         child = node(Node_put, nodeTypes[parent].next);
-        if (nodeTypes[child].isLeaf())                                                     // Reached a leaf
+        if (nodeTypes[child].isLeaf())                                          // Reached a leaf
          {z();
           nodeTypes[child].parent = parent;
           nodeTypes[child].index = nodeTypes[parent].first;
-          nodeTypes[child].splitLeaf();                                                    // Split the child leaf
+          nodeTypes[child].splitLeaf();                                         // Split the child leaf
           findAndInsert();
           merge();
           return;
@@ -1149,9 +1294,10 @@ abstract class BtreeSA extends Test                                             
          {z();
           nodeTypes[child].parent = parent;
           nodeTypes[child].index = nodeTypes[parent].first;
-          nodeTypes[child].splitBranch();                                                  // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
+          nodeTypes[child].splitBranch();                                       // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
 
-          nodeTypes[parent].search = Key; nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();    // Perform the step down again as the split will have altered the local layout
+          nodeTypes[parent].search = Key;
+          nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();              // Perform the step down again as the split will have altered the local layout
           parent = node(Node_parent, nodeTypes[parent].next);
          }
         else                                                                    // Step down directly as no split was required
@@ -1165,35 +1311,38 @@ abstract class BtreeSA extends Test                                             
 
     Integer findAndDelete()                                                     // Delete a key from the tree and returns its data if present without modifying the shape of tree
      {z(); find = find();                                                       // Try direct insertion with no modifications to the shape of the tree
-      if (!nodeTypes[find].found) return null;                                             // Inserted or updated successfully
+      if (!nodeTypes[find].found) return null;                                  // Inserted or updated successfully
       z();
-      T().setStuck(nodeTypes[find].Leaf);                                                  // The leaf that contains the key
-      T().index = nodeTypes[find].index; T().elementAt();                                  // Position in the leaf of the key
+      lT.base(nodeTypes[find].leafBase());                                      // The leaf that contains the key
+      lT.index = nodeTypes[find].index; lT.elementAt();                         // Position in the leaf of the key
 
-      Data = T().data;                                                          // Key, data pairs in the leaf
-      T().removeElementAt();                                                    // Remove the key, data pair from the leaf
+      Data = lT.tData;                                                          // Key, data pairs in the leaf
+      lT.removeElementAt();                                                     // Remove the key, data pair from the leaf
       return Data;
      }
 
     Integer delete()                                                            // Insert a key, data pair into the tree or update and existing key with a new datum
-     {z(); root().mergeRoot();
+     {z(); root.mergeRoot();
 
-      if (root().isLeaf())                                                      // Find and delete directly in root() as a leaf
+      if (root.isLeaf())                                                        // Find and delete directly in root as a leaf
        {z(); return findAndDelete();
        }
       z();
 
-      parent = Node_root;                                                       // Start at root()
+      parent = Node_root;                                                       // Start at root
 
       for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-       {z(); nodeTypes[parent].search = Key; nodeTypes[parent].findFirstGreaterThanOrEqualInBranch(); // Step down
+       {z();                                                                    // Step down
+        nodeTypes[parent].search = Key;
+        nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();
 
-        nodeTypes[parent].index = nodeTypes[parent].first; nodeTypes[parent].balance();
+        nodeTypes[parent].index = nodeTypes[parent].first;
+        nodeTypes[parent].balance();
         child = node(Node_delete, nodeTypes[parent].next);
 
-        if (nodeTypes[child].isLeaf())                                                     // Reached a leaf
+        if (nodeTypes[child].isLeaf())                                          // Reached a leaf
          {z();
-          final int data = findAndDelete();
+          final Integer data = findAndDelete();
           merge();
           return data;
          }
@@ -1207,19 +1356,20 @@ abstract class BtreeSA extends Test                                             
 
     void merge()                                                                // Merge along the specified search path
      {z();
-      root().mergeRoot();
-      parent = Node_root;                                                          // Start at root
+      root.mergeRoot();
+      parent = Node_root;                                                       // Start at root
 
       for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
        {z(); if (nodeTypes[parent].isLeaf()) return;
         z();
-        for (int j = 0; j < nodeTypes[parent].branchSize(); j++)                           // Try merging each sibling pair which might change the size of the parent
+        for (int j = 0; j < nodeTypes[parent].branchSize(); j++)                // Try merging each sibling pair which might change the size of the parent
          {z();
-          nodeTypes[parent].index = j; if (nodeTypes[parent].mergeLeftSibling ()) --j;                // A successful merge of the left  sibling reduces the current index and the upper limit
-          nodeTypes[parent].index = j;     nodeTypes[parent].mergeRightSibling();                     // A successful merge of the right sibling maintains the current position but reduces the upper limit
+          nodeTypes[parent].index = j; if (nodeTypes[parent].mergeLeftSibling ()) --j; // A successful merge of the left  sibling reduces the current index and the upper limit
+          nodeTypes[parent].index = j;     nodeTypes[parent].mergeRightSibling();      // A successful merge of the right sibling maintains the current position but reduces the upper limit
          }
 
-        nodeTypes[parent].search = Key; nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();      // Step down
+        nodeTypes[parent].search = Key;
+        nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();                // Step down
         parent = node(Node_parent, nodeTypes[parent].next);
        }
       stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
@@ -2006,6 +2156,7 @@ abstract class BtreeSA extends Test                                             
 
     final int N = 16;
     for (int i = M; i <= N; i++)  {T.Key = T.Data = i; T.put();}
+    //stop(t);
     //stop(""+t.toArray());
     ok(""+t.toArray(), """
 [(0, key:1 data:1)
@@ -2028,12 +2179,11 @@ abstract class BtreeSA extends Test                                             
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
-   {if (true) return;
-    test_put_ascending();                                                       //  7.99
+   {test_put_ascending();                                                       //  7.99
     test_put_ascending_wide();                                                  //  5.33
     test_put_descending();                                                      // 12.98
     test_put_small_random();                                                    //  8.72
-    //test_put_large_random();                                                  //  0
+    //test_put_large_random();                                                    //  0
     test_find();                                                                //  4.62
     test_delete_ascending();                                                    //  7.27
     test_delete_descending();                                                   //  7.66
@@ -2059,5 +2209,4 @@ abstract class BtreeSA extends Test                                             
       System.exit(1);
      }
    }
-*/
  }
