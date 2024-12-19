@@ -88,6 +88,7 @@ abstract class BtreeSA extends Test                                             
   StuckSP lT;                                                                   // Process a parent node
   StuckSP lL;                                                                   // Process a left node
   StuckSP lR;                                                                   // Process a right node
+
   Layout.Variable node;                                                         // The number of the node
   Layout.Variable parent;                                                       // Parent node
   Layout.Variable anode;                                                        // Node being allocated
@@ -121,6 +122,7 @@ abstract class BtreeSA extends Test                                             
   Layout.Bit  success;                                                          // Inserted or updated if true
   Layout.Bit inserted;                                                          // Inserted if true
   Layout.Structure nodeTransaction;                                             // Collection of fields used to perform a transaction against the btree
+  Layout.Array     nodeTransactions;                                            // Array of node transactions
 
   final MemoryLayout transactionMemory = new MemoryLayout();                    // Memory layout used to describe a trnasaction against the btree
 
@@ -194,7 +196,6 @@ abstract class BtreeSA extends Test                                             
 
      {allocate(root, false);                                                    // The root is always at zero, which frees zero to act as the end of list marker on the free chain
       root.setLeaf();                                                           // The root starts as a leaf
-      root.setStucks();                                                         // Describe stucks addressable from the root
      }
     transactionMemory.layout(transactionLayout());                              // Memory layout for a transaction against the btree
     transactionMemory.memory(new Memory(transactionMemory.layout.size()));      // Memory for a transaction against the btree
@@ -283,6 +284,8 @@ abstract class BtreeSA extends Test                                             
       firstKey, lastKey, flKey, parentKey,
       L, R, nl, nr, lk, ld, rk, rd,
       index, search, found, key, data, first, next, success, inserted);
+    nodeTransactions = t.array   ("nodeTransactions",                           // Collection of fields used to perform a transaction against the btree
+                                   nodeTransaction, Node_length);
     return  t.compile();
    }
 
@@ -317,7 +320,7 @@ abstract class BtreeSA extends Test                                             
 //D1 Components                                                                 // A branch or leaf in the tree
 
   class NodeTransaction                                                         // A transient description of a branch or leaf in the tree - the actual data is contained in the bit memory
-   {int node;                                                                   // The number of the node
+   {int node;                                                                   // The index number of the node
     int parent;                                                                 // Parent node
     int anode;                                                                  // Node being allocated
     int P;                                                                      // Parent node during a split, merge or steal operation
@@ -343,7 +346,6 @@ abstract class BtreeSA extends Test                                             
     boolean found;                                                              // Whether the key was found
     int       key;                                                              // Key to insert
     int      data;                                                              // Data associated with the  key
-    int      base2;                                                              // Base of the leaf
 
     int     first;                                                              // Index of first key greater than or equal to the search key
     int      next;                                                              // The corresponding next field or top if no such key was found
@@ -358,13 +360,8 @@ abstract class BtreeSA extends Test                                             
     void assertLeaf()   {if (!isLeaf()) stop("Leaf required");}
     void assertBranch() {if ( isLeaf()) stop("Branch required");}
 
-    void allocLeaf()  {z(); allocate(nodeTypes[anode]); nodeTypes[anode].setLeaf();   nodeTypes[anode].setStucks();} // Allocate leaf
-    void allocBranch(){z(); allocate(nodeTypes[anode]); nodeTypes[anode].setBranch(); nodeTypes[anode].setStucks();} // Allocate branch
-
-    void setStucks()                                                            // Descriptions of the stucks addressed by this node setting their base offsets
-     {//Leaf.base(leafBase());
-      //Branch.base(branchBase());
-     }
+    void allocLeaf()  {z(); allocate(nodeTypes[anode]); nodeTypes[anode].setLeaf();  } // Allocate leaf
+    void allocBranch(){z(); allocate(nodeTypes[anode]); nodeTypes[anode].setBranch();} // Allocate branch
 
     void free()                                                                 // Free a new node to make it available for reuse
      {z(); if (node == 0) stop("Cannot free root");                             // The root is never freed
@@ -1094,17 +1091,13 @@ abstract class BtreeSA extends Test                                             
    }  // Node
 
   int node(int nodeType, int node)                                              // Refer to a node by number
-   {final NodeTransaction n = nodeTypes[nodeType];
-    n.node = node;
-    n.setStucks();
+   {nodeTypes[nodeType].node = node;
     return nodeType;
    }
 
   NodeTransaction node(NodeTransaction Node, int node)                          // Refer to a node by number
-   {final NodeTransaction n = Node;
-    n.node = node;
-    n.setStucks();
-    return n;
+   {Node.node = node;
+    return Node;
    }
 
 //D1 Array                                                                      // Key, data pairs in the tree as an array
