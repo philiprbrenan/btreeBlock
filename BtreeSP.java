@@ -49,7 +49,7 @@ abstract class BtreeSP extends Test                                             
   final int Node_delete = 7;                                                    // Delete node
   final int Node_length = 8;                                                    // Number of node types
 
-  final NodeTransaction[]nodeTypes;                                             // One node description for each type of transacton
+  final NodeTransaction[]nodeTypes;                                             // One node description for each type of transaction
 
   final int Branch_Size        = 0;                                             // Get the size of a stuck
   final int Branch_Leaf        = 1;                                             // Check whether a node has leaves for children
@@ -159,7 +159,6 @@ abstract class BtreeSP extends Test                                             
 
      {allocate(root, false);                                                    // The root is always at zero, which frees zero to act as the end of list marker on the free chain
       root.setLeaf();                                                           // The root starts as a leaf
-      root.setStucks();                                                         // Describe stucks addressable from the root
      }
    }
 
@@ -278,13 +277,8 @@ abstract class BtreeSP extends Test                                             
     void assertLeaf()   {if (!isLeaf()) stop("Leaf required");}
     void assertBranch() {if ( isLeaf()) stop("Branch required");}
 
-    void allocLeaf()  {z(); allocate(nodeTypes[anode]); nodeTypes[anode].setLeaf();   nodeTypes[anode].setStucks();} // Allocate leaf
-    void allocBranch(){z(); allocate(nodeTypes[anode]); nodeTypes[anode].setBranch(); nodeTypes[anode].setStucks();} // Allocate branch
-
-    void setStucks()                                                            // Descriptions of the stucks addressed by this node setting their base offsets
-     {//Leaf.base(leafBase());
-      //Branch.base(branchBase());
-     }
+    void allocLeaf()  {z(); allocate(nodeTypes[anode]); nodeTypes[anode].setLeaf();  } // Allocate leaf
+    void allocBranch(){z(); allocate(nodeTypes[anode]); nodeTypes[anode].setBranch();} // Allocate branch
 
     void free()                                                                 // Free a new node to make it available for reuse
      {z(); if (node == 0) stop("Cannot free root");                             // The root is never freed
@@ -1014,17 +1008,13 @@ abstract class BtreeSP extends Test                                             
    }  // Node
 
   int node(int nodeType, int node)                                              // Refer to a node by number
-   {final NodeTransaction n = nodeTypes[nodeType];
-    n.node = node;
-    n.setStucks();
+   {nodeTypes[nodeType].node = node;
     return nodeType;
    }
 
   NodeTransaction node(NodeTransaction Node, int node)                          // Refer to a node by number
-   {final NodeTransaction n = Node;
-    n.node = node;
-    n.setStucks();
-    return n;
+   {Node.node = node;
+    return Node;
    }
 
 //D1 Array                                                                      // Key, data pairs in the tree as an array
