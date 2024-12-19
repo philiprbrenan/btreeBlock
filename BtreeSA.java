@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// BtreeSML with single parameter list
+// BtreeSA with transaction in bit memory
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, layout and simulate a btree in a block on the surface of a silicon chip.
@@ -43,36 +43,31 @@ abstract class BtreeSA extends Test                                             
   final int Node_parent = 1;                                                    // Node used for initializing the tree and for the parent node
   final int Node_left   = 2;                                                    // Node used for a left  hand child
   final int Node_right  = 3;                                                    // Node used for a right hand child
-  final int Node_child  = 4;                                                    // Node used as a generic child
-  final int Node_temp   = 5;                                                    // Temporary node
-  final int Node_find   = 6;                                                    // Find node
-  final int Node_put    = 7;                                                    // Put node
-  final int Node_delete = 8;                                                    // Delete node
-  final int Node_length = 9;                                                    // Number of node types
+  final int Node_temp   = 4;                                                    // Temporary node
+  final int Node_find   = 5;                                                    // Find node
+  final int Node_put    = 6;                                                    // Put node
+  final int Node_delete = 7;                                                    // Delete node
+  final int Node_length = 8;                                                    // Number of node types
 
   final NodeTransaction[]nodeTypes;                                             // One node description for each type of transacton
 
   final int Branch_Size        = 0;                                             // Get the size of a stuck
   final int Branch_Leaf        = 1;                                             // Check whether a node has leaves for children
   final int Branch_Top         = 2;                                             // Get the top element of a branch
-  final int Branch_Equal       = 3;                                             // Locate an equal key
-  final int Branch_FirstLeaf   = 4;                                             // Locate the first greater or equal key in a leaf
-  final int Branch_FirstBranch = 5;                                             // Locate the first greater or equal key in a branch
-  final int Branch_T           = 6;                                             // Process a parent node
-  final int Branch_tl          = 7;                                             // Process a left node
-  final int Branch_tr          = 8;                                             // Process a right node
-  final int Branch_length      = 9;                                             // Number of transaction types
+  final int Branch_FirstBranch = 3;                                             // Locate the first greater or equal key in a branch
+  final int Branch_T           = 4;                                             // Process a parent node
+  final int Branch_tl          = 5;                                             // Process a left node
+  final int Branch_tr          = 6;                                             // Process a right node
+  final int Branch_length      = 7;                                             // Number of transaction types
 
   final int Leaf_Size          = 0;                                             // Get the size of a stuck
   final int Leaf_Leaf          = 1;                                             // Check whether a node has leaves for children
-  final int Leaf_Top           = 2;                                             // Get the top element of a branch
-  final int Leaf_Equal         = 3;                                             // Locate an equal key
-  final int Leaf_FirstLeaf     = 4;                                             // Locate the first greater or equal key in a leaf
-  final int Leaf_FirstBranch   = 5;                                             // Locate the first greater or equal key in a branch
-  final int Leaf_T             = 6;                                             // Process a parent node
-  final int Leaf_tl            = 7;                                             // Process a left node
-  final int Leaf_tr            = 8;                                             // Process a right node
-  final int Leaf_length        = 9;                                             // Number of transaction types
+  final int Leaf_Equal         = 2;                                             // Locate an equal key
+  final int Leaf_FirstLeaf     = 3;                                             // Locate the first greater or equal key in a leaf
+  final int Leaf_T             = 4;                                             // Process a parent node
+  final int Leaf_tl            = 5;                                             // Process a left node
+  final int Leaf_tr            = 6;                                             // Process a right node
+  final int Leaf_length        = 7;                                             // Number of transaction types
 
   final StuckSP[]branchTransactions;                                            // Transactions to use on branch stucks
   final StuckSP[]  leafTransactions;                                            // Transactions to use on leaf stucks
@@ -81,8 +76,6 @@ abstract class BtreeSA extends Test                                             
   StuckSP bSize;                                                                // Branch size
   StuckSP bLeaf;                                                                // Check whether a node has leaves for childrn
   StuckSP bTop;                                                                 // Get the size of a stuck
-  StuckSP bEqual;                                                               // Locate an equal key
-  StuckSP bFirstLeaf;                                                           // Locate the first greater or equal key in a leaf
   StuckSP bFirstBranch;                                                         // Locate the first greater or equal key in a branch
   StuckSP bT;                                                                   // Process a parent node
   StuckSP bL;                                                                   // Process a left node
@@ -90,16 +83,11 @@ abstract class BtreeSA extends Test                                             
 
   StuckSP lSize;                                                                // Branch size
   StuckSP lLeaf;                                                                // Check whether a node has leaves for childrn
-  StuckSP lTop;                                                                 // Get the size of a stuck
   StuckSP lEqual;                                                               // Locate an equal key
   StuckSP lFirstLeaf;                                                           // Locate the first greater or equal key in a leaf
-  StuckSP lFirstBranch;                                                         // Locate the first greater or equal key in a branch
   StuckSP lT;                                                                   // Process a parent node
   StuckSP lL;                                                                   // Process a left node
   StuckSP lR;                                                                   // Process a right node
-
-  static boolean debug = false;                                                 // Debugging enabled
-                                                                                // Temporary fields for performing a transaction against the Btree.
   Layout.Variable node;                                                         // The number of the node
   Layout.Variable parent;                                                       // Parent node
   Layout.Variable anode;                                                        // Node being allocated
@@ -135,6 +123,8 @@ abstract class BtreeSA extends Test                                             
   Layout.Structure nodeTransaction;                                             // Collection of fields used to perform a transaction against the btree
 
   final MemoryLayout transactionMemory = new MemoryLayout();                    // Memory layout used to describe a trnasaction against the btree
+
+  static boolean debug = false;                                                 // Debugging enabled
 
 //D1 Construction                                                               // Create a Btree from nodes which can be branches or leaves.  The data associated with the BTree is stored only in the leaves opposite the keys
 
@@ -180,8 +170,6 @@ abstract class BtreeSA extends Test                                             
     bSize        = branchTransactions[Branch_Size       ];                      // Branch size
     bLeaf        = branchTransactions[Branch_Leaf       ];                      // Check whether a node has leaves for childrn
     bTop         = branchTransactions[Branch_Top        ];                      // Get the size of a stuck
-    bEqual       = branchTransactions[Branch_Equal      ];                      // Locate an equal key
-    bFirstLeaf   = branchTransactions[Branch_FirstLeaf  ];                      // Locate the first greater or equal key in a leaf
     bFirstBranch = branchTransactions[Branch_FirstBranch];                      // Locate the first greater or equal key in a branch
     bT           = branchTransactions[Branch_T          ];                      // Process a parent node
     bL           = branchTransactions[Branch_tl         ];                      // Process a left node
@@ -189,10 +177,8 @@ abstract class BtreeSA extends Test                                             
 
     lSize        =   leafTransactions[Leaf_Size         ];                      // Branch size
     lLeaf        =   leafTransactions[Leaf_Leaf         ];                      // Check whether a node has leaves for childrn
-    lTop         =   leafTransactions[Leaf_Top          ];                      // Get the size of a stuck
     lEqual       =   leafTransactions[Leaf_Equal        ];                      // Locate an equal key
     lFirstLeaf   =   leafTransactions[Leaf_FirstLeaf    ];                      // Locate the first greater or equal key in a leaf
-    lFirstBranch =   leafTransactions[Leaf_FirstBranch  ];                      // Locate the first greater or equal key in a branch
     lT           =   leafTransactions[Leaf_T            ];                      // Process a parent node
     lL           =   leafTransactions[Leaf_tl           ];                      // Process a left node
     lR           =   leafTransactions[Leaf_tr           ];                      // Process a right node
@@ -210,7 +196,6 @@ abstract class BtreeSA extends Test                                             
       root.setLeaf();                                                           // The root starts as a leaf
       root.setStucks();                                                         // Describe stucks addressable from the root
      }
-
     transactionMemory.layout(transactionLayout());                              // Memory layout for a transaction against the btree
     transactionMemory.memory(new Memory(transactionMemory.layout.size()));      // Memory for a transaction against the btree
    }
