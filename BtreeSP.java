@@ -273,6 +273,7 @@ abstract class BtreeSP extends Test                                             
   boolean isFull;                                                               // The node is full
   boolean isLow;                                                                // The node has too few children for a delete
   boolean hasLeavesForChildren;                                                 // The node has leaves for children
+  boolean stolenOrMerged;                                                       // A merge or steasl operation suceeded
 
   int leafBase;                                                                 // The offset of a leaf in memory
   int branchBase;                                                               // The offset of a branch in memory
@@ -756,9 +757,9 @@ abstract class BtreeSP extends Test                                             
       bT.tKey = bR.tKey; bT.tData = nodeTypes[l].node; bT.index = index; bT.insertElementAt();
      }
 
-    boolean stealFromLeft()                                                     // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
+    void stealFromLeft()                                                     // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
      {z(); assertBranch();
-      z(); if (index == 0) {z(); return false;}
+      z(); if (index == 0) {z(); stolenOrMerged = false; return;}
       z(); if (index < 0)            stop("Index", index, "too small");
       z(); branchSize();
       z(); if (index > branchSize) stop("Index", index, "too big");
@@ -781,8 +782,8 @@ abstract class BtreeSP extends Test                                             
         nodeTypes[l].leafSize();   nl = leafSize;
         nodeTypes[r].leafSize();   nr = leafSize;
 
-        z(); if (nr >= maxKeysPerLeaf()) {z(); return false;}                   // Steal not possible because there is no where to put the steal
-        z(); if (nl <= 1)                {z(); return false;}                   // Steal not allowed because it would leave the leaf sibling empty
+        z(); if (nr >= maxKeysPerLeaf()) {z(); stolenOrMerged = false; return;} // Steal not possible because there is no where to put the steal
+        z(); if (nl <= 1)                {z(); stolenOrMerged = false; return;} // Steal not allowed because it would leave the leaf sibling empty
         z();
 
         lL.lastElement(); lR.tKey = lL.tKey; lR.tData = lL.tData; lR.unshift(); // Increase right
@@ -798,8 +799,8 @@ abstract class BtreeSP extends Test                                             
         nodeTypes[l].branchSize();  nl =    branchSize;
         nodeTypes[r].branchSize();  nr =    branchSize;
 
-        z(); if (nr >= maxKeysPerBranch()) {z(); return false;}                 // Steal not possible because there is no where to put the steal
-        z(); if (nl <= 1)                  {z(); return false;}                 // Steal not allowed because it would leave the left sibling empty
+        z(); if (nr >= maxKeysPerBranch()) {z(); stolenOrMerged = false; return;} // Steal not possible because there is no where to put the steal
+        z(); if (nl <= 1)                  {z(); stolenOrMerged = false; return;} // Steal not allowed because it would leave the left sibling empty
         z();
 
         bL.lastElement();                                                       // Increase right with left top
@@ -814,12 +815,12 @@ abstract class BtreeSP extends Test                                             
         bL.lastElement();                                                       // Last left key
         bT.tKey = bL.tKey; bT.tData = L; bT.index = index-1; bT.setElementAt(); // Reduce key of parent of left
        }
-      z(); return true;
+      z(); stolenOrMerged = true; return;
      }
 
-    boolean stealFromRight()                                                    // Steal from the right sibling of the indicated child if possible
+    void stealFromRight()                                                       // Steal from the right sibling of the indicated child if possible
      {z(); assertBranch();
-      z(); branchSize(); if (index == branchSize) {z(); return false;}
+      z(); branchSize(); if (index == branchSize) {z(); stolenOrMerged = false; return;}
       z(); if (index < 0)             stop("Index", index, "too small");
       z(); branchSize(); if (index >= branchSize) stop("Index", index, "too big");
       z();
@@ -840,8 +841,8 @@ abstract class BtreeSP extends Test                                             
         nodeTypes[l].leafSize();   nl =    leafSize;
         nodeTypes[r].leafSize();   nr =    leafSize;
 
-        z(); if (nl >= maxKeysPerLeaf()) {z(); return false;}                   // Steal not possible because there is no where to put the steal
-        z(); if (nr <= 1)                {z(); return false;}                   // Steal not allowed because it would leave the right sibling empty
+        z(); if (nl >= maxKeysPerLeaf()) {z(); stolenOrMerged = false; return;} // Steal not possible because there is no where to put the steal
+        z(); if (nr <= 1)                {z(); stolenOrMerged = false; return;} // Steal not allowed because it would leave the right sibling empty
         z();
         lR.firstElement();                                                      // First element of right child
         lL.tKey = lR.tKey; lL.tData = lR.tData; lL.push();                      // Increase left
@@ -855,8 +856,8 @@ abstract class BtreeSP extends Test                                             
         nodeTypes[l].branchSize(); nl =    branchSize;
         nodeTypes[r].branchSize(); nr =    branchSize;
 
-        z(); if (nl >= maxKeysPerBranch()) {z(); return false;}                 // Steal not possible because there is no where to put the steal
-        z(); if (nr <= 1)                  {z(); return false;}                 // Steal not allowed because it would leave the right sibling empty
+        z(); if (nl >= maxKeysPerBranch()) {z(); stolenOrMerged = false; return;} // Steal not possible because there is no where to put the steal
+        z(); if (nr <= 1)                  {z(); stolenOrMerged = false; return;} // Steal not allowed because it would leave the right sibling empty
         z();
 
         bL.lastElement();                                                       // Last element of left child
@@ -868,16 +869,16 @@ abstract class BtreeSP extends Test                                             
         bT.tKey = bR.tKey; bT.tData = ld; bT.index = index; bT.setElementAt();  // Swap key of parent
         bR.shift();                                                             // Reduce right
        }
-      z(); return true;
+      z(); stolenOrMerged = true; return;
      }
 
 //D2 Merge                                                                      // Merge two nodes together and free the resulting free node
 
-    boolean mergeRoot()                                                         // Merge into the root
+    void mergeRoot()                                                            // Merge into the root
      {z();
       nodeTypes[Node_root].isLeaf();
       branchSize();
-      z(); if (IsLeaf || branchSize > 1) {z(); return false;}
+      z(); if (IsLeaf || branchSize > 1) {z(); stolenOrMerged = false; return;}
       z(); if (node != 0) stop("Expected root, got:", node);
       z();
       branchBase();
@@ -903,9 +904,9 @@ abstract class BtreeSP extends Test                                             
           setLeaf();                                                            // The root is now a leaf
           nodeTypes[l].free();                                                  // Free the children
           nodeTypes[r].free();
-          z(); return true;
+          z(); stolenOrMerged = true; return;
          }
-        z(); return false;
+        z(); stolenOrMerged = false; return;
        }
       else                                                                      // Branches
        {nodeTypes[l].branchSize(); nl = branchSize;
@@ -934,22 +935,22 @@ abstract class BtreeSP extends Test                                             
           bT.tKey = 0; bT.tData = bR.tData; bT.push();                          // Top so ignored by search ... except last
           nodeTypes[l].free();                                                  // Free the children
           nodeTypes[r].free();
-          z(); return true;
+          z(); stolenOrMerged = true; return;
          }
-        z(); return false;
+        z(); stolenOrMerged = false; return;
        }
      }
 
-    boolean mergeLeftSibling()                                                  // Merge the left sibling
+    void mergeLeftSibling()                                                     // Merge the left sibling
      {z(); assertBranch();
-      z(); if (index == 0) {z(); return false;}
+      z(); if (index == 0) {z(); stolenOrMerged = false; return;}
       branchSize();
       final int bs = branchSize;
       final String s = "for branch of size: "+bs;
       z(); if (index < 0 ) stop("Index", index, "too small", s);
       z(); if (index > bs) stop("Index", index, "too big",   s);
       //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
-      z(); if (bs    < 2 ) {z(); return false;}
+      z(); if (bs    < 2 ) {z(); stolenOrMerged = false; return;}
       z();
       branchBase();
       bT.base(branchBase);
@@ -967,7 +968,7 @@ abstract class BtreeSP extends Test                                             
         nodeTypes[l].leafSize();  nl = leafSize;
         nodeTypes[r].leafSize();  nr = leafSize;
 
-        if (nl + nr >= maxKeysPerLeaf()) {z(); return false;}                   // Combined body would be too big
+        if (nl + nr >= maxKeysPerLeaf()) {z(); stolenOrMerged = false; return;} // Combined body would be too big
         for (int i = 0; i < nl; i++)                                            // Transfer left to right
          {z(); lL.pop(); lR.tKey = lL.tKey; lR.tData = lL.tData; lR.unshift();
          }
@@ -979,7 +980,7 @@ abstract class BtreeSP extends Test                                             
         nodeTypes[l].branchSize();  nl =    branchSize;
         nodeTypes[r].branchSize();  nr =    branchSize;
 
-        if (nl + 1 + nr > maxKeysPerBranch()) {z(); return false;}              // Merge not possible because there is not enough room for the combined result
+        if (nl + 1 + nr > maxKeysPerBranch()) {z(); stolenOrMerged = false; return;}  // Merge not possible because there is not enough room for the combined result
         z();
         bT.index = index-1;                                                     // Top key
         bT.elementAt();                                                         // Top key
@@ -994,19 +995,19 @@ abstract class BtreeSP extends Test                                             
       nodeTypes[l].free();                                                      // Free the empty left node
       bT.index = index - 1;
       bT.removeElementAt();                                                     // Reduce parent on left
-      {z(); return true;}
+      z(); stolenOrMerged = true; return;
      }
 
-    boolean mergeRightSibling()                                                 // Merge the right sibling
+    void mergeRightSibling()                                                    // Merge the right sibling
      {z(); assertBranch();
       branchSize();
       final int bs = branchSize;
       final String s = "for branch of size: "+bs;
-      z(); if (index >= bs) {z(); return false;}
+      z(); if (index >= bs) {z(); stolenOrMerged = false; return;}
       z(); if (index <  0 ) stop("Index", index, "too small", s);
       z(); if (index >  bs) stop("Index", index, "too big",   s);
       //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
-      z(); if (bs < 2) {z(); return false;}
+      z(); if (bs < 2) {z(); stolenOrMerged = false; return;}
       z();
       branchBase();
       bT.base(branchBase);
@@ -1024,7 +1025,7 @@ abstract class BtreeSP extends Test                                             
         nodeTypes[l].leafSize(); nl =    leafSize;
         nodeTypes[r].leafSize(); nr =    leafSize;
 
-        if (nl + nr > maxKeysPerLeaf()) {z(); return false;}                    // Combined body would be too big
+        if (nl + nr > maxKeysPerLeaf()) {z(); stolenOrMerged = false; return;}  // Combined body would be too big
         for (int i = 0; i < nr; i++)                                            // Transfer right to left
          {z(); lR.shift(); lL.tKey  = lR.tKey; lL.tData = lR.tData; lL.push();
          }
@@ -1036,7 +1037,7 @@ abstract class BtreeSP extends Test                                             
         nodeTypes[l].branchSize(); nl =    branchSize;
         nodeTypes[r].branchSize(); nr =    branchSize;
 
-        if (nl + 1 + nr > maxKeysPerBranch()) {z(); return false;}              // Merge not possible because there is no where to put the steal
+        if (nl + 1 + nr > maxKeysPerBranch()) {z(); stolenOrMerged = false; return;} // Merge not possible because there is no where to put the steal
 
         z(); bL.lastElement();                                                  // Last element of left child
         z(); bT.index = index;
@@ -1057,7 +1058,7 @@ abstract class BtreeSP extends Test                                             
       bT.setElementAt();                                                        // Install key of right sibling in this child
       bT.index = index+1;                                                       // Reduce parent on right
       bT.removeElementAt();                                                     // Reduce parent on right
-      z(); return true;
+      z(); stolenOrMerged = true; return;
      }
 
 //D2 Balance                                                                    // Balance the tree by merging and stealing
@@ -1080,11 +1081,11 @@ abstract class BtreeSP extends Test                                             
 
       z();
       z(); node(nodeTypes[Node_temp], bT.tData).isLow();
-      z(); if (!isLow)                                return;
-      z(); if (stealFromLeft    ())                   return;
-      z(); if (stealFromRight   ())                   return;
-      z(); if (mergeLeftSibling ())                   return;
-      z(); if (mergeRightSibling())                   return;
+      z(); if (!isLow)                              return;
+      z(); stealFromLeft    (); if (stolenOrMerged) return;
+      z(); stealFromRight   (); if (stolenOrMerged) return;
+      z(); mergeLeftSibling (); if (stolenOrMerged) return;
+      z(); mergeRightSibling(); if (stolenOrMerged) return;
       stop("Unable to balance child:", bT.tData);
      }
    }  // Node
@@ -1355,8 +1356,11 @@ abstract class BtreeSP extends Test                                             
         nodeTypes[parent].branchSize();
         for (int j = 0; j < branchSize; j++)                                    // Try merging each sibling pair which might change the size of the parent
          {z();
-          index = j; if (nodeTypes[parent].mergeLeftSibling ()) --j;            // A successful merge of the left  sibling reduces the current index and the upper limit
-          index = j;     nodeTypes[parent].mergeRightSibling();                 // A successful merge of the right sibling maintains the current position but reduces the upper limit
+          index = j;
+          nodeTypes[parent].mergeLeftSibling ();
+          if (stolenOrMerged) --j;                                              // A successful merge of the left  sibling reduces the current index and the upper limit
+          index = j;
+          nodeTypes[parent].mergeRightSibling();                                // A successful merge of the right sibling maintains the current position but reduces the upper limit
           nodeTypes[parent].branchSize();
          }
 
