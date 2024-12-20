@@ -44,30 +44,26 @@ abstract class BtreeSP extends Test                                             
   final int Node_left   = 2;                                                    // Node used for a left  hand child
   final int Node_right  = 3;                                                    // Node used for a right hand child
   final int Node_temp   = 4;                                                    // Temporary node
-  final int Node_find   = 5;                                                    // Find node
-  final int Node_put    = 6;                                                    // Put node
-  final int Node_delete = 7;                                                    // Delete node
-  final int Node_length = 8;                                                    // Number of node types
+  final int Node_find   = 4;                                                    // Find node
+  final int Node_put    = 4;                                                    // Put node
+  final int Node_delete = 4;                                                    // Delete node
+  final int Node_length = 5;                                                    // Number of node types
 
   final NodeTransaction[]nodeTypes;                                             // One node description for each type of transaction
 
   final int Branch_Size        = 0;                                             // Get the size of a stuck
-  final int Branch_Leaf        = 1;                                             // Check whether a node has leaves for children
-  final int Branch_Top         = 2;                                             // Get the top element of a branch
-  final int Branch_FirstBranch = 3;                                             // Locate the first greater or equal key in a branch
-  final int Branch_T           = 4;                                             // Process a parent node
-  final int Branch_tl          = 5;                                             // Process a left node
-  final int Branch_tr          = 6;                                             // Process a right node
-  final int Branch_length      = 7;                                             // Number of transaction types
+  final int Branch_Leaf        = 0;                                             // Check whether a node has leaves for children
+  final int Branch_Top         = 0;                                             // Get the top element of a branch
+  final int Branch_FirstBranch = 0;                                             // Locate the first greater or equal key in a branch
+  final int Branch_T           = 1;                                             // Process a parent node
+  final int Branch_tl          = 2;                                             // Process a left node
+  final int Branch_tr          = 3;                                             // Process a right node
+  final int Branch_length      = 4;                                             // Number of transaction types
 
-  final int Leaf_Size          = 0;                                             // Get the size of a stuck
-  final int Leaf_Leaf          = 1;                                             // Check whether a node has leaves for children
-  final int Leaf_Equal         = 2;                                             // Locate an equal key
-  final int Leaf_FirstLeaf     = 3;                                             // Locate the first greater or equal key in a leaf
-  final int Leaf_T             = 4;                                             // Process a parent node
-  final int Leaf_tl            = 5;                                             // Process a left node
-  final int Leaf_tr            = 6;                                             // Process a right node
-  final int Leaf_length        = 7;                                             // Number of transaction types
+  final int Leaf_T             = 0;                                             // Process a parent node
+  final int Leaf_tl            = 1;                                             // Process a left node
+  final int Leaf_tr            = 2;                                             // Process a right node
+  final int Leaf_length        = 3;                                             // Number of transaction types
 
   final StuckSP[]branchTransactions;                                            // Transactions to use on branch stucks
   final StuckSP[]  leafTransactions;                                            // Transactions to use on leaf stucks
@@ -140,10 +136,10 @@ abstract class BtreeSP extends Test                                             
     bL           = branchTransactions[Branch_tl         ];                      // Process a left node
     bR           = branchTransactions[Branch_tr         ];                      // Process a right node
 
-    lSize        =   leafTransactions[Leaf_Size         ];                      // Branch size
-    lLeaf        =   leafTransactions[Leaf_Leaf         ];                      // Check whether a node has leaves for childrn
-    lEqual       =   leafTransactions[Leaf_Equal        ];                      // Locate an equal key
-    lFirstLeaf   =   leafTransactions[Leaf_FirstLeaf    ];                      // Locate the first greater or equal key in a leaf
+    lSize        =   leafTransactions[Leaf_T            ];                      // Branch size
+    lLeaf        =   leafTransactions[Leaf_T            ];                      // Check whether a node has leaves for childrn
+    lEqual       =   leafTransactions[Leaf_T            ];                      // Locate an equal key
+    lFirstLeaf   =   leafTransactions[Leaf_T            ];                      // Locate the first greater or equal key in a leaf
     lT           =   leafTransactions[Leaf_T            ];                      // Process a parent node
     lL           =   leafTransactions[Leaf_tl           ];                      // Process a left node
     lR           =   leafTransactions[Leaf_tr           ];                      // Process a right node
@@ -271,8 +267,6 @@ abstract class BtreeSP extends Test                                             
 
   int l;                                                                        // Left node
   int r;                                                                        // Right node
-
-
 
   class NodeTransaction                                                         // A transient description of a branch or leaf in the tree - the actual data is contained in the bit memory
    {int node;                                                                   // The number of the node
