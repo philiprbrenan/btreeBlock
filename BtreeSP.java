@@ -235,40 +235,49 @@ abstract class BtreeSP extends Test                                             
 
 //D1 Components                                                                 // A branch or leaf in the tree
 
+  int anode;                                                                    // Node being allocated
+  int splitLeafSize;                                                            // Where to split a full leaf
+  int splitBranchSize;                                                          // Branch split size
+
+  boolean  success;                                                             // Inserted or updated if true
+  boolean inserted;                                                             // Inserted if true
+
+  int     first;                                                                // Index of first key greater than or equal to the search key
+  int      next;                                                                // The corresponding next field or top if no such key was found
+                                                                                // Find equal in leaf
+  int    search;                                                                  // Search key
+  boolean found;                                                                // Whether the key was found
+  int       key;                                                                // Key to insert
+  int      data;                                                                // Data associated with the  key
+
+  int firstKey;                                                                 // First of right leaf
+  int lastKey;                                                                  // Last of left leaf
+  int flKey;                                                                    // Key mid way between last of left and first of right
+  int parentKey;                                                                // Parent key
+
+  int lk;                                                                       // Left  child key
+  int ld;                                                                       // Left  child data
+  int rk;                                                                       // Right child key
+  int rd;                                                                       // Right child data
+  int index;                                                                    // Index of a slot in a node
+
+  int nl;                                                                       // Number in the left child, number in the right child
+  int nr;                                                                       // Number in the left child, number in the right child
+
+  int L;                                                                        // Reference to left child
+  int R;                                                                        // Reference to right child
+
+  int P;                                                                        // Parent node during a split, merge or steal operation
+
+  int l;                                                                        // Left node
+  int r;                                                                        // Right node
+
+
+
   class NodeTransaction                                                         // A transient description of a branch or leaf in the tree - the actual data is contained in the bit memory
    {int node;                                                                   // The number of the node
     int parent;                                                                 // Parent node
-    int anode;                                                                  // Node being allocated
-    int P;                                                                      // Parent node during a split, merge or steal operation
-    int l;                                                                      // Left node
-    int r;                                                                      // Right node
-    int splitLeafSize;                                                          // Where to split a full leaf
-    int splitBranchSize;                                                        // Branch split size
-    int firstKey;                                                               // First of right leaf
-    int lastKey;                                                                // Last of left leaf
-    int flKey;                                                                  // Key mid way between last of left and first of right
-    int parentKey;                                                              // Parent key
-    int L;                                                                      // Reference to left child
-    int R;                                                                      // Reference to right child
-    int nl;                                                                     // Number in the left child, number in the right child
-    int nr;                                                                     // Number in the left child, number in the right child
-    int lk;                                                                     // Left  child key
-    int ld;                                                                     // Left  child data
-    int rk;                                                                     // Right child key
-    int rd;                                                                     // Right child data
-    int index;                                                                  // Index of a slot in a node
-                                                                                // Find equal in leaf
-    int    search;                                                              // Search key
-    boolean found;                                                              // Whether the key was found
-    int       key;                                                              // Key to insert
-    int      data;                                                              // Data associated with the  key
-    int      base2;                                                              // Base of the leaf
 
-    int     first;                                                              // Index of first key greater than or equal to the search key
-    int      next;                                                              // The corresponding next field or top if no such key was found
-
-    boolean  success;                                                           // Inserted or updated if true
-    boolean inserted;                                                           // Inserted if true
 
     boolean isLeaf() {z(); return getInt(isLeaf,    node) > 0;}                 // A leaf if true
     void   setLeaf() {z();        setInt(isLeaf, 1, node);}                     // Set as leaf
@@ -1101,7 +1110,7 @@ abstract class BtreeSP extends Test                                             
     int find()                                                                  // Find the data associated with a key in the tree
      {z();
       if (root.isLeaf())                                                        // The root is a leaf
-       {z(); root.search = Key; root.findEqualInLeaf();
+       {z(); search = Key; root.findEqualInLeaf();
         return Node_root;
        }
 
@@ -1109,11 +1118,11 @@ abstract class BtreeSP extends Test                                             
 
       for (int i = 0; i < maxDepth; i++)                                        // Step down through tree
        {z();
-        nodeTypes[parent].search = Key; nodeTypes[parent].findFirstGreaterThanOrEqualInBranch(); // Find next child in search path of key
-        child = node(Node_find, nodeTypes[parent].next);
+        search = Key; nodeTypes[parent].findFirstGreaterThanOrEqualInBranch(); // Find next child in search path of key
+        child = node(Node_find, next);
 
         if (nodeTypes[child].isLeaf())                                          // Found the containing search
-         {z(); nodeTypes[child].search = Key;
+         {z(); search = Key;
           nodeTypes[child].findEqualInLeaf();
           return child;
          }
@@ -1130,26 +1139,26 @@ abstract class BtreeSP extends Test                                             
       final NodeTransaction l = nodeTypes[leaf];
       lT.base(l.leafBase());
 
-      if (l.found)                                                              // Found the key in the leaf so update it with the new data
-       {z(); lT.tKey = Key; lT.tData = Data; lT.index = l.index; lT.setElementAt();
-        l.success = true; l.inserted = false;
+      if (found)                                                              // Found the key in the leaf so update it with the new data
+       {z(); lT.tKey = Key; lT.tData = Data; lT.index = index; lT.setElementAt();
+        success = true; inserted = false;
         return leaf;
        }
 
       if (!l.isFull())                                                          // Leaf is not full so we can insert immediately
        {z();
-        l.search = Key; l.findFirstGreaterThanOrEqualInLeaf();
-        if (l.found)                                                            // Overwrite existing key
+        search = Key; l.findFirstGreaterThanOrEqualInLeaf();
+        if (found)                                                            // Overwrite existing key
          {z();
-          lT.tKey = Key; lT.tData = Data; lT.index = l.first; lT.insertElementAt();
+          lT.tKey = Key; lT.tData = Data; lT.index = first; lT.insertElementAt();
          }
         else                                                                    // Insert into position
          {z(); lT.tKey = Key; lT.tData = Data; lT.push();
          }
-        l.success = true;
+        success = true;
         return leaf;
        }
-      z(); l.success = false;
+      z(); success = false;
       return leaf;
      }
 
@@ -1157,7 +1166,7 @@ abstract class BtreeSP extends Test                                             
 
     void put()                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
      {z(); findAndInsert = findAndInsert();                                     // Try direct insertion with no modifications to the shape of the tree
-      if (nodeTypes[findAndInsert].success) return;                             // Inserted or updated successfully
+      if (success) return;                             // Inserted or updated successfully
       z();
 
       if (root.isFull())                                                        // Start the insertion at the root(), after splitting it if necessary
@@ -1166,19 +1175,19 @@ abstract class BtreeSP extends Test                                             
         else               {z(); root.splitBranchRoot();}
         z();
         findAndInsert = findAndInsert();                                        // Splitting the root() might have been enough
-        if (nodeTypes[findAndInsert].success) return;                           // Inserted or updated successfully
+        if (success) return;                           // Inserted or updated successfully
        }
       z(); parent = Node_root;
 
       for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
        {z();
-        nodeTypes[parent].search = Key;
+        search = Key;
         nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();
-        child = node(Node_put, nodeTypes[parent].next);
+        child = node(Node_put, next);
         if (nodeTypes[child].isLeaf())                                          // Reached a leaf
          {z();
           nodeTypes[child].parent = parent;
-          nodeTypes[child].index = nodeTypes[parent].first;
+          index = first;
           nodeTypes[child].splitLeaf();                                         // Split the child leaf
           findAndInsert();
           merge();
@@ -1188,12 +1197,12 @@ abstract class BtreeSP extends Test                                             
         if (nodeTypes[child].isFull())
          {z();
           nodeTypes[child].parent = parent;
-          nodeTypes[child].index = nodeTypes[parent].first;
+          index = first;
           nodeTypes[child].splitBranch();                                       // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
 
-          nodeTypes[parent].search = Key;
+          search = Key;
           nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();              // Perform the step down again as the split will have altered the local layout
-          parent = node(Node_parent, nodeTypes[parent].next);
+          parent = node(Node_parent, next);
          }
         else                                                                    // Step down directly as no split was required
          {z(); parent = node(Node_parent, nodeTypes[child].node);
@@ -1206,10 +1215,10 @@ abstract class BtreeSP extends Test                                             
 
     Integer findAndDelete()                                                     // Delete a key from the tree and returns its data if present without modifying the shape of tree
      {z(); find = find();                                                       // Try direct insertion with no modifications to the shape of the tree
-      if (!nodeTypes[find].found) return null;                                  // Inserted or updated successfully
+      if (!found) return null;                                  // Inserted or updated successfully
       z();
       lT.base(nodeTypes[find].leafBase());                                      // The leaf that contains the key
-      lT.index = nodeTypes[find].index; lT.elementAt();                         // Position in the leaf of the key
+      lT.index = index; lT.elementAt();                         // Position in the leaf of the key
 
       Data = lT.tData;                                                          // Key, data pairs in the leaf
       lT.removeElementAt();                                                     // Remove the key, data pair from the leaf
@@ -1228,12 +1237,12 @@ abstract class BtreeSP extends Test                                             
 
       for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
        {z();                                                                    // Step down
-        nodeTypes[parent].search = Key;
+        search = Key;
         nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();
 
-        nodeTypes[parent].index = nodeTypes[parent].first;
+        index = first;
         nodeTypes[parent].balance();
-        child = node(Node_delete, nodeTypes[parent].next);
+        child = node(Node_delete, next);
 
         if (nodeTypes[child].isLeaf())                                          // Reached a leaf
          {z();
@@ -1259,13 +1268,13 @@ abstract class BtreeSP extends Test                                             
         z();
         for (int j = 0; j < nodeTypes[parent].branchSize(); j++)                // Try merging each sibling pair which might change the size of the parent
          {z();
-          nodeTypes[parent].index = j; if (nodeTypes[parent].mergeLeftSibling ()) --j; // A successful merge of the left  sibling reduces the current index and the upper limit
-          nodeTypes[parent].index = j;     nodeTypes[parent].mergeRightSibling();      // A successful merge of the right sibling maintains the current position but reduces the upper limit
+          index = j; if (nodeTypes[parent].mergeLeftSibling ()) --j; // A successful merge of the left  sibling reduces the current index and the upper limit
+          index = j;     nodeTypes[parent].mergeRightSibling();      // A successful merge of the right sibling maintains the current position but reduces the upper limit
          }
 
-        nodeTypes[parent].search = Key;
+        search = Key;
         nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();                // Step down
-        parent = node(Node_parent, nodeTypes[parent].next);
+        parent = node(Node_parent, next);
        }
       stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
      }
@@ -1388,12 +1397,12 @@ abstract class BtreeSP extends Test                                             
       if (s.containsKey(i))
        {NodeTransaction f = t.nodeTypes[T.find()];
         assert f == t.nodeTypes[t.Node_find];
-        ok(f.found);
-        ok(f.data, s.get(i));
+        ok(t.found);
+        ok(t.data, s.get(i));
        }
       else
        {NodeTransaction f = t.nodeTypes[T.find()];
-        ok(!f.found);
+        ok(!t.found);
        }
      }
    }
@@ -1421,22 +1430,22 @@ abstract class BtreeSP extends Test                                             
       NodeTransaction f = t.nodeTypes[T.find()];
       assert f == t.nodeTypes[t.Node_find];
       if (i > 0 && i % 2 == 0)
-       {ok(f.found, true);
-        ok(f.data,  i);
+       {ok(t.found, true);
+        ok(t.data,  i);
         T.Data = i-1;
         T.put();
        }
-      else ok(f.found, false);
+      else ok(t.found, false);
      }
 
     for (int i = 0; i <= 2*N+1; i++)
      {T.Key = i;
       NodeTransaction f = t.nodeTypes[T.find()];
       if (i > 0 && i % 2 == 0)
-       {ok(f.found, true);
-        ok(f.data,  i-1);
+       {ok(t.found, true);
+        ok(t.data,  i-1);
        }
-      else ok(f.found, false);
+      else ok(t.found, false);
      }
    }
 
@@ -2078,7 +2087,7 @@ abstract class BtreeSP extends Test                                             
     test_put_ascending_wide();                                                  //  5.33
     test_put_descending();                                                      // 12.98
     test_put_small_random();                                                    //  8.72
-    //test_put_large_random();                                                    //  0
+    test_put_large_random();                                                    //  0
     test_find();                                                                //  4.62
     test_delete_ascending();                                                    //  7.27
     test_delete_descending();                                                   //  7.66
