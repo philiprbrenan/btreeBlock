@@ -284,9 +284,9 @@ abstract class BtreeSP extends Test                                             
   class NodeTransaction                                                         // A transient description of a branch or leaf in the tree - the actual data is contained in the bit memory
    {int node;                                                                   // The number of the node
 
-    void    isLeaf() {z(); IsLeaf = getInt(isLeaf,   node) > 0;}                // A leaf if true
-    void   setLeaf() {z();        setInt(isLeaf, 1, node);}                     // Set as leaf
-    void setBranch() {z();        setInt(isLeaf, 0, node);}                     // Set as branch
+    void    isLeaf() {z(); IsLeaf = getInt(isLeaf,  node) > 0;}                 // A leaf if true
+    void   setLeaf() {z();          setInt(isLeaf, 1, node);}                   // Set as leaf
+    void setBranch() {z();          setInt(isLeaf, 0, node);}                   // Set as branch
 
     void assertLeaf()   {isLeaf(); if (!IsLeaf) stop("Leaf required");}
     void assertBranch() {isLeaf(); if ( IsLeaf) stop("Branch required");}
@@ -305,14 +305,14 @@ abstract class BtreeSP extends Test                                             
 
     void clear()                                                                // Clear a new node to zeros ready for use
      {z();
-      final Layout.Field n = BtreeSP.this.Node;
+      final Layout.Field n = Node;
       final int at = n.at(node), w = n.width;
       memoryLayout.memory.zero(at, w);
      }
 
     void erase()                                                                // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
      {z();
-      final Layout.Field n = BtreeSP.this.Node;
+      final Layout.Field n = Node;
       final int at = n.at(node), w = n.width;
       memoryLayout.memory.ones(at, w);
      }
@@ -760,7 +760,7 @@ abstract class BtreeSP extends Test                                             
     void stealFromLeft()                                                     // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
      {z(); assertBranch();
       z(); if (index == 0) {z(); stolenOrMerged = false; return;}
-      z(); if (index < 0)            stop("Index", index, "too small");
+      z(); if (index < 0) stop("Index", index, "too small");
       z(); branchSize();
       z(); if (index > branchSize) stop("Index", index, "too big");
       z();
@@ -782,8 +782,8 @@ abstract class BtreeSP extends Test                                             
         nodeTypes[l].leafSize();   nl = leafSize;
         nodeTypes[r].leafSize();   nr = leafSize;
 
-        z(); if (nr >= maxKeysPerLeaf()) {z(); stolenOrMerged = false; return;} // Steal not possible because there is no where to put the steal
-        z(); if (nl <= 1)                {z(); stolenOrMerged = false; return;} // Steal not allowed because it would leave the leaf sibling empty
+        if (nr >= maxKeysPerLeaf()) {z(); stolenOrMerged = false; return;}      // Steal not possible because there is no where to put the steal
+        if (nl <= 1)                {z(); stolenOrMerged = false; return;}      // Steal not allowed because it would leave the leaf sibling empty
         z();
 
         lL.lastElement(); lR.tKey = lL.tKey; lR.tData = lL.tData; lR.unshift(); // Increase right
@@ -821,7 +821,7 @@ abstract class BtreeSP extends Test                                             
     void stealFromRight()                                                       // Steal from the right sibling of the indicated child if possible
      {z(); assertBranch();
       z(); branchSize(); if (index == branchSize) {z(); stolenOrMerged = false; return;}
-      z(); if (index < 0)             stop("Index", index, "too small");
+      z(); if (index < 0) stop("Index", index, "too small");
       z(); branchSize(); if (index >= branchSize) stop("Index", index, "too big");
       z();
 
@@ -841,8 +841,8 @@ abstract class BtreeSP extends Test                                             
         nodeTypes[l].leafSize();   nl =    leafSize;
         nodeTypes[r].leafSize();   nr =    leafSize;
 
-        z(); if (nl >= maxKeysPerLeaf()) {z(); stolenOrMerged = false; return;} // Steal not possible because there is no where to put the steal
-        z(); if (nr <= 1)                {z(); stolenOrMerged = false; return;} // Steal not allowed because it would leave the right sibling empty
+        if (nl >= maxKeysPerLeaf()) {z(); stolenOrMerged = false; return;}      // Steal not possible because there is no where to put the steal
+        if (nr <= 1)                {z(); stolenOrMerged = false; return;}      // Steal not allowed because it would leave the right sibling empty
         z();
         lR.firstElement();                                                      // First element of right child
         lL.tKey = lR.tKey; lL.tData = lR.tData; lL.push();                      // Increase left
