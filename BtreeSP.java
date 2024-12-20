@@ -268,9 +268,11 @@ abstract class BtreeSP extends Test                                             
   int l;                                                                        // Left node
   int r;                                                                        // Right node
 
+  int splitParent;                                                              // The parent during a splitting operation
+
   class NodeTransaction                                                         // A transient description of a branch or leaf in the tree - the actual data is contained in the bit memory
    {int node;                                                                   // The number of the node
-    int parent;                                                                 // Parent node
+    //int parent;                                                                 // Parent node
 
 
     boolean isLeaf() {z(); return getInt(isLeaf,    node) > 0;}                 // A leaf if true
@@ -643,9 +645,9 @@ abstract class BtreeSP extends Test                                             
      {z(); assertLeaf();
       z(); if (node == 0) stop("Cannot split root with this method");
       z(); final int S = leafSize(), I = index;
-      z(); final boolean nif = !isFull(), pif = nodeTypes[parent].isFull();
+      z(); final boolean nif = !isFull(), pif = nodeTypes[splitParent].isFull();
       z(); if (nif)   stop("Leaf:", node, "is not full, but has:", S, this);
-      z(); if (pif)   stop("Parent:", parent, "must not be full");
+      z(); if (pif)   stop("Leaf split parent:", splitParent, "must not be full");
       z(); if (I < 0) stop("Index", I, "too small");
       z(); if (I > S) stop("Index", I, "too big for leaf with:", S);
       z();
@@ -660,8 +662,7 @@ abstract class BtreeSP extends Test                                             
        }
       lR.firstElement();
       lL. lastElement();
-      P = parent;                                                               // Parent
-      bT.base(nodeTypes[P].branchBase());                                       // The parent branch
+      bT.base(nodeTypes[splitParent].branchBase());                             // The parent branch
       bT.tKey  = (lR.tKey + lL.tKey) / 2;                                       // Splitting key
       bT.tData = nodeTypes[l].node;
       bT.index = index;
@@ -670,19 +671,18 @@ abstract class BtreeSP extends Test                                             
 
     void splitBranch()                                                          // Split a branch which is not the root by splitting right to left
      {z(); assertBranch();
-      z(); final int bs = branchSize(), I = index, pn = nodeTypes[parent].node, nd = node;
-      z(); final boolean nif = !isFull(), pif = nodeTypes[parent].isFull();
+      z(); final int bs = branchSize(), I = index, pn = nodeTypes[splitParent].node, nd = node;
+      z(); final boolean nif = !isFull(), pif = nodeTypes[splitParent].isFull();
       z(); if (nd == 0) stop("Cannot split root with this method");
       z(); if (nif)     stop("Branch:", nd, "is not full, but", bs);
-      z(); if (pif)     stop("Parent:", pn, "must not be full");
+      z(); if (pif)     stop("Bramch split parent:", pn, "must not be full");
       z(); if (I < 0)   stop("Index", I, "too small in node:", nd);
       z(); if (I > bs)  stop("Index", I, "too big for branch with:",
                               bs, "in node:", nd);
       z();
-      P = parent;
       l = anode = Node_left; allocBranch();
 
-      bT.base(nodeTypes[P].branchBase());                                       // The parent branch
+      bT.base(nodeTypes[splitParent].branchBase());                             // The parent branch
       bL.base(nodeTypes[l].branchBase());                                       // The branch being split into
       bR.base(             branchBase());                                       // The branch being split
 
@@ -1180,7 +1180,7 @@ abstract class BtreeSP extends Test                                             
         child = node(Node_put, next);
         if (nodeTypes[child].isLeaf())                                          // Reached a leaf
          {z();
-          nodeTypes[child].parent = parent;
+          splitParent = parent;
           index = first;
           nodeTypes[child].splitLeaf();                                         // Split the child leaf
           findAndInsert();
@@ -1190,7 +1190,7 @@ abstract class BtreeSP extends Test                                             
         z();
         if (nodeTypes[child].isFull())
          {z();
-          nodeTypes[child].parent = parent;
+          splitParent = parent;
           index = first;
           nodeTypes[child].splitBranch();                                       // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
 
