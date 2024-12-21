@@ -15,8 +15,8 @@ abstract class BtreeSP extends Test                                             
   abstract int bitsPerSize();                                                   // The number of bits in size field
   abstract int maxKeysPerLeaf();                                                // Maximum number of leafs in a key
   abstract int maxKeysPerBranch();                                              // Maximum number of keys in a branch
-  int splitLeafSize  () {return maxKeysPerLeaf()   >> 1;}                       // The number of key, data pairs to split out of a leaf
-  int splitBranchSize() {return maxKeysPerBranch() >> 1;}                       // The number of key, next pairs to split out of a branch
+  final int splitLeafSize;                                                      // The number of key, data pairs to split out of a leaf
+  final int splitBranchSize;                                                    // The number of key, next pairs to split out of a branch
 
   StuckSP leafStuck, branchStuck;                                               // Leaf, branch definition
 
@@ -59,7 +59,7 @@ abstract class BtreeSP extends Test                                             
   final StuckSP[]  leafTransactions;                                            // Transactions to use on leaf stucks
 
   final StuckSP bSize;                                                          // Branch size
-  final StuckSP bLeaf;                                                          // Check whether a node has leaves for childrn
+  final StuckSP bLeaf;                                                          // Check whether a node has leaves for children
   final StuckSP bTop;                                                           // Get the size of a stuck
   final StuckSP bFirstBranch;                                                   // Locate the first greater or equal key in a branch
   final StuckSP bT;                                                             // Process a parent node
@@ -67,7 +67,7 @@ abstract class BtreeSP extends Test                                             
   final StuckSP bR;                                                             // Process a right node
 
   final StuckSP lSize;                                                          // Branch size
-  final StuckSP lLeaf;                                                          // Check whether a node has leaves for childrn
+  final StuckSP lLeaf;                                                          // Check whether a node has leaves for children
   final StuckSP lEqual;                                                         // Locate an equal key
   final StuckSP lFirstLeaf;                                                     // Locate the first greater or equal key in a leaf
   final StuckSP lT;                                                             // Process a parent node
@@ -80,6 +80,9 @@ abstract class BtreeSP extends Test                                             
 
   BtreeSP()                                                                     // Define a Btree with user specified dimensions
    {z();
+   splitLeafSize   = maxKeysPerLeaf()   >> 1;                                   // The number of key, data pairs to split out of a leaf
+   splitBranchSize = maxKeysPerBranch() >> 1;                                   // The number of key, next pairs to split out of a branch
+
     memoryLayout.layout(layout());
     memoryLayout.memory(new Memory(memoryLayout.layout.size()));
 
@@ -112,15 +115,15 @@ abstract class BtreeSP extends Test                                             
      }
 
     bSize        = branchTransactions[Branch_Size       ];                      // Branch size
-    bLeaf        = branchTransactions[Branch_Leaf       ];                      // Check whether a node has leaves for childrn
+    bLeaf        = branchTransactions[Branch_Leaf       ];                      // Check whether a node has leaves for children
     bTop         = branchTransactions[Branch_Top        ];                      // Get the size of a stuck
     bFirstBranch = branchTransactions[Branch_FirstBranch];                      // Locate the first greater or equal key in a branch
     bT           = branchTransactions[Branch_T          ];                      // Process a parent node
     bL           = branchTransactions[Branch_tl         ];                      // Process a left node
     bR           = branchTransactions[Branch_tr         ];                      // Process a right node
 
-    lSize        =   leafTransactions[Leaf_T            ];                      // Branch size
-    lLeaf        =   leafTransactions[Leaf_T            ];                      // Check whether a node has leaves for childrn
+    lSize        =   leafTransactions[Leaf_T            ];                      // Leaf size
+    lLeaf        =   leafTransactions[Leaf_T            ];                      // Print a leaf
     lEqual       =   leafTransactions[Leaf_T            ];                      // Locate an equal key
     lFirstLeaf   =   leafTransactions[Leaf_T            ];                      // Locate the first greater or equal key in a leaf
     lT           =   leafTransactions[Leaf_T            ];                      // Process a parent node
@@ -190,8 +193,8 @@ abstract class BtreeSP extends Test                                             
 
 //D1 Memory access                                                              // Access to memory
 
-  private int  getInt(Layout.Field field)            {z(); return memoryLayout.getInt(field);}
-  private int  getInt(Layout.Field field, int index) {z(); return memoryLayout.getInt(field, index);}
+  private int  getInt(Layout.Field field)                {z(); return memoryLayout.getInt(field);}
+  private int  getInt(Layout.Field field, int index)     {z(); return memoryLayout.getInt(field, index);}
 
   private void setInt(Layout.Field field, int value)            {z(); memoryLayout.setInt(field, value);}
   private void setInt(Layout.Field field, int value, int index) {z(); memoryLayout.setInt(field, value, index);}
@@ -199,10 +202,10 @@ abstract class BtreeSP extends Test                                             
 //D1 Memory allocation                                                          // Allocate and free memory
 
   private int allocate(boolean check)                                           // Allocate a node with or without checking for sufficient free space
-   {z(); final int  f = getInt(freedChain);                                     // Last freed node
+   {z(); final int    f = getInt(freedChain);                                   // Last freed node
     z(); if (check && f == 0) stop("No more memory available");                 // No more free nodes available
-    z(); final int  F = getInt(free,       f);                                  // Second to last freed node
-                        setInt(freedChain, F);                                  // Make second to last freed node the forst freed nod to liberate the existeing first free node
+    z(); final int    F = getInt(free,       f);                                // Second to last freed node
+                          setInt(freedChain, F);                                // Make second to last freed node the first freed node to liberate the existing first free node
     node_clear = f; clear();                                                    // Construct and clear the node
     maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                                // Number of nodes in use
     return f;
@@ -211,9 +214,6 @@ abstract class BtreeSP extends Test                                             
   private int allocate() {z(); return allocate(true);}                          // Allocate a node checking for free space
 
 //D1 Components                                                                 // A branch or leaf in the tree
-
-  int   splitLeafSize;                                                          // Where to split a full leaf
-  int splitBranchSize;                                                          // Branch split size
 
   boolean     success;                                                          // Inserted or updated if true
   boolean    inserted;                                                          // Inserted if true
@@ -224,7 +224,7 @@ abstract class BtreeSP extends Test                                             
   int          search;                                                          // Search key
   boolean       found;                                                          // Whether the key was found
   int             key;                                                          // Key to insert
-  int            data;                                                          // Data associated with the  key
+  int            data;                                                          // Data associated with the key
 
   int        firstKey;                                                          // First of right leaf
   int         lastKey;                                                          // Last of left leaf
@@ -237,13 +237,8 @@ abstract class BtreeSP extends Test                                             
   int              rd;                                                          // Right child data
   int           index;                                                          // Index of a slot in a node
 
-  int              nl;                                                          // Number in the left child, number in the right child
-  int              nr;                                                          // Number in the left child, number in the right child
-
-  int               L;                                                          // Reference to left child
-  int               R;                                                          // Reference to right child
-
-  int               P;                                                          // Parent node during a split, merge or steal operation
+  int              nl;                                                          // Number in the left child
+  int              nr;                                                          // Number in the right child
 
   int               l;                                                          // Left node
   int               r;                                                          // Right node
@@ -253,22 +248,22 @@ abstract class BtreeSP extends Test                                             
   boolean      isFull;                                                          // The node is full
   boolean       isLow;                                                          // The node has too few children for a delete
   boolean hasLeavesForChildren;                                                 // The node has leaves for children
-  boolean stolenOrMerged;                                                       // A merge or steasl operation suceeded
+  boolean stolenOrMerged;                                                       // A merge or steal operation succeeded
 
-  int leafBase;                                                                 // The offset of a leaf in memory
-  int branchBase;                                                               // The offset of a branch in memory
-  int leafSize;                                                                 // Number of children in body of leaf
-  int branchSize;                                                               // Number of children in body of branch taking top for granted as it is always there
-  int top;                                                                      // The top next element of a branch - only used in printing
+  int       leafBase;                                                           // The offset of a leaf in memory
+  int     branchBase;                                                           // The offset of a branch in memory
+  int       leafSize;                                                           // Number of children in body of leaf
+  int     branchSize;                                                           // Number of children in body of branch taking top for granted as it is always there
+  int            top;                                                           // The top next element of a branch - only used in printing
                                                                                 // Find, insert, delete - the public entry points to this module
-  int           Key;                                                            // Key being found, inserted or deleted
-  int          Data;                                                            // Data found, inserted or deleted
-  int          find;                                                            // Results of a find operation
-  int findAndInsert;                                                            // Results of a find and insert operation
-  int        parent;                                                            // Parent node in a descent through the tree
-  int         child;                                                            // Child node in a descent through the tree
-  int     leafFound;                                                            // Leaf found by find
-  Integer    delete;                                                            // Results of a deletion
+  int            Key;                                                           // Key being found, inserted or deleted
+  int           Data;                                                           // Data found, inserted or deleted
+  int           find;                                                           // Results of a find operation
+  int  findAndInsert;                                                           // Results of a find and insert operation
+  int         parent;                                                           // Parent node in a descent through the tree
+  int          child;                                                           // Child node in a descent through the tree
+  int      leafFound;                                                           // Leaf found by find
+  Integer     delete;                                                           // Results of a deletion
 
   int node_isLeaf;                                                              // The node to be used to implicitly parameterize each method call
   int node_setLeaf;
@@ -643,15 +638,12 @@ abstract class BtreeSP extends Test                                             
       stop("Root is not full, but has size:", leafSize);
      }
 
-    P = root;                                                                   // Root is the parent
     allocLeaf(); l = allocLeaf;                                                 // New left leaf
     allocLeaf(); r = allocLeaf;                                                 // New right leaf
 
-    node_leafBase = P; leafBase(); lT.base(leafBase);                           // Set address of the referenced leaf stuck
-    node_leafBase = l; leafBase(); lL.base(leafBase);                           // Set address of the referenced leaf stuck
-    node_leafBase = r; leafBase(); lR.base(leafBase);                           // Set address of the referenced leaf stuck
-
-    splitLeafSize = splitLeafSize();
+    node_leafBase = root; leafBase(); lT.base(leafBase);                        // Set address of the referenced leaf stuck
+    node_leafBase = l;    leafBase(); lL.base(leafBase);                        // Set address of the referenced leaf stuck
+    node_leafBase = r;    leafBase(); lR.base(leafBase);                        // Set address of the referenced leaf stuck
 
     for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf from parent
      {z(); lT.shift(); lL.tKey = lT.tKey; lL.tData = lT.tData; lL.push();
@@ -682,7 +674,6 @@ abstract class BtreeSP extends Test                                             
      }
     z();
 
-    P = root;                                                                   // Root is the parent
     allocBranch(); l = allocBranch;                                             // New left branch
     allocBranch(); r = allocBranch;                                             // New right branch
 
@@ -690,7 +681,6 @@ abstract class BtreeSP extends Test                                             
     node_branchBase = l;    branchBase(); bL.base(branchBase);                  // Set address of the referenced branch stuck
     node_branchBase = r;    branchBase(); bR.base(branchBase);                  // Set address of the referenced branch stuck
 
-    splitBranchSize = splitBranchSize();                                        // Branch split size
     for (int i = 0; i < splitBranchSize; i++)                                   // Build left child from parent
      {z(); bT.shift(); bL.tKey = bT.tKey; bL.tData = bT.tData; bL.push();
      }
@@ -728,7 +718,6 @@ abstract class BtreeSP extends Test                                             
     node_leafBase = l;              leafBase(); lL.base(leafBase);              // The leaf being split into
     node_leafBase = node_splitLeaf; leafBase(); lR.base(leafBase);              // The leaf being split on the right
 
-    splitLeafSize = splitLeafSize();
     for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf
      {z(); lR.shift(); lL.tKey = lR.tKey; lL.tData = lR.tData; lL.push();
      }
@@ -762,7 +751,6 @@ abstract class BtreeSP extends Test                                             
     node_branchBase = l;                branchBase(); bL.base(branchBase);      // The branch being split into
     node_branchBase = node_splitBranch; branchBase(); bR.base(branchBase);      // The branch being split
 
-    splitBranchSize = splitBranchSize();
     for (int i = 0; i < splitBranchSize; i++)                                   // Build left branch from right
      {z(); bR.shift(); bL.tKey = bR.tKey; bL.tData = bR.tData; bL.push();
      }
@@ -1161,7 +1149,7 @@ abstract class BtreeSP extends Test                                             
     return printCollapsed(S);
    }
 
-//D1 Find                                                                       // Find the data associeted with a key.
+//D1 Find                                                                       // Find the data associated with a key.
 
   public int find()                                                             // Find the leaf associated with a key in the tree
    {z();
