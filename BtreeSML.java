@@ -1128,7 +1128,7 @@ abstract class BtreeSML extends Test                                            
       final Node.FindFirstGreaterThanOrEqualInBranch                            // Step down
       down = p.findFirstGreaterThanOrEqualInBranch1(Key);
 
-      p.balance(down.first);
+      p.balance(down.first);                                                    // Make sure there are enough entries in the parent to permit a deletion
       final Node q = node(deleteNode, down.next);
 
       if (q.isLeaf())                                                           // Reached a leaf
