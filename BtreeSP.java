@@ -1150,12 +1150,12 @@ abstract class BtreeSP extends Test                                             
 
 //D1 Find                                                                       // Find the data associated with a key.
 
-  public int find()                                                             // Find the leaf associated with a key in the tree
+  public void find()                                                            // Find the leaf associated with a key in the tree
    {z();
     node_isLeaf = root; isLeaf();
     if (IsLeaf)                                                                 // The root is a leaf
      {z(); search = Key; node_findEqualInLeaf = root; findEqualInLeaf();
-      return root;
+      find = root; return;
      }
 
     parent = root;                                                              // Parent starts at root which is now known to be a branch
@@ -1170,25 +1170,26 @@ abstract class BtreeSP extends Test                                             
       if (IsLeaf)                                                               // Found the containing leaf
        {z(); search = Key;
         node_findEqualInLeaf = child; findEqualInLeaf();
-        return child;
+        find = child;
+        return;
        }
       parent = child;                                                           // Step down to lower branch
      }
     stop("Search for", Key, "did not terminate in a leaf");
-    return -1;
    }
 
-  public int findAndInsert()                                                    // Find the leaf that should contain this key and insert or update it is possible
+  private void findAndInsert()                                                  // Find the leaf that should contain this key and insert or update it is possible
    {z();
-    leafFound = find();                                                         // Find the leaf that should contain this key
+    find(); leafFound = find;                                                   // Find the leaf that should contain this key
 
     node_leafBase = leafFound; leafBase();
     lT.base(leafBase);
 
-    if (found)                                                                  // Found the key in the leaf so update it with the new data
+    if (found)                                                                  // Found the key in the leaf so update it with the new data. The found flag was set by find calling findEqualInLeaf before returning.
      {z(); lT.tKey = Key; lT.tData = Data; lT.index = index; lT.setElementAt();
       success = true; inserted = false;
-      return leafFound;
+      findAndInsert = leafFound;
+      return;
      }
 
     node_isFull = leafFound; isFull();                                          // Leaf is not full so we can insert immediately
@@ -1205,16 +1206,16 @@ abstract class BtreeSP extends Test                                             
        {z(); lT.tKey = Key; lT.tData = Data; lT.push();
        }
       success = true;
-      return leafFound;
+      findAndInsert = leafFound;
+      return;
      }
     z(); success = false;
-    return leafFound;
    }
 
 //D1 Insertion                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
 
   public void put()                                                             // Insert a key, data pair into the tree or update and existing key with a new datum
-   {z(); findAndInsert = findAndInsert();                                       // Try direct insertion with no modifications to the shape of the tree
+   {z(); findAndInsert();                                                       // Try direct insertion with no modifications to the shape of the tree
     if (success) return;                                                        // Inserted or updated successfully
     z();
 
@@ -1225,7 +1226,7 @@ abstract class BtreeSP extends Test                                             
       if (IsLeaf) {z(); splitLeafRoot();}
       else        {z(); splitBranchRoot();}
       z();
-      findAndInsert = findAndInsert();                                          // Splitting the root() might have been enough
+      findAndInsert();                                                          // Splitting the root() might have been enough
       if (success) return;                                                      // Inserted or updated successfully
      }
     z(); parent = root;
@@ -1268,24 +1269,23 @@ abstract class BtreeSP extends Test                                             
 
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
 
-  public Integer findAndDelete()                                                // Delete a key from the tree and returns its data if present without modifying the shape of tree
-   {z(); find = find();                                                         // Try direct insertion with no modifications to the shape of the tree
-    if (!found) return null;                                                    // Inserted or updated successfully
+  private void findAndDelete()                                                  // Delete a key from the tree and returns its data if present without modifying the shape of tree
+   {z(); find();                                                                // Try direct insertion with no modifications to the shape of the tree
+    if (!found) return;                                                         // Inserted or updated successfully
     z(); node_leafBase = find; leafBase();                                      // The leaf that contains the key
     lT.base(leafBase);                                                          // The leaf that contains the key
     lT.index = index; lT.elementAt();                                           // Position in the leaf of the key
 
     Data = lT.tData;                                                            // Key, data pairs in the leaf
     lT.removeElementAt();                                                       // Remove the key, data pair from the leaf
-    return Data;
    }
 
-  Integer delete()                                                              // Insert a key, data pair into the tree or update and existing key with a new datum
+  public void delete()                                                          // Delete a key from the tree and return its associated Data if the key was found.
    {z(); node_mergeRoot = root; mergeRoot();
 
     node_isLeaf = root; isLeaf();
     if (IsLeaf)                                                                 // Find and delete directly in root as a leaf
-     {z(); return findAndDelete();
+     {z(); findAndDelete(); return;
      }
     z();
 
@@ -1303,19 +1303,21 @@ abstract class BtreeSP extends Test                                             
       node_isLeaf = child; isLeaf();                                            // Reached a leaf
       if (IsLeaf)                                                               // Reached a leaf
        {z();
-        final Integer data = findAndDelete();
+        findAndDelete();
+        boolean f = found;
         merge();
-        return data;
+        found = f;
+        return;
        }
       z(); parent = child;
      }
     stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
-    return null;
+    return;
    }
 
 //D1 Merge                                                                      // Merge along the specified search path
 
-  public void merge()                                                           // Merge along the specified search path
+  private void merge()                                                          // Merge along the specified search path
    {z();
     mergeRoot();
     parent = root;                                                              // Start at root
@@ -1525,8 +1527,8 @@ abstract class BtreeSP extends Test                                             
     if (box) say("At start with", N, "elements", t.printBoxed());
 
     for (int i = 1; i <= N; i++)
-     {debug = i >= 28;
-      t.Key = i; t.delete();
+     {t.Key = i; t.delete();
+      ok(t.found); ok(t.Data, i);
       //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
       if (box) say("After deleting:", i, t.printBoxed());
       switch(i) {
@@ -1825,6 +1827,7 @@ abstract class BtreeSP extends Test                                             
     for (int i = N; i > 0; --i)
      {t.Key = i;
       t.delete();
+      ok(t.found); ok(t.Data, i);
       //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
       if (box) say("After deleting:", i, t.printBoxed());
       switch(i) {
@@ -2134,6 +2137,24 @@ abstract class BtreeSP extends Test                                             
 ]""");
    }
 
+  static void test_delete_small_random()
+   {final BtreeSP t = btreeSML(4, 3);
+
+    for (int i = 0; i < random_small.length; ++i)
+     {t.Key = random_small[i]; t.Data = i;
+      t.put();
+     }
+
+    for (int i = 0; i < random_small.length; ++i)
+     {t.Key = -1;               t.delete();
+      ok(!t.found);
+
+      t.Key = random_small[i];  t.delete();
+      ok( t.found);
+      ok(t.Data, i);
+     }
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_put_ascending();                                                       //  7.99
     test_put_ascending_wide();                                                  //  5.33
@@ -2143,7 +2164,9 @@ abstract class BtreeSP extends Test                                             
     test_find();                                                                //  4.62
     test_delete_ascending();                                                    //  7.27
     test_delete_descending();                                                   //  7.66
+    test_delete_small_random();                                                 //
     test_to_array();                                                            //  2.52
+    test_delete_small_random();
    }
 
   static void newTests()                                                        // Tests being worked on
