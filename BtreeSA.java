@@ -1,24 +1,23 @@
 //------------------------------------------------------------------------------
-// BtreeSA with transaction in bit memory
+// BtreeSML with single parameter list
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, layout and simulate a btree in a block on the surface of a silicon chip.
-
+// Need binary add so we compute the mid key
 import java.util.*;
 
 abstract class BtreeSA extends Test                                             // Manipulate a btree using static methods and memory
- {MemoryLayout memoryLayout = new MemoryLayout();                               // The memory layout of the btree
+ {final MemoryLayout M = new MemoryLayout();                                    // The memory layout of the btree
+  final MemoryLayout T = new MemoryLayout();                                    // The memory used to hold temporary variable used during a transaction on the btree
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
   abstract int bitsPerNext();                                                   // The number of bits in a next field
-  abstract int bitsPerSize();                                                   // The number of bits in size field
+  abstract int bitsPerSize();                                                   // The number of bits in stuck size field
   abstract int maxKeysPerLeaf();                                                // Maximum number of leafs in a key
   abstract int maxKeysPerBranch();                                              // Maximum number of keys in a branch
-  int splitLeafSize  () {return maxKeysPerLeaf()   >> 1;}                       // The number of key, data pairs to split out of a leaf
-  int splitBranchSize() {return maxKeysPerBranch() >> 1;}                       // The number of key, next pairs to split out of a branch
-
-  StuckSP leafStuck, branchStuck;                                               // Leaf, branch definition
+  final int splitLeafSize;                                                      // The number of key, data pairs to split out of a leaf
+  final int splitBranchSize;                                                    // The number of key, next pairs to split out of a branch
 
   Layout.Field     leaf;                                                        // Layout of a leaf in the memory used by btree
   Layout.Field     branch;                                                      // Layout of a branch in the memory used by btree
@@ -31,100 +30,48 @@ abstract class BtreeSA extends Test                                             
   Layout.Structure bTree;                                                       // Btree
 
   final static int
-   linesToPrintABranch  =  4,                                                   // The number of lines required to print a branch
-        maxPrintLevels  = 10,                                                   // Maximum number of levels to print in a tree
-              maxDepth  = 99,                                                   // Maximum depth of any realistic tree
-           testMaxSize  = github_actions ? 1000 : 50;                           // Maximum number of leaves plus branches during testing
+    linesToPrintABranch =  4,                                                   // The number of lines required to print a branch
+         maxPrintLevels = 10,                                                   // Maximum number of levels to print in a tree
+               maxDepth = 99,                                                   // Maximum depth of any realistic tree
+            testMaxSize = github_actions ? 1000 : 50;                           // Maximum number of leaves plus branches during testing
 
-  int         nodeUsed  = 0;                                                    // Number of nodes currently in use
-  int      maxNodeUsed  = 0;                                                    // Maximum number of branches plus leaves used
+  int          nodeUsed = 0;                                                    // Number of nodes currently in use
+  int       maxNodeUsed = 0;                                                    // Maximum number of branches plus leaves used
 
-  final int Node_root   = 0;                                                    // The root of the tree is always node zero
-  final int Node_parent = 1;                                                    // Node used for initializing the tree and for the parent node
-  final int Node_left   = 2;                                                    // Node used for a left  hand child
-  final int Node_right  = 3;                                                    // Node used for a right hand child
-  final int Node_temp   = 4;                                                    // Temporary node
-  final int Node_find   = 5;                                                    // Find node
-  final int Node_put    = 6;                                                    // Put node
-  final int Node_delete = 7;                                                    // Delete node
-  final int Node_length = 8;                                                    // Number of node types
-
-  final NodeTransaction[]nodeTypes;                                             // One node description for each type of transacton
+  final int        root = 0;                                                    // The root of the tree is always node zero
 
   final int Branch_Size        = 0;                                             // Get the size of a stuck
-  final int Branch_Leaf        = 1;                                             // Check whether a node has leaves for children
-  final int Branch_Top         = 2;                                             // Get the top element of a branch
-  final int Branch_FirstBranch = 3;                                             // Locate the first greater or equal key in a branch
-  final int Branch_T           = 4;                                             // Process a parent node
-  final int Branch_tl          = 5;                                             // Process a left node
-  final int Branch_tr          = 6;                                             // Process a right node
-  final int Branch_length      = 7;                                             // Number of transaction types
+  final int Branch_Leaf        = 0;                                             // Check whether a node has leaves for children
+  final int Branch_Top         = 0;                                             // Get the top element of a branch
+  final int Branch_FirstBranch = 0;                                             // Locate the first greater or equal key in a branch
+  final int Branch_T           = 1;                                             // Process a parent node
+  final int Branch_tl          = 2;                                             // Process a left node
+  final int Branch_tr          = 3;                                             // Process a right node
+  final int Branch_length      = 4;                                             // Number of transaction types
 
-  final int Leaf_Size          = 0;                                             // Get the size of a stuck
-  final int Leaf_Leaf          = 1;                                             // Check whether a node has leaves for children
-  final int Leaf_Equal         = 2;                                             // Locate an equal key
-  final int Leaf_FirstLeaf     = 3;                                             // Locate the first greater or equal key in a leaf
-  final int Leaf_T             = 4;                                             // Process a parent node
-  final int Leaf_tl            = 5;                                             // Process a left node
-  final int Leaf_tr            = 6;                                             // Process a right node
-  final int Leaf_length        = 7;                                             // Number of transaction types
+  final int Leaf_T             = 0;                                             // Process a parent node
+  final int Leaf_tl            = 1;                                             // Process a left node
+  final int Leaf_tr            = 2;                                             // Process a right node
+  final int Leaf_length        = 3;                                             // Number of transaction types
 
-  final StuckSP[]branchTransactions;                                            // Transactions to use on branch stucks
-  final StuckSP[]  leafTransactions;                                            // Transactions to use on leaf stucks
+  final StuckSA[]branchTransactions;                                            // Transactions to use on branch stucks
+  final StuckSA[]  leafTransactions;                                            // Transactions to use on leaf stucks
 
-  NodeTransaction root;                                                         // The root of the tree
-  StuckSP bSize;                                                                // Branch size
-  StuckSP bLeaf;                                                                // Check whether a node has leaves for childrn
-  StuckSP bTop;                                                                 // Get the size of a stuck
-  StuckSP bFirstBranch;                                                         // Locate the first greater or equal key in a branch
-  StuckSP bT;                                                                   // Process a parent node
-  StuckSP bL;                                                                   // Process a left node
-  StuckSP bR;                                                                   // Process a right node
+  final StuckSA bSize;                                                          // Branch size
+  final StuckSA bLeaf;                                                          // Check whether a node has leaves for children
+  final StuckSA bTop;                                                           // Get the size of a stuck
+  final StuckSA bFirstBranch;                                                   // Locate the first greater or equal key in a branch
+  final StuckSA bT;                                                             // Process a parent node
+  final StuckSA bL;                                                             // Process a left node
+  final StuckSA bR;                                                             // Process a right node
 
-  StuckSP lSize;                                                                // Branch size
-  StuckSP lLeaf;                                                                // Check whether a node has leaves for childrn
-  StuckSP lEqual;                                                               // Locate an equal key
-  StuckSP lFirstLeaf;                                                           // Locate the first greater or equal key in a leaf
-  StuckSP lT;                                                                   // Process a parent node
-  StuckSP lL;                                                                   // Process a left node
-  StuckSP lR;                                                                   // Process a right node
-
-  Layout.Variable node;                                                         // The number of the node
-  Layout.Variable parent;                                                       // Parent node
-  Layout.Variable anode;                                                        // Node being allocated
-  Layout.Variable P;                                                            // Parent node during a split, merge or steal operation
-  Layout.Variable l;                                                            // Left node
-  Layout.Variable r;                                                            // Right node
-  Layout.Variable splitLeafSize;                                                // Where to split a full leaf
-  Layout.Variable splitBranchSize;                                              // Branch split size
-  Layout.Variable firstKey;                                                     // First of right leaf
-  Layout.Variable lastKey;                                                      // Last of left leaf
-  Layout.Variable flKey;                                                        // Key mid way between last of left and first of right
-  Layout.Variable parentKey;                                                    // Parent key
-  Layout.Variable L;                                                            // Reference to left child
-  Layout.Variable R;                                                            // Reference to right child
-  Layout.Variable nl;                                                           // Number in the left child, number in the right child
-  Layout.Variable nr;                                                           // Number in the left child, number in the right child
-  Layout.Variable lk;                                                           // Left  child key
-  Layout.Variable ld;                                                           // Left  child data
-  Layout.Variable rk;                                                           // Right child key
-  Layout.Variable rd;                                                           // Right child data
-  Layout.Variable index;                                                        // Index of a slot in a node
-                                                                                // Find equal in leaf
-  Layout.Variable search;                                                       // Search key
-  Layout.Bit       found;                                                       // Whether the key was found
-  Layout.Variable    key;                                                       // Key to insert
-  Layout.Variable   data;                                                       // Data associated with the  key
-
-  Layout.Variable  first;                                                       // Index of first key greater than or equal to the search key
-  Layout.Variable   next;                                                       // The corresponding next field or top if no such key was found
-
-  Layout.Bit  success;                                                          // Inserted or updated if true
-  Layout.Bit inserted;                                                          // Inserted if true
-  Layout.Structure nodeTransaction;                                             // Collection of fields used to perform a transaction against the btree
-  Layout.Array     nodeTransactions;                                            // Array of node transactions
-
-  final MemoryLayout transactionMemory = new MemoryLayout();                    // Memory layout used to describe a trnasaction against the btree
+  final StuckSA lSize;                                                          // Branch size
+  final StuckSA lLeaf;                                                          // Check whether a node has leaves for children
+  final StuckSA lEqual;                                                         // Locate an equal key
+  final StuckSA lFirstLeaf;                                                     // Locate the first greater or equal key in a leaf
+  final StuckSA lT;                                                             // Process a parent node
+  final StuckSA lL;                                                             // Process a left node
+  final StuckSA lR;                                                             // Process a right node
 
   static boolean debug = false;                                                 // Debugging enabled
 
@@ -132,73 +79,77 @@ abstract class BtreeSA extends Test                                             
 
   BtreeSA()                                                                     // Define a Btree with user specified dimensions
    {z();
-    memoryLayout.layout(layout());
-    memoryLayout.memory(new Memory(memoryLayout.layout.size()));
+    splitLeafSize   = maxKeysPerLeaf()   >> 1;                                  // The number of key, data pairs to split out of a leaf
+    splitBranchSize = maxKeysPerBranch() >> 1;                                  // The number of key, next pairs to split out of a branch
+
+    M.layout(layout());
+    M.layout.layoutName = "Main";
+    M.memory(new Memory(M.layout.size()));
+
+    T.layout(transactionLayout());                                              // Memory and layout of memory used by a transaction against the btree
+    T.layout.layoutName = "transaction";
+    T.memory(new Memory(T.layout.size()));
 
      {final int N = Branch_length;                                              // Preallocate transactions used on branch stucks
-      branchTransactions = new StuckSP[N];
+      branchTransactions = new StuckSA[N];
 
       for (int i = 0; i < N; i++)
-       {final StuckSP b = branchTransactions[i] = new StuckSP()
+       {final StuckSA b = branchTransactions[i] = new StuckSA()
          {int     maxSize() {return BtreeSA.this.maxKeysPerBranch()+1;}         // Not forgetting top next
           int  bitsPerKey() {return BtreeSA.this.bitsPerKey();}
           int bitsPerData() {return BtreeSA.this.bitsPerNext();}
           int bitsPerSize() {return BtreeSA.this.bitsPerSize();}
          };
-         b.M.memory(memoryLayout.memory);
+         b.M.memory(M.memory);
+         b.M.layout.layoutName = "branchMain";
+         b.T.layout.layoutName = "branch";
         }
       }
 
      {final int N = Leaf_length;                                                // Preallocate transactions used on leaf stucks
-      leafTransactions = new StuckSP[N];
+      leafTransactions = new StuckSA[N];
 
       for (int i = 0; i < N; i++)
-       {final StuckSP l = leafTransactions[i] = new StuckSP()
+       {final StuckSA l = leafTransactions[i] = new StuckSA()
          {int     maxSize() {return BtreeSA.this.maxKeysPerLeaf();}
           int  bitsPerKey() {return BtreeSA.this.bitsPerKey();}
           int bitsPerData() {return BtreeSA.this.bitsPerData();}
           int bitsPerSize() {return BtreeSA.this.bitsPerSize();}
          };
-         l.M.memory(memoryLayout.memory);
+         l.M.memory(M.memory);
+         l.M.layout.layoutName = "leafMain";
+         l.T.layout.layoutName = "leaf";
        }
      }
 
-     {final int N = Node_length;                                                // Preallocate nodes
-      nodeTypes = new NodeTransaction[N];
-      for (int i = 0; i < N; i++) nodeTypes[i] = new NodeTransaction();
-     }
-
-    root         = nodeTypes[Node_root];                                        // The root of the tree
     bSize        = branchTransactions[Branch_Size       ];                      // Branch size
-    bLeaf        = branchTransactions[Branch_Leaf       ];                      // Check whether a node has leaves for childrn
+    bLeaf        = branchTransactions[Branch_Leaf       ];                      // Check whether a node has leaves for children
     bTop         = branchTransactions[Branch_Top        ];                      // Get the size of a stuck
     bFirstBranch = branchTransactions[Branch_FirstBranch];                      // Locate the first greater or equal key in a branch
     bT           = branchTransactions[Branch_T          ];                      // Process a parent node
     bL           = branchTransactions[Branch_tl         ];                      // Process a left node
     bR           = branchTransactions[Branch_tr         ];                      // Process a right node
 
-    lSize        =   leafTransactions[Leaf_Size         ];                      // Branch size
-    lLeaf        =   leafTransactions[Leaf_Leaf         ];                      // Check whether a node has leaves for childrn
-    lEqual       =   leafTransactions[Leaf_Equal        ];                      // Locate an equal key
-    lFirstLeaf   =   leafTransactions[Leaf_FirstLeaf    ];                      // Locate the first greater or equal key in a leaf
+    lSize        =   leafTransactions[Leaf_T            ];                      // Leaf size
+    lLeaf        =   leafTransactions[Leaf_T            ];                      // Print a leaf
+    lEqual       =   leafTransactions[Leaf_T            ];                      // Locate an equal key
+    lFirstLeaf   =   leafTransactions[Leaf_T            ];                      // Locate the first greater or equal key in a leaf
     lT           =   leafTransactions[Leaf_T            ];                      // Process a parent node
     lL           =   leafTransactions[Leaf_tl           ];                      // Process a left node
     lR           =   leafTransactions[Leaf_tr           ];                      // Process a right node
 
     for (int i = maxSize(); i > 0; --i)                                         // Put all the nodes on the free chain at the start with low nodes first
-     {final NodeTransaction n = nodeTypes[0];                                   // Any node type will do at this point
-      n.node = i - 1;
-      n.clear();
+     {final int n = i - 1;                                                      // Number of node
+      T.at(node_clear).setInt(n);
+      clear();
       final int  f = getInt(freedChain);
-                     setInt(free, f,    n.node);
-                     setInt(freedChain, n.node);
+                     setInt(free, f,    n);
+                     setInt(freedChain, n);
      }
 
-     {allocate(root, false);                                                    // The root is always at zero, which frees zero to act as the end of list marker on the free chain
-      root.setLeaf();                                                           // The root starts as a leaf
-     }
-    transactionMemory.layout(transactionLayout());                              // Memory layout for a transaction against the btree
-    transactionMemory.memory(new Memory(transactionMemory.layout.size()));      // Memory for a transaction against the btree
+    allocate(false);                                                            // The root is always at zero, which frees zero to act as the end of list marker on the free chain
+    T.at(node_setLeaf).setInt(root);
+    setLeaf();                                                                  // The root starts as a leaf
    }
 
   static BtreeSA btreeSML(final int leafKeys, int branchKeys)                   // Define a test btree with the specified dimensions
@@ -217,19 +168,21 @@ abstract class BtreeSA extends Test                                             
    {z();
     final BtreeSA btree = this;
 
-    leafStuck = new StuckSP()                                                   // Leaf
+    final StuckSA leafStuck = new StuckSA()                                     // Leaf
      {int               maxSize() {return btree.maxKeysPerLeaf();}
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerData();}
       int           bitsPerSize() {return btree.bitsPerSize();}
      };
+    leafStuck.T.layout.layoutName = "leaf";
 
-    branchStuck = new StuckSP()                                                 // Branch
+    final StuckSA branchStuck = new StuckSA()                                   // Branch
      {int               maxSize() {return btree.maxKeysPerBranch()+1;}          // Not forgetting top next
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerNext();}
       int           bitsPerSize() {return btree.bitsPerSize();}
      };
+    branchStuck.T.layout.layoutName = "branch";
 
     final Layout l = Layout.layout();
     leaf         = l.duplicate("leaf",         leafStuck.layout());
@@ -244,865 +197,1147 @@ abstract class BtreeSA extends Test                                             
     return l.compile();
    }
 
-  Layout transactionLayout()                                                    // Layout describing memory used by btree
-   {z();
-    final Layout  t = new Layout();                                             // The layout of the memory used by a transaction against the btree
-    node            = t.variable ("node"           , bitsPerNext());            // The number of the node
-    parent          = t.variable ("parent"         , bitsPerNext());            // Parent node
-    anode           = t.variable ("anode"          , bitsPerNext());            // Node being allocated
-    P               = t.variable ("P"              , bitsPerNext());            // Parent node during a split, merge or steal operation
-    l               = t.variable ("l"              , bitsPerNext());            // Left node
-    r               = t.variable ("r"              , bitsPerNext());            // Right node
-    splitLeafSize   = t.variable ("splitLeafSize"  , bitsPerSize());            // Where to split a full leaf
-    splitBranchSize = t.variable ("splitBranchSize", bitsPerSize());            // Branch split size
-    firstKey        = t.variable ("firstKey"       , bitsPerKey());             // First of right leaf
-    lastKey         = t.variable ("lastKey"        , bitsPerKey());             // Last of left leaf
-    flKey           = t.variable ("flKey"          , bitsPerKey());             // Key mid way between last of left and first of right
-    parentKey       = t.variable ("parentKey"      , bitsPerKey());             // Parent key
-    L               = t.variable ("L"              , bitsPerNext());            // Reference to left child
-    R               = t.variable ("R"              , bitsPerNext());            // Reference to right child
-    nl              = t.variable ("nl"             , bitsPerSize());            // Number in the left child, number in the right child
-    nr              = t.variable ("nr"             , bitsPerSize());            // Number in the left child, number in the right child
-    lk              = t.variable ("lk"             , bitsPerKey());             // Left  child key
-    ld              = t.variable ("ld"             , bitsPerData());            // Left  child data
-    rk              = t.variable ("rk"             , bitsPerKey());             // Right child key
-    rd              = t.variable ("rd"             , bitsPerData());            // Right child data
-    index           = t.variable ("index"          , bitsPerSize());            // Index of a slot in a node
-                                                                                // Find in leaf
-    search          = t.variable ("search"         , bitsPerKey());             // Search key
-    found           = t.bit      ("found");                                     // Whether the key was found
-    key             = t.variable ("key"            , bitsPerKey());             // Key to insert
-    data            = t.variable ("data"           , bitsPerData());            // Data associated with the  key
-
-    first           = t.variable ("first"          , bitsPerSize());            // Index of first key greater than or equal to the search key
-    next            = t.variable ("next"           , bitsPerNext());            // The corresponding next field or top if no such key was found
-
-    success         = t.bit      ("success"        );                           // Inserted or updated if true
-    inserted        = t.bit      ("inserted"       );                           // Inserted if true
-    nodeTransaction = t.structure("nodeTransaction",                            // Collection of fields used to perform a transaction against the btree
-      node, parent, anode, P, l, r, splitLeafSize, splitBranchSize,
-      firstKey, lastKey, flKey, parentKey,
-      L, R, nl, nr, lk, ld, rk, rd,
-      index, search, found, key, data, first, next, success, inserted);
-    nodeTransactions = t.array   ("nodeTransactions",                           // Collection of fields used to perform a transaction against the btree
-                                   nodeTransaction, Node_length);
-    return  t.compile();
-   }
-
 //D1 Control                                                                    // Testing, control and integrity
 
-  void ok(String expected) {Test.ok(toString(), expected);}                     // Confirm tree is as expected
-  void stop()              {Test.stop(toString());}                             // Stop after printing the tree
+  private void ok(String expected) {Test.ok(toString(), expected);}             // Confirm tree is as expected
+  private void stop()              {Test.stop(toString());}                     // Stop after printing the tree
   public String toString() {return print();}                                    // Print the tree
 
 //D1 Memory access                                                              // Access to memory
 
-  int  getInt(Layout.Field field)            {z(); return memoryLayout.getInt(field);}
-  int  getInt(Layout.Field field, int index) {z(); return memoryLayout.getInt(field, index);}
+  private void checkMainField(Layout.Field field)                               // Check that a variable is in main memory
+   {z();
+    if (field.container() != M.layout)
+     {final String name = field.container().layoutName;
+      stop("Field:", field.name, "is part of memory layout:", name, "not main");
+     }
+   }
 
-  void setInt(Layout.Field field, int value)            {z(); memoryLayout.setInt(field, value);}
-  void setInt(Layout.Field field, int value, int index) {z(); memoryLayout.setInt(field, value, index);}
+  private void checkTransactionField(Layout.Field field)                        // Check that a variable is in transaction memory
+   {z();
+    if (field.container() != T.layout)
+     {final String name = field.container().layoutName;
+      stop("Field:", field.name, "is part of memory layout:", name, "not transaction");
+     }
+   }
+
+  private void checkBranchField(Layout.Field field)                             // Check that a variable is in a branch stuck
+   {z();
+    final String name = field.container().layoutName;
+    if (!name.equals("branch"))
+     {stop("Field:", field.name, "is part of memory layout:", name, "not branch");
+     }
+   }
+
+  private void checkLeafField(Layout.Field field)                               // Check that a variable is in a leaf stuck
+   {z();
+    final String name = field.container().layoutName;
+    if (!name.equals("leaf"))
+     {stop("Field:", field.name, "is part of memory layout:", name, "not leaf");
+     }
+   }
+
+  private int getInt(Layout.Field field)                                        // Get an integer from main memory
+   {z(); checkMainField(field); return M.getInt(field);
+   }
+  private int  getInt(Layout.Field field, int index)
+   {z(); checkMainField(field); return M.getInt(field, index);
+   }
+
+  private void setInt(Layout.Field field, int value)                            // Set an integer in main memory
+   {z(); checkMainField(field); M.setInt(field, value);
+   }
+  private void setInt(Layout.Field field, int value, int index)
+   {z(); checkMainField(field); M.setInt(field, value, index);
+   }
+
+  private int tGetInt(Layout.Field field)                                       // Get an integer from transaction memory
+   {z(); checkTransactionField(field); return T.getInt(field);
+   }
+  private int tGetInt(Layout.Field field, int index)
+   {z(); checkTransactionField(field); return T.getInt(field, index);
+   }
+
+  private void tSetInt(Layout.Field field, int value)                           // Set an integer in transaction memory
+   {z(); checkTransactionField(field); T.setInt(field, value);
+   }
+  private void tSetInt(Layout.Field field, int value, int index)
+   {z(); checkTransactionField(field); T.setInt(field, value, index);
+   }
+
+  void tt(Layout.Variable target, Layout.Variable source)                       // Copy the value of one transaction variable into another
+   {z(); checkTransactionField(target); checkTransactionField(source);
+    T.at(target).move(T.at(source));
+   }
+
+  void tm(Layout.Variable target, Layout.Variable source)                       // Copy the value of a main memory variable into transaction memory
+   {z(); checkTransactionField(target); checkMainField(source);
+    T.at(target).move(M.at(source));
+   }
+
+  void mt(Layout.Variable target, Layout.Variable source)                       // Copy the value of a transaction memory variable into main memory
+   {z(); checkMainField(target); checkTransactionField(source);
+    M.at(target).move(T.at(source));
+   }
 
 //D1 Memory allocation                                                          // Allocate and free memory
 
-  void allocate(NodeTransaction node,  boolean check)                           // Allocate a node with or without checking for sufficient free space
-   {z(); final int  f = getInt(freedChain);                                     // Last freed node
-    z(); if (check && f == 0) stop("No more memory available");                 // No more free nodes available
-    z(); final int  F = getInt(free,       f);                                  // Second to last freed node
-                        setInt(freedChain, F);                                  // Make second to last freed node the forst freed nod to liberate the existeing first free node
-    node.node = f; node.clear();                                                // Construct and clear the node
+
+  private void allocate(boolean check)                                          // Allocate a node with or without checking for sufficient free space
+   {z(); tm(allocate, freedChain);                                              // Last freed node
+    z(); if (check && tGetInt(allocate) == 0) stop("No more memory available"); // No more free nodes available
+    z(); M.at(nextFree).move(M.at(free, T.at(allocate)));                       // Second to last freed node
+    mt(freedChain, nextFree);                                                   // Make second to last freed node the first freed node to liberate the existing first free node
+    node_clear = allocate; clear();                                             // Construct and clear the node
     maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                                // Number of nodes in use
-//    return n;
    }
 
-  void allocate(NodeTransaction node) {z(); allocate(node, true);}              // Allocate a node checking for free space
+  private void allocate() {z(); allocate(true);}                                // Allocate a node checking for free space
 
 //D1 Components                                                                 // A branch or leaf in the tree
 
-  class NodeTransaction                                                         // A transient description of a branch or leaf in the tree - the actual data is contained in the bit memory
-   {int node;                                                                   // The index number of the node
-    int parent;                                                                 // Parent node
-    int anode;                                                                  // Node being allocated
-    int P;                                                                      // Parent node during a split, merge or steal operation
-    int l;                                                                      // Left node
-    int r;                                                                      // Right node
-    int splitLeafSize;                                                          // Where to split a full leaf
-    int splitBranchSize;                                                        // Branch split size
-    int firstKey;                                                               // First of right leaf
-    int lastKey;                                                                // Last of left leaf
-    int flKey;                                                                  // Key mid way between last of left and first of right
-    int parentKey;                                                              // Parent key
-    int L;                                                                      // Reference to left child
-    int R;                                                                      // Reference to right child
-    int nl;                                                                     // Number in the left child, number in the right child
-    int nr;                                                                     // Number in the left child, number in the right child
-    int lk;                                                                     // Left  child key
-    int ld;                                                                     // Left  child data
-    int rk;                                                                     // Right child key
-    int rd;                                                                     // Right child data
-    int index;                                                                  // Index of a slot in a node
+  Layout.Variable         allocate;                                             // The latest allocation result
+  Layout.Variable         nextFree;                                             // Next element of the free chain
+
+  Layout.Bit               success;                                             // Inserted or updated if true
+  Layout.Bit              inserted;                                             // Inserted if true
+
+  Layout.Variable            first;                                             // Index of first key greater than or equal to the search key
+  Layout.Variable             next;                                             // The corresponding next field or top if no such key was found
                                                                                 // Find equal in leaf
-    int    search;                                                              // Search key
-    boolean found;                                                              // Whether the key was found
-    int       key;                                                              // Key to insert
-    int      data;                                                              // Data associated with the  key
+  Layout.Variable           search;                                             // Search key
+  Layout.Bit                 found;                                             // Whether the key was found
+  Layout.Variable              key;                                             // Key to insert
+  Layout.Variable             data;                                             // Data associated with the key
 
-    int     first;                                                              // Index of first key greater than or equal to the search key
-    int      next;                                                              // The corresponding next field or top if no such key was found
+  Layout.Variable         firstKey;                                             // First of right leaf
+  Layout.Variable          lastKey;                                             // Last of left leaf
+  Layout.Variable            flKey;                                             // Key mid way between last of left and first of right
+  Layout.Variable        parentKey;                                             // Parent key
 
-    boolean  success;                                                           // Inserted or updated if true
-    boolean inserted;                                                           // Inserted if true
+  Layout.Variable               lk;                                             // Left  child key
+  Layout.Variable               ld;                                             // Left  child data
+  Layout.Variable               rk;                                             // Right child key
+  Layout.Variable               rd;                                             // Right child data
+  Layout.Variable            index;                                             // Index of a slot in a node
 
-    boolean isLeaf() {z(); return getInt(isLeaf,    node) > 0;}                 // A leaf if true
-    void   setLeaf() {z();        setInt(isLeaf, 1, node);}                     // Set as leaf
-    void setBranch() {z();        setInt(isLeaf, 0, node);}                     // Set as branch
+  Layout.Variable               nl;                                             // Number in the left child
+  Layout.Variable               nr;                                             // Number in the right child
 
-    void assertLeaf()   {if (!isLeaf()) stop("Leaf required");}
-    void assertBranch() {if ( isLeaf()) stop("Branch required");}
+  Layout.Variable                l;                                             // Left node
+  Layout.Variable                r;                                             // Right node
 
-    void allocLeaf()  {z(); allocate(nodeTypes[anode]); nodeTypes[anode].setLeaf();  } // Allocate leaf
-    void allocBranch(){z(); allocate(nodeTypes[anode]); nodeTypes[anode].setBranch();} // Allocate branch
+  Layout.Variable      splitParent;                                             // The parent during a splitting operation
+  Layout.Bit             IsLeaf;                                                // On a leaf
+  Layout.Bit             isFull;                                                // The node is full
+  Layout.Bit              isLow;                                                // The node has too few children for a delete
+  Layout.Bit        hasLeavesForChildren;                                       // The node has leaves for children
+  Layout.Bit        stolenOrMerged;                                             // A merge or steal operation succeeded
 
-    void free()                                                                 // Free a new node to make it available for reuse
-     {z(); if (node == 0) stop("Cannot free root");                             // The root is never freed
-      z(); erase();                                                             // Clear the node to encourage erroneous frees to do damage that shows up quickly.
-      final int  f = getInt(freedChain);                                        // Last freed node from head of free chain
-                     setInt(free,    f, node);                                  // Chain this node in front of the last freed node
-                     setInt(freedChain, node);                                  // Make this node the head of the free chain
-      maxNodeUsed  = max(maxNodeUsed, --nodeUsed);                              // Number of nodes in use
+  Layout.Variable        leafBase;                                              // The offset of a leaf in memory
+  Layout.Variable      branchBase;                                              // The offset of a branch in memory
+  Layout.Variable        leafSize;                                              // Number of children in body of leaf
+  Layout.Variable      branchSize;                                              // Number of children in body of branch taking top for granted as it is always there
+  Layout.Variable             top;                                              // The top next element of a branch - only used in printing
+                                                                                // Find, insert, delete - the public entry points to this module
+  Layout.Variable             Key;                                              // Key being found, inserted or deleted
+  Layout.Variable            Data;                                              // Data found, inserted or deleted
+  Layout.Variable            find;                                              // Results of a find operation
+  Layout.Variable   findAndInsert;                                              // Results of a find and insert operation
+  Layout.Variable          parent;                                              // Parent node in a descent through the tree
+  Layout.Variable           child;                                              // Child node in a descent through the tree
+  Layout.Variable       leafFound;                                              // Leaf found by find
+
+  Layout.Variable  node_isLeaf;                                                 // The node to be used to implicitly parameterize each method call
+  Layout.Variable  node_setLeaf;
+  Layout.Variable  node_setBranch;
+  Layout.Variable  node_assertLeaf;
+  Layout.Variable  node_assertBranch;
+  Layout.Variable  allocLeaf;
+  Layout.Variable  allocBranch;
+  Layout.Variable  node_free;
+  Layout.Variable  node_clear;
+  Layout.Variable  node_erase;
+  Layout.Variable  node_leafBase;
+  Layout.Variable  node_branchBase;
+  Layout.Variable  node_leafSize;
+  Layout.Variable  node_branchSize;
+  Layout.Variable  node_isFull;
+  Layout.Variable  node_isLow;
+  Layout.Variable  node_hasLeavesForChildren;
+  Layout.Variable  node_top;
+  Layout.Variable  node_findEqualInLeaf;
+  Layout.Variable  node_findFirstGreaterThanOrEqualInLeaf;
+  Layout.Variable  node_findFirstGreaterThanOrEqualInBranch;
+  Layout.Variable  node_splitLeaf;
+  Layout.Variable  node_splitBranch;
+  Layout.Variable  node_stealFromLeft;
+  Layout.Variable  node_stealFromRight;
+  Layout.Variable  node_mergeRoot;
+  Layout.Variable  node_mergeLeftSibling;
+  Layout.Variable  node_mergeRightSibling;
+  Layout.Variable  node_balance;
+
+  Layout transactionLayout()                                                    // Layout of temporary storage used during a transaction against the btree
+   {final Layout L = new Layout();
+                                    allocate = L.variable ("allocate"                                      , bitsPerNext());
+                                    nextFree = L.variable ("nextFree"                                      , bitsPerNext());
+                                     success = L.bit      ("success"                                       );
+                                    inserted = L.bit      ("inserted"                                      );
+
+                                       first = L.variable ("first"                                         , bitsPerSize());
+                                        next = L.variable ("next"                                          , bitsPerKey());
+
+                                      search = L.variable ("search"                                        , bitsPerKey());
+                                       found = L.bit      ("found"                                         );
+                                         key = L.variable (" key"                                          , bitsPerKey());
+                                        data = L.variable ("data"                                          , bitsPerData());
+
+                                    firstKey = L.variable ("firstKey"                                      , bitsPerKey());
+                                     lastKey = L.variable ("lastKey"                                       , bitsPerKey());
+                                       flKey = L.variable ("flKey"                                         , bitsPerKey());
+                                   parentKey = L.variable ("parentKey"                                     , bitsPerKey());
+
+                                          lk = L.variable ("lk"                                            , bitsPerKey());
+                                          ld = L.variable ("ld"                                            , bitsPerData());
+                                          rk = L.variable ("rk"                                            , bitsPerKey());
+                                          rd = L.variable ("rd"                                            , bitsPerData());
+                                       index = L.variable ("index"                                         , bitsPerSize());
+
+                                          nl = L.variable ("nl"                                            , bitsPerSize());
+                                          nr = L.variable ("nr"                                            , bitsPerSize());
+
+                                           l = L.variable ("l"                                             , bitsPerNext());
+                                           r = L.variable ("r"                                             , bitsPerNext());
+
+                                 splitParent = L.variable ("splitParent"                                   , bitsPerNext());
+                                      IsLeaf = L.bit      ("IsLeaf"                                        );
+                                      isFull = L.bit      ("isFull"                                        );
+                                       isLow = L.bit      ("isLow"                                         );
+                        hasLeavesForChildren = L.bit      ("hasLeavesForChildren"                          );
+                              stolenOrMerged = L.bit      ("stolenOrMerged"                                );
+
+                                    leafBase = L.variable ("leafBase"                                      , bitsPerNext());
+                                  branchBase = L.variable ("branchBase"                                    , bitsPerNext());
+                                    leafSize = L.variable ("leafSize"                                      , bitsPerSize());
+                                  branchSize = L.variable ("branchSize"                                    , bitsPerSize());
+                                         top = L.variable ("top"                                           , bitsPerNext());
+
+                                         Key = L.variable ("Key"                                           , bitsPerKey());
+                                        Data = L.variable ("Data"                                          , bitsPerData());
+                                        find = L.variable ("find"                                          , bitsPerNext());
+                               findAndInsert = L.variable ("findAndInsert"                                 , bitsPerNext());
+                                      parent = L.variable ("parent"                                        , bitsPerNext());
+                                       child = L.variable ("child"                                         , bitsPerNext());
+                                   leafFound = L.variable ("leafFound"                                     , bitsPerNext());
+
+                                 node_isLeaf = L.variable ("node_isLeaf"                                   , bitsPerNext());
+                                node_setLeaf = L.variable ("node_setLeaf"                                  , bitsPerNext());
+                              node_setBranch = L.variable ("node_setBranch"                                , bitsPerNext());
+                             node_assertLeaf = L.variable ("node_assertLeaf"                               , bitsPerNext());
+                           node_assertBranch = L.variable ("node_assertBranch"                             , bitsPerNext());
+                                   allocLeaf = L.variable ("allocLeaf"                                     , bitsPerNext());
+                                 allocBranch = L.variable ("allocBranch"                                   , bitsPerNext());
+                                   node_free = L.variable ("node_free"                                     , bitsPerNext());
+                                  node_clear = L.variable ("node_clear"                                    , bitsPerNext());
+                                  node_erase = L.variable ("node_erase"                                    , bitsPerNext());
+                               node_leafBase = L.variable ("node_leafBase"                                 , bitsPerNext());
+                             node_branchBase = L.variable ("node_branchBase"                               , bitsPerNext());
+                               node_leafSize = L.variable ("node_leafSize"                                 , bitsPerNext());
+                             node_branchSize = L.variable ("node_branchSize"                               , bitsPerNext());
+                                 node_isFull = L.variable ("node_isFull"                                   , bitsPerNext());
+                                  node_isLow = L.variable ("node_isLow"                                    , bitsPerNext());
+                   node_hasLeavesForChildren = L.variable ("node_hasLeavesForChildren"                     , bitsPerNext());
+                                    node_top = L.variable ("node_top"                                      , bitsPerNext());
+                        node_findEqualInLeaf = L.variable ("node_findEqualInLeaf"                          , bitsPerNext());
+      node_findFirstGreaterThanOrEqualInLeaf = L.variable ("node_findFirstGreaterThanOrEqualInLeaf"        , bitsPerNext());
+    node_findFirstGreaterThanOrEqualInBranch = L.variable ("node_findFirstGreaterThanOrEqualInBranch"      , bitsPerNext());
+                              node_splitLeaf = L.variable ("node_splitLeaf"                                , bitsPerNext());
+                            node_splitBranch = L.variable ("node_splitBranch"                              , bitsPerNext());
+                          node_stealFromLeft = L.variable ("node_stealFromLeft"                            , bitsPerNext());
+                         node_stealFromRight = L.variable ("node_stealFromRight"                           , bitsPerNext());
+                              node_mergeRoot = L.variable ("node_mergeRoot"                                , bitsPerNext());
+                       node_mergeLeftSibling = L.variable ("node_mergeLeftSibling"                         , bitsPerNext());
+                      node_mergeRightSibling = L.variable ("node_mergeRightSibling"                        , bitsPerNext());
+                                node_balance = L.variable ("node_balance"                                  , bitsPerNext());
+    return L.compile();
+   }
+
+  private void    isLeaf() {z(); T.at(IsLeaf).move(M.at(isLeaf, T.at(node_isLeaf)));}      // A leaf if true
+  private void   setLeaf() {z(); M.at(isLeaf, T.at(node_setLeaf))  .move(T.constant(1));}  // Set as leaf
+  private void setBranch() {z(); M.at(isLeaf, T.at(node_setBranch)).move(T.constant(0));}  // Set as branch
+
+  private void assertLeaf()
+   {z();
+    tt(node_isLeaf, node_assertLeaf);
+    isLeaf();
+    if (tGetInt(IsLeaf) == 0) stop("Leaf required");
+   }
+  private void assertBranch()
+   {z();
+    tt(node_isLeaf, node_assertBranch);
+    isLeaf();
+    if (tGetInt(IsLeaf) != 0) stop("Branch required");
+   }
+
+  private void allocLeaf()  {z(); allocate(); allocLeaf   = node_setLeaf   = allocate; setLeaf();  } // Allocate leaf
+  private void allocBranch(){z(); allocate(); allocBranch = node_setBranch = allocate; setBranch();} // Allocate branch
+
+  private void free()                                                           // Free a new node to make it available for reuse
+   {z(); if (tGetInt(node_free) == 0) stop("Cannot free root");                 // The root is never freed
+    z(); tt(node_erase, node_free); erase();                                    // Clear the node to encourage erroneous frees to do damage that shows up quickly.
+    M.at(free, T.at(node_free)).move(M.at(freedChain));                         // Chain this node in front of the last freed node
+    M.at(freedChain).move(T.at(node_free));                                      // Make this node the head of the free chain
+    maxNodeUsed  = max(maxNodeUsed, --nodeUsed);                                // Number of nodes in use
+   }
+
+  private void clear()                                                          // Clear a new node to zeros ready for use
+   {z(); M.at(Node, T.at(node_clear)).zero();
+   }
+
+  private void erase()                                                          // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
+   {z(); M.at(Node, T.at(node_clear)).ones();
+   }
+
+  private void leafBase()   {z(); T.at(leafBase  ).setInt(M.at(leaf,   T.at(node_leafBase  )).setOff().at);} // Base of leaf stuck in memory
+  private void branchBase() {z(); T.at(branchBase).setInt(M.at(branch, T.at(node_branchBase)).setOff().at);} // Base of branch stuck in memory
+
+  private void leafSize()                                                       // Number of children in body of leaf
+   {z();
+    tt(node_leafBase, node_leafSize); leafBase();
+    lSize.base(T.at(leafBase));
+    lSize.size();
+    leafSize = lSize.size;
+   }
+
+  private void branchSize()                                                     // Number of children in body of branch taking top for granted as it is always there
+   {z();
+    tt(node_branchBase, node_branchSize); branchBase();
+    bSize.base(T.at(branchBase));
+    bSize.size();
+    bSize.T.at(bSize.size).dec();                                               // Account for top
+    T.at(branchSize).move(bSize.T.at(bSize.size));
+   }
+
+  private void isFull()                                                         // The node is full
+   {z();  tt(node_isLeaf, node_isFull); isLeaf();
+    if (T.at(IsLeaf).isOnes())
+     {z(); tt(node_leafSize, node_isFull); leafSize();
+      T.at(leafSize).equal(T.constant(maxKeysPerLeaf()), T.at(isFull));
      }
-
-    void clear()                                                                // Clear a new node to zeros ready for use
-     {z();
-      final Layout.Field n = BtreeSA.this.Node;
-      final int at = n.at(node), w = n.width;
-      memoryLayout.memory.zero(at, w);
+    else
+     {z(); tt(node_branchSize, node_isFull); branchSize();
+      T.at(branchSize).equal(T.constant(maxKeysPerBranch()), T.at(isFull));
      }
+   }
 
-    void erase()                                                                // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
-     {z();
-      final Layout.Field n = BtreeSA.this.Node;
-      final int at = n.at(node), w = n.width;
-      memoryLayout.memory.ones(at, w);
+  private void isLow()                                                          // The node is low on children making it impossible to merge two sibling children
+   {z(); tt(node_isLeaf, node_isLow); isLeaf();
+    if (T.at(IsLeaf).isOnes())
+     {tt(node_leafSize, node_isLow);
+      leafSize();
+      T.at(leafSize).lessThan(T.constant(2), T.at(isLow));
      }
-
-    int leafBase()   {z(); return leaf  .at(node);}                             // Base of leaf stuck in memory
-    int branchBase() {z(); return branch.at(node);}                             // Base of branch stuck in memory
-
-    int leafSize()                                                              // Number of children in body of leaf
-     {z();
-      lSize.base(leafBase());
-      lSize.size();
-      return lSize.size;
+    else
+     {tt(node_branchSize, node_isLow);
+      branchSize();
+      T.at(branchSize).lessThan(T.constant(2), T.at(isLow));
      }
+   }
 
-    int branchSize()                                                            // Number of children in body of branch taking top for granted as it is always there
-     {z();
-      bSize.base(branchBase());
-      bSize.size();
-      return bSize.size-1;
-     }
+  private void hasLeavesForChildren()                                           // The node has leaves for children
+   {z(); tt(node_assertBranch , node_hasLeavesForChildren);
+    assertBranch();
+    tt(node_branchBase, node_hasLeavesForChildren); branchBase();
+    bLeaf.base(T.at(branchBase));
+    bLeaf.lastElement();
+    node_isLeaf = bLeaf.tData; isLeaf();
+    hasLeavesForChildren = IsLeaf;
+   }
 
-    boolean isFull()                                                            // The node is full
-     {z(); return isLeaf() ? leafSize() == maxKeysPerLeaf  ():
-                           branchSize() == maxKeysPerBranch();
-     }
+  private void top()                                                            // The top next element of a branch - only used in printing
+   {z(); tt(node_assertBranch, node_top); assertBranch();
+    tt(node_branchBase, node_top); branchBase();
+    bTop.base(T.at(branchBase));
+    tt(node_branchSize, node_top); branchSize();
+    bTop.index = branchSize;
+    bTop.elementAt();
+    top = bTop.tData;
+   }
 
-    boolean isLow() {z(); return (isLeaf() ? leafSize() : branchSize()) < 2;}   // The node is low on children making it impossible to merge two sibling children
-
-    boolean hasLeavesForChildren()                                              // The node has leaves for children
-     {z(); assertBranch();
-      bLeaf.base(branchBase());
-      bLeaf.lastElement();
-      return nodeTypes[node(Node_temp, bLeaf.tData)].isLeaf();
-     }
-
-    int top()                                                                   // The top next element of a branch - only used in printing
-     {z(); assertBranch();
-      bTop.base(branchBase());
-      bTop.index = branchSize();
-      bTop.elementAt();
-      return bTop.tData;
-     }
-
-    public String toString()                                                    // Print a node
-     {final StringBuilder s = new StringBuilder();
-      if (isLeaf())                                                             // Print a leaf
-       {final int N  = leafSize();                                              // Number of elements in leaf
-        s.append("Leaf(node:"+node+" size:"+N+")\n");
-        lLeaf.base(leafBase());
-        for (int i = 0; i < N; i++)                                             // Each element in the leaf
-         {lLeaf.index = i;
-          lLeaf.elementAt();
-          s.append("  "+(i+1)+" key:"+lLeaf.tKey+" data:"+lLeaf.tData+"\n");
-         }
+  public String toString(int node)                                              // Print a node
+   {final StringBuilder s = new StringBuilder();
+    T.at(node_isLeaf).setInt(node); isLeaf();                                               // Print a leaf
+    if (T.at(IsLeaf).isOnes())                                                                 // Print a leaf
+     {T.at(node_leafSize).setInt(node);
+      leafSize();                                                               // Number of elements in leaf
+      final int N = T.at(leafSize).getInt();                                              // Number of elements in leaf
+      s.append("Leaf(node:"+node+" size:"+N+")\n");
+      T.at(node_leafBase).setInt(node); leafBase();
+      lLeaf.base(T.at(leafBase));
+      for (int i = 0; i < N; i++)                                               // Each element in the leaf
+       {lLeaf.T.at(lLeaf.index).setInt(i);
+        lLeaf.elementAt();
+        s.append("  "+(i+1)+" key:"+lLeaf.tKey+" data:"+lLeaf.tData+"\n");
        }
-      else                                                                      // Print a branch
-       {s.append("Branch(node:"+node+" size:"+branchSize()+" top:"+top()+"\n");
-
-        final int N = branchSize();                                             // Number of elements in branch not including top
-        bLeaf.base(branchBase());
-        for (int i = 0; i < N; i++)
-         {bLeaf.index = i; bLeaf.elementAt();
-          s.append(String.format("  %2d key:%2d next:%2d\n", i+1, bLeaf.tKey, bLeaf.tData));
-         }
-        bLeaf.index = N; bLeaf.elementAt();
-        s.append("             Top:"+bLeaf.tData+")\n");
-       }
-
-      return s.toString();
      }
+    else                                                                        // Print a branch
+     {T.at(node_branchSize).setInt(node); branchSize();
+      final int N = T.at(branchSize).getInt();                                                 // Number of elements in branch not including top
+      T.at(node_top).setInt(node); top();
+      s.append("Branch(node:"+node+" size:"+N+" top:"+top+"\n");
+
+      T.at(node_branchBase).setInt(node); branchBase();
+      bLeaf.base(T.at(branchBase));
+      for (int i = 0; i < N; i++)
+       {bLeaf.T.at(bLeaf.index).setInt(i); bLeaf.elementAt();
+        s.append(String.format("  %2d key:%2d next:%2d\n", i+1,
+        bLeaf.T.at(bLeaf.tKey) .getInt(),
+        bLeaf.T.at(bLeaf.tData).getInt()));
+       }
+      bLeaf.T.at(bLeaf.index).setInt(N); bLeaf.elementAt();
+      s.append("             Top:"+bLeaf.T.at(bLeaf.tData).getInt()+")\n");
+     }
+
+    return s.toString();
+   }
 
 //D2 Search                                                                     // Search within a node and update the node description with the results
 
-    void findEqualInLeaf()                                                      // Find the first key in the leaf that is equal to the search key
-     {z(); assertLeaf();
-      lEqual.base(leafBase());
+  private void findEqualInLeaf()                                                // Find the first key in the leaf that is equal to the search key
+   {z(); tt(node_assertLeaf, node_findEqualInLeaf); assertLeaf();
+    tt(node_leafBase, node_findEqualInLeaf); leafBase();
+    lEqual.base(T.at(leafBase));
 
-      lEqual.search = search; lEqual.search();
-      found         = lEqual.found;
-      index         = lEqual.index;
-      data          = lEqual.tData;
-     }
+    lEqual.T.at(lEqual.search).move(T.at(search));
+    lEqual.search();
+    T.at(found).move(lEqual.T.at(lEqual.found));
+    T.at(index).move(lEqual.T.at(lEqual.index));
+    T.at(data ).move(lEqual.T.at(lEqual.tData));
+   }
 
-    public String findEqualInLeaf_toString()                                    // Print details of find equal in leaf node
-     {final StringBuilder s = new StringBuilder();
-      s.append("FindEqualInLeaf(Leaf:"+node);
-      s.append(" Key:"+search+" found:"+found);
-      if (found) s.append(" data:"+data+" index:"+index);
-      s.append(")\n");
-      return s.toString();
-     }
+  public String findEqualInLeaf_toString()                                      // Print details of find equal in leaf node
+   {final StringBuilder s = new StringBuilder();
+    s.append("FindEqualInLeaf(");
+    s.append(  "Leaf:"+T.at(node_findEqualInLeaf).getInt());
+    s.append(  " Key:"+T.at(search)              .getInt());
+    s.append(" found:"+T.at(found)               .getInt());
+    if (T.at(found).isOnes()) s.append(" data:"+T.at(data).getInt()+" index:"+T.at(index).getInt());
+    s.append(")\n");
+    return s.toString();
+   }
 
-    void findFirstGreaterThanOrEqualInLeaf()                                    // Find the first key in the  leaf that is equal to or greater than the search key
-     {z(); assertLeaf();
-      lFirstLeaf.base(leafBase());
-      lFirstLeaf.search = search; lFirstLeaf.searchFirstGreaterThanOrEqual();
-      found = lFirstLeaf.found;
-      first = lFirstLeaf.index;
-     }
+  private void findFirstGreaterThanOrEqualInLeaf()                              // Find the first key in the  leaf that is equal to or greater than the search key
+   {z(); tt(node_assertLeaf, node_findFirstGreaterThanOrEqualInLeaf); assertLeaf();
+    tt(node_leafBase, node_findFirstGreaterThanOrEqualInLeaf); leafBase();
+    lFirstLeaf.base(T.at(leafBase));
+    lFirstLeaf.T.at(lFirstLeaf.search).move(T.at(search));
+    lFirstLeaf.searchFirstGreaterThanOrEqual();
+    T.at(found).move(lFirstLeaf.T.at(lFirstLeaf.found));
+    T.at(first).move(lFirstLeaf.T.at(lFirstLeaf.index));
+   }
 
-    void findFirstGreaterThanOrEqualInBranch()                                  // Find the first key in the branch that is equal to or greater than the search key
-     {z(); assertBranch();
-      bFirstBranch.base(branchBase());
-      bFirstBranch.search = search; bFirstBranch.limit = 1;
-      bFirstBranch.searchFirstGreaterThanOrEqual();
-      found = bFirstBranch.found;
-      first = bFirstBranch.index;
-      if (bFirstBranch.found) next = bFirstBranch.tData;                        // Next if key matches else top
-      else {bFirstBranch.lastElement(); next = bFirstBranch.tData;}
-     }
+  private void findFirstGreaterThanOrEqualInBranch()                            // Find the first key in the branch that is equal to or greater than the search key
+   {z();
+    tt(node_assertBranch, node_findFirstGreaterThanOrEqualInBranch); assertBranch();
+    tt(node_branchBase, node_findFirstGreaterThanOrEqualInBranch); branchBase();
+    bFirstBranch.base(T.at(branchBase));
+    bFirstBranch.T.at(bFirstBranch.search).move(T.at(search));
+    bFirstBranch.T.at(bFirstBranch.limit).setInt(1);
+    bFirstBranch.searchFirstGreaterThanOrEqual();
+    T.at(found).move(bFirstBranch.T.at(bFirstBranch.found));
+    T.at(first).move(bFirstBranch.T.at(bFirstBranch.index));
+    if (T.at(found).isOnes())         T.at(next).move(bFirstBranch.T.at(bFirstBranch.tData));                          // Next if key matches else top
+    else {bFirstBranch.lastElement(); T.at(next).move(bFirstBranch.T.at(bFirstBranch.tData));}
+   }
 
 //D2 Array                                                                      // Represent the contents of the tree as an array
 
-    void leafToArray(Stack<ArrayElement> s)                                     // Leaf as an array
-     {z(); assertLeaf();
-      final int     K = leafSize();
-      final StuckSP t = lLeaf.copy();
-      t.base(leafBase());
+  private void leafToArray(int node, Stack<ArrayElement> s)                     // Leaf as an array
+   {z(); T.at(node_assertLeaf).setInt(node); assertLeaf();
+    T.at(node_leafSize).setInt(node);
+    leafSize();
+    final int     K = T.at(leafSize).getInt();
+    final StuckSA t = lLeaf.copy();
+    T.at(node_leafBase).setInt(node); leafBase();
+    t.base(T.at(leafBase));
+    for  (int i = 0; i < K; i++)
+     {z();
+      t.T.at(t.index).setInt(i); t.elementAt();
+      s.push(new ArrayElement(i, t.T.at(t.tKey).getInt(), t.T.at(t.tData).getInt()));
+     }
+   }
+
+  private void branchToArray(int node, Stack<ArrayElement> s)                   // Branch to array
+   {z();
+    T.at(node_assertBranch).setInt(node); assertBranch();
+    T.at(node_branchSize  ).setInt(node); branchSize();
+    final int K = T.at(branchSize).getInt()+1;                                  // Include top next
+
+    if (K > 0)                                                                  // Branch has key, next pairs
+     {z();
+      final StuckSA t = bLeaf.copy();
+      T.at(node_branchBase).setInt(node); branchBase();
+      t.base(T.at(branchBase));
       for  (int i = 0; i < K; i++)
        {z();
-        t.index = i; t.elementAt();
-        s.push(new ArrayElement(i, t.tKey, t.tData));
-       }
-     }
+        t.T.at(t.index).setInt(i); t.elementAt();                                             // Each node in the branch
 
-    void branchToArray(Stack<ArrayElement> s)                                   // Branch to array
-     {z(); assertBranch();
-      final int K = branchSize()+1;                                             // Include top next
-
-      if (K > 0)                                                                // Branch has key, next pairs
-       {z();
-        final StuckSP t = bLeaf.copy();
-        t.base(branchBase());
-        for  (int i = 0; i < K; i++)
+        T.at(node_isLeaf).move(t.T.at(t.tData)); isLeaf();
+        if (T.at(IsLeaf).isOnes()) {z(); leafToArray(t.T.at(t.tData).getInt(), s);}
+        else
          {z();
-          t.index = i; t.elementAt();                                           // Each node in the branch
-          final NodeTransaction n = node(new NodeTransaction(), t.tData);       // Using recursion here is unsatisfactory.
-
-          if (n.isLeaf()) {z(); n.leafToArray(s);}
-          else
-           {z();
-            if (t.tData == 0)
-             {say("Cannot descend through root from index", i,
-                  "in branch", node);
-              break;
-             }
-            z(); n.branchToArray(s);
+          if (t.T.at(t.tData).isZero())
+           {say("Cannot descend through root from index", i,
+                "in branch", node);
+            break;
            }
+          z(); branchToArray(t.T.at(t.tData).getInt(), s);
          }
        }
      }
+   }
 
 //D2 Print                                                                      // Print the contents of the tree
 
-    void printLeaf(Stack<StringBuilder>S, int level)                            // Print leaf horizontally
-     {assertLeaf();
-      padStrings(S, level);
-      final StringBuilder s = new StringBuilder();                              // String builder
-      final int     K = leafSize();
-      final StuckSP t = lLeaf.copy();
-      t.base(leafBase());
+  private void printLeaf(int node, Stack<StringBuilder>S, int level)            // Print leaf horizontally
+   {T.at(node_assertLeaf).setInt(node);
+    assertLeaf();
+    padStrings(S, level);
+    final StringBuilder s = new StringBuilder();                                // String builder
+    T.at(node_leafSize).setInt(node);
+    leafSize();
+    final int     K = T.at(leafSize).getInt();
+    final StuckSA t = lLeaf.copy();
+    T.at(node_leafBase).setInt(node); leafBase();
+    t.base(T.at(leafBase));
 
+    for  (int i = 0; i < K; i++)
+     {t.T.at(t.index).setInt(i); t.elementAt();                                 // Each node in the branch
+      s.append(""+t.T.at(t.tKey).getInt()+",");
+     }
+    if (s.length() > 0) s.setLength(s.length()-1);                              // Remove trailing comma if present
+    s.append("="+node+" ");
+    S.elementAt(level*linesToPrintABranch).append(s.toString());
+    padStrings(S, level);
+   }
+
+  private void printBranch(int node, Stack<StringBuilder>S, int level)          // Print branch horizontally
+   {T.at(node_assertBranch).setInt(node); assertBranch();
+    if (level > maxPrintLevels) return;
+    padStrings(S, level);
+    final int L = level * linesToPrintABranch;
+    T.at(node_branchSize).setInt(node); branchSize();
+    final int K = T.at(branchSize).getInt();
+
+    if (K > 0)                                                                  // Branch has key, next pairs
+     {final StuckSA t = bLeaf.copy();
+      T.at(node_branchBase).setInt(node); branchBase();
+      t.base(T.at(branchBase));
       for  (int i = 0; i < K; i++)
-       {t.index = i; t.elementAt();                                             // Each node in the branch
-        s.append(""+t.tKey+",");
-       }
-      if (s.length() > 0) s.setLength(s.length()-1);                            // Remove trailing comma if present
-      s.append("="+node+" ");
-      S.elementAt(level*linesToPrintABranch).append(s.toString());
-      padStrings(S, level);
-     }
-
-    void printBranch(Stack<StringBuilder>S, int level)                          // Print branch horizontally
-     {assertBranch();
-      if (level > maxPrintLevels) return;
-      padStrings(S, level);
-      final int L = level * linesToPrintABranch;
-      final int K = branchSize();
-
-      if (K > 0)                                                                // Branch has key, next pairs
-       {final StuckSP t = bLeaf.copy();
-        t.base(branchBase());
-        for  (int i = 0; i < K; i++)
-         {t.index = i; t.elementAt();                                           // Each node in the branch
-          final NodeTransaction n = node(new NodeTransaction(), t.tData);       // Printing will not be part of the chip so we can use recursion and create new nodes as needed
-          if (n.isLeaf())
-           {n.printLeaf(S, level+1);
-           }
-          else
-           {if (t.tData == 0)
-             {say("Cannot descend through root from index", i,
-                  "in branch", node);
-              break;
-             }
-            n.printBranch(S, level+1);
-           }
-
-          S.elementAt(L+0).append(""+t.tKey);                                    // Key
-          S.elementAt(L+1).append(""+node+(i > 0 ?  "."+i : ""));               // Index in node
-          S.elementAt(L+2).append(""+t.tData);                                   // Next
+       {t.T.at(t.index).setInt(i); t.elementAt();                               // Each node in the branch
+        T.at(node_isLeaf).move(t.T.at(t.tData)); isLeaf();
+        if (T.at(IsLeaf).isOnes())
+         {printLeaf(t.T.at(t.tData).getInt(), S, level+1);
          }
-       }
-      else                                                                      // Branch is empty so print just the index of the branch
-       {S.elementAt(L+0).append(""+node+"Empty");
-       }
-      final int top = top();                                                    // Top next will always be present
-      S.elementAt(L+3).append(top);                                             // Append top next
-
-      final NodeTransaction n = node(new NodeTransaction(), top);
-      if (n.isLeaf())                                                           // Print leaf
-       {n.printLeaf(S, level+1);
-       }
-      else                                                                      // Print branch
-       {if (top == 0)
-         {say("Cannot descend through root from top in branch:", node);
-          return;
+        else
+         {if (t.T.at(t.tData).isZero())
+           {say("Cannot descend through root from index", i,
+                "in branch", node);
+            break;
+           }
+          printBranch(t.T.at(t.tData).getInt(), S, level+1);
          }
-        n.printBranch(S, level+1);
+
+        S.elementAt(L+0).append(""+t.T.at(t.tKey ).getInt());                                     // Key
+        S.elementAt(L+1).append(""+node+(i > 0 ?  "."+i : ""));                 // Index in node
+        S.elementAt(L+2).append(""+t.T.at(t.tData).getInt());                                    // Next
        }
-
-      padStrings(S, level);
+     }
+    else                                                                        // Branch is empty so print just the index of the branch
+     {S.elementAt(L+0).append(""+node+"Empty");
      }
 
-    public String find_toString()                                               // Print find result
-     {final StringBuilder s = new StringBuilder();
-      s.append("Find(search:"+node);
-      s.append(    " search:"+search);
-      s.append(     " found:"+found);
-      s.append(      " data:"+data);
-      s.append(     " index:"+index);
-      s.append(")\n");
-      return s.toString();
+    T.at(node_top).setInt(node); top();                                            // Top next will always be present
+    S.elementAt(L+3).append(T.at(top).getInt());                                // Append top next
+
+    T.at(node_isLeaf).move(T.at(top)); isLeaf();                                // Print leaf
+    if (T.at(IsLeaf).isOnes())                                                                 // Print leaf
+     {printLeaf(T.at(top).getInt(), S, level+1);
+     }
+    else                                                                        // Print branch
+     {if (T.at(top).isZero())
+       {say("Cannot descend through root from top in branch:", node);
+        return;
+       }
+      printBranch(T.at(top).getInt(), S, level+1);
      }
 
-    public String findAndInsert_toString()                                      // Print find and insert result
-     {final StringBuilder s = new StringBuilder();
-      s.append("FindAndInsert(");
-      s.append(    " key:"+key);
-      s.append(   " data:"+data);
-      s.append(" success:"+success);
-      if (success) s.append(" inserted:"+inserted);
-      s.append(")\n" );
-      return s.toString();
-     }
+    padStrings(S, level);
+   }
 
-    public String findFirstGreaterThanOrEqualInLeaf_toString()                  // Print results of search
-     {final StringBuilder s = new StringBuilder();
-      s.append("FindFirstGreaterThanOrEqualInLeaf(");
-      s.append(  "Leaf:"+node);
-      s.append(  " Key:"+search);
-      s.append(" found:"+found);
-      if (found) s.append(" first:"+first);
-      s.append(")\n");
-      return s.toString();
-     }
+  public String find_toString()                                                 // Print find result
+   {final StringBuilder s = new StringBuilder();
+    s.append("Find(");
+    s.append(    " search:"+T.at(search).getInt());
+    s.append(     " found:"+T.at(found) .getInt());
+    s.append(      " data:"+T.at(data)  .getInt());
+    s.append(     " index:"+T.at(index) .getInt());
+    s.append(")\n");
+    return s.toString();
+   }
 
-    public String findFirstGreaterThanOrEqualInBranch_toString()                // Print search results
-     {final StringBuilder s = new StringBuilder();
-      s.append("FindFirstGreaterThanOrEqualInBranch(");
-      s.append("branch:"+node);
-      s.append(  " Key:"+search);
-      s.append(" found:"+found);
-      s.append( " next:"+next);
-      if (found) s.append(" first:"+first);
-      s.append(")\n");
-      return s.toString();
-     }
+  public String findAndInsert_toString()                                        // Print find and insert result
+   {final StringBuilder s = new StringBuilder();
+    s.append("FindAndInsert(");
+    s.append(    " key:"+T.at(key)    .getInt());
+    s.append(   " data:"+T.at(data)   .getInt());
+    s.append(" success:"+T.at(success).getInt());
+    if (T.at(success).isOnes()) s.append(" inserted:"+T.at(inserted));
+    s.append(")\n" );
+    return s.toString();
+   }
+
+  public String findFirstGreaterThanOrEqualInLeaf_toString()                    // Print results of search
+   {final StringBuilder s = new StringBuilder();
+    s.append("FindFirstGreaterThanOrEqualInLeaf(");
+    s.append(  "Leaf:"+T.at(node_findFirstGreaterThanOrEqualInLeaf).getInt());
+    s.append(  " Key:"+T.at(search).getInt());
+    s.append(" found:"+T.at(found).getInt());
+    if (T.at(found).isOnes()) s.append(" first:"+T.at(first).getInt());
+    s.append(")\n");
+    return s.toString();
+   }
+
+  public String findFirstGreaterThanOrEqualInBranch_toString()                  // Print search results
+   {final StringBuilder s = new StringBuilder();
+    s.append("FindFirstGreaterThanOrEqualInBranch(");
+    s.append("branch:"+T.at(node_findFirstGreaterThanOrEqualInBranch).getInt());
+    s.append(  " Key:"+T.at(search).getInt());
+    s.append(" found:"+T.at(found).getInt());
+    s.append( " next:"+T.at(next).getInt());
+    if (T.at(found).isOnes()) s.append(" first:"+T.at(first).getInt());
+    s.append(")\n");
+    return s.toString();
+   }
 
 //D2 Split                                                                      // Split nodes in half to increase the number of nodes in the tree
 
-    void splitLeafRoot()                                                        // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
-     {z(); assertLeaf();
-      z(); if (node != 0) stop("Wanted root, but got node:", node);
-      z(); if (!isFull()) stop("Root is not full, but has size:", leafSize());
-
-      P = Node_root;                                                            // Root is the parent
-      l = anode = Node_left;  allocLeaf();                                      // New left leaf
-      r = anode = Node_right; allocLeaf();                                      // New right leaf
-
-      lT.base(nodeTypes[P].leafBase());                                         // Set address of the referenced leaf stuck
-      lL.base(nodeTypes[l].leafBase());                                         // Set address of the referenced leaf stuck
-      lR.base(nodeTypes[r].leafBase());                                         // Set address of the referenced leaf stuck
-
-      splitLeafSize = splitLeafSize();
-
-      for (int i = 0; i < splitLeafSize; i++)                                   // Build left leaf from parent
-       {z(); lT.shift(); lL.tKey = lT.tKey; lL.tData = lT.tData; lL.push();
-       }
-      for (int i = 0; i < splitLeafSize; i++)                                   // Build right leaf from parent
-       {z(); lT.shift(); lR.tKey = lT.tKey; lR.tData = lT.tData; lR.push();
-       }
-
-      lR.firstElement();
-      lL. lastElement();
-      setBranch();
-      bT.base(nodeTypes[P].branchBase());                                       // Set address of the referenced leaf stuck
-      bT.clear();                                                               // Clear the branch
-      firstKey = lR.tKey;                                                       // First of right leaf
-      lastKey  = lL.tKey;                                                       // Last of left leaf
-      flKey    = (lastKey + firstKey) / 2;                                      // Mid key
-      bT.tKey  = flKey; bT.tData = nodeTypes[l].node; bT.push();                // Insert left leaf into root
-      bT.tKey  =     0; bT.tData = nodeTypes[r].node; bT.push();                // Insert right into root. This will be the top node and so ignored by search ... except last.
+  private void splitLeafRoot()                                                  // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
+   {z(); T.at(node_assertLeaf).setInt(root); assertLeaf();
+    z(); T.at(node_isFull).setInt(root); isFull();
+    if (T.at(isFull).isZero())
+     {T.at(node_leafSize).setInt(root);
+      leafSize();
+      stop("Root is not full, but has size:", T.at(leafSize).getInt());
      }
 
-    void splitBranchRoot()                                                      // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
-     {z(); assertBranch();
-      z(); if (node != 0) stop("Not root, but node:", node);
-      z(); if (!isFull()) stop("Root is not full, but has size:", branchSize());
+    allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
+    allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
+
+    T.at(node_leafBase).setInt(root); leafBase(); lT.base(T.at(leafBase));                        // Set address of the referenced leaf stuck
+    tt(node_leafBase, l); leafBase(); lL.base(T.at(leafBase));                        // Set address of the referenced leaf stuck
+    tt(node_leafBase, r); leafBase(); lR.base(T.at(leafBase));                        // Set address of the referenced leaf stuck
+
+    for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf from parent
+     {z(); lT.shift();
+      lL.T.at(lL.tKey ).move(lT.T.at(lT.tKey ));
+      lL.T.at(lL.tData).move(lT.T.at(lT.tData));
+      lL.push();
+     }
+    for (int i = 0; i < splitLeafSize; i++)                                     // Build right leaf from parent
+     {z(); lT.shift();
+      lR.T.at(lR.tKey ).move(lT.T.at(lT.tKey));
+      lR.T.at(lR.tData).move(lT.T.at(lT.tData));
+      lR.push();
+     }
+
+    lR.firstElement();
+    lL. lastElement();
+    T.at(node_setBranch).setInt(root); setBranch();                                         // The root is now a branch
+    T.at(node_branchBase).setInt(root); branchBase();                                       // Set address of the referenced leaf stuck
+    bT.base(T.at(branchBase));                                                        // Set address of the referenced leaf stuck
+    bT.clear();                                                                 // Clear the branch
+    T.at(firstKey).move(lR.T.at(lR.tKey));                                                         // First of right leaf
+    T.at(lastKey ).move(lL.T.at(lL.tKey));                                                         // Last of left leaf
+    T.at(flKey   ).setInt((T.at(firstKey).getInt() + T.at(lastKey).getInt()) / 2);          // Mid key - keys are likely to be bigger than 31 bits
+    bT.T.at(bT.tKey).move(T.at(flKey));
+    bT.T.at(bT.tData).move(T.at(l));
+    bT.push();                                  // Insert left leaf into root
+    bT.T.at(bT.tKey).zero();
+    bT.T.at(bT.tData).move(T.at(r));
+    bT.push();                                  // Insert right into root. This will be the top node and so ignored by search ... except last.
+   }
+
+  private void splitBranchRoot()                                                // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
+   {z(); T.at(node_assertBranch).setInt(root); assertBranch();
+    z(); T.at(node_isFull).setInt(root); isFull();
+    if (T.at(isFull).isZero())
+     {T.at(node_branchSize).setInt(root); branchSize();
+      stop("Root is not full, but has size:", branchSize);
+     }
+    z();
+
+    allocBranch(); tt(l, allocBranch);                                          // New left branch
+    allocBranch(); tt(r, allocBranch);                                          // New right branch
+
+    T.at(node_branchBase).setInt(root); branchBase(); bT.base(T.at(branchBase));                  // Set address of the referenced branch stuck
+    tt(node_branchBase, l); branchBase(); bL.base(T.at(branchBase));                  // Set address of the referenced branch stuck
+    tt(node_branchBase, r); branchBase(); bR.base(T.at(branchBase));                  // Set address of the referenced branch stuck
+
+    for (int i = 0; i < splitBranchSize; i++)                                   // Build left child from parent
+     {z(); bT.shift();
+      bL.T.at(bL.tKey ).move(bT.T.at(bT.tKey ));
+      bL.T.at(bL.tData).move(bT.T.at(bT.tData));
+      bL.push();
+     }
+    bT.shift();                                                                 // This key, next pair will be part of the root
+    T.at(parentKey).move(bT.T.at(bT.tKey));
+    bL.T.at(bL.tKey).zero();
+    bL.T.at(bL.tData).move(bT.T.at(bT.tData));
+    bL.push();                                                                  // Becomes top and so ignored by search ... except last
+
+    for(int i = 0; i < splitBranchSize; i++)                                    // Build right child from parent
+     {z(); bT.shift();
+      bR.T.at(bR.tKey ).move(bT.T.at(bT.tKey ));
+      bR.T.at(bR.tData).move(bT.T.at(bT.tData));
+      bR.push();
+     }
+
+    bT.shift();
+    bR.T.at(bR.tKey).zero();
+    bR.T.at(bR.tData).move(bT.T.at(bT.tData));
+    bR.push();                    // Becomes top and so ignored by search ... except last
+
+    bT.clear();                                                                 // Refer to new branches from root
+    bT.T.at(bT.tKey) .move(T.at(parentKey));
+    bT.T.at(bT.tData).move(T.at(l));
+    bT.push();
+    bT.T.at(bT.tKey ).zero();
+    bT.T.at(bT.tData).move(T.at(r));
+    bT.push();                               // Becomes top and so ignored by search ... except last
+   }
+
+  private void splitLeaf()                                                      // Split a leaf which is not the root
+   {z(); tt(node_assertLeaf, node_splitLeaf); assertLeaf();
+    z(); if (T.at(node_splitLeaf).isZero()) stop("Cannot split root with this method");
+    z(); tt(node_leafSize, node_splitLeaf);
+         leafSize();
+    z(); final int S = T.at(leafSize).getInt(), I = T.at(index).getInt();
+         tt(node_isFull, node_splitLeaf); isFull();
+    z(); final boolean nif = !isFull;
+         node_isFull = splitParent; isFull();
+    z(); final boolean pif = isFull;
+    z(); if (nif)   stop("Leaf:", node_splitLeaf, "is not full, but has:", S, this);
+    z(); if (pif)   stop("Leaf split parent:", splitParent, "must not be full");
+    z(); if (I < 0) stop("Index", I, "too small");
+    z(); if (I > S) stop("Index", I, "too big for leaf with:", S);
+    z();
+    allocLeaf(); l = allocLeaf;                                                 // New  split out leaf
+
+    node_leafBase = l;              leafBase(); lL.base(T.at(leafBase));              // The leaf being split into
+    tt(node_leafBase, node_splitLeaf); leafBase(); lR.base(T.at(leafBase));              // The leaf being split on the right
+
+    for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf
+     {z(); lR.shift(); lL.tKey = lR.tKey; lL.tData = lR.tData; lL.push();
+     }
+    lR.firstElement();
+    lL. lastElement();
+    node_branchBase = splitParent; branchBase();                                // The parent branch
+    bT.base(T.at(branchBase));                                                        // The parent branch
+    bT.tKey  = (lR.tKey + lL.tKey) / 2;                                         // Splitting key
+    bT.tData = l;
+    bT.index = index;
+    bT.insertElementAt();                                                       // Insert new key, next pair in parent
+   }
+
+  private void splitBranch()                                                    // Split a branch which is not the root by splitting right to left
+   {z(); tt(node_assertBranch, node_splitBranch); assertBranch();
+    z(); tt(node_branchSize, node_splitBranch); branchSize();
+    z(); final int bs = branchSize, I = index, pn = splitParent, nd = node_splitBranch;
+         tt(node_isFull, node_splitBranch); isFull();
+    z(); final boolean nif = !isFull;
+         node_isFull = splitParent; isFull();
+    z(); final boolean pif = isFull;
+    z(); if (nd == 0) stop("Cannot split root with this method");
+    z(); if (nif)     stop("Branch:", nd, "is not full, but", bs);
+    z(); if (pif)     stop("Branch split parent:", pn, "must not be full");
+    z(); if (I < 0)   stop("Index", I, "too small in node:", nd);
+    z(); if (I > bs)  stop("Index", I, "too big for branch with:",
+                            bs, "in node:", nd);
+    z();
+    allocBranch(); l = allocBranch;
+    node_branchBase = splitParent;      branchBase(); bT.base(T.at(branchBase));      // The parent branch
+    node_branchBase = l;                branchBase(); bL.base(T.at(branchBase));      // The branch being split into
+    tt(node_branchBase, node_splitBranch); branchBase(); bR.base(T.at(branchBase));      // The branch being split
+
+    for (int i = 0; i < splitBranchSize; i++)                                   // Build left branch from right
+     {z(); bR.shift(); bL.tKey = bR.tKey; bL.tData = bR.tData; bL.push();
+     }
+    bR.shift(); bL.tKey = 0; bL.tData = bR.tData; bL.push();                    // Build right branch - becomes top and so is ignored by search ... except last
+    bT.tKey = bR.tKey; bT.tData = l; bT.index = index; bT.insertElementAt();
+   }
+
+  private void stealFromLeft()                                                  // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
+   {z(); tt(node_assertBranch, node_stealFromLeft); assertBranch();
+    z(); if (index == 0) {z(); stolenOrMerged = false; return;}
+    z(); if (index < 0) stop("Index", index, "too small");
+    z(); tt(node_branchSize, node_stealFromLeft); branchSize();
+    z(); if (index > branchSize) stop("Index", index, "too big");
+    z();
+
+    tt(node_branchBase, node_stealFromLeft); branchBase();
+    bT.base(T.at(branchBase));
+    bT.index = index - 1; bT.elementAt(); l = bT.tData;
+    bT.index = index - 0; bT.elementAt(); r = bT.tData;
+
+    tt(node_hasLeavesForChildren, node_stealFromLeft); hasLeavesForChildren();     // Children are leaves
+    if (hasLeavesForChildren)                                                   // Children are leaves
+     {z();
+      node_leafBase = l; leafBase(); lL.base(T.at(leafBase));
+      node_leafBase = r; leafBase(); lR.base(T.at(leafBase));
+
+      tt(node_leafSize, l);
+      leafSize();
+      nl = leafSize;
+      tt(node_leafSize, r);
+      leafSize();
+      nr = leafSize;
+
+      if (nr >= maxKeysPerLeaf()) {z(); stolenOrMerged = false; return;}        // Steal not possible because there is no where to put the steal
+      if (nl <= 1)                {z(); stolenOrMerged = false; return;}        // Steal not allowed because it would leave the leaf sibling empty
       z();
 
-      P = Node_root;                                                            // Root is the parent
-      l = anode = Node_left;  allocBranch();                                    // New left branch
-      r = anode = Node_right; allocBranch();                                    // New right branch
+      lL.lastElement(); lR.tKey = lL.tKey; lR.tData = lL.tData; lR.unshift();   // Increase right
 
-      bT.base(nodeTypes[P].branchBase());                                       // Set address of the referenced branch stuck
-      bL.base(nodeTypes[l].branchBase());                                       // Set address of the referenced branch stuck
-      bR.base(nodeTypes[r].branchBase());                                       // Set address of the referenced branch stuck
-
-      splitBranchSize = splitBranchSize();                                      // Branch split size
-      for (int i = 0; i < splitBranchSize; i++)                                 // Build left child from parent
-       {z(); bT.shift(); bL.tKey = bT.tKey; bL.tData = bT.tData; bL.push();
-       }
-      bT.shift();                                                               // This key, next pair will be part of the root
-      parentKey = bT.tKey;
-      bL.tKey = 0; bL.tData = bT.tData; bL.push();                              // Becomes top and so ignored by search ... except last
-
-      for(int i = 0; i < splitBranchSize; i++)                                  // Build right child from parent
-       {z(); bT.shift(); bR.tKey = bT.tKey; bR.tData = bT.tData; bR.push();
-       }
-
-      bT.shift(); bR.tKey = 0; bR.tData = bT.tData; bR.push();                  // Becomes top and so ignored by search ... except last
-
-      bT.clear();                                                               // Refer to new branches from root
-      bT.tKey = parentKey; bT.tData = nodeTypes[l].node; bT.push();
-      bT.tKey =         0; bT.tData = nodeTypes[r].node; bT.push();             // Becomes top and so ignored by search ... except last
+      lL.pop();                                                                 // Reduce left
+      lL.index = nl-2; lL.elementAt();                                          // Last key on left
+      bT.tKey  = lL.tKey; bT.tData = l; bT.index = index-1; bT.setElementAt();  // Reduce key of parent of left
      }
+    else                                                                        // Children are branches
+     {z();
+      node_branchBase = l; branchBase(); bL.base(T.at(branchBase));
+      node_branchBase = r; branchBase(); bR.base(T.at(branchBase));
+      node_branchSize = l; branchSize(); nl = branchSize;
+      node_branchSize = r; branchSize(); nr = branchSize;
 
-    void splitLeaf()                                                            // Split a leaf which is not the root
-     {z(); assertLeaf();
-      z(); if (node == 0) stop("Cannot split root with this method");
-      z(); final int S = leafSize(), I = index;
-      z(); final boolean nif = !isFull(), pif = nodeTypes[parent].isFull();
-      z(); if (nif)   stop("Leaf:", node, "is not full, but has:", S, this);
-      z(); if (pif)   stop("Parent:", parent, "must not be full");
-      z(); if (I < 0) stop("Index", I, "too small");
-      z(); if (I > S) stop("Index", I, "too big for leaf with:", S);
-      z();
-      l = anode = Node_left; allocLeaf();                                       // New  split out leaf
-
-      lL.base(nodeTypes[l].leafBase());                                         // The leaf being split into
-      lR.base(             leafBase());                                         // The leaf being split on the right
-
-      splitLeafSize = splitLeafSize();
-      for (int i = 0; i < splitLeafSize; i++)                                   // Build left leaf
-       {z(); lR.shift(); lL.tKey = lR.tKey; lL.tData = lR.tData; lL.push();
-       }
-      lR.firstElement();
-      lL. lastElement();
-      P = parent;                                                               // Parent
-      bT.base(nodeTypes[P].branchBase());                                       // The parent branch
-      bT.tKey  = (lR.tKey + lL.tKey) / 2;                                       // Splitting key
-      bT.tData = nodeTypes[l].node;
-      bT.index = index;
-      bT.insertElementAt();                                                     // Insert new key, next pair in parent
-     }
-
-    void splitBranch()                                                          // Split a branch which is not the root by splitting right to left
-     {z(); assertBranch();
-      z(); final int bs = branchSize(), I = index, pn = nodeTypes[parent].node, nd = node;
-      z(); final boolean nif = !isFull(), pif = nodeTypes[parent].isFull();
-      z(); if (nd == 0) stop("Cannot split root with this method");
-      z(); if (nif)     stop("Branch:", nd, "is not full, but", bs);
-      z(); if (pif)     stop("Parent:", pn, "must not be full");
-      z(); if (I < 0)   stop("Index", I, "too small in node:", nd);
-      z(); if (I > bs)  stop("Index", I, "too big for branch with:",
-                              bs, "in node:", nd);
-      z();
-      P = parent;
-      l = anode = Node_left; allocBranch();
-
-      bT.base(nodeTypes[P].branchBase());                                       // The parent branch
-      bL.base(nodeTypes[l].branchBase());                                       // The branch being split into
-      bR.base(             branchBase());                                       // The branch being split
-
-      splitBranchSize = splitBranchSize();
-      for (int i = 0; i < splitBranchSize; i++)                                 // Build left branch from right
-       {z(); bR.shift(); bL.tKey = bR.tKey; bL.tData = bR.tData; bL.push();
-       }
-      bR.shift(); bL.tKey = 0; bL.tData = bR.tData; bL.push();                  // Build right branch - becomes top and so is ignored by search ... except last
-      bT.tKey = bR.tKey; bT.tData = nodeTypes[l].node; bT.index = index; bT.insertElementAt();
-     }
-
-    boolean stealFromLeft()                                                     // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
-     {z(); assertBranch();
-      z(); if (index == 0) {z(); return false;}
-      z(); if (index < 0)            stop("Index", index, "too small");
-      z(); if (index > branchSize()) stop("Index", index, "too big");
+      z(); if (nr >= maxKeysPerBranch()) {z(); stolenOrMerged = false; return;} // Steal not possible because there is no where to put the steal
+      z(); if (nl <= 1)                  {z(); stolenOrMerged = false; return;} // Steal not allowed because it would leave the left sibling empty
       z();
 
-      bT.base(branchBase());
-      bT.index = index - 1; bT.elementAt(); L = bT.tData;
-      bT.index = index - 0; bT.elementAt(); R = bT.tData;
+      bL.lastElement();                                                         // Increase right with left top
+      bT.index = index; bT.elementAt();                                         // Top key
+      bR.tKey  = bT.tKey; bR.tData = bL.tData; bR.unshift();                    // Increase right with left top
+      bL.pop();                                                                 // Remove left top
 
-      l = node(Node_left,  L);
-      r = node(Node_right, R);
+      bR.firstElement();                                                        // Increase right with left top
 
-      if (hasLeavesForChildren())                                               // Children are leaves
-       {z();
-        lL.base(nodeTypes[l].leafBase());
-        lR.base(nodeTypes[r].leafBase());
-
-        nl = nodeTypes[l].leafSize();
-        nr = nodeTypes[r].leafSize();
-
-        z(); if (nr >= maxKeysPerLeaf()) {z(); return false;}                   // Steal not possible because there is no where to put the steal
-        z(); if (nl <= 1)                {z(); return false;}                   // Steal not allowed because it would leave the leaf sibling empty
-        z();
-
-        lL.lastElement(); lR.tKey = lL.tKey; lR.tData = lL.tData; lR.unshift(); // Increase right
-
-        lL.pop();                                                               // Reduce left
-        lL.index = nl-2; lL.elementAt();                                        // Last key on left
-        bT.tKey  = lL.tKey; bT.tData = L; bT.index = index-1; bT.setElementAt();// Reduce key of parent of left
-       }
-      else                                                                      // Children are branches
-       {z();
-        bL.base(nodeTypes[l].branchBase());
-        bR.base(nodeTypes[r].branchBase());
-        nl =    nodeTypes[l].branchSize();
-        nr =    nodeTypes[r].branchSize();
-
-        z(); if (nr >= maxKeysPerBranch()) {z(); return false;}                 // Steal not possible because there is no where to put the steal
-        z(); if (nl <= 1)                  {z(); return false;}                 // Steal not allowed because it would leave the left sibling empty
-        z();
-
-        bL.lastElement();                                                       // Increase right with left top
-        bT.index = index; bT.elementAt();                                       // Top key
-        bR.tKey  = bT.tKey; bR.tData = bL.tData; bR.unshift();                  // Increase right with left top
-        bL.pop();                                                               // Remove left top
-
-        bR.firstElement();                                                      // Increase right with left top
-
-        bT.index = index-1; bT.elementAt();                                     // Parent key
-        bR.tKey  = bT.tKey; bR.index = 0; bR.setElementAt();                    // Reduce key of parent of right
-        bL.lastElement();                                                       // Last left key
-        bT.tKey = bL.tKey; bT.tData = L; bT.index = index-1; bT.setElementAt(); // Reduce key of parent of left
-       }
-      z(); return true;
+      bT.index = index-1; bT.elementAt();                                       // Parent key
+      bR.tKey  = bT.tKey; bR.index = 0; bR.setElementAt();                      // Reduce key of parent of right
+      bL.lastElement();                                                         // Last left key
+      bT.tKey = bL.tKey; bT.tData = l; bT.index = index-1; bT.setElementAt();   // Reduce key of parent of left
      }
+    z(); stolenOrMerged = true; return;
+   }
 
-    boolean stealFromRight()                                                    // Steal from the right sibling of the indicated child if possible
-     {z(); assertBranch();
-      z(); if (index == branchSize()) {z(); return false;}
-      z(); if (index < 0)             stop("Index", index, "too small");
-      z(); if (index >= branchSize()) stop("Index", index, "too big");
+  private void stealFromRight()                                                 // Steal from the right sibling of the indicated child if possible
+   {z(); tt(node_assertBranch, node_stealFromRight); assertBranch();
+    z(); tt(node_branchSize, node_stealFromRight); branchSize();
+    if (index == branchSize) {z(); stolenOrMerged = false; return;}
+    z(); if (index < 0) stop("Index", index, "too small");
+    z(); if (index >= branchSize) stop("Index", index, "too big");
+    z();
+
+    tt(node_branchBase, node_stealFromRight); branchBase();
+    bT.base(T.at(branchBase));
+    bT.index = index+0; bT.elementAt(); lk = bT.tKey; l = bT.tData;
+    bT.index = index+1; bT.elementAt(); rk = bT.tKey; r = bT.tData;
+
+    tt(node_hasLeavesForChildren, node_stealFromRight); hasLeavesForChildren();    // Children are leaves
+    if (hasLeavesForChildren)                                                   // Children are leaves
+     {z();
+      node_leafBase = l; leafBase(); lL.base(T.at(leafBase));
+      node_leafBase = r; leafBase(); lR.base(T.at(leafBase));
+      tt(node_leafSize, l);
+      leafSize();
+      nl = leafSize;
+      tt(node_leafSize, r);
+      leafSize();
+      nr = leafSize;
+
+      if (nl >= maxKeysPerLeaf()) {z(); stolenOrMerged = false; return;}        // Steal not possible because there is no where to put the steal
+      if (nr <= 1)                {z(); stolenOrMerged = false; return;}        // Steal not allowed because it would leave the right sibling empty
+      z();
+      lR.firstElement();                                                        // First element of right child
+      lL.tKey = lR.tKey; lL.tData = lR.tData; lL.push();                        // Increase left
+      bT.tKey = lR.tKey; bT.tData = l; bT.index = index; bT.setElementAt();     // Swap key of parent
+      lR.shift();                                                               // Reduce right
+     }
+    else                                                                        // Children are branches
+     {z();
+      node_branchBase = l; branchBase(); bL.base(T.at(branchBase));
+      node_branchBase = r; branchBase(); bR.base(T.at(branchBase));
+      node_branchSize = l; branchSize(); nl = branchSize;
+      node_branchSize = r; branchSize(); nr = branchSize;
+
+      z(); if (nl >= maxKeysPerBranch()) {z(); stolenOrMerged = false; return;} // Steal not possible because there is no where to put the steal
+      z(); if (nr <= 1)                  {z(); stolenOrMerged = false; return;} // Steal not allowed because it would leave the right sibling empty
       z();
 
-      bT.base(branchBase());
-      bT.index = index+0; bT.elementAt(); lk = bT.tKey; ld = bT.tData;
-      bT.index = index+1; bT.elementAt(); rk = bT.tKey; rd = bT.tData;
+      bL.lastElement();                                                         // Last element of left child
+      bL.tKey = lk; bL.index = nl; bL.setElementAt();                           // Left top becomes real
 
-      l = node(Node_left,  ld);
-      r = node(Node_right, rd);
+      bR.firstElement();                                                        // First element of  right child
 
-      if (hasLeavesForChildren())                                               // Children are leaves
-       {z();
-        lL.base(nodeTypes[l].leafBase());
-        lR.base(nodeTypes[r].leafBase());
-        nl =    nodeTypes[l].leafSize();
-        nr =    nodeTypes[r].leafSize();
-
-        z(); if (nl >= maxKeysPerLeaf()) {z(); return false;}                   // Steal not possible because there is no where to put the steal
-        z(); if (nr <= 1)                {z(); return false;}                   // Steal not allowed because it would leave the right sibling empty
-        z();
-        lR.firstElement();                                                      // First element of right child
-        lL.tKey = lR.tKey; lL.tData = lR.tData; lL.push();                      // Increase left
-        bT.tKey = lR.tKey; bT.tData = ld; bT.index = index; bT.setElementAt();  // Swap key of parent
-        lR.shift();                                                             // Reduce right
-       }
-      else                                                                      // Children are branches
-       {z();
-        bL.base(nodeTypes[l].branchBase());
-        bR.base(nodeTypes[r].branchBase());
-        nl =    nodeTypes[l].branchSize();
-        nr =    nodeTypes[r].branchSize();
-
-        z(); if (nl >= maxKeysPerBranch()) {z(); return false;}                 // Steal not possible because there is no where to put the steal
-        z(); if (nr <= 1)                  {z(); return false;}                 // Steal not allowed because it would leave the right sibling empty
-        z();
-
-        bL.lastElement();                                                       // Last element of left child
-        bL.tKey = lk; bL.index = nl; bL.setElementAt();                         // Left top becomes real
-
-        bR.firstElement();                                                      // First element of  right child
-
-        bL.tKey = 0; bL.tData = bR.tData; bL.push();                            // New top for left is ignored by search ,.. except last
-        bT.tKey = bR.tKey; bT.tData = ld; bT.index = index; bT.setElementAt();  // Swap key of parent
-        bR.shift();                                                             // Reduce right
-       }
-      z(); return true;
+      bL.tKey = 0; bL.tData = bR.tData; bL.push();                              // New top for left is ignored by search ,.. except last
+      bT.tKey = bR.tKey; bT.tData = l; bT.index = index; bT.setElementAt();     // Swap key of parent
+      bR.shift();                                                               // Reduce right
      }
+    z(); stolenOrMerged = true; return;
+   }
 
 //D2 Merge                                                                      // Merge two nodes together and free the resulting free node
 
-    boolean mergeRoot()                                                         // Merge into the root
+  private void mergeRoot()                                                      // Merge into the root
+   {z();
+    T.at(node_isLeaf).setInt(root); isLeaf();
+    z(); if (T.at(IsLeaf).isOnes()) {z(); stolenOrMerged = false; return;}                     // Confirm we are on a branch
+    T.at(node_branchSize).setInt(root); branchSize();
+    z(); if (branchSize > 1) {z(); stolenOrMerged = false; return;}             // Confirm we are on an almost empty root
+    z();
+    T.at(node_branchBase).setInt(root); branchBase();
+    bT.base(T.at(branchBase));
+    bT.firstElement(); l = bT.tData;
+    bT. lastElement(); r = bT.tData;
+
+    T.at(node_hasLeavesForChildren).setInt(root); hasLeavesForChildren();
+    if (hasLeavesForChildren)                                                   // Leaves
      {z();
-      if (nodeTypes[Node_root].isLeaf() || branchSize() > 1)
-       {z(); return false;
+      tt(node_leafSize, l);
+      leafSize();
+      nl = leafSize;
+      tt(node_leafSize, r);
+      leafSize();
+      nr = leafSize;
+      if (nl + nr <= maxKeysPerLeaf())
+       {z(); bT.clear();
+        node_leafBase = l; leafBase(); lL.base(T.at(leafBase));
+        node_leafBase = r; leafBase(); lR.base(T.at(leafBase));
+        for (int i = 0; i < nl; ++i)                                            // Merge in left child leaf
+         {z(); lL.shift(); bT.tKey = lL.tKey; bT.tData = lL.tData; bT.push();
+         }
+        for (int i = 0; i < nr; ++i)                                            // Merge in right child leaf
+         {z(); lR.shift(); bT.tKey  = lR.tKey; bT.tData = lR.tData; bT.push();
+         }
+        T.at(node_setLeaf).setInt(root); setLeaf();                                         // The root is now a leaf
+        node_free = l; free();                                                  // Free the children
+        node_free = r; free();
+        z(); stolenOrMerged = true; return;
        }
-      z(); if (node != 0) stop("Expected root, got:", node);
-      z();
-      bT.base(branchBase());
-      bT.firstElement(); l = node(Node_left,  bT.tData);
-      bT. lastElement(); r = node(Node_right, bT.tData);
+      z(); stolenOrMerged = false; return;
+     }
+    else                                                                        // Branches
+     {node_branchSize = l; branchSize(); nl = branchSize;
+      node_branchSize = r; branchSize(); nr = branchSize;
 
-      if (hasLeavesForChildren())                                               // Leaves
+      if (nl + 1 + nr <= maxKeysPerBranch())
        {z();
-        nl = nodeTypes[l].leafSize();
-        nr = nodeTypes[r].leafSize();
-        if (nl + nr <= maxKeysPerLeaf())
-         {z(); bT.clear();
-          lL.base(nodeTypes[l].leafBase());
-          lR.base(nodeTypes[r].leafBase());
-          for (int i = 0; i < nl; ++i)                                          // Merge in left child leaf
-           {z(); lL.shift(); bT.tKey = lL.tKey; bT.tData = lL.tData; bT.push();
-           }
-          for (int i = 0; i < nr; ++i)                                          // Merge in right child leaf
-           {z(); lR.shift(); bT.tKey  = lR.tKey; bT.tData = lR.tData; bT.push();
-           }
-          setLeaf();                                                            // The root is now a leaf
-          nodeTypes[l].free();                                                  // Free the children
-          nodeTypes[r].free();
-          z(); return true;
+        node_branchBase = l; branchBase(); bL.base(T.at(branchBase));
+        node_branchBase = r; branchBase(); bR.base(T.at(branchBase));
+        bT.firstElement();
+        parentKey = bT.tKey;
+        bT.clear();
+        for (int i = 0; i < nl; ++i)                                            // Merge left child branch
+         {z(); bL.shift(); bT.tKey  = bL.tKey; bT.tData = bL.tData; bT.push();
          }
-        z(); return false;
+
+        bL.lastElement();
+        bT.tKey = parentKey; bT.tData = bL.tData; bT.push();
+
+        for (int i = 0; i < nr; ++i)                                            // Merge right child branch
+         {z(); bR.shift(); bT.tKey  = bR.tKey; bT.tData = bR.tData; bT.push();
+         }
+
+        bR.lastElement();                                                       // Top next
+
+        bT.tKey = 0; bT.tData = bR.tData; bT.push();                            // Top so ignored by search ... except last
+        node_free = l; free();                                                  // Free the children
+        node_free = r; free();
+        z(); stolenOrMerged = true; return;
        }
-      else                                                                      // Branches
-       {nl = nodeTypes[l].branchSize();
-        nr = nodeTypes[r].branchSize();
+      z(); stolenOrMerged = false; return;
+     }
+   }
 
-        if (nl + 1 + nr <= maxKeysPerBranch())
-         {z();
-          bL.base(nodeTypes[l].branchBase());
-          bR.base(nodeTypes[r].branchBase());
-          bT.firstElement();
-          parentKey = bT.tKey;
-          bT.clear();
-          for (int i = 0; i < nl; ++i)                                          // Merge left child branch
-           {z(); bL.shift(); bT.tKey  = bL.tKey; bT.tData = bL.tData; bT.push();
-           }
+  private void mergeLeftSibling()                                               // Merge the left sibling
+   {z(); tt(node_assertBranch, node_mergeLeftSibling); assertBranch();
+    z(); if (index == 0) {z(); stolenOrMerged = false; return;}
+    tt(node_branchSize, node_mergeLeftSibling); branchSize();
+    final int bs = branchSize;
+    final String s = "for branch of size: "+bs;
+    z(); if (index < 0 ) stop("Index", index, "too small", s);
+    z(); if (index > bs) stop("Index", index, "too big",   s);
+    //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
+    z(); if (bs    < 2 ) {z(); stolenOrMerged = false; return;}
+    z();
+    tt(node_branchBase, node_mergeLeftSibling); branchBase();
+    bT.base(T.at(branchBase));
+    bT.index = index-1; bT.elementAt(); l = bT.tData;
+    bT.index = index-0; bT.elementAt(); r = bT.tData;
 
-          bL.lastElement();
-          bT.tKey = parentKey; bT.tData = bL.tData; bT.push();
+    tt(node_hasLeavesForChildren, node_mergeLeftSibling); hasLeavesForChildren();
+    if (hasLeavesForChildren)                                                   // Children are leaves
+     {z();
+      node_leafBase = l;
+      leafBase();
+      lL.base(T.at(leafBase));
+      node_leafBase = r;
+      leafBase();
+      lR.base(T.at(leafBase));
+      tt(node_leafSize, l);
+      leafSize();
+      nl = leafSize;
+      tt(node_leafSize, r);
+      leafSize();
+      nr = leafSize;
 
-          for (int i = 0; i < nr; ++i)                                          // Merge right child branch
-           {z(); bR.shift(); bT.tKey  = bR.tKey; bT.tData = bR.tData; bT.push();
-           }
-
-          bR.lastElement();                                                     // Top next
-
-          bT.tKey = 0; bT.tData = bR.tData; bT.push();                          // Top so ignored by search ... except last
-          nodeTypes[l].free();                                                  // Free the children
-          nodeTypes[r].free();
-          z(); return true;
-         }
-        z(); return false;
+      if (nl + nr >= maxKeysPerLeaf()) {z(); stolenOrMerged = false; return;}   // Combined body would be too big
+      for (int i = 0; i < nl; i++)                                              // Transfer left to right
+       {z(); lL.pop(); lR.tKey = lL.tKey; lR.tData = lL.tData; lR.unshift();
        }
      }
+    else                                                                        // Children are branches
+     {z();
+      node_branchBase = l; branchBase(); bL.base(T.at(branchBase));
+      node_branchBase = r; branchBase(); bR.base(T.at(branchBase));
+      node_branchSize = l; branchSize(); nl = branchSize;
+      node_branchSize = r; branchSize(); nr = branchSize;
 
-    boolean mergeLeftSibling()                                                  // Merge the left sibling
-     {z(); assertBranch();
-      z(); if (index == 0) {z(); return false;}
-      final int bs = branchSize();
-      final String s = "for branch of size: "+bs;
-      z(); if (index < 0 ) stop("Index", index, "too small", s);
-      z(); if (index > bs) stop("Index", index, "too big",   s);
-      //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
-      z(); if (bs    < 2 ) {z(); return false;}
+      if (nl + 1 + nr > maxKeysPerBranch()) {z(); stolenOrMerged = false; return;}  // Merge not possible because there is not enough room for the combined result
       z();
-      bT.base(branchBase());
-      bT.index = index-1; bT.elementAt(); L = bT.tData;
-      bT.index = index-0; bT.elementAt(); R = bT.tData;
+      bT.index = index-1;                                                       // Top key
+      bT.elementAt();                                                           // Top key
+      bL.lastElement();                                                         // Last element of left child
+      bR.tKey = bT.tKey; bR.tData = bL.tData; bR.unshift();                     // Left top to right
 
-      l = node(Node_left,  L);
-      r = node(Node_right, R);
-
-      if (hasLeavesForChildren())                                               // Children are leaves
-       {z();
-        lL.base(nodeTypes[l].leafBase());
-        lR.base(nodeTypes[r].leafBase());
-        nl = nodeTypes[l].leafSize();
-        nr = nodeTypes[r].leafSize();
-
-        if (nl + nr >= maxKeysPerLeaf()) {z(); return false;}                   // Combined body would be too big
-        for (int i = 0; i < nl; i++)                                            // Transfer left to right
-         {z(); lL.pop(); lR.tKey = lL.tKey; lR.tData = lL.tData; lR.unshift();
-         }
+      bL.pop();                                                                 // Remove left top
+      for (int i = 0; i < nl; i++)                                              // Transfer left to right
+       {z(); bL.pop(); bR.tKey = bL.tKey; bR.tData = bL.tData; bR.unshift();
        }
-      else                                                                      // Children are branches
-       {z();
-        bL.base(nodeTypes[l].branchBase());
-        bR.base(nodeTypes[r].branchBase());
-        nl =    nodeTypes[l].branchSize();
-        nr =    nodeTypes[r].branchSize();
-
-        if (nl + 1 + nr > maxKeysPerBranch()) {z(); return false;}              // Merge not possible because there is not enough room for the combined result
-        z();
-        bT.index = index-1;                                                     // Top key
-        bT.elementAt();                                                         // Top key
-        bL.lastElement();                                                       // Last element of left child
-        bR.tKey = bT.tKey; bR.tData = bL.tData; bR.unshift();                   // Left top to right
-
-        bL.pop();                                                               // Remove left top
-        for (int i = 0; i < nl; i++)                                            // Transfer left to right
-         {z(); bL.pop(); bR.tKey = bL.tKey; bR.tData = bL.tData; bR.unshift();
-         }
-       }
-      nodeTypes[l].free();                                                      // Free the empty left node
-      bT.index = index - 1;
-      bT.removeElementAt();                                                     // Reduce parent on left
-      {z(); return true;}
      }
+    node_free = l; free();                                                      // Free the empty left node
+    bT.index = index - 1;
+    bT.removeElementAt();                                                       // Reduce parent on left
+    z(); stolenOrMerged = true; return;
+   }
 
-    boolean mergeRightSibling()                                                 // Merge the right sibling
-     {z(); assertBranch();
-      final int bs = branchSize();
-      final String s = "for branch of size: "+bs;
-      z(); if (index >= bs) {z(); return false;}
-      z(); if (index <  0 ) stop("Index", index, "too small", s);
-      z(); if (index >  bs) stop("Index", index, "too big",   s);
-      //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
-      z(); if (bs < 2) {z(); return false;}
-      z();
-      bT.base(branchBase());
-      bT.index = index+0; bT.elementAt(); L = bT.tData;
-      bT.index = index+1; bT.elementAt(); R = bT.tData;
+  private void mergeRightSibling()                                              // Merge the right sibling
+   {z(); tt(node_assertBranch, node_mergeRightSibling); assertBranch();
+    tt(node_branchSize, node_mergeRightSibling); branchSize();
+    final int bs = branchSize;
+    final String s = "for branch of size: "+bs;
+    z(); if (index >= bs) {z(); stolenOrMerged = false; return;}
+    z(); if (index <  0 ) stop("Index", index, "too small", s);
+    z(); if (index >  bs) stop("Index", index, "too big",   s);
+    //if (branchSize() < 2)     stop("Node:", this,  "must have two or more children");
+    z(); if (bs < 2) {z(); stolenOrMerged = false; return;}
+    z();
+    tt(node_branchBase, node_mergeRightSibling); branchBase();
+    bT.base(T.at(branchBase));
+    bT.index = index+0; bT.elementAt(); l = bT.tData;
+    bT.index = index+1; bT.elementAt(); r = bT.tData;
 
-      l = node(Node_left,  L);
-      r = node(Node_right, R);
+    tt(node_hasLeavesForChildren, node_mergeRightSibling); hasLeavesForChildren();
+    if (hasLeavesForChildren)                                                   // Children are leaves
+     {z();
+      node_leafBase = l;
+      leafBase();
+      lL.base(T.at(leafBase));
+      node_leafBase = r;
+      leafBase();
+      lR.base(T.at(leafBase));
+      tt(node_leafSize, l);
+      leafSize();
+      nl = leafSize;
+      tt(node_leafSize, r);
+      leafSize();
+      nr = leafSize;
 
-      if (hasLeavesForChildren())                                               // Children are leaves
-       {z();
-        lL.base(nodeTypes[l].leafBase());
-        lR.base(nodeTypes[r].leafBase());
-        nl =    nodeTypes[l].leafSize();
-        nr =    nodeTypes[r].leafSize();
-
-        if (nl + nr > maxKeysPerLeaf()) {z(); return false;}                    // Combined body would be too big
-        for (int i = 0; i < nr; i++)                                            // Transfer right to left
-         {z(); lR.shift(); lL.tKey  = lR.tKey; lL.tData = lR.tData; lL.push();
-         }
+      if (nl + nr > maxKeysPerLeaf()) {z(); stolenOrMerged = false; return;}    // Combined body would be too big
+      for (int i = 0; i < nr; i++)                                              // Transfer right to left
+       {z(); lR.shift(); lL.tKey  = lR.tKey; lL.tData = lR.tData; lL.push();
        }
-      else                                                                      // Children are branches
-       {z();
-        bL.base(nodeTypes[l].branchBase());
-        bR.base(nodeTypes[r].branchBase());
-        nl =    nodeTypes[l].branchSize();
-        nr =    nodeTypes[r].branchSize();
-
-        if (nl + 1 + nr > maxKeysPerBranch()) {z(); return false;}              // Merge not possible because there is no where to put the steal
-
-        z(); bL.lastElement();                                                  // Last element of left child
-        z(); bT.index = index;
-        z(); bT.elementAt();                                                    // Parent dividing element
-
-        bL.tKey = bT.tKey; bL.index = nl;                                       // Re-key left top
-        bL.setElementAt();                                                      // Re-key left top
-
-        for (int i = 0; i < nr+1; i++)                                          // Transfer right to left
-         {z(); bR.shift(); bL.tKey  = bR.tKey; bL.tData = bR.tData; bL.push();
-         }
-       }
-      nodeTypes[r].free();                                                      // Free the empty right node
-
-      bT.index = index+1; bT.elementAt(); parentKey = bT.tKey;                  // One up from dividing point in parent
-      bT.index = index;   bT.elementAt();                                       // Dividing point in parent
-      bT.tKey  = parentKey;
-      bT.setElementAt();                                                        // Install key of right sibling in this child
-      bT.index = index+1;                                                       // Reduce parent on right
-      bT.removeElementAt();                                                     // Reduce parent on right
-      z(); return true;
      }
+    else                                                                        // Children are branches
+     {z();
+      node_branchBase = l;
+      branchBase();
+      bL.base(T.at(branchBase));
+      node_branchBase = r;
+      branchBase();
+      bR.base(T.at(branchBase));
+      node_branchSize = l;
+      branchSize();
+      nl = branchSize;
+      node_branchSize = r;
+      branchSize();
+      nr = branchSize;
+
+      if (nl + 1 + nr > maxKeysPerBranch()) {z(); stolenOrMerged = false; return;} // Merge not possible because there is no where to put the steal
+
+      z(); bL.lastElement();                                                    // Last element of left child
+      z(); bT.index = index;
+      z(); bT.elementAt();                                                      // Parent dividing element
+
+      bL.tKey = bT.tKey; bL.index = nl;                                         // Re-key left top
+      bL.setElementAt();                                                        // Re-key left top
+
+      for (int i = 0; i < nr+1; i++)                                            // Transfer right to left
+       {z(); bR.shift(); bL.tKey  = bR.tKey; bL.tData = bR.tData; bL.push();
+       }
+     }
+    node_free = r; free();                                                      // Free the empty right node
+
+    bT.index = index+1; bT.elementAt(); parentKey = bT.tKey;                    // One up from dividing point in parent
+    bT.index = index;   bT.elementAt();                                         // Dividing point in parent
+    bT.tKey  = parentKey;
+    bT.setElementAt();                                                          // Install key of right sibling in this child
+    bT.index = index+1;                                                         // Reduce parent on right
+    bT.removeElementAt();                                                       // Reduce parent on right
+    z(); stolenOrMerged = true; return;
+   }
 
 //D2 Balance                                                                    // Balance the tree by merging and stealing
 
-    void balance()                                                              // Augment the indexed child so it has at least two children in its body
-     {z(); assertBranch();
-      z(); if (index < 0)            stop("Index", index, "too small");
-      z(); if (index > branchSize()) stop("Index", index, "too big");
-      z(); if (isLow() && node != root.node)
-            {stop("Parent:", node, "must not be low on children");
-            }
-      z();
+  private void balance()                                                        // Augment the indexed child so it has at least two children in its body
+   {z(); tt(node_assertBranch, node_balance); assertBranch();
+    z(); if (index < 0)          stop("Index", index, "too small");
+    z(); tt(node_branchSize, node_balance); branchSize();
+    z(); if (index > branchSize) stop("Index", index, "too big");
+    z(); tt(node_isLow, node_balance); isLow();
+    z(); if (isLow && node_balance != root)
+          {stop("Parent:", node_balance, "must not be low on children");
+          }
+    z();
 
-      bT.base(branchBase());
-      bT.index = index;
-      bT.elementAt();
+    tt(node_branchBase, node_balance); branchBase();
+    bT.base(T.at(branchBase));
+    bT.index = index;
+    bT.elementAt();
 
-      z();
-      z(); if (!node(nodeTypes[Node_temp], bT.tData).isLow()) return;
-      z(); if (stealFromLeft    ())                   return;
-      z(); if (stealFromRight   ())                   return;
-      z(); if (mergeLeftSibling ())                   return;
-      z(); if (mergeRightSibling())                   return;
-      stop("Unable to balance child:", bT.tData);
-     }
-   }  // Node
-
-  int node(int nodeType, int node)                                              // Refer to a node by number
-   {nodeTypes[nodeType].node = node;
-    return nodeType;
-   }
-
-  NodeTransaction node(NodeTransaction Node, int node)                          // Refer to a node by number
-   {Node.node = node;
-    return Node;
+    z();
+    z(); node_isLow = bT.tData; isLow();
+    z(); if (!isLow)                                                                     return;
+    z(); tt(node_stealFromLeft, node_balance); stealFromLeft    (); if (stolenOrMerged) return;
+    z(); tt(node_stealFromRight, node_balance); stealFromRight   (); if (stolenOrMerged) return;
+    z(); tt(node_mergeLeftSibling, node_balance); mergeLeftSibling (); if (stolenOrMerged) return;
+    z(); tt(node_mergeRightSibling, node_balance); mergeRightSibling(); if (stolenOrMerged) return;
+    stop("Unable to balance child:", bT.tData);
    }
 
 //D1 Array                                                                      // Key, data pairs in the tree as an array
 
-  class ArrayElement                                                            // A key, data pair in the btree as an array element
+  private class ArrayElement                                                    // A key, data pair in the btree as an array element
    {final int i, key, data;
     ArrayElement(int I, int Key, int Data)
      {i = I; key = Key; data = Data;
@@ -1112,17 +1347,18 @@ abstract class BtreeSA extends Test                                             
      }
    }
 
-  Stack<ArrayElement> toArray()                                                 // Key, data pairs in the tree as an array
+  private Stack<ArrayElement> toArray()                                         // Key, data pairs in the tree as an array
    {z();
     final Stack<ArrayElement> s = new Stack<>();
-    if (root.isLeaf()) {z(); root.  leafToArray(s);}
-    else               {z(); root.branchToArray(s);}
+    T.at(node_isLeaf).setInt(root); isLeaf();
+    if (T.at(IsLeaf).isOnes()) {z();   leafToArray(root, s);}
+    else        {z(); branchToArray(root, s);}
     return s;
    }
 
 //D1 Print                                                                      // Print a BTree horizontally
 
-   String printBoxed()                                                          // Print a tree in a box
+   private String printBoxed()                                                  // Print a tree in a box
     {final String  s = toString();
      final int     n = longestLine(s)-1;
      final String[]L = s.split("\n");
@@ -1133,7 +1369,7 @@ abstract class BtreeSA extends Test                                             
      return t.toString();
     }
 
-  void padStrings(Stack<StringBuilder> S, int level)                            // Pad the strings at each level of the tree so we have a vertical face to continue with - a bit like Marc Brunel's tunneling shield
+  private void padStrings(Stack<StringBuilder> S, int level)                    // Pad the strings at each level of the tree so we have a vertical face to continue with - a bit like Marc Brunel's tunneling shield
    {final int N = level * linesToPrintABranch + maxKeysPerLeaf();               // Number of lines we might want
     for (int i = S.size(); i <= N; ++i) S.push(new StringBuilder());            // Make sure we have a full deck of strings
     int m = 0;                                                                  // Maximum length
@@ -1155,203 +1391,212 @@ abstract class BtreeSA extends Test                                             
     return t.toString();
    }
 
-  String print()                                                                // Print a tree horizontally
+  private String print()                                                        // Print a tree horizontally
    {z();
     final Stack<StringBuilder> S = new Stack<>();
 
-    if (root.isLeaf())
-     {z(); root.printLeaf(S, 0);
+    T.at(node_isLeaf).setInt(root); isLeaf();
+    if (T.at(IsLeaf).isOnes())
+     {z(); printLeaf(root, S, 0);
      }
     else
-     {z(); root.printBranch(S, 0);
+     {z(); printBranch(root, S, 0);
      }
     return printCollapsed(S);
    }
 
-//D1 Find                                                                       // Find the data associeted with a key.
+//D1 Find                                                                       // Find the data associated with a key.
 
-  class Transaction                                                             // A transaction on the btree
-   {BtreeSA btree;                                                              // Btree being processed
-    int           Key;                                                          // Key being found, inserted or deleted
-    int          Data;                                                          // Data found, inserted or deleted
-    int          find;                                                          // Results of a find operation
-    int findAndInsert;                                                          // Results of a find and insert operation
-    int        parent;                                                          // Parent node in a descent through the tree
-    int         child;                                                          // Child node in a descent through the tree
-    int          leaf;                                                          // Leaf found by find
-    Integer    delete;                                                          // Results of a deletion
-
-    int find()                                                                  // Find the data associated with a key in the tree
-     {z();
-      if (root.isLeaf())                                                        // The root is a leaf
-       {z(); root.search = Key; root.findEqualInLeaf();
-        return Node_root;
-       }
-
-      parent = Node_root;                                                       // Parent starts at root which is known to be a branch
-
-      for (int i = 0; i < maxDepth; i++)                                        // Step down through tree
-       {z();
-        nodeTypes[parent].search = Key; nodeTypes[parent].findFirstGreaterThanOrEqualInBranch(); // Find next child in search path of key
-        child = node(Node_find, nodeTypes[parent].next);
-
-        if (nodeTypes[child].isLeaf())                                          // Found the containing search
-         {z(); nodeTypes[child].search = Key;
-          nodeTypes[child].findEqualInLeaf();
-          return child;
-         }
-        parent = node(Node_parent, nodeTypes[child].node);                      // Step down to lower branch
-       }
-      stop("Search did not terminate in a leaf");
-      return -1;
+  public int find()                                                             // Find the leaf associated with a key in the tree
+   {z();
+    T.at(node_isLeaf).setInt(root); isLeaf();
+    if (T.at(IsLeaf).isOnes())                                                                 // The root is a leaf
+     {z(); search = Key; T.at(node_findEqualInLeaf).setInt(root); findEqualInLeaf();
+      return root;
      }
 
-    int findAndInsert()                                                         // Find the leaf that should contain this key and insert or update it is possible
+    parent = root;                                                              // Parent starts at root which is now known to be a branch
+
+    for (int i = 0; i < maxDepth; i++)                                          // Step down through tree
      {z();
-      leaf = find();                                                            // Find the leaf that should contain this key
-
-      final NodeTransaction l = nodeTypes[leaf];
-      lT.base(l.leafBase());
-
-      if (l.found)                                                              // Found the key in the leaf so update it with the new data
-       {z(); lT.tKey = Key; lT.tData = Data; lT.index = l.index; lT.setElementAt();
-        l.success = true; l.inserted = false;
-        return leaf;
+      search = Key;
+      node_findFirstGreaterThanOrEqualInBranch = parent;
+      findFirstGreaterThanOrEqualInBranch();                                    // Find next child in search path of key
+      child = next;
+      node_isLeaf = child; isLeaf();
+      if (T.at(IsLeaf).isOnes())                                                               // Found the containing leaf
+       {z(); search = Key;
+        node_findEqualInLeaf = child; findEqualInLeaf();
+        return child;
        }
-
-      if (!l.isFull())                                                          // Leaf is not full so we can insert immediately
-       {z();
-        l.search = Key; l.findFirstGreaterThanOrEqualInLeaf();
-        if (l.found)                                                            // Overwrite existing key
-         {z();
-          lT.tKey = Key; lT.tData = Data; lT.index = l.first; lT.insertElementAt();
-         }
-        else                                                                    // Insert into position
-         {z(); lT.tKey = Key; lT.tData = Data; lT.push();
-         }
-        l.success = true;
-        return leaf;
-       }
-      z(); l.success = false;
-      return leaf;
+      parent = child;                                                           // Step down to lower branch
      }
+    stop("Search for", Key, "did not terminate in a leaf");
+    return -1;
+   }
+
+  public int findAndInsert()                                                    // Find the leaf that should contain this key and insert or update it is possible
+   {z();
+    leafFound = find();                                                         // Find the leaf that should contain this key
+
+    node_leafBase = leafFound; leafBase();
+    lT.base(T.at(leafBase));
+
+    if (found)                                                                  // Found the key in the leaf so update it with the new data
+     {z(); lT.tKey = Key; lT.tData = Data; lT.index = index; lT.setElementAt();
+      success = true; inserted = false;
+      return leafFound;
+     }
+
+    node_isFull = leafFound; isFull();                                          // Leaf is not full so we can insert immediately
+    if (T.at(isFull).isZero())                                                                // Leaf is not full so we can insert immediately
+     {z();
+      search = Key;
+      node_findFirstGreaterThanOrEqualInLeaf = leafFound;
+      findFirstGreaterThanOrEqualInLeaf();
+      if (found)                                                                // Overwrite existing key
+       {z();
+        lT.tKey = Key; lT.tData = Data; lT.index = first; lT.insertElementAt();
+       }
+      else                                                                      // Insert into position
+       {z(); lT.tKey = Key; lT.tData = Data; lT.push();
+       }
+      success = true;
+      return leafFound;
+     }
+    z(); success = false;
+    return leafFound;
+   }
 
 //D1 Insertion                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
 
-    void put()                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
-     {z(); findAndInsert = findAndInsert();                                     // Try direct insertion with no modifications to the shape of the tree
-      if (nodeTypes[findAndInsert].success) return;                             // Inserted or updated successfully
+  public void put()                                                             // Insert a key, data pair into the tree or update and existing key with a new datum
+   {z(); findAndInsert = findAndInsert();                                       // Try direct insertion with no modifications to the shape of the tree
+    if (success) return;                                                        // Inserted or updated successfully
+    z();
+
+    T.at(node_isFull).setInt(root); isFull();                                               // Start the insertion at the root(), after splitting it if necessary
+    if (isFull)                                                                 // Start the insertion at the root(), after splitting it if necessary
+     {z();
+      T.at(node_isLeaf).setInt(root); isLeaf();
+      if (T.at(IsLeaf).isOnes()) {z(); splitLeafRoot();}
+      else        {z(); splitBranchRoot();}
       z();
-
-      if (root.isFull())                                                        // Start the insertion at the root(), after splitting it if necessary
-       {z();
-        if (root.isLeaf()) {z(); root.splitLeafRoot();}
-        else               {z(); root.splitBranchRoot();}
-        z();
-        findAndInsert = findAndInsert();                                        // Splitting the root() might have been enough
-        if (nodeTypes[findAndInsert].success) return;                           // Inserted or updated successfully
-       }
-      z(); parent = Node_root;
-
-      for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-       {z();
-        nodeTypes[parent].search = Key;
-        nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();
-        child = node(Node_put, nodeTypes[parent].next);
-        if (nodeTypes[child].isLeaf())                                          // Reached a leaf
-         {z();
-          nodeTypes[child].parent = parent;
-          nodeTypes[child].index = nodeTypes[parent].first;
-          nodeTypes[child].splitLeaf();                                         // Split the child leaf
-          findAndInsert();
-          merge();
-          return;
-         }
-        z();
-        if (nodeTypes[child].isFull())
-         {z();
-          nodeTypes[child].parent = parent;
-          nodeTypes[child].index = nodeTypes[parent].first;
-          nodeTypes[child].splitBranch();                                       // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
-
-          nodeTypes[parent].search = Key;
-          nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();              // Perform the step down again as the split will have altered the local layout
-          parent = node(Node_parent, nodeTypes[parent].next);
-         }
-        else                                                                    // Step down directly as no split was required
-         {z(); parent = node(Node_parent, nodeTypes[child].node);
-         }
-       }
-      stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
+      findAndInsert = findAndInsert();                                          // Splitting the root() might have been enough
+      if (success) return;                                                      // Inserted or updated successfully
      }
+    z(); parent = root;
+
+    for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
+     {z();
+      search = Key;
+      node_findFirstGreaterThanOrEqualInBranch = parent;
+           findFirstGreaterThanOrEqualInBranch();
+      child = next;
+      node_isLeaf = child; isLeaf();
+      if (T.at(IsLeaf).isOnes())                                                               // Reached a leaf
+       {z();
+        splitParent = parent;
+        index = first;
+        node_splitLeaf = child; splitLeaf();                                    // Split the child leaf
+        findAndInsert();
+        merge();
+        return;
+       }
+      z();
+      node_isFull = child; isFull();
+      if (isFull)
+       {z();
+        splitParent = parent;
+        index = first;
+        node_splitBranch= child; splitBranch();                                 // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
+
+        search = Key;
+        node_findFirstGreaterThanOrEqualInBranch = parent;
+        findFirstGreaterThanOrEqualInBranch();                                  // Perform the step down again as the split will have altered the local layout
+        parent = next;
+       }
+      else                                                                      // Step down directly as no split was required
+       {z(); parent = child;
+       }
+     }
+    stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
+   }
 
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
 
-    Integer findAndDelete()                                                     // Delete a key from the tree and returns its data if present without modifying the shape of tree
-     {z(); find = find();                                                       // Try direct insertion with no modifications to the shape of the tree
-      if (!nodeTypes[find].found) return null;                                  // Inserted or updated successfully
-      z();
-      lT.base(nodeTypes[find].leafBase());                                      // The leaf that contains the key
-      lT.index = nodeTypes[find].index; lT.elementAt();                         // Position in the leaf of the key
+  public Integer findAndDelete()                                                // Delete a key from the tree and returns its data if present without modifying the shape of tree
+   {z(); find = find();                                                         // Try direct insertion with no modifications to the shape of the tree
+    if (!found) return null;                                                    // Inserted or updated successfully
+    z(); node_leafBase = find; leafBase();                                      // The leaf that contains the key
+    lT.base(T.at(leafBase));                                                          // The leaf that contains the key
+    lT.index = index; lT.elementAt();                                           // Position in the leaf of the key
 
-      Data = lT.tData;                                                          // Key, data pairs in the leaf
-      lT.removeElementAt();                                                     // Remove the key, data pair from the leaf
-      return Data;
+    Data = lT.tData;                                                            // Key, data pairs in the leaf
+    lT.removeElementAt();                                                       // Remove the key, data pair from the leaf
+    return Data;
+   }
+
+  Integer delete()                                                              // Insert a key, data pair into the tree or update and existing key with a new datum
+   {z(); T.at(node_mergeRoot).setInt(root); mergeRoot();
+
+    T.at(node_isLeaf).setInt(root); isLeaf();
+    if (T.at(IsLeaf).isOnes())                                                                 // Find and delete directly in root as a leaf
+     {z(); return findAndDelete();
      }
+    z();
 
-    Integer delete()                                                            // Insert a key, data pair into the tree or update and existing key with a new datum
-     {z(); root.mergeRoot();
+    parent = root;                                                              // Start at root
 
-      if (root.isLeaf())                                                        // Find and delete directly in root as a leaf
-       {z(); return findAndDelete();
+    for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
+     {z();                                                                      // Step down
+      search = Key;
+      node_findFirstGreaterThanOrEqualInBranch = parent;
+      findFirstGreaterThanOrEqualInBranch();
+
+      index = first; node_balance = parent; balance();                          // Make sure there are enough entries in the parent to permit a deletion
+      child = next;
+
+      node_isLeaf = child; isLeaf();                                            // Reached a leaf
+      if (T.at(IsLeaf).isOnes())                                                               // Reached a leaf
+       {z();
+        final Integer data = findAndDelete();
+        merge();
+        return data;
        }
-      z();
-
-      parent = Node_root;                                                       // Start at root
-
-      for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-       {z();                                                                    // Step down
-        nodeTypes[parent].search = Key;
-        nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();
-
-        nodeTypes[parent].index = nodeTypes[parent].first;
-        nodeTypes[parent].balance();
-        child = node(Node_delete, nodeTypes[parent].next);
-
-        if (nodeTypes[child].isLeaf())                                          // Reached a leaf
-         {z();
-          final Integer data = findAndDelete();
-          merge();
-          return data;
-         }
-        z(); parent = node(Node_parent, nodeTypes[child].node);
-       }
-      stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
-      return null;
+      z(); parent = child;
      }
+    stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
+    return null;
+   }
 
 //D1 Merge                                                                      // Merge along the specified search path
 
-    void merge()                                                                // Merge along the specified search path
-     {z();
-      root.mergeRoot();
-      parent = Node_root;                                                       // Start at root
+  public void merge()                                                           // Merge along the specified search path
+   {z();
+    mergeRoot();
+    parent = root;                                                              // Start at root
 
-      for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-       {z(); if (nodeTypes[parent].isLeaf()) return;
-        z();
-        for (int j = 0; j < nodeTypes[parent].branchSize(); j++)                // Try merging each sibling pair which might change the size of the parent
-         {z();
-          nodeTypes[parent].index = j; if (nodeTypes[parent].mergeLeftSibling ()) --j; // A successful merge of the left  sibling reduces the current index and the upper limit
-          nodeTypes[parent].index = j;     nodeTypes[parent].mergeRightSibling();      // A successful merge of the right sibling maintains the current position but reduces the upper limit
-         }
-
-        nodeTypes[parent].search = Key;
-        nodeTypes[parent].findFirstGreaterThanOrEqualInBranch();                // Step down
-        parent = node(Node_parent, nodeTypes[parent].next);
+    for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
+     {z(); node_isLeaf = parent; isLeaf(); if (T.at(IsLeaf).isOnes()) return;
+      z();
+      node_branchSize = parent; branchSize();
+      for (int j = 0; j < branchSize; j++)                                      // Try merging each sibling pair which might change the size of the parent
+       {z();
+        index = j;
+        node_mergeLeftSibling = parent; mergeLeftSibling();
+        if (stolenOrMerged) --j;                                                // A successful merge of the left  sibling reduces the current index and the upper limit
+        index = j;
+        node_mergeRightSibling = parent; mergeRightSibling();                   // A successful merge of the right sibling maintains the current position but reduces the upper limit
+        node_branchSize = parent; branchSize();
        }
-      stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
+
+      search = Key;
+      node_findFirstGreaterThanOrEqualInBranch = parent;
+      findFirstGreaterThanOrEqualInBranch();                                    // Step down
+      parent = next;
      }
+    stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
    }
 
 //D0 Tests                                                                      // Testing
@@ -1361,9 +1606,8 @@ abstract class BtreeSA extends Test                                             
 
   static void test_put_ascending()
    {final BtreeSA     t = btreeSML(4, 3);
-    final Transaction T = t.new Transaction();
     final int N = 64;
-    for (int i = 1; i <= N; i++) {T.Key = T.Data = i; T.put();}
+    for (int i = 1; i <= N; i++) {t.Key = t.Data = i; t.put(); }
     //t.stop();
     t.ok("""
                                                                                                                             32                                                                                                                                           |
@@ -1385,9 +1629,8 @@ abstract class BtreeSA extends Test                                             
 
   static void test_put_ascending_wide()
    {final BtreeSA     t = btreeSML(8, 7);
-    final Transaction T = t.new Transaction();
     final int N = 64;
-    for (int i = 1; i <= N; ++i) {T.Key = T.Data = i; T.put();}
+    for (int i = 1; i <= N; ++i) {t.Key = t.Data = i; t.put();}
     //stop(t);
     t.ok("""
                                                                                                       32                                                                                                                  |
@@ -1405,9 +1648,8 @@ abstract class BtreeSA extends Test                                             
 
   static void test_put_descending()
    {final BtreeSA     t = btreeSML(2, 3);
-    final Transaction T = t.new Transaction();
     final int N = 64;
-    for (int i = N; i > 0; --i) {T.Key = T.Data = i; T.put();}
+    for (int i = N; i > 0; --i) {t.Key = t.Data = i; t.put();}
     //t.stop();
     t.ok("""
                                                                                   16                                                                                              32                                                                                                                                                                                          |
@@ -1429,11 +1671,10 @@ abstract class BtreeSA extends Test                                             
 
   static void test_put_small_random()
    {final BtreeSA     t = btreeSML(6, 3);
-    final Transaction T = t.new Transaction();
 
     for (int i = 0; i < random_small.length; ++i)
-     {T.Key = T.Data = random_small[i];
-      T.put();
+     {t.Key = t.Data = random_small[i];
+      t.put();
      }
     //stop(t);
     t.ok("""
@@ -1457,35 +1698,32 @@ abstract class BtreeSA extends Test                                             
   static void test_put_large_random()
    {if (!github_actions) return;
     final BtreeSA t = btreeSML(2, 3);
-    final Transaction T = t.new Transaction();
     final TreeMap<Integer,Integer> s = new TreeMap<>();
 
     for (int i = 0; i < random_large.length; ++i)
      {final int r = random_large[i];
       s.put(r, i);
-      T.Key = r; T.Data = i; T.put();
+      t.Key = r; t.Data = i; t.put();
      }
     final int a = s.firstKey(), b = s.lastKey();
     for (int i = a-1; i < b + 1; ++i)
-     {T.Key = i;
+     {t.Key = i;
       if (s.containsKey(i))
-       {NodeTransaction f = t.nodeTypes[T.find()];
-        assert f == t.nodeTypes[t.Node_find];
-        ok(f.found);
-        ok(f.data, s.get(i));
+       {t.find();
+        ok(t.found);
+        ok(t.data, s.get(i));
        }
       else
-       {NodeTransaction f = t.nodeTypes[T.find()];
-        ok(!f.found);
+       {t.find();
+        ok(!t.found);
        }
      }
    }
 
   static void test_find()
    {final BtreeSA     t = btreeSML(8, 3);
-    final Transaction T = t.new Transaction();
     final int N = 32;
-    for (int i = 1; i <= N; i++) {T.Key = T.Data = 2*i; T.put();}               // Insert
+    for (int i = 1; i <= N; i++) {t.Key = t.Data = 2*i; t.put();}               // Insert
     //stop(t);
     t.ok("""
                                                   33                                                      |
@@ -1500,36 +1738,34 @@ abstract class BtreeSA extends Test                                             
 """);
 
     for (int i = 0; i <= 2*N+1; i++)                                            // Update
-     {T.Key = i;
-      NodeTransaction f = t.nodeTypes[T.find()];
-      assert f == t.nodeTypes[t.Node_find];
+     {t.Key = i;
+      t.find();
       if (i > 0 && i % 2 == 0)
-       {ok(f.found, true);
-        ok(f.data,  i);
-        T.Data = i-1;
-        T.put();
+       {ok(t.found, true);
+        ok(t.data,  i);
+        t.Data = i-1;
+        t.put();
        }
-      else ok(f.found, false);
+      else ok(t.found, false);
      }
 
     for (int i = 0; i <= 2*N+1; i++)
-     {T.Key = i;
-      NodeTransaction f = t.nodeTypes[T.find()];
+     {t.Key = i;
+      t.find();
       if (i > 0 && i % 2 == 0)
-       {ok(f.found, true);
-        ok(f.data,  i-1);
+       {ok(t.found, true);
+        ok(t.data,  i-1);
        }
-      else ok(f.found, false);
+      else ok(t.found, false);
      }
    }
 
   static void test_delete_ascending()
    {final BtreeSA     t = btreeSML(4, 3);
-    final Transaction T = t.new Transaction();
 
     final int N = 32;
     final boolean box = false;                                                  // Print read me
-    for (int i = 1; i <= N; i++) {T.Key = T.Data = i; T.put();}
+    for (int i = 1; i <= N; i++) {t.Key = t.Data = i; t.put();}
     //t.stop();
     t.ok("""
                                                       16                               24                               |
@@ -1546,7 +1782,8 @@ abstract class BtreeSA extends Test                                             
     if (box) say("At start with", N, "elements", t.printBoxed());
 
     for (int i = 1; i <= N; i++)
-     {T.Key = i; T.delete();
+     {debug = i >= 28;
+      t.Key = i; t.delete();
       //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
       if (box) say("After deleting:", i, t.printBoxed());
       switch(i) {
@@ -1824,10 +2061,9 @@ abstract class BtreeSA extends Test                                             
 
   static void test_delete_descending()
    {final BtreeSA     t = btreeSML(4, 3);
-    final Transaction T = t.new Transaction();
     final int N = 32;
     final boolean box = false;                                                  // Print read me
-    for (int i = 1; i <= N; i++) {T.Key = T.Data = i; T.put();}
+    for (int i = 1; i <= N; i++) {t.Key = t.Data = i; t.put();}
     //t.stop();
     t.ok("""
                                                       16                               24                               |
@@ -1844,8 +2080,8 @@ abstract class BtreeSA extends Test                                             
     if (box) say("At start with", N, "elements", t.printBoxed());
 
     for (int i = N; i > 0; --i)
-     {T.Key = i;
-      T.delete();
+     {t.Key = i;
+      t.delete();
       //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
       if (box) say("After deleting:", i, t.printBoxed());
       switch(i) {
@@ -2122,10 +2358,9 @@ abstract class BtreeSA extends Test                                             
    }
   static void test_to_array()
    {final BtreeSA     t = btreeSML(2, 3);
-    final Transaction T = t.new Transaction();
 
     final int M = 2;
-    for (int i = 1; i <= M; i++)  {T.Key = T.Data = i; T.put();}
+    for (int i = 1; i <= M; i++)  {t.Key = t.Data = i; t.put();}
     //stop(""+t.toArray());
     ok(""+t.toArray(), """
 [(0, key:1 data:1)
@@ -2133,7 +2368,7 @@ abstract class BtreeSA extends Test                                             
 ]""");
 
     final int N = 16;
-    for (int i = M; i <= N; i++)  {T.Key = T.Data = i; T.put();}
+    for (int i = M; i <= N; i++)  {t.Key = t.Data = i; t.put();}
     //stop(t);
     //stop(""+t.toArray());
     ok(""+t.toArray(), """
@@ -2161,7 +2396,7 @@ abstract class BtreeSA extends Test                                             
     test_put_ascending_wide();                                                  //  5.33
     test_put_descending();                                                      // 12.98
     test_put_small_random();                                                    //  8.72
-    //test_put_large_random();                                                    //  0
+    test_put_large_random();                                                    //  0
     test_find();                                                                //  4.62
     test_delete_ascending();                                                    //  7.27
     test_delete_descending();                                                   //  7.66
@@ -2175,7 +2410,7 @@ abstract class BtreeSA extends Test                                             
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      //if (github_actions)                                                       // Coverage analysis
+      if (github_actions)                                                       // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
