@@ -7,7 +7,7 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 abstract class BtreeSP extends Test                                             // Manipulate a btree using static methods and memory
- {MemoryLayout memoryLayout = new MemoryLayout();                               // The memory layout of the btree
+ {final MemoryLayout memoryLayout = new MemoryLayout();                         // The memory layout of the btree
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -17,8 +17,6 @@ abstract class BtreeSP extends Test                                             
   abstract int maxKeysPerBranch();                                              // Maximum number of keys in a branch
   final int splitLeafSize;                                                      // The number of key, data pairs to split out of a leaf
   final int splitBranchSize;                                                    // The number of key, next pairs to split out of a branch
-
-  StuckSP leafStuck, branchStuck;                                               // Leaf, branch definition
 
   Layout.Field     leaf;                                                        // Layout of a leaf in the memory used by btree
   Layout.Field     branch;                                                      // Layout of a branch in the memory used by btree
@@ -158,14 +156,14 @@ abstract class BtreeSP extends Test                                             
    {z();
     final BtreeSP btree = this;
 
-    leafStuck = new StuckSP()                                                   // Leaf
+    final StuckSP leafStuck = new StuckSP()                                     // Leaf
      {int               maxSize() {return btree.maxKeysPerLeaf();}
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerData();}
       int           bitsPerSize() {return btree.bitsPerSize();}
      };
 
-    branchStuck = new StuckSP()                                                 // Branch
+    final StuckSP branchStuck = new StuckSP()                                   // Branch
      {int               maxSize() {return btree.maxKeysPerBranch()+1;}          // Not forgetting top next
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerNext();}
@@ -201,19 +199,21 @@ abstract class BtreeSP extends Test                                             
 
 //D1 Memory allocation                                                          // Allocate and free memory
 
-  private int allocate(boolean check)                                           // Allocate a node with or without checking for sufficient free space
-   {z(); final int    f = getInt(freedChain);                                   // Last freed node
-    z(); if (check && f == 0) stop("No more memory available");                 // No more free nodes available
-    z(); final int    F = getInt(free,       f);                                // Second to last freed node
-                          setInt(freedChain, F);                                // Make second to last freed node the first freed node to liberate the existing first free node
-    node_clear = f; clear();                                                    // Construct and clear the node
+  private void allocate(boolean check)                                          // Allocate a node with or without checking for sufficient free space
+   {z(); allocate = getInt(freedChain);                                         // Last freed node
+    z(); if (check && allocate == 0) stop("No more memory available");          // No more free nodes available
+    z(); nextFree = getInt(free, allocate);                                     // Second to last freed node
+    setInt(freedChain, nextFree);                                               // Make second to last freed node the first freed node to liberate the existing first free node
+    node_clear = allocate; clear();                                             // Construct and clear the node
     maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                                // Number of nodes in use
-    return f;
    }
 
-  private int allocate() {z(); return allocate(true);}                          // Allocate a node checking for free space
+  private void allocate() {z(); allocate(true);}                                // Allocate a node checking for free space
 
 //D1 Components                                                                 // A branch or leaf in the tree
+
+  int        allocate;                                                          // The latest allocation result
+  int        nextFree;                                                          // Next element of the free chain
 
   boolean     success;                                                          // Inserted or updated if true
   boolean    inserted;                                                          // Inserted if true
@@ -263,7 +263,6 @@ abstract class BtreeSP extends Test                                             
   int         parent;                                                           // Parent node in a descent through the tree
   int          child;                                                           // Child node in a descent through the tree
   int      leafFound;                                                           // Leaf found by find
-  Integer     delete;                                                           // Results of a deletion
 
   int node_isLeaf;                                                              // The node to be used to implicitly parameterize each method call
   int node_setLeaf;
@@ -295,15 +294,15 @@ abstract class BtreeSP extends Test                                             
   int node_mergeRightSibling;
   int node_balance;
 
-  private void    isLeaf() {z(); IsLeaf = getInt(isLeaf,  node_isLeaf) > 0;}    // A leaf if true
+  private void    isLeaf() {z(); IsLeaf = getInt(isLeaf,    node_isLeaf) > 0;}  // A leaf if true
   private void   setLeaf() {z();          setInt(isLeaf, 1, node_setLeaf);}     // Set as leaf
   private void setBranch() {z();          setInt(isLeaf, 0, node_setBranch);}   // Set as branch
 
   private void assertLeaf()   {z(); node_isLeaf = node_assertLeaf;   isLeaf(); if (!IsLeaf) stop("Leaf required");}
   private void assertBranch() {z(); node_isLeaf = node_assertBranch; isLeaf(); if ( IsLeaf) stop("Branch required");}
 
-  private void allocLeaf()  {z(); allocLeaf   = node_setLeaf   = allocate(); setLeaf();  } // Allocate leaf
-  private void allocBranch(){z(); allocBranch = node_setBranch = allocate(); setBranch();} // Allocate branch
+  private void allocLeaf()  {z(); allocate(); allocLeaf   = node_setLeaf   = allocate; setLeaf();  } // Allocate leaf
+  private void allocBranch(){z(); allocate(); allocBranch = node_setBranch = allocate; setBranch();} // Allocate branch
 
   private void free()                                                           // Free a new node to make it available for reuse
    {z(); if (node_free == 0) stop("Cannot free root");                          // The root is never freed
