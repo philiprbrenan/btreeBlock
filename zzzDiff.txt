@@ -1,0 +1,114 @@
+1153c1153
+<   public int find()                                                             // Find the leaf associated with a key in the tree
+---
+>   public void find()                                                            // Find the leaf associated with a key in the tree
+1158c1158
+<       return root;
+---
+>       find = root; return;
+1173c1173,1174
+<         return child;
+---
+>         find = child;
+>         return;
+1178d1178
+<     return -1;
+1181c1181
+<   public int findAndInsert()                                                    // Find the leaf that should contain this key and insert or update it is possible
+---
+>   private void findAndInsert()                                                  // Find the leaf that should contain this key and insert or update it is possible
+1183c1183
+<     leafFound = find();                                                         // Find the leaf that should contain this key
+---
+>     find(); leafFound = find;                                                   // Find the leaf that should contain this key
+1188c1188
+<     if (found)                                                                  // Found the key in the leaf so update it with the new data
+---
+>     if (found)                                                                  // Found the key in the leaf so update it with the new data. The found flag was set by find calling findEqualInLeaf before returning.
+1191c1191,1192
+<       return leafFound;
+---
+>       findAndInsert = leafFound;
+>       return;
+1208c1209,1210
+<       return leafFound;
+---
+>       findAndInsert = leafFound;
+>       return;
+1211d1212
+<     return leafFound;
+1217c1218
+<    {z(); findAndInsert = findAndInsert();                                       // Try direct insertion with no modifications to the shape of the tree
+---
+>    {z(); findAndInsert();                                                       // Try direct insertion with no modifications to the shape of the tree
+1228c1229
+<       findAndInsert = findAndInsert();                                          // Splitting the root() might have been enough
+---
+>       findAndInsert();                                                          // Splitting the root() might have been enough
+1271,1273c1272,1274
+<   public Integer findAndDelete()                                                // Delete a key from the tree and returns its data if present without modifying the shape of tree
+<    {z(); find = find();                                                         // Try direct insertion with no modifications to the shape of the tree
+<     if (!found) return null;                                                    // Inserted or updated successfully
+---
+>   private void findAndDelete()                                                  // Delete a key from the tree and returns its data if present without modifying the shape of tree
+>    {z(); find();                                                                // Try direct insertion with no modifications to the shape of the tree
+>     if (!found) return;                                                         // Inserted or updated successfully
+1280d1280
+<     return Data;
+1283c1283
+<   Integer delete()                                                              // Insert a key, data pair into the tree or update and existing key with a new datum
+---
+>   public void delete()                                                          // Delete a key from the tree and return its associated Data if the key was found.
+1288c1288
+<      {z(); return findAndDelete();
+---
+>      {z(); findAndDelete(); return;
+1306c1306,1307
+<         final Integer data = findAndDelete();
+---
+>         findAndDelete();
+>         boolean f = found;
+1308c1309,1310
+<         return data;
+---
+>         found = f;
+>         return;
+1313c1315
+<     return null;
+---
+>     return;
+1318c1320
+<   public void merge()                                                           // Merge along the specified search path
+---
+>   private void merge()                                                          // Merge along the specified search path
+1528,1529c1530,1531
+<      {debug = i >= 28;
+<       t.Key = i; t.delete();
+---
+>      {t.Key = i; t.delete();
+>       ok(t.found); ok(t.Data, i);
+1827a1830
+>       ok(t.found); ok(t.Data, i);
+2136a2140,2157
+>   static void test_delete_small_random()
+>    {final BtreeSP t = btreeSML(4, 3);
+> 
+>     for (int i = 0; i < random_small.length; ++i)
+>      {t.Key = random_small[i]; t.Data = i;
+>       t.put();
+>      }
+> 
+>     for (int i = 0; i < random_small.length; ++i)
+>      {t.Key = -1;               t.delete();
+>       ok(!t.found);
+> 
+>       t.Key = random_small[i];  t.delete();
+>       ok( t.found);
+>       ok(t.Data, i);
+>      }
+>    }
+> 
+2145a2167
+>     test_delete_small_random();                                                 //
+2146a2169
+>     test_delete_small_random();
