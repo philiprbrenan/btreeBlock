@@ -925,94 +925,110 @@ abstract class BtreeSA extends Test                                             
          leafSize();
     z(); final int S = T.at(leafSize).getInt(), I = T.at(index).getInt();
          tt(node_isFull, node_splitLeaf); isFull();
-    z(); final boolean nif = !isFull;
-         node_isFull = splitParent; isFull();
-    z(); final boolean pif = isFull;
-    z(); if (nif)   stop("Leaf:", node_splitLeaf, "is not full, but has:", S, this);
-    z(); if (pif)   stop("Leaf split parent:", splitParent, "must not be full");
+    z(); if (T.at(isFull).isZero())   stop("Leaf:", node_splitLeaf, "is not full, but has:", S, this);
+         tt(node_isFull, splitParent); isFull();
+    z(); if (T.at(isFull).isOnes())   stop("Leaf split parent:", splitParent, "must not be full");
     z(); if (I < 0) stop("Index", I, "too small");
     z(); if (I > S) stop("Index", I, "too big for leaf with:", S);
     z();
-    allocLeaf(); l = allocLeaf;                                                 // New  split out leaf
+    allocLeaf(); tt(l, allocLeaf);                                                 // New  split out leaf
 
-    node_leafBase = l;              leafBase(); lL.base(T.at(leafBase));              // The leaf being split into
+    tt(node_leafBase, l);              leafBase(); lL.base(T.at(leafBase));              // The leaf being split into
     tt(node_leafBase, node_splitLeaf); leafBase(); lR.base(T.at(leafBase));              // The leaf being split on the right
 
     for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf
-     {z(); lR.shift(); lL.tKey = lR.tKey; lL.tData = lR.tData; lL.push();
+     {z(); lR.shift();
+      lL.T.at(lL.tKey ).move(lR.T.at(lR.tKey ));
+      lL.T.at(lL.tData).move(lR.T.at(lR.tData));
+      lL.push();
      }
     lR.firstElement();
     lL. lastElement();
-    node_branchBase = splitParent; branchBase();                                // The parent branch
+    tt(node_branchBase, splitParent); branchBase();                                // The parent branch
     bT.base(T.at(branchBase));                                                        // The parent branch
-    bT.tKey  = (lR.tKey + lL.tKey) / 2;                                         // Splitting key
-    bT.tData = l;
-    bT.index = index;
+    bT.T.at(bT.tKey).setInt((lR.T.at(lR.tKey).getInt() + lL.T.at(lL.tKey).getInt()) / 2);    // Splitting key
+    bT.T.at(bT.tData).move(T.at(l));
+    bT.T.at(bT.index).move(T.at(index));
     bT.insertElementAt();                                                       // Insert new key, next pair in parent
    }
 
   private void splitBranch()                                                    // Split a branch which is not the root by splitting right to left
    {z(); tt(node_assertBranch, node_splitBranch); assertBranch();
     z(); tt(node_branchSize, node_splitBranch); branchSize();
-    z(); final int bs = branchSize, I = index, pn = splitParent, nd = node_splitBranch;
-         tt(node_isFull, node_splitBranch); isFull();
-    z(); final boolean nif = !isFull;
-         node_isFull = splitParent; isFull();
-    z(); final boolean pif = isFull;
+    z(); final int bs = T.at(branchSize      ).getInt(),
+                    I = T.at(index           ).getInt(),
+                   pn = T.at(splitParent     ).getInt(),
+                   nd = T.at(node_splitBranch).getInt();
     z(); if (nd == 0) stop("Cannot split root with this method");
-    z(); if (nif)     stop("Branch:", nd, "is not full, but", bs);
-    z(); if (pif)     stop("Branch split parent:", pn, "must not be full");
+
+         tt(node_isFull, node_splitBranch); isFull();
+    z(); if (T.at(isFull).isZero())     stop("Branch:", nd, "is not full, but", bs);
+
+         tt(node_isFull, splitParent); isFull();
+    z(); if (T.at(isFull).isOnes())     stop("Branch split parent:", pn, "must not be full");
+
     z(); if (I < 0)   stop("Index", I, "too small in node:", nd);
     z(); if (I > bs)  stop("Index", I, "too big for branch with:",
                             bs, "in node:", nd);
     z();
-    allocBranch(); l = allocBranch;
-    node_branchBase = splitParent;      branchBase(); bT.base(T.at(branchBase));      // The parent branch
-    node_branchBase = l;                branchBase(); bL.base(T.at(branchBase));      // The branch being split into
+    allocBranch(); tt(l, allocBranch);
+    tt(node_branchBase, splitParent);      branchBase(); bT.base(T.at(branchBase));      // The parent branch
+    tt(node_branchBase, l);                branchBase(); bL.base(T.at(branchBase));      // The branch being split into
     tt(node_branchBase, node_splitBranch); branchBase(); bR.base(T.at(branchBase));      // The branch being split
 
     for (int i = 0; i < splitBranchSize; i++)                                   // Build left branch from right
-     {z(); bR.shift(); bL.tKey = bR.tKey; bL.tData = bR.tData; bL.push();
+     {z(); bR.shift();
+      bL.T.at(bL.tKey ).move(bR.T.at(bR.tKey ));
+      bL.T.at(bL.tData).move(bR.T.at(bR.tData));
+      bL.push();
      }
-    bR.shift(); bL.tKey = 0; bL.tData = bR.tData; bL.push();                    // Build right branch - becomes top and so is ignored by search ... except last
-    bT.tKey = bR.tKey; bT.tData = l; bT.index = index; bT.insertElementAt();
+    bR.shift();
+    bL.T.at(bL.tKey ).zero();
+    bL.T.at(bL.tData).move(bR.T.at(bR.tData));
+    bL.push();                    // Build right branch - becomes top and so is ignored by search ... except last
+    bT.T.at(bT.tKey ).move(bR.T.at(bR.tKey));
+    bT.T.at(bT.tData).move(T.at(l));
+    bT.T.at(bT.index).move(T.at(index));
+    bT.insertElementAt();
    }
 
   private void stealFromLeft()                                                  // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
    {z(); tt(node_assertBranch, node_stealFromLeft); assertBranch();
-    z(); if (index == 0) {z(); stolenOrMerged = false; return;}
-    z(); if (index < 0) stop("Index", index, "too small");
+    z(); if (T.at(index).isZero()) {z(); T.at(stolenOrMerged).zero(); return;}
     z(); tt(node_branchSize, node_stealFromLeft); branchSize();
-    z(); if (index > branchSize) stop("Index", index, "too big");
+    z(); if (T.at(index).greaterThan(T.at(branchSize))) stop("Index", index, "too big");
     z();
 
     tt(node_branchBase, node_stealFromLeft); branchBase();
     bT.base(T.at(branchBase));
-    bT.index = index - 1; bT.elementAt(); l = bT.tData;
-    bT.index = index - 0; bT.elementAt(); r = bT.tData;
+    bT.T.at(bT.index).move(T.at(index)); bT.T.at(bT.index).dec(); bT.elementAt(); T.at(l).move(bT.T.at(bT.tData));
+    bT.T.at(bT.index).move(T.at(index));                          bT.elementAt(); T.at(r).move(bT.T.at(bT.tData));
 
-    tt(node_hasLeavesForChildren, node_stealFromLeft); hasLeavesForChildren();     // Children are leaves
-    if (hasLeavesForChildren)                                                   // Children are leaves
+    tt(node_hasLeavesForChildren, node_stealFromLeft); hasLeavesForChildren();  // Children are leaves
+    if (T.at(hasLeavesForChildren).isOnes())                                    // Children are leaves
      {z();
-      node_leafBase = l; leafBase(); lL.base(T.at(leafBase));
-      node_leafBase = r; leafBase(); lR.base(T.at(leafBase));
+      tt(node_leafBase, l); leafBase(); lL.base(T.at(leafBase));
+      tt(node_leafBase, r); leafBase(); lR.base(T.at(leafBase));
 
-      tt(node_leafSize, l);
-      leafSize();
-      nl = leafSize;
-      tt(node_leafSize, r);
-      leafSize();
-      nr = leafSize;
+      tt(node_leafSize, l); leafSize(); tt(nl, leafSize);
+      tt(node_leafSize, r); leafSize(); tt(nr, leafSize);
 
-      if (nr >= maxKeysPerLeaf()) {z(); stolenOrMerged = false; return;}        // Steal not possible because there is no where to put the steal
-      if (nl <= 1)                {z(); stolenOrMerged = false; return;}        // Steal not allowed because it would leave the leaf sibling empty
+      if (T.at(nr).greaterThanOrEqual(T.constant(maxKeysPerLeaf()))) {z(); T.at(stolenOrMerged).zero(); return;}        // Steal not possible because there is no where to put the steal
+      if (T.at(nl).lessThanOrEqual   (T.constant(0)))                {z(); T.at(stolenOrMerged).zero(); return;}        // Steal not allowed because it would leave the leaf sibling empty
       z();
 
-      lL.lastElement(); lR.tKey = lL.tKey; lR.tData = lL.tData; lR.unshift();   // Increase right
+      lL.lastElement();
+      lR.T.at(lR.tKey ).move(lL.T.at(lL.tKey ));
+      lR.T.at(lR.tData).move(lL.T.at(lL.tData));
+      lR.unshift();   // Increase right
 
       lL.pop();                                                                 // Reduce left
-      lL.index = nl-2; lL.elementAt();                                          // Last key on left
-      bT.tKey  = lL.tKey; bT.tData = l; bT.index = index-1; bT.setElementAt();  // Reduce key of parent of left
+      lL.index = nl-2;
+      lL.elementAt();                                          // Last key on left
+      bT.tKey  = lL.tKey;
+      bT.tData = l;
+      bT.index = index-1;
+      bT.setElementAt();  // Reduce key of parent of left
      }
     else                                                                        // Children are branches
      {z();
