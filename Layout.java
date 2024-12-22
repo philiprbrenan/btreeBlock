@@ -11,6 +11,7 @@ import java.util.*;
 public class Layout extends Test                                                // A Memory layout for a chip. There might be several such layouts representing parts of the chip.
  {Field top;                                                                    // The top most field in a set of nested fields describing memory.
   final Stack<Field> fields = new Stack<>();                                    // Field creation sequence to enable efficient duplication of a layout
+  String layoutName;                                                            // Name this memory layout if helpful
   static boolean debug = false;                                                 // Debugging when true
 
   static Layout layout() {return new Layout();}                                 // Create a new Layout that can be loaded field by field
@@ -54,6 +55,8 @@ public class Layout extends Test                                                
      {z(); name = Name; number = fields.size();
       fields.push(this);
      }
+
+    Layout container() {return Layout.this;}                                    // The containing layout
 
     int at(int...Indices) {z(); return locator.at(Indices);}                    // Location of field taking into account field indices
     int width()           {z(); return width;}                                  // Size of the memory in bits occupied by this field
@@ -109,6 +112,7 @@ public class Layout extends Test                                                
     StringBuilder header()                                                      // Create a string builder with a header preloaded
      {final StringBuilder s = new StringBuilder();
       //s.append("Memory: "+memory.memoryNumber+"\n");
+      if (layoutName != null) s.append("Memory Layout: "+layoutName+"\n");
       s.append(String.format
        ("%1s %4s  %4s  %4s    %-16s       %s\n",
         "T", "At", "Wide", "Size", "Name", "Path"));
@@ -612,6 +616,36 @@ V    0     2              a                    A.a
     ok(l.get("A.a").at(2, 3), 22);
    }
 
+  static void test_container()
+   {Layout    l = new Layout();
+    Variable  a = l.variable ("a", 2);
+    Variable  b = l.variable ("b", 2);
+    Variable  c = l.variable ("c", 4);
+    Structure s = l.structure("s", a, b, c);
+    l.compile();  l.layoutName = "aaa";
+
+    Layout    L = new Layout();
+    Variable  A = L.variable ("A", 2);
+    Field     B = L.duplicate("B", l);
+    Variable  C = L.variable ("C", 4);
+    Structure S = L.structure("S", A, B, C);
+    L.compile();  L.layoutName = "bbb";
+
+    ok(L, """
+Memory Layout: bbb
+T   At  Wide  Size    Name                   Path
+S    0    14          S
+V    0     2            A                    A
+S    2     8            B                    B
+V    2     2              a                    B.a
+V    4     2              b                    B.b
+V    6     4              c                    B.c
+V   10     4            C                    C
+""");
+    ok(a.container().layoutName, "aaa");
+    ok(A.container().layoutName, "bbb");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_layout();
     test_array();
@@ -620,6 +654,7 @@ V    0     2              a                    A.a
     test_duplicate();
     test_duplicate_array();
     test_array_indexing();
+    test_container();
    }
 
   static void newTests()                                                        // Tests being worked on
