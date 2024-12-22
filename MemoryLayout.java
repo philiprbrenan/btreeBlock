@@ -223,6 +223,22 @@ class MemoryLayout extends Test                                                 
 
 //D1 Boolean                                                                    // Boolean operations on fields held in memories.
 
+    boolean isZero()                                                            // Whether the field is all zero
+     {z();
+      for(int i = 0; i < width; ++i)
+       {z(); if (getBit(i)) {z(); return false;}
+       }
+      z(); return true;
+     }
+
+    boolean isOnes()                                                            // Whether the field is all ones
+     {z();
+      for(int i = 0; i < width; ++i)
+       {z(); if (!getBit(i)) {z(); return false;}
+       }
+      z(); return true;
+     }
+
     boolean equal(At b)                                                         // Whether  a == b
      {z();
       if (field == null || b.field == null)
@@ -987,8 +1003,37 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.at(a).setInt(1);
     m.at(b).setInt(2);
 
-    m.at(a).lessThan(m.at(b), m.at(r)); ok( m.at(r).getInt(), 1);
-    m.at(b).lessThan(m.at(a), m.at(r)); ok( m.at(r).getInt(), 0);
+    m.at(a).lessThan(m.at(b), m.at(r)); ok(m.at(r).getInt(), 1);
+    m.at(b).lessThan(m.at(a), m.at(r)); ok(m.at(r).getInt(), 0);
+   }
+
+  static void test_is_ones_or_zeros()
+   {Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Variable  c = l.variable ("c", 4);
+    Layout.Structure s = l.structure("s", a, b, c);
+    l.compile();
+
+    MemoryLayout     m = new MemoryLayout();
+    m.layout(l);
+    m.memory(new Memory(l.size()));
+
+    m.at(a).zero();
+    m.at(b).setInt(2);
+    m.at(c).ones();
+
+    ok(m, """
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        12                                      s
+   2 V        0         4                                  0     a
+   3 V        4         4                                  2     b
+   4 V        8         4                                 15     c
+""");
+
+    ok( m.at(a).isZero()); ok(!m.at(a).isOnes());
+    ok(!m.at(b).isZero()); ok(!m.at(b).isOnes());
+    ok(!m.at(c).isZero()); ok( m.at(c).isOnes());
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -1006,6 +1051,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_move_down();
     test_zero();
     test_boolean_result();
+    test_is_ones_or_zeros();
    }
 
   static void newTests()                                                        // Tests being worked on
