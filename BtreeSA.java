@@ -1449,7 +1449,7 @@ abstract class BtreeSA extends Test                                             
     T.at(node_isLeaf).setInt(root); isLeaf();
     if (T.at(IsLeaf).isOnes())                                                                 // The root is a leaf
      {z(); tt(search, Key); T.at(node_findEqualInLeaf).setInt(root); findEqualInLeaf();
-      find = root; return;
+      T.at(find).zero(); return;
      }
 
     T.at(parent).zero();                                                        // Parent starts at root which is now known to be a branch
@@ -1461,100 +1461,100 @@ abstract class BtreeSA extends Test                                             
       findFirstGreaterThanOrEqualInBranch();                                    // Find next child in search path of key
       tt(child, next);
       tt(node_isLeaf, child); isLeaf();
-      if (T.at(IsLeaf).isOnes())                                                               // Found the containing leaf
+      if (T.at(IsLeaf).isOnes())                                                // Found the containing leaf
        {z(); tt(search, Key);
         tt(node_findEqualInLeaf, child); findEqualInLeaf();
-        find = child; return;
+        tt(find, child); return;
        }
-      parent = child;                                                           // Step down to lower branch
+      tt(parent, child);                                                        // Step down to lower branch
      }
     stop("Search for", Key, "did not terminate in a leaf");
    }
 
   private void findAndInsert()                                                  // Find the leaf that should contain this key and insert or update it is possible
    {z();
-    find(); leafFound = find;                                                   // Find the leaf that should contain this key
+    find(); tt(leafFound, find);                                                // Find the leaf that should contain this key
 
-    node_leafBase = leafFound; leafBase();
+    tt(node_leafBase, leafFound); leafBase();
     lT.base(T.at(leafBase));
 
-    if (found)                                                                  // Found the key in the leaf so update it with the new data
-     {z(); lT.T.at(lT.tKey) = Key; lT.T.at(lT.tData) = Data; lT.index = index; lT.setElementAt();
-      success = true; inserted = false;
-      findAndInsert = leafFound;
+    if (T.at(found).isOnes())                                                   // Found the key in the leaf so update it with the new data
+     {z(); lT.T.at(lT.tKey).move(T.at(Key)); lT.T.at(lT.tData).move(T.at(Data)); lT.T.at(lT.index).move(T.at(index)); lT.setElementAt();
+      T.at(success).ones(); T.at(inserted).zero();
+      tt(findAndInsert, leafFound);
       return;
      }
 
-    node_isFull = leafFound; isFull();                                          // Leaf is not full so we can insert immediately
-    if (T.at(isFull).isZero())                                                                // Leaf is not full so we can insert immediately
+    tt(node_isFull, leafFound); isFull();                                       // Leaf is not full so we can insert immediately
+    if (T.at(isFull).isZero())                                                  // Leaf is not full so we can insert immediately
      {z();
-      search = Key;
-      node_findFirstGreaterThanOrEqualInLeaf = leafFound;
+      tt(search, Key);
+      tt(node_findFirstGreaterThanOrEqualInLeaf, leafFound);
       findFirstGreaterThanOrEqualInLeaf();
-      if (found)                                                                // Overwrite existing key
+      if (T.at(found).isOnes())                                                 // Overwrite existing key
        {z();
-        lT.T.at(lT.tKey) = Key; lT.T.at(lT.tData) = Data; lT.index = first; lT.insertElementAt();
+        lT.T.at(lT.tKey).move(T.at(Key)); lT.T.at(lT.tData).move(T.at(Data)); lT.T.at(lT.index).move(T.at(first)); lT.insertElementAt();
        }
       else                                                                      // Insert into position
-       {z(); lT.T.at(lT.tKey) = Key; lT.T.at(lT.tData) = Data; lT.push();
+       {z(); lT.T.at(lT.tKey).move(T.at(Key)); lT.T.at(lT.tData).move(T.at(Data)); lT.push();
        }
-      success = true;
-      findAndInsert = leafFound;
+      T.at(success).ones();
+      tt(findAndInsert, leafFound);
       return;
      }
-    z(); success = false;
+    z(); T.at(success).zero();
    }
 
 //D1 Insertion                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
 
   public void put()                                                             // Insert a key, data pair into the tree or update and existing key with a new datum
    {z(); findAndInsert();                                                       // Try direct insertion with no modifications to the shape of the tree
-    if (success) return;                                                        // Inserted or updated successfully
+    if (T.at(success).isOnes()) return;                                         // Inserted or updated successfully
     z();
 
-    T.at(node_isFull).setInt(root); isFull();                                   // Start the insertion at the root(), after splitting it if necessary
-    if (isFull)                                                                 // Start the insertion at the root(), after splitting it if necessary
+    T.at(node_isFull).zero(); isFull();                                        // Start the insertion at the root(), after splitting it if necessary
+    if (T.at(isFull).isOnes())                                                  // Start the insertion at the root(), after splitting it if necessary
      {z();
-      T.at(node_isLeaf).setInt(root); isLeaf();
+      T.at(node_isLeaf).zero(); isLeaf();
       if (T.at(IsLeaf).isOnes()) {z(); splitLeafRoot();}
-      else        {z(); splitBranchRoot();}
+      else                       {z(); splitBranchRoot();}
       z();
       findAndInsert();                                                          // Splitting the root() might have been enough
-      if (success) return;                                                      // Inserted or updated successfully
+      if (T.at(success).isOnes()) return;                                                      // Inserted or updated successfully
      }
-    z(); parent = root;
+    z(); T.at(parent).zero();
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
      {z();
-      search = Key;
-      node_findFirstGreaterThanOrEqualInBranch = parent;
-           findFirstGreaterThanOrEqualInBranch();
-      child = next;
-      node_isLeaf = child; isLeaf();
+      tt(search, Key);
+      tt(node_findFirstGreaterThanOrEqualInBranch, parent);
+              findFirstGreaterThanOrEqualInBranch();
+      tt(child, next);
+      tt(node_isLeaf, child); isLeaf();
       if (T.at(IsLeaf).isOnes())                                                               // Reached a leaf
        {z();
-        splitParent = parent;
-        index = first;
-        node_splitLeaf = child; splitLeaf();                                    // Split the child leaf
+        tt(splitParent, parent);
+        tt(index, first);
+        tt(node_splitLeaf, child); splitLeaf();                                    // Split the child leaf
         findAndInsert();
         merge();
         return;
        }
       z();
-      node_isFull = child; isFull();
-      if (isFull)
+      tt(node_isFull, child); isFull();
+      if (T.at(isFull).isOnes())
        {z();
-        splitParent = parent;
-        index = first;
-        node_splitBranch= child; splitBranch();                                 // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
+        tt(splitParent, parent);
+        tt(index, first);
+        tt(node_splitBranch, child); splitBranch();                                 // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
 
-        search = Key;
-        node_findFirstGreaterThanOrEqualInBranch = parent;
+        tt(search, Key);
+        tt(node_findFirstGreaterThanOrEqualInBranch, parent);
         findFirstGreaterThanOrEqualInBranch();                                  // Perform the step down again as the split will have altered the local layout
-        parent = next;
+        tt(parent, next);
        }
       else                                                                      // Step down directly as no split was required
-       {z(); parent = child;
+       {z(); tt(parent, child);
        }
      }
     stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
@@ -1564,45 +1564,45 @@ abstract class BtreeSA extends Test                                             
 
   private void findAndDelete()                                                  // Delete a key from the tree and returns its data if present without modifying the shape of tree
    {z(); find();                                                                // Try direct insertion with no modifications to the shape of the tree
-    if (!found) return;                                                         // Inserted or updated successfully
-    z(); node_leafBase = find; leafBase();                                      // The leaf that contains the key
+    if (T.at(found).isZero()) return;                                           // Inserted or updated successfully
+    z(); tt(node_leafBase, find); leafBase();                                   // The leaf that contains the key
     lT.base(T.at(leafBase));                                                    // The leaf that contains the key
-    lT.index = index; lT.elementAt();                                           // Position in the leaf of the key
+    lT.T.at(lT.index).move(T.at(index)); lT.elementAt();                        // Position in the leaf of the key
 
-    Data = lT.T.at(lT.tData);                                                   // Key, data pairs in the leaf
+    T.at(Data).move(lT.T.at(lT.tData));                                         // Key, data pairs in the leaf
     lT.removeElementAt();                                                       // Remove the key, data pair from the leaf
    }
 
   public void delete()                                                          // Delete a key from the tree and return its associated Data if the key was found.
-   {z(); T.at(node_mergeRoot).setInt(root); mergeRoot();
+   {z(); T.at(node_mergeRoot).zero(); mergeRoot();
 
-    T.at(node_isLeaf).setInt(root); isLeaf();
+    T.at(node_isLeaf).zero(); isLeaf();
     if (T.at(IsLeaf).isOnes())                                                  // Find and delete directly in root as a leaf
      {z(); findAndDelete(); return;
      }
     z();
 
-    parent = root;                                                              // Start at root
+    T.at(parent).zero();                                                        // Start at root
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
      {z();                                                                      // Step down
-      search = Key;
-      node_findFirstGreaterThanOrEqualInBranch = parent;
+      tt(search, Key);
+      tt(node_findFirstGreaterThanOrEqualInBranch, parent);
       findFirstGreaterThanOrEqualInBranch();
 
-      index = first; node_balance = parent; balance();                          // Make sure there are enough entries in the parent to permit a deletion
-      child = next;
+      tt(index, first); tt(node_balance, parent); balance();                    // Make sure there are enough entries in the parent to permit a deletion
+      tt(child, next);
 
-      node_isLeaf = child; isLeaf();
+      tt(node_isLeaf, child); isLeaf();
       if (T.at(IsLeaf).isOnes())                                                // Reached a leaf
        {z();
         findAndDelete();
-        final int f = found;
+        final int f = T.at(found).getInt();
         merge();
-        found = f;
+        T.at(found).setInt(f);
         return;
        }
-      z(); parent = child;
+      z(); tt(parent, child);
      }
     stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
    }
@@ -1612,26 +1612,26 @@ abstract class BtreeSA extends Test                                             
   private void merge()                                                          // Merge along the specified search path
    {z();
     mergeRoot();
-    parent = root;                                                              // Start at root
+    T.at(parent).zero();                                                        // Start at root
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-     {z(); node_isLeaf = parent; isLeaf(); if (T.at(IsLeaf).isOnes()) return;
+     {z(); tt(node_isLeaf, parent); isLeaf(); if (T.at(IsLeaf).isOnes()) return;
       z();
-      node_branchSize = parent; branchSize();
-      for (int j = 0; j < branchSize; j++)                                      // Try merging each sibling pair which might change the size of the parent
+      tt(node_branchSize, parent); branchSize();
+      for (int j = 0; j < T.at(branchSize).getInt(); j++)                       // Try merging each sibling pair which might change the size of the parent
        {z();
-        index = j;
-        node_mergeLeftSibling = parent; mergeLeftSibling();
-        if (stolenOrMerged) --j;                                                // A successful merge of the left  sibling reduces the current index and the upper limit
-        index = j;
-        node_mergeRightSibling = parent; mergeRightSibling();                   // A successful merge of the right sibling maintains the current position but reduces the upper limit
-        node_branchSize = parent; branchSize();
+        T.at(index).setInt(j);
+        tt(node_mergeLeftSibling, parent); mergeLeftSibling();
+        if (T.at(stolenOrMerged).isOnes()) --j;                                 // A successful merge of the left  sibling reduces the current index and the upper limit
+        T.at(index).setInt(j);
+        tt(node_mergeRightSibling, parent); mergeRightSibling();                // A successful merge of the right sibling maintains the current position but reduces the upper limit
+        tt(node_branchSize,        parent); branchSize();
        }
 
-      search = Key;
-      node_findFirstGreaterThanOrEqualInBranch = parent;
+      tt(search, Key);
+      tt(node_findFirstGreaterThanOrEqualInBranch, parent);
       findFirstGreaterThanOrEqualInBranch();                                    // Step down
-      parent = next;
+      tt(parent, next);
      }
     stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
    }
@@ -1644,7 +1644,7 @@ abstract class BtreeSA extends Test                                             
   static void test_put_ascending()
    {final BtreeSA     t = btreeSML(4, 3);
     final int N = 64;
-    for (int i = 1; i <= N; i++) {t.Key = t.Data = i; t.put(); }
+    for (int i = 1; i <= N; i++) {t.T.at(t.Key).setInt(i); t.T.at(t.Data).setInt(i); t.put(); }
     //t.stop();
     t.ok("""
                                                                                                                             32                                                                                                                                           |
@@ -1667,7 +1667,7 @@ abstract class BtreeSA extends Test                                             
   static void test_put_ascending_wide()
    {final BtreeSA     t = btreeSML(8, 7);
     final int N = 64;
-    for (int i = 1; i <= N; ++i) {t.Key = t.Data = i; t.put();}
+    for (int i = 1; i <= N; ++i) {t.T.at(t.Key).setInt(i); t.T.at(t.Data).setInt(i); t.put();}
     //stop(t);
     t.ok("""
                                                                                                       32                                                                                                                  |
@@ -1686,7 +1686,7 @@ abstract class BtreeSA extends Test                                             
   static void test_put_descending()
    {final BtreeSA     t = btreeSML(2, 3);
     final int N = 64;
-    for (int i = N; i > 0; --i) {t.Key = t.Data = i; t.put();}
+    for (int i = N; i > 0; --i) {t.T.at(t.Key).setInt(i); t.T.at(t.Data).setInt(i); t.put();}
     //t.stop();
     t.ok("""
                                                                                   16                                                                                              32                                                                                                                                                                                          |
@@ -1710,7 +1710,8 @@ abstract class BtreeSA extends Test                                             
    {final BtreeSA     t = btreeSML(6, 3);
 
     for (int i = 0; i < random_small.length; ++i)
-     {t.Key = t.Data = random_small[i];
+     {t.T.at(t.Key).setInt(random_small[i]);
+      t.T.at(t.Data).setInt(random_small[i]);
       t.put();
      }
     //stop(t);
@@ -1740,19 +1741,20 @@ abstract class BtreeSA extends Test                                             
     for (int i = 0; i < random_large.length; ++i)
      {final int r = random_large[i];
       s.put(r, i);
-      t.Key = r; t.Data = i; t.put();
+      t.T.at(t.Key).setInt(r); t.T.at(t.Data).setInt(i);
+      t.put();
      }
     final int a = s.firstKey(), b = s.lastKey();
     for (int i = a-1; i < b + 1; ++i)
-     {t.Key = i;
+     {t.T.at(t.Key).setInt(i);
       if (s.containsKey(i))
        {t.find();
-        ok(t.found);
-        ok(t.data, s.get(i));
+        ok(t.T.at(t.found).isOnes());
+        ok(t.T.at(t.data ).getInt(), s.get(i));
        }
       else
        {t.find();
-        ok(!t.found);
+        ok(t.T.at(t.found).isZero());
        }
      }
    }
@@ -1760,7 +1762,11 @@ abstract class BtreeSA extends Test                                             
   static void test_find()
    {final BtreeSA     t = btreeSML(8, 3);
     final int N = 32;
-    for (int i = 1; i <= N; i++) {t.Key = t.Data = 2*i; t.put();}               // Insert
+    for (int i = 1; i <= N; i++)
+     {t.T.at(t.Key ).setInt(2*i);
+      t.T.at(t.Data).setInt(2*i);
+      t.put();
+     }               // Insert
     //stop(t);
     t.ok("""
                                                   33                                                      |
@@ -1775,25 +1781,25 @@ abstract class BtreeSA extends Test                                             
 """);
 
     for (int i = 0; i <= 2*N+1; i++)                                            // Update
-     {t.Key = i;
+     {t.T.at(t.Key ).setInt(i);
       t.find();
       if (i > 0 && i % 2 == 0)
-       {ok(t.found, true);
-        ok(t.data,  i);
-        t.Data = i-1;
+       {ok(t.T.at(t.found).isOnes());
+        ok(t.T.at(t.data ).getInt(), i);
+        t.T.at(t.Data).setInt(i-1);
         t.put();
        }
-      else ok(t.found, false);
+      else ok(t.T.at(t.found).isZero());
      }
 
     for (int i = 0; i <= 2*N+1; i++)
-     {t.Key = i;
+     {t.T.at(t.Key ).setInt(i);
       t.find();
       if (i > 0 && i % 2 == 0)
-       {ok(t.found, true);
-        ok(t.data,  i-1);
+       {ok(t.T.at(t.found).isOnes());
+        ok(t.T.at(t.data ).getInt(), i-1);
        }
-      else ok(t.found, false);
+      else ok(t.T.at(t.found).isZero());
      }
    }
 
@@ -1802,7 +1808,7 @@ abstract class BtreeSA extends Test                                             
 
     final int N = 32;
     final boolean box = false;                                                  // Print read me
-    for (int i = 1; i <= N; i++) {t.Key = t.Data = i; t.put();}
+    for (int i = 1; i <= N; i++) {t.T.at(t.Key).setInt(i); t.T.at(t.Data).setInt(i); t.put();}
     //t.stop();
     t.ok("""
                                                       16                               24                               |
@@ -1819,7 +1825,8 @@ abstract class BtreeSA extends Test                                             
     if (box) say("At start with", N, "elements", t.printBoxed());
 
     for (int i = 1; i <= N; i++)
-     {t.Key = i; t.delete();
+     {t.T.at(t.Key ).setInt(i);
+      t.delete();
       //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
       if (box) say("After deleting:", i, t.printBoxed());
       switch(i) {
@@ -2099,7 +2106,7 @@ abstract class BtreeSA extends Test                                             
    {final BtreeSA     t = btreeSML(4, 3);
     final int N = 32;
     final boolean box = false;                                                  // Print read me
-    for (int i = 1; i <= N; i++) {t.Key = t.Data = i; t.put();}
+    for (int i = 1; i <= N; i++) {t.T.at(t.Key).setInt(i); t.T.at(t.Data).setInt(i); t.put();}
     //t.stop();
     t.ok("""
                                                       16                               24                               |
@@ -2116,7 +2123,7 @@ abstract class BtreeSA extends Test                                             
     if (box) say("At start with", N, "elements", t.printBoxed());
 
     for (int i = N; i > 0; --i)
-     {t.Key = i;
+     {t.T.at(t.Key ).setInt(i);
       t.delete();
       //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
       if (box) say("After deleting:", i, t.printBoxed());
@@ -2396,7 +2403,7 @@ abstract class BtreeSA extends Test                                             
    {final BtreeSA     t = btreeSML(2, 3);
 
     final int M = 2;
-    for (int i = 1; i <= M; i++)  {t.Key = t.Data = i; t.put();}
+    for (int i = 1; i <= M; i++)  {t.T.at(t.Key).setInt(i); t.T.at(t.Data).setInt(i); t.put();}
     //stop(""+t.toArray());
     ok(""+t.toArray(), """
 [(0, key:1 data:1)
@@ -2404,7 +2411,7 @@ abstract class BtreeSA extends Test                                             
 ]""");
 
     final int N = 16;
-    for (int i = M; i <= N; i++)  {t.Key = t.Data = i; t.put();}
+    for (int i = M; i <= N; i++)  {t.T.at(t.Key).setInt(i); t.T.at(t.Data).setInt(i); t.put();}
     //stop(t);
     //stop(""+t.toArray());
     ok(""+t.toArray(), """
@@ -2428,20 +2435,23 @@ abstract class BtreeSA extends Test                                             
    }
 
   static void test_delete_small_random()
-   {final BtreeSP t = btreeSML(4, 3);
+   {final BtreeSA t = btreeSML(4, 3);
 
     for (int i = 0; i < random_small.length; ++i)
-     {t.Key = random_small[i]; t.Data = i;
+     {t.T.at(t.Key ).setInt(random_small[i]);
+      t.T.at(t.Data).setInt(i);
       t.put();
      }
 
     for (int i = 0; i < random_small.length; ++i)
-     {t.Key = -1;               t.delete();
-      ok(!t.found);
+     {t.T.at(t.Key ).setInt(-1);
+      t.delete();
+      ok(t.T.at(t.found).isZero());
 
-      t.Key = random_small[i];  t.delete();
-      ok( t.found);
-      ok(t.Data, i);
+      t.T.at(t.Key ).setInt(random_small[i]);
+      t.delete();
+      ok(t.T.at(t.found).isOnes());
+      ok(t.T.at(t.Data), i);
      }
    }
 
