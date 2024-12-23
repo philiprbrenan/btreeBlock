@@ -457,7 +457,6 @@ abstract class BtreeSP extends Test                                             
     bFirstBranch.searchFirstGreaterThanOrEqual();
     found = bFirstBranch.found;
     first = bFirstBranch.index;
-say("AAAA", first);
     if (bFirstBranch.found) next = bFirstBranch.tData;                          // Next if key matches else top
     else {bFirstBranch.lastElement(); next = bFirstBranch.tData;}
    }
@@ -1035,7 +1034,7 @@ say("AAAA", first);
 
       bL.tKey = bT.tKey; bL.index = nl;                                         // Re-key left top
       bL.setElementAt();                                                        // Re-key left top
-
+say("AAAA", nr+1);
       for (int i = 0; i < nr+1; i++)                                            // Transfer right to left
        {z(); bR.shift(); bL.tKey  = bR.tKey; bL.tData = bR.tData; bL.push();
        }
@@ -1353,7 +1352,7 @@ say("AAAA", first);
   static void test_put_ascending()
    {final BtreeSP     t = btreeSP(4, 3);
     final int N = 64;
-    for (int i = 1; i <= N; i++) {t.Key = t.Data = i; t.put(); }
+    for (int i = 1; i <= N; i++) {t.Key = t.Data = i; t.put(); if (i >= 23) stop("");}
     //t.stop();
     t.ok("""
                                                                                                                             32                                                                                                                                           |
@@ -1376,7 +1375,7 @@ say("AAAA", first);
   static void test_put_ascending_wide()
    {final BtreeSP     t = btreeSP(8, 7);
     final int N = 64;
-    for (int i = 1; i <= N; ++i) {t.Key = t.Data = i; t.put(); if (i >= 7) stop("");}
+    for (int i = 1; i <= N; ++i) {t.Key = t.Data = i; t.put();}
     //stop(t);
     t.ok("""
                                                                                                       32                                                                                                                  |
