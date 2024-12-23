@@ -687,7 +687,6 @@ abstract class BtreeSA extends Test                                             
     bFirstBranch.searchFirstGreaterThanOrEqual();
     T.at(found).move(bFirstBranch.T.at(bFirstBranch.found));
     T.at(first).move(bFirstBranch.T.at(bFirstBranch.index));
-say("HHHH11", bFirstBranch.T.at(bFirstBranch.index));
     if (T.at(found).isOnes())                                                   // Next if key matches else top
      {z();
       T.at(next).move(bFirstBranch.T.at(bFirstBranch.tData));
@@ -695,9 +694,7 @@ say("HHHH11", bFirstBranch.T.at(bFirstBranch.index));
     else
      {z();
       bFirstBranch.lastElement();
-say("HHHH22", bFirstBranch.T.at(bFirstBranch.tData));
       T.at(next).move(bFirstBranch.T.at(bFirstBranch.tData));
-      say("GGGG22", T.at(next));
      }
    }
 
@@ -752,15 +749,19 @@ say("HHHH22", bFirstBranch.T.at(bFirstBranch.tData));
 
   private void printLeaf(int node, Stack<StringBuilder>S, int level)            // Print leaf horizontally
    {T.at(node_assertLeaf).setInt(node);
+say("PPPP Leaf ", node);
     assertLeaf();
     padStrings(S, level);
     final StringBuilder s = new StringBuilder();                                // String builder
     T.at(node_leafSize).setInt(node);
     leafSize();
     final int     K = T.at(leafSize).getInt();
+say("PPPP11 ", K, node);
+
     final StuckSA t = lLeaf.copy();
     T.at(node_leafBase).setInt(node); leafBase();
     t.base(T.at(leafBase));
+say("QQQQ", t, "K", K);
 
     for  (int i = 0; i < K; i++)
      {t.T.at(t.index).setInt(i); t.elementAt();                                 // Each node in the leaf
@@ -774,6 +775,7 @@ say("HHHH22", bFirstBranch.T.at(bFirstBranch.tData));
 
   private void printBranch(int node, Stack<StringBuilder>S, int level)          // Print branch horizontally
    {T.at(node_assertBranch).setInt(node); assertBranch();
+say("PPPP Branch ", node);
     if (level > maxPrintLevels) return;
     padStrings(S, level);
     final int L = level * linesToPrintABranch;
@@ -799,20 +801,20 @@ say("HHHH22", bFirstBranch.T.at(bFirstBranch.tData));
           printBranch(t.T.at(t.tData).getInt(), S, level+1);
          }
 
-        S.elementAt(L+0).append(""+t.T.at(t.tKey ).getInt());                                     // Key
+        S.elementAt(L+0).append(""+t.T.at(t.tKey ).getInt());                   // Key
         S.elementAt(L+1).append(""+node+(i > 0 ?  "."+i : ""));                 // Index in node
-        S.elementAt(L+2).append(""+t.T.at(t.tData).getInt());                                    // Next
+        S.elementAt(L+2).append(""+t.T.at(t.tData).getInt());                   // Next
        }
      }
     else                                                                        // Branch is empty so print just the index of the branch
      {S.elementAt(L+0).append(""+node+"Empty");
      }
 
-    T.at(node_top).setInt(node); top();                                            // Top next will always be present
+    T.at(node_top).setInt(node); top();                                         // Top next will always be present
     S.elementAt(L+3).append(T.at(top).getInt());                                // Append top next
 
     T.at(node_isLeaf).move(T.at(top)); isLeaf();                                // Print leaf
-    if (T.at(IsLeaf).isOnes())                                                                 // Print leaf
+    if (T.at(IsLeaf).isOnes())                                                  // Print leaf
      {printLeaf(T.at(top).getInt(), S, level+1);
      }
     else                                                                        // Print branch
@@ -932,9 +934,9 @@ say("AAAA", T.at(l), T.at(r));
     allocBranch(); tt(l, allocBranch);                                          // New left branch
     allocBranch(); tt(r, allocBranch);                                          // New right branch
 
-    T.at(node_branchBase).setInt(root); branchBase(); bT.base(T.at(branchBase));                  // Set address of the referenced branch stuck
-    tt(node_branchBase, l); branchBase(); bL.base(T.at(branchBase));                  // Set address of the referenced branch stuck
-    tt(node_branchBase, r); branchBase(); bR.base(T.at(branchBase));                  // Set address of the referenced branch stuck
+    T.at(node_branchBase).setInt(root); branchBase(); bT.base(T.at(branchBase));// Set address of the referenced branch stuck
+    tt(node_branchBase, l);             branchBase(); bL.base(T.at(branchBase));// Set address of the referenced branch stuck
+    tt(node_branchBase, r);             branchBase(); bR.base(T.at(branchBase));// Set address of the referenced branch stuck
 
     for (int i = 0; i < splitBranchSize; i++)                                   // Build left child from parent
      {z(); bT.shift();
@@ -958,7 +960,7 @@ say("AAAA", T.at(l), T.at(r));
     bT.shift();
     bR.T.at(bR.tKey).zero();
     bR.T.at(bR.tData).move(bT.T.at(bT.tData));
-    bR.push();                    // Becomes top and so ignored by search ... except last
+    bR.push();                                                                  // Becomes top and so ignored by search ... except last
 
     bT.clear();                                                                 // Refer to new branches from root
     bT.T.at(bT.tKey) .move(T.at(parentKey));
@@ -966,7 +968,7 @@ say("AAAA", T.at(l), T.at(r));
     bT.push();
     bT.T.at(bT.tKey ).zero();
     bT.T.at(bT.tData).move(T.at(r));
-    bT.push();                               // Becomes top and so ignored by search ... except last
+    bT.push();                                                                  // Becomes top and so ignored by search ... except last
    }
 
   private void splitLeaf()                                                      // Split a leaf which is not the root
@@ -975,7 +977,6 @@ say("AAAA", T.at(l), T.at(r));
     z(); tt(node_leafSize, node_splitLeaf);
          leafSize();
     z(); final int S = T.at(leafSize).getInt(), I = T.at(index).getInt();
-say("FFFF11", I, T.at(index));
          tt(node_isFull, node_splitLeaf); isFull();
     z(); if (T.at(isFull).isZero())   stop("Leaf:", node_splitLeaf, "is not full, but has:", S, this);
          tt(node_isFull, splitParent); isFull();
@@ -984,7 +985,6 @@ say("FFFF11", I, T.at(index));
     z(); if (I > S) stop("Index", I, "too big for leaf with:", S);
     z();
     allocLeaf(); tt(l, allocLeaf);                                              // New  split out leaf
-say("FFFF22", I, T.at(index));
 
     tt(node_leafBase, l);              leafBase(); lL.base(T.at(leafBase));     // The leaf being split into
     tt(node_leafBase, node_splitLeaf); leafBase(); lR.base(T.at(leafBase));     // The leaf being split on the right
@@ -1003,7 +1003,6 @@ say("FFFF22", I, T.at(index));
     bT.T.at(bT.tData).move(T.at(l));
     bT.T.at(bT.index).move(T.at(index));
     bT.insertElementAt();                                                       // Insert new key, next pair in parent
-stop("FFFF", this, T.at(index));
    }
 
   private void splitBranch()                                                    // Split a branch which is not the root by splitting right to left
@@ -1039,7 +1038,7 @@ stop("FFFF", this, T.at(index));
     bR.shift();
     bL.T.at(bL.tKey ).zero();
     bL.T.at(bL.tData).move(bR.T.at(bR.tData));
-    bL.push();                    // Build right branch - becomes top and so is ignored by search ... except last
+    bL.push();                                                                  // Build right branch - becomes top and so is ignored by search ... except last
     bT.T.at(bT.tKey ).move(bR.T.at(bR.tKey));
     bT.T.at(bT.tData).move(T.at(l));
     bT.T.at(bT.index).move(T.at(index));
@@ -1338,6 +1337,7 @@ stop("FFFF", this, T.at(index));
     tt(node_hasLeavesForChildren, node_mergeRightSibling); hasLeavesForChildren();
     if (T.at(hasLeavesForChildren).isOnes())                                    // Children are leaves
      {z();
+say("MMMM111");
       tt(node_leafBase, l);
       leafBase();
       lL.base(T.at(leafBase));
@@ -1380,25 +1380,35 @@ stop("FFFF", this, T.at(index));
       bL.T.at(bL.tKey).move(bT.T.at(bT.tKey)); bL.T.at(bL.index).move(T.at(nl));// Re-key left top
       bL.setElementAt();                                                        // Re-key left top
 
-      for (int i = 0; i < T.at(nr).getInt()+1; i++)                                            // Transfer right to left
-       {z(); bR.shift(); bL.T.at(bL.tKey).move(bR.T.at(bR.tKey)); bL.T.at(bL.tData).move(bR.T.at(bR.tData)); bL.push();
+      final int N = T.at(nr).getInt()+1;
+//say("MMMM222", M);
+      for (int i = 0; i < N; i++)                             // Transfer right to left
+       {z();
+        bR.shift();
+        bL.T.at(bL.tKey) .move(bR.T.at(bR.tKey));
+        bL.T.at(bL.tData).move(bR.T.at(bR.tData));
+        bL.push();
+//say("MMMM333", M);
        }
      }
-    tt(node_free, r); free();                                                   // Free the empty right node
+    tt(node_free, r);
+//    free();                                                                     // Free the empty right node
 
     bT.T.at(bT.index).move(T.at(index));
     bT.T.at(bT.index).inc();
 
     bT.elementAt();
-    T.at(parentKey).move(bT.T.at(bT.tKey));                    // One up from dividing point in parent
+    T.at(parentKey).move(bT.T.at(bT.tKey));                                     // One up from dividing point in parent
     bT.T.at(bT.index).move(T.at(index));
-    bT.elementAt();                                         // Dividing point in parent
+    bT.elementAt();                                                             // Dividing point in parent
     bT.T.at(bT.tKey).move(T.at(parentKey));
     bT.setElementAt();                                                          // Install key of right sibling in this child
-    bT.T.at(bT.index).move(T.at(index));                                                         // Reduce parent on right
+    bT.T.at(bT.index).move(T.at(index));                                        // Reduce parent on right
     bT.T.at(bT.index).inc();
     bT.removeElementAt();                                                       // Reduce parent on right
-    z(); T.at(stolenOrMerged).ones(); return;
+    z(); T.at(stolenOrMerged).ones();
+//  say("MMMM888", M);
+    return;
    }
 
 //D2 Balance                                                                    // Balance the tree by merging and stealing
@@ -1601,10 +1611,11 @@ say("FindAndInsert node_is_full", T.at(node_isFull).getInt());
         tt(splitParent, parent);
         tt(index, first);
         tt(node_splitLeaf, child);
-say("JJJJ", T.at(node_splitLeaf));
         splitLeaf();                                                            // Split the child leaf
         findAndInsert();
+say("JJJJ33", this);
         merge();
+say("JJJJ44", this);
         return;
        }
       z();
@@ -1613,7 +1624,7 @@ say("JJJJ", T.at(node_splitLeaf));
        {z();
         tt(splitParent, parent);
         tt(index, first);
-        tt(node_splitBranch, child); splitBranch();                                 // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
+        tt(node_splitBranch, child); splitBranch();                              // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
 
         tt(search, Key);
         tt(node_findFirstGreaterThanOrEqualInBranch, parent);
@@ -1691,7 +1702,9 @@ say("JJJJ", T.at(node_splitLeaf));
         tt(node_mergeLeftSibling, parent); mergeLeftSibling();
         if (T.at(stolenOrMerged).isOnes()) --j;                                 // A successful merge of the left  sibling reduces the current index and the upper limit
         T.at(index).setInt(j);
+say("KKKK22", this);
         tt(node_mergeRightSibling, parent); mergeRightSibling();                // A successful merge of the right sibling maintains the current position but reduces the upper limit
+say("KKKK33", this);
         tt(node_branchSize,        parent); branchSize();
        }
 
@@ -1716,7 +1729,7 @@ say("JJJJ", T.at(node_splitLeaf));
       t.T.at(t.Key ).setInt(i);
       t.T.at(t.Data).setInt(i);
       t.put();
-      say("DDDD", t);
+      if (i >= 22) say("DDDD", t);
      }
     //t.stop();
     t.ok("""
