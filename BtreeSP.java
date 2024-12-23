@@ -1034,7 +1034,6 @@ abstract class BtreeSP extends Test                                             
 
       bL.tKey = bT.tKey; bL.index = nl;                                         // Re-key left top
       bL.setElementAt();                                                        // Re-key left top
-say("AAAA", nr+1);
       for (int i = 0; i < nr+1; i++)                                            // Transfer right to left
        {z(); bR.shift(); bL.tKey  = bR.tKey; bL.tData = bR.tData; bL.push();
        }
@@ -1352,7 +1351,7 @@ say("AAAA", nr+1);
   static void test_put_ascending()
    {final BtreeSP     t = btreeSP(4, 3);
     final int N = 64;
-    for (int i = 1; i <= N; i++) {t.Key = t.Data = i; t.put(); if (i >= 23) stop("");}
+    for (int i = 1; i <= N; i++) {t.Key = t.Data = i; t.put();}
     //t.stop();
     t.ok("""
                                                                                                                             32                                                                                                                                           |
