@@ -21,7 +21,9 @@ public class Layout extends Test                                                
     top = fields.lastElement();                                                 // The last defined field becomes the super structure
     top.layout(0, 0);                                                           // Locate field positions
     top.indexNames();                                                           // Index the names of the fields
-    for (Field f: fields) f.locator = new Locator(f);                           // Create a locator for each field
+    for (Field f: fields) f.locator  = new Locator(f);                          // Create a locator for each field
+    for (Field f: fields) f.compiled = true;                                    // Mark field as having being compiled
+    for (Field f: fields) if (debug) say("AAAA", f.name);
     return this;
    }
 
@@ -43,6 +45,7 @@ public class Layout extends Test                                                
    {String                       name;                                          // Name of field
     int                        number;                                          // Number of field
     String                   fullName;                                          // Full name of this field
+    boolean                  compiled;                                          // Whether this field has been compiled
     int                            at;                                          // Offset of field from start of memory
     int                         width;                                          // Number of bits in a field
     int                         depth;                                          // Depth of field - the number of containing arrays/structures/unions above
@@ -288,16 +291,16 @@ public class Layout extends Test                                                
 
 //D1 Duplication                                                                // Duplicate a layout so that ot can be integrated into other layouts
 
-  Field locateField(Layout l, Field f)                                          // Locate the field in the specified layout that corresponds to the specified field in this layout
+  Field locateField(Layout l, int offset, Field f)                              // Locate the field in the specified layout that corresponds to the specified field in this layout
    {z();
-    return l.fields.elementAt(f.number);
+    return l.fields.elementAt(offset+f.number);
    }
 
-  Field[]locateFields(Layout l, Field[]f)                                       // Locate the fields in the specified layout that corresponds to the specified fields in this layout
+  Field[]locateFields(Layout l, int offset, Field[]f)                           // Locate the fields in the specified layout that corresponds to the specified fields in this layout
    {z();
     final Field[]fields = new Field[f.length];
     for (int i = 0; i < f.length; i++)
-     {z(); fields[i] = l.fields.elementAt(f[i].number);
+     {z(); fields[i] = l.fields.elementAt(offset+f[i].number);
      }
     return fields;
    }
@@ -311,9 +314,9 @@ public class Layout extends Test                                                
       final Field F = switch (f)
        {case Bit        b -> l.bit      (b.name);
         case Variable   v -> l.variable (v.name, v.width);
-        case Array      a -> l.array    (a.name, locateField (l, a.element), a.size);
-        case Union      u -> l.union    (u.name, locateFields(l, u.fields));
-        case Structure  s -> l.structure(s.name, locateFields(l, s.fields));
+        case Array      a -> l.array    (a.name, locateField (l, 0, a.element), a.size);
+        case Union      u -> l.union    (u.name, locateFields(l, 0, u.fields));
+        case Structure  s -> l.structure(s.name, locateFields(l, 0, s.fields));
         default -> null;
        };
      }
@@ -323,14 +326,20 @@ public class Layout extends Test                                                
   Field duplicate(Layout Layout)                                                // Duplicate the specified layout inside this layout
    {z();
     if (Layout == this) stop("Cannot duplicate self into self");
-    final Layout l = Layout.duplicate();
-    final Field  f = l.top;
-
-    for(Field lf: l.fields) fields.push(lf);                                    // Add all the duplicated fields in the correct order
-    for (int i = 0; i < fields.size(); i++)                                     // Renumber the fields
-     {z(); fields.elementAt(i).number = i;
+    Field F = null;
+    final int offset = fields.size();
+    for(Field f: Layout.fields)
+     {z(); F = switch (f)
+       {case Bit        b -> bit      (b.name);
+        case Variable   v -> variable (v.name, v.width);
+        case Array      a -> array    (a.name, locateField (this, offset, a.element), a.size);
+        case Union      u -> union    (u.name, locateFields(this, offset, u.fields));
+        case Structure  s -> structure(s.name, locateFields(this, offset, s.fields));
+        default -> null;
+       };
      }
-    return f;                                                                   // Resulting field
+    if (F == null) stop("Cannot duplicate an empty layout");
+    return F;                                                                   // Resulting field
    }
 
   Field duplicate(String name, Layout layout)                                   // Duplicate this layout for use int the current layout giving the top most field a new name
@@ -525,7 +534,40 @@ B    0     1            b                    b
 
    }
 
-  static void test_duplicate()
+  static void test_duplicate_whole()
+   {Layout    l = new Layout();
+    Variable  a = l.variable ("a", 2);
+    Variable  b = l.variable ("b", 2);
+    Variable  c = l.variable ("c", 4);
+    Structure s = l.structure("s", a, b, c);
+    Variable  d = l.variable ("d", 2);
+    Array     A = l.array    ("A", s, 2);
+    Variable  e = l.variable ("e", 2);
+    Structure S = l.structure("S", d, A, e);
+    l.compile();
+    //stop(l);
+    ok(l, """
+T   At  Wide  Size    Name                   Path
+S    0    20          S
+V    0     2            d                    d
+A    2    16     2      A                    A
+S    2     8              s                    A.s
+V    2     2                a                    A.s.a
+V    4     2                b                    A.s.b
+V    6     4                c                    A.s.c
+V   18     2            e                    e
+""");
+
+    Layout    m = l.duplicate();
+    //stop(m);
+    ok(l, m);
+
+    Layout    n = m.duplicate();
+    //stop(n);
+    ok(l, n);
+   }
+
+  static void test_duplicate_part()
    {Layout    l = new Layout();
     Variable  a = l.variable ("a", 2);
     Variable  b = l.variable ("b", 2);
@@ -554,11 +596,12 @@ V   10     4            C                    C
 """);
 
     Layout  M = L.duplicate();
-    //stop(M);
+
+    //say(L); say(M);
     ok(L, M);
 
     Layout  N = M.duplicate();
-    //stop(N);
+    //say(M); stop(N);
     ok(L, N);
 
     //stop("AAAA", M.get("B.a"));
@@ -651,7 +694,8 @@ V   10     4            C                    C
     test_array();
     test_arrays();
     test_union();
-    test_duplicate();
+    test_duplicate_whole();
+    test_duplicate_part();
     test_duplicate_array();
     test_array_indexing();
     test_container();
