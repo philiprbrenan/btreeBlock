@@ -508,14 +508,20 @@ abstract class BtreeSA extends Test                                             
     tt(node_setLeaf,  allocate);
     setLeaf();
    }
-  private void allocBranch(){z(); allocate(); allocBranch = node_setBranch = allocate; setBranch();} // Allocate branch
+  private void allocBranch()                                                    // Allocate branch
+   {z();
+    allocate();
+    tt(allocBranch   , allocate);
+    tt(node_setBranch, allocate);
+    setBranch();
+   }
 
   private void free()                                                           // Free a new node to make it available for reuse
    {z(); if (tGetInt(node_free) == 0) stop("Cannot free root");                 // The root is never freed
     z(); tt(node_erase, node_free); erase();                                    // Clear the node to encourage erroneous frees to do damage that shows up quickly.
     M.at(free, T.at(node_free)).setOff().move(M.at(freeList));                  // Chain this node in front of the last freed node
     M.at(freeList).move(T.at(node_free));                                       // Make this node the head of the free chain
-    maxNodeUsed  = max(maxNodeUsed, --nodeUsed);                                // Number of nodes in use
+    maxNodeUsed = max(maxNodeUsed, --nodeUsed);                                // Number of nodes in use
    }
 
   private void clear()                                                          // Clear a new node to zeros ready for use
@@ -548,7 +554,9 @@ abstract class BtreeSA extends Test                                             
    }
 
   private void isFull()                                                         // The node is full
-   {z();  tt(node_isLeaf, node_isFull); isLeaf();
+   {z();
+    tt(node_isLeaf, node_isFull);
+    isLeaf();
     if (T.at(IsLeaf).isOnes())
      {z();
       tt(node_leafSize, node_isFull);
@@ -583,8 +591,8 @@ abstract class BtreeSA extends Test                                             
     tt(node_branchBase, node_hasLeavesForChildren); branchBase();
     bLeaf.base(T.at(branchBase));
     bLeaf.lastElement();
-    node_isLeaf = bLeaf.tData; isLeaf();
-    hasLeavesForChildren = IsLeaf;
+    T.at(node_isLeaf).move(bLeaf.T.at(bLeaf.tData)); isLeaf();
+    tt(hasLeavesForChildren, IsLeaf);
    }
 
   private void top()                                                            // The top next element of a branch - only used in printing
@@ -592,9 +600,9 @@ abstract class BtreeSA extends Test                                             
     tt(node_branchBase, node_top); branchBase();
     bTop.base(T.at(branchBase));
     tt(node_branchSize, node_top); branchSize();
-    bTop.index = branchSize;
+    bTop.T.at(bTop.index).move(T.at(branchSize));
     bTop.elementAt();
-    top = bTop.tData;
+    T.at(top).move(bTop.T.at(bTop.tData));
    }
 
   public String toString(int node)                                              // Print a node
@@ -672,15 +680,25 @@ abstract class BtreeSA extends Test                                             
   private void findFirstGreaterThanOrEqualInBranch()                            // Find the first key in the branch that is equal to or greater than the search key
    {z();
     tt(node_assertBranch, node_findFirstGreaterThanOrEqualInBranch); assertBranch();
-    tt(node_branchBase, node_findFirstGreaterThanOrEqualInBranch); branchBase();
+    tt(node_branchBase,   node_findFirstGreaterThanOrEqualInBranch); branchBase();
     bFirstBranch.base(T.at(branchBase));
     bFirstBranch.T.at(bFirstBranch.search).move(T.at(search));
     bFirstBranch.T.at(bFirstBranch.limit).setInt(1);
     bFirstBranch.searchFirstGreaterThanOrEqual();
     T.at(found).move(bFirstBranch.T.at(bFirstBranch.found));
     T.at(first).move(bFirstBranch.T.at(bFirstBranch.index));
-    if (T.at(found).isOnes())         T.at(next).move(bFirstBranch.T.at(bFirstBranch.tData));                          // Next if key matches else top
-    else {bFirstBranch.lastElement(); T.at(next).move(bFirstBranch.T.at(bFirstBranch.tData));}
+say("HHHH11", bFirstBranch.T.at(bFirstBranch.index));
+    if (T.at(found).isOnes())                                                   // Next if key matches else top
+     {z();
+      T.at(next).move(bFirstBranch.T.at(bFirstBranch.tData));
+     }
+    else
+     {z();
+      bFirstBranch.lastElement();
+say("HHHH22", bFirstBranch.T.at(bFirstBranch.tData));
+      T.at(next).move(bFirstBranch.T.at(bFirstBranch.tData));
+      say("GGGG22", T.at(next));
+     }
    }
 
 //D2 Array                                                                      // Represent the contents of the tree as an array
@@ -745,7 +763,7 @@ abstract class BtreeSA extends Test                                             
     t.base(T.at(leafBase));
 
     for  (int i = 0; i < K; i++)
-     {t.T.at(t.index).setInt(i); t.elementAt();                                 // Each node in the branch
+     {t.T.at(t.index).setInt(i); t.elementAt();                                 // Each node in the leaf
       s.append(""+t.T.at(t.tKey).getInt()+",");
      }
     if (s.length() > 0) s.setLength(s.length()-1);                              // Remove trailing comma if present
@@ -957,6 +975,7 @@ say("AAAA", T.at(l), T.at(r));
     z(); tt(node_leafSize, node_splitLeaf);
          leafSize();
     z(); final int S = T.at(leafSize).getInt(), I = T.at(index).getInt();
+say("FFFF11", I, T.at(index));
          tt(node_isFull, node_splitLeaf); isFull();
     z(); if (T.at(isFull).isZero())   stop("Leaf:", node_splitLeaf, "is not full, but has:", S, this);
          tt(node_isFull, splitParent); isFull();
@@ -964,10 +983,11 @@ say("AAAA", T.at(l), T.at(r));
     z(); if (I < 0) stop("Index", I, "too small");
     z(); if (I > S) stop("Index", I, "too big for leaf with:", S);
     z();
-    allocLeaf(); tt(l, allocLeaf);                                                 // New  split out leaf
+    allocLeaf(); tt(l, allocLeaf);                                              // New  split out leaf
+say("FFFF22", I, T.at(index));
 
-    tt(node_leafBase, l);              leafBase(); lL.base(T.at(leafBase));              // The leaf being split into
-    tt(node_leafBase, node_splitLeaf); leafBase(); lR.base(T.at(leafBase));              // The leaf being split on the right
+    tt(node_leafBase, l);              leafBase(); lL.base(T.at(leafBase));     // The leaf being split into
+    tt(node_leafBase, node_splitLeaf); leafBase(); lR.base(T.at(leafBase));     // The leaf being split on the right
 
     for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf
      {z(); lR.shift();
@@ -977,12 +997,13 @@ say("AAAA", T.at(l), T.at(r));
      }
     lR.firstElement();
     lL. lastElement();
-    tt(node_branchBase, splitParent); branchBase();                                // The parent branch
-    bT.base(T.at(branchBase));                                                        // The parent branch
+    tt(node_branchBase, splitParent); branchBase();                             // The parent branch
+    bT.base(T.at(branchBase));                                                  // The parent branch
     bT.T.at(bT.tKey).setInt((lR.T.at(lR.tKey).getInt() + lL.T.at(lL.tKey).getInt()) / 2);    // Splitting key
     bT.T.at(bT.tData).move(T.at(l));
     bT.T.at(bT.index).move(T.at(index));
     bT.insertElementAt();                                                       // Insert new key, next pair in parent
+stop("FFFF", this, T.at(index));
    }
 
   private void splitBranch()                                                    // Split a branch which is not the root by splitting right to left
@@ -1056,13 +1077,15 @@ say("AAAA", T.at(l), T.at(r));
       lR.unshift();   // Increase right
 
       lL.pop();                                                                 // Reduce left
-      lL.T.at(lL.index).move(T.at(nl));  lL.T.at(lL.index).dec(); lL.T.at(lL.index).dec();
-      lL.elementAt();                                          // Last key on left
+      lL.T.at(lL.index).move(T.at(nl));
+      lL.T.at(lL.index).dec();
+      lL.T.at(lL.index).dec();
+      lL.elementAt();                                                           // Last key on left
       bT.T.at(bT.tKey).move(lL.T.at(lL.tKey));
-      bT.tData = l;
+      bT.T.at(bT.tData).move(T.at(l));
       bT.T.at(bT.index).move(T.at(index));
       bT.T.at(bT.index).dec();
-      bT.setElementAt();  // Reduce key of parent of left
+      bT.setElementAt();                                                        // Reduce key of parent of left
      }
     else                                                                        // Children are branches
      {z();
@@ -1553,8 +1576,8 @@ say("FindAndInsert node_is_full", T.at(node_isFull).getInt());
    {z(); findAndInsert();                                                       // Try direct insertion with no modifications to the shape of the tree
     if (T.at(success).isOnes()) return;                                         // Inserted or updated successfully
     z();
-
-    T.at(node_isFull).zero(); isFull();                                        // Start the insertion at the root(), after splitting it if necessary
+    T.at(node_isFull).zero();
+    isFull();                                                                   // Start the insertion at the root(), after splitting it if necessary
     if (T.at(isFull).isOnes())                                                  // Start the insertion at the root(), after splitting it if necessary
      {z();
       T.at(node_isLeaf).zero(); isLeaf();
@@ -1562,7 +1585,7 @@ say("FindAndInsert node_is_full", T.at(node_isFull).getInt());
       else                       {z(); splitBranchRoot();}
       z();
       findAndInsert();                                                          // Splitting the root() might have been enough
-      if (T.at(success).isOnes()) return;                                                      // Inserted or updated successfully
+      if (T.at(success).isOnes()) return;                                       // Inserted or updated successfully
      }
     z(); T.at(parent).zero();
 
@@ -1573,11 +1596,13 @@ say("FindAndInsert node_is_full", T.at(node_isFull).getInt());
               findFirstGreaterThanOrEqualInBranch();
       tt(child, next);
       tt(node_isLeaf, child); isLeaf();
-      if (T.at(IsLeaf).isOnes())                                                               // Reached a leaf
+      if (T.at(IsLeaf).isOnes())                                                // Reached a leaf
        {z();
         tt(splitParent, parent);
         tt(index, first);
-        tt(node_splitLeaf, child); splitLeaf();                                    // Split the child leaf
+        tt(node_splitLeaf, child);
+say("JJJJ", T.at(node_splitLeaf));
+        splitLeaf();                                                            // Split the child leaf
         findAndInsert();
         merge();
         return;
@@ -1691,6 +1716,7 @@ say("FindAndInsert node_is_full", T.at(node_isFull).getInt());
       t.T.at(t.Key ).setInt(i);
       t.T.at(t.Data).setInt(i);
       t.put();
+      say("DDDD", t);
      }
     //t.stop();
     t.ok("""
