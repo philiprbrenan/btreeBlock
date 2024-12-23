@@ -162,8 +162,7 @@ abstract class StuckSA extends Test                                             
 
   void clear()                                                                  // Zero the current size to clear the stuck
    {z();
-    z(); assertNotEmpty();
-    z(); M.at(currentSize).setOff().setInt(0);
+    M.at(currentSize).setOff().setInt(0);
     sizeFullEmpty();
    }
 
@@ -214,8 +213,8 @@ abstract class StuckSA extends Test                                             
    {z(); action = "unshift";
     size(); isFull(); assertNotFull();
     setFound();
-    M.at(Keys).moveUp(T.at(currentSize), C.at(Keys));
-    M.at(Data).moveUp(T.at(currentSize), C.at(Data));
+    M.at(Keys).moveUp(T.constant(0), C.at(Keys));
+    M.at(Data).moveUp(T.constant(0), C.at(Data));
     inc();
     T.at(index).setInt(0);
     setKeyData();
@@ -258,7 +257,7 @@ abstract class StuckSA extends Test                                             
   void setElementAt()                                                           // Set an element either in range or one above the current range
    {z(); action = "setElementAt";
     size();
-    T.at(index).equal(T.at(size), T.at(equal));                           // Extended range
+    T.at(index).equal(T.at(size), T.at(equal));                                 // Extended range
     new If(T.at(equal).getInt() > 0)
      {void Then()
        {z(); setKeyData(); inc();
@@ -321,7 +320,7 @@ abstract class StuckSA extends Test                                             
    {z(); action = "search";
     size();
 
-    final int n = T.at(size).getInt(), l = T.at(limit).getInt(), L = n-l;   // Limit search if requested
+    final int n = T.at(size).getInt(), l = T.at(limit).getInt(), L = n-l;       // Limit search if requested
 
     for (int i = 0; i < L; i++)                                                 // Search
      {z(); T.at(index).setInt(i); moveKey();
@@ -338,7 +337,7 @@ abstract class StuckSA extends Test                                             
    {z(); action = "searchFirstGreaterThanOrEqual";
     size();
 
-    final int n = T.at(size).getInt(), l = T.at(limit).getInt(), L = n-l;   // Limit search if requested
+    final int n = T.at(size).getInt(), l = T.at(limit).getInt(), L = n-l;       // Limit search if requested
 
     for (int i = 0; i < L; i++)                                                 // Search
      {z(); T.at(index).setInt(i); moveKey();
@@ -348,6 +347,7 @@ abstract class StuckSA extends Test                                             
         return;
        }
      }
+    T.at(index).setInt(L);                                                      // Index top is no match found
     T.at(found).setInt(0);
    }
 
@@ -432,7 +432,7 @@ StuckSA(maxSize:8 size:4)
     s.size();
     ok(m.at(s.size).getInt(), 4);
     s.clear();
-    ok(m.at(s.currentSize).setOff().getInt(), 0);
+    ok(s.M.at(s.currentSize).setOff().getInt(), 0);
     ok(m.at(s.size).getInt(), 0);
    }
 
@@ -768,7 +768,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:1 found:1 index:
     m.at(s.search).setInt(7); s.searchFirstGreaterThanOrEqual();
     //stop(t);
     ok(s.print(), """
-Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:2 key:6 data:3 size:4 isFull:0 isEmpty:0)
+Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:3 key:6 data:3 size:4 isFull:0 isEmpty:0)
 """);
    }
 
@@ -815,10 +815,10 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     final StuckSA       t = S.copy(); t.base(M.at(a));
     final MemoryLayout tm = t.T;
-    tm.at(s.tKey).setInt(1); tm.at(s.tData).setInt(2); t.push();
-    tm.at(s.tKey).setInt(2); tm.at(s.tData).setInt(4); t.push();
-    tm.at(s.tKey).setInt(3); tm.at(s.tData).setInt(6); t.push();
-    tm.at(s.tKey).setInt(4); tm.at(s.tData).setInt(8); t.push();
+    tm.at(t.tKey).setInt(1); tm.at(t.tData).setInt(2); t.push();
+    tm.at(t.tKey).setInt(2); tm.at(t.tData).setInt(4); t.push();
+    tm.at(t.tKey).setInt(3); tm.at(t.tData).setInt(6); t.push();
+    tm.at(t.tKey).setInt(4); tm.at(t.tData).setInt(8); t.push();
 
     //stop(s.memoryLayout);
     ok(s.M, """
