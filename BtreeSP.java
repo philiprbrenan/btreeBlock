@@ -457,6 +457,7 @@ abstract class BtreeSP extends Test                                             
     bFirstBranch.searchFirstGreaterThanOrEqual();
     found = bFirstBranch.found;
     first = bFirstBranch.index;
+say("AAAA", first);
     if (bFirstBranch.found) next = bFirstBranch.tData;                          // Next if key matches else top
     else {bFirstBranch.lastElement(); next = bFirstBranch.tData;}
    }
@@ -1375,7 +1376,7 @@ abstract class BtreeSP extends Test                                             
   static void test_put_ascending_wide()
    {final BtreeSP     t = btreeSP(8, 7);
     final int N = 64;
-    for (int i = 1; i <= N; ++i) {t.Key = t.Data = i; t.put();}
+    for (int i = 1; i <= N; ++i) {t.Key = t.Data = i; t.put(); if (i >= 7) stop("");}
     //stop(t);
     t.ok("""
                                                                                                       32                                                                                                                  |
@@ -2170,7 +2171,8 @@ abstract class BtreeSP extends Test                                             
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_put_ascending();                                                       //  7.99
    }
 
   public static void main(String[] args)                                        // Test if called as a program
