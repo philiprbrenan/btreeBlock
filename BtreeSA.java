@@ -26,7 +26,7 @@ abstract class BtreeSA extends Test                                             
   Layout.Variable  free;                                                        // Free list chain
   Layout.Structure Node;                                                        // Layout of a node in the memory used by btree
   Layout.Array     nodes;                                                       // Layout of an array of nodes in the memory used by btree
-  Layout.Variable  freedChain;                                                  // Single linked list of freed nodes
+  Layout.Variable  freeList;                                                  // Single linked list of freed nodes
   Layout.Structure bTree;                                                       // Btree
 
   final static int
@@ -138,21 +138,22 @@ abstract class BtreeSA extends Test                                             
     lL           =   leafTransactions[Leaf_tl           ];                      // Process a left node
     lR           =   leafTransactions[Leaf_tr           ];                      // Process a right node
 
-    for (int i = maxSize(); i > 0; --i)                                         // Put all the nodes on the free chain at the start with low nodes first
-     {final int n = i - 1;                                                      // Number of node
-      T.at(node_clear).setInt(n);
-      clear();
-      final int  f = getInt(freedChain);
-                     setInt(free, f,    n);
-                     setInt(freedChain, n);
+     {final int N = maxSize();                                                  // Put all the nodes on the free chain at the start with low nodes first
+      for (int i = N; i > 0; --i)                                               // Put all the nodes on the free chain at the start with low nodes first
+       {final int n = i - 1;                                                    // Number of node
+        T.at(node_clear).setInt(n);
+        clear();
+        final int  f = i == N ? 0 : i;                                          // Curent first element on free chain
+        setInt(free, (i == N ? 0 : i), n);                                      // Link this node to the previous node
+       }
+      setInt(freeList, root);                                                 // Root is first on free chain
      }
-
     allocate(false);                                                            // The root is always at zero, which frees zero to act as the end of list marker on the free chain
     T.at(node_setLeaf).setInt(root);
     setLeaf();                                                                  // The root starts as a leaf
    }
 
-  static BtreeSA btreeSML(final int leafKeys, int branchKeys)                   // Define a test btree with the specified dimensions
+  static BtreeSA btreeSA(final int leafKeys, int branchKeys)                   // Define a test btree with the specified dimensions
    {return  new BtreeSA()
      {int maxSize         () {return testMaxSize;}
       int maxKeysPerLeaf  () {return    leafKeys;}
@@ -192,8 +193,8 @@ abstract class BtreeSA extends Test                                             
     free         = l.variable ("free",         btree.bitsPerNext());
     Node         = l.structure("node",         isLeaf, free, branchOrLeaf);
     nodes        = l.array    ("nodes",        Node,         maxSize());
-    freedChain   = l.variable ("freedChain",   btree.bitsPerNext());
-    bTree        = l.structure("bTree",        freedChain  , nodes);
+    freeList   = l.variable ("freeList",   btree.bitsPerNext());
+    bTree        = l.structure("bTree",        freeList  , nodes);
     return l.compile();
    }
 
@@ -284,11 +285,13 @@ abstract class BtreeSA extends Test                                             
 
 
   private void allocate(boolean check)                                          // Allocate a node with or without checking for sufficient free space
-   {z(); tm(allocate, freedChain);                                              // Last freed node
+   {z();
+    tm(allocate, freeList);                                                // Node at head of free nodes list
     z(); if (check && tGetInt(allocate) == 0) stop("No more memory available"); // No more free nodes available
-    z(); M.at(nextFree).move(M.at(free, T.at(allocate)));                       // Second to last freed node
-    mt(freedChain, nextFree);                                                   // Make second to last freed node the first freed node to liberate the existing first free node
-    node_clear = allocate; clear();                                             // Construct and clear the node
+    z(); T.at(nextFree).move(M.at(free, T.at(allocate)).setOff());              // Second node on free list
+    mt(freeList, nextFree);                                                    // Make second to last freed node the first freed node to liberate the existing first free node
+    tt(node_clear, allocate);
+    clear();                                                                    // Construct and clear the node
     maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                                // Number of nodes in use
    }
 
@@ -460,12 +463,30 @@ abstract class BtreeSA extends Test                                             
                        node_mergeLeftSibling = L.variable ("node_mergeLeftSibling"                         , bitsPerNext());
                       node_mergeRightSibling = L.variable ("node_mergeRightSibling"                        , bitsPerNext());
                                 node_balance = L.variable ("node_balance"                                  , bitsPerNext());
+
+    final Layout.Structure transaction = L.structure("transaction", allocate,
+      nextFree, success, inserted, first, next, search, found, key, data,
+      firstKey, lastKey, flKey, parentKey, lk, ld, rk, rd, index, nl, nr,
+      l, r, splitParent, IsLeaf, isFull, isLow, hasLeavesForChildren,
+      stolenOrMerged, leafBase, branchBase, leafSize, branchSize,
+      top, Key, Data, find, findAndInsert, parent, child, leafFound,
+      node_isLeaf, node_setLeaf, node_setBranch, node_assertLeaf,
+      node_assertBranch, allocLeaf, allocBranch, node_free,
+      node_clear, node_erase, node_leafBase, node_branchBase,
+      node_leafSize, node_branchSize, node_isFull, node_isLow,
+      node_hasLeavesForChildren, node_top, node_findEqualInLeaf,
+      node_findFirstGreaterThanOrEqualInLeaf,
+      node_findFirstGreaterThanOrEqualInBranch, node_splitLeaf,
+      node_splitBranch, node_stealFromLeft, node_stealFromRight,
+      node_mergeRoot, node_mergeLeftSibling, node_mergeRightSibling,
+      node_balance);
+
     return L.compile();
    }
 
-  private void    isLeaf() {z(); T.at(IsLeaf).move(M.at(isLeaf, T.at(node_isLeaf)));}      // A leaf if true
-  private void   setLeaf() {z(); M.at(isLeaf, T.at(node_setLeaf))  .move(T.constant(1));}  // Set as leaf
-  private void setBranch() {z(); M.at(isLeaf, T.at(node_setBranch)).move(T.constant(0));}  // Set as branch
+  private void    isLeaf() {z(); T.at(IsLeaf).move(M.at(isLeaf, T.at(node_isLeaf)).setOff());}      // A leaf if true
+  private void   setLeaf() {z(); M.at(isLeaf, T.at(node_setLeaf))  .setOff().setInt(1);} // Set as leaf
+  private void setBranch() {z(); M.at(isLeaf, T.at(node_setBranch)).setOff().setInt(0);} // Set as branch
 
   private void assertLeaf()
    {z();
@@ -480,23 +501,30 @@ abstract class BtreeSA extends Test                                             
     if (tGetInt(IsLeaf) != 0) stop("Branch required");
    }
 
-  private void allocLeaf()  {z(); allocate(); allocLeaf   = node_setLeaf   = allocate; setLeaf();  } // Allocate leaf
+  private void allocLeaf()                                                      // Allocate leaf
+   {z();
+    allocate();
+    tt(allocLeaf,     allocate);
+    tt(node_setLeaf,  allocate);
+    setLeaf();
+   }
   private void allocBranch(){z(); allocate(); allocBranch = node_setBranch = allocate; setBranch();} // Allocate branch
 
   private void free()                                                           // Free a new node to make it available for reuse
    {z(); if (tGetInt(node_free) == 0) stop("Cannot free root");                 // The root is never freed
     z(); tt(node_erase, node_free); erase();                                    // Clear the node to encourage erroneous frees to do damage that shows up quickly.
-    M.at(free, T.at(node_free)).move(M.at(freedChain));                         // Chain this node in front of the last freed node
-    M.at(freedChain).move(T.at(node_free));                                      // Make this node the head of the free chain
+    M.at(free, T.at(node_free)).setOff().move(M.at(freeList));                  // Chain this node in front of the last freed node
+    M.at(freeList).move(T.at(node_free));                                       // Make this node the head of the free chain
     maxNodeUsed  = max(maxNodeUsed, --nodeUsed);                                // Number of nodes in use
    }
 
   private void clear()                                                          // Clear a new node to zeros ready for use
-   {z(); M.at(Node, T.at(node_clear)).zero();
+   {z();
+    M.at(Node, T.at(node_clear)).setOff().zero();
    }
 
   private void erase()                                                          // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
-   {z(); M.at(Node, T.at(node_clear)).ones();
+   {z(); M.at(Node, T.at(node_clear)).setOff().ones();
    }
 
   private void leafBase()   {z(); T.at(leafBase  ).setInt(M.at(leaf,   T.at(node_leafBase  )).setOff().at);} // Base of leaf stuck in memory
@@ -507,7 +535,7 @@ abstract class BtreeSA extends Test                                             
     tt(node_leafBase, node_leafSize); leafBase();
     lSize.base(T.at(leafBase));
     lSize.size();
-    leafSize = lSize.size;
+    T.at(leafSize).move(lSize.T.at(lSize.size));
    }
 
   private void branchSize()                                                     // Number of children in body of branch taking top for granted as it is always there
@@ -522,11 +550,15 @@ abstract class BtreeSA extends Test                                             
   private void isFull()                                                         // The node is full
    {z();  tt(node_isLeaf, node_isFull); isLeaf();
     if (T.at(IsLeaf).isOnes())
-     {z(); tt(node_leafSize, node_isFull); leafSize();
+     {z();
+      tt(node_leafSize, node_isFull);
+      leafSize();
       T.at(leafSize).equal(T.constant(maxKeysPerLeaf()), T.at(isFull));
      }
     else
-     {z(); tt(node_branchSize, node_isFull); branchSize();
+     {z();
+      tt(node_branchSize, node_isFull);
+      branchSize();
       T.at(branchSize).equal(T.constant(maxKeysPerBranch()), T.at(isFull));
      }
    }
@@ -835,10 +867,11 @@ abstract class BtreeSA extends Test                                             
     allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
     allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
 
-    T.at(node_leafBase).setInt(root); leafBase(); lT.base(T.at(leafBase));                        // Set address of the referenced leaf stuck
-    tt(node_leafBase, l); leafBase(); lL.base(T.at(leafBase));                        // Set address of the referenced leaf stuck
-    tt(node_leafBase, r); leafBase(); lR.base(T.at(leafBase));                        // Set address of the referenced leaf stuck
+    T.at(node_leafBase).zero(); leafBase(); lT.base(T.at(leafBase));                        // Set address of the referenced leaf stuck
+    tt  (node_leafBase, l);     leafBase(); lL.base(T.at(leafBase));                        // Set address of the referenced leaf stuck
+    tt  (node_leafBase, r);     leafBase(); lR.base(T.at(leafBase));                        // Set address of the referenced leaf stuck
 
+say("AAAA", T.at(l), T.at(r));
     for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf from parent
      {z(); lT.shift();
       lL.T.at(lL.tKey ).move(lT.T.at(lT.tKey ));
@@ -1446,10 +1479,15 @@ abstract class BtreeSA extends Test                                             
 
   public void find()                                                            // Find the leaf associated with a key in the tree
    {z();
-    T.at(node_isLeaf).setInt(root); isLeaf();
+
+    T.at(node_isLeaf).zero(); isLeaf();
     if (T.at(IsLeaf).isOnes())                                                                 // The root is a leaf
-     {z(); tt(search, Key); T.at(node_findEqualInLeaf).setInt(root); findEqualInLeaf();
-      T.at(find).zero(); return;
+     {z();
+      tt(search, Key);
+      T.at(node_findEqualInLeaf).setInt(root);
+      findEqualInLeaf();
+      T.at(find).zero();
+      return;
      }
 
     T.at(parent).zero();                                                        // Parent starts at root which is now known to be a branch
@@ -1462,8 +1500,10 @@ abstract class BtreeSA extends Test                                             
       tt(child, next);
       tt(node_isLeaf, child); isLeaf();
       if (T.at(IsLeaf).isOnes())                                                // Found the containing leaf
-       {z(); tt(search, Key);
-        tt(node_findEqualInLeaf, child); findEqualInLeaf();
+       {z();
+        tt(search, Key);
+        tt(node_findEqualInLeaf, child);
+        findEqualInLeaf();
         tt(find, child); return;
        }
       tt(parent, child);                                                        // Step down to lower branch
@@ -1473,8 +1513,8 @@ abstract class BtreeSA extends Test                                             
 
   private void findAndInsert()                                                  // Find the leaf that should contain this key and insert or update it is possible
    {z();
-    find(); tt(leafFound, find);                                                // Find the leaf that should contain this key
-
+    find();
+    tt(leafFound, find);                                                        // Find the leaf that should contain this key
     tt(node_leafBase, leafFound); leafBase();
     lT.base(T.at(leafBase));
 
@@ -1485,7 +1525,9 @@ abstract class BtreeSA extends Test                                             
       return;
      }
 
-    tt(node_isFull, leafFound); isFull();                                       // Leaf is not full so we can insert immediately
+    tt(node_isFull, leafFound);
+say("FindAndInsert node_is_full", T.at(node_isFull).getInt());
+    isFull();
     if (T.at(isFull).isZero())                                                  // Leaf is not full so we can insert immediately
      {z();
       tt(search, Key);
@@ -1642,9 +1684,14 @@ abstract class BtreeSA extends Test                                             
   final static int[]random_large = {5918,5624,2514,4291,1791,5109,7993,60,1345,2705,5849,1034,2085,4208,4590,7740,9367,6582,4178,5578,1120,378,7120,8646,5112,4903,1482,8005,3801,5439,4534,9524,6111,204,5459,248,4284,8037,5369,7334,3384,5193,2847,1660,5605,7371,3430,1786,1216,4282,2146,1969,7236,2187,136,2726,9480,5,4515,6082,969,5017,7809,9321,3826,9179,5781,3351,4819,4545,8607,4146,6682,1043,2890,2964,7472,9405,4348,8333,2915,9674,7225,4743,995,1321,3885,6061,9958,3901,4710,4185,4776,5070,8892,8506,6988,2317,9342,3764,9859,4724,5195,673,359,9740,2089,9942,3749,9208,1,7446,7023,5496,4206,3272,3527,8593,809,3149,4173,9605,9021,5120,5265,7121,8667,6911,4717,2535,2743,1289,1494,3788,6380,9366,2732,1501,8543,8013,5612,2393,7041,3350,3204,288,7213,1741,1238,9830,6722,4687,6758,8067,4443,5013,5374,6986,282,6762,192,340,5075,6970,7723,5913,1060,1641,1495,5738,1618,157,6891,173,7535,4952,9166,8950,8680,1974,5466,2383,3387,3392,2188,3140,6806,3131,6237,6249,7952,1114,9017,4285,7193,3191,3763,9087,7284,9170,6116,3717,6695,6538,6165,6449,8960,2897,6814,3283,6600,6151,4624,3992,5860,9557,1884,5585,2966,1061,6414,2431,9543,6654,7417,2617,878,8848,8241,3790,3370,8768,1694,9875,9882,8802,7072,3772,2689,5301,7921,7774,1614,494,2338,8638,4161,4523,5709,4305,17,9626,843,9284,3492,7755,5525,4423,9718,2237,7401,2686,8751,1585,5919,9444,3271,1490,7004,5980,3904,370,5930,6304,7737,93,5941,9079,4968,9266,262,2766,4999,2450,9518,5137,8405,483,8840,2231,700,8049,8823,9811,9378,3811,8074,153,1940,1998,4354,7830,7086,6132,9967,5680,448,1976,4101,7839,3122,4379,9296,4881,1246,4334,9457,5401,1945,9548,8290,1184,3464,132,2458,7704,1056,7554,6203,2270,6070,4889,7369,1676,485,3648,357,1912,9661,4246,1576,1836,4521,7667,6907,2098,8825,7404,4019,8284,3710,7202,7050,9870,3348,3624,9224,6601,7897,6288,3713,932,5596,353,2615,3273,833,1446,8624,2489,3872,486,1091,2493,4157,3611,6570,7107,9153,4543,9504,4746,1342,9737,3247,8984,3640,5698,7814,307,8775,1150,4330,3059,5784,2370,5248,4806,6107,9700,231,3566,5627,3957,5317,5415,8119,2588,9440,2961,9786,4769,466,5411,3080,7623,5031,2378,9286,4801,797,1527,2325,847,6341,5310,1926,9481,2115,2165,5255,5465,5561,3606,7673,7443,7243,8447,2348,7925,6447,8311,6729,4441,7763,8107,267,8135,9194,6775,3883,9639,612,5024,1351,7557,9241,5181,2239,8002,5446,747,166,325,9925,3820,9531,5163,3545,558,7103,7658,5670,8323,4821,6263,7982,59,3700,1082,4474,4353,8637,9558,5191,842,5925,6455,4092,9929,9961,290,3523,6290,7787,8266,7986,7269,6408,3620,406,5964,7289,1620,6726,1257,1993,7006,5545,2913,5093,5066,3019,7081,6760,6779,7061,9051,8852,8118,2340,6596,4594,9708,8430,8659,8920,9268,5431,9203,2823,1427,2203,6422,6193,5214,9566,8791,4964,7575,4350,56,2227,8545,5646,3089,2204,4081,487,8496,2258,4336,6955,3452,556,8602,8251,8569,8636,9430,1025,9459,7137,8392,3553,5945,9414,3078,1688,5480,327,8117,2289,2195,8564,9423,103,7724,3091,8548,7298,5279,6042,2855,3286,3542,9361,420,7020,4112,5320,5366,6379,114,9174,9744,592,5346,3985,3174,5157,9890,1605,3082,8099,4346,7256,8670,5687,6613,6620,1458,1045,7917,2980,2399,1433,3315,4084,178,7056,2132,2728,4421,9195,4181,6017,6229,2945,4627,2809,8816,6737,18,8981,3813,8890,5304,3789,6959,7476,1856,4197,6944,9578,5915,3060,9932,3463,67,7393,9857,5822,3187,501,653,8453,3691,9736,6845,1365,9645,4120,2157,8471,4436,6435,2758,7591,9805,7142,7612,4891,7342,5764,8683,8365,2967,6947,441,2116,6612,1399,7585,972,6548,5481,7733,7209,222,5903,6161,9172,9628,7348,1588,5992,6094,7176,4214,8702,2987,74,8486,9788,7164,5788,8535,8422,6826,1800,8965,4965,565,5609,4686,2556,9324,5000,9809,1994,4737,63,8992,4783,2536,4462,8868,6346,5553,3980,2670,1601,4272,8725,4698,7333,7826,9233,4198,1997,1687,4851,62,7893,8149,8015,341,2230,1280,5559,9756,3761,7834,6805,9287,4622,5748,2320,1958,9129,9649,1644,4323,5096,9490,7529,6444,7478,7044,9525,7713,234,7553,9099,9885,7135,6493,9793,6268,8363,2267,9157,9451,1438,9292,1637,3739,695,1090,4731,4549,5171,5975,7347,5192,5243,1084,2216,9860,3318,5594,5790,1107,220,9397,3378,1353,4498,6497,5442,7929,7377,9541,9871,9895,6742,9146,9409,292,6278,50,5288,2217,4923,6790,4730,9240,3006,3547,9347,7863,4275,3287,2673,7485,1915,9837,2931,3918,635,9131,1197,6250,3853,4303,790,5548,9993,3702,2446,3862,9652,4432,973,41,3507,8585,2444,1633,956,5789,1523,8657,4869,8580,8474,7093,7812,2549,7363,9315,6731,1130,7645,7018,7852,362,1636,2905,8006,4040,6643,8052,7021,3665,8383,715,1876,2783,3065,604,4566,8761,7911,1983,3836,5547,8495,8144,1950,2537,8575,640,8730,8303,1454,8165,6647,4762,909,9449,8640,9253,7293,8767,3004,4623,6862,8994,2520,1215,6299,8414,2576,6148,1510,313,3693,9843,8757,5774,8871,8061,8832,5573,5275,9452,1248,228,9749,2730};
 
   static void test_put_ascending()
-   {final BtreeSA     t = btreeSML(4, 3);
+   {final BtreeSA     t = btreeSA(4, 3);
     final int N = 64;
-    for (int i = 1; i <= N; i++) {t.T.at(t.Key).setInt(i); t.T.at(t.Data).setInt(i); t.put(); }
+    for (int i = 1; i <= N; i++)
+     {say("Put Ascending", i);
+      t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(i);
+      t.put();
+     }
     //t.stop();
     t.ok("""
                                                                                                                             32                                                                                                                                           |
@@ -1665,7 +1712,7 @@ abstract class BtreeSA extends Test                                             
    }
 
   static void test_put_ascending_wide()
-   {final BtreeSA     t = btreeSML(8, 7);
+   {final BtreeSA     t = btreeSA(8, 7);
     final int N = 64;
     for (int i = 1; i <= N; ++i) {t.T.at(t.Key).setInt(i); t.T.at(t.Data).setInt(i); t.put();}
     //stop(t);
@@ -1684,7 +1731,7 @@ abstract class BtreeSA extends Test                                             
    }
 
   static void test_put_descending()
-   {final BtreeSA     t = btreeSML(2, 3);
+   {final BtreeSA     t = btreeSA(2, 3);
     final int N = 64;
     for (int i = N; i > 0; --i) {t.T.at(t.Key).setInt(i); t.T.at(t.Data).setInt(i); t.put();}
     //t.stop();
@@ -1707,7 +1754,7 @@ abstract class BtreeSA extends Test                                             
    }
 
   static void test_put_small_random()
-   {final BtreeSA     t = btreeSML(6, 3);
+   {final BtreeSA     t = btreeSA(6, 3);
 
     for (int i = 0; i < random_small.length; ++i)
      {t.T.at(t.Key).setInt(random_small[i]);
@@ -1735,7 +1782,7 @@ abstract class BtreeSA extends Test                                             
 
   static void test_put_large_random()
    {if (!github_actions) return;
-    final BtreeSA t = btreeSML(2, 3);
+    final BtreeSA t = btreeSA(2, 3);
     final TreeMap<Integer,Integer> s = new TreeMap<>();
 
     for (int i = 0; i < random_large.length; ++i)
@@ -1760,7 +1807,7 @@ abstract class BtreeSA extends Test                                             
    }
 
   static void test_find()
-   {final BtreeSA     t = btreeSML(8, 3);
+   {final BtreeSA     t = btreeSA(8, 3);
     final int N = 32;
     for (int i = 1; i <= N; i++)
      {t.T.at(t.Key ).setInt(2*i);
@@ -1804,7 +1851,7 @@ abstract class BtreeSA extends Test                                             
    }
 
   static void test_delete_ascending()
-   {final BtreeSA     t = btreeSML(4, 3);
+   {final BtreeSA     t = btreeSA(4, 3);
 
     final int N = 32;
     final boolean box = false;                                                  // Print read me
@@ -2103,7 +2150,7 @@ abstract class BtreeSA extends Test                                             
    }
 
   static void test_delete_descending()
-   {final BtreeSA     t = btreeSML(4, 3);
+   {final BtreeSA     t = btreeSA(4, 3);
     final int N = 32;
     final boolean box = false;                                                  // Print read me
     for (int i = 1; i <= N; i++) {t.T.at(t.Key).setInt(i); t.T.at(t.Data).setInt(i); t.put();}
@@ -2400,7 +2447,7 @@ abstract class BtreeSA extends Test                                             
      }
    }
   static void test_to_array()
-   {final BtreeSA     t = btreeSML(2, 3);
+   {final BtreeSA     t = btreeSA(2, 3);
 
     final int M = 2;
     for (int i = 1; i <= M; i++)  {t.T.at(t.Key).setInt(i); t.T.at(t.Data).setInt(i); t.put();}
@@ -2435,7 +2482,7 @@ abstract class BtreeSA extends Test                                             
    }
 
   static void test_delete_small_random()
-   {final BtreeSA t = btreeSML(4, 3);
+   {final BtreeSA t = btreeSA(4, 3);
 
     for (int i = 0; i < random_small.length; ++i)
      {t.T.at(t.Key ).setInt(random_small[i]);
@@ -2469,8 +2516,7 @@ abstract class BtreeSA extends Test                                             
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_delete_small_random();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
