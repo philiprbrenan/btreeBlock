@@ -78,6 +78,7 @@ abstract class StuckSML extends Test                                            
     Data        = l.array    ("Data"       , data,   maxSize());
     currentSize = l.variable ("currentSize", bitsPerSize());
     stuck       = l.structure("stuck"      , currentSize, Keys, Data);
+    l.layoutName = "mainStuckSML";
     return l.compile();
    }
 
