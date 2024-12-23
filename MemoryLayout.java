@@ -97,8 +97,10 @@ class MemoryLayout extends Test                                                 
        }
      if (layout != Field.container())
        {final String n = Field.name, m = layout.layoutName, f = Field.container().layoutName;
-        stop("Field:", n,      (f == null ? "" : "in layout: "+ f),
-             "is not part of", (m == null ? "this layout" : "layout: "+ f));
+        if (f == null || m == null || !f.equals(m))
+         {stop("Field:", n,      (f == null ? "" : "in layout: "+ f),
+               "is not part of", (m == null ? "this layout" : "layout: "+ f));
+         }
        }
      }
 
