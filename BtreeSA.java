@@ -26,7 +26,7 @@ abstract class BtreeSA extends Test                                             
   Layout.Variable  free;                                                        // Free list chain
   Layout.Structure Node;                                                        // Layout of a node in the memory used by btree
   Layout.Array     nodes;                                                       // Layout of an array of nodes in the memory used by btree
-  Layout.Variable  freeList;                                                  // Single linked list of freed nodes
+  Layout.Variable  freeList;                                                    // Single linked list of nodes that have been freed and so can be reused without fragmenting memory
   Layout.Structure bTree;                                                       // Btree
 
   final static int
@@ -146,14 +146,14 @@ abstract class BtreeSA extends Test                                             
         final int  f = i == N ? 0 : i;                                          // Curent first element on free chain
         setInt(free, (i == N ? 0 : i), n);                                      // Link this node to the previous node
        }
-      setInt(freeList, root);                                                 // Root is first on free chain
+      setInt(freeList, root);                                                   // Root is first on free chain
      }
     allocate(false);                                                            // The root is always at zero, which frees zero to act as the end of list marker on the free chain
     T.at(node_setLeaf).setInt(root);
     setLeaf();                                                                  // The root starts as a leaf
    }
 
-  static BtreeSA btreeSA(final int leafKeys, int branchKeys)                   // Define a test btree with the specified dimensions
+  static BtreeSA btreeSA(final int leafKeys, int branchKeys)                    // Define a test btree with the specified dimensions
    {return  new BtreeSA()
      {int maxSize         () {return testMaxSize;}
       int maxKeysPerLeaf  () {return    leafKeys;}
@@ -286,10 +286,10 @@ abstract class BtreeSA extends Test                                             
 
   private void allocate(boolean check)                                          // Allocate a node with or without checking for sufficient free space
    {z();
-    tm(allocate, freeList);                                                // Node at head of free nodes list
+    tm(allocate, freeList);                                                     // Node at head of free nodes list
     z(); if (check && tGetInt(allocate) == 0) stop("No more memory available"); // No more free nodes available
     z(); T.at(nextFree).move(M.at(free, T.at(allocate)).setOff());              // Second node on free list
-    mt(freeList, nextFree);                                                    // Make second to last freed node the first freed node to liberate the existing first free node
+    mt(freeList, nextFree);                                                     // Make second to last freed node the first freed node to liberate the existing first free node
     tt(node_clear, allocate);
     clear();                                                                    // Construct and clear the node
     maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                                // Number of nodes in use
@@ -521,7 +521,7 @@ abstract class BtreeSA extends Test                                             
     z(); tt(node_erase, node_free); erase();                                    // Clear the node to encourage erroneous frees to do damage that shows up quickly.
     M.at(free, T.at(node_free)).setOff().move(M.at(freeList));                  // Chain this node in front of the last freed node
     M.at(freeList).move(T.at(node_free));                                       // Make this node the head of the free chain
-    maxNodeUsed = max(maxNodeUsed, --nodeUsed);                                // Number of nodes in use
+    maxNodeUsed = max(maxNodeUsed, --nodeUsed);                                 // Number of nodes in use
    }
 
   private void clear()                                                          // Clear a new node to zeros ready for use
@@ -530,7 +530,8 @@ abstract class BtreeSA extends Test                                             
    }
 
   private void erase()                                                          // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
-   {z(); M.at(Node, T.at(node_clear)).setOff().ones();
+   {z();
+    M.at(Node, T.at(node_erase)).setOff().ones();
    }
 
   private void leafBase()   {z(); T.at(leafBase  ).setInt(M.at(leaf,   T.at(node_leafBase  )).setOff().at);} // Base of leaf stuck in memory
@@ -607,11 +608,11 @@ abstract class BtreeSA extends Test                                             
 
   public String toString(int node)                                              // Print a node
    {final StringBuilder s = new StringBuilder();
-    T.at(node_isLeaf).setInt(node); isLeaf();                                               // Print a leaf
-    if (T.at(IsLeaf).isOnes())                                                                 // Print a leaf
+    T.at(node_isLeaf).setInt(node); isLeaf();
+    if (T.at(IsLeaf).isOnes())                                                  // Print a leaf
      {T.at(node_leafSize).setInt(node);
-      leafSize();                                                               // Number of elements in leaf
-      final int N = T.at(leafSize).getInt();                                              // Number of elements in leaf
+      leafSize();
+      final int N = T.at(leafSize).getInt();                                    // Number of elements in leaf
       s.append("Leaf(node:"+node+" size:"+N+")\n");
       T.at(node_leafBase).setInt(node); leafBase();
       lLeaf.base(T.at(leafBase));
@@ -623,7 +624,7 @@ abstract class BtreeSA extends Test                                             
      }
     else                                                                        // Print a branch
      {T.at(node_branchSize).setInt(node); branchSize();
-      final int N = T.at(branchSize).getInt();                                                 // Number of elements in branch not including top
+      final int N = T.at(branchSize).getInt();                                  // Number of elements in branch not including top
       T.at(node_top).setInt(node); top();
       s.append("Branch(node:"+node+" size:"+N+" top:"+top+"\n");
 
@@ -728,10 +729,13 @@ abstract class BtreeSA extends Test                                             
       t.base(T.at(branchBase));
       for  (int i = 0; i < K; i++)
        {z();
-        t.T.at(t.index).setInt(i); t.elementAt();                                             // Each node in the branch
+        t.T.at(t.index).setInt(i); t.elementAt();                               // Each node in the branch
 
         T.at(node_isLeaf).move(t.T.at(t.tData)); isLeaf();
-        if (T.at(IsLeaf).isOnes()) {z(); leafToArray(t.T.at(t.tData).getInt(), s);}
+        if (T.at(IsLeaf).isOnes())
+         {z();
+          leafToArray(t.T.at(t.tData).getInt(), s);
+         }
         else
          {z();
           if (t.T.at(t.tData).isZero())
@@ -749,19 +753,16 @@ abstract class BtreeSA extends Test                                             
 
   private void printLeaf(int node, Stack<StringBuilder>S, int level)            // Print leaf horizontally
    {T.at(node_assertLeaf).setInt(node);
-say("PPPP Leaf ", node);
     assertLeaf();
     padStrings(S, level);
     final StringBuilder s = new StringBuilder();                                // String builder
     T.at(node_leafSize).setInt(node);
     leafSize();
     final int     K = T.at(leafSize).getInt();
-say("PPPP11 ", K, node);
 
     final StuckSA t = lLeaf.copy();
     T.at(node_leafBase).setInt(node); leafBase();
     t.base(T.at(leafBase));
-say("QQQQ", t, "K", K);
 
     for  (int i = 0; i < K; i++)
      {t.T.at(t.index).setInt(i); t.elementAt();                                 // Each node in the leaf
@@ -775,7 +776,6 @@ say("QQQQ", t, "K", K);
 
   private void printBranch(int node, Stack<StringBuilder>S, int level)          // Print branch horizontally
    {T.at(node_assertBranch).setInt(node); assertBranch();
-say("PPPP Branch ", node);
     if (level > maxPrintLevels) return;
     padStrings(S, level);
     final int L = level * linesToPrintABranch;
@@ -887,11 +887,10 @@ say("PPPP Branch ", node);
     allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
     allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
 
-    T.at(node_leafBase).zero(); leafBase(); lT.base(T.at(leafBase));                        // Set address of the referenced leaf stuck
-    tt  (node_leafBase, l);     leafBase(); lL.base(T.at(leafBase));                        // Set address of the referenced leaf stuck
-    tt  (node_leafBase, r);     leafBase(); lR.base(T.at(leafBase));                        // Set address of the referenced leaf stuck
+    T.at(node_leafBase).zero(); leafBase(); lT.base(T.at(leafBase));            // Set address of the referenced leaf stuck
+    tt  (node_leafBase, l);     leafBase(); lL.base(T.at(leafBase));            // Set address of the referenced leaf stuck
+    tt  (node_leafBase, r);     leafBase(); lR.base(T.at(leafBase));            // Set address of the referenced leaf stuck
 
-say("AAAA", T.at(l), T.at(r));
     for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf from parent
      {z(); lT.shift();
       lL.T.at(lL.tKey ).move(lT.T.at(lT.tKey ));
@@ -907,19 +906,19 @@ say("AAAA", T.at(l), T.at(r));
 
     lR.firstElement();
     lL. lastElement();
-    T.at(node_setBranch).setInt(root); setBranch();                                         // The root is now a branch
-    T.at(node_branchBase).setInt(root); branchBase();                                       // Set address of the referenced leaf stuck
-    bT.base(T.at(branchBase));                                                        // Set address of the referenced leaf stuck
+    T.at(node_setBranch).setInt(root); setBranch();                             // The root is now a branch
+    T.at(node_branchBase).setInt(root); branchBase();                           // Set address of the referenced leaf stuck
+    bT.base(T.at(branchBase));                                                  // Set address of the referenced leaf stuck
     bT.clear();                                                                 // Clear the branch
-    T.at(firstKey).move(lR.T.at(lR.tKey));                                                         // First of right leaf
-    T.at(lastKey ).move(lL.T.at(lL.tKey));                                                         // Last of left leaf
-    T.at(flKey   ).setInt((T.at(firstKey).getInt() + T.at(lastKey).getInt()) / 2);          // Mid key - keys are likely to be bigger than 31 bits
+    T.at(firstKey).move(lR.T.at(lR.tKey));                                      // First of right leaf
+    T.at(lastKey ).move(lL.T.at(lL.tKey));                                      // Last of left leaf
+    T.at(flKey   ).setInt((T.at(firstKey).getInt() + T.at(lastKey).getInt()) / 2);  // Mid key - keys are likely to be bigger than 31 bits
     bT.T.at(bT.tKey).move(T.at(flKey));
     bT.T.at(bT.tData).move(T.at(l));
-    bT.push();                                  // Insert left leaf into root
+    bT.push();                                                                  // Insert left leaf into root
     bT.T.at(bT.tKey).zero();
     bT.T.at(bT.tData).move(T.at(r));
-    bT.push();                                  // Insert right into root. This will be the top node and so ignored by search ... except last.
+    bT.push();                                                                  // Insert right into root. This will be the top node and so ignored by search ... except last.
    }
 
   private void splitBranchRoot()                                                // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
@@ -1025,9 +1024,9 @@ say("AAAA", T.at(l), T.at(r));
                             bs, "in node:", nd);
     z();
     allocBranch(); tt(l, allocBranch);
-    tt(node_branchBase, splitParent);      branchBase(); bT.base(T.at(branchBase));      // The parent branch
-    tt(node_branchBase, l);                branchBase(); bL.base(T.at(branchBase));      // The branch being split into
-    tt(node_branchBase, node_splitBranch); branchBase(); bR.base(T.at(branchBase));      // The branch being split
+    tt(node_branchBase, splitParent);      branchBase(); bT.base(T.at(branchBase)); // The parent branch
+    tt(node_branchBase, l);                branchBase(); bL.base(T.at(branchBase)); // The branch being split into
+    tt(node_branchBase, node_splitBranch); branchBase(); bR.base(T.at(branchBase)); // The branch being split
 
     for (int i = 0; i < splitBranchSize; i++)                                   // Build left branch from right
      {z(); bR.shift();
@@ -1052,12 +1051,22 @@ say("AAAA", T.at(l), T.at(r));
     z(); if (T.at(index).greaterThan(T.at(branchSize))) stop("Index", index, "too big");
     z();
 
-    tt(node_branchBase, node_stealFromLeft); branchBase();
+    tt(node_branchBase, node_stealFromLeft);
+    branchBase();
     bT.base(T.at(branchBase));
-    bT.T.at(bT.index).move(T.at(index)); bT.T.at(bT.index).dec(); bT.elementAt(); T.at(l).move(bT.T.at(bT.tData));
-    bT.T.at(bT.index).move(T.at(index));                          bT.elementAt(); T.at(r).move(bT.T.at(bT.tData));
 
-    tt(node_hasLeavesForChildren, node_stealFromLeft); hasLeavesForChildren();  // Children are leaves
+    bT.T.at(bT.index).move(T.at(index));
+    bT.T.at(bT.index).dec();
+    bT.elementAt();
+
+    T.at(l).move(bT.T.at(bT.tData));
+    bT.T.at(bT.index).move(T.at(index));
+    bT.elementAt();
+    T.at(r).move(bT.T.at(bT.tData));
+
+    tt(node_hasLeavesForChildren, node_stealFromLeft);
+    hasLeavesForChildren();
+
     if (T.at(hasLeavesForChildren).isOnes())                                    // Children are leaves
      {z();
       tt(node_leafBase, l); leafBase(); lL.base(T.at(leafBase));
@@ -1066,21 +1075,30 @@ say("AAAA", T.at(l), T.at(r));
       tt(node_leafSize, l); leafSize(); tt(nl, leafSize);
       tt(node_leafSize, r); leafSize(); tt(nr, leafSize);
 
-      if (T.at(nr).greaterThanOrEqual(T.constant(maxKeysPerLeaf()))) {z(); T.at(stolenOrMerged).zero(); return;}        // Steal not possible because there is no where to put the steal
-      if (T.at(nl).lessThanOrEqual   (T.constant(0)))                {z(); T.at(stolenOrMerged).zero(); return;}        // Steal not allowed because it would leave the leaf sibling empty
+      if (T.at(nr).greaterThanOrEqual(T.constant(maxKeysPerLeaf())))            // Steal not possible because there is no where to put the steal
+       {z(); T.at(stolenOrMerged).zero();
+        return;
+       }
+      if (T.at(nl).lessThanOrEqual   (T.constant(0)))                           // Steal not allowed because it would leave the leaf sibling empty
+       {z(); T.at(stolenOrMerged).zero();
+        return;
+       }
       z();
 
       lL.lastElement();
+
       lR.T.at(lR.tKey ).move(lL.T.at(lL.tKey ));
       lR.T.at(lR.tData).move(lL.T.at(lL.tData));
-      lR.unshift();   // Increase right
+      lR.unshift();                                                             // Increase right
 
       lL.pop();                                                                 // Reduce left
+
       lL.T.at(lL.index).move(T.at(nl));
       lL.T.at(lL.index).dec();
       lL.T.at(lL.index).dec();
       lL.elementAt();                                                           // Last key on left
-      bT.T.at(bT.tKey).move(lL.T.at(lL.tKey));
+
+      bT.T.at(bT.tKey) .move(lL.T.at(lL.tKey));
       bT.T.at(bT.tData).move(T.at(l));
       bT.T.at(bT.index).move(T.at(index));
       bT.T.at(bT.index).dec();
@@ -1098,8 +1116,11 @@ say("AAAA", T.at(l), T.at(r));
       z();
 
       bL.lastElement();                                                         // Increase right with left top
-      bT.T.at(bT.index).move(T.at(index)); bT.elementAt();                                         // Top key
-      bR.T.at(bR.tKey) .move(bT.T.at(bT.tKey)); bR.T.at(bR.tData).move(bL.T.at(bL.tData)); bR.unshift();                    // Increase right with left top
+      bT.T.at(bT.index).move(T.at(index));
+      bT.elementAt();                                                           // Top key
+      bR.T.at(bR.tKey) .move(bT.T.at(bT.tKey));
+      bR.T.at(bR.tData).move(bL.T.at(bL.tData));
+      bR.unshift();                                                             // Increase right with left top
       bL.pop();                                                                 // Remove left top
 
       bR.firstElement();                                                        // Increase right with left top
@@ -1109,26 +1130,34 @@ say("AAAA", T.at(l), T.at(r));
 
       bT.elementAt();                                                           // Parent key
       bR.T.at(bR.tKey).move(bT.T.at(bT.tKey));
-      bT.T.at(bR.index).zero();
+      bR.T.at(bR.index).zero();
       bR.setElementAt();                                                        // Reduce key of parent of right
+
       bL.lastElement();                                                         // Last left key
-      bT.T.at(bT.tKey).move(bL.T.at(bL.tKey));
-      bT.T.at(bT.tData).ones();
+      bT.T.at(bT.tKey) .move(bL.T.at(bL.tKey));
+      bT.T.at(bT.tData).move(T.at(l));
       bT.T.at(bT.index).move(T.at(index));
       bT.T.at(bT.index).dec();
       bT.setElementAt();                                                        // Reduce key of parent of left
      }
-    z(); T.at(stolenOrMerged).ones(); return;
+    z(); T.at(stolenOrMerged).ones();
+    return;
    }
 
   private void stealFromRight()                                                 // Steal from the right sibling of the indicated child if possible
    {z(); tt(node_assertBranch, node_stealFromRight); assertBranch();
-    z(); tt(node_branchSize, node_stealFromRight); branchSize();
-    if (T.at(index).equal(T.at(branchSize))) {z(); T.at(stolenOrMerged).zero(); return;}
-    z(); if (T.at(index).greaterThanOrEqual(T.at(branchSize))) stop("Index", T.at(index).getInt(), "too big");
+    z(); tt(node_branchSize, node_stealFromRight);   branchSize();
+    if (T.at(index).equal(T.at(branchSize)))
+     {z(); T.at(stolenOrMerged).zero();
+      return;
+     }
+    if (T.at(index).greaterThanOrEqual(T.at(branchSize)))
+     {stop("Index", T.at(index).getInt(), "too big");
+     }
     z();
 
-    tt(node_branchBase, node_stealFromRight); branchBase();
+    tt(node_branchBase, node_stealFromRight);
+    branchBase();
     bT.base(T.at(branchBase));
     bT.T.at(bT.index).move(T.at(index));
     bT.elementAt();
@@ -1140,7 +1169,8 @@ say("AAAA", T.at(l), T.at(r));
     T.at(rk).move(bT.T.at(bT.tKey));
     T.at(r) .move(bT.T.at(bT.tData));
 
-    tt(node_hasLeavesForChildren, node_stealFromRight); hasLeavesForChildren();    // Children are leaves
+    tt(node_hasLeavesForChildren, node_stealFromRight);
+    hasLeavesForChildren();
     if (T.at(hasLeavesForChildren).isOnes())                                    // Children are leaves
      {z();
       tt(node_leafBase, l); leafBase(); lL.base(T.at(leafBase));
@@ -1152,18 +1182,24 @@ say("AAAA", T.at(l), T.at(r));
       leafSize();
       tt(nr, leafSize);
 
-      if (T.at(nl).greaterThanOrEqual(T.constant(maxKeysPerLeaf()))) {z(); T.at(stolenOrMerged).zero(); return;}        // Steal not possible because there is no where to put the steal
-      if (T.at(nr).lessThanOrEqual   (T.constant(1)))                {z(); T.at(stolenOrMerged).zero(); return;}        // Steal not allowed because it would leave the right sibling empty
+      if (T.at(nl).greaterThanOrEqual(T.constant(maxKeysPerLeaf())))            // Steal not possible because there is no where to put the steal
+       {z(); T.at(stolenOrMerged).zero();
+        return;
+       }
+      if (T.at(nr).lessThanOrEqual(T.constant(1)))                              // Steal not allowed because it would leave the right sibling empty
+       {z(); T.at(stolenOrMerged).zero();
+        return;
+       }
       z();
       lR.firstElement();                                                        // First element of right child
-      lL.T.at(lL.tKey).move(lR.T.at(lR.tKey));
+      lL.T.at(lL.tKey) .move(lR.T.at(lR.tKey));
       lL.T.at(lL.tData).move(lR.T.at(lR.tData));
-      lL.push();                        // Increase left
+      lL.push();                                                                // Increase left
 
-      bT.T.at(bT.tKey).move(lR.T.at(lR.tKey));
+      bT.T.at(bT.tKey) .move(lR.T.at(lR.tKey));
       bT.T.at(bT.tData).move(T.at(l));
       bT.T.at(bT.index).move(T.at(index));
-      bT.setElementAt();     // Swap key of parent
+      bT.setElementAt();                                                        // Swap key of parent
       lR.shift();                                                               // Reduce right
      }
     else                                                                        // Children are branches
@@ -1173,32 +1209,47 @@ say("AAAA", T.at(l), T.at(r));
       tt(node_branchSize, l); branchSize(); tt(nl, branchSize);
       tt(node_branchSize, r); branchSize(); tt(nr, branchSize);
 
-      z(); if (T.at(nl).greaterThanOrEqual(T.constant(maxKeysPerBranch()))) {z(); T.at(stolenOrMerged).zero(); return;} // Steal not possible because there is no where to put the steal
-      z(); if (T.at(nr).lessThanOrEqual   (T.constant(1)))                  {z(); T.at(stolenOrMerged).zero(); return;} // Steal not allowed because it would leave the right sibling empty
+      if (T.at(nl).greaterThanOrEqual(T.constant(maxKeysPerBranch())))          // Steal not possible because there is no where to put the steal
+       {z(); T.at(stolenOrMerged).zero();
+        return;
+       }
+      if (T.at(nr).lessThanOrEqual(T.constant(1)))                              // Steal not allowed because it would leave the right sibling empty
+       {z(); T.at(stolenOrMerged).zero();
+        return;
+       }
       z();
 
       bL.lastElement();                                                         // Last element of left child
-      bL.T.at(bL.tKey).move(T.at(lk)); bL.T.at(bL.index).move(T.at(nl)); bL.setElementAt();                           // Left top becomes real
+      bL.T.at(bL.tKey).move(T.at(lk));
+      bL.T.at(bL.index).move(T.at(nl));
+      bL.setElementAt();                                                        // Left top becomes real
 
       bR.firstElement();                                                        // First element of  right child
 
-      bL.T.at(bL.tKey).zero(); bL.T.at(bL.tData).move(bR.T.at(bR.tData)); bL.push();                              // New top for left is ignored by search ,.. except last
-      bT.T.at(bT.tKey).move(bR.T.at(bR.tKey)); bT.T.at(bT.tData).move(T.at(l)); bT.T.at(bT.index).move(T.at(index)); bT.setElementAt();     // Swap key of parent
+      bL.T.at(bL.tKey).zero();
+      bL.T.at(bL.tData).move(bR.T.at(bR.tData));
+      bL.push();                                                                // New top for left is ignored by search ,.. except last
+
+      bT.T.at(bT.tKey).move(bR.T.at(bR.tKey));
+      bT.T.at(bT.tData).move(T.at(l));
+      bT.T.at(bT.index).move(T.at(index));
+      bT.setElementAt();                                                        // Swap key of parent
       bR.shift();                                                               // Reduce right
      }
-    z(); T.at(stolenOrMerged).ones(); return;
+    z(); T.at(stolenOrMerged).ones();
+    return;
    }
 
 //D2 Merge                                                                      // Merge two nodes together and free the resulting free node
 
   private void mergeRoot()                                                      // Merge into the root
    {z();
-    T.at(node_isLeaf).setInt(root); isLeaf();
+    T.at(node_isLeaf).zero(); isLeaf();
     z(); if (T.at(IsLeaf).isOnes()) {z(); T.at(stolenOrMerged).zero(); return;}                     // Confirm we are on a branch
-    T.at(node_branchSize).setInt(root); branchSize();
+    T.at(node_branchSize).zero(); branchSize();
     z(); if (T.at(branchSize).greaterThan(T.constant(1))) {z(); T.at(stolenOrMerged).zero(); return;}             // Confirm we are on an almost empty root
     z();
-    T.at(node_branchBase).setInt(root); branchBase();
+    T.at(node_branchBase).zero(); branchBase();
     bT.base(T.at(branchBase));
     bT.firstElement(); T.at(l).move(bT.T.at(bT.tData));
     bT. lastElement(); T.at(r).move(bT.T.at(bT.tData));
@@ -1337,7 +1388,6 @@ say("AAAA", T.at(l), T.at(r));
     tt(node_hasLeavesForChildren, node_mergeRightSibling); hasLeavesForChildren();
     if (T.at(hasLeavesForChildren).isOnes())                                    // Children are leaves
      {z();
-say("MMMM111");
       tt(node_leafBase, l);
       leafBase();
       lL.base(T.at(leafBase));
@@ -1381,18 +1431,16 @@ say("MMMM111");
       bL.setElementAt();                                                        // Re-key left top
 
       final int N = T.at(nr).getInt()+1;
-//say("MMMM222", M);
-      for (int i = 0; i < N; i++)                             // Transfer right to left
+      for (int i = 0; i < N; i++)                                               // Transfer right to left
        {z();
         bR.shift();
         bL.T.at(bL.tKey) .move(bR.T.at(bR.tKey));
         bL.T.at(bL.tData).move(bR.T.at(bR.tData));
         bL.push();
-//say("MMMM333", M);
        }
      }
     tt(node_free, r);
-//    free();                                                                     // Free the empty right node
+    free();                                                                     // Free the empty right node
 
     bT.T.at(bT.index).move(T.at(index));
     bT.T.at(bT.index).inc();
@@ -1407,7 +1455,6 @@ say("MMMM111");
     bT.T.at(bT.index).inc();
     bT.removeElementAt();                                                       // Reduce parent on right
     z(); T.at(stolenOrMerged).ones();
-//  say("MMMM888", M);
     return;
    }
 
@@ -1423,14 +1470,18 @@ say("MMMM111");
           }
     z();
 
-    tt(node_branchBase, node_balance); branchBase();
+    tt(node_branchBase, node_balance);
+    branchBase();
     bT.base(T.at(branchBase));
+
     bT.T.at(bT.index).move(T.at(index));
     bT.elementAt();
 
     z();
-    z(); T.at(node_isLow).move(bT.T.at(bT.tData)); isLow();
+    z(); T.at(node_isLow).move(bT.T.at(bT.tData));
+         isLow();
     z(); if (T.at(isLow).isZero())                                                    return;
+
     z(); tt(node_stealFromLeft,     node_balance); stealFromLeft    (); if (T.at(stolenOrMerged).isOnes()) return;
     z(); tt(node_stealFromRight,    node_balance); stealFromRight   (); if (T.at(stolenOrMerged).isOnes()) return;
     z(); tt(node_mergeLeftSibling,  node_balance); mergeLeftSibling (); if (T.at(stolenOrMerged).isOnes()) return;
@@ -1559,7 +1610,6 @@ say("MMMM111");
      }
 
     tt(node_isFull, leafFound);
-say("FindAndInsert node_is_full", T.at(node_isFull).getInt());
     isFull();
     if (T.at(isFull).isZero())                                                  // Leaf is not full so we can insert immediately
      {z();
@@ -1613,9 +1663,7 @@ say("FindAndInsert node_is_full", T.at(node_isFull).getInt());
         tt(node_splitLeaf, child);
         splitLeaf();                                                            // Split the child leaf
         findAndInsert();
-say("JJJJ33", this);
         merge();
-say("JJJJ44", this);
         return;
        }
       z();
@@ -1702,9 +1750,7 @@ say("JJJJ44", this);
         tt(node_mergeLeftSibling, parent); mergeLeftSibling();
         if (T.at(stolenOrMerged).isOnes()) --j;                                 // A successful merge of the left  sibling reduces the current index and the upper limit
         T.at(index).setInt(j);
-say("KKKK22", this);
         tt(node_mergeRightSibling, parent); mergeRightSibling();                // A successful merge of the right sibling maintains the current position but reduces the upper limit
-say("KKKK33", this);
         tt(node_branchSize,        parent); branchSize();
        }
 
@@ -1725,11 +1771,9 @@ say("KKKK33", this);
    {final BtreeSA     t = btreeSA(4, 3);
     final int N = 64;
     for (int i = 1; i <= N; i++)
-     {say("Put Ascending", i);
-      t.T.at(t.Key ).setInt(i);
+     {t.T.at(t.Key ).setInt(i);
       t.T.at(t.Data).setInt(i);
       t.put();
-      if (i >= 22) say("DDDD", t);
      }
     //t.stop();
     t.ok("""
@@ -2537,20 +2581,20 @@ say("KKKK33", this);
       t.T.at(t.Key ).setInt(random_small[i]);
       t.delete();
       ok(t.T.at(t.found).isOnes());
-      ok(t.T.at(t.Data), i);
+      ok(t.T.at(t.Data).getInt(), i);
      }
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
-   {test_put_ascending();                                                       //  7.99
-    test_put_ascending_wide();                                                  //  5.33
-    test_put_descending();                                                      // 12.98
-    test_put_small_random();                                                    //  8.72
-    test_put_large_random();                                                    //  0
-    test_find();                                                                //  4.62
-    test_delete_ascending();                                                    //  7.27
-    test_delete_descending();                                                   //  7.66
-    test_to_array();                                                            //  2.52
+   {test_put_ascending();
+    test_put_ascending_wide();
+    test_put_descending();
+    test_put_small_random();
+    test_put_large_random();
+    test_find();
+    test_delete_ascending();
+    test_delete_descending();
+    test_to_array();
     test_delete_small_random();
    }
 
