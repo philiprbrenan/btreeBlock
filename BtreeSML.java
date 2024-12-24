@@ -1950,7 +1950,7 @@ abstract class BtreeSML extends Test                                            
     test_put_ascending_wide();                                                  //  5.33
     test_put_descending();                                                      // 12.98
     test_put_small_random();                                                    //  8.72
-//  test_put_large_random();                                                    //  0
+    test_put_large_random();                                                    //  0
     test_find();                                                                //  4.62
     test_delete_ascending();                                                    //  7.27
     test_delete_descending();                                                   //  7.66
