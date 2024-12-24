@@ -8,7 +8,7 @@ import java.util.*;
 
 class Program extends Test                                                      // A progam that manipulates a memory layout via si instructions
  {final Stack<I> code = new Stack<>();                                          // Code of the program
-  final int   maxTime = 1000;                                                   // Code of the program
+  final int   maxTime = 1000;                                                   // Maximum numner of steps eprmitted in running the program
   int            step = 0;                                                      // Execution step
   int            time = 0;                                                      // Execution time
   boolean ifCondition = true;                                                   // Execute the then part of the next if statement if true, else the else part if present
@@ -50,7 +50,7 @@ class Program extends Test                                                      
   void GoOn(Label label, MemoryLayout.At condition)                             // Go to a specified label if a memory location is on, i.e. not zero
    {z(); if (condition.setOff().getInt() > 0) Goto(label);
    }
-  void GoOff(Label label, MemoryLayout.At condition)                            // Go to a specified label if a memory location is on, i.e. not zero
+  void GoOff(Label label, MemoryLayout.At condition)                            // Go to a specified label if a memory location is off, i.e. zero
    {z(); if (condition.setOff().getInt() == 0) Goto(label);
    }
 
