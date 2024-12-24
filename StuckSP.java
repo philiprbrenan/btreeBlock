@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// StuckSML parameterized by a single structure
+// StuckSML parameterized by a transaction
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
@@ -38,8 +38,13 @@ abstract class StuckSP extends Test                                             
   StuckSP()                                                                     // Create the stuck with a maximum number of the specified elements
    {z();
     M.layout(layout());
+    M.memory(new Memory(M.layout.size()));                                      // Can be set after construction to address a different memory. You will also need to call base if the stuck is located some where other than at location zero in memory.
     C.layout(M.layout);
     C.memory(new Memory(C.layout.size()));
+   }
+
+  void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
+   {z();  M.base(Base);
    }
 
   StuckSP copy()                                                                // Copy a stuck definition
@@ -73,10 +78,6 @@ abstract class StuckSP extends Test                                             
     currentSize = l.variable ("currentSize", bitsPerSize());
     stuck       = l.structure("stuck"      , currentSize, Keys, Data);
     return l.compile();
-   }
-
-  void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
-   {z();  M.base(Base);
    }
 
 //D1 Transactions                                                               // Transactions on the stuck
