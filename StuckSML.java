@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// StuckStatic in bit memory
+// Stuck in bit memory
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
@@ -10,7 +10,7 @@ abstract class StuckSML extends Test                                            
   abstract int bitsPerData();                                                   // The number of bits per data
   abstract int bitsPerSize();                                                   // The number of bits in size field
 
-  final MemoryLayout memoryLayout = new MemoryLayout();                         // Memory for stuck
+  final MemoryLayout M = new MemoryLayout();                                    // Memory for stuck
 
   Layout.Variable  key;                                                         // Key in a stuck
   Layout.Array     Keys;                                                        // Array of keys
@@ -45,7 +45,12 @@ abstract class StuckSML extends Test                                            
 
   StuckSML()                                                                    // Create the layout for the stuck
    {z();
-    memoryLayout.layout(layout());
+    M.layout(layout());
+    M.memory(new Memory(M.layout.size()));                // Can be set after construction to address a different memory. You will also need to call base if the stuck is located some where other than at location zero in memory.
+   }
+
+  void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
+   {z();  M.base(Base);
    }
 
   StuckSML copy()                                                               // Copy a stuck definition
@@ -63,9 +68,9 @@ abstract class StuckSML extends Test                                            
     child.Data        = parent.Data;
     child.currentSize = parent.currentSize;
     child.stuck       = parent.stuck;
-    child.memoryLayout.memory(parent.memoryLayout.memory);
-    child.memoryLayout.layout(parent.memoryLayout.layout);
-    child.memoryLayout.base  (parent.memoryLayout.base);
+    child.M.memory(parent.M.memory);
+    child.M.layout(parent.M.layout);
+    child.M.base  (parent.M.base);
     return child;
    }
 
@@ -84,12 +89,8 @@ abstract class StuckSML extends Test                                            
 
 //D1 Characteristics                                                            // Characteristics of the stuck
 
-  void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
-   {z();  memoryLayout.base(Base);
-   }
-
   int size()                                                                    // The current number of key elements in the stuck
-   {z(); final int s = memoryLayout.getInt(currentSize);
+   {z(); final int s = M.getInt(currentSize);
     return s;
    }
   boolean isFull       () {z(); return size() > maxSize();}                     // Check the stuck is full
@@ -136,11 +137,11 @@ abstract class StuckSML extends Test                                            
 
 //D1 Memory                                                                     // Actions on memory of stuck
 
-  int  getInt(Layout.Field field)                       {z(); return memoryLayout.getInt(field);}
-  int  getInt(Layout.Field field,            int index) {z(); return memoryLayout.getInt(field,        index);}
+  int  getInt(Layout.Field field)                       {z(); return M.getInt(field);}
+  int  getInt(Layout.Field field,            int index) {z(); return M.getInt(field,        index);}
 
-  void setInt(Layout.Field field, int value)            {z();        memoryLayout.setInt(field, value);}
-  void setInt(Layout.Field field, int value, int index) {z();        memoryLayout.setInt(field, value, index);}
+  void setInt(Layout.Field field, int value)            {z();        M.setInt(field, value);}
+  void setInt(Layout.Field field, int value, int index) {z();        M.setInt(field, value, index);}
 
   int  key     (int Index)              {z(); return getInt(key,    Index);}
   int  data    (int Index)              {z(); return getInt(data,   Index);}
@@ -497,7 +498,7 @@ abstract class StuckSML extends Test                                            
       int bitsPerData () {return 16;}
       int bitsPerSize () {return 16;}
      };
-    s.memoryLayout.memory(new Memory(s.memoryLayout.layout.size()+offset));
+    s.M.memory(new Memory(s.M.layout.size()+offset));
     s.base(offset);
     return s;
    }
@@ -527,8 +528,8 @@ StuckSML(maxSize:4 size:4)
     t.push(14, 10);
     t.push(13, 11);
     t.push(12, 12);
-    //stop(t.memoryLayout());
-    ok(t.memoryLayout, """
+    //stop(t.M);
+    ok(t.M, """
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       16       144                                      stuck
    2 V       16        16                                  4     currentSize
@@ -544,7 +545,7 @@ Line T       At      Wide       Size    Indices        Value   Name
   12 V      144        16               3                 12       data
 """);
     //stop(t.memory());
-    ok(t.memoryLayout.memory, """
+    ok(t.M.memory, """
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 000c 000b 000a 0009 000c 000d 000e 000f 0004 0000
@@ -913,13 +914,13 @@ CheckOrderExceptLast(inOrder:false outOfOrder:2)
       int bitsPerSize () {return 8;}
       int baseAt      () {return 0;}
      };
-    final int N = S.memoryLayout.layout.size();
-    S.memoryLayout.memory(new Memory(2 * N));
+    final int N = S.M.layout.size();
+    S.M.memory(new Memory(2 * N));
 
     final StuckSML s = S.copy(); s.base(0); s.push(2, 1); s.push(4, 2); s.push(6, 3); s.push(8, 4);
     final StuckSML t = S.copy(); t.base(N); t.push(1, 2); t.push(2, 4); t.push(3, 6); t.push(4, 8);
-    //stop(s.memoryLayout());
-    ok(s.memoryLayout, """
+    //stop(s.M));
+    ok(s.M, """
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        72                                      stuck
    2 V        0         8                                  4     currentSize
@@ -935,8 +936,8 @@ Line T       At      Wide       Size    Indices        Value   Name
   12 V       64         8               3                  4       data
 """);
 
-    //stop(t.memoryLayout());
-    ok(t.memoryLayout, """
+    //stop(t.M);
+    ok(t.M, """
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       72        72                                      stuck
    2 V       72         8                                  4     currentSize
@@ -953,7 +954,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
 
     //stop(S.memory());
-    ok(S.memoryLayout.memory, """
+    ok(S.M.memory, """
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0806 0402 0403 0201 0404 0302 0108 0604 0204
