@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// StuckSP parameterized by a single structure in bit memory
+// StuckSP parameterized by a transaction in bit memory
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
@@ -13,7 +13,6 @@ abstract class StuckSA extends Test                                             
   final MemoryLayout M = new MemoryLayout();                                    // Memory for stuck
   final MemoryLayout C = new MemoryLayout();                                    // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
   final MemoryLayout T = new MemoryLayout();                                    // Memory for transaction intermediates
-
 
   Layout.Variable   sKey;                                                       // Key in a stuck
   Layout.Array      Keys;                                                       // Array of keys
@@ -45,6 +44,14 @@ abstract class StuckSA extends Test                                             
     C.memory(new Memory(C.layout.size()));
     T.layout(transactionLayout());
     T.memory(new Memory(T.layout.size()));
+   }
+
+  void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
+   {z();  M.base(Base);
+   }
+
+  void base(MemoryLayout.At Base)                                               // Set the base address of the stuck in the memory layout containing the stuck
+   {z();  M.base(Base.setOff().result);
    }
 
   StuckSA copy()                                                                // Copy a stuck definition
@@ -95,14 +102,6 @@ abstract class StuckSA extends Test                                             
       equal = l.bit      (  "equal");
        temp = l.structure("temp", search, limit, isFull, isEmpty, found, index, tKey, tData, size, equal);
     return l.compile();
-   }
-
-  void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
-   {z();  M.base(Base);
-   }
-
-  void base(MemoryLayout.At Base)                                               // Set the base address of the stuck in the memory layout containing the stuck
-   {z();  M.base(Base.setOff().result);
    }
 
 //D1 Transactions                                                               // Transactions on the stuck
