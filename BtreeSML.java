@@ -161,9 +161,9 @@ abstract class BtreeSML extends Test                                            
 
     Node()
      {Leaf   = BtreeSML.this.Leaf.copy();                                       // Address the leaf stuck
-      Leaf.memoryLayout.memory(BtreeSML.this.memoryLayout.memory);
+      Leaf.M.memory(BtreeSML.this.memoryLayout.memory);
       Branch = BtreeSML.this.Branch.copy();                                     // Address the branch stuck
-      Branch.memoryLayout.memory(BtreeSML.this.memoryLayout.memory);
+      Branch.M.memory(BtreeSML.this.memoryLayout.memory);
      }
 
     boolean isLeaf() {z(); return getInt(isLeaf,    node) > 0;}                 // A leaf if true
