@@ -110,60 +110,80 @@ abstract class StuckPA extends Test                                             
 
   void size()                                                                   // The current number of key elements in the stuck
    {z();
-    T.at(size).move(M.at(currentSize));
+    P.new I() {void a() {T.at(size).move(M.at(currentSize));}};
    }
 
   void isFull()                                                                 // Check the stuck is full
    {z();
-    T.at(size).greaterThanOrEqual(T.constant(maxSize()), T.at(isFull));
+    P.new I() {void a() {T.at(size).greaterThanOrEqual(T.constant(maxSize()), T.at(isFull));}};
    }
 
   void isEmpty()                                                                // Check the stuck is empty
    {z();
-    T.at(size).equal(T.constant(0), T.at(isEmpty));
+    P.new I() {void a() {T.at(size).equal(T.constant(0), T.at(isEmpty));}};
    }
 
   void assertNotFull()                                                          // Assert the stuck is not full
    {z();
-    if (T.at(isFull).getInt() > 0) stop("Full");
+    P.new I() {void a() {if (T.at(isFull).getInt() > 0) stop("Full");}};
    }
 
   void assertNotEmpty()                                                         // Assert the stuck is not empty
    {z();
-    if (T.at(isEmpty).getInt() > 0) stop("Empty");
+    P.new I() {void a() {if (T.at(isEmpty).getInt() > 0) stop("Empty");}};
    }
 
   void assertInNormal()                                                         // Check that the index would yield a valid element
    {z();
-    final int i = T.at(index).getInt();
-    final int n = T.at(size) .getInt();
-    if (i < 0 || i >= n) stop("Out of normal range",   i, "for size", n);
+    P.new I()
+     {void a()
+       {final int i = T.at(index).getInt();
+        final int n = T.at(size) .getInt();
+        if (i < 0 || i >= n) stop("Out of normal range",   i, "for size", n);
+       }
+     };
    }
 
   void assertInExtended()                                                       // Check that the index would yield a valid element
    {z();
-    final int i = T.at(index).getInt();
-    final int n = T.at(size) .getInt();
-    if (i < 0 || i > n) stop("Out of extended range", i, "for size", n);
+    P.new I()
+     {void a()
+       {final int i = T.at(index).getInt();
+        final int n = T.at(size) .getInt();
+        if (i < 0 || i > n) stop("Out of extended range", i, "for size", n);
+       }
+     };
    }
 
   void inc()                                                                    // Increment the current size
    {z();
-    z(); assertNotFull();
-    z(); final int n = M.at(currentSize).setOff().getInt();
-                       M.at(currentSize).setOff().setInt(n+1);
+    assertNotFull();
+    P.new I()
+     {void a()
+       {final int n = M.at(currentSize).setOff().getInt();
+                      M.at(currentSize).setOff().setInt(n+1);
+       }
+     };
    }
 
   void dec()                                                                    // Decrement the current size
    {z();
-    z(); assertNotEmpty();
-    z(); final int n = M.at(currentSize).setOff().getInt();
-                       M.at(currentSize).setOff().setInt(n-1);
+    assertNotEmpty();
+    P.new I()
+     {void a()
+       {final int n = M.at(currentSize).setOff().getInt();
+                      M.at(currentSize).setOff().setInt(n-1);
+       }
+     };
    }
 
   void clear()                                                                  // Zero the current size to clear the stuck
    {z();
-    M.at(currentSize).setOff().setInt(0);
+    P.new I()
+     {void a()
+       {M.at(currentSize).setOff().setInt(0);
+       }
+     };
     sizeFullEmpty();
    }
 
@@ -179,32 +199,34 @@ abstract class StuckPA extends Test                                             
 
   void moveKey()                                                                // Move a key from the stuck to this transaction
    {z();
-    T.at(tKey ).move(key ().setOff());
+    P.new I() {void a() {T.at(tKey ).move(key ().setOff());}};
    }
 
   void moveData()                                                               // Move a key from the stuck to this transaction
    {z();
-    T.at(tData).move(data().setOff());
+    P.new I() {void a() {T.at(tData).move(data().setOff());}};
    }
 
   void setKey  ()                                                               // Set the indexed key
    {z();
-   key().setOff().move(T.at(tKey));
+    P.new I() {void a() {key().setOff().move(T.at(tKey));}};
    }
 
   void setData ()                                                               // Set the indexed data
    {z();
-    data().setOff().move(T.at(tData));
+    P.new I() {void a() {data().setOff().move(T.at(tData));}};
    }
 
   void setKeyData()    {z(); setKey(); setData();}                              // Set a key, data element in the stuck
   void sizeFullEmpty() {z(); size(); isFull(); isEmpty();}                      // Status
-  void setFound()      {z(); T.at(found).setInt(1);}                            // Set found to true
+  void setFound()      {z(); P.new I() {void a() {T.at(found).setInt(1);}};}    // Set found to true
 
   void push()                                                                   // Push an element onto the stuck
    {z(); action = "push";
-    size(); isFull(); assertNotFull();
-    T.at(index).move(T.at(size));
+    size();
+    isFull();
+    assertNotFull();
+    P.new I() {void a() {T.at(index).move(T.at(size));  }};
     setKeyData();
     inc();
     sizeFullEmpty();
@@ -212,60 +234,67 @@ abstract class StuckPA extends Test                                             
 
   void unshift()                                                                // Unshift an element onto the stuck
    {z(); action = "unshift";
-    size(); isFull(); assertNotFull();
+    size();
+    isFull();
+    assertNotFull();
     setFound();
-    M.at(Keys).moveUp(T.constant(0), C.at(Keys));
-    M.at(Data).moveUp(T.constant(0), C.at(Data));
+    P.new I() {void a() {M.at(Keys).moveUp(T.constant(0), C.at(Keys));}};
+    P.new I() {void a() {M.at(Data).moveUp(T.constant(0), C.at(Data));}};
     inc();
-    T.at(index).setInt(0);
+    P.new I() {void a() {T.at(index).setInt(0);                       }};
     setKeyData();
     sizeFullEmpty();
    }
 
   void pop()                                                                    // Pop an element from the stuck
    {z(); action = "pop";
-    size(); isEmpty(); assertNotEmpty();
+    size();
+    isEmpty();
+    assertNotEmpty();
     dec();
     setFound();
-    T.at(size).dec();
-    T.at(index).move(T.at(size));
+    P.new I() {void a() {T.at(size).dec();            }};
+    P.new I() {void a() {T.at(index).move(T.at(size));}};
     moveKey(); moveData();
     sizeFullEmpty();
    }
 
   void shift()                                                                  // Shift an element from the stuck
    {z(); action = "shift";
-    size(); isEmpty(); assertNotEmpty();
+    size();
+    isEmpty();
+    assertNotEmpty();
     setFound();
-    T.at(index).setInt(0);
+    P.new I() {void a() {T.at(index).setInt(0);                                  }};
     moveKey(); moveData();
-
-    T.zero();
-    M.at(Keys).setOff().moveDown(T.constant(0), C.at(Keys));
-    M.at(Data).setOff().moveDown(T.constant(0), C.at(Data));
+    P.new I() {void a() {T.zero();                                               }};
+    P.new I() {void a() {M.at(Keys).setOff().moveDown(T.constant(0), C.at(Keys));}};
+    P.new I() {void a() {M.at(Data).setOff().moveDown(T.constant(0), C.at(Data));}};
     dec();
-
     sizeFullEmpty();
    }
 
   void elementAt()                                                              // Look up key and data associated with the index in the stuck at the specified base offset in memory
    {z(); action = "elementAt";
-    size(); assertInNormal();
+    size();
+    assertInNormal();
     setFound();
-    moveKey(); moveData();
+    moveKey();
+    moveData();
    }
 
   void setElementAt()                                                           // Set an element either in range or one above the current range
    {z(); action = "setElementAt";
     size();
-    T.at(index).equal(T.at(size), T.at(equal));                                 // Extended range
-    new If(T.at(equal).getInt() > 0)
+    P.new I() {void a() {T.at(index).equal(T.at(size), T.at(equal));}};         // Extended range
+    P.new If(T.at(equal))
      {void Then()
-       {z(); setKeyData(); inc();
-        T.at(size).inc();
+       {setKeyData();
+        inc();
+        P.new I() {void a() {T.at(size).inc();}};
        }
       void Else()                                                               // In range
-       {z(); assertInNormal(); setKeyData();
+       {assertInNormal(); setKeyData();
        }
      };
     setFound();
@@ -273,47 +302,50 @@ abstract class StuckPA extends Test                                             
 
   void insertElementAt()                                                        // Insert an element at the indicated location shifting all the remaining elements up one
    {z(); action = "insertElementAt";
-    size(); isFull();
+    size();
+    isFull();
     assertInExtended();
-
-    T.zero();
-    M.at(Keys).moveUp(T.at(index), C.at(Keys));
-    M.at(Data).moveUp(T.at(index), C.at(Data));
-    M.at(currentSize).inc();
-
+    P.new I() {void a() {T.zero();                                   }};
+    P.new I() {void a() {M.at(Keys).moveUp(T.at(index), C.at(Keys));}};
+    P.new I() {void a() {M.at(Data).moveUp(T.at(index), C.at(Data));}};
+    P.new I() {void a() {M.at(currentSize).inc();                    }};
     setKeyData();
     sizeFullEmpty();
    }
 
   void removeElementAt()                                                        // Remove an element at the indicated location from the stuck
    {z(); action = "removeElementAt";
-    size(); assertInNormal();
+    size();
+    assertInNormal();
     setFound();
-    moveKey(); moveData();
-
-    T.zero();
-    M.at(Keys).moveDown(T.at(index), C.at(Keys));
-    M.at(Data).moveDown(T.at(index), C.at(Data));
-    M.at(currentSize).setOff().dec();
-
+    moveKey();
+    moveData();
+    P.new I() {void a() {T.zero();                                    }};
+    P.new I() {void a() {M.at(Keys).moveDown(T.at(index), C.at(Keys));}};
+    P.new I() {void a() {M.at(Data).moveDown(T.at(index), C.at(Data));}};
+    P.new I() {void a() {M.at(currentSize).setOff().dec();            }};
     sizeFullEmpty();
    }
 
   void firstElement()                                                           // First element
    {z(); action = "firstElement";
-    size(); isEmpty(); assertNotEmpty();
+    size();
+    isEmpty();
+    assertNotEmpty();
     setFound();
-    T.at(index).setInt(0);
+    P.new I() {void a() {T.at(index).setInt(0);}};
     moveKey();
     moveData();
    }
 
   void lastElement()                                                            // Last element
    {z(); action = "lastElement";
-    size(); isEmpty(); assertNotEmpty();
+    size();
+    isEmpty();
+    assertNotEmpty();
     setFound();
-    T.at(index).move(M.at(currentSize).setOff());
-    T.at(index).dec();
+    P.new I() {void a() {T.at(index).move(M.at(currentSize).setOff());}};
+    P.new I() {void a() {T.at(index).dec();                           }};
     moveKey(); moveData();
    }
 
@@ -321,35 +353,70 @@ abstract class StuckPA extends Test                                             
    {z(); action = "search";
     size();
 
-    final int n = T.at(size).getInt(), l = T.at(limit).getInt(), L = n-l;       // Limit search if requested
-
-    for (int i = 0; i < L; i++)                                                 // Search
-     {z(); T.at(index).setInt(i); moveKey();
-      T.at(tKey).equal(T.at(search), T.at(equal));
-      if (T.at(equal).getInt() > 0)
-       {z(); setFound(); moveData();
-        return;
+    P.new I()
+     {void a()
+       {final int n = T.at(size).getInt(), l = T.at(limit).getInt(), L = n-l;   // Limit search if requested
+        T.at(size).setInt(L);
        }
-     }
-    T.at(found).setInt(0);
+     };
+
+    T.at(found).setInt(0);                                                      // Assume we will not find a match
+
+    P.new Block()
+     {void code()
+       {for (int I = 0; I < maxSize(); I++)                                     // Search
+         {final int i = I;
+          P.new I() {void a() {T.constant(i).equal(T.at(size), T.at(equal));}};
+          P.new I() {void a() {P.GoOn(end, T.at(equal));}};                     // Reached the upper limit of the stuck
+          P.new I() {void a() {T.at(index).setInt(i);}};
+          moveKey();
+          P.new I() {void a() {T.at(tKey).equal(T.at(search), T.at(equal));}};
+          P.new If (T.at(equal))                                                // Found an equal key
+           {void Then()
+             {setFound();
+              moveData();
+              P.new I() {void a() {P.Goto(end);}};
+             }
+           };
+         }
+       }
+     };
    }
 
   void searchFirstGreaterThanOrEqual()                                          // Search for first greater than or equal
    {z(); action = "searchFirstGreaterThanOrEqual";
     size();
 
-    final int n = T.at(size).getInt(), l = T.at(limit).getInt(), L = n-l;       // Limit search if requested
-
-    for (int i = 0; i < L; i++)                                                 // Search
-     {z(); T.at(index).setInt(i); moveKey();
-      T.at(tKey).greaterThanOrEqual(T.at(search), T.at(equal));
-      if (T.at(equal).getInt() > 0)
-       {z(); setFound(); moveKey(); moveData();
-        return;
+    P.new I()
+     {void a()
+       {final int n = T.at(size).getInt(), l = T.at(limit).getInt(), L = n-l;   // Limit search if requested
+        T.at(size).setInt(L);
        }
-     }
-    T.at(index).setInt(L);                                                      // Index top is no match found
-    T.at(found).setInt(0);
+     };
+
+    P.new I() {void a() {T.at(found).setInt(0);}};                              // Assume we will not find a match
+    P.new I() {void a() {T.at(index).move(T.at(size));}};                       // Index top if no match found
+
+    P.new Block()
+     {void code()
+       {for (int I = 0; I < maxSize(); I++)                                     // Search
+         {final int i = I;
+          P.new I() {void a() {T.constant(i).equal(T.at(size), T.at(equal));}};
+          P.new I() {void a() {P.GoOn(end, T.at(equal));}};                     // Reached the upper limit of the stuck
+          P.new I() {void a() {T.at(index).setInt(i);}};
+          moveKey();
+          P.new I() {void a() {T.at(tKey).greaterThanOrEqual(T.at(search), T.at(equal));}};
+          P.new If (T.at(equal))                                                // Found an equal key or greater
+           {void Then()
+             {setFound();
+              moveKey();
+              moveData();
+              P.new I() {void a() {P.Goto(end);}};
+             }
+           };
+         }
+       }
+     };
    }
 
   public String print()
@@ -390,7 +457,7 @@ abstract class StuckPA extends Test                                             
 
 //D1 Testing                                                                    // Test the stuck
 
-  static StuckPA stuckStatic()                                                  // Create a sample stuck
+  static StuckPA stuckPA()                                                      // Create a sample stuck
    {z();
     final int offset = 16;                                                      // To make testing more relevant
     final StuckPA s =  new StuckPA()
@@ -409,13 +476,16 @@ abstract class StuckPA extends Test                                             
 //D0 Tests                                                                      // Test stuck
 
   static StuckPA test_load()
-   {StuckPA s = stuckStatic();
-    final MemoryLayout m = s.T;
-    for (int i = 0; i < 4; i++)
-     {m.at(s.tKey ).setInt(2 + 2 * i);
-      m.at(s.tData).setInt(1 + 1 * i);
+   {StuckPA s = stuckPA();
+
+    for (int I = 0; I < 4; I++)
+     {final int i = I;
+      s.P.new I() {void a() {s.T.at(s.tKey ).setInt(2 + 2 * i);}};
+      s.P.new I() {void a() {s.T.at(s.tData).setInt(1 + 1 * i);}};
       s.push();
      }
+    s.P.run();
+    s.P.clear();
     //stop(s);
     ok(s, """
 StuckPA(maxSize:8 size:4)
@@ -429,22 +499,22 @@ StuckPA(maxSize:8 size:4)
 
   static void test_clear()
    {StuckPA s = test_load();
-    final MemoryLayout m = s.T;
     s.size();
-    ok(m.at(s.size).getInt(), 4);
+    ok(s.T.at(s.size).getInt(), 4);
     s.clear();
+    s.P.run();
     ok(s.M.at(s.currentSize).setOff().getInt(), 0);
-    ok(m.at(s.size).getInt(), 0);
+    ok(s.T.at(s.size).getInt(), 0);
    }
 
   static void test_push()
-   {StuckPA s = stuckStatic();
-    final MemoryLayout m = s.T;
-    m.at(s.tKey).setInt(15); m.at(s.tData).setInt( 9); s.push();
-    m.at(s.tKey).setInt(14); m.at(s.tData).setInt(10); s.push();
-    m.at(s.tKey).setInt(13); m.at(s.tData).setInt(11); s.push();
-    m.at(s.tKey).setInt(12); m.at(s.tData).setInt(12); s.push();
-    //stop(s.memoryLayout());
+   {StuckPA s = stuckPA();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(15); s.T.at(s.tData).setInt( 9);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(14); s.T.at(s.tData).setInt(10);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(13); s.T.at(s.tData).setInt(11);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(12); s.T.at(s.tData).setInt(12);}}; s.push();
+    s.P.run();
+    //stop(s.M);
     ok(s.M, """
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       16       272                                      stuck
@@ -485,20 +555,25 @@ StuckPA(maxSize:8 size:4)
   3 key:12 data:12
 """);
 
-    m.at(s.tKey).setInt(11); m.at(s.tData).setInt(11); s.push(); ok(m.at(s.isFull).getInt() == 0); ok(m.at(s.isEmpty).getInt() == 0);
-    m.at(s.tKey).setInt(10); m.at(s.tData).setInt(10); s.push();
-    m.at(s.tKey).setInt( 9); m.at(s.tData).setInt( 9); s.push();
-    m.at(s.tKey).setInt( 8); m.at(s.tData).setInt( 8); s.push(); ok(m.at(s.isFull).getInt() == 1);
-    sayThisOrStop("Full");
-    try {m.at(s.tKey).setInt(7); m.at(s.tData).setInt(7); s.push();} catch(RuntimeException e) {}
+    s.P.clear();
+    s.T.at(s.tKey).setInt(11); s.T.at(s.tData  ).setInt(11); s.push();
+    s.P.new I() {void a()  {ok(s.T.at(s.isFull ).getInt() == 0);}};
+    s.P.new I() {void a()  {ok(s.T.at(s.isEmpty).getInt() == 0);}};
+    s.T.at(s.tKey).setInt(10); s.T.at(s.tData  ).setInt(10); s.push();
+    s.T.at(s.tKey).setInt( 9); s.T.at(s.tData  ).setInt( 9); s.push();
+    s.T.at(s.tKey).setInt( 8); s.T.at(s.tData  ).setInt( 8); s.push();
+    s.P.new I() {void a() {ok(s.T.at(s.isFull  ).getInt() == 1);}};
+    s.P.new I() {void a() {sayThisOrStop("Full");}};
+    s.T.at(s.tKey).setInt(7); s.T.at(s.tData).setInt(7); s.push();
+    try {s.P.run();} catch(RuntimeException e) {}
    }
 
   static void test_pop()
    {StuckPA s = test_load();
-    final MemoryLayout m = s.T;
 
     s.pop();
-    //stop(s);
+    s.P.run();
+    //stop(s.print());
     ok(s.print(), """
 Transaction(action:pop search:0 limit:0 found:1 index:3 key:8 data:4 size:3 isFull:0 isEmpty:0)
 """);
@@ -510,18 +585,20 @@ StuckPA(maxSize:8 size:3)
   2 key:6 data:3
 """);
 
-    ok(m.at(s.isEmpty).getInt() == 0);
+    s.P.clear();
+    s.P.new I() {void a() {ok(s.T.at(s.isEmpty).getInt() == 0);}};
     s.clear();
-    ok(m.at(s.isEmpty).getInt() == 1);
-    sayThisOrStop("Empty");
-    try {s.pop();} catch(RuntimeException e) {}
+    s.P.new I() {void a() {ok(s.T.at(s.isEmpty).getInt() == 1);}};
+    s.P.new I() {void a() {sayThisOrStop("Empty");}};
+    s.pop();
+    try {s.P.run();} catch(RuntimeException e) {}
    }
 
   static void test_shift()
    {StuckPA s = test_load();
-    final MemoryLayout m = s.T;
 
     s.shift();
+    s.P.run(); s.P.clear();
     ok(s.print(), """
 Transaction(action:shift search:0 limit:0 found:1 index:0 key:2 data:1 size:3 isFull:0 isEmpty:0)
 """);
@@ -533,19 +610,22 @@ StuckPA(maxSize:8 size:3)
   2 key:8 data:4
 """);
 
-    ok(m.at(s.isEmpty).getInt() == 0);
+    ok(s.T.at(s.isEmpty).getInt() == 0);
     s.clear();
-    ok(m.at(s.isEmpty).getInt() == 1);
+    s.P.run(); s.P.clear();
+    ok(s.T.at(s.isEmpty).getInt() == 1);
     sayThisOrStop("Empty");
-    try {s.pop();} catch(RuntimeException e) {}
+    s.pop();
+    try {s.P.run();} catch(RuntimeException e) {}
    }
 
   static void test_unshift()
-   {StuckPA            s = test_load();
+   {StuckPA s = test_load();
     final MemoryLayout m = s.T;
 
-    m.at(s.tKey).setInt(9); m.at(s.tData).setInt(9);
+    s.T.at(s.tKey).setInt(9); s.T.at(s.tData).setInt(9);
     s.unshift();
+    s.P.run(); s.P.clear();
     //stop(s);
     ok(s.print(), """
 Transaction(action:unshift search:0 limit:0 found:1 index:0 key:9 data:9 size:5 isFull:0 isEmpty:0)
@@ -560,39 +640,44 @@ StuckPA(maxSize:8 size:5)
   4 key:8 data:4
 """);
 
-    ok(m.at(s.isFull).getInt() == 0);
+    ok(s.T.at(s.isFull).getInt() == 0);
     s.unshift(); s.unshift(); s.unshift();
-    ok(m.at(s.isFull).getInt() == 1);
+    s.P.run(); s.P.clear();
+    ok(s.T.at(s.isFull).getInt() == 1);
     sayThisOrStop("Full");
-    try {s.unshift();} catch(RuntimeException e) {}
+    s.unshift();
+    try {s.P.run();} catch(RuntimeException e) {}
    }
 
   static void test_elementAt()
-   {StuckPA            s = test_load();
-    final MemoryLayout m = s.T;
+   {StuckPA s = test_load();
 
-    m.at(s.index).setInt(2);
+    s.T.at(s.index).setInt(2);
     s.elementAt();
+    s.P.run(); s.P.clear();
     //stop(s);
     ok(s.print(), """
 Transaction(action:elementAt search:0 limit:0 found:1 index:2 key:6 data:3 size:4 isFull:0 isEmpty:0)
 """);
 
-    m.at(s.index).setInt(-2);
+    s.T.at(s.index).setInt(-2);
     sayThisOrStop("Out of normal range 65534 for size 4");
-    try {s.elementAt();} catch(RuntimeException e) {}
+    s.elementAt();
+    try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
 
-    m.at(s.index).setInt(4);
+    s.T.at(s.index).setInt(4);
     sayThisOrStop("Out of normal range 4 for size 4");
-    try {s.elementAt();} catch(RuntimeException e) {}
+    try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
    }
 
   static void test_set_element_at()
-   {StuckPA            s = test_load();
-    final MemoryLayout m = s.T;
+   {StuckPA s = test_load();
 
-    m.at(s.tKey).setInt(22); m.at(s.tData).setInt(33); m.at(s.index).setInt(2);
+    s.P.new I() {void a() {s.T.at(s.tKey ).setInt(22);}};
+    s.P.new I() {void a() {s.T.at(s.tData).setInt(33);}};
+    s.P.new I() {void a() {s.T.at(s.index).setInt( 2);}};
     s.setElementAt();
+    s.P.run(); s.P.clear();
     //stop(s);
     ok(s, """
 StuckPA(maxSize:8 size:4)
@@ -602,7 +687,11 @@ StuckPA(maxSize:8 size:4)
   3 key:8 data:4
 """);
 
-    m.at(s.tKey).setInt(88); m.at(s.tData).setInt(99); m.at(s.index).setInt(4); s.setElementAt();
+    s.P.new I() {void a() {s.T.at(s.tKey ).setInt(88);}};
+    s.P.new I() {void a() {s.T.at(s.tData).setInt(99);}};
+    s.P.new I() {void a() {s.T.at(s.index).setInt( 4);}};
+    s.setElementAt();
+    s.P.run(); s.P.clear();
     //stop(s);
     ok(s, """
 StuckPA(maxSize:8 size:5)
@@ -613,20 +702,25 @@ StuckPA(maxSize:8 size:5)
   4 key:88 data:99
 """);
 
-    m.at(s.index).setInt(-2);
+    s.P.new I() {void a() {s.T.at(s.index).setInt(-2);}};
     sayThisOrStop("Out of normal range 65534 for size 5");
-    try {s.setElementAt();} catch(RuntimeException e) {}
+    s.setElementAt();
+    try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
 
-    m.at(s.index).setInt(6);
+    s.P.new I() {void a() {s.T.at(s.index).setInt(6);}};
     sayThisOrStop("Out of normal range 6 for size 5");
-    try {s.setElementAt();} catch(RuntimeException e) {}
+    s.setElementAt();
+    try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
    }
 
   static void test_insert_element_at()
-   {StuckPA            s = test_load();
-    final MemoryLayout m = s.T;
+   {StuckPA s = test_load();
 
-    m.at(s.tKey).setInt(9); m.at(s.tData).setInt(9); m.at(s.index).setInt(2); s.insertElementAt();
+    s.P.new I() {void a() {s.T.at(s.tKey ).setInt(9);}};
+    s.P.new I() {void a() {s.T.at(s.tData).setInt(9);}};
+    s.P.new I() {void a() {s.T.at(s.index).setInt(2);}};
+    s.insertElementAt();
+    s.P.run(); s.P.clear();
     //stop(s);
     ok(s, """
 StuckPA(maxSize:8 size:5)
@@ -637,7 +731,11 @@ StuckPA(maxSize:8 size:5)
   4 key:8 data:4
 """);
 
-    m.at(s.tKey).setInt(7); m.at(s.tData).setInt(7); m.at(s.index).setInt(5); s.insertElementAt();
+    s.P.new I() {void a() {s.T.at(s.tKey ).setInt(7);}};
+    s.P.new I() {void a() {s.T.at(s.tData).setInt(7);}};
+    s.P.new I() {void a() {s.T.at(s.index).setInt(5);}};
+    s.insertElementAt();
+    s.P.run(); s.P.clear();
     //stop(s);
     ok(s, """
 StuckPA(maxSize:8 size:6)
@@ -649,16 +747,18 @@ StuckPA(maxSize:8 size:6)
   5 key:7 data:7
 """);
 
-    m.at(s.index).setInt(7);
+    s.P.new I() {void a() {s.T.at(s.index).setInt(7);}};
     sayThisOrStop("Out of extended range 7 for size 6");
-    try {s.insertElementAt();} catch(RuntimeException e) {}
+    s.insertElementAt();
+    try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
    }
 
   static void test_remove_element_at()
-   {StuckPA            s = test_load();
-    final MemoryLayout m = s.T;
+   {StuckPA s = test_load();
 
-    m.at(s.index).setInt(2); s.removeElementAt();
+    s.P.new I() {void a() {s.T.at(s.index).setInt(2);}};
+    s.removeElementAt();
+    s.P.run(); s.P.clear();
     //stop(t);
     ok(s.print(), """
 Transaction(action:removeElementAt search:0 limit:0 found:1 index:2 key:6 data:3 size:3 isFull:0 isEmpty:0)
@@ -672,21 +772,24 @@ StuckPA(maxSize:8 size:3)
   2 key:8 data:4
 """);
 
-    m.at(s.index).setInt(3);
+    s.P.new I() {void a() {s.T.at(s.index).setInt(3);}};
     sayThisOrStop("Out of normal range 3 for size 3");
-    try {s.removeElementAt();} catch(RuntimeException e) {}
+    s.removeElementAt();
+    try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
    }
 
   static void test_first_last()
-   {StuckPA            s = test_load();
-    final MemoryLayout m = s.T;
+   {StuckPA s = test_load();
+
     s.firstElement();
+    s.P.run(); s.P.clear();
     //stop(t);
     ok(s.print(), """
 Transaction(action:firstElement search:0 limit:0 found:1 index:0 key:2 data:1 size:4 isFull:0 isEmpty:0)
 """);
 
     s.lastElement();
+    s.P.run(); s.P.clear();
     //stop(s);
     ok(s.print(), """
 Transaction(action:lastElement search:0 limit:0 found:1 index:3 key:8 data:4 size:4 isFull:0 isEmpty:0)
@@ -694,25 +797,31 @@ Transaction(action:lastElement search:0 limit:0 found:1 index:3 key:8 data:4 siz
 
     s.clear();
     sayThisOrStop("Empty");
-    try {s.firstElement();} catch(RuntimeException e) {}
+    s.firstElement();
+    try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
    }
 
   static void test_search()
-   {StuckPA            s = test_load();
-    final MemoryLayout m = s.T;
+   {StuckPA s = test_load();
 
-    m.at(s.search).setInt(2); s.search();
+    s.P.new I() {void a() {s.T.at(s.search).setInt(2);}};
+    s.search();
+    s.P.run(); s.P.clear();
     //stop(s);
     ok(s.print(), """
 Transaction(action:search search:2 limit:0 found:1 index:0 key:2 data:1 size:4 isFull:0 isEmpty:0)
 """);
 
-    m.at(s.search).setInt(3);  s.search();
+    s.P.new I() {void a() {s.T.at(s.search).setInt(3);}};
+    s.search();
+    s.P.run(); s.P.clear();
     //stop(s);
     ok(s.print(), """
 Transaction(action:search search:3 limit:0 found:0 index:3 key:8 data:1 size:4 isFull:0 isEmpty:0)
 """);
-    m.at(s.search).setInt(8);  s.search();
+    s.P.new I() {void a() {s.T.at(s.search).setInt(8);  }};
+    s.search();
+    s.P.run(); s.P.clear();
     //stop(s);
     ok(s.print(), """
 Transaction(action:search search:8 limit:0 found:1 index:3 key:8 data:4 size:4 isFull:0 isEmpty:0)
@@ -720,35 +829,40 @@ Transaction(action:search search:8 limit:0 found:1 index:3 key:8 data:4 size:4 i
    }
 
   static void test_search_except_last()
-   {StuckPA            s = test_load();
-    final MemoryLayout m = s.T;
+   {StuckPA s = test_load();
 
-    m.at(s.limit).setInt(1);
-
-    m.at(s.search).setInt(4);  s.search();
+    s.P.new I() {void a() {s.T.at(s.limit ).setInt(1);}};
+    s.P.new I() {void a() {s.T.at(s.search).setInt(4);}};
+    s.search();
+    s.P.run(); s.P.clear();
     //stop(s);
     ok(s.print(), """
-Transaction(action:search search:4 limit:1 found:1 index:1 key:4 data:2 size:4 isFull:0 isEmpty:0)
+Transaction(action:search search:4 limit:1 found:1 index:1 key:4 data:2 size:3 isFull:0 isEmpty:0)
 """);
 
-    m.at(s.search).setInt(8); s.search();
+    s.P.new I() {void a() {s.T.at(s.search).setInt(8);}};
+    s.search();
+    s.P.run(); s.P.clear();
     //stop(t);
     ok(s.print(), """
-Transaction(action:search search:8 limit:1 found:0 index:2 key:6 data:2 size:4 isFull:0 isEmpty:0)
+Transaction(action:search search:8 limit:1 found:0 index:2 key:6 data:2 size:3 isFull:0 isEmpty:0)
 """);
    }
 
   static void test_search_first_greater_than_or_equal()
-   {StuckPA            s = test_load();
-    final MemoryLayout m = s.T;
+   {StuckPA s = test_load();
 
-    m.at(s.search).setInt(5); s.searchFirstGreaterThanOrEqual();
+    s.P.new I() {void a() {s.T.at(s.search).setInt(5);}};
+    s.searchFirstGreaterThanOrEqual();
+    s.P.run(); s.P.clear();
     //stop(t);
     ok(s.print(), """
 Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:0 found:1 index:2 key:6 data:3 size:4 isFull:0 isEmpty:0)
 """);
 
-    m.at(s.search).setInt(7); s.searchFirstGreaterThanOrEqual();
+    s.P.new I() {void a() {s.T.at(s.search).setInt(7);}};
+    s.searchFirstGreaterThanOrEqual();
+    s.P.run(); s.P.clear();
     //stop(t);
     ok(s.print(), """
 Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:0 found:1 index:3 key:8 data:4 size:4 isFull:0 isEmpty:0)
@@ -756,20 +870,23 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:0 found:1 index:
    }
 
   static void test_search_first_greater_than_or_equal_except_last()
-   {StuckPA            s = test_load();
-    final MemoryLayout m = s.T;
+   {StuckPA s = test_load();
 
-    m.at(s.limit).setInt(1);
-    m.at(s.search).setInt(5); s.searchFirstGreaterThanOrEqual();
+    s.P.new I() {void a() {s.T.at(s.limit).setInt(1);}};
+    s.P.new I() {void a() {s.T.at(s.search).setInt(5);}};
+    s.searchFirstGreaterThanOrEqual();
+    s.P.run(); s.P.clear();
     //stop(t);
     ok(s.print(), """
-Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:1 found:1 index:2 key:6 data:3 size:4 isFull:0 isEmpty:0)
+Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:1 found:1 index:2 key:6 data:3 size:3 isFull:0 isEmpty:0)
 """);
 
-    m.at(s.search).setInt(7); s.searchFirstGreaterThanOrEqual();
+    s.P.new I() {void a() {s.T.at(s.search).setInt(7);}};
+    s.searchFirstGreaterThanOrEqual();
+    s.P.run(); s.P.clear();
     //stop(t);
     ok(s.print(), """
-Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:3 key:6 data:3 size:4 isFull:0 isEmpty:0)
+Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:2 key:6 data:3 size:3 isFull:0 isEmpty:0)
 """);
    }
 
@@ -798,14 +915,14 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:
     S.M.memory(new Memory(S.M.layout.size()*2));
 
     final StuckPA       s = S.copy(); s.base(0);
-    final MemoryLayout sm = s.T;
 
-    sm.at(s.tKey).setInt(2); sm.at(s.tData).setInt(1); s.push();
-    sm.at(s.tKey).setInt(4); sm.at(s.tData).setInt(2); s.push();
-    sm.at(s.tKey).setInt(6); sm.at(s.tData).setInt(3); s.push();
-    sm.at(s.tKey).setInt(8); sm.at(s.tData).setInt(4); s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt(1);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(4); s.T.at(s.tData).setInt(2);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(6); s.T.at(s.tData).setInt(3);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(8); s.T.at(s.tData).setInt(4);}}; s.push();
+    s.P.run(); s.P.clear();
 
-    M.at(a).setInt(S.M.layout.size());
+    M.at(a).setInt(S.M.layout.size());                                          // Use a field as an index in an at
     ok(M, """
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        48                                      d
@@ -815,12 +932,11 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
 
     final StuckPA       t = S.copy(); t.base(M.at(a));
-    final MemoryLayout tm = t.T;
-    tm.at(t.tKey).setInt(1); tm.at(t.tData).setInt(2); t.push();
-    tm.at(t.tKey).setInt(2); tm.at(t.tData).setInt(4); t.push();
-    tm.at(t.tKey).setInt(3); tm.at(t.tData).setInt(6); t.push();
-    tm.at(t.tKey).setInt(4); tm.at(t.tData).setInt(8); t.push();
-
+    t.P.new I() {void a() {t.T.at(t.tKey).setInt(1); t.T.at(t.tData).setInt(2);}}; t.push();
+    t.P.new I() {void a() {t.T.at(t.tKey).setInt(2); t.T.at(t.tData).setInt(4);}}; t.push();
+    t.P.new I() {void a() {t.T.at(t.tKey).setInt(3); t.T.at(t.tData).setInt(6);}}; t.push();
+    t.P.new I() {void a() {t.T.at(t.tKey).setInt(4); t.T.at(t.tData).setInt(8);}}; t.push();
+    t.P.run(); t.P.clear();
     //stop(s.memoryLayout);
     ok(s.M, """
 Line T       At      Wide       Size    Indices        Value   Name
