@@ -8,10 +8,10 @@ import java.util.*;
 
 class Program extends Test                                                      // A progam that manipulates a memory layout via si instructions
  {final Stack<I> code = new Stack<>();                                          // Code of the program
-  final int   maxTime = 1000;                                                   // Maximum numner of steps eprmitted in running the program
+  final int   maxTime = 1000;                                                   // Maximum numner of steps permitted while running the program
   int            step = 0;                                                      // Execution step
   int            time = 0;                                                      // Execution time
-  boolean ifCondition = true;                                                   // Execute the then part of the next if statement if true, else the else part if present
+  boolean     running = false;                                                  // Executing if true
   Stack<Label> labels = new Stack<>();                                          // Labels for some instructions
 
   class Label                                                                   // Label definition
@@ -22,7 +22,12 @@ class Program extends Test                                                      
 
   class I                                                                       // Instruction definition
    {int instructionNumber;                                                      // Instruction number
-    I() {instructionNumber = code.size(); code.push(this);}                     // Can always be removed from this position if needed and placed some where else
+    final String definition = traceBack();                                      // Location of code that defined this instruction
+    I()                                                                         // Define an instruction
+     {if (running) stop("Cannot define instructions during program execution",
+       definition);
+      instructionNumber = code.size(); code.push(this);
+     }
     void   a() {}                                                               // Action performed by instruction
     void   i() {}                                                               // Initialization for instruction
     String n() {return "instruction";}                                          // Instruction name
@@ -36,13 +41,15 @@ class Program extends Test                                                      
 
   void run()                                                                    // Run the program
    {z(); initialize();
+    running = true;
     final int N = code.size();
     for (step = 0, time = 0; step < N && time < maxTime; step++, time++)
      {z(); code.elementAt(step).a();
      }
+    running = false;
    }
 
-  void clear() {z(); code.clear();}                                             // Clear the program code
+  void clear() {z(); code.clear(); running = false;}                            // Clear the program code
 
 //D1 Blocks                                                                     // Blocks of code used to implement if statements and for loops
 
