@@ -187,7 +187,7 @@ abstract class StuckSA extends Test                                             
 
   void setKey  ()                                                               // Set the indexed key
    {z();
-   key().setOff().move(T.at(tKey));
+    key().setOff().move(T.at(tKey));
    }
 
   void setData ()                                                               // Set the indexed data
@@ -320,8 +320,9 @@ abstract class StuckSA extends Test                                             
     size();
 
     final int n = T.at(size).getInt(), l = T.at(limit).getInt(), L = n-l;       // Limit search if requested
+    T.at(size).setInt(L);
 
-    for (int i = 0; i < L; i++)                                                 // Search
+    for (int i = 0; i < T.at(size).getInt(); i++)                               // Search
      {z(); T.at(index).setInt(i); moveKey();
       T.at(tKey).equal(T.at(search), T.at(equal));
       if (T.at(equal).getInt() > 0)
@@ -337,8 +338,9 @@ abstract class StuckSA extends Test                                             
     size();
 
     final int n = T.at(size).getInt(), l = T.at(limit).getInt(), L = n-l;       // Limit search if requested
+    T.at(size).setInt(L);
 
-    for (int i = 0; i < L; i++)                                                 // Search
+    for (int i = 0; i < T.at(size).getInt(); i++)                               // Search
      {z(); T.at(index).setInt(i); moveKey();
       T.at(tKey).greaterThanOrEqual(T.at(search), T.at(equal));
       if (T.at(equal).getInt() > 0)
@@ -346,7 +348,7 @@ abstract class StuckSA extends Test                                             
         return;
        }
      }
-    T.at(index).setInt(L);                                                      // Index top is no match found
+    T.at(index).setInt(L);                                                      // Index top if no match found
     T.at(found).setInt(0);
    }
 
@@ -726,13 +728,13 @@ Transaction(action:search search:8 limit:0 found:1 index:3 key:8 data:4 size:4 i
     m.at(s.search).setInt(4);  s.search();
     //stop(s);
     ok(s.print(), """
-Transaction(action:search search:4 limit:1 found:1 index:1 key:4 data:2 size:4 isFull:0 isEmpty:0)
+Transaction(action:search search:4 limit:1 found:1 index:1 key:4 data:2 size:3 isFull:0 isEmpty:0)
 """);
 
     m.at(s.search).setInt(8); s.search();
     //stop(t);
     ok(s.print(), """
-Transaction(action:search search:8 limit:1 found:0 index:2 key:6 data:2 size:4 isFull:0 isEmpty:0)
+Transaction(action:search search:8 limit:1 found:0 index:2 key:6 data:2 size:3 isFull:0 isEmpty:0)
 """);
    }
 
@@ -761,13 +763,13 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:0 found:1 index:
     m.at(s.search).setInt(5); s.searchFirstGreaterThanOrEqual();
     //stop(t);
     ok(s.print(), """
-Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:1 found:1 index:2 key:6 data:3 size:4 isFull:0 isEmpty:0)
+Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:1 found:1 index:2 key:6 data:3 size:3 isFull:0 isEmpty:0)
 """);
 
     m.at(s.search).setInt(7); s.searchFirstGreaterThanOrEqual();
     //stop(t);
     ok(s.print(), """
-Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:3 key:6 data:3 size:4 isFull:0 isEmpty:0)
+Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:3 key:6 data:3 size:3 isFull:0 isEmpty:0)
 """);
    }
 
