@@ -49,6 +49,11 @@ class Program extends Test                                                      
     running = false;
    }
 
+  void stop(String em)                                                          // Stop everything with an explanatory message
+   {z();
+    new I() {void a() {Test.stop(em);}};
+   }
+
   void clear() {z(); code.clear(); running = false;}                            // Clear the program code
 
 //D1 Blocks                                                                     // Blocks of code used to implement if statements and for loops
@@ -260,12 +265,20 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(f, "[1, 2, 1]");
    }
 
+  static void test_stop()
+   {Program p = new Program();
+    sayThisOrStop("stopping");
+    p.new I() {void a() {Test.stop("stopping");}};
+    try {p.run();} catch(RuntimeException e) {};
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_fibonacci();
     test_fizz_buzz();
     test_if();
     test_goOn();
     test_goOff();
+    test_stop();
    }
 
   static void newTests()                                                        // Tests being worked on
