@@ -13,7 +13,6 @@ abstract class StuckPA extends Test                                             
   final MemoryLayout M = new MemoryLayout();                                    // Memory for stuck
   final MemoryLayout C = new MemoryLayout();                                    // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
   final MemoryLayout T = new MemoryLayout();                                    // Memory for transaction intermediates
-
   Program            P = new Program();                                         // The program to be written to to describe the actions on the stuck.  The caller can provide a different one as this field is not final
 
   Layout.Variable   sKey;                                                       // Key in a stuck
