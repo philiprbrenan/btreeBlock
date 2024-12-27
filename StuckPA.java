@@ -125,13 +125,13 @@ abstract class StuckPA extends Test                                             
 
   void isFull()                                                                 // Check the stuck is full
    {z();
-    P.new I() {void a() {T.at(full).setInt(maxSize());}};
+    T.setIntInstruction(full, maxSize());
     T.at(size).greaterThanOrEqual(T.at(full), T.at(isFull));
    }
 
   void isEmpty()                                                                // Check the stuck is empty
    {z();
-    P.new I() {void a() {T.at(full).setInt(0);}};
+    T.setIntInstruction(full, 0);
     T.at(size).equal(T.at(full), T.at(isEmpty));
    }
 
@@ -191,11 +191,7 @@ abstract class StuckPA extends Test                                             
 
   void clear()                                                                  // Zero the current size to clear the stuck
    {z();
-    P.new I()
-     {void a()
-       {M.at(currentSize).setOff().setInt(0);
-       }
-     };
+    M.setIntInstruction(currentSize, 0);
     sizeFullEmpty();
    }
 
@@ -226,7 +222,7 @@ abstract class StuckPA extends Test                                             
 
   void setKeyData()    {z(); setKey(); setData();}                              // Set a key, data element in the stuck
   void sizeFullEmpty() {z(); size(); isFull(); isEmpty();}                      // Status
-  void setFound()      {z(); P.new I() {void a() {T.at(found).setInt(1);}};}    // Set found to true
+  void setFound()      {z(); T.setIntInstruction(found, 1);}                    // Set found to true
 
   void push()                                                                   // Push an element onto the stuck
    {z(); action = "push";
@@ -246,12 +242,11 @@ abstract class StuckPA extends Test                                             
     isFull();
     assertNotFull();
     setFound();
-    P.new I() {void a() {T.at(index).setInt(0);}};
+    T.setIntInstruction(index, 0);
     M.at(Keys).moveUp(T.at(index), C.at(Keys));
-    P.new I() {void a() {T.at(index).setInt(0);}};
+    //T.setIntInstruction(index, 0);
     M.at(Data).moveUp(T.at(index), C.at(Data));
     inc();
-    P.new I() {void a() {T.at(index).setInt(0);}};
     setKeyData();
     sizeFullEmpty();
    }
@@ -275,7 +270,7 @@ abstract class StuckPA extends Test                                             
     isEmpty();
     assertNotEmpty();
     setFound();
-    P.new I() {void a() {T.at(index).setInt(0);}};
+    T.setIntInstruction(index, 0);
     moveKey(); moveData();
     T.zero();
     M.at(Keys).setOff().moveDown(T.at(index), C.at(Keys));
@@ -344,7 +339,7 @@ abstract class StuckPA extends Test                                             
     isEmpty();
     assertNotEmpty();
     setFound();
-    P.new I() {void a() {T.at(index).setInt(0);}};
+    T.setIntInstruction(index, 0);
     moveKey();
     moveData();
    }
@@ -372,13 +367,13 @@ abstract class StuckPA extends Test                                             
        }
      };
 
-    T.at(found).setInt(0);                                                      // Assume we will not find a match
+    T.setIntInstruction(found, 0);                                              // Assume we will not find a match
 
     P.new Block()
      {void code()
        {for (int I = 0; I < maxSize(); I++)                                     // Search
          {final int i = I;
-          P.new I() {void a() {T.at(index).setInt(i);}};
+          T.setIntInstruction(index, i);
           T.at(index).equal(T.at(size), T.at(equal));
           P.GoOn(end, T.at(equal));                                             // Reached the upper limit of the stuck
           moveKey();
@@ -406,14 +401,14 @@ abstract class StuckPA extends Test                                             
        }
      };
 
-    P.new I() {void a() {T.at(found).setInt(0);}};                              // Assume we will not find a match
+    T.setIntInstruction(found, 0);                                              // Assume we will not find a match
     T.at(index).move(T.at(size));                                               // Index top if no match found
 
     P.new Block()
      {void code()
        {for (int I = 0; I < maxSize(); I++)                                     // Search
          {final int i = I;
-          P.new I() {void a() {T.at(index).setInt(i);}};
+          T.setIntInstruction(index, i);
           T.at(index).equal(T.at(size), T.at(equal));
           P.GoOn(end, T.at(equal));                                             // Reached the upper limit of the stuck
           moveKey();
