@@ -159,7 +159,7 @@ class BtreeStuckStatic extends Test                                             
         search = Search;
 
         final StuckStatic.SearchFirstGreaterThanOrEqual s =
-        keyData.searchFirstGreaterThanOrEqual1(Search);
+                  keyData.searchFirstGreaterThanOrEqual1(Search);
         found = s.found;
         first = s.index;
         return this;
@@ -192,7 +192,7 @@ class BtreeStuckStatic extends Test                                             
         branch = Node.this;
         search = Search;
         final StuckStatic.SearchFirstGreaterThanOrEqualExceptLast s =
-            keyNext.searchFirstGreaterThanOrEqualExceptLast1(Search);
+                  keyNext.searchFirstGreaterThanOrEqualExceptLast1(Search);
         found = s.found;
         first = s.index;
         next  = s.found ? s.data : keyNext.lastElement1().data;                 // Next if no key matches
@@ -431,9 +431,9 @@ class BtreeStuckStatic extends Test                                             
       if (hasLeavesForChildren())                                               // Children are leaves
        {z();
         final StuckStatic l = nodes.elementAt(L.data).keyData;
-        final StuckStatic  r = nodes.elementAt(R.data).keyData;
-        final int  nl = nodes.elementAt(L.data).leafSize();
-        final int  nr = nodes.elementAt(R.data).leafSize();
+        final StuckStatic r = nodes.elementAt(R.data).keyData;
+        final int        nl = nodes.elementAt(L.data).leafSize();
+        final int        nr = nodes.elementAt(R.data).leafSize();
 
         if (nr >= maxKeysPerLeaf) return false;                                 // Steal not possible because there is no where to put the steal
         if (nl <= 1) return false;                                              // Steal not allowed because it would leave the leaf sibling empty
@@ -447,8 +447,8 @@ class BtreeStuckStatic extends Test                                             
        {z();
         final StuckStatic  l = nodes.elementAt(L.data).keyNext;
         final StuckStatic  r = nodes.elementAt(R.data).keyNext;
-        final int  nl = nodes.elementAt(L.data).branchSize();
-        final int  nr = nodes.elementAt(R.data).branchSize();
+        final int         nl = nodes.elementAt(L.data).branchSize();
+        final int         nr = nodes.elementAt(R.data).branchSize();
 
         if (nr >= maxKeysPerBranch) return false;                               // Steal not possible because there is no where to put the steal
         if (nl <= 1) return false;                                              // Steal not allowed because it would leave the left sibling empty
