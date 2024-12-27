@@ -51,6 +51,16 @@ class MemoryLayoutPA extends Test                                               
     memory.set(a.at, a.width, value);
    }
 
+  void setIntInstruction(Layout.Field field, int value, int...indices)          // Set a value in memory occupoied by the layout
+   {z();
+    P.new I()
+     {void a()
+       {final At a = new At(field, indices).setOff();
+        memory.set(a.at, a.width, value);
+       }
+     };
+   }
+
   void zero()                                                                   // Clear the memory associated with the layout to zeros
    {z();
     memory.set(base, layout.size(), 0);
