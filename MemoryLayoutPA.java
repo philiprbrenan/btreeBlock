@@ -11,13 +11,14 @@ class MemoryLayoutPA extends Test                                               
   Memory memory;                                                                // Memory containing layout
   int      base;                                                                // Base of layout in memory - like located in Pl1
   boolean debug;                                                                // Debug if true
-  Program     P = new Program();                                                // Program containing generated code
+  ProgramPA P = new ProgramPA();                                                // Program containing generated code
 
 //D1 Control                                                                    // Testing, control and integrity
 
-  void memory(Memory Memory) {memory = Memory;}                                 // Set the base of the layout in memory allowing such layouts to be relocated
-  void layout(Layout Layout) {layout = Layout;}                                 // Set the base of the layout in memory allowing such layouts to be relocated
-  void base  (int Base)      {base   = Base;}                                   // Set the base of the layout in memory allowing such layouts to be relocated
+  void memory (Memory    Memory)  {memory = Memory;}                            // Set the base of the layout in memory allowing such layouts to be relocated
+  void layout (Layout    Layout)  {layout = Layout;}                            // Set the base of the layout in memory allowing such layouts to be relocated
+  void program(ProgramPA program) {P      = program;}                           // Program in which to generate instructions
+  void base   (int Base)          {base   = Base;}                              // Set the base of the layout in memory allowing such layouts to be relocated
 
   void ok(String Lines)                                                         // Check that specified lines are present in the memory layout
    {final String  m = toString();                                               // Memory as string
@@ -39,7 +40,9 @@ class MemoryLayoutPA extends Test                                               
 //D1 Get and Set                                                                // Get and set values in memory but only during testing
 
   int  getInt(Layout.Field field, int...indices)                                // Get a value from memory occupied by the layout
-   {z(); return new     At(field,       indices).setOff().result;
+   {z();
+    final int i = new At(field, indices).setOff().result;
+    return i;
    }
 
   void setInt(Layout.Field field, int value, int...indices)                     // Set a value in memory occupoied by the layout
@@ -58,19 +61,11 @@ class MemoryLayoutPA extends Test                                               
   class At
    {final Layout.Field field;                                                   // Field description in layout
     final int  width;                                                           // Width of element in memory
-    enum Type {constant, direct, indirect};                                     // Type of memory reference. Constant a known constant value. Direct: a field with indioces known at compile time. Indirect: a field whose indices are other fields whose indices are known at compile time.
-    final Type type;                                                            // Type of memory reference
     final int[]indices;                                                         // Known indices to be applied directly to locate the field in memory
     final At[] directs;                                                         // Fields whose location is known at the start so they can be used for indices into memory rather like registers on a chip
     int  delta;                                                                 // Delta due to indices
     int  at;                                                                    // Location in memory
     int  result;                                                                // The contents of memory at this location
-
-    At(int constant)                                                            // Constant value made to look like a memory reference
-     {z(); field = null; indices = null; width = delta = at = 0;
-      directs = null;
-      type = Type.constant; result = constant;
-     }
 
     void locateDirectAddress()                                                  // Locate a direct address and its content
      {delta  = field.locator.at(indices);
@@ -108,25 +103,25 @@ class MemoryLayoutPA extends Test                                               
     At(Layout.Field Field)                                                      // No indices or base
      {z(); checkCompiled(Field);
       field = Field; indices = new int[0]; width = field.width;
-      type = Type.direct; directs = null;
+      directs = null;
       locateDirectAddress();                                                    // The indices are constant so the address will not change over time
      }
 
     At(Layout.Field Field, int...Indices)                                       // Constant indices used for setting initial values
      {z(); checkCompiled(Field);
       field = Field; indices = Indices; width = field.width;
-      type = Type.direct; directs = null;
+      directs = null;
       locateDirectAddress();                                                    // The indices are constant so the address will not change over time
      }
 
     At(Layout.Field Field, At...Directs)                                        // Variable indices used for obtaining run time values
      {z(); checkCompiled(Field);
       for (int i = 0; i < Directs.length; i++)
-       {if (Directs[i].type != Type.direct) stop("Index:", i, "must not have a base or indices");
+       {if (Directs[i].directs != null) stop("Index:", i, "must not have a base or indices");
        }
 
       field = Field; width = field.width;
-      type = Type.indirect; directs = Directs;
+      directs = Directs;
       indices = new int[Directs.length];
      }
 
@@ -136,23 +131,20 @@ class MemoryLayoutPA extends Test                                               
       z(); return true;
      }
 
-    int width()                                                                 // Width of the field in memory
-     {z(); if (type == Type.constant) stop("A constant does not have any specific width");
-      z(); return field.width();
-     }
+    int width() {z(); return field.width();}                                    // Width of the field in memory
 
     At setOff()                                                                 // Set the base address of the field
      {z();
-      if (type == Type.indirect) {z(); locateInDirectAddress();}                // Evaluate indirect indices
-      else                       {z(); locateDirectAddress();}                  // Evaluate direct indices
+      if (directs != null) {z(); locateInDirectAddress();}                      // Evaluate indirect indices
+      else                 {z(); locateDirectAddress();}                        // Evaluate direct indices
       return this;
      }
 
     boolean getBit(int i)            {return memory.getBit(at+i);}              // Get a bit from memory assuming that setOff() has been called to fix the location of the field containing the bit
-    void    setBit(int i, boolean b) {       memory.set(at+i, b);}              // Set a bit in memory  assuming that setOff() has been called to fix the location of the field containing the bit
+    void    setBit(int i, boolean b) {memory.set(at+i, b);}                     // Set a bit in memory  assuming that setOff() has been called to fix the location of the field containing the bit
 
-    int  getInt()          {z(); return result;}                                // The value in memory, at the indicated location, treated as an integer or the value of the constant
-    void setInt(int value) {z(); if (debug) say("BBBB", at, value);memory.set(at, width, value);}                 // Set the value in memory at the indicated location, treated as an integer
+    int  getInt()          {z(); return result;}                                // The value in memory, at the indicated location, treated as an integer or the value of the constant, assumming setOff has been called to update the variable description
+    void setInt(int value) {z(); memory.set(at, width, value);}                 // Set the value in memory at the indicated location, treated as an integer
 
     public String toString()                                                    // Print field name(indices)=value or name=value if there are no indices
      {final StringBuilder s = new StringBuilder();
@@ -176,14 +168,18 @@ class MemoryLayoutPA extends Test                                               
 
     void move(At source)                                                        // Copy the specified number of bits from source to target assuming no overlap. The source and target can be in the same or a different memory.
      {z(); sameSize(source);
+      final At target = this;
       P.new I()
        {void a()
-         {for(int i = 0; i < width; ++i)
+         {source.setOff();
+          target.setOff();
+          for(int i = 0; i < width; ++i)
            {z();
             final boolean b = source.getBit(i);
-            setBit(i, b);
+            target.setBit(i, b);
            }
          }
+        String n() {return field.name+"="+source.field.name;}
        };
      }
 
@@ -197,20 +193,20 @@ class MemoryLayoutPA extends Test                                               
      {z(); sameSize(buffer);
       if (!(field instanceof Layout.Array))  stop("Array required for moveUp");
       final At target = this;
+      buffer.move(target);                                                      // Make a copy of the thing to be moved so we can move in parallel
       P.new I()
        {void a()
-         {z(); setOff();                                                        // Set the offset of the source/target
-          z(); buffer.setOff().move(target);                                    // Set the offset of the buffer and copies the source
-
-          final Layout.Array A = field.toArray();                               // Address field to be moved as an array
+         {final Layout.Array A = field.toArray();                               // Address field to be moved as an array
           final  int w =     A.element.width;                                   // Width of array element
+          Index.setOff();
           for   (int i = Index.result+1; i < A.size; i++)                       // Each element
            {for (int j = 0;              j < w;      j++)                       // Each bit in each element
              {final boolean b = buffer.getBit((i-1)*w + j);
-              setBit(i*w+j, b);
+              target.setBit(i*w+j, b);
              }
             }
          }
+        String n() {return field.name+" moveUp @ "+Index.field.name+" using "+buffer.field.name;}
        };
      }
 
@@ -218,20 +214,20 @@ class MemoryLayoutPA extends Test                                               
      {z(); sameSize(buffer);
       if (!(field instanceof Layout.Array)) stop("Array required for moveDown");
       final At target = this;
+      buffer.move(target);                                                      // Make a copy of the thing to be moved so we can move in parallel
       P.new I()
        {void a()
-         {z(); setOff();                                                        // Set the offset of the target
-          z(); buffer.setOff().move(target);                                    // Set the offset of the buffer and copies the source
-
-          final Layout.Array A = field.toArray();                               // Address field to be moved as an array
+         {final Layout.Array A = field.toArray();                               // Address field to be moved as an array
           final  int w =     A.element.width;                                   // Width of array element
+          Index.setOff();
           for   (int i = Index.result; i < A.size-1; i++)                       // Each element
            {for (int j = 0;            j < w;        j++)                       // Each bit in each element
              {final boolean b = buffer.getBit((i+1)*w + j);
-              setBit(i*w+j, b);
+              target.setBit(i*w+j, b);
              }
            }
          }
+        String n() {return field.name+" moveDown @ "+Index.field.name+" using "+buffer.field.name;}
        };
      }
 
@@ -262,7 +258,7 @@ class MemoryLayoutPA extends Test                                               
 
 //D1 Boolean                                                                    // Boolean operations on fields held in memories.
 
-    boolean isZero()                                                            // Whether the field is all zero
+    private boolean isZero()                                                    // Whether the field is all zero
      {z();
       for(int i = 0; i < width; ++i)
        {z(); if (getBit(i)) {z(); return false;}
@@ -272,10 +268,15 @@ class MemoryLayoutPA extends Test                                               
 
     void    isZero(At result)                                                   // Whether a field is all zeros
      {z();
-      result.setInt(isZero() ? 1 : 0);
+      P.new I()
+       {void a()
+         {result.setInt(isZero() ? 1 : 0);
+         }
+        String n() {return result.field.name+" = isZero "+field.name;}
+       };
      }
 
-    boolean isOnes()                                                            // Whether the field is all ones
+    private boolean isOnes()                                                    // Whether the field is all ones
      {z();
       for(int i = 0; i < width; ++i)
        {z(); if (!getBit(i)) {z(); return false;}
@@ -283,18 +284,18 @@ class MemoryLayoutPA extends Test                                               
       z(); return true;
      }
 
-    void    isOnes(At result)                                                   // Whether a field is all ones
+    void isOnes(At result)                                                      // Whether a field is all ones
      {z();
-      result.setInt(isOnes() ? 1 : 0);
+      P.new I()
+       {void a()
+         {result.setInt(isOnes() ? 1 : 0);
+         }
+        String n() {return result.field.name+" = isOnes "+field.name;}
+       };
      }
 
-    boolean equal(At b)                                                         // Whether  a == b
-     {z();
-      if (field == null || b.field == null)
-       {z(); return result == b.result;
-       }
-
-      z(); sameSize(b);
+    private boolean equal(At b)                                                 // Whether  a == b
+     {z(); sameSize(b);
 
       for(int i = 0; i < width; ++i)
        {z(); if (getBit(i) != b.getBit(i)) {z(); return false;}
@@ -302,23 +303,28 @@ class MemoryLayoutPA extends Test                                               
       z(); return true;
      }
 
-    void    equal(At b, At result)                                              // Whether  a == b
+    void equal(At b, At result)                                                // Whether  a == b
      {z();
-      result.setInt(equal(b) ? 1 : 0);
+      P.new I()
+       {void a()
+         {result.setInt(equal(b) ? 1 : 0);
+         }
+        String n() {return result.field.name+"="+field.name+"=="+b.field.name;}
+       };
      }
-
-    boolean notEqual(At b) {return !equal(b);}                                  // Whether a != b
 
     void    notEqual(At b, At result)                                           // Whether  a != b
      {z();
-      P.new I() {void a() {result.setInt(equal(b) ? 1 : 0);}};
+      P.new I()
+       {void a()
+         {result.setInt(!equal(b) ? 1 : 0);
+         }
+        String n() {return result.field.name+"="+field.name+"!="+b.field.name;}
+       };
      }
 
-    boolean lessThan(At b)                                                      // Whether a < b
-     {z();
-      if (field == null || b.field == null) {z(); return result <  b.result;}
-      z(); sameSize(b);
-
+    private boolean lessThan(At b)                                              // Whether a < b
+     {z(); sameSize(b);
       for(int i = width; i > 0; --i)
        {z();
         if (!getBit(i-1) &&  b.getBit(i-1)) {z(); return true;}
@@ -327,53 +333,52 @@ class MemoryLayoutPA extends Test                                               
        z(); return false;
      }
 
-    void    lessThan(At b, At result)                                           // Whether  a < b
-     {z();
-      P.new I() {void a() {result.setInt(lessThan(b) ? 1 : 0);}};
+    void lessThan(At b, At result)                                              // Whether  a < b
+     {z(); sameSize(b);
+      P.new I()
+       {void a()
+         {result.setInt(lessThan(b) ? 1 : 0);
+         }
+        String n() {return result.field.name+"="+field.name+"<"+b.field.name;}
+       };
      }
 
-    boolean lessThanOrEqual(At b)                                               // Whether a <= b
-     {z();
-      if (field == null || b.field == null) {z(); return result <= b.result;}
-      z(); sameSize(b);
-      return lessThan(b) || equal(b);
-     }
-
-    void    lessThanOrEqual(At b, At result)                                    // Whether  a <= b
-     {z();
-      P.new I() {void a() {result.setInt(lessThanOrEqual(b) ? 1 : 0);}};
-     }
-
-    boolean greaterThan(At b)                                                   // Whether a > b
-     {z();
-      if (field == null || b.field == null) {z(); return result > b.result;}
-      z(); sameSize(b);
-      return !lessThan(b) && !equal(b);
+    void lessThanOrEqual(At b, At result)                                       // Whether  a <= b
+     {z(); sameSize(b);
+      P.new I()
+       {void a()
+        {result.setInt(lessThan(b) || equal(b) ? 1 : 0);
+        }
+        String n() {return result.field.name+"="+field.name+"<="+b.field.name;}
+      };
      }
 
     void    greaterThan(At b, At result)                                        // Whether  a > b
-     {z();
-      P.new I() {void a() {result.setInt(greaterThan(b) ? 1 : 0);}};
-     }
-
-    boolean greaterThanOrEqual(At b)                                            // Whether a >= b
-     {z();
-      return !lessThan(b);
+     {z(); sameSize(b);
+      P.new I()
+       {void a()
+         {result.setInt(!lessThan(b) && !equal(b) ? 1 : 0);
+         }
+        String n() {return result.field.name+"="+field.name+">"+b.field.name;}
+       };
      }
 
     void    greaterThanOrEqual(At b, At result)                                 // Whether  a >= b
-     {z();
-      P.new I() {void a() {result.setInt(greaterThanOrEqual(b) ? 1 : 0);}};
+     {z(); sameSize(b);
+      P.new I()
+       {void a()
+         {result.setInt(!lessThan(b) ? 1 : 0);
+         }
+        String n() {return result.field.name+"="+field.name+">="+b.field.name;}
+       };
      }
 
 //D1 Arithmetic                                                                 // Arithmetic on integers
 
 //D2 Binary                                                                     // Arithmetic on binary integers
 
-    void inc()     {z(); P.new I() {void a() {final int i = getInt()+1; setInt(i);   }};} // Increment a variable treated as an signed binary integer with wrap around on overflow.  Return the result after  the increment.
-    void dec()     {z(); P.new I() {void a() {final int i = getInt()-1; setInt(i);   }};} // Decrement a variable treated as an signed binary integer with wrap around on underflow. Return the result after  the decrement.
-    void incPost() {z(); P.new I() {void a() {final int i = getInt();   setInt(i+1); }};} // Increment a variable treated as an signed binary integer with wrap around on overflow.  Return the result before the increment.
-    void decPost() {z(); P.new I() {void a() {final int i = getInt();   setInt(i-1); }};} // Decrement a variable treated as an signed binary integer with wrap around on underflow. Return the result before the decrement.
+    void inc() {z(); P.new I() {void a() {setOff(); final int i = getInt()+1; setInt(i);} String n() {return "++"+field.name;}};} // Increment a variable treated as an signed binary integer with wrap around on overflow.  Return the result after  the increment.
+    void dec() {z(); P.new I() {void a() {setOff(); final int i = getInt()-1; setInt(i);} String n() {return "--"+field.name;}};} // Decrement a variable treated as an signed binary integer with wrap around on underflow. Return the result after  the decrement.
    } // At
 
   At at(Layout.Field Field)                                                     // A field without indices or base addressing
@@ -386,16 +391,6 @@ class MemoryLayoutPA extends Test                                               
 
   At at(Layout.Field Field, At...Indices)                                       // A field with  variable indices. Each index being a field with no indices
    {return new    At(Field,      Indices);
-   }
-
-  class Constant extends At                                                     // A constant integer
-   {Constant(int constant)
-     {super(constant);
-     }
-   }
-
-  Constant constant(int constant)
-   {return new Constant(constant);
    }
 
 //D1 Print                                                                      // Print a memory layout
@@ -537,22 +532,22 @@ class MemoryLayoutPA extends Test                                               
     m.setInt(t.a, 1, 0, 2, 1);
     m.setInt(t.a, 2, 0, 2, 2);
 
-    ok( m.at(t.a, 0, 1, 1).equal   (m.at(t.a, 0, 2, 1)));
-    ok(!m.at(t.a, 0, 1, 1).equal   (m.at(t.a, 0, 1, 2)));
-    ok(!m.at(t.a, 0, 1, 1).notEqual(m.at(t.a, 0, 2, 1)));
-    ok( m.at(t.a, 0, 1, 1).notEqual(m.at(t.a, 0, 1, 2)));
+    m.at(t.a, 0, 1, 1).equal             (m.at(t.a, 0, 2, 1), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 1);
+    m.at(t.a, 0, 1, 1).equal             (m.at(t.a, 0, 1, 2), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 0);
+    m.at(t.a, 0, 1, 1).notEqual          (m.at(t.a, 0, 2, 1), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 0);
+    m.at(t.a, 0, 1, 1).notEqual          (m.at(t.a, 0, 1, 2), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 1);
 
-    ok( m.at(t.a, 0, 1, 1).lessThan       (m.at(t.a, 0, 1, 2)));
-    ok(!m.at(t.a, 0, 1, 1).lessThan       (m.at(t.a, 0, 2, 1)));
-    ok( m.at(t.a, 0, 1, 1).lessThanOrEqual(m.at(t.a, 0, 1, 2)));
-    ok( m.at(t.a, 0, 1, 1).lessThanOrEqual(m.at(t.a, 0, 2, 1)));
-    ok(!m.at(t.a, 0, 1, 2).lessThanOrEqual(m.at(t.a, 0, 2, 1)));
+    m.at(t.a, 0, 1, 1).lessThan          (m.at(t.a, 0, 1, 2), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 1);
+    m.at(t.a, 0, 1, 1).lessThan          (m.at(t.a, 0, 2, 1), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 0);
+    m.at(t.a, 0, 1, 1).lessThanOrEqual   (m.at(t.a, 0, 1, 2), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 1);
+    m.at(t.a, 0, 1, 1).lessThanOrEqual   (m.at(t.a, 0, 2, 1), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 1);
+    m.at(t.a, 0, 1, 2).lessThanOrEqual   (m.at(t.a, 0, 2, 1), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 0);
 
-    ok(!m.at(t.a, 0, 1, 1).greaterThan       (m.at(t.a, 0, 1, 2)));
-    ok( m.at(t.a, 0, 1, 2).greaterThan       (m.at(t.a, 0, 1, 1)));
-    ok( m.at(t.a, 0, 2, 1).greaterThanOrEqual(m.at(t.a, 0, 1, 1)));
-    ok( m.at(t.a, 0, 1, 1).greaterThanOrEqual(m.at(t.a, 0, 2, 1)));
-    ok(!m.at(t.a, 0, 2, 1).greaterThanOrEqual(m.at(t.a, 0, 1, 2)));
+    m.at(t.a, 0, 1, 1).greaterThan       (m.at(t.a, 0, 1, 2), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 0);
+    m.at(t.a, 0, 1, 2).greaterThan       (m.at(t.a, 0, 1, 1), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 1);
+    m.at(t.a, 0, 2, 1).greaterThanOrEqual(m.at(t.a, 0, 1, 1), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 1);
+    m.at(t.a, 0, 1, 1).greaterThanOrEqual(m.at(t.a, 0, 2, 1), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 1);
+    m.at(t.a, 0, 2, 1).greaterThanOrEqual(m.at(t.a, 0, 1, 2), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 0);
    }
 
   static void test_copy()
@@ -697,47 +692,6 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
-  static void test_move_across()
-   {Layout           l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", 4);
-    Layout.Variable  b = l.variable ("b", 4);
-    Layout.Structure s = l.structure("s", a, b);
-    l.compile();
-
-    Layout           l1 = Layout.layout();
-    Layout.Field     s1 = l1.duplicate("s", l);
-    l1.compile();
-
-    Layout           l2 = Layout.layout();
-    Layout.Field     s2 = l2.duplicate("s", l);
-    l2.compile();
-
-    MemoryLayoutPA     m1 = new MemoryLayoutPA();
-    m1.layout(l1);
-    m1.memory(new Memory(l1.size()));
-
-    MemoryLayoutPA     m2 = new MemoryLayoutPA();
-    m2.layout(l2);
-    m2.memory(new Memory(l2.size()));
-
-    m1.at(l1.get("a")).setInt(1);
-    m2.at(l2.get("b")).move(m1.at(l1.get("a")));
-    //stop(m1);
-    m1.ok("""
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0         8                                      s
-   2 V        0         4                                  1     a
-   3 V        4         4                                  0     b
-""");
-    //stop(m2);
-    m2.ok("""
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0         8                                      s
-   2 V        0         4                                  0     a
-   3 V        4         4                                  1     b
-""");
-   }
-
   static void test_set_inc_dec_get()
    {Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
@@ -761,7 +715,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     m.at(a).inc();
     m.at(b).dec();
-    m.P.run();
+    m.P.run(); m.P.clear();
 
     ok(m.at(a).getInt(), 2);
     ok(m.at(b).getInt(), 2);
@@ -777,39 +731,13 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(m.at(a).getInt(), 2);
     ok(m.at(b).getInt(), 2);
 
-    m.at(a).decPost();
-    m.at(b).incPost();
-
-    ok(m.at(a).getInt(), 2);
-    ok(m.at(b).getInt(), 2);
+    m.at(a).dec();
+    m.at(b).inc();
     m.P.run();
+    //stop(m);
 
     ok(m.at(a).getInt(), 1);
     ok(m.at(b).getInt(), 3);
-   }
-
-  static void test_boolean_constant()
-   {Layout           l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", 4);
-    l.compile();
-
-    MemoryLayoutPA     m = new MemoryLayoutPA();
-    m.layout(l);
-    m.memory(new Memory(l.size()));
-    m.at(a).setInt(1);
-
-    MemoryLayoutPA.At A = m.at(a),
-     c0 = m.constant(0), c1 = m.constant(1), c2 = m.constant(2);
-    final boolean T = true, F = false;
-
-    ok(A.equal   (c0), F); ok(A.equal   (c1), T); ok(A.equal   (c2), F);
-    ok(A.notEqual(c0), T); ok(A.notEqual(c1), F); ok(A.notEqual(c2), T);
-
-    ok(A.lessThan       (c0), F); ok(A.lessThan       (c1), F); ok(A.lessThan       (c2), T);
-    ok(A.lessThanOrEqual(c0), F); ok(A.lessThanOrEqual(c1), T); ok(A.lessThanOrEqual(c2), T);
-
-    ok(A.greaterThan       (c0), T); ok(A.greaterThan       (c1), F); ok(A.greaterThan       (c2), F);
-    ok(A.greaterThanOrEqual(c0), T); ok(A.greaterThanOrEqual(c1), T); ok(A.greaterThanOrEqual(c2), F);
    }
 
   static void test_addressing()
@@ -885,114 +813,6 @@ Line T       At      Wide       Size    Indices        Value   Name
   11 V       64         8               5                  0       a
   12 V       72         8               6                  0       a
   13 V       80         8               7                  0       a
-""");
-   }
-
-  static void test_move_up()
-   {final int        N = 8;
-    Layout           l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", N);
-    Layout.Array     A = l.array    ("A", a, 6);
-    l.compile();
-
-    Layout           w = Layout.layout();
-    Layout.Variable  z = w.variable ("z", N);
-    Layout.Variable  i = w.variable ("i", N);
-    Layout.Field     B = w.duplicate("A", l);
-    Layout.Structure S = w.structure("S", z, i, B);
-    w.compile();
-
-    MemoryLayoutPA     L = new MemoryLayoutPA();
-    L.layout(l);
-    L.memory(new Memory(l.size()));
-    MemoryLayoutPA     W = new MemoryLayoutPA();
-    W.layout(w);
-    W.memory(new Memory(w.size()));
-
-    for (int j = 0; j < A.size; j++) L.at(a, j).setInt(10+j);
-
-    W.at(i).setInt(2);
-    //L.at(A).moveUp(W.at(i), W.at(B));
-    L.at(A, W.at(z)).moveUp(W.at(i), W.at(B, W.at(z)));
-    //stop(L);
-    ok(L, """
-Line T       At      Wide       Size    Indices        Value   Name
-   1 A        0        48          6                           A
-   2 V        0         8               0                 10     a
-   3 V        8         8               1                 11     a
-   4 V       16         8               2                 12     a
-   5 V       24         8               3                 12     a
-   6 V       32         8               4                 13     a
-   7 V       40         8               5                 14     a
-""");
-
-  //stop(W);
-  ok(W, """
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        64                                      S
-   2 V        0         8                                  0     z
-   3 V        8         8                                  2     i
-   4 A       16        48          6                             A
-   5 V       16         8               0                 10       a
-   6 V       24         8               1                 11       a
-   7 V       32         8               2                 12       a
-   8 V       40         8               3                 13       a
-   9 V       48         8               4                 14       a
-  10 V       56         8               5                 15       a
-""");
-   }
-
-  static void test_move_down()
-   {final int        N = 8;
-    Layout           l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", N);
-    Layout.Array     A = l.array    ("A", a, 6);
-    l.compile();
-
-    Layout           w = Layout.layout();
-    Layout.Variable  z = w.variable ("z", N);
-    Layout.Variable  i = w.variable ("i", N);
-    Layout.Field     B = w.duplicate("A", l);
-    Layout.Structure S = w.structure("S", z, i, B);
-    w.compile();
-
-    MemoryLayoutPA     L = new MemoryLayoutPA();
-    L.layout(l);
-    L.memory(new Memory(l.size()));
-    MemoryLayoutPA     W = new MemoryLayoutPA();
-    W.layout(w);
-    W.memory(new Memory(w.size()));
-
-    for (int j = 0; j < A.size; j++) L.at(a, j).setInt(10+j);
-
-    W.at(i).setInt(2);
-    L.at(A).moveDown(W.at(i), W.at(B));
-  //L.at(A, W.at(z)).moveUp(W.at(i), W.at(B, W.at(z)));
-    //stop(L);
-    ok(L, """
-Line T       At      Wide       Size    Indices        Value   Name
-   1 A        0        48          6                           A
-   2 V        0         8               0                 10     a
-   3 V        8         8               1                 11     a
-   4 V       16         8               2                 13     a
-   5 V       24         8               3                 14     a
-   6 V       32         8               4                 15     a
-   7 V       40         8               5                 15     a
-""");
-
-  //stop(W);
-  ok(W, """
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        64                                      S
-   2 V        0         8                                  0     z
-   3 V        8         8                                  2     i
-   4 A       16        48          6                             A
-   5 V       16         8               0                 10       a
-   6 V       24         8               1                 11       a
-   7 V       32         8               2                 12       a
-   8 V       40         8               3                 13       a
-   9 V       48         8               4                 14       a
-  10 V       56         8               5                 15       a
 """);
    }
 
@@ -1146,12 +966,8 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_base();
     test_based_array();
     test_move();
-    //test_move_across();
     test_set_inc_dec_get();
-    test_boolean_constant();
     test_addressing();
-    //test_move_up();
-    //test_move_down();
     test_zero();
     test_boolean_result();
     test_is_ones_or_zeros();
