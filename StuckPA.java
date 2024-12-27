@@ -2,8 +2,8 @@
 // StuckSA on a bit machine - completed on Christmas Eve!
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
-package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
-// can setInt generate an instruction ?
+package com.AppaApps.Silicon;                                                   // Design, simulate and layout a binary tree on a silicon chip.
+
 abstract class StuckPA extends Test                                             // A fixed size stack of ordered key, data pairs
  {abstract int maxSize();                                                       // The maximum number of entries in the stuck.
   abstract int bitsPerKey();                                                    // The number of bits per key
@@ -13,7 +13,7 @@ abstract class StuckPA extends Test                                             
   final MemoryLayoutPA M = new MemoryLayoutPA();                                // Memory for stuck
   final MemoryLayoutPA C = new MemoryLayoutPA();                                // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
   final MemoryLayoutPA T = new MemoryLayoutPA();                                // Memory for transaction intermediates
-  ProgramPA            P = new ProgramPA();                                       // The program to be written to to describe the actions on the stuck.  The caller can provide a different one as this field is not final
+  ProgramPA            P = new ProgramPA();                                     // The program to be written to to describe the actions on the stuck.  The caller can provide a different one as this field is not final
 
   Layout.Variable   sKey;                                                       // Key in a stuck
   Layout.Array      Keys;                                                       // Array of keys
