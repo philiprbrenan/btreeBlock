@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// BtreeSA with transaction in bit memory
+// BtreeSP with transaction in bit memory
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, layout and simulate a btree in a block on the surface of a silicon chip.
