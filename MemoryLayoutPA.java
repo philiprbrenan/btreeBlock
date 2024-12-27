@@ -258,7 +258,7 @@ class MemoryLayoutPA extends Test                                               
 
 //D1 Boolean                                                                    // Boolean operations on fields held in memories.
 
-    private boolean isZero()                                                    // Whether the field is all zero
+    boolean isZero()                                                            // Whether the field is all zero
      {z();
       for(int i = 0; i < width; ++i)
        {z(); if (getBit(i)) {z(); return false;}
@@ -276,7 +276,7 @@ class MemoryLayoutPA extends Test                                               
        };
      }
 
-    private boolean isOnes()                                                    // Whether the field is all ones
+    boolean isOnes()                                                            // Whether the field is all ones
      {z();
       for(int i = 0; i < width; ++i)
        {z(); if (!getBit(i)) {z(); return false;}
