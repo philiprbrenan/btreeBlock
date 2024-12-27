@@ -1389,18 +1389,10 @@ abstract class BtreeSA extends Test                                             
     hasLeavesForChildren();
     if (T.at(hasLeavesForChildren).isOnes())                                    // Children are leaves
      {z();
-      tt(node_leafBase, l);
-      leafBase();
-      lL.base(T.at(leafBase));
-      tt(node_leafBase, r);
-      leafBase();
-      lR.base(T.at(leafBase));
-      tt(node_leafSize, l);
-      leafSize();
-      tt(nl, leafSize);
-      tt(node_leafSize, r);
-      leafSize();
-      tt(nr, leafSize);
+      tt(node_leafBase, l); leafBase(); lL.base(T.at(leafBase));
+      tt(node_leafBase, r); leafBase(); lR.base(T.at(leafBase));
+      tt(node_leafSize, l); leafSize(); tt(nl, leafSize);
+      tt(node_leafSize, r); leafSize(); tt(nr, leafSize);
 
       if (T.at(nl).getInt() + T.at(nr).getInt() >= maxKeysPerLeaf())            // Combined body would be too big
        {z(); T.at(stolenOrMerged).zero();
