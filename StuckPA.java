@@ -3,17 +3,17 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
-
+// can setInt generate an instruction ?
 abstract class StuckPA extends Test                                             // A fixed size stack of ordered key, data pairs
  {abstract int maxSize();                                                       // The maximum number of entries in the stuck.
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
   abstract int bitsPerSize();                                                   // The number of bits in size field
 
-  final MemoryLayout M = new MemoryLayout();                                    // Memory for stuck
-  final MemoryLayout C = new MemoryLayout();                                    // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
-  final MemoryLayout T = new MemoryLayout();                                    // Memory for transaction intermediates
-  Program            P = new Program();                                         // The program to be written to to describe the actions on the stuck.  The caller can provide a different one as this field is not final
+  final MemoryLayoutPA M = new MemoryLayoutPA();                                // Memory for stuck
+  final MemoryLayoutPA C = new MemoryLayoutPA();                                // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
+  final MemoryLayoutPA T = new MemoryLayoutPA();                                // Memory for transaction intermediates
+  ProgramPA            P = new ProgramPA();                                       // The program to be written to to describe the actions on the stuck.  The caller can provide a different one as this field is not final
 
   Layout.Variable   sKey;                                                       // Key in a stuck
   Layout.Array      Keys;                                                       // Array of keys
@@ -30,6 +30,7 @@ abstract class StuckPA extends Test                                             
   Layout.Variable   tKey;                                                       // The retrieved key
   Layout.Variable  tData;                                                       // The retrieved data
   Layout.Variable   size;                                                       // The current size of the stuck
+  Layout.Variable   full;                                                       // Used by isFull
   Layout.Bit       equal;                                                       // The result of an equal operation
   Layout.Structure  temp;                                                       // Transaction intermediate fields
 
@@ -45,14 +46,22 @@ abstract class StuckPA extends Test                                             
     C.memory(new Memory(C.layout.size()));
     T.layout(transactionLayout());
     T.memory(new Memory(T.layout.size()));
+    program(P);
    }
 
   void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
    {z();  M.base(Base);
    }
 
-  void base(MemoryLayout.At Base)                                               // Set the base address of the stuck in the memory layout containing the stuck
+  void base(MemoryLayoutPA.At Base)                                             // Set the base address of the stuck in the memory layout containing the stuck
    {z();  M.base(Base.setOff().result);
+   }
+
+  void program(ProgramPA program)                                               // Set the program in which the various components should generate code
+   {z();  P = program;
+    M.program(P);
+    C.program(P);
+    T.program(P);
    }
 
   StuckPA copy()                                                                // Copy a stuck definition
@@ -73,6 +82,7 @@ abstract class StuckPA extends Test                                             
     child.M.memory(parent.M.memory);
     child.M.layout(parent.M.layout);
     child.M.base  (parent.M.base);
+    child.program(parent.P);
     return child;
    }
 
@@ -100,8 +110,9 @@ abstract class StuckPA extends Test                                             
        tKey = l.variable (    "key", bitsPerKey());
       tData = l.variable (   "data", bitsPerData());
        size = l.variable (   "size", bitsPerSize());
+       full = l.variable (   "full", bitsPerSize());
       equal = l.bit      (  "equal");
-       temp = l.structure("temp", search, limit, isFull, isEmpty, found, index, tKey, tData, size, equal);
+       temp = l.structure("temp", search, limit, isFull, isEmpty, found, index, tKey, tData, size, full, equal);
     return l.compile();
    }
 
@@ -109,17 +120,19 @@ abstract class StuckPA extends Test                                             
 
   void size()                                                                   // The current number of key elements in the stuck
    {z();
-    P.new I() {void a() {T.at(size).move(M.at(currentSize));}};
+    T.at(size).move(M.at(currentSize));
    }
 
   void isFull()                                                                 // Check the stuck is full
    {z();
-    P.new I() {void a() {T.at(size).greaterThanOrEqual(T.constant(maxSize()), T.at(isFull));}};
+    P.new I() {void a() {T.at(full).setInt(maxSize());}};
+    T.at(size).greaterThanOrEqual(T.at(full), T.at(isFull));
    }
 
   void isEmpty()                                                                // Check the stuck is empty
    {z();
-    P.new I() {void a() {T.at(size).equal(T.constant(0), T.at(isEmpty));}};
+    P.new I() {void a() {T.at(full).setInt(0);}};
+    T.at(size).equal(T.at(full), T.at(isEmpty));
    }
 
   void assertNotFull()                                                          // Assert the stuck is not full
@@ -186,34 +199,29 @@ abstract class StuckPA extends Test                                             
     sizeFullEmpty();
    }
 
-  MemoryLayout.At key()                                                         // Refer to key
+  MemoryLayoutPA.At key()                                                       // Refer to key
    {z();
     return M.at(sKey, T.at(index));
    }
 
-  MemoryLayout.At data()                                                        // Refer to data
-   {z();
-    return M.at(sData, T.at(index));
+  MemoryLayoutPA.At data()                                                      // Refer to data
+   {z(); return M.at(sData, T.at(index));
    }
 
   void moveKey()                                                                // Move a key from the stuck to this transaction
-   {z();
-    P.new I() {void a() {T.at(tKey ).move(key ().setOff());}};
+   {z(); T.at(tKey ).move(key ());
    }
 
   void moveData()                                                               // Move a key from the stuck to this transaction
-   {z();
-    P.new I() {void a() {T.at(tData).move(data().setOff());}};
+   {z(); T.at(tData).move(data());
    }
 
   void setKey  ()                                                               // Set the indexed key
-   {z();
-    P.new I() {void a() {key().setOff().move(T.at(tKey));}};
+   {z(); key().move(T.at(tKey));
    }
 
   void setData ()                                                               // Set the indexed data
-   {z();
-    P.new I() {void a() {data().setOff().move(T.at(tData));}};
+   {z(); data().move(T.at(tData));
    }
 
   void setKeyData()    {z(); setKey(); setData();}                              // Set a key, data element in the stuck
@@ -222,10 +230,11 @@ abstract class StuckPA extends Test                                             
 
   void push()                                                                   // Push an element onto the stuck
    {z(); action = "push";
-    size();
     isFull();
     assertNotFull();
-    P.new I() {void a() {T.at(index).move(T.at(size));  }};
+    size();
+
+    T.at(index).move(T.at(size));
     setKeyData();
     inc();
     sizeFullEmpty();
@@ -237,10 +246,12 @@ abstract class StuckPA extends Test                                             
     isFull();
     assertNotFull();
     setFound();
-    P.new I() {void a() {M.at(Keys).moveUp(T.constant(0), C.at(Keys));}};
-    P.new I() {void a() {M.at(Data).moveUp(T.constant(0), C.at(Data));}};
+    P.new I() {void a() {T.at(index).setInt(0);}};
+    M.at(Keys).moveUp(T.at(index), C.at(Keys));
+    P.new I() {void a() {T.at(index).setInt(0);}};
+    M.at(Data).moveUp(T.at(index), C.at(Data));
     inc();
-    P.new I() {void a() {T.at(index).setInt(0);                       }};
+    P.new I() {void a() {T.at(index).setInt(0);}};
     setKeyData();
     sizeFullEmpty();
    }
@@ -252,8 +263,8 @@ abstract class StuckPA extends Test                                             
     assertNotEmpty();
     dec();
     setFound();
-    P.new I() {void a() {T.at(size).dec();            }};
-    P.new I() {void a() {T.at(index).move(T.at(size));}};
+    T.at(size).dec();
+    T.at(index).move(T.at(size));
     moveKey(); moveData();
     sizeFullEmpty();
    }
@@ -264,11 +275,11 @@ abstract class StuckPA extends Test                                             
     isEmpty();
     assertNotEmpty();
     setFound();
-    P.new I() {void a() {T.at(index).setInt(0);                                  }};
+    P.new I() {void a() {T.at(index).setInt(0);}};
     moveKey(); moveData();
-    P.new I() {void a() {T.zero();                                               }};
-    P.new I() {void a() {M.at(Keys).setOff().moveDown(T.constant(0), C.at(Keys));}};
-    P.new I() {void a() {M.at(Data).setOff().moveDown(T.constant(0), C.at(Data));}};
+    T.zero();
+    M.at(Keys).setOff().moveDown(T.at(index), C.at(Keys));
+    M.at(Data).setOff().moveDown(T.at(index), C.at(Data));
     dec();
     sizeFullEmpty();
    }
@@ -285,12 +296,12 @@ abstract class StuckPA extends Test                                             
   void setElementAt()                                                           // Set an element either in range or one above the current range
    {z(); action = "setElementAt";
     size();
-    P.new I() {void a() {T.at(index).equal(T.at(size), T.at(equal));}};         // Extended range
+    T.at(index).equal(T.at(size), T.at(equal));                                 // Extended range
     P.new If(T.at(equal))
      {void Then()
        {setKeyData();
         inc();
-        P.new I() {void a() {T.at(size).inc();}};
+        T.at(size).inc();
        }
       void Else()                                                               // In range
        {assertInNormal(); setKeyData();
@@ -301,13 +312,14 @@ abstract class StuckPA extends Test                                             
 
   void insertElementAt()                                                        // Insert an element at the indicated location shifting all the remaining elements up one
    {z(); action = "insertElementAt";
+
     size();
     isFull();
     assertInExtended();
-    P.new I() {void a() {T.zero();                                   }};
-    P.new I() {void a() {M.at(Keys).moveUp(T.at(index), C.at(Keys));}};
-    P.new I() {void a() {M.at(Data).moveUp(T.at(index), C.at(Data));}};
-    P.new I() {void a() {M.at(currentSize).inc();                    }};
+    T.zero();
+    M.at(Keys).moveUp(T.at(index), C.at(Keys));
+    M.at(Data).moveUp(T.at(index), C.at(Data));
+    M.at(currentSize).inc();
     setKeyData();
     sizeFullEmpty();
    }
@@ -319,10 +331,10 @@ abstract class StuckPA extends Test                                             
     setFound();
     moveKey();
     moveData();
-    P.new I() {void a() {T.zero();                                    }};
-    P.new I() {void a() {M.at(Keys).moveDown(T.at(index), C.at(Keys));}};
-    P.new I() {void a() {M.at(Data).moveDown(T.at(index), C.at(Data));}};
-    P.new I() {void a() {M.at(currentSize).setOff().dec();            }};
+    T.zero();
+    M.at(Keys).moveDown(T.at(index), C.at(Keys));
+    M.at(Data).moveDown(T.at(index), C.at(Data));
+    M.at(currentSize).setOff().dec();
     sizeFullEmpty();
    }
 
@@ -343,9 +355,10 @@ abstract class StuckPA extends Test                                             
     isEmpty();
     assertNotEmpty();
     setFound();
-    P.new I() {void a() {T.at(index).move(M.at(currentSize).setOff());}};
-    P.new I() {void a() {T.at(index).dec();                           }};
-    moveKey(); moveData();
+    T.at(index).move(M.at(currentSize).setOff());
+    T.at(index).dec();
+    moveKey();
+    moveData();
    }
 
   void search()                                                                 // Search for an element within all elements of the stuck
@@ -365,16 +378,16 @@ abstract class StuckPA extends Test                                             
      {void code()
        {for (int I = 0; I < maxSize(); I++)                                     // Search
          {final int i = I;
-          P.new I() {void a() {T.constant(i).equal(T.at(size), T.at(equal));}};
-          P.new I() {void a() {P.GoOn(end, T.at(equal));}};                     // Reached the upper limit of the stuck
           P.new I() {void a() {T.at(index).setInt(i);}};
+          T.at(index).equal(T.at(size), T.at(equal));
+          P.GoOn(end, T.at(equal));                                             // Reached the upper limit of the stuck
           moveKey();
-          P.new I() {void a() {T.at(tKey).equal(T.at(search), T.at(equal));}};
+          T.at(tKey).equal(T.at(search), T.at(equal));
           P.new If (T.at(equal))                                                // Found an equal key
            {void Then()
              {setFound();
               moveData();
-              P.new I() {void a() {P.Goto(end);}};
+              P.Goto(end);
              }
            };
          }
@@ -394,23 +407,23 @@ abstract class StuckPA extends Test                                             
      };
 
     P.new I() {void a() {T.at(found).setInt(0);}};                              // Assume we will not find a match
-    P.new I() {void a() {T.at(index).move(T.at(size));}};                       // Index top if no match found
+    T.at(index).move(T.at(size));                                               // Index top if no match found
 
     P.new Block()
      {void code()
        {for (int I = 0; I < maxSize(); I++)                                     // Search
          {final int i = I;
-          P.new I() {void a() {T.constant(i).equal(T.at(size), T.at(equal));}};
-          P.new I() {void a() {P.GoOn(end, T.at(equal));}};                     // Reached the upper limit of the stuck
           P.new I() {void a() {T.at(index).setInt(i);}};
+          T.at(index).equal(T.at(size), T.at(equal));
+          P.GoOn(end, T.at(equal));                                             // Reached the upper limit of the stuck
           moveKey();
-          P.new I() {void a() {T.at(tKey).greaterThanOrEqual(T.at(search), T.at(equal));}};
+          T.at(tKey).greaterThanOrEqual(T.at(search), T.at(equal));
           P.new If (T.at(equal))                                                // Found an equal key or greater
            {void Then()
              {setFound();
               moveKey();
               moveData();
-              P.new I() {void a() {P.Goto(end);}};
+              P.Goto(end);
              }
            };
          }
@@ -467,6 +480,7 @@ abstract class StuckPA extends Test                                             
      };
     s.M.memory(new Memory(s.M.layout.size()+offset));
     s.base(offset);
+
     return s;
    }
 
@@ -620,7 +634,7 @@ StuckPA(maxSize:8 size:3)
 
   static void test_unshift()
    {StuckPA s = test_load();
-    final MemoryLayout m = s.T;
+    final MemoryLayoutPA m = s.T;
 
     s.T.at(s.tKey).setInt(9); s.T.at(s.tData).setInt(9);
     s.unshift();
@@ -816,7 +830,7 @@ Transaction(action:search search:2 limit:0 found:1 index:0 key:2 data:1 size:4 i
     s.P.run(); s.P.clear();
     //stop(s);
     ok(s.print(), """
-Transaction(action:search search:3 limit:0 found:0 index:3 key:8 data:1 size:4 isFull:0 isEmpty:0)
+Transaction(action:search search:3 limit:0 found:0 index:4 key:8 data:1 size:4 isFull:0 isEmpty:0)
 """);
     s.P.new I() {void a() {s.T.at(s.search).setInt(8);  }};
     s.search();
@@ -844,7 +858,7 @@ Transaction(action:search search:4 limit:1 found:1 index:1 key:4 data:2 size:3 i
     s.P.run(); s.P.clear();
     //stop(t);
     ok(s.print(), """
-Transaction(action:search search:8 limit:1 found:0 index:2 key:6 data:2 size:3 isFull:0 isEmpty:0)
+Transaction(action:search search:8 limit:1 found:0 index:3 key:6 data:2 size:3 isFull:0 isEmpty:0)
 """);
    }
 
@@ -885,7 +899,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:1 found:1 index:
     s.P.run(); s.P.clear();
     //stop(t);
     ok(s.print(), """
-Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:2 key:6 data:3 size:3 isFull:0 isEmpty:0)
+Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:3 key:6 data:3 size:3 isFull:0 isEmpty:0)
 """);
    }
 
@@ -898,7 +912,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:
     Layout.Variable  c = l.variable ("c", N);
     Layout.Structure d = l.structure("d", a, b, c);
     l.layoutName = "aaa";
-    MemoryLayout  M = new MemoryLayout();
+    MemoryLayoutPA  M = new MemoryLayoutPA();
     M.layout(l.compile());
     M.memory(new Memory(l.size()));
 
@@ -999,6 +1013,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    //test_insert_element_at();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
