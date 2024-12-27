@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// BtreePA using Pseudo Assembler
+// BtreeSA in pseudo assembler
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, layout and simulate a btree in a block on the surface of a silicon chip.
@@ -7,8 +7,9 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 abstract class BtreePA extends Test                                             // Manipulate a btree using static methods and memory
- {final MemoryLayout M = new MemoryLayout();                                    // The memory layout of the btree
-  final MemoryLayout T = new MemoryLayout();                                    // The memory used to hold temporary variable used during a transaction on the btree
+ {final MemoryLayoutPA M = new MemoryLayoutPA();                                // The memory layout of the btree
+  final MemoryLayoutPA T = new MemoryLayoutPA();                                // The memory used to hold temporary variable used during a transaction on the btree
+  final Program        P = new Program();                                       // Program in which to generate instructions
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -54,24 +55,24 @@ abstract class BtreePA extends Test                                             
   final int Leaf_tr            = 2;                                             // Process a right node
   final int Leaf_length        = 3;                                             // Number of transaction types
 
-  final StuckSA[]branchTransactions;                                            // Transactions to use on branch stucks
-  final StuckSA[]  leafTransactions;                                            // Transactions to use on leaf stucks
+  final StuckPA[]branchTransactions;                                            // Transactions to use on branch stucks
+  final StuckPA[]  leafTransactions;                                            // Transactions to use on leaf stucks
 
-  final StuckSA bSize;                                                          // Branch size
-  final StuckSA bLeaf;                                                          // Check whether a node has leaves for children
-  final StuckSA bTop;                                                           // Get the size of a stuck
-  final StuckSA bFirstBranch;                                                   // Locate the first greater or equal key in a branch
-  final StuckSA bT;                                                             // Process a parent node
-  final StuckSA bL;                                                             // Process a left node
-  final StuckSA bR;                                                             // Process a right node
+  final StuckPA bSize;                                                          // Branch size
+  final StuckPA bLeaf;                                                          // Check whether a node has leaves for children
+  final StuckPA bTop;                                                           // Get the size of a stuck
+  final StuckPA bFirstBranch;                                                   // Locate the first greater or equal key in a branch
+  final StuckPA bT;                                                             // Process a parent node
+  final StuckPA bL;                                                             // Process a left node
+  final StuckPA bR;                                                             // Process a right node
 
-  final StuckSA lSize;                                                          // Branch size
-  final StuckSA lLeaf;                                                          // Check whether a node has leaves for children
-  final StuckSA lEqual;                                                         // Locate an equal key
-  final StuckSA lFirstLeaf;                                                     // Locate the first greater or equal key in a leaf
-  final StuckSA lT;                                                             // Process a parent node
-  final StuckSA lL;                                                             // Process a left node
-  final StuckSA lR;                                                             // Process a right node
+  final StuckPA lSize;                                                          // Branch size
+  final StuckPA lLeaf;                                                          // Check whether a node has leaves for children
+  final StuckPA lEqual;                                                         // Locate an equal key
+  final StuckPA lFirstLeaf;                                                     // Locate the first greater or equal key in a leaf
+  final StuckPA lT;                                                             // Process a parent node
+  final StuckPA lL;                                                             // Process a left node
+  final StuckPA lR;                                                             // Process a right node
 
   static boolean debug = false;                                                 // Debugging enabled
 
@@ -85,16 +86,18 @@ abstract class BtreePA extends Test                                             
     M.layout(layout());
     M.layout.layoutName = "Main";
     M.memory(new Memory(M.layout.size()));
+    M.program(P);
 
     T.layout(transactionLayout());                                              // Memory and layout of memory used by a transaction against the btree
     T.layout.layoutName = "transaction";
     T.memory(new Memory(T.layout.size()));
+    T.program(P);
 
      {final int N = Branch_length;                                              // Preallocate transactions used on branch stucks
-      branchTransactions = new StuckSA[N];
+      branchTransactions = new StuckPA[N];
 
       for (int i = 0; i < N; i++)
-       {final StuckSA b = branchTransactions[i] = new StuckSA()
+       {final StuckPA b = branchTransactions[i] = new StuckPA()
          {int     maxSize() {return BtreePA.this.maxKeysPerBranch()+1;}         // Not forgetting top next
           int  bitsPerKey() {return BtreePA.this.bitsPerKey();}
           int bitsPerData() {return BtreePA.this.bitsPerNext();}
@@ -103,14 +106,15 @@ abstract class BtreePA extends Test                                             
          b.M.memory(M.memory);
          b.M.layout.layoutName = "branchMain";
          b.T.layout.layoutName = "branch";
+         b.P = b.M.P = b.T.P = b.C.program = P;
         }
       }
 
      {final int N = Leaf_length;                                                // Preallocate transactions used on leaf stucks
-      leafTransactions = new StuckSA[N];
+      leafTransactions = new StuckPA[N];
 
       for (int i = 0; i < N; i++)
-       {final StuckSA l = leafTransactions[i] = new StuckSA()
+       {final StuckPA l = leafTransactions[i] = new StuckPA()
          {int     maxSize() {return BtreePA.this.maxKeysPerLeaf();}
           int  bitsPerKey() {return BtreePA.this.bitsPerKey();}
           int bitsPerData() {return BtreePA.this.bitsPerData();}
@@ -119,6 +123,7 @@ abstract class BtreePA extends Test                                             
          l.M.memory(M.memory);
          l.M.layout.layoutName = "leafMain";
          l.T.layout.layoutName = "leaf";
+         l.P = l.M.P = l.T.P = l.C.P = P;
        }
      }
 
@@ -154,7 +159,7 @@ abstract class BtreePA extends Test                                             
    }
 
   static BtreePA btreeSA(final int leafKeys, int branchKeys)                    // Define a test btree with the specified dimensions
-   {return  new BtreePA()
+   {return  new BtreeSA()
      {int maxSize         () {return testMaxSize;}
       int maxKeysPerLeaf  () {return    leafKeys;}
       int maxKeysPerBranch() {return  branchKeys;}
@@ -169,7 +174,7 @@ abstract class BtreePA extends Test                                             
    {z();
     final BtreePA btree = this;
 
-    final StuckSA leafStuck = new StuckSA()                                     // Leaf
+    final StuckPA leafStuck = new StuckPA()                                     // Leaf
      {int               maxSize() {return btree.maxKeysPerLeaf();}
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerData();}
@@ -177,7 +182,7 @@ abstract class BtreePA extends Test                                             
      };
     leafStuck.T.layout.layoutName = "leaf";
 
-    final StuckSA branchStuck = new StuckSA()                                   // Branch
+    final StuckPA branchStuck = new StuckPA()                                   // Branch
      {int               maxSize() {return btree.maxKeysPerBranch()+1;}          // Not forgetting top next
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerNext();}
@@ -691,7 +696,7 @@ abstract class BtreePA extends Test                                             
     T.at(node_leafSize).setInt(node);
     leafSize();
     final int     K = T.at(leafSize).getInt();
-    final StuckSA t = lLeaf.copy();
+    final StuckPA t = lLeaf.copy();
     T.at(node_leafBase).setInt(node); leafBase();
     t.base(T.at(leafBase));
     for  (int i = 0; i < K; i++)
@@ -709,7 +714,7 @@ abstract class BtreePA extends Test                                             
 
     if (K > 0)                                                                  // Branch has key, next pairs
      {z();
-      final StuckSA t = bLeaf.copy();
+      final StuckPA t = bLeaf.copy();
       T.at(node_branchBase).setInt(node); branchBase();
       t.base(T.at(branchBase));
       for  (int i = 0; i < K; i++)
@@ -745,7 +750,7 @@ abstract class BtreePA extends Test                                             
     leafSize();
     final int     K = T.at(leafSize).getInt();
 
-    final StuckSA t = lLeaf.copy();
+    final StuckPA t = lLeaf.copy();
     T.at(node_leafBase).setInt(node); leafBase();
     t.base(T.at(leafBase));
 
@@ -768,7 +773,7 @@ abstract class BtreePA extends Test                                             
     final int K = T.at(branchSize).getInt();
 
     if (K > 0)                                                                  // Branch has key, next pairs
-     {final StuckSA t = bLeaf.copy();
+     {final StuckPA t = bLeaf.copy();
       T.at(node_branchBase).setInt(node); branchBase();
       t.base(T.at(branchBase));
       for  (int i = 0; i < K; i++)
