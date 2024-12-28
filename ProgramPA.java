@@ -22,10 +22,10 @@ class ProgramPA extends Test                                                    
 
   class I                                                                       // Instruction definition
    {int instructionNumber;                                                      // Instruction number
-    final String definition = traceBack();                                      // Location of code that defined this instruction
+    final String traceBack = traceBack();                                       // Location of code that defined this instruction
     I()                                                                         // Define an instruction
      {if (running) stop("Cannot define instructions during program execution",
-       definition);
+       traceBack);
       instructionNumber = code.size(); code.push(this);
      }
     void   a() {}                                                               // Action performed by instruction
@@ -62,7 +62,7 @@ class ProgramPA extends Test                                                    
    {z();
     new I()
      {void a() {z(); step = label.instruction-1;}                               // The program execution for loop will increment
-      String n() {return "Go to "+(label.instruction+1);}
+      String n() {return "Go to "+(label.instruction+1);}                       // One based with no auto increment from run
      };
    }
   void GoOn(Label label, MemoryLayoutPA.At condition)                           // Go to a specified label if a memory location is on, i.e. not zero
