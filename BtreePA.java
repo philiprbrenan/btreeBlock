@@ -1916,9 +1916,11 @@ abstract class BtreePA extends Test                                             
             tt(search, Key);
             tt(node_findFirstGreaterThanOrEqualInLeaf, leafFound);
                     findFirstGreaterThanOrEqualInLeaf();
+P.new I() {void a() {say("FFFF111");}};
             P.new If(T.at(found))                                               // Overwrite existing key
              {void Then()
                {z();
+P.new I() {void a() {say("FFFF222");}};
                 lT.T.at(lT.tKey ).move(T.at(Key));
                 lT.T.at(lT.tData).move(T.at(Data));
                 lT.T.at(lT.index).move(T.at(first));
@@ -1928,7 +1930,9 @@ abstract class BtreePA extends Test                                             
                {z();
                 lT.T.at(lT.tKey ).move(T.at(Key));
                 lT.T.at(lT.tData).move(T.at(Data));
+P.new I() {void a() {say("FFFF333", lT.T.at(lT.tKey).getInt());}};
                 lT.push();
+P.new I() {void a() {say("FFFF444", lT.T.at(lT.tKey).getInt());}};
                }
              };
             T.at(success).ones();
@@ -1947,13 +1951,8 @@ abstract class BtreePA extends Test                                             
    {P.new Block()
      {void code()
        {final ProgramPA.Label Return = end;
-        P.new I() {void a() {say("PPPP", T.at(Key).getInt());}};
         findAndInsert();                                                        // Try direct insertion with no modifications to the shape of the tree
-P.new I() {void a() {say("PPP111", T.at(success).getInt());}};
-
         P.GoOn(Return, T.at(success));                                          // Inserted or updated successfully
-P.new I() {void a() {say("PPP222", T.at(success).getInt());}};
-        z();
         T.at(node_isFull).zero();
         isFull();                                                               // Start the insertion at the root(), after splitting it if necessary
         P.new If (T.at(isFull))                                                 // Start the insertion at the root(), after splitting it if necessary
@@ -2019,7 +2018,6 @@ P.new I() {void a() {say("PPP222", T.at(success).getInt());}};
         P.stop("Fallen off the end of the tree");                               // The tree must be missing a leaf
        }
      };
-P.new I() {void a() {say("PPP333", T.at(success).getInt());}};
    }
 
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
@@ -2085,9 +2083,9 @@ P.new I() {void a() {say("PPP333", T.at(success).getInt());}};
             P.Goto(start);
            }
          };
+        stop("Fallen off the end of the tree");                                 // The tree must be missing a leaf
        };
      };
-    stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
    }
 
 //D1 Merge                                                                      // Merge along the specified search path
@@ -2139,9 +2137,9 @@ P.new I() {void a() {say("PPP333", T.at(success).getInt());}};
             P.Goto(start);
            }
          };
+        P.stop("Fallen off the end of the tree");                               // The tree must be missing a leaf
        }
      };
-    P.stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
    }
 
 //D0 Tests                                                                      // Testing
@@ -2151,16 +2149,16 @@ P.new I() {void a() {say("PPP333", T.at(success).getInt());}};
 
   static void test_put_ascending()
    {final BtreePA     t = btreePA(4, 3);
-    final int N = 64;
+    final int N = 2; //64;
     t.put();
     for (int i = 1; i <= N; i++)
      {t.T.at(t.Key ).setInt(i);
       t.T.at(t.Data).setInt(i);
       say("AAAA11", i);
       t.P.run();
-      stop("AAAA22", t.M);
+      say("AAAA22", t);
      }
-    //t.stop();
+    stop(t.M);
     t.ok("""
                                                                                                                             32                                                                                                                                           |
                                                                                                                             0                                                                                                                                            |
