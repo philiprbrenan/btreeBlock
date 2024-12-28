@@ -110,6 +110,38 @@ class ProgramPA extends Test                                                    
     abstract void code();
    }
 
+  abstract class Loop                                                           // A loop that is executed a specified nunmber of times
+   {final Label start = new Label(), next = new Label(), end = new Label();     // Labels to restart currrent iteration, start the next iteration, or exit the loop
+    final MemoryLayoutPA M = new MemoryLayoutPA() ;
+    final Layout    layout;
+    final Layout.Variable  index;
+    final Layout.Bit     compare;
+    final Layout.Variable  limit;
+    final Layout.Structure structure;
+    final ProgramPA P = ProgramPA.this;
+
+    Loop(int Limit, int Width)
+     {layout    = Layout.layout();
+      index     = layout.variable ("index",   Width);
+      limit     = layout.variable ("limit",   Width);
+      compare   = layout.bit      ("compare");
+      structure = layout.structure("structure", index, limit, compare);
+      M.layout(layout.compile());
+      M.memory (new Memory(layout.size()));
+      M.program(ProgramPA.this);
+      M.at(limit).setInt(Limit);
+      M.at(index).zero();
+      start.set();
+      code();
+      next.set();
+      M.at(index).inc();
+      M.at(index).lessThan(M.at(limit), M.at(compare));
+      P.GoOn(start, M.at(compare));
+      end.set();
+     }
+    abstract void code();
+   }
+
 //D1 Print                                                                      // Print a program
 
   public String toString()
@@ -373,6 +405,18 @@ Line T       At      Wide       Size    Indices        Value   Name
     try {p.run();} catch(RuntimeException e) {};
    }
 
+  static void test_loop()
+   {ProgramPA p = new ProgramPA();
+    final Stack<Integer> f = new Stack<>();
+    p.new Loop(8, 4)
+     {void code()
+       {P.new I() {void a() {f.push(M.at(index).getInt());}};
+       }
+     };
+    p.run();
+    ok(f, "[0, 1, 2, 3, 4, 5, 6, 7]");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_inc();
     test_fibonacci();
@@ -381,6 +425,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_goOn();
     test_goOff();
     test_stop();
+    test_loop();
    }
 
   static void newTests()                                                        // Tests being worked on
