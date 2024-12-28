@@ -158,7 +158,6 @@ abstract class BtreePA extends Test                                             
     allocate(false);                                                            // The root is always at zero, which frees zero to act as the end of list marker on the free chain
     P.new I() {void a() {T.at(node_setLeaf).setInt(root);}};
     setLeaf();                                                                  // The root starts as a leaf
- P.run(); stop("AAAA", T.at(allocate).getInt(), M);
   }
 
   static BtreePA btreePA(final int leafKeys, int branchKeys)                    // Define a test btree with the specified dimensions
@@ -511,9 +510,9 @@ abstract class BtreePA extends Test                                             
     return L.compile();
    }
 
-  private void    isLeaf() {z(); T.at(IsLeaf).move(M.at(isLeaf, T.at(node_isLeaf)).setOff());}      // A leaf if true
-  private void   setLeaf() {z(); M.at(isLeaf, T.at(node_setLeaf))  .setOff().setInt(1);} // Set as leaf
-  private void setBranch() {z(); M.at(isLeaf, T.at(node_setBranch)).setOff().setInt(0);} // Set as branch
+  private void    isLeaf() {z(); T.at(IsLeaf).move(M.at(isLeaf, T.at(node_isLeaf)));}                            // A leaf if true
+  private void   setLeaf() {z(); P.new I() {void a() {M.at(isLeaf, T.at(node_setLeaf))  .setOff().setInt(1);}};} // Set as leaf
+  private void setBranch() {z(); P.new I() {void a() {M.at(isLeaf, T.at(node_setBranch)).setOff().setInt(0);}};} // Set as branch
 
   private void assertLeaf()
    {z();
@@ -531,7 +530,7 @@ abstract class BtreePA extends Test                                             
     isLeaf();
     P.new If (T.at(IsLeaf))
      {void Then()
-      {P.new I() {void a() {stop("Branch required");}};
+      {P.new I() {void a() {stop("Branch required", traceBack);}};
       }
     };
    }
@@ -1317,9 +1316,9 @@ abstract class BtreePA extends Test                                             
   private void mergeRoot()                                                      // Merge into the root
    {z();
     P.new Block()
-     {final ProgramPA.Label Return = end;
-      void code()
-       {T.at(node_isLeaf).zero();
+     {void code()
+       {final ProgramPA.Label Return = end;
+        T.at(node_isLeaf).zero();
         isLeaf();
         P.new If (T.at(IsLeaf))                                                 // Confirm we are on a branch
          {void Then()
@@ -1838,17 +1837,16 @@ abstract class BtreePA extends Test                                             
   public void find()                                                            // Find the leaf associated with a key in the tree
    {z();
     P.new Block()
-     {final ProgramPA.Label Return = end;
-      void code()
-       {T.at(node_isLeaf).zero();
-P.new I() {void a() {say("FFFF", T.at(search));}};
+     {void code()
+       {final ProgramPA.Label Return = end;
+        T.at(node_isLeaf).zero();
         isLeaf();
         P.new If (T.at(IsLeaf))                                                 // The root is a leaf
          {void Then()
            {tt(search, Key);
             T.at(node_findEqualInLeaf).setInt(root);
             findEqualInLeaf();
-            T.at(find).zero();
+            T.at(find).zero();                                                  // Found in root
             P.Goto(Return);
            }
          };
@@ -1889,7 +1887,8 @@ P.new I() {void a() {say("FFFF", T.at(search));}};
   private void findAndInsert()                                                  // Find the leaf that should contain this key and insert or update it is possible
    {P.new Block()
      {void code()
-       {find();
+       {final ProgramPA.Label Return = end;
+        find();
         tt(leafFound, find);                                                    // Find the leaf that should contain this key
         tt(node_leafBase, leafFound);
         leafBase();
@@ -1905,7 +1904,7 @@ P.new I() {void a() {say("FFFF", T.at(search));}};
             T.at(success).ones();
             T.at(inserted).zero();
             tt(findAndInsert, leafFound);
-            P.Goto(End);
+            P.Goto(Return);
            }
          };
 
@@ -1916,7 +1915,7 @@ P.new I() {void a() {say("FFFF", T.at(search));}};
            {z();
             tt(search, Key);
             tt(node_findFirstGreaterThanOrEqualInLeaf, leafFound);
-            findFirstGreaterThanOrEqualInLeaf();
+                    findFirstGreaterThanOrEqualInLeaf();
             P.new If(T.at(found))                                               // Overwrite existing key
              {void Then()
                {z();
@@ -1934,22 +1933,26 @@ P.new I() {void a() {say("FFFF", T.at(search));}};
              };
             T.at(success).ones();
             tt(findAndInsert, leafFound);
-            P.Goto(End);
+            P.Goto(Return);
            }
          };
+        T.at(success).zero();
        }
      };
-    z(); T.at(success).zero();
    }
 
 //D1 Insertion                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
 
   public void put()                                                             // Insert a key, data pair into the tree or update and existing key with a new datum
    {P.new Block()
-     {final ProgramPA.Label Return = end;
-      void code()
-       {findAndInsert();                                                        // Try direct insertion with no modifications to the shape of the tree
-        P.GoOn(Return, T.at(success));                                            // Inserted or updated successfully
+     {void code()
+       {final ProgramPA.Label Return = end;
+        P.new I() {void a() {say("PPPP", T.at(Key).getInt());}};
+        findAndInsert();                                                        // Try direct insertion with no modifications to the shape of the tree
+P.new I() {void a() {say("PPP111", T.at(success).getInt());}};
+
+        P.GoOn(Return, T.at(success));                                          // Inserted or updated successfully
+P.new I() {void a() {say("PPP222", T.at(success).getInt());}};
         z();
         T.at(node_isFull).zero();
         isFull();                                                               // Start the insertion at the root(), after splitting it if necessary
@@ -2013,9 +2016,10 @@ P.new I() {void a() {say("FFFF", T.at(search));}};
             P.Goto(start);
            }
          };
+        P.stop("Fallen off the end of the tree");                               // The tree must be missing a leaf
        }
      };
-    P.stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
+P.new I() {void a() {say("PPP333", T.at(success).getInt());}};
    }
 
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
@@ -2037,9 +2041,9 @@ P.new I() {void a() {say("FFFF", T.at(search));}};
 
   public void delete()                                                          // Delete a key from the tree and return its associated Data if the key was found.
    {P.new Block()                                                               // Step down through the tree, splitting as we go
-     {final ProgramPA.Label Return = end;
-      void code()
-       {T.at(node_mergeRoot).zero(); mergeRoot();
+     {void code()
+       {final ProgramPA.Label Return = end;
+        T.at(node_mergeRoot).zero(); mergeRoot();
 
         T.at(node_isLeaf).zero(); isLeaf();
         P.new If (T.at(IsLeaf))                                                 // Find and delete directly in root as a leaf
@@ -2090,9 +2094,9 @@ P.new I() {void a() {say("FFFF", T.at(search));}};
 
   private void merge()                                                          // Merge along the specified search path
    {P.new Block()                                                               // Step down through the tree, splitting as we go
-     {final ProgramPA.Label Return = end;
-      void code()
-       {mergeRoot();
+     {void code()
+       {final ProgramPA.Label Return = end;
+        mergeRoot();
         T.at(parent).zero();                                                    // Start at root
 
         T.at(mergeDepth).zero();
@@ -2148,13 +2152,12 @@ P.new I() {void a() {say("FFFF", T.at(search));}};
   static void test_put_ascending()
    {final BtreePA     t = btreePA(4, 3);
     final int N = 64;
+    t.put();
     for (int i = 1; i <= N; i++)
-     {stop("AAAAAA", t.M);
-
-      t.T.at(t.Key ).setInt(i);
+     {t.T.at(t.Key ).setInt(i);
       t.T.at(t.Data).setInt(i);
       say("AAAA11", i);
-      t.put();
+      t.P.run();
       stop("AAAA22", t.M);
      }
     //t.stop();
