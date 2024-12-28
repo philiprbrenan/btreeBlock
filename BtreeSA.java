@@ -1665,7 +1665,7 @@ abstract class BtreeSA extends Test                                             
       tt(search, Key);
       T.at(node_findEqualInLeaf).setInt(root);
       findEqualInLeaf();
-      T.at(find).zero();
+      T.at(find).zero();                                                        // Found in root
       return;
      }
 
