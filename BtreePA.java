@@ -4,6 +4,7 @@
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, layout and simulate a btree in a block on the surface of a silicon chip.
 // Need binary add so we compute the mid key
+// loop set counter anc check  in find, put delete
 import java.util.*;
 
 abstract class BtreePA extends Test                                             // Manipulate a btree using static methods and memory
@@ -330,6 +331,7 @@ abstract class BtreePA extends Test                                             
   Layout.Bit   hasLeavesForChildren;                                            // The node has leaves for children
   Layout.Bit         stolenOrMerged;                                            // A merge or steal operation succeeded
   Layout.Bit           pastMaxDepth;                                            // A merge or steal operation succeeded
+  Layout.Bit             nodeMerged;                                                                         // All sequential pairs of siblings have been offered a chance to merge
 
   Layout.Variable          leafBase;                                            // The offset of a leaf in memory
   Layout.Variable        branchBase;                                            // The offset of a branch in memory
@@ -352,6 +354,7 @@ abstract class BtreePA extends Test                                             
   Layout.Variable          putDepth;                                            // Current level being traversed by put
   Layout.Variable       deleteDepth;                                            // Current level being traversed by delete
   Layout.Variable        mergeDepth;                                            // Current level being traversed by merge
+  Layout.Variable        mergeIndex;                                            // Current indx of node being mereged across
 
   Layout.Variable  node_isLeaf;                                                 // The node to be used to implicitly parameterize each method call
   Layout.Variable  node_setLeaf;
@@ -422,6 +425,7 @@ abstract class BtreePA extends Test                                             
                         hasLeavesForChildren = L.bit      ("hasLeavesForChildren"                          );
                               stolenOrMerged = L.bit      ("stolenOrMerged"                                );
                                 pastMaxDepth = L.bit      ("pastMaxDepth"                                  );
+                                  nodeMerged = L.bit      ("nodeMerged"                                    );
 
                                     leafBase = L.variable ("leafBase"                                      , bitsPerNext());
                                   branchBase = L.variable ("branchBase"                                    , bitsPerNext());
@@ -445,6 +449,7 @@ abstract class BtreePA extends Test                                             
                                     putDepth = L.variable ("putDepth"                                      , bitsPerNext());
                                  deleteDepth = L.variable ("deleteDepth"                                   , bitsPerNext());
                                   mergeDepth = L.variable ("mergeDepth"                                    , bitsPerNext());
+                                  mergeIndex = L.variable ("mergeIndex"                                    , bitsPerNext());
 
                                  node_isLeaf = L.variable ("node_isLeaf"                                   , bitsPerNext());
                                 node_setLeaf = L.variable ("node_setLeaf"                                  , bitsPerNext());
@@ -480,10 +485,10 @@ abstract class BtreePA extends Test                                             
       nextFree, success, inserted, first, next, search, found, key, data,
       firstKey, lastKey, flKey, parentKey, lk, ld, rk, rd, index, nl, nr,
       l, r, splitParent, IsLeaf, isFull, isLow, hasLeavesForChildren,
-      stolenOrMerged, pastMaxDepth, leafBase, branchBase, leafSize, branchSize,
+      stolenOrMerged, pastMaxDepth, nodeMerged, leafBase, branchBase, leafSize, branchSize,
       top, Key, Data, find, findAndInsert, parent, child, leafFound,
       maxKeysPerLeaf, maxKeysPerBranch, two, MaxDepth,
-      findDepth, putDepth, deleteDepth, mergeDepth,
+      findDepth, putDepth, deleteDepth, mergeDepth, mergeIndex,
       node_isLeaf, node_setLeaf, node_setBranch, node_assertLeaf,
       node_assertBranch, allocLeaf, allocBranch, node_free,
       node_clear, node_erase, node_leafBase, node_branchBase,
@@ -1752,7 +1757,7 @@ abstract class BtreePA extends Test                                             
 
     P.new Block()
      {final ProgramPA.Label Return = end;
-       void code()
+      void code()
        {T.at(node_isLeaf).zero();
         isLeaf();
         P.new If (T.at(IsLeaf))                                                 // The root is a leaf
@@ -1772,7 +1777,7 @@ abstract class BtreePA extends Test                                             
          {void code()
            {T.at(findDepth).inc();
             T.at(findDepth).greaterThan(T.at(MaxDepth), T.at(pastMaxDepth));
-            P.GoOn(end, T.at(pastMaxDepth));                                      // Prevent runaway searches
+            P.GoOn(end, T.at(pastMaxDepth));                                    // Prevent runaway searches
 
             tt(search, Key);
             tt(node_findFirstGreaterThanOrEqualInBranch, parent);
@@ -1799,183 +1804,256 @@ abstract class BtreePA extends Test                                             
    }
 
   private void findAndInsert()                                                  // Find the leaf that should contain this key and insert or update it is possible
-   {z();
-    find();
-    tt(leafFound, find);                                                        // Find the leaf that should contain this key
-    tt(node_leafBase, leafFound);
-    leafBase();
-    lT.base(T.at(leafBase));
+   {P.new Block()
+     {void code()
+       {find();
+        tt(leafFound, find);                                                        // Find the leaf that should contain this key
+        tt(node_leafBase, leafFound);
+        leafBase();
+        lT.base(T.at(leafBase));
 
-    if (T.at(found).isOnes())                                                   // Found the key in the leaf so update it with the new data
-     {z();
-      lT.T.at(lT.tKey ).move(T.at(Key));
-      lT.T.at(lT.tData).move(T.at(Data));
-      lT.T.at(lT.index).move(T.at(index));
-      lT.setElementAt();
+        P.new If (T.at(found))                                                   // Found the key in the leaf so update it with the new data
+         {void Then()
+           {lT.T.at(lT.tKey ).move(T.at(Key));
+            lT.T.at(lT.tData).move(T.at(Data));
+            lT.T.at(lT.index).move(T.at(index));
+            lT.setElementAt();
 
-      T.at(success).ones();
-      T.at(inserted).zero();
-      tt(findAndInsert, leafFound);
-      return;
-     }
+            T.at(success).ones();
+            T.at(inserted).zero();
+            tt(findAndInsert, leafFound);
+            P.Goto(End);
+           }
+         };
 
-    tt(node_isFull, leafFound);
-    isFull();
-    if (T.at(isFull).isZero())                                                  // Leaf is not full so we can insert immediately
-     {z();
-      tt(search, Key);
-      tt(node_findFirstGreaterThanOrEqualInLeaf, leafFound);
-      findFirstGreaterThanOrEqualInLeaf();
-      if (T.at(found).isOnes())                                                 // Overwrite existing key
-       {z();
-        lT.T.at(lT.tKey ).move(T.at(Key));
-        lT.T.at(lT.tData).move(T.at(Data));
-        lT.T.at(lT.index).move(T.at(first));
-        lT.insertElementAt();
+        tt(node_isFull, leafFound);
+        isFull();
+        P.new If(T.at(isFull))                                                  // Leaf is not full so we can insert immediately
+         {void Else()
+           {z();
+            tt(search, Key);
+            tt(node_findFirstGreaterThanOrEqualInLeaf, leafFound);
+            findFirstGreaterThanOrEqualInLeaf();
+            P.new If(T.at(found))                                               // Overwrite existing key
+             {void Then()
+               {z();
+                lT.T.at(lT.tKey ).move(T.at(Key));
+                lT.T.at(lT.tData).move(T.at(Data));
+                lT.T.at(lT.index).move(T.at(first));
+                lT.insertElementAt();
+               }
+              void Else()                                                       // Insert into position
+               {z();
+                lT.T.at(lT.tKey ).move(T.at(Key));
+                lT.T.at(lT.tData).move(T.at(Data));
+                lT.push();
+               }
+             };
+            T.at(success).ones();
+            tt(findAndInsert, leafFound);
+            P.Goto(End);
+           }
+         };
        }
-      else                                                                      // Insert into position
-       {z();
-        lT.T.at(lT.tKey ).move(T.at(Key));
-        lT.T.at(lT.tData).move(T.at(Data));
-        lT.push();
-       }
-      T.at(success).ones();
-      tt(findAndInsert, leafFound);
-      return;
-     }
+     };
     z(); T.at(success).zero();
    }
 
 //D1 Insertion                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
 
   public void put()                                                             // Insert a key, data pair into the tree or update and existing key with a new datum
-   {z(); findAndInsert();                                                       // Try direct insertion with no modifications to the shape of the tree
-    if (T.at(success).isOnes()) return;                                         // Inserted or updated successfully
-    z();
-    T.at(node_isFull).zero();
-    isFull();                                                                   // Start the insertion at the root(), after splitting it if necessary
-    if (T.at(isFull).isOnes())                                                  // Start the insertion at the root(), after splitting it if necessary
-     {z();
-      T.at(node_isLeaf).zero(); isLeaf();
-      if (T.at(IsLeaf).isOnes()) {z(); splitLeafRoot();}
-      else                       {z(); splitBranchRoot();}
-      z();
-      findAndInsert();                                                          // Splitting the root() might have been enough
-      if (T.at(success).isOnes()) return;                                       // Inserted or updated successfully
-     }
-    z(); T.at(parent).zero();
+   {P.new Block()
+     {final ProgramPA.Label Return = end;
+      void code()
+       {findAndInsert();                                                        // Try direct insertion with no modifications to the shape of the tree
+        P.GoOn(Return, T.at(success));                                            // Inserted or updated successfully
+        z();
+        T.at(node_isFull).zero();
+        isFull();                                                               // Start the insertion at the root(), after splitting it if necessary
+        P.new If (T.at(isFull))                                                 // Start the insertion at the root(), after splitting it if necessary
+         {void Then()
+           {T.at(node_isLeaf).zero();
+            isLeaf();
+            P.new If (T.at(IsLeaf))
+             {void Then() {splitLeafRoot();}
+              void Else() {splitBranchRoot();}
+             };
+            z();
+            findAndInsert();                                                    // Splitting the root() might have been enough
+            P.GoOn(Return, T.at(success));                                      // Inserted or updated successfully
+           }
+         };
 
-    for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-     {z();
-      tt(search, Key);
-      tt(node_findFirstGreaterThanOrEqualInBranch, parent);
-              findFirstGreaterThanOrEqualInBranch();
-      tt(child, next);
-      tt(node_isLeaf, child); isLeaf();
-      if (T.at(IsLeaf).isOnes())                                                // Reached a leaf
-       {z();
-        tt(splitParent, parent);
-        tt(index, first);
-        tt(node_splitLeaf, child);
-        splitLeaf();                                                            // Split the child leaf
-        findAndInsert();
-        merge();
-        return;
-       }
-      z();
-      tt(node_isFull, child); isFull();
-      if (T.at(isFull).isOnes())
-       {z();
-        tt(splitParent, parent);
-        tt(index, first);
-        tt(node_splitBranch, child); splitBranch();                              // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
+        z(); T.at(parent  ).zero();
+        z(); T.at(putDepth).zero();
 
-        tt(search, Key);
-        tt(node_findFirstGreaterThanOrEqualInBranch, parent);
-        findFirstGreaterThanOrEqualInBranch();                                  // Perform the step down again as the split will have altered the local layout
-        tt(parent, next);
+        P.new Block()                                                           // Step down through the tree, splitting as we go
+         {void code()
+           {T.at(putDepth).inc();
+            T.at(putDepth).greaterThan(T.at(MaxDepth), T.at(pastMaxDepth));
+            P.GoOn(end, T.at(pastMaxDepth));                                    // Prevent runaway searches
+
+            tt(search, Key);
+            tt(node_findFirstGreaterThanOrEqualInBranch, parent);
+                    findFirstGreaterThanOrEqualInBranch();
+            tt(child, next);
+            tt(node_isLeaf, child); isLeaf();
+            P.new If (T.at(IsLeaf))                                             // Reached a leaf
+             {void Then()
+               {z();
+                tt(splitParent, parent);
+                tt(index, first);
+                tt(node_splitLeaf, child);
+                splitLeaf();                                                    // Split the child leaf
+                findAndInsert();
+                merge();
+                P.Goto(Return);
+               }
+             };
+            z();
+            tt(node_isFull, child); isFull();
+            P.new If (T.at(isFull))
+             {void Then()
+               {tt(splitParent, parent);
+                tt(index, first);
+                tt(node_splitBranch, child); splitBranch();                       // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
+
+                tt(search, Key);
+                tt(node_findFirstGreaterThanOrEqualInBranch, parent);
+                findFirstGreaterThanOrEqualInBranch();                            // Perform the step down again as the split will have altered the local layout
+                tt(parent, next);
+               }
+              void Else()                                                         // Step down directly as no split was required
+               {z(); tt(parent, child);
+               }
+             };
+            P.Goto(start);
+           }
+         };
        }
-      else                                                                      // Step down directly as no split was required
-       {z(); tt(parent, child);
-       }
-     }
+     };
     stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
    }
 
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
 
   private void findAndDelete()                                                  // Delete a key from the tree and returns its data if present without modifying the shape of tree
-   {z(); find();                                                                // Try direct insertion with no modifications to the shape of the tree
-    if (T.at(found).isZero()) return;                                           // Inserted or updated successfully
-    z(); tt(node_leafBase, find); leafBase();                                   // The leaf that contains the key
-    lT.base(T.at(leafBase));                                                    // The leaf that contains the key
-    lT.T.at(lT.index).move(T.at(index)); lT.elementAt();                        // Position in the leaf of the key
+   {P.new Block()
+     {void code()
+       {find();                                                                 // Try direct insertion with no modifications to the shape of the tree
+        P.new If (T.at(found)) {void Else() {P.Goto(end);}};                    // Key not found so nothing to delete
+        z(); tt(node_leafBase, find); leafBase();                               // The leaf that contains the key
+        lT.base(T.at(leafBase));                                                // The leaf that contains the key
+        lT.T.at(lT.index).move(T.at(index)); lT.elementAt();                    // Position in the leaf of the key
 
-    T.at(Data).move(lT.T.at(lT.tData));                                         // Key, data pairs in the leaf
-    lT.removeElementAt();                                                       // Remove the key, data pair from the leaf
+        T.at(Data).move(lT.T.at(lT.tData));                                     // Key, data pairs in the leaf
+        lT.removeElementAt();                                                   // Remove the key, data pair from the leaf
+       }
+     };
    }
 
   public void delete()                                                          // Delete a key from the tree and return its associated Data if the key was found.
-   {z(); T.at(node_mergeRoot).zero(); mergeRoot();
+   {P.new Block()                                                           // Step down through the tree, splitting as we go
+     {final ProgramPA.Label Return = end;
+      void code()
+       {T.at(node_mergeRoot).zero(); mergeRoot();
 
-    T.at(node_isLeaf).zero(); isLeaf();
-    if (T.at(IsLeaf).isOnes())                                                  // Find and delete directly in root as a leaf
-     {z(); findAndDelete(); return;
-     }
-    z();
+        T.at(node_isLeaf).zero(); isLeaf();
+        P.new If (T.at(IsLeaf))                                                  // Find and delete directly in root as a leaf
+         {void Then()
+           {z();
+            findAndDelete();
+            P.Goto(Return);
+           }
+         };
 
-    T.at(parent).zero();                                                        // Start at root
+        T.at(parent).zero();                                                    // Start at root
+        T.at(deleteDepth).zero();
 
-    for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-     {z();                                                                      // Step down
-      tt(search, Key);
-      tt(node_findFirstGreaterThanOrEqualInBranch, parent);
-      findFirstGreaterThanOrEqualInBranch();
+        P.new Block()                                                           // Step down through the tree, splitting as we go
+         {void code()
+           {T.at(deleteDepth).inc();
+            T.at(deleteDepth).greaterThan(T.at(MaxDepth), T.at(pastMaxDepth));
+            P.GoOn(end, T.at(pastMaxDepth));                                    // Prevent runaway searches
 
-      tt(index, first); tt(node_balance, parent); balance();                    // Make sure there are enough entries in the parent to permit a deletion
-      tt(child, next);
+            tt(search, Key);
+            tt(node_findFirstGreaterThanOrEqualInBranch, parent);
+            findFirstGreaterThanOrEqualInBranch();
 
-      tt(node_isLeaf, child); isLeaf();
-      if (T.at(IsLeaf).isOnes())                                                // Reached a leaf
-       {z();
-        findAndDelete();
-        final int f = T.at(found).getInt();
-        merge();
-        T.at(found).setInt(f);
-        return;
-       }
-      z(); tt(parent, child);
-     }
+            tt(index, first); tt(node_balance, parent); balance();              // Make sure there are enough entries in the parent to permit a deletion
+            tt(child, next);
+
+            tt(node_isLeaf, child); isLeaf();
+            P.new If (T.at(IsLeaf))                                             // Reached a leaf
+             {void Then()
+               {z();
+                findAndDelete();
+                final int f = T.at(found).getInt();
+                merge();
+                T.at(found).setInt(f);
+                P.Goto(Return);
+               }
+             };
+            tt(parent, child);
+            P.Goto(start);
+           }
+         };
+       };
+     };
     stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
    }
 
 //D1 Merge                                                                      // Merge along the specified search path
 
   private void merge()                                                          // Merge along the specified search path
-   {z();
-    mergeRoot();
-    T.at(parent).zero();                                                        // Start at root
+   {P.new Block()                                                               // Step down through the tree, splitting as we go
+     {final ProgramPA.Label Return = end;
+      void code()
+       {mergeRoot();
+        T.at(parent).zero();                                                    // Start at root
 
-    for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-     {z(); tt(node_isLeaf, parent); isLeaf();
-      if (T.at(IsLeaf).isOnes()) return;
-      z();
-      tt(node_branchSize, parent); branchSize();
-      for (int j = 0; j < T.at(branchSize).getInt(); j++)                       // Try merging each sibling pair which might change the size of the parent
-       {z();
-        T.at(index).setInt(j);
-        tt(node_mergeLeftSibling, parent); mergeLeftSibling();
-        if (T.at(stolenOrMerged).isOnes()) --j;                                 // A successful merge of the left  sibling reduces the current index and the upper limit
-        T.at(index).setInt(j);
-        tt(node_mergeRightSibling, parent); mergeRightSibling();                // A successful merge of the right sibling maintains the current position but reduces the upper limit
-        tt(node_branchSize,        parent); branchSize();
+        T.at(mergeDepth).zero();
+        P.new Block()                                                           // Step down through the tree, splitting as we go
+         {void code()
+           {T.at(mergeDepth).inc();
+            T.at(mergeDepth).greaterThan(T.at(MaxDepth), T.at(pastMaxDepth));
+            P.GoOn(end, T.at(pastMaxDepth));                                    // Prevent runaway searches
+
+            tt(node_isLeaf, parent);
+            isLeaf();
+            P.GoOn(Return, T.at(IsLeaf));                                       // Reached a leaf
+            tt(node_branchSize, parent); branchSize();
+
+            T.at(mergeIndex).zero();                                            // Index of child being merged
+            P.new Block()                                                       // Try merging each sibling pair which might change the size of the parent
+             {void code()
+               {tt(node_branchSize, parent);
+                branchSize();
+                T.at(mergeIndex).greaterThanOrEqual(T.at(branchSize), T.at(nodeMerged));
+                P.GoOn(end, T.at(nodeMerged));                                  // All sequential pairs of siblings have been offered a chance to merge
+
+                T.at(index).move(T.at(mergeIndex));
+                tt(node_mergeLeftSibling, parent);
+                mergeLeftSibling();
+                P.new If (T.at(stolenOrMerged)) {void Then() {T.at(mergeIndex).dec();}};                          // A successful merge of the left  sibling reduces the current index and the upper limit
+                T.at(index).move(T.at(mergeIndex));
+                tt(node_mergeRightSibling, parent);
+                mergeRightSibling();                                            // A successful merge of the right sibling maintains the current position but reduces the upper limit
+                tt(node_branchSize,        parent);
+                branchSize();
+                T.at(mergeIndex).inc();
+                P.Goto(start);
+               }
+             };
+            tt(search, Key);
+            tt(node_findFirstGreaterThanOrEqualInBranch, parent);
+            findFirstGreaterThanOrEqualInBranch();                                // Step down
+            tt(parent, next);
+            P.Goto(start);
+           }
+         };
        }
-
-      tt(search, Key);
-      tt(node_findFirstGreaterThanOrEqualInBranch, parent);
-      findFirstGreaterThanOrEqualInBranch();                                    // Step down
-      tt(parent, next);
-     }
+     };
     stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
    }
 
