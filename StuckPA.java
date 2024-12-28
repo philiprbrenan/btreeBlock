@@ -229,7 +229,6 @@ abstract class StuckPA extends Test                                             
     isFull();
     assertNotFull();
     size();
-
     T.at(index).move(T.at(size));
     setKeyData();
     inc();
