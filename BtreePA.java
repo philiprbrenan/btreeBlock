@@ -88,6 +88,8 @@ abstract class BtreePA extends Test                                             
     M.layout.layoutName = "Main";
     M.memory(new Memory(M.layout.size()));
     M.program(P);
+    M.name = "BtreePA";
+    M.memory.name = "BtreePA";
 
     T.layout(transactionLayout());                                              // Memory and layout of memory used by a transaction against the btree
     T.layout.layoutName = "transaction";
@@ -209,7 +211,7 @@ abstract class BtreePA extends Test                                             
 
   private void ok(String expected) {Test.ok(toString(), expected);}             // Confirm tree is as expected
   private void stop()              {Test.stop(toString());}                     // Stop after printing the tree
-  public String toString() {return print();}                                    // Print the tree
+  public String toString()         {return print();}                            // Print the tree
 
 //D1 Memory access                                                              // Access to memory
 
@@ -285,6 +287,8 @@ abstract class BtreePA extends Test                                             
        };
      }
     M.at(freeList).move(M.at(free, T.at(allocate)));                            // Second node on free list
+    P.new I() {void a() {say("Allocate",  T.at(allocate).getInt());}};
+
     tt(node_clear, allocate);
     clear();                                                                    // Construct and clear the node
 //    maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                                // Number of nodes in use
@@ -561,7 +565,7 @@ abstract class BtreePA extends Test                                             
 
   private void clear()                                                          // Clear a new node to zeros ready for use
    {z();
-    M.at(Node, T.at(node_clear)).setOff().zero();
+    M.at(Node, T.at(node_clear)).zero();
    }
 
   private void erase()                                                          // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
@@ -805,83 +809,6 @@ abstract class BtreePA extends Test                                             
 
 //D2 Print                                                                      // Print the contents of the tree
 
-  private void printLeaf(int node, Stack<StringBuilder>S, int level)            // Print leaf horizontally
-   {T.at(node_assertLeaf).setInt(node);
-    assertLeaf();
-    padStrings(S, level);
-    final StringBuilder s = new StringBuilder();                                // String builder
-    T.at(node_leafSize).setInt(node);
-    leafSize();
-    final int     K = T.at(leafSize).getInt();
-
-    final StuckPA t = lLeaf.copy();
-    T.at(node_leafBase).setInt(node); leafBase();
-    t.base(T.at(leafBase));
-
-    for  (int i = 0; i < K; i++)
-     {t.T.at(t.index).setInt(i); t.elementAt();                                 // Each node in the leaf
-      s.append(""+t.T.at(t.tKey).getInt()+",");
-     }
-    if (s.length() > 0) s.setLength(s.length()-1);                              // Remove trailing comma if present
-    s.append("="+node+" ");
-    S.elementAt(level*linesToPrintABranch).append(s.toString());
-    padStrings(S, level);
-   }
-
-  private void printBranch(int node, Stack<StringBuilder>S, int level)          // Print branch horizontally
-   {T.at(node_assertBranch).setInt(node); assertBranch();
-    if (level > maxPrintLevels) return;
-    padStrings(S, level);
-    final int L = level * linesToPrintABranch;
-    T.at(node_branchSize).setInt(node); branchSize();
-    final int K = T.at(branchSize).getInt();
-
-    if (K > 0)                                                                  // Branch has key, next pairs
-     {final StuckPA t = bLeaf.copy();
-      T.at(node_branchBase).setInt(node); branchBase();
-      t.base(T.at(branchBase));
-      for  (int i = 0; i < K; i++)
-       {t.T.at(t.index).setInt(i); t.elementAt();                               // Each node in the branch
-        T.at(node_isLeaf).move(t.T.at(t.tData)); isLeaf();
-        if (T.at(IsLeaf).isOnes())
-         {printLeaf(t.T.at(t.tData).getInt(), S, level+1);
-         }
-        else
-         {if (t.T.at(t.tData).isZero())
-           {say("Cannot descend through root from index", i,
-                "in branch", node);
-            break;
-           }
-          printBranch(t.T.at(t.tData).getInt(), S, level+1);
-         }
-
-        S.elementAt(L+0).append(""+t.T.at(t.tKey ).getInt());                   // Key
-        S.elementAt(L+1).append(""+node+(i > 0 ?  "."+i : ""));                 // Index in node
-        S.elementAt(L+2).append(""+t.T.at(t.tData).getInt());                   // Next
-       }
-     }
-    else                                                                        // Branch is empty so print just the index of the branch
-     {S.elementAt(L+0).append(""+node+"Empty");
-     }
-
-    T.at(node_top).setInt(node); top();                                         // Top next will always be present
-    S.elementAt(L+3).append(T.at(top).getInt());                                // Append top next
-
-    T.at(node_isLeaf).move(T.at(top)); isLeaf();                                // Print leaf
-    if (T.at(IsLeaf).isOnes())                                                  // Print leaf
-     {printLeaf(T.at(top).getInt(), S, level+1);
-     }
-    else                                                                        // Print branch
-     {if (T.at(top).isZero())
-       {say("Cannot descend through root from top in branch:", node);
-        return;
-       }
-      printBranch(T.at(top).getInt(), S, level+1);
-     }
-
-    padStrings(S, level);
-   }
-
   public String find_toString()                                                 // Print find result
    {final StringBuilder s = new StringBuilder();
     s.append("Find(");
@@ -930,15 +857,20 @@ abstract class BtreePA extends Test                                             
 //D2 Split                                                                      // Split nodes in half to increase the number of nodes in the tree
 
   private void splitLeafRoot()                                                  // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
-   {z(); T.at(node_assertLeaf).setInt(root); assertLeaf();
-    z(); T.at(node_isFull).setInt(root); isFull();
-    if (T.at(isFull).isZero())
-     {T.at(node_leafSize).setInt(root);
-      leafSize();
-      P.new I() {void a() {stop("Root is not full, but has size:", T.at(leafSize).getInt());}};
-     }
+   {z(); T.setIntInstruction(node_assertLeaf, root); assertLeaf();
+    z(); T.setIntInstruction(node_isFull,     root); isFull();
+    P.new If (T.at(isFull))
+     {void Else()
+       {T.setIntInstruction(node_leafSize, root);
+        leafSize();
+        P.new I() {void a() {stop("Root is not full, but has size:", T.at(leafSize).getInt());}};
+       }
+     };
 
-    allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
+    allocLeaf();
+    P.new I() {void a() {say(M);}}; P.halt("BBBB");
+
+    tt(l, allocLeaf);                                              // New left leaf
     allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
 
     T.at(node_leafBase).zero(); leafBase(); lT.base(T.at(leafBase));            // Set address of the referenced leaf stuck
@@ -1819,17 +1751,19 @@ abstract class BtreePA extends Test                                             
    }
 
   private String print()                                                        // Print a tree horizontally
-   {z();
-    final Stack<StringBuilder> S = new Stack<>();
-
-    T.at(node_isLeaf).setInt(root); isLeaf();
-    if (T.at(IsLeaf).isOnes())
-     {z(); printLeaf(root, S, 0);
-     }
-    else
-     {z(); printBranch(root, S, 0);
-     }
-    return printCollapsed(S);
+   {final BtreePA  p = this;
+    final BtreeSML s = new BtreeSML()                                           // Create a btree of the same dimensions in aclass that can already print the btree so that we do not have to deal with the complexity of printing from assembler
+     {int maxSize         () {return p.maxSize         ();}
+      int maxKeysPerLeaf  () {return p.maxKeysPerLeaf  ();}
+      int maxKeysPerBranch() {return p.maxKeysPerBranch();}
+      int bitsPerKey      () {return p.bitsPerKey      ();}
+      int bitsPerData     () {return p.bitsPerData     ();}
+      int bitsPerNext     () {return p.bitsPerNext     ();}
+      int bitsPerSize     () {return p.bitsPerSize     ();}
+      Memory   memory     () {return p.M.memory;}                               // The memory to be used by the btree
+     };
+    s.fixMemory(p.M.memory);
+    return s.toString();
    }
 
 //D1 Find                                                                       // Find the data associated with a key.
@@ -1916,11 +1850,9 @@ abstract class BtreePA extends Test                                             
             tt(search, Key);
             tt(node_findFirstGreaterThanOrEqualInLeaf, leafFound);
                     findFirstGreaterThanOrEqualInLeaf();
-P.new I() {void a() {say("FFFF111");}};
             P.new If(T.at(found))                                               // Overwrite existing key
              {void Then()
                {z();
-P.new I() {void a() {say("FFFF222");}};
                 lT.T.at(lT.tKey ).move(T.at(Key));
                 lT.T.at(lT.tData).move(T.at(Data));
                 lT.T.at(lT.index).move(T.at(first));
@@ -1930,9 +1862,7 @@ P.new I() {void a() {say("FFFF222");}};
                {z();
                 lT.T.at(lT.tKey ).move(T.at(Key));
                 lT.T.at(lT.tData).move(T.at(Data));
-P.new I() {void a() {say("FFFF333", lT.T.at(lT.tKey).getInt());}};
                 lT.push();
-P.new I() {void a() {say("FFFF444", lT.T.at(lT.tKey).getInt());}};
                }
              };
             T.at(success).ones();
@@ -2149,16 +2079,17 @@ P.new I() {void a() {say("FFFF444", lT.T.at(lT.tKey).getInt());}};
 
   static void test_put_ascending()
    {final BtreePA     t = btreePA(4, 3);
-    final int N = 2; //64;
-    t.put();
-    for (int i = 1; i <= N; i++)
-     {t.T.at(t.Key ).setInt(i);
-      t.T.at(t.Data).setInt(i);
-      say("AAAA11", i);
-      t.P.run();
-      say("AAAA22", t);
-     }
-    stop(t.M);
+    t.P.new Loop(5, t.bitsPerKey())
+     {void code()
+       {t.T.at(t.Key ).move(M.at(index));
+        t.T.at(t.Data).move(M.at(index));
+        P.new I() {void a() {say("AAAA11", M.at(index).getInt());}};
+        t.put();
+        P.new I() {void a() {say("AAAA22", t.M);}};
+       }
+     };
+    t.P.run();
+    stop("AAAA33", t);
     t.ok("""
                                                                                                                             32                                                                                                                                           |
                                                                                                                             0                                                                                                                                            |
