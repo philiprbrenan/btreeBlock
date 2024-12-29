@@ -125,6 +125,13 @@ abstract class BtreeSML extends Test                                            
     return l.compile();
    }
 
+  void fixMemory(Memory memory)                                                 // Fix memory so that we can use the methods in this implementation of btree against memory created by other implementations of btree as a long as they use the same memory layout
+   {memoryLayout .memory(memory);                                               // Refer to supplied memory
+    root.Leaf  .M.memory(memory);                                               // Fix leaf stuck of root
+    root.Branch.M.memory(memory);                                               // Fix branch stuck of root
+    root.setStucks();                                                           // Set base addresses for the leaf and branch stucks used by the root
+   }
+
 //D1 Control                                                                    // Testing, control and integrity
 
   void ok(String expected) {Test.ok(toString(), expected);}                     // Confirm tree is as expected
@@ -929,6 +936,7 @@ abstract class BtreeSML extends Test                                            
 
   String print()                                                                // Print a tree horizontally
    {z();
+
     final Stack<StringBuilder> S = new Stack<>();
 
     if (root.isLeaf())
