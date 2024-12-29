@@ -150,13 +150,16 @@ abstract class BtreePA extends Test                                             
     lL           =   leafTransactions[Leaf_tl           ];                      // Process a left node
     lR           =   leafTransactions[Leaf_tr           ];                      // Process a right node
 
-     {final int N = maxSize();                                                  // Put all the nodes on the free chain at the start with low nodes first
-      for (int i = N; i > 0; --i)                                               // Put all the nodes on the free chain at the start with low nodes first
-       {final int n = i - 1;                                                    // Number of node
-        setInt(free, (i == N ? 0 : i), n);                                      // Link this node to the previous node
+    P.new I()
+     {void a()
+       {final int N = maxSize();                                                  // Put all the nodes on the free chain at the start with low nodes first
+        for (int i = N; i > 0; --i)                                               // Put all the nodes on the free chain at the start with low nodes first
+         {final int n = i - 1;                                                    // Number of node
+          setInt(free, (i == N ? 0 : i), n);                                      // Link this node to the previous node
+         }
+        setInt(freeList, root);                                                   // Root is first on free chain
        }
-      setInt(freeList, root);                                                   // Root is first on free chain
-     }
+     };
     allocate(false);                                                            // The root is always at zero, which frees zero to act as the end of list marker on the free chain
     P.new I() {void a() {T.at(node_setLeaf).setInt(root);}};
     setLeaf();                                                                  // The root starts as a leaf
@@ -572,8 +575,8 @@ abstract class BtreePA extends Test                                             
     M.at(Node, T.at(node_erase)).setOff().ones();
    }
 
-  private void leafBase()   {z(); T.at(leafBase  ).setInt(M.at(leaf,   T.at(node_leafBase  )).setOff().at);} // Base of leaf stuck in memory
-  private void branchBase() {z(); T.at(branchBase).setInt(M.at(branch, T.at(node_branchBase)).setOff().at);} // Base of branch stuck in memory
+  private void leafBase()   {z(); P.new I() {void a() {T.at(leafBase  ).setInt(M.at(leaf,   T.at(node_leafBase  )).setOff().at);}};} // Base of leaf stuck in memory
+  private void branchBase() {z(); P.new I() {void a() {T.at(branchBase).setInt(M.at(branch, T.at(node_branchBase)).setOff().at);}};} // Base of branch stuck in memory
 
   private void leafSize()                                                       // Number of children in body of leaf
    {z();
