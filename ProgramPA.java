@@ -43,10 +43,18 @@ class ProgramPA extends Test                                                    
    {z(); initialize();
     running = true;
     final int N = code.size();
-    for (step = 0, time = 0; step < N && time < maxTime; step++, time++)
+    for (step = 0, time = 0; step < N && time < maxTime && running; step++, time++)
      {z(); code.elementAt(step).a();
      }
     running = false;
+   }
+
+  void halt(String em)                                                          // Halt execution with an explanatory message
+   {z();
+    new I()
+     {void   a() {say(em, traceBack); running = false;}
+      String n() {return "halt";}
+     };
    }
 
   void stop(String em)                                                          // Stop everything with an explanatory message
@@ -130,12 +138,12 @@ class ProgramPA extends Test                                                    
       M.memory (new Memory(layout.size()));
       M.program(ProgramPA.this);
       M.at(limit).setInt(Limit);
-      M.at(index).zero();
+      M.setIntInstruction(index, 1);
       start.set();
       code();
       next.set();
       M.at(index).inc();
-      M.at(index).lessThan(M.at(limit), M.at(compare));
+      M.at(index).lessThanOrEqual(M.at(limit), M.at(compare));
       P.GoOn(start, M.at(compare));
       end.set();
      }
@@ -414,7 +422,7 @@ Line T       At      Wide       Size    Indices        Value   Name
        }
      };
     p.run();
-    ok(f, "[0, 1, 2, 3, 4, 5, 6, 7]");
+    ok(f, "[1, 2, 3, 4, 5, 6, 7, 8]");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
