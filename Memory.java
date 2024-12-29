@@ -7,7 +7,8 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 class Memory extends Test                                                       // Memory provided in bits
- {final boolean[]bits;                                                          // The name of the bit machine
+ {final boolean[]bits;                                                          // The memory in bits
+  String name;                                                                  // The name of the memory
 
 //D1 Construct                                                                  // Memory provided in bits
 
@@ -34,15 +35,15 @@ class Memory extends Test                                                       
      {z();
       final StringBuilder s = new StringBuilder();                              // Line of hex
       for (int j = 0; j < N; j += 4)                                            // Blocks of 4 bits
-       {final StringBuilder H = new StringBuilder(B.substring(i*N+j, i*N+j+4));// Bits to convert
+       {final StringBuilder H = new StringBuilder(B.substring(i*N+j, i*N+j+4)); // Bits to convert
         final int h = Integer.parseInt(""+H.reverse(), 2);                      // Low endian
         s.append("0123456789abcdef".charAt(h));
         if (j % 16 == 12) s.append(" ");
        }
       S.append(String.format("%4d  ", i)+(""+s.reverse()).trim()+"\n");
      }
-
-    return "      "+T+"\nLine  "+t+"\n"+S;
+    final String title = name != null ? "Memory:" + name + "\n" : "";
+    return title+"      "+T+"\nLine  "+t+"\n"+S;
    }
 
   int size() {z(); return bits.length;}                                         // Size of memory
