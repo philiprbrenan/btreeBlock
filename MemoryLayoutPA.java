@@ -46,6 +46,12 @@ class MemoryLayoutPA extends Test                                               
     return i;
    }
 
+  int  getIntExterior(Layout.Field field, int...indices)                        // Get a value from memory occupied by the layout without confirming we are in an instruction
+   {z();
+    final int i = new At(field, indices).setOff(false).result;
+    return i;
+   }
+
   void setInt(Layout.Field field, int value, int...indices)                     // Set a value in memory occupoied by the layout
    {z();
     final At a = new At(field, indices).setOff();
@@ -144,8 +150,11 @@ class MemoryLayoutPA extends Test                                               
 
     int width() {z(); return field.width();}                                    // Width of the field in memory
 
-    At setOff()                                                                 // Set the base address of the field
+    At setOff() {z(); return setOff(true);}                                     // Set the base address of the field from its indices confirming that we are inside an executing instruction
+
+    At setOff(boolean checkSetOff)                                              // Set the base address of the field
      {z();
+      if (checkSetOff && !P.running) stop("Set off must be inside an instruction");
       if (directs != null) {z(); locateInDirectAddress();}                      // Evaluate indirect indices
       else                 {z(); locateDirectAddress();}                        // Evaluate direct indices
       return this;
@@ -161,7 +170,7 @@ class MemoryLayoutPA extends Test                                               
      {final StringBuilder s = new StringBuilder();
       s.append(field.name);
       if (indices.length > 0)
-       {setOff();
+       {setOff(false);
         s.append("[");
         for (int i = 0, N = indices.length; i < N; i++)
          {s.append(indices[i]);
@@ -246,7 +255,6 @@ class MemoryLayoutPA extends Test                                               
 
     void zero()                                                                 // Zero some memory
      {z();
-      P.new I() {void a() {say("ZZZZ", name, at, width);}};
       P.new I() {void a() {setOff(); memory.zero(at, width);}};
      }
 
@@ -458,7 +466,7 @@ class MemoryLayoutPA extends Test                                               
     pp.s.append(switch(field)                                                   // Value
      {case Layout.Variable  v ->
        {final int a = field.locator.at(in);
-        final int n = getInt(field, in);
+        final int n = getIntExterior(field, in);
         yield String.format("%13d", n);
        }
       case Layout.Array     a -> String.format("%13s", "");
@@ -514,37 +522,44 @@ class MemoryLayoutPA extends Test                                               
    }
 
   static void test_get_set()
-   {TestMemoryLayout t = new TestMemoryLayout();
+   {TestMemoryLayout   t = new TestMemoryLayout();
         MemoryLayoutPA m = t.M;
+        ProgramPA      p = m.P;
               Layout l = m.layout;
-   ok(m.at( t.c,      0, 0, 0), "c[0,0,0](0+12)12=15");
-   m.setInt(t.c,  11, 0, 0, 0);
-   ok(m.at( t.c,      0, 0, 0), "c[0,0,0](0+12)12=11");
+                      ok(m.at    (t.c,      0, 0, 0), "c[0,0,0](0+12)12=15");
+    p.new I() {void a() {m.setInt(t.c,  11, 0, 0, 0); }}; p.run(); p.clear();
+                      ok(m.at    (t.c,      0, 0, 0), "c[0,0,0](0+12)12=11");
 
-   ok(m.at( t.c,      0, 0, 1), "c[0,0,1](0+24)24=0");
-   m.setInt(t.c,  11, 0, 0, 1);
-   ok(m.at( t.c,      0, 0, 1), "c[0,0,1](0+24)24=11");
+                      ok(m.at( t.c,      0, 0, 1), "c[0,0,1](0+24)24=0");
+    p.new I() {void a() {m.setInt(t.c,  11, 0, 0, 1); }}; p.run(); p.clear();
+                      ok(m.at( t.c,      0, 0, 1), "c[0,0,1](0+24)24=11");
 
-   ok(m.at( t.a,      0, 2, 2), "a[0,2,2](0+116)116=15");
-   m.setInt(t.a,   5, 0, 2, 2);
-   ok(m.at( t.a,      0, 2, 2), "a[0,2,2](0+116)116=5");
+                      ok(m.at    (t.a,     0, 2, 2), "a[0,2,2](0+116)116=15");
+    p.new I() {void a() {m.setInt(t.a,  5, 0, 2, 2); }}; p.run(); p.clear();
+                      ok(m.at    (t.a,     0, 2, 2), "a[0,2,2](0+116)116=5");
 
-   ok(m.at( t.b,      1, 2, 2), "b[1,2,2](0+252)252=15");
-   m.setInt(t.b,   7, 1, 2, 2);
-   ok(m.at( t.b,      1, 2, 2), "b[1,2,2](0+252)252=7");
+    ok(m.at( t.b,      1, 2, 2), "b[1,2,2](0+252)252=15");
+    p.new I() {void a() {m.setInt(t.b,   7, 1, 2, 2); }}; p.run(); p.clear();
+    ok(m.at( t.b,      1, 2, 2), "b[1,2,2](0+252)252=7");
 
-    ok(m.at( t.e,     1, 2), "e[1,2](0+260)260=15");
-    m.setInt(t.e, 11, 1, 2);
-    ok(m.at( t.e,     1, 2), "e[1,2](0+260)260=11");
+                      ok(m.at    (t.e,     1, 2), "e[1,2](0+260)260=15");
+    p.new I() {void a() {m.setInt(t.e, 11, 1, 2);  }}; p.run(); p.clear();
+                      ok(m.at    (t.e,     1, 2), "e[1,2](0+260)260=11");
    }
 
   static void test_boolean()
    {TestMemoryLayout t = new TestMemoryLayout();
         MemoryLayoutPA m = t.M;
-    m.setInt(t.a, 1, 0, 1, 1);
-    m.setInt(t.a, 2, 0, 1, 2);
-    m.setInt(t.a, 1, 0, 2, 1);
-    m.setInt(t.a, 2, 0, 2, 2);
+        ProgramPA      p = m.P;
+    p.new I()
+     {void a()
+       {m.setInt(t.a, 1, 0, 1, 1);
+        m.setInt(t.a, 2, 0, 1, 2);
+        m.setInt(t.a, 1, 0, 2, 1);
+        m.setInt(t.a, 2, 0, 2, 2);
+       }
+     };
+    m.P.run(); m.P.clear();
 
     m.at(t.a, 0, 1, 1).equal             (m.at(t.a, 0, 2, 1), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 1);
     m.at(t.a, 0, 1, 1).equal             (m.at(t.a, 0, 1, 2), m.at(t.e, 0, 0)); m.P.run(); m.P.clear(); ok(m.at(t.e, 0, 0).getInt(), 0);
@@ -567,9 +582,15 @@ class MemoryLayoutPA extends Test                                               
   static void test_copy()
    {TestMemoryLayout t = new TestMemoryLayout();
         MemoryLayoutPA m = t.M;
-    m.setInt(t.a, 1, 0, 0, 0);
-    m.setInt(t.a, 2, 0, 0, 1);
-    m.setInt(t.a, 3, 0, 0, 2);
+        ProgramPA      p = m.P;
+    p.new I()
+     {void a()
+       {m.setInt(t.a, 1, 0, 0, 0);
+        m.setInt(t.a, 2, 0, 0, 1);
+        m.setInt(t.a, 3, 0, 0, 2);
+       }
+     };
+    m.P.run(); m.P.clear();
 
     ok(m.at(t.a, 0, 0, 0), "a[0,0,0](0+4)4=1");
     ok(m.at(t.a, 0, 0, 1), "a[0,0,1](0+16)16=2");
@@ -595,6 +616,7 @@ class MemoryLayoutPA extends Test                                               
     final int        N = l.size();
 
     MemoryLayoutPA     m = new MemoryLayoutPA();
+        ProgramPA      p = m.P;
     m.layout(l);
     m.memory(new Memory(2*N));
     m.base(N);
@@ -608,12 +630,19 @@ Line T       At      Wide       Size    Indices        Value   Name
    4 V       24         4                                  0     c
    5 V       28         4                                 15     d
 """);
-    ok(m.getInt(a),  0);
-    ok(m.getInt(b), 15);
-       m.setInt(a,  9);
-       m.setInt(b, 10);
-       m.setInt(c, 11);
-       m.setInt(d, 12);
+    ok(m.getIntExterior(a),  0);
+    ok(m.getIntExterior(b), 15);
+
+
+    p.new I()
+     {void a()
+       {m.setInt(a,  9);
+        m.setInt(b, 10);
+        m.setInt(c, 11);
+        m.setInt(d, 12);
+       }
+     };
+    m.P.run(); m.P.clear();
 
     //stop(m);
     m.ok("""
@@ -632,7 +661,9 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Array     A = l.array    ("A", a, 4);
     l.compile();
-    MemoryLayoutPA     m = new MemoryLayoutPA();
+    MemoryLayoutPA   m = new MemoryLayoutPA();
+        ProgramPA    p = m.P;
+
     m.layout(l);
     m.memory(new Memory(l.size()+B));
     m.base(B);
@@ -646,18 +677,25 @@ Line T       At      Wide       Size    Indices        Value   Name
    4 V       16         4               2                  0     a
    5 V       20         4               3                 15     a
 """);
-    ok(m.getInt(a,  0),  0);
-    ok(m.getInt(a,  1), 15);
-    ok(m.getInt(a,  2),  0);
-    ok(m.getInt(a,  3), 15);
-       m.setInt(a,  9,  0);
-       m.setInt(a, 10,  1);
-       m.setInt(a, 11,  2);
-       m.setInt(a, 12,  3);
-    ok(m.getInt(a, 0),  9);
-    ok(m.getInt(a, 1), 10);
-    ok(m.getInt(a, 2), 11);
-    ok(m.getInt(a, 3), 12);
+    ok(m.getIntExterior(a,  0),  0);
+    ok(m.getIntExterior(a,  1), 15);
+    ok(m.getIntExterior(a,  2),  0);
+    ok(m.getIntExterior(a,  3), 15);
+
+    p.new I()
+     {void a()
+       {m.setInt(a,  9,  0);
+        m.setInt(a, 10,  1);
+        m.setInt(a, 11,  2);
+        m.setInt(a, 12,  3);
+       }
+     };
+
+    m.P.run(); m.P.clear();
+    ok(m.getIntExterior(a, 0),  9);
+    ok(m.getIntExterior(a, 1), 10);
+    ok(m.getIntExterior(a, 2), 11);
+    ok(m.getIntExterior(a, 3), 12);
 
     //stop(m);
     m.ok("""
@@ -765,22 +803,34 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Structure S = l.structure("S", z, i, j, A);
     l.compile();
 
-    MemoryLayoutPA     m = new MemoryLayoutPA();
+    MemoryLayoutPA m = new MemoryLayoutPA();
+         ProgramPA p = m.P;
     m.layout(l);
     m.memory(new Memory(l.size()));
 
     MemoryLayoutPA.At  Z = m.at(z), I = m.at(i), J = m.at(j);
-    Z.setOff().setInt(0);
-    I.setOff().setInt(1);
-    J.setOff().setInt(2);
+
+    p.new I()
+     {void a()
+       {Z.setOff().setInt(0);
+        I.setOff().setInt(1);
+        J.setOff().setInt(2);
+       }
+     };
+    m.P.run(); m.P.clear();
 
     MemoryLayoutPA.At az = m.at(a, Z);
     MemoryLayoutPA.At ai = m.at(a, I);
     MemoryLayoutPA.At aj = m.at(a, J);
 
-    az.setOff().setInt(10);
-    ai.setOff().setInt(11);
-    aj.setOff().setInt(12);
+    p.new I()
+     {void a()
+       {az.setOff().setInt(10);
+        ai.setOff().setInt(11);
+        aj.setOff().setInt(12);
+       }
+     };
+    m.P.run(); m.P.clear();
 
     //stop(m.memory);
     ok(""+m.memory, """
@@ -809,8 +859,14 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     I.setInt(3);
     J.setInt(4);
-    ai.setOff().setInt(13);
-    aj.setOff().setInt(14);
+    p.new I()
+     {void a()
+       {ai.setOff().setInt(13);
+        aj.setOff().setInt(14);
+       }
+     };
+    m.P.run(); m.P.clear();
+
     //stop(m);
     ok(""+m, """
 Line T       At      Wide       Size    Indices        Value   Name
