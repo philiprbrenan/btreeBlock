@@ -287,7 +287,6 @@ abstract class BtreePA extends Test                                             
        };
      }
     M.at(freeList).move(M.at(free, T.at(allocate)));                            // Second node on free list
-    P.new I() {void a() {say("Allocate",  T.at(allocate).getInt());}};
 
     tt(node_clear, allocate);
     clear();                                                                    // Construct and clear the node
@@ -867,10 +866,7 @@ abstract class BtreePA extends Test                                             
        }
      };
 
-    allocLeaf();
-    P.new I() {void a() {say(M);}}; P.halt("BBBB");
-
-    tt(l, allocLeaf);                                              // New left leaf
+    allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
     allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
 
     T.at(node_leafBase).zero(); leafBase(); lT.base(T.at(leafBase));            // Set address of the referenced leaf stuck
@@ -2085,7 +2081,7 @@ abstract class BtreePA extends Test                                             
         t.T.at(t.Data).move(M.at(index));
         P.new I() {void a() {say("AAAA11", M.at(index).getInt());}};
         t.put();
-        P.new I() {void a() {say("AAAA22", t.M);}};
+//        P.new I() {void a() {say("AAAA22", t.M);}};
        }
      };
     t.P.run();
