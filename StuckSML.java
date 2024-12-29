@@ -46,7 +46,7 @@ abstract class StuckSML extends Test                                            
   StuckSML()                                                                    // Create the layout for the stuck
    {z();
     M.layout(layout());
-    M.memory(new Memory(M.layout.size()));                // Can be set after construction to address a different memory. You will also need to call base if the stuck is located some where other than at location zero in memory.
+    M.memory(new Memory(M.layout.size()));                                      // Can be set after construction to address a different memory. You will also need to call base if the stuck is located some where other than at location zero in memory.
    }
 
   void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
@@ -89,10 +89,7 @@ abstract class StuckSML extends Test                                            
 
 //D1 Characteristics                                                            // Characteristics of the stuck
 
-  int size()                                                                    // The current number of key elements in the stuck
-   {z(); final int s = M.getInt(currentSize);
-    return s;
-   }
+  int       size       () {z(); return M.getInt(currentSize);}                  // The current number of key elements in the stuck
   boolean isFull       () {z(); return size() > maxSize();}                     // Check the stuck is full
   boolean isEmpty      () {z(); return size() == 0;}                            // Check the stuck is empty
   void assertNotFull   () {z(); if (isFull ()) stop("Full") ;}                  // Assert the stack is not full
