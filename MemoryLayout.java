@@ -11,6 +11,7 @@ class MemoryLayout extends Test                                                 
   Memory memory;                                                                // Memory containing layout
   int      base;                                                                // Base of layout in memory - like located in Pl1
   boolean debug;                                                                // Debug if true
+  String   name;                                                                // Name of the memory layout if supplied
 
 //D1 Control                                                                    // Testing, control and integrity
 
@@ -381,6 +382,8 @@ class MemoryLayout extends Test                                                 
 
   public String toString()                                                      // Print the values of the layout variable in memory
    {final PrintPosition pp = new PrintPosition();
+    if (name        != null) pp.s.append("MemoryLayout: "+name+"\n");
+    if (memory.name != null) pp.s.append("Memory: "+memory.name+"\n");
     pp.s.append(String.format
        ("%4s %1s %8s  %8s   %8s   %8s     %8s   %s\n",
         "Line", "T", "At", "Wide", "Size", "Indices", "Value", "Name"));
