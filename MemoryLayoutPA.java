@@ -12,6 +12,7 @@ class MemoryLayoutPA extends Test                                               
   int      base;                                                                // Base of layout in memory - like located in Pl1
   boolean debug;                                                                // Debug if true
   ProgramPA P = new ProgramPA();                                                // Program containing generated code
+  String   name;                                                                // Name of the memory layout if supplied
 
 //D1 Control                                                                    // Testing, control and integrity
 
@@ -245,7 +246,8 @@ class MemoryLayoutPA extends Test                                               
 
     void zero()                                                                 // Zero some memory
      {z();
-      P.new I() {void a() {memory.zero(at, width);}};
+      P.new I() {void a() {say("ZZZZ", name, at, width);}};
+      P.new I() {void a() {setOff(); memory.zero(at, width);}};
      }
 
     void ones()                                                                 // Ones some memory
@@ -414,6 +416,8 @@ class MemoryLayoutPA extends Test                                               
 
   public String toString()                                                      // Print the values of the layout variable in memory
    {final PrintPosition pp = new PrintPosition();
+    if (name        != null) pp.s.append("MemoryLayout: "+name+"\n");
+    if (memory.name != null) pp.s.append("Memory: "+memory.name+"\n");
     pp.s.append(String.format
        ("%4s %1s %8s  %8s   %8s   %8s     %8s   %s\n",
         "Line", "T", "At", "Wide", "Size", "Indices", "Value", "Name"));
