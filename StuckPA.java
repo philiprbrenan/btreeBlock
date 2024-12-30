@@ -54,7 +54,7 @@ abstract class StuckPA extends Test                                             
    }
 
   void base(MemoryLayoutPA.At Base)                                             // Set the base address of the stuck in the memory layout containing the stuck
-   {z();  P.new I() {void a() {say("AAAA", M.name); M.base(Base.setOff().result);}};
+   {z();  P.new I() {void a() {M.base(Base.setOff().result);}};
    }
 
   void program(ProgramPA program)                                               // Set the program in which the various components should generate code
