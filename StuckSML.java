@@ -476,9 +476,10 @@ abstract class StuckSML extends Test                                            
   public String toString()
    {final StringBuilder s = new StringBuilder();                                //
     z();
+    final int N = size();
     s.append("StuckSML(maxSize:"+maxSize());
-    s.append(" size:"+size()+")\n");
-    for (int i = 0, j = size(); i < j; i++)                                     // Search
+    s.append(" size:"+N+")\n");
+    for (int i = 0; i < N; i++)                                                 // Search
      {z(); s.append("  "+i+" key:"+key(i)+" data:"+data(i)+"\n");
      }
     return s.toString();
