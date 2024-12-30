@@ -4,7 +4,6 @@
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Design, layout and simulate a btree in a block on the surface of a silicon chip.
 // Need binary add so we compute the mid key
-// loop set counter anc check  in find, put delete
 import java.util.*;
 
 abstract class BtreePA extends Test                                             // Manipulate a btree using static methods and memory
@@ -35,7 +34,7 @@ abstract class BtreePA extends Test                                             
     linesToPrintABranch =  4,                                                   // The number of lines required to print a branch
          maxPrintLevels = 10,                                                   // Maximum number of levels to print in a tree
                maxDepth = 99,                                                   // Maximum depth of any realistic tree
-            testMaxSize = github_actions ? 1000 : 50;                           // Maximum number of leaves plus branches during testing
+            testMaxSize = github_actions ? 1000 : 100;                          // Maximum number of leaves plus branches during testing
 
   int          nodeUsed = 0;                                                    // Number of nodes currently in use
   int       maxNodeUsed = 0;                                                    // Maximum number of branches plus leaves used
@@ -161,7 +160,7 @@ abstract class BtreePA extends Test                                             
        }
      };
     allocate(false);                                                            // The root is always at zero, which frees zero to act as the end of list marker on the free chain
-    P.new I() {void a() {T.at(node_setLeaf).setInt(root);}};
+    T.setIntInstruction(node_setLeaf, root);
     setLeaf();                                                                  // The root starts as a leaf
   }
 
@@ -340,7 +339,8 @@ abstract class BtreePA extends Test                                             
   Layout.Bit         stolenOrMerged;                                            // A merge or steal operation succeeded
   Layout.Bit           pastMaxDepth;                                            // A merge or steal operation succeeded
   Layout.Bit             nodeMerged;                                            // All sequential pairs of siblings have been offered a chance to merge
-  Layout.Bit              mergeable;                                            // The keft and right children are mergable
+  Layout.Bit              mergeable;                                            // The left and right children are mergable
+  Layout.Bit                deleted;                                            // Whether the delete request actually deleted the specified key
 
   Layout.Variable          leafBase;                                            // The offset of a leaf in memory
   Layout.Variable        branchBase;                                            // The offset of a branch in memory
@@ -438,6 +438,7 @@ abstract class BtreePA extends Test                                             
                                 pastMaxDepth = L.bit      ("pastMaxDepth"                                  );
                                   nodeMerged = L.bit      ("nodeMerged"                                    );
                                    mergeable = L.bit      ("mergeable"                                     );
+                                     deleted = L.bit      ("deleted"                                       );
 
                                     leafBase = L.variable ("leafBase"                                      , bitsPerNext());
                                   branchBase = L.variable ("branchBase"                                    , bitsPerNext());
@@ -498,7 +499,7 @@ abstract class BtreePA extends Test                                             
       nextFree, success, inserted, first, next, search, found, key, data,
       firstKey, lastKey, flKey, parentKey, lk, ld, rk, rd, index, nl, nr,
       l, r, splitParent, IsLeaf, isFull, isEmpty, isLow, hasLeavesForChildren,
-      stolenOrMerged, pastMaxDepth, nodeMerged, mergeable, leafBase, branchBase, leafSize, branchSize,
+      stolenOrMerged, pastMaxDepth, nodeMerged, mergeable, deleted, leafBase, branchBase, leafSize, branchSize,
       top, Key, Data, find, findAndInsert, parent, child, leafFound,
       maxKeysPerLeaf, maxKeysPerBranch, two, MaxDepth,
       findDepth, putDepth, deleteDepth, mergeDepth, mergeIndex,
@@ -560,7 +561,7 @@ abstract class BtreePA extends Test                                             
    {z();
     P.new If (T.at(node_free)) {void Else() {P.stop("Cannot free root");}};     // The root is never freed
     z(); tt(node_erase, node_free); erase();                                    // Clear the node to encourage erroneous frees to do damage that shows up quickly.
-    M.at(free, T.at(node_free)).setOff().move(M.at(freeList));                  // Chain this node in front of the last freed node
+    M.at(free, T.at(node_free)).move(M.at(freeList));                           // Chain this node in front of the last freed node
     M.at(freeList).move(T.at(node_free));                                       // Make this node the head of the free chain
     maxNodeUsed = max(maxNodeUsed, --nodeUsed);                                 // Number of nodes in use
    }
@@ -572,7 +573,7 @@ abstract class BtreePA extends Test                                             
 
   private void erase()                                                          // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
    {z();
-    M.at(Node, T.at(node_erase)).setOff().ones();
+    M.at(Node, T.at(node_erase)).ones();
    }
 
   private void leafBase()   {z(); P.new I() {void a() {T.at(leafBase  ).setInt(M.at(leaf,   T.at(node_leafBase  )).setOff().at);}};} // Base of leaf stuck in memory
@@ -591,8 +592,8 @@ abstract class BtreePA extends Test                                             
     tt(node_branchBase, node_branchSize); branchBase();
     bSize.base(T.at(branchBase));
     bSize.size();
-    bSize.T.at(bSize.size).dec();                                               // Account for top
-    T.at(branchSize).move(bSize.T.at(bSize.size));
+    T.at(branchSize).move(bSize.T.at(bSize.size));                              // Changed order here to match leafSize more closely
+    T.at(branchSize).dec();                                                     // Account for top
    }
 
   private void isEmpty()                                                        // The node is empty
@@ -609,7 +610,7 @@ abstract class BtreePA extends Test                                             
      {z();
       tt(node_branchSize, node_isEmpty);
       branchSize();
-      T.at(branchSize).lessThan(T.at(two), T.at(isEmpty));                      // Allow for top which must always be present
+      T.at(branchSize).isZero(T.at(isEmpty));                                   // Allow for top which must always be present
      }
    }
 
@@ -617,32 +618,34 @@ abstract class BtreePA extends Test                                             
    {z();
     tt(node_isLeaf, node_isFull);
     isLeaf();
-    if (T.at(IsLeaf).isOnes())
-     {z();
-      tt(node_leafSize, node_isFull);
-      leafSize();
-      T.at(leafSize).equal(T.at(maxKeysPerLeaf), T.at(isFull));
-     }
-    else
-     {z();
-      tt(node_branchSize, node_isFull);
-      branchSize();
-      T.at(branchSize).equal(T.at(maxKeysPerBranch), T.at(isFull));
-     }
+    P.new If (T.at(IsLeaf))
+     {void Then()
+       {tt(node_leafSize, node_isFull);
+        leafSize();
+        T.at(leafSize)  .equal(T.at(maxKeysPerLeaf),   T.at(isFull));
+       }
+      void Else()
+       {tt(node_branchSize, node_isFull);
+        branchSize();
+        T.at(branchSize).equal(T.at(maxKeysPerBranch), T.at(isFull));
+       }
+     };
    }
 
   private void isLow()                                                          // The node is low on children making it impossible to merge two sibling children
    {z(); tt(node_isLeaf, node_isLow); isLeaf();
-    if (T.at(IsLeaf).isOnes())
-     {tt(node_leafSize, node_isLow);
-      leafSize();
-      T.at(leafSize).lessThan(T.at(two), T.at(isLow));
-     }
-    else
-     {tt(node_branchSize, node_isLow);
-      branchSize();
-      T.at(branchSize).lessThan(T.at(two), T.at(isLow));
-     }
+    P.new If (T.at(IsLeaf))
+     {void Then()
+       {tt(node_leafSize, node_isLow);
+        leafSize();
+        T.at(leafSize).lessThan(T.at(two), T.at(isLow));
+       }
+      void Else()
+       {tt(node_branchSize, node_isLow);
+        branchSize();
+        T.at(branchSize).lessThan(T.at(two), T.at(isLow));
+       }
+     };
    }
 
   private void hasLeavesForChildren()                                           // The node has leaves for children
@@ -664,7 +667,7 @@ abstract class BtreePA extends Test                                             
     bTop.elementAt();
     T.at(top).move(bTop.T.at(bTop.tData));
    }
-
+/*
   public String toString(int node)                                              // Print a node
    {final StringBuilder s = new StringBuilder();
     T.at(node_isLeaf).setInt(node); isLeaf();
@@ -701,7 +704,7 @@ abstract class BtreePA extends Test                                             
 
     return s.toString();
    }
-
+*/
 //D2 Search                                                                     // Search within a node and update the node description with the results
 
   private void findEqualInLeaf()                                                // Find the first key in the leaf that is equal to the search key
@@ -744,7 +747,7 @@ abstract class BtreePA extends Test                                             
     tt(node_branchBase,   node_findFirstGreaterThanOrEqualInBranch); branchBase();
     bFirstBranch.base(T.at(branchBase));
     bFirstBranch.T.at(bFirstBranch.search).move(T.at(search));
-    bFirstBranch.T.at(bFirstBranch.limit).setInt(1);
+    P.new I() {void a() {bFirstBranch.T.at(bFirstBranch.limit).setInt(1);}};
     bFirstBranch.searchFirstGreaterThanOrEqual();
     T.at(found).move(bFirstBranch.T.at(bFirstBranch.found));
     T.at(first).move(bFirstBranch.T.at(bFirstBranch.index));
@@ -891,14 +894,13 @@ abstract class BtreePA extends Test                                             
 
     lR.firstElement();
     lL. lastElement();
-    T.at(node_setBranch ).setInt(root); setBranch();                            // The root is now a branch
-    T.at(node_branchBase).setInt(root); branchBase();                           // Set address of the referenced leaf stuck
+    T.setIntInstruction(node_setBranch,  root); setBranch();                    // The root is now a branch
+    T.setIntInstruction(node_branchBase, root); branchBase();                   // Set address of the referenced leaf stuck
     bT.base(T.at(branchBase));                                                  // Set address of the referenced leaf stuck
     bT.clear();                                                                 // Clear the branch
     T.at(firstKey).move(lR.T.at(lR.tKey));                                      // First of right leaf
     T.at(lastKey ).move(lL.T.at(lL.tKey));                                      // Last of left leaf
-    T.at(flKey   ).setInt((T.at(firstKey).getInt() +
-                           T.at(lastKey).getInt()) / 2);                        // Mid key - keys are likely to be bigger than 31 bits
+    P.new I() {void a() {T.at(flKey).setInt((T.at(firstKey).getInt() + T.at(lastKey).getInt()) / 2);}}; // Mid key - keys are likely to be bigger than 31 bits
     bT.T.at(bT.tKey).move(T.at(flKey));
     bT.T.at(bT.tData).move(T.at(l));
     bT.push();                                                                  // Insert left leaf into root
@@ -908,18 +910,20 @@ abstract class BtreePA extends Test                                             
    }
 
   private void splitBranchRoot()                                                // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
-   {z(); T.at(node_assertBranch).setInt(root); assertBranch();
-    z(); T.at(node_isFull).setInt(root); isFull();
-    if (T.at(isFull).isZero())
-     {T.at(node_branchSize).setInt(root); branchSize();
-      P.stop("Root is not full");
-     }
+   {z(); T.setIntInstruction(node_assertBranch, root); assertBranch();
+    z(); T.setIntInstruction(node_isFull,       root); isFull();
+    P.new If (T.at(isFull))
+     {void Else()
+       {P.stop("Root is not full");
+       }
+     };
     z();
 
     allocBranch(); tt(l, allocBranch);                                          // New left branch
     allocBranch(); tt(r, allocBranch);                                          // New right branch
 
-    T.at(node_branchBase).setInt(root); branchBase(); bT.base(T.at(branchBase));// Set address of the referenced branch stuck
+    T.setIntInstruction(node_branchBase, root);
+    branchBase(); bT.base(T.at(branchBase));// Set address of the referenced branch stuck
     tt(node_branchBase, l);             branchBase(); bL.base(T.at(branchBase));// Set address of the referenced branch stuck
     tt(node_branchBase, r);             branchBase(); bR.base(T.at(branchBase));// Set address of the referenced branch stuck
 
@@ -958,31 +962,32 @@ abstract class BtreePA extends Test                                             
 
   private void splitLeaf()                                                      // Split a leaf which is not the root
    {z(); tt(node_assertLeaf, node_splitLeaf); assertLeaf();
-    if (T.at(node_splitLeaf).isZero())
-     {P.stop("Cannot split root with this method");
-     }
+    P.new If (T.at(node_splitLeaf))
+     {void Else()
+       {P.stop("Cannot split root with this method");
+       }
+     };
     tt(node_leafSize, node_splitLeaf);
     leafSize();
-    final int S = T.at(leafSize).getInt(), I = T.at(index).getInt();
-    tt(node_isFull, node_splitLeaf); isFull();
-    if (T.at(isFull).isZero())
-     {P.stop("Leaf is not full");
-     }
-    tt(node_isFull, splitParent); isFull();
-    if (T.at(isFull).isOnes())
-     {stop("Leaf split parent:", splitParent, "must not be full");
-     }
-    if (I < 0) stop("Index", I, "too small");
-    if (I > S) stop("Index", I, "too big for leaf with:", S);
-    z();
+    tt(node_isFull, node_splitLeaf);
+    isFull();
+    P.new If (T.at(isFull))
+     {void Else()
+       {P.stop("Leaf is not full");
+       }
+     };
+    tt(node_isFull, splitParent);
+    isFull();
+    P.new If (T.at(isFull))
+     {void Then()
+       {P.stop("Leaf split parent must not be full");
+       }
+     };
     allocLeaf(); tt(l, allocLeaf);                                              // New  split out leaf
 
-    tt(node_leafBase, l);
-    leafBase();
-    lL.base(T.at(leafBase));                                                    // The leaf being split into
-    tt(node_leafBase, node_splitLeaf);
-    leafBase();
-    lR.base(T.at(leafBase));                                                    // The leaf being split on the right
+    tt(node_leafBase, l);              leafBase(); lL.base(T.at(leafBase));     // The leaf being split into
+    tt(node_leafBase, node_splitLeaf); leafBase(); lR.base(T.at(leafBase));     // The leaf being split on the right
+
     for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf
      {z(); lR.shift();
       lL.T.at(lL.tKey ).move(lR.T.at(lR.tKey ));
@@ -993,8 +998,7 @@ abstract class BtreePA extends Test                                             
     lL. lastElement();
     tt(node_branchBase, splitParent); branchBase();                             // The parent branch
     bT.base(T.at(branchBase));                                                  // The parent branch
-    bT.T.at(bT.tKey).setInt((lR.T.at(lR.tKey).getInt() +
-                             lL.T.at(lL.tKey).getInt()) / 2);                   // Splitting key
+    P.new I() {void a() {bT.T.at(bT.tKey).setInt((lR.T.at(lR.tKey).getInt() + lL.T.at(lL.tKey).getInt()) / 2);}};                   // Splitting key
     bT.T.at(bT.tData).move(T.at(l));
     bT.T.at(bT.index).move(T.at(index));
     bT.insertElementAt();                                                       // Insert new key, next pair in parent
@@ -1249,7 +1253,7 @@ abstract class BtreePA extends Test                                             
     P.new Block()
      {void code()
        {final ProgramPA.Label Return = end;
-        T.at(node_isLeaf).zero();
+        T.at(node_isLeaf).zero();                                               // Address the root
         isLeaf();
         P.new If (T.at(IsLeaf))                                                 // Confirm we are on a branch
          {void Then()
@@ -1271,7 +1275,7 @@ abstract class BtreePA extends Test                                             
         bT. lastElement();
         T.at(r).move(bT.T.at(bT.tData));
 
-        P.new I() {void a() {T.at(node_hasLeavesForChildren).setInt(root);}};
+        T.setIntInstruction(node_hasLeavesForChildren, root);
         hasLeavesForChildren();
         P.new If (T.at(hasLeavesForChildren))                                   // Leaves
          {void Then()
@@ -1320,7 +1324,7 @@ abstract class BtreePA extends Test                                             
                       bT.T.at(bT.tData).move(lR.T.at(lR.tData));
                       bT.push();
                      }
-                    T.at(node_setLeaf).setInt(root);                            // The root is now a leaf
+                    T.setIntInstruction(node_setLeaf, root);                    // The root is now a leaf
                     setLeaf();
                     tt(node_free, l); free();                                   // Free the children
                     tt(node_free, r); free();
@@ -1384,13 +1388,13 @@ abstract class BtreePA extends Test                                             
                    }
                  };
 
-                bR.lastElement();                                                 // Top next
+                bR.lastElement();                                               // Top next
 
                 bT.T.at(bT.tKey ).zero();
                 bT.T.at(bT.tData).move(bR.T.at(bR.tData));
-                bT.push();                                                        // Top so ignored by search ... except last
+                bT.push();                                                      // Top so ignored by search ... except last
 
-                tt(node_free, l); free();                                         // Free the children
+                tt(node_free, l); free();                                       // Free the children
                 tt(node_free, r); free();
                 z(); T.at(stolenOrMerged).ones(); P.Goto(Return);
                }
@@ -1533,8 +1537,10 @@ abstract class BtreePA extends Test                                             
     P.new Block()
      {void code()
        {z();
-        tt(node_assertBranch, node_mergeRightSibling); assertBranch();
-        tt(node_branchSize, node_mergeRightSibling); branchSize();
+        tt(node_assertBranch, node_mergeRightSibling);
+        assertBranch();
+        tt(node_branchSize, node_mergeRightSibling);
+        branchSize();
         T.at(index).greaterThanOrEqual(T.at(branchSize), T.at(stolenOrMerged));
         stealNotPossible(end);
         T.at(branchSize).lessThan(T.at(two), T.at(stolenOrMerged));
@@ -1561,6 +1567,7 @@ abstract class BtreePA extends Test                                             
             tt(node_leafBase, r);
             leafBase();
             lR.base(T.at(leafBase));
+
             tt(node_leafSize, l);
             leafSize();
             tt(nl, leafSize);
@@ -1571,7 +1578,7 @@ abstract class BtreePA extends Test                                             
             P.new I()                                                           // Check that combined node would not be too big
              {void a()
                {T.at(stolenOrMerged).setInt
-                 ((T.at(nl).getInt() + T.at(nr).getInt() >= maxKeysPerLeaf()) ?
+                 ((T.at(nl).getInt() + T.at(nr).getInt() > maxKeysPerLeaf()) ?
                   1 : 0);
                }
              };
@@ -1581,9 +1588,9 @@ abstract class BtreePA extends Test                                             
              {void code()
                {for (int i = 0; i < maxKeysPerLeaf(); i++)                      // Transfer right to left
                  {z();
-                  tt(node_branchBase, r);
-                  branchSize();
-                  P.GoOff(end, T.at(branchSize));
+                  tt(node_leafBase, r);
+                  leafSize();
+                  P.GoOff(end, T.at(leafSize));
                   lR.shift();
                   lL.T.at(lL.tKey ).move(lR.T.at(lR.tKey));
                   lL.T.at(lL.tData).move(lR.T.at(lR.tData));
@@ -1666,7 +1673,7 @@ abstract class BtreePA extends Test                                             
     P.new Block()
      {void code()
        {tt(node_assertBranch, node_balance); assertBranch();
-        tt(node_branchSize, node_balance); branchSize();
+        tt(node_branchSize,   node_balance); branchSize();
         T.at(index).greaterThan(T.at(branchSize), T.at(stolenOrMerged));
         P.new If (T.at(stolenOrMerged))
          {void Then()
@@ -1676,12 +1683,12 @@ abstract class BtreePA extends Test                                             
 
         tt(node_branchBase, node_balance);
         branchBase();
-        bT.base(T.at(branchBase));
+        bT.base(T.at(branchBase));                                              // Address parent
 
-        bT.T.at(bT.index).move(T.at(index));
+        bT.T.at(bT.index).move(T.at(index));                                    // Index child to be augmented
         bT.elementAt();
 
-        T.at(node_isLow).move(bT.T.at(bT.tData));
+        T.at(node_isLow).move(bT.T.at(bT.tData));                               // Child must have only one entry to be balanced
         isLow();
         P.GoOff(end, T.at(isLow));
         tt(node_stealFromLeft,     node_balance); stealFromLeft    (); P.GoOn(end, T.at(stolenOrMerged));
@@ -1777,7 +1784,7 @@ abstract class BtreePA extends Test                                             
         P.new If (T.at(IsLeaf))                                                 // The root is a leaf
          {void Then()
            {tt(search, Key);
-            T.at(node_findEqualInLeaf).setInt(root);
+            T.setIntInstruction(node_findEqualInLeaf, root);
             findEqualInLeaf();
             T.at(find).zero();                                                  // Found in root
             P.Goto(Return);
@@ -2002,9 +2009,8 @@ abstract class BtreePA extends Test                                             
              {void Then()
                {z();
                 findAndDelete();
-                final int f = T.at(found).getInt();
+                tt(deleted, found);
                 merge();
-                T.at(found).setInt(f);
                 P.Goto(Return);
                }
              };
@@ -2049,7 +2055,7 @@ abstract class BtreePA extends Test                                             
                 T.at(index).move(T.at(mergeIndex));
                 tt(node_mergeLeftSibling, parent);
                 mergeLeftSibling();
-                P.new If (T.at(stolenOrMerged)) {void Then() {T.at(mergeIndex).dec();}};                          // A successful merge of the left  sibling reduces the current index and the upper limit
+                P.new If (T.at(stolenOrMerged)) {void Then() {T.at(mergeIndex).dec();}};// A successful merge of the left  sibling reduces the current index and the upper limit
                 T.at(index).move(T.at(mergeIndex));
                 tt(node_mergeRightSibling, parent);
                 mergeRightSibling();                                            // A successful merge of the right sibling maintains the current position but reduces the upper limit
@@ -2078,13 +2084,13 @@ abstract class BtreePA extends Test                                             
 
   static void test_put_ascending()
    {final BtreePA     t = btreePA(4, 3);
-    t.P.new Loop(5, t.bitsPerKey())
+    t.P.new Loop(8, t.bitsPerKey())
      {void code()
        {t.T.at(t.Key ).move(M.at(index));
         t.T.at(t.Data).move(M.at(index));
         P.new I() {void a() {say("AAAA11", M.at(index).getInt());}};
         t.put();
-//        P.new I() {void a() {say("AAAA22", t.M);}};
+        P.new I() {void a() {say("AAAA22", t);}};
        }
      };
     t.P.run();
@@ -2888,11 +2894,11 @@ abstract class BtreePA extends Test                                             
     for (int i = 0; i < random_small.length; ++i)
      {t.T.at(t.Key ).setInt(-1);
       t.delete();
-      ok(t.T.at(t.found).isZero());
+      ok(t.T.at(t.deleted).isZero());
 
       t.T.at(t.Key ).setInt(random_small[i]);
       t.delete();
-      ok(t.T.at(t.found).isOnes());
+      ok(t.T.at(t.deleted).isOnes());
       ok(t.T.at(t.Data).getInt(), i);
      }
    }
