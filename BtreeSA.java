@@ -977,12 +977,9 @@ abstract class BtreeSA extends Test                                             
     z();
     allocLeaf(); tt(l, allocLeaf);                                              // New  split out leaf
 
-    tt(node_leafBase, l);
-    leafBase();
-    lL.base(T.at(leafBase));                                                    // The leaf being split into
-    tt(node_leafBase, node_splitLeaf);
-    leafBase();
-    lR.base(T.at(leafBase));                                                    // The leaf being split on the right
+    tt(node_leafBase, l);               leafBase(); lL.base(T.at(leafBase));    // The leaf being split into
+    tt(node_leafBase, node_splitLeaf);  leafBase(); lR.base(T.at(leafBase));    // The leaf being split on the right
+
     for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf
      {z(); lR.shift();
       lL.T.at(lL.tKey ).move(lR.T.at(lR.tKey ));
@@ -1567,9 +1564,9 @@ abstract class BtreeSA extends Test                                             
 
     tt(node_branchBase, node_balance);
     branchBase();
-    bT.base(T.at(branchBase));
+    bT.base(T.at(branchBase));                                                  // Address parent
 
-    bT.T.at(bT.index).move(T.at(index));
+    bT.T.at(bT.index).move(T.at(index));                                        // Address child we are seeking to balance
     bT.elementAt();
 
     z();
@@ -1884,6 +1881,7 @@ abstract class BtreeSA extends Test                                             
      {t.T.at(t.Key ).setInt(i);
       t.T.at(t.Data).setInt(i);
       t.put();
+      say(t);
      }
     //t.stop();
     t.ok("""
@@ -2709,6 +2707,7 @@ abstract class BtreeSA extends Test                                             
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    test_put_ascending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
