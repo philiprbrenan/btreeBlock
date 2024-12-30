@@ -260,20 +260,20 @@ class MemoryLayoutPA extends Test                                               
 
     void ones()                                                                 // Ones some memory
      {z();
-      P.new I() {void a() {memory.ones(at, width);}};
+      P.new I() {void a() {setOff(); memory.ones(at, width);}};
      }
 
     void invert(At a)                                                           // Invert the specified bits
      {z();
-      P.new I() {void a() {memory.invert(a.result, a.width());}};
+      P.new I() {void a() {setOff(); memory.invert(a.result, a.width());}};
      }
 
     boolean isAllZero()                                                         // Check that the specified memory is all zeros
-     {z(); return memory.isAllZero(at, width);
+     {z(); setOff(); return memory.isAllZero(at, width);
      }
 
     boolean isAllOnes()                                                         // Check that  the specified memory is all ones
-     {z(); return memory.isAllOnes(at, width);
+     {z(); setOff(); return memory.isAllOnes(at, width);
      }
 
 //D1 Boolean                                                                    // Boolean operations on fields held in memories.
@@ -290,7 +290,7 @@ class MemoryLayoutPA extends Test                                               
      {z();
       P.new I()
        {void a()
-         {result.setInt(isZero() ? 1 : 0);
+         {result.setOff().setInt(setOff().isZero() ? 1 : 0);
          }
         String n() {return result.field.name+" = isZero "+field.name;}
        };
@@ -308,7 +308,7 @@ class MemoryLayoutPA extends Test                                               
      {z();
       P.new I()
        {void a()
-         {result.setInt(isOnes() ? 1 : 0);
+         {result.setOff().setInt(setOff().isOnes() ? 1 : 0);
          }
         String n() {return result.field.name+" = isOnes "+field.name;}
        };
@@ -327,7 +327,7 @@ class MemoryLayoutPA extends Test                                               
      {z();
       P.new I()
        {void a()
-         {result.setInt(equal(b) ? 1 : 0);
+         {result.setOff().setInt(equal(b.setOff()) ? 1 : 0);
          }
         String n() {return result.field.name+"="+field.name+"=="+b.field.name;}
        };
@@ -337,7 +337,7 @@ class MemoryLayoutPA extends Test                                               
      {z();
       P.new I()
        {void a()
-         {result.setInt(!equal(b) ? 1 : 0);
+         {result.setOff().setInt(!equal(b.setOff()) ? 1 : 0);
          }
         String n() {return result.field.name+"="+field.name+"!="+b.field.name;}
        };
@@ -357,7 +357,7 @@ class MemoryLayoutPA extends Test                                               
      {z(); sameSize(b);
       P.new I()
        {void a()
-         {result.setInt(lessThan(b) ? 1 : 0);
+         {result.setOff().setInt(lessThan(b.setOff()) ? 1 : 0);
          }
         String n() {return result.field.name+"="+field.name+"<"+b.field.name;}
        };
@@ -367,7 +367,7 @@ class MemoryLayoutPA extends Test                                               
      {z(); sameSize(b);
       P.new I()
        {void a()
-        {result.setInt(lessThan(b) || equal(b) ? 1 : 0);
+        {result.setOff().setInt(lessThan(b.setOff()) || equal(b) ? 1 : 0);
         }
         String n() {return result.field.name+"="+field.name+"<="+b.field.name;}
       };
@@ -377,7 +377,7 @@ class MemoryLayoutPA extends Test                                               
      {z(); sameSize(b);
       P.new I()
        {void a()
-         {result.setInt(!lessThan(b) && !equal(b) ? 1 : 0);
+         {result.setOff().setInt(!lessThan(b.setOff()) && !equal(b) ? 1 : 0);
          }
         String n() {return result.field.name+"="+field.name+">"+b.field.name;}
        };
@@ -387,7 +387,7 @@ class MemoryLayoutPA extends Test                                               
      {z(); sameSize(b);
       P.new I()
        {void a()
-         {result.setInt(!lessThan(b) ? 1 : 0);
+         {result.setOff().setInt(!lessThan(b.setOff()) ? 1 : 0);
          }
         String n() {return result.field.name+"="+field.name+">="+b.field.name;}
        };
