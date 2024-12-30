@@ -823,7 +823,7 @@ abstract class BtreeSML extends Test                                            
         final int  nl = l.leafSize();
         final int  nr = r.leafSize();
 
-        if (nl + nr > maxKeysPerLeaf()) return false;                           // Combined body would be too big
+        if (nl + nr > maxKeysPerLeaf()) return false;                           // Combined body would be too big for one leaf
         z();
         final int N = r.Leaf.size();                                            // Number of entries to remove
         for (int i = 0; i < N; i++)                                             // Transfer right to left
@@ -840,7 +840,7 @@ abstract class BtreeSML extends Test                                            
         final int  nl = l.branchSize();
         final int  nr = r.branchSize();
 
-        if (nl + 1 + nr > maxKeysPerBranch()) return false;                     // Merge not possible because there is no where to put the steal
+        if (nl + 1 + nr > maxKeysPerBranch()) return false;                     // Merge not possible because there is not enough room in a single branch
         z(); final StuckSML.LastElement le = l.Branch.lastElement1();           // Last element of left child
         z(); final StuckSML.ElementAt   ea = p.Branch.elementAt1(index);        // Parent dividing element
         l.Branch.setElementAt(ea.key, le.data, nl);                             // Re-key left top
