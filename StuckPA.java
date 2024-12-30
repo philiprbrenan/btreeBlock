@@ -226,6 +226,7 @@ abstract class StuckPA extends Test                                             
 
   void push()                                                                   // Push an element onto the stuck
    {z(); action = "push";
+    size();
     isFull();
     assertNotFull();
     size();
