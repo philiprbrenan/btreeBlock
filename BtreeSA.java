@@ -1521,7 +1521,7 @@ abstract class BtreeSA extends Test                                             
       bL.setElementAt();                                                        // Re-key left top
 
       final int N = T.at(nr).getInt()+1;
-      for (int i = 0; i < N; i++)                                               // Transfer right to left
+      for (int i = 0; i < N; i++)                                               // Transfer right to left including top
        {z();
         bR.shift();
         bL.T.at(bL.tKey) .move(bR.T.at(bR.tKey));
