@@ -8,7 +8,7 @@ import java.util.*;
 
 class ProgramPA extends Test                                                    // A progam that manipulates a memory layout via si instructions
  {final Stack<I> code = new Stack<>();                                          // Code of the program
-  final int   maxTime = 1000;                                                   // Maximum numner of steps permitted while running the program
+  final int   maxTime = 100_000;                                                // Maximum numner of steps permitted while running the program
   int            step = 0;                                                      // Execution step
   int            time = 0;                                                      // Execution time
   boolean     running = false;                                                  // Executing if true
@@ -46,6 +46,8 @@ class ProgramPA extends Test                                                    
     for (step = 0, time = 0; step < N && time < maxTime && running; step++, time++)
      {z(); code.elementAt(step).a();
      }
+    if (!running)  stop("Running no longer set but it shoudl be!");
+    if (time >= maxTime) stop("Out of time: ", time);
     running = false;
    }
 
@@ -59,7 +61,7 @@ class ProgramPA extends Test                                                    
 
   void stop(String em)                                                          // Stop everything with an explanatory message
    {z();
-    new I() {void a() {Test.stop(em);} String n() {return "stop";}};
+    new I() {void a() {Test.stop(em, traceBack);} String n() {return "stop";}};
    }
 
   void clear() {z(); code.clear(); running = false;}                            // Clear the program code
@@ -316,10 +318,10 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Structure s = l.structure("s", a, b);
     l.compile();
 
-    MemoryLayoutPA     m = new MemoryLayoutPA();
+    MemoryLayoutPA   m = new MemoryLayoutPA();
     m.layout(l);
     m.memory(new Memory(l.size()));
-    ProgramPA        p = new ProgramPA();
+    ProgramPA        p = m.P;
     Stack<Integer>   f = new Stack<>();
 
     m.at(a).setInt(1);
@@ -353,7 +355,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.layout(l);
     m.memory(new Memory(l.size()));
 
-    ProgramPA        p = new ProgramPA();
+    ProgramPA        p = m.P;
     Stack<Integer>   f = new Stack<>();
 
     m.at(a).setInt(1);
@@ -381,10 +383,10 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
     l.compile();
-    MemoryLayoutPA     m = new MemoryLayoutPA();
+    MemoryLayoutPA   m = new MemoryLayoutPA();
     m.layout(l);
     m.memory(new Memory(l.size()));
-    ProgramPA        p = new ProgramPA();
+    ProgramPA        p = m.P;
     Stack<Integer>   f = new Stack<>();
 
     m.at(a).setInt(1);
