@@ -2916,8 +2916,7 @@ P.new I() {void a() {say("GGGG balance");}};
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
-   {if (true) return;
-    test_put_ascending();
+   {test_put_ascending();
     test_put_ascending_wide();
     test_put_descending();
     test_put_small_random();
@@ -2931,7 +2930,7 @@ P.new I() {void a() {say("GGGG balance");}};
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_put_ascending();
+    test_put_ascending_wide();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
