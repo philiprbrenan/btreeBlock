@@ -303,14 +303,14 @@ public class Test                                                               
     return;
    }
 
-  static void say(Object...O)                                                   // Say something
+  static StringBuilder saySb(Object...O)                                        // Say something into a string builder
    {final StringBuilder b = new StringBuilder();                                // Print as a series of whitespace separated items
     for (int i = 0; i <  O.length; ++i)
      {final Object o = O[i];
       if (o == null) {b.append("(null)"); continue;}
       final String s = o.toString();
 
-      if (b.length() > 0 && s.length() > 0 && s.charAt(s.length()-1) == '\n')   // Print a string that has a new line at the end indocating it is vertially aligned
+      if (b.length() > 0 && s.length() > 0 && s.charAt(s.length()-1) == '\n')   // Print a string that has a new line at the end indicating it is vertially aligned
        {b.append("\n"+s);
        }
 
@@ -319,6 +319,11 @@ public class Test                                                               
         !Character.isWhitespace(s.charAt(0))) b.append(" "+s);
       else b.append(s);
      }
+    return  b;
+   }
+
+  static void say(Object...O)                                                   // Say something
+   {final StringBuilder b = saySb(O);                                           // Print as a series of whitespace separated items
 
     if (sayThisOrStop.size() > 0)                                               // Convert the say into a stop if the expected message does not eventuate
      {final String act = b.toString() .replace("\n", "\\n").trim();             // Message we actually got
