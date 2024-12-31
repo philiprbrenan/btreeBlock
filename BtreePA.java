@@ -311,7 +311,7 @@ abstract class BtreePA extends Test                                             
   Layout.Variable            search;                                            // Search key
   Layout.Bit                  found;                                            // Whether the key was found
   Layout.Variable               key;                                            // Key to insert
-  Layout.Variable              data;                                            // Data associated with the key
+  Layout.Variable              data;                                            // Data associated with the key found
 
   Layout.Variable          firstKey;                                            // First of right leaf
   Layout.Variable           lastKey;                                            // Last of left leaf
@@ -349,7 +349,7 @@ abstract class BtreePA extends Test                                             
   Layout.Variable               top;                                            // The top next element of a branch - only used in printing
                                                                                 // Find, insert, delete - the public entry points to this module
   Layout.Variable               Key;                                            // Key being found, inserted or deleted
-  Layout.Variable              Data;                                            // Data found, inserted or deleted
+  Layout.Variable              Data;                                            // Data associated with the key being inserted
   Layout.Variable              find;                                            // Results of a find operation
   Layout.Variable     findAndInsert;                                            // Results of a find and insert operation
   Layout.Variable            parent;                                            // Parent node in a descent through the tree
@@ -1328,19 +1328,20 @@ abstract class BtreePA extends Test                                             
                    {for (int i = 0; i < maxKeysPerLeaf(); ++i)                  // Merge in right child leaf
                      {tt(node_isEmpty, r);
                       isEmpty();
+
                       P.GoOn(end, T.at(isEmpty));                               // Stop when right leaf child is empty
                       lR.shift();
                       bT.T.at(bT.tKey ).move(lR.T.at(lR.tKey));
                       bT.T.at(bT.tData).move(lR.T.at(lR.tData));
                       bT.push();
                      }
-                    T.setIntInstruction(node_setLeaf, root);                    // The root is now a leaf
-                    setLeaf();
-                    tt(node_free, l); free();                                   // Free the children
-                    tt(node_free, r); free();
-                    z(); T.at(stolenOrMerged).ones(); P.Goto(Return);
                    }
                  };
+                T.setIntInstruction(node_setLeaf, root);                    // The root is now a leaf
+                setLeaf();
+                tt(node_free, l); free();                                   // Free the children
+                tt(node_free, r); free();
+                z(); T.at(stolenOrMerged).ones(); P.Goto(Return);
                }
              };
             z(); T.at(stolenOrMerged).zero(); P.Goto(Return);;
@@ -1692,7 +1693,7 @@ abstract class BtreePA extends Test                                             
         T.at(index).greaterThan(T.at(branchSize), T.at(stolenOrMerged));
         P.new If (T.at(stolenOrMerged))
          {void Then()
-           {stop("Index", T.at(index).getInt(), "too big");
+           {P.stop("Index too big");
            }
          };
 
@@ -2000,6 +2001,7 @@ abstract class BtreePA extends Test                                             
          {void Then()
            {z();
             findAndDelete();
+            tt(deleted, found);
             P.Goto(Return);
            }
          };
@@ -2034,7 +2036,7 @@ abstract class BtreePA extends Test                                             
             P.Goto(start);
            }
          };
-        stop("Fallen off the end of the tree");                                 // The tree must be missing a leaf
+        P.stop("Fallen off the end of the tree");                                 // The tree must be missing a leaf
        };
      };
    }
@@ -2105,7 +2107,7 @@ abstract class BtreePA extends Test                                             
     t.P.run(); t.P.clear();
     t.put();
     for(int i = 1; i <= 64; ++i)
-     {say(currentTestName(), i);
+     {//say(currentTestName(), i);
       t.T.at(t.Key).setInt(  i);
       t.T.at(t.Data).setInt( i);
       t.P.run();
@@ -2133,7 +2135,7 @@ abstract class BtreePA extends Test                                             
     t.P.run(); t.P.clear();
     t.put();
     for(int i = 1; i <= 64; ++i)
-     {say(currentTestName(), i);
+     {//say(currentTestName(), i);
       t.T.at(t.Key ).setInt(i);
       t.T.at(t.Data).setInt(i);
       t.P.run();
@@ -2158,7 +2160,7 @@ abstract class BtreePA extends Test                                             
     t.P.run(); t.P.clear();
     t.put();
     for(int i = 64; i > 0; --i)
-     {say(currentTestName(), i);
+     {//say(currentTestName(), i);
       t.T.at(t.Key).setInt(   i);
       t.T.at(t.Data).setInt(  i);
       t.P.run();
@@ -2187,7 +2189,7 @@ abstract class BtreePA extends Test                                             
     t.P.run(); t.P.clear();
     t.put();
     for(int i = 0; i < random_small.length; i++)
-     {say(currentTestName(), i);
+     {//say(currentTestName(), i);
       t.T.at(t.Key).setInt( random_small[i]);
       t.T.at(t.Data).setInt(  i);
       t.P.run();
@@ -2237,11 +2239,12 @@ abstract class BtreePA extends Test                                             
    }
 
   static void test_find()
-   {final BtreePA    t = btreePA(8, 3);
+   {final int N = 64;
+     final BtreePA    t = btreePA(8, 3);
     t.P.run(); t.P.clear();
     t.put();
-    for(int i = 2; i <= 64; i += 2)
-     {say(currentTestName(),  "a", i);
+    for(int i = 2; i <= N; i += 2)
+     {//say(currentTestName(),  "a", i);
       t.T.at(t.Key).setInt(  i);
       t.T.at(t.Data).setInt( i);
       t.P.run();                                                                // Insert
@@ -2263,39 +2266,39 @@ abstract class BtreePA extends Test                                             
 
     t.P.clear();
     t.find();
-    for(int i = 1; i <= 65; i += 2)                                             // Keys that cannot be found
-     {say(currentTestName(), "b", i);
-      t.T.setIntInstruction(t.Key, i);
+    for(int i = 1; i <= N+1; i += 2)                                            // Keys that cannot be found
+     {//say(currentTestName(), "b", i);
+      t.T.at(t.Key).setInt(i);
       t.P.run();
       ok(t.T.at(t.found).getInt(), 0);
      }
 
-    for(int i = 2; i <= 64; i += 2)                                             // Keys that can be found
-     {say(currentTestName(),  "c", i);
-      t.T.setIntInstruction(t.Key, i);
+    for(int i = 2; i <= N; i += 2)                                              // Keys that can be found
+     {//say(currentTestName(),  "c", i);
+      t.T.at(t.Key).setInt(i);
       t.P.run();
       ok(t.T.at(t.found).getInt(), 1);
-      ok(t.T.at(t.Data ).getInt(), i);
+      ok(t.T.at(t.data ).getInt(), i);
      }
 
     t.P.clear();
     t.put();
-    for(int i = 2; i <= 64; i += 2)                                             // Update data associated with each key
-     {say(currentTestName(),  "d", i);
-      t.T.setIntInstruction(t.Key,  i);
-      t.T.setIntInstruction(t.Data, i - 1);
+    for(int i = 2; i <= N; i += 2)                                              // Update data associated with each key
+     {//say(currentTestName(),  "d", i);
+      t.T.at(t.Key) .setInt(i);
+      t.T.at(t.Data).setInt(i-1);
       t.P.run();
      }
 
     t.P.clear();
     t.find();
-    for(int i = 2; i <= 64; i += 2)                                             // Keys that can be found
-     {say(currentTestName(),  "e", i);
-      t.T.setIntInstruction(t.Key, i);
+    for(int i = 2; i <= N; i += 2)                                              // Keys that can be found
+     {//say(currentTestName(),  "e", i);
+      t.T.at(t.Key).setInt(i);
       t.P.run();
       ok(t.T.at(t.found).getInt(), 1);
       t.T.at(t.Key).dec();
-      ok(t.T.at(t.Data ).getInt(), i-1);
+      ok(t.T.at(t.data ).getInt(), i-1);
      }
    }
 
@@ -2308,12 +2311,13 @@ abstract class BtreePA extends Test                                             
 
     t.put();
     for(int i = 1; i <= N; ++i)
-     {say(currentTestName(),  i);
+     {//say(currentTestName(), "a", i);
       t.T.at(t.Key).setInt(  i);
       t.T.at(t.Data).setInt( i);
       t.P.run();
      }
     //t.stop();
+
     t.ok("""
                                                       16                               24                               |
                                                       0                                0.1                              |
@@ -2331,7 +2335,8 @@ abstract class BtreePA extends Test                                             
     t.P.clear();
     t.delete();
     for (int i = 1; i <= N; i++)
-     {t.T.at(t.Key).setInt( i);
+     {//say(currentTestName(), "b", i);
+      t.T.at(t.Key).setInt( i);
       t.P.run();
       //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
       if (box) say("After deleting:", i, t.printBoxed());
@@ -2615,7 +2620,7 @@ abstract class BtreePA extends Test                                             
     final boolean box = false;                                                  // Print read me
     t.put();
     for(int i = 1; i <= N; ++i)
-     {say(currentTestName(),  i);
+     {//say(currentTestName(),  "a", i);
       t.T.at(t.Key).setInt(  i);
       t.T.at(t.Data).setInt( i);
       t.P.run();
@@ -2638,7 +2643,8 @@ abstract class BtreePA extends Test                                             
     t.P.clear();
     t.delete();
     for (int i = N; i > 0; --i)
-     {t.T.at(t.Key).setInt( i);
+     {//say(currentTestName(), "b", i);
+      t.T.at(t.Key).setInt( i);
       t.P.run();
       //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
       if (box) say("After deleting:", i, t.printBoxed());
@@ -2919,8 +2925,9 @@ abstract class BtreePA extends Test                                             
    {final BtreePA t = btreePA(4, 3);
     t.P.run(); t.P.clear();
     t.put();
-    for (int i = 0; i < random_small.length; ++i)
-     {say(currentTestName(),  "a", i);
+    final int N = random_small.length;
+    for (int i = 0; i < N; ++i)
+     {//say(currentTestName(),  "a", i);
       t.T.at(t.Key).setInt( random_small[i]);
       t.T.at(t.Data).setInt(i);
       t.P.run();
@@ -2928,14 +2935,14 @@ abstract class BtreePA extends Test                                             
 
     t.P.clear();
     t.delete();
-    for (int i = 0; i < random_small.length; ++i)
-     {say(currentTestName(),  "b", i);
+    for (int i = 0; i < N; ++i)
+     {//say(currentTestName(),  "b", i);
       t.T.at(t.Key).setInt( -1);
-      t.delete();
+      t.P.run();
       ok(t.T.at(t.deleted).getInt(), 0);
 
       t.T.at(t.Key ).setInt(random_small[i]);
-      t.delete();
+      t.P.run();
       ok(t.T.at(t.deleted).getInt(), 1);
       ok(t.T.at(t.Data)   .getInt(), i);
      }
@@ -2955,7 +2962,8 @@ abstract class BtreePA extends Test                                             
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_delete_small_random();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
