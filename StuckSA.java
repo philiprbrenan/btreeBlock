@@ -2,7 +2,7 @@
 // StuckSP parameterized by a transaction in bit memory
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
-package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
+package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
 
 abstract class StuckSA extends Test                                             // A fixed size stack of ordered key, data pairs
  {abstract int maxSize();                                                       // The maximum number of entries in the stuck.
