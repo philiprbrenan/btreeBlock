@@ -1,8 +1,0 @@
-Address  Jump  Instruction     Target  Source  Constant
-      0        ldrc                 0       0         0
-      1        strd                 0       0         0
-      2        inc                  0       0         0
-      3        strd                 0       0         1
-      4        inc                  0       0         0
-      5        strd                 0       0         2
-      6        stop                 0       0         0
