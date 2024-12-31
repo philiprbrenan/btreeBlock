@@ -8,11 +8,19 @@ import java.util.*;
 
 class ProgramPA extends Test                                                    // A progam that manipulates a memory layout via si instructions
  {final Stack<I> code = new Stack<>();                                          // Code of the program
-  final int   maxTime = 100_000;                                                // Maximum numner of steps permitted while running the program
+  final int   maxTime = 100_000;                                                // Maximum number of steps permitted while running the program
   int            step = 0;                                                      // Execution step
   int            time = 0;                                                      // Execution time
   boolean     running = false;                                                  // Executing if true
   Stack<Label> labels = new Stack<>();                                          // Labels for some instructions
+
+
+  ProgramPA() {}                                                                // Create a program that instructions can be added to and then executed
+
+  ProgramPA(ProgramPA Program)                                                  // Copy a program
+   {for(I     i : Program.code  ) code  .push(i);
+    for(Label l : Program.labels) labels.push(l);
+   }
 
   class Label                                                                   // Label definition
    {int instruction;                                                            // The instruction to which this labels applies
@@ -46,7 +54,7 @@ class ProgramPA extends Test                                                    
     for (step = 0, time = 0; step < N && time < maxTime && running; step++, time++)
      {z(); code.elementAt(step).a();
      }
-    if (!running)  stop("Running no longer set but it shoudl be!");
+    if (!running)  stop("Running no longer set but it should be!");
     if (time >= maxTime) stop("Out of time: ", time);
     running = false;
    }
@@ -120,7 +128,7 @@ class ProgramPA extends Test                                                    
     abstract void code();
    }
 
-  abstract class Loop                                                           // A loop that is executed a specified nunmber of times
+  abstract class Loop                                                           // A loop that is executed a specified number of times
    {final Label start = new Label(), next = new Label(), end = new Label();     // Labels to restart currrent iteration, start the next iteration, or exit the loop
     final MemoryLayoutPA M = new MemoryLayoutPA() ;
     final Layout    layout;
@@ -131,7 +139,8 @@ class ProgramPA extends Test                                                    
     final ProgramPA P = ProgramPA.this;
 
     Loop(int Limit, int Width)
-     {layout    = Layout.layout();
+     {if (Limit < 1) stop("Loop limit must be 1 or more, not:", Limit);
+      layout    = Layout.layout();
       index     = layout.variable ("index",   Width);
       limit     = layout.variable ("limit",   Width);
       compare   = layout.bit      ("compare");
@@ -147,6 +156,37 @@ class ProgramPA extends Test                                                    
       M.at(index).inc();
       M.at(index).lessThanOrEqual(M.at(limit), M.at(compare));
       P.GoOn(start, M.at(compare));
+      end.set();
+     }
+    abstract void code();
+   }
+
+  abstract class Pool                                                           // A loop that is executed a specified number of times in reverse
+   {final Label start = new Label(), next = new Label(), end = new Label();     // Labels to restart currrent iteration, start the next iteration, or exit the loop
+    final MemoryLayoutPA M = new MemoryLayoutPA() ;
+    final Layout    layout;
+    final Layout.Variable  index;
+    final Layout.Bit     compare;
+    final Layout.Structure structure;
+    final ProgramPA P = ProgramPA.this;
+
+    Pool(int Limit, int Width)
+     {if (Limit < 1) stop("Pool start index must be 1 or more, not:", Limit);
+      layout    = Layout.layout();
+      index     = layout.variable ("index",   Width);
+      compare   = layout.bit      ("compare");
+      structure = layout.structure("structure", index, compare);
+      M.layout(layout.compile());
+      M.memory (new Memory(layout.size()));
+      M.program(ProgramPA.this);
+      M.setIntInstruction(index, Limit);
+      start.set();
+      code();
+      next.set();
+      M.at(index).dec();
+      M.at(index).isZero(M.at(compare));
+      P.GoOff(end, M.at(index));
+      P.Goto(start);
       end.set();
      }
     abstract void code();
@@ -424,7 +464,21 @@ Line T       At      Wide       Size    Indices        Value   Name
        }
      };
     p.run();
+    //stop(f);
     ok(f, "[1, 2, 3, 4, 5, 6, 7, 8]");
+   }
+
+  static void test_pool()
+   {ProgramPA p = new ProgramPA();
+    final Stack<Integer> f = new Stack<>();
+    p.new Pool(8, 4)
+     {void code()
+       {P.new I() {void a() {f.push(M.at(index).getInt());}};
+       }
+     };
+    p.run();
+    //stop(f);
+    ok(f, "[8, 7, 6, 5, 4, 3, 2, 1]");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -436,6 +490,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_goOff();
     test_stop();
     test_loop();
+    test_pool();
    }
 
   static void newTests()                                                        // Tests being worked on
