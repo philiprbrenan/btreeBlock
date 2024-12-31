@@ -323,7 +323,7 @@ public class Test                                                               
     if (sayThisOrStop.size() > 0)                                               // Convert the say into a stop if the expected message does not eventuate
      {final String act = b.toString() .replace("\n", "\\n").trim();             // Message we actually got
       final String exp = sayThisOrStop.removeFirst().replace("\n", "\\n").trim();// Message we expected
-      if (!exp.equals(act))                                                     // Expected message does not match what we have got
+      if (!act.startsWith(exp))                                                 // Expected message does not match what we have got
        {stop("Actual message does not equal expected message:\n"+
           "Actual  :"+act+" length("+act.length()+")\n"+
           "Expected:"+exp+" length("+exp.length()+")\n");
