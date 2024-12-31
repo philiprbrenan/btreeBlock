@@ -2,7 +2,7 @@
 // Program with pseudo assembler in memory layouts
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
-package com.AppaApps.Silicon;                                                   // Simulate a silicon chip.
+package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
 
 import java.util.*;
 
