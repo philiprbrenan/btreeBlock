@@ -2,7 +2,7 @@
 // BtreeSP with transaction in bit memory
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
-package com.AppaApps.Silicon;                                                   // Design, layout and simulate a btree in a block on the surface of a silicon chip.
+package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
 // Need binary add so we compute the mid key
 import java.util.*;
 
