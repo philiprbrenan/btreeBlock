@@ -1,0 +1,170 @@
+Address  Jump  Instruction     Target  Source  Constant
+      0        ldrc                 0       6        31
+      1        ldrd                 0       3       160
+      2        sr                   0       3         3
+      3        ldrc                 0       8       159
+      4        label                0       0        21
+      5        ldrc                 0      13         0
+      6        ldrc                 0       5         0
+      7        ldrr                 7       8         0
+      8        ldri                 7       7         0
+      9        ldrr                 5       7         0
+     10        and                  5       6         0
+     11        ldrr                10       5         0
+     12        cmpEq               10       3         0
+     13    15  jumpIfZero           0      10         8
+     14        inc                  0      13         0
+     15        label                0       0         2
+     16        sr                   0       7         1
+     17        ldrr                 5       7         0
+     18        and                  5       6         0
+     19        ldrr                10       5         0
+     20        cmpEq               10       3         0
+     21    23  jumpIfZero           0      10        12
+     22        inc                  0      13         0
+     23        label                0       0         3
+     24        sr                   0       7         1
+     25        ldrr                 5       7         0
+     26        and                  5       6         0
+     27        ldrr                10       5         0
+     28        cmpEq               10       3         0
+     29    31  jumpIfZero           0      10        16
+     30        inc                  0      13         0
+     31        label                0       0         4
+     32        sr                   0       7         1
+     33        ldrr                 5       7         0
+     34        and                  5       6         0
+     35        ldrr                10       5         0
+     36        cmpEq               10       3         0
+     37    39  jumpIfZero           0      10        20
+     38        inc                  0      13         0
+     39        label                0       0         5
+     40        add                  0      13         0
+     41    43  jumpIfZero           0      13        22
+     42        inc                  0       1         0
+     43        label                0       0         6
+     44        ldrr                 9       8         0
+     45        cmpLt                0       9       159
+     46   151  jumpIfZero           0       9        76
+     47        ldrc                 0      12         0
+     48        ldrr                 4       8         0
+     49        inc                  0       4         0
+     50        ldri                 4       4         0
+     51        sl                   0       4         8
+     52        ldrr                 5       8         0
+     53        ldri                 5       5         0
+     54        or                   4       5         0
+     55        ldrr                 5       4         0
+     56        and                  5       6         0
+     57        ldrr                10       5         0
+     58        cmpEq               10       3         0
+     59    61  jumpIfZero           0      10        31
+     60        inc                  0      12         0
+     61        label                0       0         8
+     62        sr                   0       4         1
+     63        ldrr                 5       4         0
+     64        and                  5       6         0
+     65        ldrr                10       5         0
+     66        cmpEq               10       3         0
+     67    69  jumpIfZero           0      10        35
+     68        inc                  0      12         0
+     69        label                0       0         9
+     70        sr                   0       4         1
+     71        ldrr                 5       4         0
+     72        and                  5       6         0
+     73        ldrr                10       5         0
+     74        cmpEq               10       3         0
+     75    77  jumpIfZero           0      10        39
+     76        inc                  0      12         0
+     77        label                0       0        10
+     78        sr                   0       4         1
+     79        ldrr                 5       4         0
+     80        and                  5       6         0
+     81        ldrr                10       5         0
+     82        cmpEq               10       3         0
+     83    85  jumpIfZero           0      10        43
+     84        inc                  0      12         0
+     85        label                0       0        11
+     86        sr                   0       4         1
+     87        ldrr                 5       4         0
+     88        and                  5       6         0
+     89        ldrr                10       5         0
+     90        cmpEq               10       3         0
+     91    93  jumpIfZero           0      10        47
+     92        inc                  0      12         0
+     93        label                0       0        12
+     94        sr                   0       4         1
+     95        ldrr                 5       4         0
+     96        and                  5       6         0
+     97        ldrr                10       5         0
+     98        cmpEq               10       3         0
+     99   101  jumpIfZero           0      10        51
+    100        inc                  0      12         0
+    101        label                0       0        13
+    102        sr                   0       4         1
+    103        ldrr                 5       4         0
+    104        and                  5       6         0
+    105        ldrr                10       5         0
+    106        cmpEq               10       3         0
+    107   109  jumpIfZero           0      10        55
+    108        inc                  0      12         0
+    109        label                0       0        14
+    110        sr                   0       4         1
+    111        ldrr                 5       4         0
+    112        and                  5       6         0
+    113        ldrr                10       5         0
+    114        cmpEq               10       3         0
+    115   117  jumpIfZero           0      10        59
+    116        inc                  0      12         0
+    117        label                0       0        15
+    118        sr                   0       4         1
+    119        ldrr                 5       4         0
+    120        and                  5       6         0
+    121        ldrr                10       5         0
+    122        cmpEq               10       3         0
+    123   125  jumpIfZero           0      10        63
+    124        inc                  0      12         0
+    125        label                0       0        16
+    126        sr                   0       4         1
+    127        ldrr                 5       4         0
+    128        and                  5       6         0
+    129        ldrr                10       5         0
+    130        cmpEq               10       3         0
+    131   133  jumpIfZero           0      10        67
+    132        inc                  0      12         0
+    133        label                0       0        17
+    134        sr                   0       4         1
+    135        ldrr                 5       4         0
+    136        and                  5       6         0
+    137        ldrr                10       5         0
+    138        cmpEq               10       3         0
+    139   141  jumpIfZero           0      10        71
+    140        inc                  0      12         0
+    141        label                0       0        18
+    142        sr                   0       4         1
+    143        ldrr                 5       4         0
+    144        and                  5       6         0
+    145        ldrr                10       5         0
+    146        cmpEq               10       3         0
+    147   149  jumpIfZero           0      10        75
+    148        inc                  0      12         0
+    149        label                0       0        19
+    150        add                  2      12         0
+    151        label                0       0         7
+    152        ldrr                10       8         0
+    153        cmpLt                0      10       159
+    154   160  jumpIfZero           0      10        80
+    155        ldrr                10       8         0
+    156        cmpGt                0      10       128
+    157   159  jumpIfZero           0      10        80
+    158        sub                  2      13         0
+    159        label                0       0        21
+    160        label                0       0        20
+    161        dec                  0       8         0
+    162        ldrr                10       8         0
+    163        cmpGt                0      10       127
+    164     4  jumpIfNotZero        0      10         2
+    165        strd                 0       0       192
+    166        strd                 0       1       193
+    167        strd                 0       2       194
+    168        stop                 0       0         0
