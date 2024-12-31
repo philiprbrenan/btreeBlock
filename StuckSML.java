@@ -2,7 +2,7 @@
 // Stuck in bit memory
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
-package com.AppaApps.Silicon;                                                   // Design, simulate and layout  a binary tree on a silicon chip.
+package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
 // Reference the keys and data through a small mapping table and free stack so that we can manipulate keys and data by a small index rather than copying them directly.
 abstract class StuckSML extends Test                                            // A fixed size stack of ordered key, data pairs with null deemed highest
  {abstract int maxSize();                                                       // The maximum number of entries in the stuck.
@@ -162,7 +162,7 @@ abstract class StuckSML extends Test                                            
 
   void inc  () {z(); assertNotFull (); final int v = getInt(currentSize)+1; setInt(currentSize, v);}  // Increment the current size
   void dec  () {z(); assertNotEmpty(); final int v = getInt(currentSize)-1; setInt(currentSize, v);}  // Decrement the current size
-  void clear() {z();                       final int v = 0                ; setInt(currentSize, v);}  // Clear the stuck
+  void clear() {z();                   final int v = 0                    ; setInt(currentSize, v);}  // Clear the stuck
 
   void push(int key, int data)                                                  // Push an element onto the stuck
    {z();
@@ -276,7 +276,7 @@ abstract class StuckSML extends Test                                            
      }
    }
 
-  void insertElementAt(int key, int data, int Index)                  // Insert an element at the indicated location shifting all the remaining elements up one
+  void insertElementAt(int key, int data, int Index)                            // Insert an element at the indicated location shifting all the remaining elements up one
    {z(); assertInExtended(Index);
     for (int i = size(); i > Index; --i)                                        // Shift the stuck up one place
      {z(); copyKeyData(i, i-1);
@@ -307,7 +307,10 @@ abstract class StuckSML extends Test                                            
       return s.toString();
      }
    }
-  RemoveElementAt removeElementAt1(int Index) {z(); return RemoveElementAt1.removeElementAt(Index);} // Remove the indicated element
+
+  RemoveElementAt removeElementAt1(int Index)                                   // Remove the indicated element
+   {z(); return RemoveElementAt1.removeElementAt(Index);
+   }
 
   class FirstElement extends Result                                             // First element
    {FirstElement firstElement()
@@ -330,8 +333,8 @@ abstract class StuckSML extends Test                                            
       return s.toString();
      }
    }
-  FirstElement firstElement1() {z(); return FirstElement1.firstElement();} // First element
-  FirstElement firstElement2() {z(); return FirstElement2.firstElement();} // First element
+  FirstElement firstElement1() {z(); return FirstElement1.firstElement();}      // First element
+  FirstElement firstElement2() {z(); return FirstElement2.firstElement();}      // First element
 
   class LastElement extends Result                                              // Last element
    {LastElement lastElement()
@@ -400,7 +403,10 @@ abstract class StuckSML extends Test                                            
 
   class SearchExceptLast extends Search                                         // Search for an element ignoring the last element on the stuck
    {SearchExceptLast() {super(); z();}
-    SearchExceptLast searchExceptLast(int search) {z(); search(search); return this;}
+    SearchExceptLast searchExceptLast(int search)
+     {z(); search(search);
+      return this;
+     }
     int   limit() {z(); return size()-1;}                                       // How much of the stuck to search
     String name()         {z(); return "SearchExceptLast";}                     // Name of the search
    }
@@ -447,34 +453,41 @@ abstract class StuckSML extends Test                                            
    }
   SearchFirstGreaterThanOrEqual                                                 // Search for a key
   searchFirstGreaterThanOrEqual1(int Search)
-   {z(); return SearchFirstGreaterThanOrEqual1.searchFirstGreaterThanOrEqual(Search);
+   {z(); return SearchFirstGreaterThanOrEqual1.
+                searchFirstGreaterThanOrEqual(Search);
    }
   SearchFirstGreaterThanOrEqual                                                 // Search for a key
   searchFirstGreaterThanOrEqual2(int Search)
-   {z(); return SearchFirstGreaterThanOrEqual2.searchFirstGreaterThanOrEqual(Search);
+   {z(); return SearchFirstGreaterThanOrEqual2.
+                searchFirstGreaterThanOrEqual(Search);
    }
 
   class     SearchFirstGreaterThanOrEqualExceptLast                             // Search for an element ignoring the last element on the stuck
     extends SearchFirstGreaterThanOrEqual
    {SearchFirstGreaterThanOrEqualExceptLast()           {}
     SearchFirstGreaterThanOrEqualExceptLast
-    searchFirstGreaterThanOrEqualExceptLast(int search) {z(); searchFirstGreaterThanOrEqual(search); return this;}   // Search for a key ignoring the last element on the stuck
-    int   limit() {z(); return size()-1;}                           // How much of the stuck to search
-    String name()         {z(); return "SearchFirstGreaterThanOrEqualExceptLast";}      // Name of the search
+    searchFirstGreaterThanOrEqualExceptLast(int search)                         // Search for a key ignoring the last element on the stuck
+     {z(); searchFirstGreaterThanOrEqual(search);
+      return this;
+     }
+    int   limit() {z(); return size()-1;}                                       // How much of the stuck to search
+    String name() {z(); return "SearchFirstGreaterThanOrEqualExceptLast";}      // Name of the search
    }
   SearchFirstGreaterThanOrEqualExceptLast                                       // Search for a key ignoring the last element on the stuck
   searchFirstGreaterThanOrEqualExceptLast1(int Search)
-   {z(); return SearchFirstGreaterThanOrEqualExceptLast1.searchFirstGreaterThanOrEqualExceptLast(Search);
+   {z(); return SearchFirstGreaterThanOrEqualExceptLast1.
+                searchFirstGreaterThanOrEqualExceptLast(Search);
    }
   SearchFirstGreaterThanOrEqualExceptLast                                       // Search for a key ignoring the last element on the stuck
   searchFirstGreaterThanOrEqualExceptLast2(int Search)
-   {z(); return SearchFirstGreaterThanOrEqualExceptLast2.searchFirstGreaterThanOrEqualExceptLast(Search);
+   {z(); return SearchFirstGreaterThanOrEqualExceptLast2.
+                searchFirstGreaterThanOrEqualExceptLast(Search);
    }
 
 //D1 Print                                                                      // Print a stuck
 
-  public String toString()
-   {final StringBuilder s = new StringBuilder();                                //
+  public String toString()                                                      // Print a stuck
+   {final StringBuilder s = new StringBuilder();
     z();
     final int N = size();
     s.append("StuckSML(maxSize:"+maxSize());
