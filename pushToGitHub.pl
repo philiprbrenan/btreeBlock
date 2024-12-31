@@ -19,7 +19,7 @@ my @ext  = qw(.java .md .pl .txt .png .py);                                     
 #  @ext  = qw(.java .md .pl .txt);                                              # Reduced set of files to upload to github
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
-        @files = grep {!m(z/)} @files;                                          # Remove backups
+        @files = grep {!m(z/|machine/)} @files;                                 # Remove backups
 my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
 
 for my $s(@files)                                                               # Upload each selected file
