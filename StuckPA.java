@@ -137,12 +137,12 @@ abstract class StuckPA extends Test                                             
 
   void assertNotFull()                                                          // Assert the stuck is not full
    {z();
-    P.new I() {void a() {if (T.at(isFull).getInt() > 0) stop("Full");}};
+    P.new I() {void a() {if (T.at(isFull).getInt() > 0) stop("Full", traceBack);}};
    }
 
   void assertNotEmpty()                                                         // Assert the stuck is not empty
    {z();
-    P.new I() {void a() {if (T.at(isEmpty).getInt() > 0) stop("Empty");}};
+    P.new I() {void a() {if (T.at(isEmpty).getInt() > 0) stop("Empty", traceBack);}};
    }
 
   void assertInNormal()                                                         // Check that the index would yield a valid element
@@ -151,7 +151,7 @@ abstract class StuckPA extends Test                                             
      {void a()
        {final int i = T.at(index).getInt();
         final int n = T.at(size) .getInt();
-        if (i < 0 || i >= n) stop("Out of normal range",   i, "for size", n);
+        if (i < 0 || i >= n) stop("Out of normal range",   i, "for size", n, traceBack);
        }
      };
    }
@@ -162,7 +162,7 @@ abstract class StuckPA extends Test                                             
      {void a()
        {final int i = T.at(index).getInt();
         final int n = T.at(size) .getInt();
-        if (i < 0 || i > n) stop("Out of extended range", i, "for size", n);
+        if (i < 0 || i > n) stop("Out of extended range", i, "for size", n, traceBack);
        }
      };
    }
