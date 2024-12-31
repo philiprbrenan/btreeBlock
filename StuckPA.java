@@ -137,7 +137,14 @@ abstract class StuckPA extends Test                                             
 
   void assertNotFull()                                                          // Assert the stuck is not full
    {z();
-    P.new I() {void a() {if (T.at(isFull).getInt() > 0) stop("Full", traceBack);}};
+   final StuckPA t = this;
+    P.new I()
+     {void a()
+       {if (T.at(isFull).getInt() > 0)
+         {stop("Stuck full, base:", t.M.base, traceBack);
+         }
+       }
+     };
    }
 
   void assertNotEmpty()                                                         // Assert the stuck is not empty
@@ -566,7 +573,7 @@ StuckSML(maxSize:8 size:4)
     s.T.at(s.tKey).setInt( 9); s.T.at(s.tData  ).setInt( 9); s.push();
     s.T.at(s.tKey).setInt( 8); s.T.at(s.tData  ).setInt( 8); s.push();
     s.P.new I() {void a() {ok(s.T.at(s.isFull  ).getInt() == 1);}};
-    s.P.new I() {void a() {sayThisOrStop("Full");}};
+    s.P.new I() {void a() {sayThisOrStop("Stuck full, base:");}};
     s.T.at(s.tKey).setInt(7); s.T.at(s.tData).setInt(7); s.push();
     try {s.P.run();} catch(RuntimeException e) {}
    }
@@ -647,7 +654,7 @@ StuckSML(maxSize:8 size:5)
     s.unshift(); s.unshift(); s.unshift();
     s.P.run(); s.P.clear();
     ok(s.T.at(s.isFull).getInt() == 1);
-    sayThisOrStop("Full");
+    sayThisOrStop("Stuck full, base:");
     s.unshift();
     try {s.P.run();} catch(RuntimeException e) {}
    }
