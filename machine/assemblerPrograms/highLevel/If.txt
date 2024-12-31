@@ -1,0 +1,12 @@
+Address  Jump  Instruction     Target  Source  Constant
+      0        ldrc                 0       0       255
+      1        label                0       0         2
+      2        ldrr                 1       0         0
+      3        sl                   0       1        15
+      4        sr                   0       1        15
+      5     7  jumpIfZero           0       1         4
+      6        stri                 0       0         0
+      7        label                0       0         2
+      8        dec                  0       0         0
+      9     1  jumpIfNotZero        0       0         1
+     10        stop                 0       0         0
