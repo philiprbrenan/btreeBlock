@@ -3,7 +3,8 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-// Need binary add so we compute the mid key
+// Need binary add so we compute the mid key no matter how many bits
+// Need two versions of Two - one for leaf one for branch
 import java.util.*;
 
 abstract class BtreePA extends Test                                             // Manipulate a btree using static methods and memory
@@ -170,6 +171,18 @@ abstract class BtreePA extends Test                                             
       int bitsPerData     () {return          32;}
       int bitsPerNext     () {return          32;}
       int bitsPerSize     () {return          32;}
+     };
+   }
+
+  static BtreePA btreePA_small()                                                // Define a small test btree
+   {return new BtreePA()
+     {int maxSize         () {return  8;}
+      int maxKeysPerLeaf  () {return  2;}
+      int maxKeysPerBranch() {return  3;}
+      int bitsPerKey      () {return  4;}
+      int bitsPerData     () {return  4;}
+      int bitsPerNext     () {return  4;}
+      int bitsPerSize     () {return  4;}
      };
    }
 
@@ -844,7 +857,9 @@ abstract class BtreePA extends Test                                             
      };
 
     allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
+P.new I() {void a() {say("AAAA11 l", T.at(l));}};
     allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
+P.new I() {void a() {say("AAAA22 r", T.at(r));}};
 
     T.at(node_leafBase).zero(); leafBase(); lT.base(T.at(leafBase));            // Set address of the referenced leaf stuck
     tt  (node_leafBase, l);     leafBase(); lL.base(T.at(leafBase));            // Set address of the referenced leaf stuck
@@ -2931,6 +2946,21 @@ abstract class BtreePA extends Test                                             
      }
    }
 
+  static void test_dump()
+   {final BtreePA t = btreePA_small();
+    t.P.run(); t.P.clear();
+    t.put();
+    final int N = 6;
+    for (int i = 1; i <= N; ++i)
+     {say(currentTestName(),  "a", i);
+      t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(N-i);
+      t.P.run();
+      say("AAAAA", t.M);
+
+     }
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_put_ascending();
     test_put_ascending_wide();
@@ -2942,10 +2972,12 @@ abstract class BtreePA extends Test                                             
     test_delete_descending();
     //test_to_array();
     test_delete_small_random();
+    //test_dump();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_dump();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
