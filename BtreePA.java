@@ -34,7 +34,7 @@ abstract class BtreePA extends Test                                             
     linesToPrintABranch =  4,                                                   // The number of lines required to print a branch
          maxPrintLevels = 10,                                                   // Maximum number of levels to print in a tree
                maxDepth = 99,                                                   // Maximum depth of any realistic tree
-            testMaxSize = github_actions ? 1000 : 100;                          // Maximum number of leaves plus branches during testing
+            testMaxSize = github_actions ? 1000 : 50;                           // Maximum number of leaves plus branches during testing
 
   int          nodeUsed = 0;                                                    // Number of nodes currently in use
   int       maxNodeUsed = 0;                                                    // Maximum number of branches plus leaves used
