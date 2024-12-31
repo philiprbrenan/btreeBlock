@@ -33,22 +33,17 @@ class ProgramPA extends Test                                                    
     final String traceBack = traceBack();                                       // Location of code that defined this instruction
     I()                                                                         // Define an instruction
      {if (running) stop("Cannot define instructions during program execution",
-       traceBack);
+        traceBack);
       instructionNumber = code.size(); code.push(this);
      }
     void   a() {}                                                               // Action performed by instruction
-    void   i() {}                                                               // Initialization for instruction
-    String n() {return "instruction";}                                          // Instruction name
+      String n() {return "instruction";}                                        // Instruction name
    }
 
 //D1 Execute                                                                    // Execute the program
 
-  void initialize()                                                             // Initialize each instruction
-   {z(); for (I i : code) {z(); i.i();}
-   }
-
   void run()                                                                    // Run the program
-   {z(); initialize();
+   {z();
     running = true;
     final int N = code.size();
     for (step = 0, time = 0; step < N && time < maxTime && running; step++, time++)
@@ -59,18 +54,19 @@ class ProgramPA extends Test                                                    
     running = false;
    }
 
-  void halt(String em)                                                          // Halt execution with an explanatory message
+  void halt(Object...O)                                                         // Halt execution with an explanatory message
    {z();
     new I()
-     {void   a() {say(em, traceBack); running = false;}
+     {void   a() {say(O); say(traceBack); running = false;}
       String n() {return "halt";}
      };
    }
 
-  void stop(String em)                                                          // Stop everything with an explanatory message
-   {z();
-    new I() {void a() {Test.stop(em, traceBack);} String n() {return "stop";}};
-   }
+//  void stop(Object...O)                                                         // Stop everything with an explanatory message
+//   {z();
+//    new I() {void a() {say(O); say(traceBack); say("Stopping"); Test.stop();}
+//    String n() {return "stop";}};
+//   }
 
   void clear() {z(); code.clear(); running = false;}                            // Clear the program code
 
