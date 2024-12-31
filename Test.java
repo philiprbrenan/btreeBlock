@@ -2,8 +2,8 @@
 // Test a java program.
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
-package com.AppaApps.Silicon;                                                   // Design, simulate and layout digital a binary tree on a silicon chip.
-// Extend coverage to multiple files
+package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
+
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
