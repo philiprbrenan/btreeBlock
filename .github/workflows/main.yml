@@ -1,4 +1,4 @@
-# Test 2024-12-31 at 20:37:59
+# Test 2024-12-31 at 20:39:31
 
 name: Test
 run-name: btreeBlock
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        task: [Btree, BtreePA, BtreeSA, BtreeSML, BtreeSP, BtreeStuck, BtreeStuckStatic, If, Layout, Memory, MemoryLayout, MemoryLayoutPA, Program, ProgramPA, Stuck, StuckPA, StuckSA, StuckSML, StuckSP, StuckStatic, Test, Machine, Machine2, Machine3, ProblemThree, Machine3_01, Machine3_02, Machine3_03, Machine3_04, Machine3_05]
+        task: [Btree, BtreePA, BtreeSA, BtreeSML, BtreeSP, BtreeStuck, BtreeStuckStatic, If, Layout, Memory, MemoryLayout, MemoryLayoutPA, Program, ProgramPA, Stuck, StuckPA, StuckSA, StuckSML, StuckSP, StuckStatic, Test]
 
     steps:
     - uses: actions/checkout@v4
@@ -153,48 +153,3 @@ jobs:
       if: matrix.task == 'Test'
       run: |
         java -cp Classes com/AppaApps/Silicon/Test
-
-    - name: Test Machine
-      if: matrix.task == 'Machine'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Machine
-
-    - name: Test Machine2
-      if: matrix.task == 'Machine2'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Machine2
-
-    - name: Test Machine3
-      if: matrix.task == 'Machine3'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Machine3
-
-    - name: Test ProblemThree
-      if: matrix.task == 'ProblemThree'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/ProblemThree
-
-    - name: Test Machine3_01
-      if: matrix.task == 'Machine3_01'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Machine3_01
-
-    - name: Test Machine3_02
-      if: matrix.task == 'Machine3_02'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Machine3_02
-
-    - name: Test Machine3_03
-      if: matrix.task == 'Machine3_03'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Machine3_03
-
-    - name: Test Machine3_04
-      if: matrix.task == 'Machine3_04'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Machine3_04
-
-    - name: Test Machine3_05
-      if: matrix.task == 'Machine3_05'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Machine3_05
