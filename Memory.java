@@ -217,6 +217,23 @@ class Memory extends Test                                                       
      }
    }
 
+//D1 Verilog                                                                    // Transfer memory to and from Verilog
+
+  void dumpVerilog(String file)                                                 // Initialize memory in verilog with the contents of this memory
+   {final StringBuilder s = new StringBuilder();
+    final int N = bits.length-1, B = logTwo(N)-1;
+    s.append("reg ["+N+":0] memory;\n");
+    s.append("task initialize_memory;\n");
+    s.append("    begin\n");
+    for(int i = 0; i<= N; ++i)
+     {final int b = bits[i] ? 1 : 0;
+      s.append("        memory["+i+"] = "+b+";\n");
+     }
+    s.append("    end\n");
+    s.append("endtask\n");
+    writeFile(file, s);
+   }
+
 //D0                                                                            // Tests
 
   static void test_set_get()
@@ -326,6 +343,12 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 """);
    }
 
+  static void test_dump_verilog()
+   {Memory m = memory(256);
+    m.alternating(4);
+    m.dumpVerilog("verilog/memory.sv");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_set_get();
     test_zero_ones();
@@ -334,6 +357,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
     test_boolean();
     test_alternating();
     test_all_zeros_and_ones();
+    test_dump_verilog();
    }
 
   static void newTests()                                                        // Tests being worked on
