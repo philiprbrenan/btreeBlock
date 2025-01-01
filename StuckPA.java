@@ -455,10 +455,10 @@ abstract class StuckPA extends Test                                             
   public String toString()                                                      // Print a stuck
    {final StuckPA  s = this;
     final StuckSML t = new StuckSML()
-     {int maxSize    () {return s.maxSize    ();};                               // The maximum number of entries in the stuck.
-      int bitsPerKey () {return s.bitsPerKey ();};                               // The number of bits per key
-      int bitsPerData() {return s.bitsPerData();};                               // The number of bits per data
-      int bitsPerSize() {return s.bitsPerSize();};                               // The number of bits in size field
+     {int maxSize    () {return s.maxSize    ();};                              // The maximum number of entries in the stuck.
+      int bitsPerKey () {return s.bitsPerKey ();};                              // The number of bits per key
+      int bitsPerData() {return s.bitsPerData();};                              // The number of bits per data
+      int bitsPerSize() {return s.bitsPerSize();};                              // The number of bits in size field
      };
     t.M.memory(s.M.memory);
     t.base(s.M.base);
