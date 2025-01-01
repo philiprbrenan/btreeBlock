@@ -6,6 +6,7 @@ package com.AppaApps.Silicon;                                                   
 
 import java.io.*;
 import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.stream.*;
 import java.text.*;
@@ -269,16 +270,102 @@ public class Test                                                               
      }
    }
 
+//D1 Files                                                                      // Operations on files
+
   static Stack<String> readFile(String filePath)                                // Read a file into stack of strings
    {try
      {final Stack<String> S = new Stack<>();
       for(String s:  Files.readAllLines(Paths.get(filePath))) S.push(s);
       return S;
      }
-    catch (IOException e)
-     {stop("Cannot read file", filePath);
+    catch (Exception e)
+     {stop("Cannot read file", filePath, e);
      }
     return null;
+   }
+
+  static void writeFile(String filePath, StringBuilder string)                  // Write a string builder to a file
+   {try
+     {makePath(filePath(filePath));
+       Files.write(Paths.get(filePath), string.toString().getBytes());
+     }
+    catch (Exception e)
+     {stop("Cannot write file", filePath, e);
+     }
+   }
+
+  static void deleteFile(String filePath)                                       // Delete a file
+   {try
+     {Files.delete(Paths.get(filePath));
+     }
+    catch (Exception e)
+     {stop("Cannot delete file", filePath, e);
+     }
+   }
+
+  static void makePath(String folder)                                           // Make a path
+   {try
+     {Files.createDirectories(Paths.get(folder));
+     }
+    catch (Exception e)
+     {stop("Cannot mzkd path", folder, e);
+     }
+   }
+
+  static Stack<Path> findFiles(String filePath)                                 // Find all files in and below a folder
+   {final Stack<Path> files = new Stack<>();
+    try
+     {final Path dir = Paths.get(filePath);
+      Files.walk(dir).filter(Files::isRegularFile).forEach(files::push);
+     }
+    catch (Exception e) {}
+    return files;
+   }
+
+  static void deleteAllFiles(String filePath, int limit)                        // Delete files and folders in the specified folder and its sub folders until the limit on the number of files has been reached or the specified folder has been removed
+   {final Path dir = Paths.get(filePath);                                       // Specify the directory path
+    final int[]limits = {limit};
+    try
+     {Files.walkFileTree(dir, new SimpleFileVisitor<Path>()
+       {public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException
+         {if (limits[0] > 0) Files.delete(file);                                    // Delete the file
+            --limits[0];
+          return limits[0] > 0 ? FileVisitResult.CONTINUE : FileVisitResult.TERMINATE;
+         }
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException
+         {if (limits[0] > 0) Files.delete(dir);                                     // Delete the folder
+            --limits[0];
+          return limits[0] > 0 ? FileVisitResult.CONTINUE : FileVisitResult.TERMINATE;
+         }
+       });
+     }
+    catch (Exception e)
+     {stop("Cannot find files under", filePath, e);
+     }
+   }
+
+  static boolean fileExists(String filePath)                                    // Check whether a file exists
+   {final Path p = Paths.get(filePath);
+    return Files.exists(p) && Files.isRegularFile(p);
+   }
+
+  static boolean folderExists(String folder)                                    // Check whether a folder exists
+   {final Path p = Paths.get(folder);
+    return Files.exists(p) && Files.isDirectory(p);
+   }
+
+  static String fileName(String filePath)                                         // Get the file name from a file path name
+   {return Paths.get(filePath).getFileName().toString();
+   }
+
+  static String filePath(String filePath)                                         // Get the folder name from a file path name
+   {return Paths.get(filePath).getParent().toString() + "/";
+   }
+
+  static String fileExt(String filePath)                                        // Get the extension name from a file path name
+   {final int p = filePath.lastIndexOf(".");
+    return p > 0 && p < filePath.length() - 1 ?
+      filePath.substring(p + 1) : null;
    }
 
 //D2 Timing                                                                     // Print log messages
@@ -572,11 +659,33 @@ CCCCC
     ok(longestLine("A\nBBB\nCC\n"), 4);
    }
 
+  static void test_files()
+   {final String p = "/tmp/z/z/", a = p+"aaa.txt", b = p+"bbb.txt";
+    final StringBuilder s = new StringBuilder();
+    s.append("Hello\nWorld");
+    writeFile(a, s);
+    writeFile(b, s);
+    ok(readFile(a),  "[Hello, World]");
+    ok(findFiles(p), "[/tmp/z/z/aaa.txt, /tmp/z/z/bbb.txt]");
+    deleteAllFiles(p, 1);
+    ok(findFiles(p), "[/tmp/z/z/bbb.txt]");
+    ok(!fileExists("/tmp/z/z/aaa.txt"));
+    ok( fileExists("/tmp/z/z/bbb.txt"));
+    ok( folderExists("/tmp/z/z/"));
+    deleteAllFiles(p, 2);
+    ok(findFiles(p), "[]");
+    ok(!folderExists("/tmp/z/z/"));
+    ok(fileName(a), "aaa.txt");
+    ok(fileExt(a), "txt");
+    ok(filePath(a), "/tmp/z/z/");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_log_two();
     test_max_min();
     test_string();
     test_longest_line();
+    test_files();
    }
 
   static void newTests()                                                        // Tests being worked on
