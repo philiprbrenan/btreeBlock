@@ -1324,23 +1324,19 @@ abstract class BtreePA extends Test                                             
                 T.at(node_leafBase).zero(); leafBase(); lT.base(T.at(leafBase));
                 tt(node_leafBase, l);       leafBase(); lL.base(T.at(leafBase));
                 tt(node_leafBase, r);       leafBase(); lR.base(T.at(leafBase));
-P.new I() {void a() {say("AAAA11");}};
                 P.new Block()
                  {void code()
                    {for (int i = 0; i < maxKeysPerLeaf(); ++i)                  // Merge in left child leaf
                      {tt(node_isEmpty, l);
                       isEmpty();
                       P.GoOn(end, T.at(isEmpty));                               // Stop when left leaf  child is empty
-P.new I() {void a() {say("AAAA22", lL);}};
                       lL.shift();
                       lT.T.at(lT.tKey ).move(lL.T.at(lL.tKey));
                       lT.T.at(lT.tData).move(lL.T.at(lL.tData));
                       lT.push();
-P.new I() {void a() {say("AAAA33", lT);}};
                      }
                    }
                  };
-P.new I() {void a() {say("AAAA44");}};
 
                 P.new Block()
                  {void code()
@@ -2990,10 +2986,11 @@ P.new I() {void a() {say("AAAA44");}};
       3                  2        |
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
+    t.M.memory.dumpVerilog("verilog/inc/memory.sv");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
-   {//test_put_ascending();
+   {test_put_ascending();
     test_put_ascending_wide();
     test_put_descending();
     test_put_small_random();
@@ -3007,9 +3004,9 @@ P.new I() {void a() {say("AAAA44");}};
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    //test_dump();
-    test_put_ascending();
+   {oldTests();
+    test_dump();
+    //test_put_ascending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
