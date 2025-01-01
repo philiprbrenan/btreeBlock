@@ -14,12 +14,13 @@ abstract class BtreePA extends Test                                             
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
-  abstract int bitsPerNext();                                                   // The number of bits in a next field
-  abstract int bitsPerSize();                                                   // The number of bits in stuck size field
   abstract int maxKeysPerLeaf();                                                // Maximum number of leafs in a key
   abstract int maxKeysPerBranch();                                              // Maximum number of keys in a branch
-  final   int splitLeafSize;                                                    // The number of key, data pairs to split out of a leaf
-  final   int splitBranchSize;                                                  // The number of key, next pairs to split out of a branch
+  final    int splitLeafSize;                                                   // The number of key, data pairs to split out of a leaf
+  final    int splitBranchSize;                                                 // The number of key, next pairs to split out of a branch
+  final    int bitsPerAddress;                                                  // The number of bits required to address a bit in memory
+  final    int bitsPerNext;                                                     // The number of bits in a next field
+  final    int bitsPerSize;                                                     // The number of bits in stuck size field
 
   Layout.Field     leaf;                                                        // Layout of a leaf in the memory used by btree
   Layout.Field     branch;                                                      // Layout of a branch in the memory used by btree
@@ -71,7 +72,7 @@ abstract class BtreePA extends Test                                             
   final StuckPA lLeaf;                                                          // Check whether a node has leaves for children
   final StuckPA lEqual;                                                         // Locate an equal key
   final StuckPA lFirstLeaf;                                                     // Locate the first greater or equal key in a leaf
-  final StuckPA lT;                                                             // Process a parent node
+  final StuckPA lT;                                                             // Process a parent node as a leaf
   final StuckPA lL;                                                             // Process a left node
   final StuckPA lR;                                                             // Process a right node
 
@@ -83,6 +84,8 @@ abstract class BtreePA extends Test                                             
    {z();
     splitLeafSize   = maxKeysPerLeaf()   >> 1;                                  // The number of key, data pairs to split out of a leaf
     splitBranchSize = maxKeysPerBranch() >> 1;                                  // The number of key, next pairs to split out of a branch
+    bitsPerNext     = logTwo(maxSize());                                        // The number of bits in a next field sufficient to index any node
+    bitsPerSize     = logTwo(max(bitsPerKey(), bitsPerData())+1);               // The number of bits in stuck size field sufficient to index an key or data element including top
 
     M.layout(layout());
     M.layout.layoutName = "Main";
@@ -90,6 +93,8 @@ abstract class BtreePA extends Test                                             
     M.program(P);
     M.name = "BtreePA";
     M.memory.name = "BtreePA";
+
+    bitsPerAddress = logTwo(M.memory.size());                                   // Number of bits to address any bit in memory
 
     T.layout(transactionLayout());                                              // Memory and layout of memory used by a transaction against the btree
     T.layout.layoutName = "transaction";
@@ -107,8 +112,8 @@ abstract class BtreePA extends Test                                             
        {final StuckPA b = branchTransactions[i] = new StuckPA()
          {int     maxSize() {return BtreePA.this.maxKeysPerBranch()+1;}         // Not forgetting top next
           int  bitsPerKey() {return BtreePA.this.bitsPerKey();}
-          int bitsPerData() {return BtreePA.this.bitsPerNext();}
-          int bitsPerSize() {return BtreePA.this.bitsPerSize();}
+          int bitsPerData() {return BtreePA.this.bitsPerNext;}
+          int bitsPerSize() {return BtreePA.this.bitsPerSize;}
          };
          b.M.memory(M.memory);
          b.M.layout.layoutName = "branchMain";
@@ -125,7 +130,7 @@ abstract class BtreePA extends Test                                             
          {int     maxSize() {return BtreePA.this.maxKeysPerLeaf();}
           int  bitsPerKey() {return BtreePA.this.bitsPerKey();}
           int bitsPerData() {return BtreePA.this.bitsPerData();}
-          int bitsPerSize() {return BtreePA.this.bitsPerSize();}
+          int bitsPerSize() {return BtreePA.this.bitsPerSize;}
          };
          l.M.memory(M.memory);
          l.M.layout.layoutName = "leafMain";
@@ -169,8 +174,6 @@ abstract class BtreePA extends Test                                             
       int maxKeysPerBranch() {return  branchKeys;}
       int bitsPerKey      () {return          32;}
       int bitsPerData     () {return          32;}
-      int bitsPerNext     () {return          32;}
-      int bitsPerSize     () {return          32;}
      };
    }
 
@@ -181,8 +184,6 @@ abstract class BtreePA extends Test                                             
       int maxKeysPerBranch() {return  3;}
       int bitsPerKey      () {return  4;}
       int bitsPerData     () {return  4;}
-      int bitsPerNext     () {return  4;}
-      int bitsPerSize     () {return  4;}
      };
    }
 
@@ -194,15 +195,15 @@ abstract class BtreePA extends Test                                             
      {int               maxSize() {return btree.maxKeysPerLeaf();}
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerData();}
-      int           bitsPerSize() {return btree.bitsPerSize();}
+      int           bitsPerSize() {return btree.bitsPerSize;}
      };
     leafStuck.T.layout.layoutName = "leaf";
 
     final StuckPA branchStuck = new StuckPA()                                   // Branch
      {int               maxSize() {return btree.maxKeysPerBranch()+1;}          // Not forgetting top next
       int            bitsPerKey() {return btree.bitsPerKey();}
-      int           bitsPerData() {return btree.bitsPerNext();}
-      int           bitsPerSize() {return btree.bitsPerSize();}
+      int           bitsPerData() {return btree.bitsPerNext;}
+      int           bitsPerSize() {return btree.bitsPerSize;}
      };
     branchStuck.T.layout.layoutName = "branch";
 
@@ -211,10 +212,10 @@ abstract class BtreePA extends Test                                             
     branch       = l.duplicate("branch",       branchStuck.layout());
     branchOrLeaf = l.union    ("branchOrLeaf", leaf,   branch);
     isLeaf       = l.bit      ("isLeaf");
-    free         = l.variable ("free",         btree.bitsPerNext());
+    free         = l.variable ("free",         btree.bitsPerNext);
     Node         = l.structure("node",         isLeaf, free, branchOrLeaf);
     nodes        = l.array    ("nodes",        Node,         maxSize());
-    freeList     = l.variable ("freeList",     btree.bitsPerNext());
+    freeList     = l.variable ("freeList",     btree.bitsPerNext);
     bTree        = l.structure("bTree",        freeList  , nodes);
     return l.compile();
    }
@@ -408,13 +409,13 @@ abstract class BtreePA extends Test                                             
 
   Layout transactionLayout()                                                    // Layout of temporary storage used during a transaction against the btree
    {final Layout L = new Layout();
-                                    allocate = L.variable ("allocate"                                      , bitsPerNext());
-                                    nextFree = L.variable ("nextFree"                                      , bitsPerNext());
+                                    allocate = L.variable ("allocate"                                      , bitsPerNext);
+                                    nextFree = L.variable ("nextFree"                                      , bitsPerNext);
                                      success = L.bit      ("success"                                       );
                                     inserted = L.bit      ("inserted"                                      );
 
-                                       first = L.variable ("first"                                         , bitsPerSize());
-                                        next = L.variable ("next"                                          , bitsPerKey());
+                                       first = L.variable ("first"                                         , bitsPerSize);
+                                        next = L.variable ("next"                                          , bitsPerNext);
 
                                       search = L.variable ("search"                                        , bitsPerKey());
                                        found = L.bit      ("found"                                         );
@@ -430,15 +431,15 @@ abstract class BtreePA extends Test                                             
                                           ld = L.variable ("ld"                                            , bitsPerData());
                                           rk = L.variable ("rk"                                            , bitsPerKey());
                                           rd = L.variable ("rd"                                            , bitsPerData());
-                                       index = L.variable ("index"                                         , bitsPerSize());
+                                       index = L.variable ("index"                                         , bitsPerSize);
 
-                                          nl = L.variable ("nl"                                            , bitsPerSize());
-                                          nr = L.variable ("nr"                                            , bitsPerSize());
+                                          nl = L.variable ("nl"                                            , bitsPerSize);
+                                          nr = L.variable ("nr"                                            , bitsPerSize);
 
-                                           l = L.variable ("l"                                             , bitsPerNext());
-                                           r = L.variable ("r"                                             , bitsPerNext());
+                                           l = L.variable ("l"                                             , bitsPerNext);
+                                           r = L.variable ("r"                                             , bitsPerNext);
 
-                                 splitParent = L.variable ("splitParent"                                   , bitsPerNext());
+                                 splitParent = L.variable ("splitParent"                                   , bitsPerNext);
                                       IsLeaf = L.bit      ("IsLeaf"                                        );
                                       isFull = L.bit      ("isFull"                                        );
                                      isEmpty = L.bit      ("isEmpty"                                       );
@@ -450,60 +451,60 @@ abstract class BtreePA extends Test                                             
                                    mergeable = L.bit      ("mergeable"                                     );
                                      deleted = L.bit      ("deleted"                                       );
 
-                                    leafBase = L.variable ("leafBase"                                      , bitsPerNext());
-                                  branchBase = L.variable ("branchBase"                                    , bitsPerNext());
-                                    leafSize = L.variable ("leafSize"                                      , bitsPerSize());
-                                  branchSize = L.variable ("branchSize"                                    , bitsPerSize());
-                                         top = L.variable ("top"                                           , bitsPerNext());
+                                    leafBase = L.variable ("leafBase"                                      , bitsPerAddress);
+                                  branchBase = L.variable ("branchBase"                                    , bitsPerAddress);
+                                    leafSize = L.variable ("leafSize"                                      , bitsPerSize);
+                                  branchSize = L.variable ("branchSize"                                    , bitsPerSize);
+                                         top = L.variable ("top"                                           , bitsPerNext);
 
                                          Key = L.variable ("Key"                                           , bitsPerKey());
                                         Data = L.variable ("Data"                                          , bitsPerData());
-                                        find = L.variable ("find"                                          , bitsPerNext());
-                               findAndInsert = L.variable ("findAndInsert"                                 , bitsPerNext());
-                                      parent = L.variable ("parent"                                        , bitsPerNext());
-                                       child = L.variable ("child"                                         , bitsPerNext());
-                                   leafFound = L.variable ("leafFound"                                     , bitsPerNext());
+                                        find = L.variable ("find"                                          , bitsPerNext);
+                               findAndInsert = L.variable ("findAndInsert"                                 , bitsPerNext);
+                                      parent = L.variable ("parent"                                        , bitsPerNext);
+                                       child = L.variable ("child"                                         , bitsPerNext);
+                                   leafFound = L.variable ("leafFound"                                     , bitsPerNext);
 
-                              maxKeysPerLeaf = L.variable ("maxKeysPerLeaf"                                , bitsPerNext());
-                            maxKeysPerBranch = L.variable ("maxKeysPerBranch"                              , bitsPerNext());
-                                    MaxDepth = L.variable ("maxDepth"                                      , bitsPerNext());
-                                         two = L.variable ("two"                                           , bitsPerNext());
-                                   findDepth = L.variable ("findDepth"                                     , bitsPerNext());
-                                    putDepth = L.variable ("putDepth"                                      , bitsPerNext());
-                                 deleteDepth = L.variable ("deleteDepth"                                   , bitsPerNext());
-                                  mergeDepth = L.variable ("mergeDepth"                                    , bitsPerNext());
-                                  mergeIndex = L.variable ("mergeIndex"                                    , bitsPerNext());
+                              maxKeysPerLeaf = L.variable ("maxKeysPerLeaf"                                , bitsPerNext);
+                            maxKeysPerBranch = L.variable ("maxKeysPerBranch"                              , bitsPerNext);
+                                    MaxDepth = L.variable ("maxDepth"                                      , bitsPerNext);
+                                         two = L.variable ("two"                                           , bitsPerNext);
+                                   findDepth = L.variable ("findDepth"                                     , bitsPerNext);
+                                    putDepth = L.variable ("putDepth"                                      , bitsPerNext);
+                                 deleteDepth = L.variable ("deleteDepth"                                   , bitsPerNext);
+                                  mergeDepth = L.variable ("mergeDepth"                                    , bitsPerNext);
+                                  mergeIndex = L.variable ("mergeIndex"                                    , bitsPerNext);
 
-                                 node_isLeaf = L.variable ("node_isLeaf"                                   , bitsPerNext());
-                                node_setLeaf = L.variable ("node_setLeaf"                                  , bitsPerNext());
-                              node_setBranch = L.variable ("node_setBranch"                                , bitsPerNext());
-                             node_assertLeaf = L.variable ("node_assertLeaf"                               , bitsPerNext());
-                           node_assertBranch = L.variable ("node_assertBranch"                             , bitsPerNext());
-                                   allocLeaf = L.variable ("allocLeaf"                                     , bitsPerNext());
-                                 allocBranch = L.variable ("allocBranch"                                   , bitsPerNext());
-                                   node_free = L.variable ("node_free"                                     , bitsPerNext());
-                                  node_clear = L.variable ("node_clear"                                    , bitsPerNext());
-                                  node_erase = L.variable ("node_erase"                                    , bitsPerNext());
-                               node_leafBase = L.variable ("node_leafBase"                                 , bitsPerNext());
-                             node_branchBase = L.variable ("node_branchBase"                               , bitsPerNext());
-                               node_leafSize = L.variable ("node_leafSize"                                 , bitsPerNext());
-                             node_branchSize = L.variable ("node_branchSize"                               , bitsPerNext());
-                                 node_isFull = L.variable ("node_isFull"                                   , bitsPerNext());
-                                node_isEmpty = L.variable ("node_isEmpty"                                  , bitsPerNext());
-                                  node_isLow = L.variable ("node_isLow"                                    , bitsPerNext());
-                   node_hasLeavesForChildren = L.variable ("node_hasLeavesForChildren"                     , bitsPerNext());
-                                    node_top = L.variable ("node_top"                                      , bitsPerNext());
-                        node_findEqualInLeaf = L.variable ("node_findEqualInLeaf"                          , bitsPerNext());
-      node_findFirstGreaterThanOrEqualInLeaf = L.variable ("node_findFirstGreaterThanOrEqualInLeaf"        , bitsPerNext());
-    node_findFirstGreaterThanOrEqualInBranch = L.variable ("node_findFirstGreaterThanOrEqualInBranch"      , bitsPerNext());
-                              node_splitLeaf = L.variable ("node_splitLeaf"                                , bitsPerNext());
-                            node_splitBranch = L.variable ("node_splitBranch"                              , bitsPerNext());
-                          node_stealFromLeft = L.variable ("node_stealFromLeft"                            , bitsPerNext());
-                         node_stealFromRight = L.variable ("node_stealFromRight"                           , bitsPerNext());
-                              node_mergeRoot = L.variable ("node_mergeRoot"                                , bitsPerNext());
-                       node_mergeLeftSibling = L.variable ("node_mergeLeftSibling"                         , bitsPerNext());
-                      node_mergeRightSibling = L.variable ("node_mergeRightSibling"                        , bitsPerNext());
-                                node_balance = L.variable ("node_balance"                                  , bitsPerNext());
+                                 node_isLeaf = L.variable ("node_isLeaf"                                   , bitsPerNext);
+                                node_setLeaf = L.variable ("node_setLeaf"                                  , bitsPerNext);
+                              node_setBranch = L.variable ("node_setBranch"                                , bitsPerNext);
+                             node_assertLeaf = L.variable ("node_assertLeaf"                               , bitsPerNext);
+                           node_assertBranch = L.variable ("node_assertBranch"                             , bitsPerNext);
+                                   allocLeaf = L.variable ("allocLeaf"                                     , bitsPerNext);
+                                 allocBranch = L.variable ("allocBranch"                                   , bitsPerNext);
+                                   node_free = L.variable ("node_free"                                     , bitsPerNext);
+                                  node_clear = L.variable ("node_clear"                                    , bitsPerNext);
+                                  node_erase = L.variable ("node_erase"                                    , bitsPerNext);
+                               node_leafBase = L.variable ("node_leafBase"                                 , bitsPerNext);
+                             node_branchBase = L.variable ("node_branchBase"                               , bitsPerNext);
+                               node_leafSize = L.variable ("node_leafSize"                                 , bitsPerNext);
+                             node_branchSize = L.variable ("node_branchSize"                               , bitsPerNext);
+                                 node_isFull = L.variable ("node_isFull"                                   , bitsPerNext);
+                                node_isEmpty = L.variable ("node_isEmpty"                                  , bitsPerNext);
+                                  node_isLow = L.variable ("node_isLow"                                    , bitsPerNext);
+                   node_hasLeavesForChildren = L.variable ("node_hasLeavesForChildren"                     , bitsPerNext);
+                                    node_top = L.variable ("node_top"                                      , bitsPerNext);
+                        node_findEqualInLeaf = L.variable ("node_findEqualInLeaf"                          , bitsPerNext);
+      node_findFirstGreaterThanOrEqualInLeaf = L.variable ("node_findFirstGreaterThanOrEqualInLeaf"        , bitsPerNext);
+    node_findFirstGreaterThanOrEqualInBranch = L.variable ("node_findFirstGreaterThanOrEqualInBranch"      , bitsPerNext);
+                              node_splitLeaf = L.variable ("node_splitLeaf"                                , bitsPerNext);
+                            node_splitBranch = L.variable ("node_splitBranch"                              , bitsPerNext);
+                          node_stealFromLeft = L.variable ("node_stealFromLeft"                            , bitsPerNext);
+                         node_stealFromRight = L.variable ("node_stealFromRight"                           , bitsPerNext);
+                              node_mergeRoot = L.variable ("node_mergeRoot"                                , bitsPerNext);
+                       node_mergeLeftSibling = L.variable ("node_mergeLeftSibling"                         , bitsPerNext);
+                      node_mergeRightSibling = L.variable ("node_mergeRightSibling"                        , bitsPerNext);
+                                node_balance = L.variable ("node_balance"                                  , bitsPerNext);
 
     final Layout.Structure transaction = L.structure("transaction", allocate,
       nextFree, success, inserted, first, next, search, found, key, data,
@@ -586,8 +587,25 @@ abstract class BtreePA extends Test                                             
     M.at(Node, T.at(node_erase)).ones();
    }
 
-  private void leafBase()   {z(); P.new I() {void a() {T.at(leafBase  ).setInt(M.at(leaf,   T.at(node_leafBase  )).setOff().at);}};} // Base of leaf stuck in memory
-  private void branchBase() {z(); P.new I() {void a() {T.at(branchBase).setInt(M.at(branch, T.at(node_branchBase)).setOff().at);}};} // Base of branch stuck in memory
+  private void leafBase()                                                       // Base of leaf stuck in memory
+   {z();
+    P.new I()
+     {void a()
+       {final MemoryLayoutPA.At a = M.at(leaf, T.at(node_leafBase)).setOff();
+        T.at(leafBase).setInt(a.at);
+       }
+     };
+   }
+
+  private void branchBase()
+   {z();
+    P.new I()                                                                   // Base of branch stuck in memory
+     {void a()
+       {final MemoryLayoutPA.At a = M.at(branch, T.at(node_branchBase)).setOff();
+        T.at(branchBase).setInt(a.at);
+       }
+     };
+   }
 
   private void leafSize()                                                       // Number of children in body of leaf
    {z();
@@ -857,9 +875,7 @@ abstract class BtreePA extends Test                                             
      };
 
     allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
-P.new I() {void a() {say("AAAA11 l", T.at(l));}};
     allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
-P.new I() {void a() {say("AAAA22 r", T.at(r));}};
 
     T.at(node_leafBase).zero(); leafBase(); lT.base(T.at(leafBase));            // Set address of the referenced leaf stuck
     tt  (node_leafBase, l);     leafBase(); lL.base(T.at(leafBase));            // Set address of the referenced leaf stuck
@@ -1275,13 +1291,9 @@ P.new I() {void a() {say("AAAA22 r", T.at(r));}};
         stealNotPossible(end);
 
         z();
-        T.at(node_branchBase).zero();
-        branchBase();
-        bT.base(T.at(branchBase));
-        bT.firstElement();
-        T.at(l).move(bT.T.at(bT.tData));
-        bT. lastElement();
-        T.at(r).move(bT.T.at(bT.tData));
+        T.at(node_branchBase).zero(); branchBase();  bT.base(T.at(branchBase));
+        bT.firstElement(); T.at(l).move(bT.T.at(bT.tData));
+        bT. lastElement(); T.at(r).move(bT.T.at(bT.tData));
 
         T.setIntInstruction(node_hasLeavesForChildren, root);
         hasLeavesForChildren();
@@ -1305,8 +1317,9 @@ P.new I() {void a() {say("AAAA22 r", T.at(r));}};
             P.new If (T.at(mergeable))
              {void Then()
                {z(); bT.clear();
-                tt(node_leafBase, l); leafBase(); lL.base(T.at(leafBase));
-                tt(node_leafBase, r); leafBase(); lR.base(T.at(leafBase));
+                T.at(node_leafBase).zero(); leafBase(); lT.base(T.at(leafBase));
+                tt(node_leafBase, l);       leafBase(); lL.base(T.at(leafBase));
+                tt(node_leafBase, r);       leafBase(); lR.base(T.at(leafBase));
                 P.new Block()
                  {void code()
                    {for (int i = 0; i < maxKeysPerLeaf(); ++i)                  // Merge in left child leaf
@@ -1314,9 +1327,9 @@ P.new I() {void a() {say("AAAA22 r", T.at(r));}};
                       isEmpty();
                       P.GoOn(end, T.at(isEmpty));                               // Stop when left leaf  child is empty
                       lL.shift();
-                      bT.T.at(bT.tKey ).move(lL.T.at(lL.tKey));
-                      bT.T.at(bT.tData).move(lL.T.at(lL.tData));
-                      bT.push();
+                      lT.T.at(lT.tKey ).move(lL.T.at(lL.tKey));
+                      lT.T.at(lT.tData).move(lL.T.at(lL.tData));
+                      lT.push();
                      }
                    }
                  };
@@ -1329,9 +1342,9 @@ P.new I() {void a() {say("AAAA22 r", T.at(r));}};
 
                       P.GoOn(end, T.at(isEmpty));                               // Stop when right leaf child is empty
                       lR.shift();
-                      bT.T.at(bT.tKey ).move(lR.T.at(lR.tKey));
-                      bT.T.at(bT.tData).move(lR.T.at(lR.tData));
-                      bT.push();
+                      lT.T.at(lT.tKey ).move(lR.T.at(lR.tKey));
+                      lT.T.at(lT.tData).move(lR.T.at(lR.tData));
+                      lT.push();
                      }
                    }
                  };
@@ -1778,8 +1791,8 @@ P.new I() {void a() {say("AAAA22 r", T.at(r));}};
       int maxKeysPerBranch() {return p.maxKeysPerBranch();}
       int bitsPerKey      () {return p.bitsPerKey      ();}
       int bitsPerData     () {return p.bitsPerData     ();}
-      int bitsPerNext     () {return p.bitsPerNext     ();}
-      int bitsPerSize     () {return p.bitsPerSize     ();}
+      int bitsPerNext     () {return p.bitsPerNext       ;}
+      int bitsPerSize     () {return p.bitsPerSize       ;}
       Memory   memory     () {return p.M.memory;}                               // The memory to be used by the btree
      };
     s.fixMemory(p.M.memory);
@@ -2950,15 +2963,25 @@ P.new I() {void a() {say("AAAA22 r", T.at(r));}};
    {final BtreePA t = btreePA_small();
     t.P.run(); t.P.clear();
     t.put();
-    final int N = 6;
+    final int N = 9;
     for (int i = 1; i <= N; ++i)
      {say(currentTestName(),  "a", i);
       t.T.at(t.Key ).setInt(i);
       t.T.at(t.Data).setInt(N-i);
       t.P.run();
-      say("AAAAA", t.M);
-
      }
+    //stop(t);
+    ok(t, """
+             4                    |
+             0                    |
+             5                    |
+             6                    |
+      2             6    7        |
+      5             6    6.1      |
+      1             4    7        |
+      3                  2        |
+1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
+""");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
