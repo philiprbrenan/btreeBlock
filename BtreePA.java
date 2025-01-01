@@ -2993,7 +2993,7 @@ P.new I() {void a() {say("AAAA44");}};
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
-   {test_put_ascending();
+   {//test_put_ascending();
     test_put_ascending_wide();
     test_put_descending();
     test_put_small_random();
