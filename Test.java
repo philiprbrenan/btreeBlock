@@ -518,6 +518,19 @@ public class Test                                                               
 
 //D0                                                                            // Tests
 
+  static void test_log_two()
+   {ok(logTwo(0), 0);
+    ok(logTwo(1), 0);
+    ok(logTwo(2), 1);
+    ok(logTwo(3), 2);
+    ok(logTwo(4), 2);
+    ok(logTwo(5), 3);
+    ok(logTwo(6), 3);
+    ok(logTwo(8), 3);
+    ok(logTwo(7), 3);
+    ok(logTwo(9), 4);
+   }
+
   static void test_max_min()
    {ok(min(3,  2,  1),  1);
     ok(max(1,  2,  3),  3);
@@ -560,7 +573,8 @@ CCCCC
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
-   {test_max_min();
+   {test_log_two();
+    test_max_min();
     test_string();
     test_longest_line();
    }
