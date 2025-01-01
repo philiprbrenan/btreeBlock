@@ -3009,7 +3009,7 @@ P.new I() {void a() {say("AAAA44");}};
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
     //test_dump();
-    test_delete_small_random();
+    test_put_ascending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
