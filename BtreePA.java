@@ -469,15 +469,15 @@ abstract class BtreePA extends Test                                             
                                        child = L.variable ("child"                                         , bitsPerNext);
                                    leafFound = L.variable ("leafFound"                                     , bitsPerNext);
 
-                              maxKeysPerLeaf = L.variable ("maxKeysPerLeaf"                                , bitsPerNext);
-                            maxKeysPerBranch = L.variable ("maxKeysPerBranch"                              , bitsPerNext);
+                              maxKeysPerLeaf = L.variable ("maxKeysPerLeaf"                                , bitsPerSize);
+                            maxKeysPerBranch = L.variable ("maxKeysPerBranch"                              , bitsPerSize);
                                     MaxDepth = L.variable ("maxDepth"                                      , bitsPerNext);
-                                         two = L.variable ("two"                                           , bitsPerNext);
+                                         two = L.variable ("two"                                           , bitsPerSize);
                                    findDepth = L.variable ("findDepth"                                     , bitsPerNext);
                                     putDepth = L.variable ("putDepth"                                      , bitsPerNext);
                                  deleteDepth = L.variable ("deleteDepth"                                   , bitsPerNext);
                                   mergeDepth = L.variable ("mergeDepth"                                    , bitsPerNext);
-                                  mergeIndex = L.variable ("mergeIndex"                                    , bitsPerNext);
+                                  mergeIndex = L.variable ("mergeIndex"                                    , bitsPerSize);
 
                                  node_isLeaf = L.variable ("node_isLeaf"                                   , bitsPerNext);
                                 node_setLeaf = L.variable ("node_setLeaf"                                  , bitsPerNext);
@@ -2989,7 +2989,7 @@ abstract class BtreePA extends Test                                             
     t.M.memory.dumpVerilog("verilog/inc/memory.sv");
    }
 
-  static void oldTests2()                                                        // Tests thought to be in good shape
+  static void oldTests()                                                        // Tests thought to be in good shape
    {test_put_ascending();
     test_put_ascending_wide();
     test_put_descending();
@@ -3003,15 +3003,10 @@ abstract class BtreePA extends Test                                             
     test_dump();
    }
 
-  static void oldTests()                                                        // Tests thought to be in good shape
-   {test_delete_small_random();
-    test_dump();
-   }
-
   static void newTests()                                                        // Tests being worked on
    {oldTests();
     test_dump();
-    //test_put_ascending();
+    test_put_ascending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
