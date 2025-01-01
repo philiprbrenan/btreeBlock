@@ -52,10 +52,14 @@ abstract class BtreePA extends Test                                             
   final int Branch_tr          = 3;                                             // Process a right node
   final int Branch_length      = 4;                                             // Number of transaction types
 
-  final int Leaf_T             = 0;                                             // Process a parent node
-  final int Leaf_tl            = 1;                                             // Process a left node
-  final int Leaf_tr            = 2;                                             // Process a right node
-  final int Leaf_length        = 3;                                             // Number of transaction types
+  final int Leaf_Size          = 0;                                             // Get the size of a stuck
+  final int Leaf_Leaf          = 0;                                             // Check whether a node has leaves for children
+  final int Leaf_Equal         = 0;                                             // Get the top element of a branch
+  final int Leaf_FirstLeaf     = 0;                                             // Locate the first greater or equal key in a branch
+  final int Leaf_T             = 1;                                             // Process a parent node
+  final int Leaf_tl            = 2;                                             // Process a left node
+  final int Leaf_tr            = 3;                                             // Process a right node
+  final int Leaf_length        = 4;                                             // Number of transaction types
 
   final StuckPA[]branchTransactions;                                            // Transactions to use on branch stucks
   final StuckPA[]  leafTransactions;                                            // Transactions to use on leaf stucks
@@ -147,10 +151,10 @@ abstract class BtreePA extends Test                                             
     bL           = branchTransactions[Branch_tl         ];                      // Process a left node
     bR           = branchTransactions[Branch_tr         ];                      // Process a right node
 
-    lSize        =   leafTransactions[Leaf_T            ];                      // Leaf size
-    lLeaf        =   leafTransactions[Leaf_T            ];                      // Print a leaf
-    lEqual       =   leafTransactions[Leaf_T            ];                      // Locate an equal key
-    lFirstLeaf   =   leafTransactions[Leaf_T            ];                      // Locate the first greater or equal key in a leaf
+    lSize        =   leafTransactions[Leaf_Size         ];                      // Leaf size
+    lLeaf        =   leafTransactions[Leaf_Leaf         ];                      // Print a leaf
+    lEqual       =   leafTransactions[Leaf_Equal        ];                      // Locate an equal key
+    lFirstLeaf   =   leafTransactions[Leaf_FirstLeaf    ];                      // Locate the first greater or equal key in a leaf
     lT           =   leafTransactions[Leaf_T            ];                      // Process a parent node
     lL           =   leafTransactions[Leaf_tl           ];                      // Process a left node
     lR           =   leafTransactions[Leaf_tr           ];                      // Process a right node
@@ -1320,19 +1324,23 @@ abstract class BtreePA extends Test                                             
                 T.at(node_leafBase).zero(); leafBase(); lT.base(T.at(leafBase));
                 tt(node_leafBase, l);       leafBase(); lL.base(T.at(leafBase));
                 tt(node_leafBase, r);       leafBase(); lR.base(T.at(leafBase));
+P.new I() {void a() {say("AAAA11");}};
                 P.new Block()
                  {void code()
                    {for (int i = 0; i < maxKeysPerLeaf(); ++i)                  // Merge in left child leaf
                      {tt(node_isEmpty, l);
                       isEmpty();
                       P.GoOn(end, T.at(isEmpty));                               // Stop when left leaf  child is empty
+P.new I() {void a() {say("AAAA22", lL);}};
                       lL.shift();
                       lT.T.at(lT.tKey ).move(lL.T.at(lL.tKey));
                       lT.T.at(lT.tData).move(lL.T.at(lL.tData));
                       lT.push();
+P.new I() {void a() {say("AAAA33", lT);}};
                      }
                    }
                  };
+P.new I() {void a() {say("AAAA44");}};
 
                 P.new Block()
                  {void code()
@@ -2995,12 +3003,13 @@ abstract class BtreePA extends Test                                             
     test_delete_descending();
     //test_to_array();
     test_delete_small_random();
-    //test_dump();
+    test_dump();
    }
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_dump();
+    //test_dump();
+    test_delete_small_random();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
