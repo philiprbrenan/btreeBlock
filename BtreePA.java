@@ -2989,9 +2989,8 @@ abstract class BtreePA extends Test                                             
     t.M.memory.dumpVerilog("verilog/inc/memory.sv");
    }
 
-  static void oldTests()                                                        // Tests thought to be in good shape
-   {if (true) return;
-    test_put_ascending();
+  static void oldTests2()                                                        // Tests thought to be in good shape
+   {test_put_ascending();
     test_put_ascending_wide();
     test_put_descending();
     test_put_small_random();
@@ -3002,6 +3001,10 @@ abstract class BtreePA extends Test                                             
     //test_to_array();
     test_delete_small_random();
     test_dump();
+   }
+
+  static void oldTests()                                                        // Tests thought to be in good shape
+   {test_dump();
    }
 
   static void newTests()                                                        // Tests being worked on
