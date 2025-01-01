@@ -391,7 +391,9 @@ public class Layout extends Test                                                
         final int   w = A.element.width, s = A.size, n = Indices[i];
         if (n < 0 || n >= s) stop("Array:", A.name, "has size:", s,
          "but is being indexed with:", n);
+if (debug) say("BBBB11", field.name, field.at, "fw", field.width, "w", w, "n", n, "d", d);
         d += w * n;
+if (debug) say("BBBB22", d);
        }
       return d;
      }
@@ -516,22 +518,32 @@ V   28     4                e                    B.S.e
   static void test_union()
    {Layout    l = layout();
     Variable  a = l.variable ("a", 2);
-    Variable  b = l.bit      ("b");
-    Union     u = l.union    ("u", a, b);
+    Variable  b = l.variable ("b", 2);
+    Variable  c = l.variable ("c", 2);
+    Structure s = l.structure("s", a, b, c);
+    Variable  A = l.variable ("A", 4);
+    Variable  B = l.variable ("B", 4);
+    Variable  C = l.variable ("C", 4);
+    Structure S = l.structure("S", A, B, C);
+    Union     u = l.union    ("u", s, S);
+    Array     r = l.array    ("r", u, 4);
     l.compile();
     //stop(l);
     l.ok("""
 T   At  Wide  Size    Name                   Path
-U    0     2          u
-V    0     2            a                    a
-B    0     1            b                    b
+A    0    48     4    r
+U    0    12            u                    u
+S    0     6              s                    u.s
+V    0     2                a                    u.s.a
+V    2     2                b                    u.s.b
+V    4     2                c                    u.s.c
+S    0    12              S                    u.S
+V    0     4                A                    u.S.A
+V    4     4                B                    u.S.B
+V    8     4                C                    u.S.C
 """);
 
-    ok(l.size(), 2);
-    a.toVariable();
-    b.toBit();
-    u.toUnion();
-
+    ok(l.size(), 48);
    }
 
   static void test_duplicate_whole()
@@ -708,7 +720,7 @@ V   10     4            C                    C
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      //if (github_actions)                                                       // Coverage analysis
+      if (github_actions)                                                       // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
