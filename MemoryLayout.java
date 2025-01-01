@@ -399,7 +399,9 @@ class MemoryLayout extends Test                                                 
     pp.s.append(String.format("%4d %s %8d  %8d",
       pp.line, field.fieldType(), pp.bits, field.width));
 
-    pp.bits += switch(field)                                                    // Bit position
+    final int start = pp.bits;                                                  // Start bit for this field
+
+    pp.bits += switch(field)                                                    // Width
      {case Layout.Variable  v -> field.width;
       default -> 0;
      };
@@ -444,7 +446,16 @@ class MemoryLayout extends Test                                                 
           pp.indices.pop();
          }
        }
-      case Layout.Structure s ->                                                // Structure and Union
+      case Layout.Union u ->                                                    // Union
+       {final int end = pp.bits;                                                // Save end point of union
+        for (int i = 0; i < u.fields.length; i++)
+         {pp.bits = start;                                                      // Restore the start point for each field of the union
+          pp.line++;
+          print(u.fields[i], pp, indent+1);
+          pp.bits = max(pp.bits, end);                                          // Restore end point of union
+         }
+       }
+      case Layout.Structure s ->                                                // Structure
        {for (int i = 0; i < s.fields.length; i++)
          {pp.line++;
           print(s.fields[i], pp, indent+1);
@@ -1076,6 +1087,71 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.at(a).zero();
    }
 
+  static void test_union()
+   {Layout               l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 2);
+    Layout.Variable  b = l.variable ("b", 2);
+    Layout.Variable  c = l.variable ("c", 2);
+    Layout.Structure s = l.structure("s", a, b, c);
+    Layout.Variable  A = l.variable ("A", 4);
+    Layout.Variable  B = l.variable ("B", 4);
+    Layout.Variable  C = l.variable ("C", 4);
+    Layout.Structure S = l.structure("S", A, B, C);
+    Layout.Union     u = l.union    ("u", s, S);
+    Layout.Array     r = l.array    ("r", u, 4);
+    l.compile();
+
+    MemoryLayout  m = new MemoryLayout();
+    m.layout(l);
+    m.memory(new Memory(l.size()));
+
+    m.at(a, 0).ones();  m.at(a, 1).ones();    m.at(a, 2).ones();    m.at(a, 3).ones();
+    m.at(b, 0).zero();  m.at(b, 1).zero();    m.at(b, 2).zero();    m.at(b, 3).zero();
+    m.at(c, 0).ones();  m.at(c, 1).ones();    m.at(c, 2).ones();    m.at(c, 3).ones();
+
+    //stop(m);
+    ok(m, """
+Line T       At      Wide       Size    Indices        Value   Name
+   1 A        0        48          4                           r
+   2 U        0        12               0                        u
+   3 S        0         6               0                          s
+   4 V        0         2               0                  3         a
+   5 V        2         2               0                  0         b
+   6 V        4         2               0                  3         c
+   7 S        0        12               0                          S
+   8 V        0         4               0                  3         A
+   9 V        4         4               0                  3         B
+  10 V        8         4               0                  0         C
+  11 U       12        12               1                        u
+  12 S       12         6               1                          s
+  13 V       12         2               1                  3         a
+  14 V       14         2               1                  0         b
+  15 V       16         2               1                  3         c
+  16 S       12        12               1                          S
+  17 V       12         4               1                  3         A
+  18 V       16         4               1                  3         B
+  19 V       20         4               1                  0         C
+  20 U       24        12               2                        u
+  21 S       24         6               2                          s
+  22 V       24         2               2                  3         a
+  23 V       26         2               2                  0         b
+  24 V       28         2               2                  3         c
+  25 S       24        12               2                          S
+  26 V       24         4               2                  3         A
+  27 V       28         4               2                  3         B
+  28 V       32         4               2                  0         C
+  29 U       36        12               3                        u
+  30 S       36         6               3                          s
+  31 V       36         2               3                  3         a
+  32 V       38         2               3                  0         b
+  33 V       40         2               3                  3         c
+  34 S       36        12               3                          S
+  35 V       36         4               3                  3         A
+  36 V       40         4               3                  3         B
+  37 V       44         4               3                  0         C
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_get_set();
     test_boolean();
@@ -1093,11 +1169,11 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_boolean_result();
     test_is_ones_or_zeros();
     test_not_compiled();
+    test_union();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_move_across();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
