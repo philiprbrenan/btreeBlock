@@ -3004,7 +3004,8 @@ abstract class BtreePA extends Test                                             
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
-   {test_dump();
+   {test_delete_small_random();
+    test_dump();
    }
 
   static void newTests()                                                        // Tests being worked on
