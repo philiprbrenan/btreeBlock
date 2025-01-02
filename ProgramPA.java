@@ -3,7 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-
+// Remove pointless jumps to non existant then and else in If statement if these methods do not generate any code
 import java.util.*;
 
 class ProgramPA extends Test                                                    // A progam that manipulates a memory layout via si instructions
@@ -58,6 +58,7 @@ class ProgramPA extends Test                                                    
    {z();
     new I()
      {void   a() {say(O); /*say(traceBack);*/ running = false;}
+      String v() {return "Halt";}
       String n() {return "halt";}
      };
    }
@@ -129,11 +130,11 @@ class ProgramPA extends Test                                                    
 
   abstract class Loop                                                           // A loop that is executed a specified number of times
    {final Label start = new Label(), next = new Label(), end = new Label();     // Labels to restart currrent iteration, start the next iteration, or exit the loop
-    final MemoryLayoutPA M = new MemoryLayoutPA("M");
-    final Layout    layout;
-    final Layout.Variable  index;
-    final Layout.Bit     compare;
-    final Layout.Variable  limit;
+    final MemoryLayoutPA           M;
+    final Layout              layout;
+    final Layout.Variable      index;
+    final Layout.Bit         compare;
+    final Layout.Variable      limit;
     final Layout.Structure structure;
     final ProgramPA P = ProgramPA.this;
 
@@ -144,8 +145,7 @@ class ProgramPA extends Test                                                    
       limit     = layout.variable ("limit",   Width);
       compare   = layout.bit      ("compare");
       structure = layout.structure("structure", index, limit, compare);
-      M.layout(layout.compile());
-      M.memory (new Memory(layout.size()));
+      M = new MemoryLayoutPA(layout.compile(), "M");
       M.program(ProgramPA.this);
       M.at(limit).setInt(Limit);
       M.setIntInstruction(index, 1);
@@ -162,10 +162,10 @@ class ProgramPA extends Test                                                    
 
   abstract class Pool                                                           // A loop that is executed a specified number of times in reverse
    {final Label start = new Label(), next = new Label(), end = new Label();     // Labels to restart currrent iteration, start the next iteration, or exit the loop
-    final MemoryLayoutPA M = new MemoryLayoutPA("M") ;
-    final Layout    layout;
-    final Layout.Variable  index;
-    final Layout.Bit     compare;
+    final MemoryLayoutPA           M;
+    final Layout              layout;
+    final Layout.Variable      index;
+    final Layout.Bit         compare;
     final Layout.Structure structure;
     final ProgramPA P = ProgramPA.this;
 
@@ -175,8 +175,7 @@ class ProgramPA extends Test                                                    
       index     = layout.variable ("index",   Width);
       compare   = layout.bit      ("compare");
       structure = layout.structure("structure", index, compare);
-      M.layout(layout.compile());
-      M.memory (new Memory(layout.size()));
+      M = new MemoryLayoutPA(layout.compile(), "M");
       M.program(ProgramPA.this);
       M.setIntInstruction(index, Limit);
       start.set();
@@ -208,8 +207,9 @@ class ProgramPA extends Test                                                    
     s.append("case(pc)\n");
     int n = 0;
     for(int i = 0; i < code.size(); ++i)
-     {final String c = code.elementAt(i).v();
-      if (c.length() == 0) ++n;                                                 // Count empty verilog strings
+     {final I I = code.elementAt(i);
+      final String c = I.v();
+      if (c.length() == 0) {++n; say(I.traceBack);}                             // Count empty verilog strings
       s.append(String.format("  %4d : begin %s end\n", i+1, c));
      }
     s.append("""
@@ -224,12 +224,8 @@ endcase
   static void test_inc()
    {Layout           l = Layout.layout();
     Layout.Variable  n = l.variable ("n", 8);
-    l.compile();
-
     ProgramPA        p = new ProgramPA();
-    MemoryLayoutPA   m = new MemoryLayoutPA("M");
-    m.layout(l);
-    m.memory(new Memory(l.size()));
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
     m.program(p);
 
     m.at(n).inc();
@@ -255,12 +251,8 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  u = l.variable ("u", N);
     Layout.Bit       f = l.bit      ("f");
     Layout.Structure s = l.structure("s", a, b, c, n, u, f);
-    l.compile();
-
     ProgramPA        p = new ProgramPA();
-    MemoryLayoutPA   m = new MemoryLayoutPA("M");
-    m.layout(l);
-    m.memory(new Memory(l.size()));
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
     m.program(p);
 
     Stack<Integer>   F = new Stack<>();
@@ -324,12 +316,8 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Bit       g = l.bit      ("g");
     Layout.Variable  u = l.variable ("u", N);
     Layout.Structure s = l.structure("s", a, b, c, g, u);
-    l.compile();
-
-    ProgramPA          p = new ProgramPA();
-    MemoryLayoutPA     m = new MemoryLayoutPA("M");
-    m.layout(l);
-    m.memory(new Memory(l.size()));
+    ProgramPA        p = new ProgramPA();
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
     m.program(p);
     Stack<String>      f = new Stack<>();
 
@@ -374,11 +362,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
-    l.compile();
-
-    MemoryLayoutPA   m = new MemoryLayoutPA("M");
-    m.layout(l);
-    m.memory(new Memory(l.size()));
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
     ProgramPA        p = m.P;
     Stack<Integer>   f = new Stack<>();
 
@@ -408,10 +392,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
-    l.compile();
-    MemoryLayoutPA     m = new MemoryLayoutPA("M");
-    m.layout(l);
-    m.memory(new Memory(l.size()));
+    MemoryLayoutPA     m = new MemoryLayoutPA(l.compile(), "M");
 
     ProgramPA        p = m.P;
     Stack<Integer>   f = new Stack<>();
@@ -440,10 +421,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
-    l.compile();
-    MemoryLayoutPA   m = new MemoryLayoutPA("M");
-    m.layout(l);
-    m.memory(new Memory(l.size()));
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
     ProgramPA        p = m.P;
     Stack<Integer>   f = new Stack<>();
 
