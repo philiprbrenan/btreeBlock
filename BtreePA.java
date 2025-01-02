@@ -8,8 +8,8 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 abstract class BtreePA extends Test                                             // Manipulate a btree using static methods and memory
- {final MemoryLayoutPA M = new MemoryLayoutPA();                                // The memory layout of the btree
-  final MemoryLayoutPA T = new MemoryLayoutPA();                                // The memory used to hold temporary variable used during a transaction on the btree
+ {final MemoryLayoutPA M = new MemoryLayoutPA("M");                             // The memory layout of the btree
+  final MemoryLayoutPA T = new MemoryLayoutPA("T");                             // The memory used to hold temporary variable used during a transaction on the btree
   final ProgramPA      P = new ProgramPA();                                     // Program in which to generate instructions
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
@@ -92,16 +92,15 @@ abstract class BtreePA extends Test                                             
     bitsPerSize     = logTwo(max(bitsPerKey(), bitsPerData())+1);               // The number of bits in stuck size field sufficient to index an key or data element including top
 
     M.layout(layout());
-    M.layout.layoutName = "Main";
+    M.layout.layoutName = "M";
     M.memory(new Memory(M.layout.size()));
     M.program(P);
-    M.name = "BtreePA";
-    M.memory.name = "BtreePA";
+    M.memory.name = "M";
 
     bitsPerAddress = logTwo(M.memory.size());                                   // Number of bits to address any bit in memory
 
     T.layout(transactionLayout());                                              // Memory and layout of memory used by a transaction against the btree
-    T.layout.layoutName = "transaction";
+    T.layout.layoutName = "T";
     T.memory(new Memory(T.layout.size()));
     T.at(maxKeysPerLeaf)  .setInt(maxKeysPerLeaf());
     T.at(maxKeysPerBranch).setInt(maxKeysPerBranch());
@@ -2112,6 +2111,100 @@ abstract class BtreePA extends Test                                             
      };
    }
 
+//D1 Verilog                                                                    // Generate verilog code that implements the instructions used to manipulate a btree
+
+  void dumpVerilog(String filePath)                                             // Write verilog
+   {final String file = fileName(filePath), folder = folderName(filePath);      // Parse file name
+     final StringBuilder s = new StringBuilder();                               // Chip
+    s.append("""
+//-----------------------------------------------------------------------------
+// Database on a chip
+// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
+//------------------------------------------------------------------------------
+`timescale 10ps/1ps
+module doc(reset, stop, clock, pfd, Key, Data, data, found);                    // Database on a chip
+  input                 reset;                                                  // Restart the program run sequence when this goes high
+  input                 stop;                                                   // Program has stopped when this goes high
+  input                 clock;                                                  // Program counter clock
+  input            [2:0]pfd;                                                    // Put, find delete
+  input [$bitsPerKey :0]Key;                                                    // Input key
+  input [$bitsPerData:0]Data;                                                   // Input data
+  output[$bitsPerData:0]data;                                                   // Output data
+  output                found;                                                  // Whether the key was found on put, find delete
+
+  integer pc;                                                                   // Program counter
+
+  `include "memory.sv"
+  $temporaryStorage
+
+  always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
+
+    if (reset) begin;                                                           // Reset
+      pc <= 0;
+      $display("reset");
+    end
+
+    else begin;                                                                 // Run
+      pc <= pc + 1;
+      $instructions
+      $display("%4d  %4d  %4d", pc, Key, Data);
+    end
+  end
+endmodule
+""");
+    final StringBuilder t = new StringBuilder();                                 // Test bench
+    t.append("""
+//-----------------------------------------------------------------------------
+// Database on a chip test bench
+// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
+//------------------------------------------------------------------------------
+`timescale 10ps/1ps
+module doc_tb;                                                                  // Test bench for database on a chip
+  parameter execs  = 140_000;                                                   // Maximum number of instructions to execute
+
+  reg                  reset;                                                   // Restart the program run sequence when this goes high
+  reg                  stop;                                                    // Program has stopped when this goes high
+  reg                  clock;                                                   // Program counter clock
+  reg             [2:0]pfd;                                                     // Put, find delete
+  reg  [$bitsPerKey :0]Key;                                                     // Input key
+  reg  [$bitsPerData:0]Data;                                                    // Input data
+  reg  [$bitsPerData:0]data;                                                    // Output data
+  reg                  found;                                                   // Whether the key was found on put, find delete
+
+  doc a1(.reset(reset), .stop(stop), .clock(clock),                             // Connect to the chip
+    .Key(Key), .Data(Data), .data(data), .found(found));
+
+  initial begin                                                                 // Test the chip
+    reset = 0; #1; reset = 1; #1; reset = 0; #1;                                // Reset the chip
+    execute();
+  end
+
+  task execute;                                                                 // Clock the chip
+    integer i;
+    begin
+      Key = 2; Data = 3;
+      for(i = 0; i < 10; i = i + 1) begin;
+        clock = 0; #1; clock = 1; #1;
+      end
+    end
+  endtask
+endmodule
+""");
+
+    writeFile(filePath+".sv", editVariables(s));
+    writeFile(filePath+".tb", editVariables(t));
+    M.memory.dumpVerilog(folder+"includes/memory.sv", M.name);
+   }
+
+  private StringBuilder editVariables(StringBuilder S)                          // Edit the variables in a string builder
+   {String s = S.toString();
+           s = s.replace("$bitsPerKey",    ""+bitsPerKey());
+           s = s.replace("$bitsPerData",   ""+bitsPerData());
+           s = s.replace("$instructions",     P.dumpVerilog());
+           s = s.replace("$temporaryStorage", T.memory.declareVerilog(T.name));
+    return new StringBuilder(s);
+   }
+
 //D0 Tests                                                                      // Testing
 
   final static int[]random_small = {27, 442, 545, 317, 511, 578, 391, 993, 858, 586, 472, 906, 658, 704, 882, 246, 261, 501, 354, 903, 854, 279, 526, 686, 987, 403, 401, 989, 650, 576, 436, 560, 806, 554, 422, 298, 425, 912, 503, 611, 135, 447, 344, 338, 39, 804, 976, 186, 234, 106, 667, 494, 690, 480, 288, 151, 773, 769, 260, 809, 438, 237, 516, 29, 376, 72, 946, 103, 961, 55, 358, 232, 229, 90, 155, 657, 681, 43, 907, 564, 377, 615, 612, 157, 922, 272, 490, 679, 830, 839, 437, 826, 577, 937, 884, 13, 96, 273, 1, 188};
@@ -2986,7 +3079,9 @@ abstract class BtreePA extends Test                                             
       3                  2        |
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
-    t.M.memory.dumpVerilog("verilog/inc/memory.sv");
+    t.P.clear();
+    t.find() ;
+    t.dumpVerilog("verilog/doc");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -3004,9 +3099,9 @@ abstract class BtreePA extends Test                                             
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
     test_dump();
-    test_put_ascending();
+    //test_put_ascending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
