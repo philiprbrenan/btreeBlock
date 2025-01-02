@@ -7,12 +7,12 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 class MemoryLayoutPA extends Test                                               // Memory layout
- {final String name;                                                            // Name of the memory layout
-  final boolean based;                                                          // If true, then we are using some one else's memory with a base offset into it, otherwise if false we are the owner of the memory and the base offset is always zero
-  final Layout layout;                                                          // Layout of part of memory
+ {final String     name;                                                        // Name of the memory layout
+  final boolean   based;                                                        // If true, then we are using some one else's memory with a base offset into it, otherwise if false we are the owner of the memory and the base offset is always zero
+  final Layout   layout;                                                        // Layout of part of memory
   private Memory memory;                                                        // Memory containing layout
-  private int base;                                                             // Base of layout in memory - like located in Pl1
-  boolean debug;                                                                // Debug if true
+  private int      base;                                                        // Base of layout in memory - like located in Pl1
+  boolean         debug;                                                        // Debug if true
   ProgramPA P = new ProgramPA();                                                // Program containing generated code
 
 //D1 Construction                                                               // Construct a memory layout
@@ -664,6 +664,31 @@ class MemoryLayoutPA extends Test                                               
      };
    }
 
+//D1 Verilog                                                                    // Transfer memory to and from Verilog
+
+  void dumpVerilog(String file, String name)                                    // Initialize memory in verilog with the contents of this memory
+   {final StringBuilder s = new StringBuilder();
+    final int N = memory.bits.length-1, B = logTwo(N)-1;
+    s.append(declareVerilog(name));
+    s.append("task initialize_memory_"+name+";\n");
+    s.append("    begin\n");
+    for(int i = 0; i<= N; ++i)
+     {final int b = memory.bits[i] ? 1 : 0;
+      s.append("        "+name+"["+i+"] = "+b+";\n");
+     }
+    s.append("    end\n");
+    s.append("endtask\n");
+    writeFile(file, s);
+   }
+
+  String declareVerilog(String name)                                            // Declare matching memory  but do not initialize it
+   {final int N = memory.bits.length-1, B = logTwo(N)-1;
+    final StringBuilder s = new StringBuilder();
+                s.append("reg ["+B+":0] "+name+"_base;\n");                     // Base offset for this memory in case it is based
+    if (!based) s.append("reg ["+N+":0] "+name+";\n");                          // Actual memory if it is not based
+    return s.toString();
+   }
+
 //D0 Tests                                                                      // Testing
 
   static class TestMemoryLayout
@@ -1221,7 +1246,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
-  static void test_verilog()
+  static void test_verilog_address()
    {Layout               l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 2);
     Layout.Variable  b = l.variable ("b", 2);
@@ -1266,6 +1291,15 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(at.verilogAddress(), "M[0+2-1 +M[28-1+:4]*6 +: 2] /* a(I) */");
    }
 
+  static void test_dump_verilog()
+   {Layout               l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 2);
+    Layout.Array     A = l.array    ("A", a, 4);
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
+    m.memory().alternating(4);
+    m.dumpVerilog("verilog/includes/memory.sv", "M");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_get_set();
     test_boolean();
@@ -1279,12 +1313,12 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_boolean_result();
     test_is_ones_or_zeros();
     test_union();
-    test_verilog();
+    test_verilog_address();
+    test_dump_verilog();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_verilog();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
