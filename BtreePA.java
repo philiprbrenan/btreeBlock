@@ -8,8 +8,8 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 abstract class BtreePA extends Test                                             // Manipulate a btree using static methods and memory
- {final MemoryLayoutPA M = new MemoryLayoutPA("M");                             // The memory layout of the btree
-  final MemoryLayoutPA T = new MemoryLayoutPA("T");                             // The memory used to hold temporary variable used during a transaction on the btree
+ {final MemoryLayoutPA M;                                                       // The memory layout of the btree
+  final MemoryLayoutPA T;                                                       // The memory used to hold temporary variable used during a transaction on the btree
   final ProgramPA      P = new ProgramPA();                                     // Program in which to generate instructions
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
@@ -91,17 +91,12 @@ abstract class BtreePA extends Test                                             
     bitsPerNext     = logTwo(maxSize());                                        // The number of bits in a next field sufficient to index any node
     bitsPerSize     = logTwo(max(bitsPerKey(), bitsPerData())+1);               // The number of bits in stuck size field sufficient to index an key or data element including top
 
-    M.layout(layout());
-    M.layout.layoutName = "M";
-    M.memory(new Memory(M.layout.size()));
+    M = new MemoryLayoutPA(layout(),            "M");                           // The memory layout of the btree
+    bitsPerAddress = logTwo(M.memory().size());                                 // Number of bits to address any bit in memory
+    T = new MemoryLayoutPA(transactionLayout(), "T");                           // The memory used to hold temporary variable used during a transaction on the btree
+
     M.program(P);
-    M.memory.name = "M";
 
-    bitsPerAddress = logTwo(M.memory.size());                                   // Number of bits to address any bit in memory
-
-    T.layout(transactionLayout());                                              // Memory and layout of memory used by a transaction against the btree
-    T.layout.layoutName = "T";
-    T.memory(new Memory(T.layout.size()));
     T.at(maxKeysPerLeaf)  .setInt(maxKeysPerLeaf());
     T.at(maxKeysPerBranch).setInt(maxKeysPerBranch());
     T.at(two)             .setInt(2);
@@ -112,15 +107,15 @@ abstract class BtreePA extends Test                                             
       branchTransactions = new StuckPA[N];
 
       for (int i = 0; i < N; i++)
-       {final StuckPA b = branchTransactions[i] = new StuckPA()
+       {final StuckPA b = branchTransactions[i] = new StuckPA("branch_"+i, true)// Based stucks
          {int     maxSize() {return BtreePA.this.maxKeysPerBranch()+1;}         // Not forgetting top next
           int  bitsPerKey() {return BtreePA.this.bitsPerKey();}
           int bitsPerData() {return BtreePA.this.bitsPerNext;}
           int bitsPerSize() {return BtreePA.this.bitsPerSize;}
          };
-         b.M.memory(M.memory);
-         b.M.layout.layoutName = "branchMain";
-         b.T.layout.layoutName = "branch";
+         b.M.memory(M.memory());
+         b.M.layout.layoutName = "branchMain"+i;
+         b.T.layout.layoutName = "branch"+i;
          b.program(P);
         }
       }
@@ -129,16 +124,16 @@ abstract class BtreePA extends Test                                             
       leafTransactions = new StuckPA[N];
 
       for (int i = 0; i < N; i++)
-       {final StuckPA l = leafTransactions[i] = new StuckPA()
+       {final StuckPA l = leafTransactions[i] = new StuckPA("leaf_"+i, true)    // Based stucks
          {int     maxSize() {return BtreePA.this.maxKeysPerLeaf();}
           int  bitsPerKey() {return BtreePA.this.bitsPerKey();}
           int bitsPerData() {return BtreePA.this.bitsPerData();}
           int bitsPerSize() {return BtreePA.this.bitsPerSize;}
          };
-         l.M.memory(M.memory);
-         l.M.layout.layoutName = "leafMain";
-         l.T.layout.layoutName = "leaf";
-         l.P = l.M.P = l.T.P = l.C.P = P;
+         l.M.memory(M.memory());
+         l.M.layout.layoutName = "leafMain"+i;
+         l.T.layout.layoutName = "leaf"+i;
+         l.program(P);
        }
      }
 
@@ -164,6 +159,7 @@ abstract class BtreePA extends Test                                             
         for (int i = N; i > 0; --i) setInt(free, (i == N ? 0 : i), i - 1);      // Link this node to the previous node
         setInt(freeList, root);                                                 // Root is first on free chain
        }
+      String v() {return "Construct Free list";}
      };
     allocate(false);                                                            // The root is always at zero, which frees zero to act as the end of list marker on the free chain
     T.setIntInstruction(node_setLeaf, root);
@@ -194,7 +190,7 @@ abstract class BtreePA extends Test                                             
    {z();
     final BtreePA btree = this;
 
-    final StuckPA leafStuck = new StuckPA()                                     // Leaf
+    final StuckPA leafStuck = new StuckPA("leaf", true)                         // Leaf
      {int               maxSize() {return btree.maxKeysPerLeaf();}
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerData();}
@@ -202,7 +198,7 @@ abstract class BtreePA extends Test                                             
      };
     leafStuck.T.layout.layoutName = "leaf";
 
-    final StuckPA branchStuck = new StuckPA()                                   // Branch
+    final StuckPA branchStuck = new StuckPA("branch", true)                     // Branch
      {int               maxSize() {return btree.maxKeysPerBranch()+1;}          // Not forgetting top next
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerNext;}
@@ -541,7 +537,7 @@ abstract class BtreePA extends Test                                             
     isLeaf();
     P.new If (T.at(IsLeaf))
      {void Else()
-       {P.new I() {void a() {stop("Leaf required");}};
+       {P.halt("Leaf required");
        }
      };
    }
@@ -551,7 +547,7 @@ abstract class BtreePA extends Test                                             
     isLeaf();
     P.new If (T.at(IsLeaf))
      {void Then()
-      {P.new I() {void a() {stop("Branch required", traceBack);}};
+      {P.halt("Branch required");
       }
     };
    }
@@ -597,6 +593,7 @@ abstract class BtreePA extends Test                                             
        {final MemoryLayoutPA.At a = M.at(leaf, T.at(node_leafBase)).setOff();
         T.at(leafBase).setInt(a.at);
        }
+      String v() {return "leafBase";}
      };
    }
 
@@ -607,6 +604,7 @@ abstract class BtreePA extends Test                                             
        {final MemoryLayoutPA.At a = M.at(branch, T.at(node_branchBase)).setOff();
         T.at(branchBase).setInt(a.at);
        }
+      String v() {return "branchBase";}
      };
    }
 
@@ -903,6 +901,7 @@ abstract class BtreePA extends Test                                             
      {void a()
        {T.at(flKey).setInt((T.at(firstKey).getInt()+T.at(lastKey).getInt())/2);
        }
+      String v() {return "splitleafRoot";}
      };
     bT.T.at(bT.tKey).move(T.at(flKey));
     bT.T.at(bT.tData).move(T.at(l));
@@ -1009,6 +1008,7 @@ abstract class BtreePA extends Test                                             
        {bT.T.at(bT.tKey).setInt((lR.T.at(lR.tKey).getInt() +
                                  lL.T.at(lL.tKey).getInt()) / 2);
        }
+      String v() {return "splitLeaf";}
      };
     bT.T.at(bT.tData).move(T.at(l));
     bT.T.at(bT.index).move(T.at(index));
@@ -1309,6 +1309,7 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + T.at(nr).getInt() <= maxKeysPerLeaf()) ?
                   1 : 0);
                }
+              String v() {return "mergeRoot";}
              };
 
             P.new If (T.at(mergeable))
@@ -1364,6 +1365,7 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + 1 + T.at(nr).getInt() <= maxKeysPerBranch()) ?
                   1 : 0);
                }
+              String v() {return "mergeRoot";}
              };
 
             P.new If (T.at(mergeable))
@@ -1481,6 +1483,7 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + T.at(nr).getInt() >= maxKeysPerLeaf()) ?
                   1 : 0);
                }
+              String v() {return "mergeLeftSibling leaves";}
              };
             stealNotPossible(end);
 
@@ -1512,6 +1515,7 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + 1 + T.at(nr).getInt() > maxKeysPerBranch()) ?
                   1 : 0);
                }
+              String v() {return "mergeLeftSibling branches";}
              };
             stealNotPossible(end);
 
@@ -1602,6 +1606,7 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + T.at(nr).getInt() > maxKeysPerLeaf()) ?
                   1 : 0);
                }
+              String v() {return "mergeRightSibling leaves";}
              };
             stealNotPossible(end);
 
@@ -1640,6 +1645,7 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + 1 + T.at(nr).getInt() > maxKeysPerBranch()) ?
                   1 : 0);
                }
+              String v() {return "mergeRightSibling branches";}
              };
             stealNotPossible(end);
 
@@ -1719,7 +1725,7 @@ abstract class BtreePA extends Test                                             
         tt(node_stealFromRight,    node_balance); stealFromRight   (); P.GoOn(end, T.at(stolenOrMerged));
         tt(node_mergeLeftSibling,  node_balance); mergeLeftSibling (); P.GoOn(end, T.at(stolenOrMerged));
         tt(node_mergeRightSibling, node_balance); mergeRightSibling(); P.GoOn(end, T.at(stolenOrMerged));
-        P.new I() {void a() {stop("Unable to balance child:", bT.T.at(bT.tData).getInt());}};
+        P.halt("Unable to balance child");
        }
      };
    }
@@ -1790,9 +1796,9 @@ abstract class BtreePA extends Test                                             
       int bitsPerData     () {return p.bitsPerData     ();}
       int bitsPerNext     () {return p.bitsPerNext       ;}
       int bitsPerSize     () {return p.bitsPerSize       ;}
-      Memory   memory     () {return p.M.memory;}                               // The memory to be used by the btree
+      Memory   memory     () {return p.M.memory();}                             // The memory to be used by the btree
      };
-    s.fixMemory(p.M.memory);
+    s.fixMemory(p.M.memory());
     return s.toString();
    }
 
@@ -1843,7 +1849,7 @@ abstract class BtreePA extends Test                                             
             P.Goto(start);
            }
          };
-        P.new I() {void a() {stop("Search for", Key, "did not terminate in a leaf");}};
+        P.halt("Search did not terminate in a leaf");
        }
      };
    }
@@ -2187,7 +2193,7 @@ endmodule
 
     writeFile(filePath+".sv", editVariables(s));
     writeFile(filePath+".tb", editVariables(t));
-    M.memory.dumpVerilog(folder+"includes/memory.sv", M.name);
+    M.memory().dumpVerilog(folder+"includes/memory.sv", M.name());
    }
 
   private StringBuilder editVariables(StringBuilder S)                          // Edit the variables in a string builder
@@ -2195,7 +2201,7 @@ endmodule
            s = s.replace("$bitsPerKey",    ""+bitsPerKey());
            s = s.replace("$bitsPerData",   ""+bitsPerData());
            s = s.replace("$instructions",     P.dumpVerilog());
-           s = s.replace("$temporaryStorage", T.memory.declareVerilog(T.name));
+           s = s.replace("$temporaryStorage", T.memory().declareVerilog(T.name()));
     return new StringBuilder(s);
    }
 
