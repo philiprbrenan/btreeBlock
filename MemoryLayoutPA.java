@@ -7,12 +7,18 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 class MemoryLayoutPA extends Test                                               // Memory layout
- {Layout layout;                                                                // Layout of part of memory
+ {final String name;                                                            // Name of the memory layout
+  Layout layout;                                                                // Layout of part of memory
   Memory memory;                                                                // Memory containing layout
   int      base;                                                                // Base of layout in memory - like located in Pl1
   boolean debug;                                                                // Debug if true
   ProgramPA P = new ProgramPA();                                                // Program containing generated code
-  String   name;                                                                // Name of the memory layout if supplied
+
+//D1 Construction                                                               // Construct a memory layout
+
+  MemoryLayoutPA(String Name)                                                   // Every layout needs a name so we can generate verilog from it
+   {name = Name;
+   }
 
 //D1 Control                                                                    // Testing, control and integrity
 
@@ -20,6 +26,8 @@ class MemoryLayoutPA extends Test                                               
   void layout (Layout    Layout)  {layout = Layout;}                            // Set the base of the layout in memory allowing such layouts to be relocated
   void program(ProgramPA program) {P      = program;}                           // Program in which to generate instructions
   void base   (int Base)          {base   = Base;}                              // Set the base of the layout in memory allowing such layouts to be relocated
+
+  String name() {return name;}                                                  // Name of the memory layout
 
   void ok(String Lines)                                                         // Check that specified lines are present in the memory layout
    {final String  m = toString();                                               // Memory as string
@@ -84,6 +92,29 @@ class MemoryLayoutPA extends Test                                               
     int  at;                                                                    // Location in memory
     int  result;                                                                // The contents of memory at this location
 
+    String verilogAddress()                                                     // A verilog representation of the address expression
+     {if (directs == null || directs.length == 0)
+       {return name()+"["+field.at+"+"+field.width+"-1 +: "+field.width+"] /* "+field.name+" */";
+       }
+      final int N = directs.length;
+
+      final Stack<String>      v = new Stack<>(), n = new Stack<>();            // Verilog expression, index variable names
+      Layout.Locator           L = field.locator;
+      final Stack<Layout.Array>A = L.arrays;                                    // The containing arrays
+
+      for (int i = 0; i < N; i++)                                               // Convolute locator
+       {final int w = A.elementAt(i).element.width;                             // Width of ontaining array element
+        final At  a = directs[i];
+        final int b = a.field.at + a.field.width;                               // The indexing field is assumed to have zero indices
+        v.push(a.ml().name+"["+b+"-1+:"+a.field.width+"]*"+w);                  // Access indexing field
+        n.push(a.field.name);
+
+       }
+      final String name = field.name+(n.size() > 0 ?                            // Name of field plus any indexing fields
+              "("+joinStrings(n, ",")+")" : "");
+      return name()+"["+field.at+"+"+field.width+"-1 +"+joinStrings(v, "+")+" +: "+field.width+"] /* "+name+" */";
+     }
+
     void locateDirectAddress()                                                  // Locate a direct address and its content
      {delta  = field.locator.at(indices);
       at     = base + delta;
@@ -93,7 +124,7 @@ class MemoryLayoutPA extends Test                                               
     void locateInDirectAddress()                                                // Locate an indirect address and its content
      {final int N = directs.length;
       for (int i = 0; i < N; i++)
-       {indices[i] = directs[i].setOff().getInt();
+       {indices[i] = directs[i].setOff().getInt();  //////// Set off should not be needed here as the component variables of a locator expression should not have indices per the constructor.
        }
       locateDirectAddress();                                                    // Locate the address directly now that its indices are known
      }
@@ -133,13 +164,16 @@ class MemoryLayoutPA extends Test                                               
 
     At(Layout.Field Field, At...Directs)                                        // Variable indices used for obtaining run time values
      {z(); checkCompiled(Field);
-      for (int i = 0; i < Directs.length; i++)
-       {if (Directs[i].directs != null) stop("Index:", i, "must not have a base or indices");
+      final int N = Directs.length;
+      for (int i = 0; i < N; i++)
+       {if (Directs[i].directs != null)
+         {stop("Index:", i, "must not have a base or indices");
+         }
        }
 
       field = Field; width = field.width;
       directs = Directs;
-      indices = new int[Directs.length];
+      indices = new int[N];                                                     // The values obtained from each indirect reference to an index will be placed here for the computation of the actual address of the indexed field
      }
 
     boolean sameSize(At b)                                                      // Check two fields are the same size
@@ -199,6 +233,9 @@ class MemoryLayoutPA extends Test                                               
             target.setBit(i, b);
            }
          }
+        String v()
+         {return target.verilogAddress()+" <= "+source.verilogAddress() + ";";
+         }
         String n() {return field.name+"="+source.field.name;}
        };
      }
@@ -255,17 +292,46 @@ class MemoryLayoutPA extends Test                                               
 
     void zero()                                                                 // Zero some memory
      {z();
-      P.new I() {void a() {setOff(); memory.zero(at, width);}};
+      P.new I()
+       {void a() {setOff(); memory.zero(at, width);}
+        String v()
+         {return verilogAddress()+" <= 0;";
+         }
+        String n()
+         {return field.name+" = 0";
+         }
+       };
      }
 
     void ones()                                                                 // Ones some memory
      {z();
-      P.new I() {void a() {setOff(); memory.ones(at, width);}};
+      final String one = field.verilogOnes();
+      P.new I()
+       {void a()
+         {setOff(); memory.ones(at, width);
+         }
+        String v()
+         {return verilogAddress()+" <= "+one+ ";";
+         }
+        String n()
+         {return field.name+" = "+one;
+         }
+       };
      }
 
     void invert(At a)                                                           // Invert the specified bits
      {z();
-      P.new I() {void a() {setOff(); memory.invert(a.result, a.width());}};
+      P.new I()
+       {void a()
+         {setOff(); memory.invert(a.result, a.width());
+         }
+        String v()
+         {return verilogAddress()+" <= ~"+verilogAddress()+ ";";
+         }
+        String n()
+         {return field.name+" = ~"+field.name;
+         }
+       };
      }
 
     boolean isAllZero()                                                         // Check that the specified memory is all zeros
@@ -288,9 +354,13 @@ class MemoryLayoutPA extends Test                                               
 
     void    isZero(At result)                                                   // Whether a field is all zeros
      {z();
+      final At target = this;
       P.new I()
        {void a()
          {result.setOff().setInt(setOff().isZero() ? 1 : 0);
+         }
+        String v()
+         {return result.verilogAddress()+" <= "+target.verilogAddress()+" == 0;";
          }
         String n() {return result.field.name+" = isZero "+field.name;}
        };
@@ -306,9 +376,14 @@ class MemoryLayoutPA extends Test                                               
 
     void isOnes(At result)                                                      // Whether a field is all ones
      {z();
+      final At target = this;
       P.new I()
        {void a()
          {result.setOff().setInt(setOff().isOnes() ? 1 : 0);
+         }
+        String v()
+         {return result.verilogAddress()+" <= "+target.verilogAddress()+
+            " == " + target.field.verilogOnes()+ ";";
          }
         String n() {return result.field.name+" = isOnes "+field.name;}
        };
@@ -325,19 +400,29 @@ class MemoryLayoutPA extends Test                                               
 
     void equal(At b, At result)                                                // Whether  a == b
      {z();
+      final At a = this;
       P.new I()
        {void a()
          {result.setOff().setInt(equal(b.setOff()) ? 1 : 0);
          }
-        String n() {return result.field.name+"="+field.name+"=="+b.field.name;}
+        String v()
+         {return result.verilogAddress()+" <= "+a.verilogAddress()+
+                                       " == " + b.verilogAddress()+ ";";
+         }
+        String n() {return result.field.name+"="+field.name+" == "+b.field.name;}
        };
      }
 
     void    notEqual(At b, At result)                                           // Whether  a != b
      {z();
+      final At a = this;
       P.new I()
        {void a()
          {result.setOff().setInt(!equal(b.setOff()) ? 1 : 0);
+         }
+        String v()
+         {return result.verilogAddress()+" <= "+a.verilogAddress()+
+                                         " != "+b.verilogAddress()+ ";";
          }
         String n() {return result.field.name+"="+field.name+"!="+b.field.name;}
        };
@@ -355,9 +440,14 @@ class MemoryLayoutPA extends Test                                               
 
     void lessThan(At b, At result)                                              // Whether  a < b
      {z(); sameSize(b);
+      final At a = this;
       P.new I()
        {void a()
          {result.setOff().setInt(lessThan(b.setOff()) ? 1 : 0);
+         }
+        String v()
+         {return result.verilogAddress()+" <= "+a.verilogAddress()+
+                                          " < "+b.verilogAddress()+ ";";
          }
         String n() {return result.field.name+"="+field.name+"<"+b.field.name;}
        };
@@ -365,19 +455,29 @@ class MemoryLayoutPA extends Test                                               
 
     void lessThanOrEqual(At b, At result)                                       // Whether  a <= b
      {z(); sameSize(b);
+      final At a = this;
       P.new I()
        {void a()
         {result.setOff().setInt(lessThan(b.setOff()) || equal(b) ? 1 : 0);
         }
+        String v()
+         {return result.verilogAddress()+" <= "+a.verilogAddress()+
+                                         " <= "+b.verilogAddress()+ ";";
+         }
         String n() {return result.field.name+"="+field.name+"<="+b.field.name;}
       };
      }
 
     void    greaterThan(At b, At result)                                        // Whether  a > b
      {z(); sameSize(b);
+      final At a = this;
       P.new I()
        {void a()
          {result.setOff().setInt(!lessThan(b.setOff()) && !equal(b) ? 1 : 0);
+         }
+        String v()
+         {return result.verilogAddress()+" <= "+a.verilogAddress()+
+                                          " > "+b.verilogAddress()+ ";";
          }
         String n() {return result.field.name+"="+field.name+">"+b.field.name;}
        };
@@ -385,9 +485,14 @@ class MemoryLayoutPA extends Test                                               
 
     void    greaterThanOrEqual(At b, At result)                                 // Whether  a >= b
      {z(); sameSize(b);
+      final At a = this;
       P.new I()
        {void a()
          {result.setOff().setInt(!lessThan(b.setOff()) ? 1 : 0);
+         }
+        String v()
+         {return result.verilogAddress()+" <= "+a.verilogAddress()+
+                                         " >= "+b.verilogAddress()+ ";";
          }
         String n() {return result.field.name+"="+field.name+">="+b.field.name;}
        };
@@ -397,8 +502,40 @@ class MemoryLayoutPA extends Test                                               
 
 //D2 Binary                                                                     // Arithmetic on binary integers
 
-    void inc() {z(); P.new I() {void a() {setOff(); final int i = getInt()+1; setInt(i);} String n() {return "++"+field.name;}};} // Increment a variable treated as an signed binary integer with wrap around on overflow.  Return the result after  the increment.
-    void dec() {z(); P.new I() {void a() {setOff(); final int i = getInt()-1; setInt(i);} String n() {return "--"+field.name;}};} // Decrement a variable treated as an signed binary integer with wrap around on underflow. Return the result after  the decrement.
+    void inc()                                                                  // Increment a variable treated as an signed binary integer with wrap around on overflow.  Return the result after  the increment.
+     {z();
+      final At a = this;
+      P.new I()
+       {void a()
+         {setOff();
+          final int i = getInt()+1;
+          setInt(i);
+         }
+        String v()
+         {return a.verilogAddress()+" <= "+a.verilogAddress()+"+ 1;";
+         }
+        String n()
+         {return "++"+field.name;
+         }
+       };
+     }
+    void dec()                                                                  // Decrement a variable treated as an signed binary integer with wrap around on overflow.  Return the result after  the increment.
+     {z();
+      final At a = this;
+      P.new I()
+       {void a()
+         {setOff();
+          final int i = getInt()-1;
+          setInt(i);
+         }
+        String v()
+         {return a.verilogAddress()+" <= "+a.verilogAddress()+"- 1;";
+         }
+        String n()
+         {return "--"+field.name;
+         }
+       };
+     }
    } // At
 
   At at(Layout.Field Field)                                                     // A field without indices or base addressing
@@ -524,7 +661,7 @@ class MemoryLayoutPA extends Test                                               
     MemoryLayoutPA   M;
     TestMemoryLayout()
      {l.compile();
-      M = new MemoryLayoutPA();
+      M = new MemoryLayoutPA("test");
       M.memory(new Memory(l.size()));
       M.layout(l);
       M.base(0);
@@ -626,7 +763,7 @@ class MemoryLayoutPA extends Test                                               
     l.compile();
     final int        N = l.size();
 
-    MemoryLayoutPA     m = new MemoryLayoutPA();
+    MemoryLayoutPA     m = new MemoryLayoutPA("test");
         ProgramPA      p = m.P;
     m.layout(l);
     m.memory(new Memory(2*N));
@@ -672,7 +809,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Array     A = l.array    ("A", a, 4);
     l.compile();
-    MemoryLayoutPA   m = new MemoryLayoutPA();
+    MemoryLayoutPA   m = new MemoryLayoutPA("test");
         ProgramPA    p = m.P;
 
     m.layout(l);
@@ -728,7 +865,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Structure s = l.structure("s", a, b, c, d);
     l.compile();
 
-    MemoryLayoutPA     m = new MemoryLayoutPA();
+    MemoryLayoutPA     m = new MemoryLayoutPA("test");
     m.layout(l);
     m.memory(new Memory(l.size()));
     m.memory.alternating(4);
@@ -762,7 +899,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Structure s = l.structure("s", a, b);
     l.compile();
 
-    MemoryLayoutPA   m = new MemoryLayoutPA();
+    MemoryLayoutPA   m = new MemoryLayoutPA("test");
     m.layout(l);
     m.memory(new Memory(l.size()));
 
@@ -814,7 +951,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Structure S = l.structure("S", z, i, j, A);
     l.compile();
 
-    MemoryLayoutPA m = new MemoryLayoutPA();
+    MemoryLayoutPA m = new MemoryLayoutPA("test");
          ProgramPA p = m.P;
     m.layout(l);
     m.memory(new Memory(l.size()));
@@ -852,6 +989,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 
     //stop(m);
     ok(""+m, """
+MemoryLayout: test
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        88                                      S
    2 V        0         8                                  0     z
@@ -880,6 +1018,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(m);
     ok(""+m, """
+MemoryLayout: test
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        88                                      S
    2 V        0         8                                  0     z
@@ -903,7 +1042,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Array     A = l.array    ("A", a, 6);
     l.compile();
 
-    MemoryLayoutPA     L = new MemoryLayoutPA();
+    MemoryLayoutPA     L = new MemoryLayoutPA("test");
     L.layout(l);
     L.memory(new Memory(l.size()+16));
     L.base(16);
@@ -918,6 +1057,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 
     //stop(L);
     ok(L, """
+MemoryLayout: test
 Line T       At      Wide       Size    Indices        Value   Name
    1 A       16        24          6                           A
    2 V       16         4               0                  0     a
@@ -939,6 +1079,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 
     //stop(L);
     ok(L, """
+MemoryLayout: test
 Line T       At      Wide       Size    Indices        Value   Name
    1 A       16        24          6                           A
    2 V       16         4               0                  0     a
@@ -959,7 +1100,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Structure s = l.structure("s", a, b, r, R);
     l.compile();
 
-    MemoryLayoutPA     m = new MemoryLayoutPA();
+    MemoryLayoutPA     m = new MemoryLayoutPA("test");
     m.layout(l);
     m.memory(new Memory(l.size()));
 
@@ -985,7 +1126,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Structure s = l.structure("s", a, b, c, A, B, C);
     l.compile();
 
-    MemoryLayoutPA   m = new MemoryLayoutPA();
+    MemoryLayoutPA   m = new MemoryLayoutPA("test");
     m.layout(l);
     m.memory(new Memory(l.size()));
 
@@ -995,6 +1136,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.P.run(); m.P.clear();
     //stop(m);
     ok(m, """
+MemoryLayout: test
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        15                                      s
    2 V        0         4                                  0     a
@@ -1030,7 +1172,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Variable  c = l.variable ("c", 4);
     Layout.Structure s = l.structure("s", a, b, c);
-    MemoryLayoutPA     m = new MemoryLayoutPA();
+    MemoryLayoutPA     m = new MemoryLayoutPA("test");
 
     sayThisOrStop("Field: a has not been compiled yet");
 
@@ -1054,7 +1196,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Array     r = l.array    ("r", u, 4);
     l.compile();
 
-    MemoryLayoutPA   m = new MemoryLayoutPA();
+    MemoryLayoutPA   m = new MemoryLayoutPA("test");
     m.layout(l);
     m.memory(new Memory(l.size()));
 
@@ -1064,6 +1206,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.P.run();
     //stop(m);
     ok(m, """
+MemoryLayout: test
 Line T       At      Wide       Size    Indices        Value   Name
    1 A        0        48          4                           r
    2 U        0        12               0                        u
@@ -1105,6 +1248,53 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
+  static void test_verilog()
+   {Layout               l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 2);
+    Layout.Variable  b = l.variable ("b", 2);
+    Layout.Variable  c = l.variable ("c", 2);
+    Layout.Structure s = l.structure("s", a, b, c);
+    Layout.Array     A = l.array    ("A", s, 4);
+    Layout.Variable  I = l.variable ("I", 4);
+    Layout.Variable  J = l.variable ("J", 4);
+    Layout.Structure S = l.structure("S", A, I, J);
+    l.compile();
+
+    MemoryLayoutPA   m = new MemoryLayoutPA("M");
+    m.layout(l);
+    m.memory(new Memory(l.size()));
+
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        32                                      S
+   2 A        0        24          4                             A
+   3 S        0         6               0                          s
+   4 V        0         2               0                  0         a
+   5 V        2         2               0                  0         b
+   6 V        4         2               0                  0         c
+   7 S        6         6               1                          s
+   8 V        6         2               1                  0         a
+   9 V        8         2               1                  0         b
+  10 V       10         2               1                  0         c
+  11 S       12         6               2                          s
+  12 V       12         2               2                  0         a
+  13 V       14         2               2                  0         b
+  14 V       16         2               2                  0         c
+  15 S       18         6               3                          s
+  16 V       18         2               3                  0         a
+  17 V       20         2               3                  0         b
+  18 V       22         2               3                  0         c
+  19 V       24         4                                  0     I
+  20 V       28         4                                  0     J
+""");
+
+    MemoryLayoutPA.At at = m.at(a, m.at(I));
+    //stop(at.verilogAddress());
+    ok(at.verilogAddress(), "M[0+2-1 +M[28-1+:4]*6 +: 2] /* a(I) */");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_get_set();
     test_boolean();
@@ -1119,10 +1309,12 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_is_ones_or_zeros();
     test_not_compiled();
     test_union();
+    test_verilog();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    test_verilog();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
