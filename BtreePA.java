@@ -2193,7 +2193,7 @@ endmodule
 
     writeFile(filePath+".sv", editVariables(s));
     writeFile(filePath+".tb", editVariables(t));
-    M.memory().dumpVerilog(folder+"includes/memory.sv", M.name());
+    M.dumpVerilog(folder+"includes/memory.sv", M.name());
    }
 
   private StringBuilder editVariables(StringBuilder S)                          // Edit the variables in a string builder
@@ -2201,7 +2201,7 @@ endmodule
            s = s.replace("$bitsPerKey",    ""+bitsPerKey());
            s = s.replace("$bitsPerData",   ""+bitsPerData());
            s = s.replace("$instructions",     P.dumpVerilog());
-           s = s.replace("$temporaryStorage", T.memory().declareVerilog(T.name()));
+           s = s.replace("$temporaryStorage", T.declareVerilog(T.name()));
     return new StringBuilder(s);
    }
 
