@@ -531,9 +531,9 @@ abstract class BtreePA extends Test                                             
     return L.compile();
    }
 
-  private void    isLeaf() {z(); T.at(IsLeaf).move(M.at(isLeaf, T.at(node_isLeaf)));}                            // A leaf if true
-  private void   setLeaf() {z(); P.new I() {void a() {M.at(isLeaf, T.at(node_setLeaf))  .setOff().setInt(1);}};} // Set as leaf
-  private void setBranch() {z(); P.new I() {void a() {M.at(isLeaf, T.at(node_setBranch)).setOff().setInt(0);}};} // Set as branch
+  private void    isLeaf() {z(); T.at(IsLeaf).move(M.at(isLeaf, T.at(node_isLeaf)));}                // A leaf if true
+  private void   setLeaf() {z(); M.at(isLeaf, T.at(node_setLeaf))  .ones();}    // Set as leaf
+  private void setBranch() {z(); M.at(isLeaf, T.at(node_setBranch)).zero();}    // Set as branch
 
   private void assertLeaf()
    {z();
@@ -2132,7 +2132,7 @@ module doc(reset, stop, clock, pfd, Key, Data, data, found);                    
   output[$bitsPerData:0]data;                                                   // Output data
   output                found;                                                  // Whether the key was found on put, find delete
 
-  integer pc;                                                                   // Program counter
+  integer step;                                                                 // Program counter
 
   `include "memory.sv"
   $temporaryStorage
@@ -2140,12 +2140,12 @@ module doc(reset, stop, clock, pfd, Key, Data, data, found);                    
   always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
 
     if (reset) begin;                                                           // Reset
-      pc <= 0;
+      step <= 0;
       $display("reset");
     end
 
     else begin;                                                                 // Run
-      pc <= pc + 1;
+      step <= step + 1;
       $instructions
       $display("%4d  %4d  %4d", pc, Key, Data);
     end
