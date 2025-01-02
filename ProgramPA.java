@@ -37,7 +37,8 @@ class ProgramPA extends Test                                                    
       instructionNumber = code.size(); code.push(this);
      }
     void   a() {}                                                               // Action performed by instruction
-      String n() {return "instruction";}                                        // Instruction name
+    String n() {return "instruction";}                                          // Instruction name
+    String v() {return "";}                                                     // Corresponding verilog
    }
 
 //D1 Execute                                                                    // Execute the program
@@ -49,7 +50,6 @@ class ProgramPA extends Test                                                    
     for (step = 0, time = 0; step < N && time < maxTime && running; step++, time++)
      {z(); code.elementAt(step).a();
      }
-    if (!running)  stop("Running no longer set but it should be!");
     if (time >= maxTime) stop("Out of time: ", time);
     running = false;
    }
@@ -126,7 +126,7 @@ class ProgramPA extends Test                                                    
 
   abstract class Loop                                                           // A loop that is executed a specified number of times
    {final Label start = new Label(), next = new Label(), end = new Label();     // Labels to restart currrent iteration, start the next iteration, or exit the loop
-    final MemoryLayoutPA M = new MemoryLayoutPA() ;
+    final MemoryLayoutPA M = new MemoryLayoutPA("M");
     final Layout    layout;
     final Layout.Variable  index;
     final Layout.Bit     compare;
@@ -159,7 +159,7 @@ class ProgramPA extends Test                                                    
 
   abstract class Pool                                                           // A loop that is executed a specified number of times in reverse
    {final Label start = new Label(), next = new Label(), end = new Label();     // Labels to restart currrent iteration, start the next iteration, or exit the loop
-    final MemoryLayoutPA M = new MemoryLayoutPA() ;
+    final MemoryLayoutPA M = new MemoryLayoutPA("M") ;
     final Layout    layout;
     final Layout.Variable  index;
     final Layout.Bit     compare;
@@ -198,6 +198,24 @@ class ProgramPA extends Test                                                    
     return s.toString();
    }
 
+//D1 Verilog                                                                    // Dump verilog equivalents of the instructions in this program
+
+  String dumpVerilog()
+   {final StringBuilder s = new StringBuilder();
+    s.append("case(pc)\n");
+    int n = 0;
+    for(int i = 0; i < code.size(); ++i)
+     {final String c = code.elementAt(i).v();
+      if (c.length() == 0) ++n;                                                 // Count empty verilog strings
+      s.append(String.format("  %4d : begin %s end\n", i+1, c));
+     }
+    s.append("""
+endcase
+""");
+    if (n > 0) err("Program still has", n, "empty statements");
+    return s.toString();
+   }
+
 //D1 Tests                                                                      // Tests
 
   static void test_inc()
@@ -206,7 +224,7 @@ class ProgramPA extends Test                                                    
     l.compile();
 
     ProgramPA        p = new ProgramPA();
-    MemoryLayoutPA   m = new MemoryLayoutPA();
+    MemoryLayoutPA   m = new MemoryLayoutPA("M");
     m.layout(l);
     m.memory(new Memory(l.size()));
     m.program(p);
@@ -218,6 +236,7 @@ class ProgramPA extends Test                                                    
 
     //stop(m);
     ok(m, """
+MemoryLayout: M
 Line T       At      Wide       Size    Indices        Value   Name
    1 V        0         8                                  3   n
 """);
@@ -236,7 +255,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     l.compile();
 
     ProgramPA        p = new ProgramPA();
-    MemoryLayoutPA   m = new MemoryLayoutPA();
+    MemoryLayoutPA   m = new MemoryLayoutPA("M");
     m.layout(l);
     m.memory(new Memory(l.size()));
     m.program(p);
@@ -270,18 +289,18 @@ Line T       At      Wide       Size    Indices        Value   Name
   11 GoOn f to 5
 """);
 
-
     p.run();
     ok(F, "[1, 2, 3, 5, 8, 13, 21, 34]");
     p.run();
     ok(F, "[1, 2, 3, 5, 8, 13, 21, 34, 1, 2, 3, 5, 8, 13, 21, 34]");
 
-    ProgramPA        q = new ProgramPA();
+    ProgramPA q = new ProgramPA();
     m.program(q);
     m.at(s).ones();
     q.run();
     //stop(m);
     ok(m, """
+MemoryLayout: M
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        41                                      s
    2 V        0         8                                255     a
@@ -305,7 +324,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     l.compile();
 
     ProgramPA          p = new ProgramPA();
-    MemoryLayoutPA     m = new MemoryLayoutPA();
+    MemoryLayoutPA     m = new MemoryLayoutPA("M");
     m.layout(l);
     m.memory(new Memory(l.size()));
     m.program(p);
@@ -354,7 +373,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Structure s = l.structure("s", a, b);
     l.compile();
 
-    MemoryLayoutPA   m = new MemoryLayoutPA();
+    MemoryLayoutPA   m = new MemoryLayoutPA("M");
     m.layout(l);
     m.memory(new Memory(l.size()));
     ProgramPA        p = m.P;
@@ -387,7 +406,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
     l.compile();
-    MemoryLayoutPA     m = new MemoryLayoutPA();
+    MemoryLayoutPA     m = new MemoryLayoutPA("M");
     m.layout(l);
     m.memory(new Memory(l.size()));
 
@@ -419,7 +438,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
     l.compile();
-    MemoryLayoutPA   m = new MemoryLayoutPA();
+    MemoryLayoutPA   m = new MemoryLayoutPA("M");
     m.layout(l);
     m.memory(new Memory(l.size()));
     ProgramPA        p = m.P;
