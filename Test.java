@@ -42,6 +42,15 @@ public class Test                                                               
     return max(l, j);
    }
 
+  static String joinStrings(Stack<String> S, String join)                       // Perl join
+   {final StringBuilder s = new StringBuilder();
+    final int N = S.size();
+    if (N == 0) return "";
+    for (int i = 0; i < N-1; i++) s.append(S.elementAt(i)+join);
+                                  s.append(S.elementAt(N-1));
+    return s.toString();
+   }
+
 //D2 Numeric routines                                                           // Numeric routines
 
   static int max(int n, int...rest)                                             // Maximum of some numbers
@@ -286,7 +295,7 @@ public class Test                                                               
 
   static void writeFile(String filePath, StringBuilder string)                  // Write a string builder to a file
    {try
-     {makePath(filePath(filePath));
+     {makePath(folderName(filePath));
        Files.write(Paths.get(filePath), string.toString().getBytes());
      }
     catch (Exception e)
@@ -354,11 +363,11 @@ public class Test                                                               
     return Files.exists(p) && Files.isDirectory(p);
    }
 
-  static String fileName(String filePath)                                         // Get the file name from a file path name
+  static String fileName(String filePath)                                       // Get the file name from a file path name
    {return Paths.get(filePath).getFileName().toString();
    }
 
-  static String filePath(String filePath)                                         // Get the folder name from a file path name
+  static String folderName(String filePath)                                     // Get the folder name from a file path name
    {return Paths.get(filePath).getParent().toString() + "/";
    }
 
@@ -677,7 +686,16 @@ CCCCC
     ok(!folderExists("/tmp/z/z/"));
     ok(fileName(a), "aaa.txt");
     ok(fileExt(a), "txt");
-    ok(filePath(a), "/tmp/z/z/");
+    ok(folderName(a), "/tmp/z/z/");
+   }
+
+  static void test_join()
+   {final Stack<String> s = new Stack<>();
+    ok(joinStrings(s, ","), "");
+    s.push("a");
+    ok(joinStrings(s, ","), "a");
+    s.push("b");
+    ok(joinStrings(s, ","), "a,b");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -686,6 +704,7 @@ CCCCC
     test_string();
     test_longest_line();
     test_files();
+    test_join();
    }
 
   static void newTests()                                                        // Tests being worked on
