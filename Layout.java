@@ -158,8 +158,7 @@ public class Layout extends Test                                                
   class Variable extends Field                                                  // Layout a variable with no sub structure
    {Variable(String name, int Width)
      {super(name); width = Width;
-      z();
-
+      z(); if (width < 1) stop("Field", name, "has no bits");
      }
 
     void indexNames()                                                           // Index the name of this field
