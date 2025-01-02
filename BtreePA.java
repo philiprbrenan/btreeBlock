@@ -867,13 +867,7 @@ abstract class BtreePA extends Test                                             
     z(); T.setIntInstruction(node_isFull,     root); isFull();
     P.new If (T.at(isFull))
      {void Else()
-       {T.setIntInstruction(node_leafSize, root);
-        leafSize();
-        P.new I()
-         {void a()
-           {stop("Root is not full, but has size:", T.at(leafSize).getInt());
-           }
-         };
+       {P.halt("Root is not full");
        }
      };
 
