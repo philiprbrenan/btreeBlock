@@ -16,7 +16,8 @@ module doc(reset, stop, clock, pfd, Key, Data, data, found);                    
   integer step;                                                                 // Program counter
 
   `include "memory.sv"
-  reg [253:0] T;
+  reg [7:0] T_base;
+reg [253:0] T;
 
 
   always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
