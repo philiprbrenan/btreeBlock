@@ -149,6 +149,10 @@ public class Layout extends Test                                                
     Array     toArray    () {z(); return (Array)    this;}                      // Try to cast a field to an array
     Structure toStructure() {z(); return (Structure)this;}                      // Try to cast a field to a structure
     Union     toUnion    () {z(); return (Union)    this;}                      // Try to cast a field to a union
+
+    String verilogOnes()                                                        // A verilog binary value of all ones the width of the field
+     {return width+"'b1{"+width+"}";
+     }
    }
 
   class Variable extends Field                                                  // Layout a variable with no sub structure
@@ -391,9 +395,7 @@ public class Layout extends Test                                                
         final int   w = A.element.width, s = A.size, n = Indices[i];
         if (n < 0 || n >= s) stop("Array:", A.name, "has size:", s,
          "but is being indexed with:", n);
-if (debug) say("BBBB11", field.name, field.at, "fw", field.width, "w", w, "n", n, "d", d);
         d += w * n;
-if (debug) say("BBBB22", d);
        }
       return d;
      }
@@ -701,6 +703,14 @@ V   10     4            C                    C
     ok(A.container().layoutName, "bbb");
    }
 
+  static void test_verilog_ones()
+   {Layout    l = new Layout();
+    Variable  a = l.variable ("a", 2);
+    l.compile();
+    //stop(a.verilogOnes());
+    ok(a.verilogOnes(), "2'b1{2}");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_layout();
     test_array();
@@ -711,6 +721,7 @@ V   10     4            C                    C
     test_duplicate_array();
     test_array_indexing();
     test_container();
+    test_verilog_ones();
    }
 
   static void newTests()                                                        // Tests being worked on
