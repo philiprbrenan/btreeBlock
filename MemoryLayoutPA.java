@@ -3,7 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Memory layout
-
+// Set base for each verilog memory
 import java.util.*;
 
 class MemoryLayoutPA extends Test                                               // Memory layout
