@@ -8,26 +8,43 @@ import java.util.*;
 
 class MemoryLayoutPA extends Test                                               // Memory layout
  {final String name;                                                            // Name of the memory layout
-  Layout layout;                                                                // Layout of part of memory
-  Memory memory;                                                                // Memory containing layout
-  int      base;                                                                // Base of layout in memory - like located in Pl1
+  final boolean based;                                                          // If true, then we are using some one else's memory with a base offset into it, otherwise if false we are the owner of the memory and the base offset is always zero
+  final Layout layout;                                                          // Layout of part of memory
+  private Memory memory;                                                        // Memory containing layout
+  private int base;                                                             // Base of layout in memory - like located in Pl1
   boolean debug;                                                                // Debug if true
   ProgramPA P = new ProgramPA();                                                // Program containing generated code
 
 //D1 Construction                                                               // Construct a memory layout
 
-  MemoryLayoutPA(String Name)                                                   // Every layout needs a name so we can generate verilog from it
-   {name = Name;
+  MemoryLayoutPA(Layout Layout, String Name)                                    // Every memory layout needs a layout and a name so we can generate verilog from it
+   {this(Layout, Name, false);
+   }
+
+  MemoryLayoutPA(Layout Layout, String Name, boolean Based)                     // Like based storage in PL1.
+   {name = Name; based = Based; layout = Layout;
+    if (!based) memory = new Memory(layout.size());                             // If it is based it uses some one else's memory, if not based we must supply memory
    }
 
 //D1 Control                                                                    // Testing, control and integrity
 
-  void memory (Memory    Memory)  {memory = Memory;}                            // Set the base of the layout in memory allowing such layouts to be relocated
-  void layout (Layout    Layout)  {layout = Layout;}                            // Set the base of the layout in memory allowing such layouts to be relocated
-  void program(ProgramPA program) {P      = program;}                           // Program in which to generate instructions
-  void base   (int Base)          {base   = Base;}                              // Set the base of the layout in memory allowing such layouts to be relocated
+  void memory (Memory  Memory)                                                  // Set the memory to be used and our base in it allowing such layouts to be relocated in other memories
+   {if (!based) stop("Not a based layout so cannot set memory");
+    memory = Memory;
+   }
 
-  String name() {return name;}                                                  // Name of the memory layout
+  //void layout (Layout    Layout)  {layout = Layout;}                          // Set the base of the layout in memory allowing such layouts to be relocated
+  void program(ProgramPA program) {P = program;}                                // Program in which to generate instructions
+
+  void base(int Base)                                                           // Set the base of the layout in memory allowing such layouts to be relocated
+   {if (!based) stop("Memory layout is not based so cannot set a base");
+    base = Base;
+   }
+
+  String name  () {return name;}                                                // Name of this mmeory layout
+  Memory memory() {return memory;}                                              // Get the memory used by a stuck
+  Layout layout() {return layout;}                                              // Get the layout in use
+  int    base  () {return base;}                                                // Get the base offset into memory being used
 
   void ok(String Lines)                                                         // Check that specified lines are present in the memory layout
    {final String  m = toString();                                               // Memory as string
@@ -73,6 +90,7 @@ class MemoryLayoutPA extends Test                                               
        {final At a = new At(field, indices).setOff();
         memory.set(a.at, a.width, value);
        }
+     String v() {return "setIntInstruction";}
      };
    }
 
@@ -150,7 +168,9 @@ class MemoryLayoutPA extends Test                                               
 
     At(Layout.Field Field)                                                      // No indices or base
      {z(); checkCompiled(Field);
-      field = Field; indices = new int[0]; width = field.width;
+      field = Field; indices = new int[0];
+      width = field.width;
+      if (width < 1) stop("Field", field.name, "does not have any bits");
       directs = null;
       locateDirectAddress();                                                    // The indices are constant so the address will not change over time
      }
@@ -216,7 +236,7 @@ class MemoryLayoutPA extends Test                                               
       return s.toString();
      }
 
-    MemoryLayoutPA ml() {return MemoryLayoutPA.this;}                               // Containing memory layout
+    MemoryLayoutPA ml() {return MemoryLayoutPA.this;}                           // Containing memory layout
 
 //D2 Move                                                                       // Copy data between memory locations
 
@@ -660,11 +680,7 @@ class MemoryLayoutPA extends Test                                               
     Layout.Array     C = l.array    ("C", B, 3);
     MemoryLayoutPA   M;
     TestMemoryLayout()
-     {l.compile();
-      M = new MemoryLayoutPA("test");
-      M.memory(new Memory(l.size()));
-      M.layout(l);
-      M.base(0);
+     {M = new MemoryLayoutPA(l.compile(), "test");
       M.memory.alternating(4);
      }
    }
@@ -763,9 +779,8 @@ class MemoryLayoutPA extends Test                                               
     l.compile();
     final int        N = l.size();
 
-    MemoryLayoutPA     m = new MemoryLayoutPA("test");
-        ProgramPA      p = m.P;
-    m.layout(l);
+    MemoryLayoutPA   m = new MemoryLayoutPA(l, "test", true);
+    ProgramPA        p = m.P;
     m.memory(new Memory(2*N));
     m.base(N);
     m.memory.alternating(4);
@@ -808,11 +823,9 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Array     A = l.array    ("A", a, 4);
-    l.compile();
-    MemoryLayoutPA   m = new MemoryLayoutPA("test");
-        ProgramPA    p = m.P;
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "test", true);
+    ProgramPA        p = m.P;
 
-    m.layout(l);
     m.memory(new Memory(l.size()+B));
     m.base(B);
     m.memory.alternating(4);
@@ -863,11 +876,8 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  c = l.variable ("c", 4);
     Layout.Variable  d = l.variable ("d", 4);
     Layout.Structure s = l.structure("s", a, b, c, d);
-    l.compile();
 
-    MemoryLayoutPA     m = new MemoryLayoutPA("test");
-    m.layout(l);
-    m.memory(new Memory(l.size()));
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "test");
     m.memory.alternating(4);
     //stop(m);
     m.ok("""
@@ -897,11 +907,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
-    l.compile();
-
-    MemoryLayoutPA   m = new MemoryLayoutPA("test");
-    m.layout(l);
-    m.memory(new Memory(l.size()));
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "test");
 
     m.at(a).setInt(1);
     m.at(b).setInt(3);
@@ -949,12 +955,8 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  a = l.variable ("a", N);
     Layout.Array     A = l.array    ("A", a, N);
     Layout.Structure S = l.structure("S", z, i, j, A);
-    l.compile();
-
-    MemoryLayoutPA m = new MemoryLayoutPA("test");
-         ProgramPA p = m.P;
-    m.layout(l);
-    m.memory(new Memory(l.size()));
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "test");
+    ProgramPA        p = m.P;
 
     MemoryLayoutPA.At  Z = m.at(z), I = m.at(i), J = m.at(j);
 
@@ -1042,8 +1044,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Array     A = l.array    ("A", a, 6);
     l.compile();
 
-    MemoryLayoutPA     L = new MemoryLayoutPA("test");
-    L.layout(l);
+    MemoryLayoutPA     L = new MemoryLayoutPA(l.compile(), "test", true);
     L.memory(new Memory(l.size()+16));
     L.base(16);
 
@@ -1098,11 +1099,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Bit       r = l.bit      ("r");
     Layout.Bit       R = l.bit      ("R");
     Layout.Structure s = l.structure("s", a, b, r, R);
-    l.compile();
-
-    MemoryLayoutPA     m = new MemoryLayoutPA("test");
-    m.layout(l);
-    m.memory(new Memory(l.size()));
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "test");
 
     m.at(a).setInt(1);
     m.at(b).setInt(2);
@@ -1124,11 +1121,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Bit       B = l.bit      ("B");
     Layout.Bit       C = l.bit      ("C");
     Layout.Structure s = l.structure("s", a, b, c, A, B, C);
-    l.compile();
-
-    MemoryLayoutPA   m = new MemoryLayoutPA("test");
-    m.layout(l);
-    m.memory(new Memory(l.size()));
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "test");
 
     m.at(a).zero();
     m.P.new I() {void a() {m.at(b).setInt(2);}};
@@ -1166,22 +1159,6 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(m.at(C).isOnes());
    }
 
-  static void test_not_compiled()
-   {Layout           l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", 4);
-    Layout.Variable  b = l.variable ("b", 4);
-    Layout.Variable  c = l.variable ("c", 4);
-    Layout.Structure s = l.structure("s", a, b, c);
-    MemoryLayoutPA     m = new MemoryLayoutPA("test");
-
-    sayThisOrStop("Field: a has not been compiled yet");
-
-    try {m.at(a).zero();} catch(Exception e) {}
-    m.layout(l.compile());
-    m.memory(new Memory(l.size()));
-    m.at(a).zero();
-   }
-
   static void test_union()
    {Layout               l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 2);
@@ -1194,11 +1171,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Structure S = l.structure("S", A, B, C);
     Layout.Union     u = l.union    ("u", s, S);
     Layout.Array     r = l.array    ("r", u, 4);
-    l.compile();
-
-    MemoryLayoutPA   m = new MemoryLayoutPA("test");
-    m.layout(l);
-    m.memory(new Memory(l.size()));
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "test");
 
     m.at(a, 0).ones();  m.at(a, 1).ones();    m.at(a, 2).ones();    m.at(a, 3).ones();
     m.at(b, 0).zero();  m.at(b, 1).zero();    m.at(b, 2).zero();    m.at(b, 3).zero();
@@ -1260,9 +1233,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Structure S = l.structure("S", A, I, J);
     l.compile();
 
-    MemoryLayoutPA   m = new MemoryLayoutPA("M");
-    m.layout(l);
-    m.memory(new Memory(l.size()));
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
 
     //stop(m);
     ok(m, """
@@ -1307,7 +1278,6 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_zero();
     test_boolean_result();
     test_is_ones_or_zeros();
-    test_not_compiled();
     test_union();
     test_verilog();
    }
