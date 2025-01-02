@@ -10,9 +10,9 @@ abstract class StuckPA extends Test                                             
   abstract int bitsPerData();                                                   // The number of bits per data
   abstract int bitsPerSize();                                                   // The number of bits in size field
 
-  final MemoryLayoutPA M = new MemoryLayoutPA();                                // Memory for stuck
-  final MemoryLayoutPA C = new MemoryLayoutPA();                                // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
-  final MemoryLayoutPA T = new MemoryLayoutPA();                                // Memory for transaction intermediates
+  final MemoryLayoutPA M = new MemoryLayoutPA("StuckSA_Memory");                // Memory for stuck
+  final MemoryLayoutPA C = new MemoryLayoutPA("StuckSA_Copy");                  // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
+  final MemoryLayoutPA T = new MemoryLayoutPA("StuckSA_Transaction");           // Memory for transaction intermediates
   ProgramPA            P = new ProgramPA();                                     // The program to be written to to describe the actions on the stuck.  The caller can provide a different one as this field is not final
 
   Layout.Variable   sKey;                                                       // Key in a stuck
@@ -135,7 +135,7 @@ abstract class StuckPA extends Test                                             
     T.at(size).equal(T.at(full), T.at(isEmpty));
    }
 
-  void assertNotFull()                                                          // Assert the stuck is not full
+  void assertNotFull22()                                                          // Assert the stuck is not full
    {z();
    final StuckPA t = this;
     P.new I()
@@ -143,6 +143,16 @@ abstract class StuckPA extends Test                                             
        {if (T.at(isFull).getInt() > 0)
          {stop("Stuck full, base:", t.M.base, traceBack);
          }
+       }
+     };
+   }
+
+  void assertNotFull()                                                          // Assert the stuck is not full
+   {z();
+   final StuckPA t = this;
+    P.new If(T.at(isFull))
+     {void Then()
+       {P.halt("Stuck full");
        }
      };
    }
@@ -526,6 +536,7 @@ StuckSML(maxSize:8 size:4)
     s.P.run();
     //stop(s.M);
     ok(s.M, """
+MemoryLayout: StuckSA_Memory
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       16       272                                      stuck
    2 V       16        16                                  4     currentSize
@@ -573,7 +584,7 @@ StuckSML(maxSize:8 size:4)
     s.T.at(s.tKey).setInt( 9); s.T.at(s.tData  ).setInt( 9); s.push();
     s.T.at(s.tKey).setInt( 8); s.T.at(s.tData  ).setInt( 8); s.push();
     s.P.new I() {void a() {ok(s.T.at(s.isFull  ).getInt() == 1);}};
-    s.P.new I() {void a() {sayThisOrStop("Stuck full, base:");}};
+    s.P.new I() {void a() {sayThisOrStop("Stuck full");}};
     s.T.at(s.tKey).setInt(7); s.T.at(s.tData).setInt(7); s.push();
     try {s.P.run();} catch(RuntimeException e) {}
    }
@@ -654,7 +665,7 @@ StuckSML(maxSize:8 size:5)
     s.unshift(); s.unshift(); s.unshift();
     s.P.run(); s.P.clear();
     ok(s.T.at(s.isFull).getInt() == 1);
-    sayThisOrStop("Stuck full, base:");
+    sayThisOrStop("Stuck full");
     s.unshift();
     try {s.P.run();} catch(RuntimeException e) {}
    }
@@ -909,7 +920,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:
     Layout.Variable  c = l.variable ("c", N);
     Layout.Structure d = l.structure("d", a, b, c);
     l.layoutName = "aaa";
-    MemoryLayoutPA  M = new MemoryLayoutPA();
+    MemoryLayoutPA  M = new MemoryLayoutPA("M");
     M.layout(l.compile());
     M.memory(new Memory(l.size()));
 
@@ -934,6 +945,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:
 
     M.at(a).setInt(S.M.layout.size());                                          // Use a field as an index in an at
     ok(M, """
+MemoryLayout: M
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        48                                      d
    2 V        0        16                                 72     a
@@ -950,6 +962,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.P.run(); t.P.clear();
     //stop(s.M);
     ok(s.M, """
+MemoryLayout: StuckSA_Memory
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        72                                      stuck
    2 V        0         8                                  4     currentSize
@@ -967,6 +980,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(t.memoryLayout);
     ok(t.M, """
+MemoryLayout: StuckSA_Memory
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       72        72                                      stuck
    2 V       72         8                                  4     currentSize
