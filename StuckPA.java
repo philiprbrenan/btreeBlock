@@ -10,9 +10,10 @@ abstract class StuckPA extends Test                                             
   abstract int bitsPerData();                                                   // The number of bits per data
   abstract int bitsPerSize();                                                   // The number of bits in size field
 
-  final MemoryLayoutPA M = new MemoryLayoutPA("StuckSA_Memory");                // Memory for stuck
-  final MemoryLayoutPA C = new MemoryLayoutPA("StuckSA_Copy");                  // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
-  final MemoryLayoutPA T = new MemoryLayoutPA("StuckSA_Transaction");           // Memory for transaction intermediates
+  final String      name;                                                       // Name of the stuck
+  final MemoryLayoutPA M;                                                       // Memory for stuck
+  final MemoryLayoutPA C;                                                       // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
+  final MemoryLayoutPA T;                                                       // Memory for transaction intermediates
   ProgramPA            P = new ProgramPA();                                     // The program to be written to to describe the actions on the stuck.  The caller can provide a different one as this field is not final
 
   Layout.Variable   sKey;                                                       // Key in a stuck
@@ -39,13 +40,18 @@ abstract class StuckPA extends Test                                             
 
 //D1 Construction                                                               // Create a stuck
 
-  StuckPA()                                                                     // Create the stuck with a maximum number of the specified elements
+  StuckPA(String Name)                                                          // Create the stuck with a maximum number of the specified elements
+   {this(Name, false);
+   }
+
+  StuckPA(String Name, boolean based)                                           // Create the stuck with a maximum number of the specified elements
    {z();
-    M.layout(layout());
-    C.layout(M.layout);
-    C.memory(new Memory(C.layout.size()));
-    T.layout(transactionLayout());
-    T.memory(new Memory(T.layout.size()));
+    name = Name;
+    final Layout layout = layout(), tl = transactionLayout();                   // Layout out the stuck
+    M = new MemoryLayoutPA(layout, name+"_StuckSA_Memory",     based);          // Memory for stuck
+    C = new MemoryLayoutPA(layout, name+"_StuckSA_Copy");                       // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
+    T = new MemoryLayoutPA(tl,     name+"_StuckSA_Transaction");                // Memory for transaction intermediates
+
     program(P);
    }
 
@@ -68,21 +74,13 @@ abstract class StuckPA extends Test                                             
   StuckPA copy()                                                                // Copy a stuck definition
    {z();
     final StuckPA parent = this;
-    final StuckPA  child = new StuckPA()
+    final StuckPA  child = new StuckPA(parent.name, true)
      {int maxSize    () {return parent.maxSize    ();}
       int bitsPerKey () {return parent.bitsPerKey ();}
       int bitsPerData() {return parent.bitsPerData();}
       int bitsPerSize() {return parent.bitsPerSize();}
      };
-    child.sKey        = parent.sKey;
-    child.Keys        = parent.Keys;
-    child.sData       = parent.sData;
-    child.Data        = parent.Data;
-    child.currentSize = parent.currentSize;
-    child.stuck       = parent.stuck;
-    child.M.memory(parent.M.memory);
-    child.M.layout(parent.M.layout);
-    child.M.base  (parent.M.base);
+    child.M.memory(parent.M.memory());
     child.program(parent.P);
     return child;
    }
@@ -455,8 +453,8 @@ abstract class StuckPA extends Test                                             
       int bitsPerData() {return s.bitsPerData();};                              // The number of bits per data
       int bitsPerSize() {return s.bitsPerSize();};                              // The number of bits in size field
      };
-    t.M.memory(s.M.memory);
-    t.base(s.M.base);
+    t.M.memory(s.M.memory());
+    t.base(s.M.base());
     return t.toString();
    }
 
@@ -465,7 +463,7 @@ abstract class StuckPA extends Test                                             
   static StuckPA stuckPA()                                                      // Create a sample stuck
    {z();
     final int offset = 16;                                                      // To make testing more relevant
-    final StuckPA s =  new StuckPA()
+    final StuckPA s =  new StuckPA("test", true)
      {int maxSize     () {return  8;}
       int bitsPerKey  () {return 16;}
       int bitsPerData () {return 16;}
@@ -486,7 +484,9 @@ abstract class StuckPA extends Test                                             
 
     for (int I = 0; I < 4; I++)
      {final int i = I;
-      s.P.new I() {void a() {s.T.at(s.tKey ).setInt(2 + 2 * i);}};
+      s.P.new I() {void a()
+        {s.T.at(s.tKey ).setInt(2 + 2 * i);
+        }};
       s.P.new I() {void a() {s.T.at(s.tData).setInt(1 + 1 * i);}};
       s.push();
      }
@@ -521,7 +521,7 @@ StuckSML(maxSize:8 size:4)
     s.P.run();
     //stop(s.M);
     ok(s.M, """
-MemoryLayout: StuckSA_Memory
+MemoryLayout: test_StuckSA_Memory
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       16       272                                      stuck
    2 V       16        16                                  4     currentSize
@@ -545,7 +545,7 @@ Line T       At      Wide       Size    Indices        Value   Name
   20 V      272        16               7                  0       data
 """);
     //stop(s.memoryLayout.memory);
-    ok(s.M.memory, """
+    ok(s.M.memory(), """
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 000c 000b 000a 0009 0000 0000 0000 0000 000c 000d 000e 000f 0004 0000
@@ -905,12 +905,11 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:
     Layout.Variable  c = l.variable ("c", N);
     Layout.Structure d = l.structure("d", a, b, c);
     l.layoutName = "aaa";
-    MemoryLayoutPA  M = new MemoryLayoutPA("M");
-    M.layout(l.compile());
+    MemoryLayoutPA  M = new MemoryLayoutPA(l.compile(), "M", true);
     M.memory(new Memory(l.size()));
 
 
-    final StuckPA S = new StuckPA()
+    final StuckPA S = new StuckPA("test", true)
      {int maxSize     () {return 4;}
       int bitsPerKey  () {return 8;}
       int bitsPerData () {return 8;}
@@ -938,7 +937,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    4 V       32        16                                  0     c
 """);
 
-    final StuckPA t = S.copy(); t.M.memory(s.M.memory);
+    final StuckPA t = S.copy(); t.M.memory(s.M.memory());
     t.base(S.M.layout.size());
     t.P.new I() {void a() {t.T.at(t.tKey).setInt(1); t.T.at(t.tData).setInt(2);}}; t.push();
     t.P.new I() {void a() {t.T.at(t.tKey).setInt(2); t.T.at(t.tData).setInt(4);}}; t.push();
@@ -947,7 +946,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.P.run(); t.P.clear();
     //stop(s.M);
     ok(s.M, """
-MemoryLayout: StuckSA_Memory
+MemoryLayout: test_StuckSA_Memory
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        72                                      stuck
    2 V        0         8                                  4     currentSize
@@ -965,7 +964,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(t.memoryLayout);
     ok(t.M, """
-MemoryLayout: StuckSA_Memory
+MemoryLayout: test_StuckSA_Memory
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       72        72                                      stuck
    2 V       72         8                                  4     currentSize
@@ -982,7 +981,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
 
     //stop(s.memoryLayout.memory);
-    ok(s.M.memory, """
+    ok(s.M.memory(), """
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0806 0402 0403 0201 0404 0302 0108 0604 0204
