@@ -54,7 +54,8 @@ abstract class StuckPA extends Test                                             
    }
 
   void base(MemoryLayoutPA.At Base)                                             // Set the base address of the stuck in the memory layout containing the stuck
-   {z();  P.new I() {void a() {M.base(Base.setOff().result);}};
+   {z();
+    P.new I() {void a() {M.base(Base.setOff().result);}};
    }
 
   void program(ProgramPA program)                                               // Set the program in which the various components should generate code
@@ -135,18 +136,6 @@ abstract class StuckPA extends Test                                             
     T.at(size).equal(T.at(full), T.at(isEmpty));
    }
 
-  void assertNotFull22()                                                          // Assert the stuck is not full
-   {z();
-   final StuckPA t = this;
-    P.new I()
-     {void a()
-       {if (T.at(isFull).getInt() > 0)
-         {stop("Stuck full, base:", t.M.base, traceBack);
-         }
-       }
-     };
-   }
-
   void assertNotFull()                                                          // Assert the stuck is not full
    {z();
    final StuckPA t = this;
@@ -159,7 +148,9 @@ abstract class StuckPA extends Test                                             
 
   void assertNotEmpty()                                                         // Assert the stuck is not empty
    {z();
-    P.new I() {void a() {if (T.at(isEmpty).getInt() > 0) stop("Empty", traceBack);}};
+    P.new If(T.at(isEmpty))
+     {void Then() {P.halt("Empty");}
+     };
    }
 
   void assertInNormal()                                                         // Check that the index would yield a valid element
@@ -169,6 +160,9 @@ abstract class StuckPA extends Test                                             
        {final int i = T.at(index).getInt();
         final int n = T.at(size) .getInt();
         if (i < 0 || i >= n) stop("Out of normal range",   i, "for size", n, traceBack);
+       }
+      String v()
+       {return "/* assertInNormal */";
        }
      };
    }
@@ -181,29 +175,22 @@ abstract class StuckPA extends Test                                             
         final int n = T.at(size) .getInt();
         if (i < 0 || i > n) stop("Out of extended range", i, "for size", n, traceBack);
        }
+      String v()
+       {return "/* assertInEXtended */";
+       }
      };
    }
 
   void inc()                                                                    // Increment the current size
    {z();
     assertNotFull();
-    P.new I()
-     {void a()
-       {final int n = M.at(currentSize).setOff().getInt();
-                      M.at(currentSize).setOff().setInt(n+1);
-       }
-     };
+    M.at(currentSize).inc();
    }
 
   void dec()                                                                    // Decrement the current size
    {z();
     assertNotEmpty();
-    P.new I()
-     {void a()
-       {final int n = M.at(currentSize).setOff().getInt();
-                      M.at(currentSize).setOff().setInt(n-1);
-       }
-     };
+    M.at(currentSize).dec();
    }
 
   void clear()                                                                  // Zero the current size to clear the stuck
@@ -377,10 +364,9 @@ abstract class StuckPA extends Test                                             
    {z(); action = "search";
     size();
 
-    P.new I()
-     {void a()
-       {final int n = T.at(size).getInt(), l = T.at(limit).getInt(), L = n-l;   // Limit search if requested
-        T.at(size).setInt(L);
+    P.new If(T.at(limit))                                                       // Better if we had a separate routine for search a branch versus a leaf
+     {void Then()
+       {T.at(size).dec();
        }
      };
 
@@ -411,10 +397,9 @@ abstract class StuckPA extends Test                                             
    {z(); action = "searchFirstGreaterThanOrEqual";
     size();
 
-    P.new I()
-     {void a()
-       {final int n = T.at(size).getInt(), l = T.at(limit).getInt(), L = n-l;   // Limit search if requested
-        T.at(size).setInt(L);
+    P.new If(T.at(limit))                                                       // Better if we had a separate routine for search a branch versus a leaf
+     {void Then()
+       {T.at(size).dec();
        }
      };
 
