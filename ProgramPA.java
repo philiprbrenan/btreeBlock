@@ -57,7 +57,7 @@ class ProgramPA extends Test                                                    
   void halt(Object...O)                                                         // Halt execution with an explanatory message
    {z();
     new I()
-     {void   a() {say(O); say(traceBack); running = false;}
+     {void   a() {say(O); /*say(traceBack);*/ running = false;}
       String n() {return "halt";}
      };
    }
@@ -75,7 +75,8 @@ class ProgramPA extends Test                                                    
   void Goto(Label label)                                                        // Goto a label
    {z();
     new I()
-     {void a() {z(); step = label.instruction-1;}                               // The program execution for loop will increment
+     {void   a() {z(); step = label.instruction-1;}                             // The program execution for loop will increment
+      String v() {return "step = "+(label.instruction-1)+";";}                  // The program execution for loop will increment
       String n() {return "Go to "+(label.instruction+1);}                       // One based with no auto increment from run
      };
    }
@@ -85,6 +86,7 @@ class ProgramPA extends Test                                                    
      {void a()
        {z(); if (condition.setOff().getInt() > 0) step = label.instruction-1;
        }
+      String v() {return "if ("+condition.verilogAddress()+" > 0) step = "+(label.instruction-1)+";";} // The program execution for loop will increment
       String n() {return "GoOn "+condition.field.name+" to "+(label.instruction+1);}
      };
    }
@@ -94,6 +96,7 @@ class ProgramPA extends Test                                                    
      {void a()
        {z(); if (condition.setOff().getInt() == 0) step = label.instruction-1;
        }
+      String v() {return "if ("+condition.verilogAddress()+" == 0) step = "+(label.instruction-1)+";";} // The program execution for loop will increment
       String n() {return "GoOff "+condition.field.name+" to "+(label.instruction+1);}
      };
    }
