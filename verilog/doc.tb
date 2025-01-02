@@ -6,14 +6,14 @@
 module doc_tb;                                                                  // Test bench for database on a chip
   parameter execs  = 140_000;                                                   // Maximum number of instructions to execute
 
-  reg       reset;                                                              // Restart the program run sequence when this goes high
-  reg       stop;                                                               // Program has stopped when this goes high
-  reg       clock;                                                              // Program counter clock
-  reg  [2:0]pfd;                                                                // Put, find delete
-  reg  [7:0]Key;                                                                // Input key
-  reg  [7:0]Data;                                                               // Input data
-  reg  [7:0]data;                                                               // Output data
-  reg      found;                                                               // Whether the key was found on put, find delete
+  reg                  reset;                                                   // Restart the program run sequence when this goes high
+  reg                  stop;                                                    // Program has stopped when this goes high
+  reg                  clock;                                                   // Program counter clock
+  reg             [2:0]pfd;                                                     // Put, find delete
+  reg  [4 :0]Key;                                                     // Input key
+  reg  [4:0]Data;                                                    // Input data
+  reg  [4:0]data;                                                    // Output data
+  reg                  found;                                                   // Whether the key was found on put, find delete
 
   doc a1(.reset(reset), .stop(stop), .clock(clock),                             // Connect to the chip
     .Key(Key), .Data(Data), .data(data), .found(found));
