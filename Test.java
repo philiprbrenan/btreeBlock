@@ -155,7 +155,7 @@ public class Test                                                               
     return b.toString();
    }
 
-  static String traceBack() {return traceBack(new Exception());}                // Get a stack trace that we can use in Geany
+  static String traceBack()    {return traceBack(new Exception());}             // Get a stack trace that we can use in Geany
 
   static String traceDdd()                                                      // Locate line associated with a say statement
    {final StackTraceElement[]  t = new Exception().getStackTrace();
