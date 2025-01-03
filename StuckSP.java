@@ -38,9 +38,9 @@ abstract class StuckSP extends Test                                             
   StuckSP()                                                                     // Create the stuck with a maximum number of the specified elements
    {z();
     M.layout(layout());
-    M.memory(new Memory(M.layout.size()));                                      // Can be set after construction to address a different memory. You will also need to call base if the stuck is located some where other than at location zero in memory.
+    M.memory(new Memory("StuckSP", M.layout.size()));                                      // Can be set after construction to address a different memory. You will also need to call base if the stuck is located some where other than at location zero in memory.
     C.layout(M.layout);
-    C.memory(new Memory(C.layout.size()));
+    C.memory(new Memory("StuckSP", C.layout.size()));
    }
 
   void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
@@ -298,7 +298,7 @@ abstract class StuckSP extends Test                                             
       int bitsPerData () {return 16;}
       int bitsPerSize () {return 16;}
      };
-    s.M.memory(new Memory(s.M.layout.size()+offset));
+    s.M.memory(new Memory("StuckSP", s.M.layout.size()+offset));
     s.base(offset);
     return s;
    }
@@ -338,6 +338,7 @@ StuckSP(maxSize:8 size:4)
     t.tKey = 12; t.tData = 12; t.push();
     //stop(t.memoryLayout());
     ok(t.M, """
+Memory: StuckSP
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       16       272                                      stuck
    2 V       16        16                                  4     currentSize
@@ -362,6 +363,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
     //stop(t.memory());
     ok(t.M.memory, """
+Memory: StuckSP
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 000c 000b 000a 0009 0000 0000 0000 0000 000c 000d 000e 000f 0004 0000
@@ -659,7 +661,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:false in
       int baseAt      () {return 0;}
      };
 
-    S.M.memory(new Memory(S.M.layout.size()*2));
+    S.M.memory(new Memory("StuckSP", S.M.layout.size()*2));
 
     final StuckSP      s = S.copy(); s.base(0);
 
@@ -676,6 +678,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:false in
     t.tKey = 4; t.tData = 8; t.push();
     //stop(s.M);
     ok(s.M, """
+Memory: StuckSP
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        72                                      stuck
    2 V        0         8                                  4     currentSize
@@ -693,6 +696,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(t.M);
     ok(t.M, """
+Memory: StuckSP
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       72        72                                      stuck
    2 V       72         8                                  4     currentSize
@@ -710,6 +714,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(S.M.memory);
     ok(S.M.memory, """
+Memory: StuckSP
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0806 0402 0403 0201 0404 0302 0108 0604 0204
