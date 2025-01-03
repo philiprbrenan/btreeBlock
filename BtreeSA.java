@@ -84,11 +84,11 @@ abstract class BtreeSA extends Test                                             
 
     M.layout(layout());
     M.layout.layoutName = "Main";
-    M.memory(new Memory(M.layout.size()));
+    M.memory(new Memory("BtreeSA", M.layout.size()));
 
     T.layout(transactionLayout());                                              // Memory and layout of memory used by a transaction against the btree
     T.layout.layoutName = "transaction";
-    T.memory(new Memory(T.layout.size()));
+    T.memory(new Memory("BtreeSA", T.layout.size()));
 
      {final int N = Branch_length;                                              // Preallocate transactions used on branch stucks
       branchTransactions = new StuckSA[N];
