@@ -105,7 +105,7 @@ class Program extends Test                                                      
 
     MemoryLayout     m = new MemoryLayout();
     m.layout(l);
-    m.memory(new Memory(l.size()));
+    m.memory(new Memory("Program", l.size()));
 
     Program          p = new Program();
     Stack<Integer>   f = new Stack<>();
@@ -128,6 +128,7 @@ class Program extends Test                                                      
     q.run();
     //stop(m);
     ok(m, """
+Memory: Program
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        24                                      s
    2 V        0         8                                255     a
@@ -146,7 +147,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     MemoryLayout     m = new MemoryLayout();
     m.layout(l);
-    m.memory(new Memory(l.size()));
+    m.memory(new Memory("Program", l.size()));
     Program          p = new Program();
     Stack<String>    f = new Stack<>();
 
@@ -177,7 +178,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     MemoryLayout     m = new MemoryLayout();
     m.layout(l);
-    m.memory(new Memory(l.size()));
+    m.memory(new Memory("Program", l.size()));
     Program          p = new Program();
     Stack<Integer>   f = new Stack<>();
 
@@ -210,7 +211,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     l.compile();
     MemoryLayout     m = new MemoryLayout();
     m.layout(l);
-    m.memory(new Memory(l.size()));
+    m.memory(new Memory("Program", l.size()));
 
     Program          p = new Program();
     Stack<Integer>   f = new Stack<>();
@@ -242,7 +243,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     l.compile();
     MemoryLayout     m = new MemoryLayout();
     m.layout(l);
-    m.memory(new Memory(l.size()));
+    m.memory(new Memory("Program", l.size()));
     Program          p = new Program();
     Stack<Integer>   f = new Stack<>();
 
