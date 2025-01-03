@@ -8,15 +8,17 @@ import java.util.*;
 
 class Memory extends Test                                                       // Memory provided in bits
  {final boolean[]bits;                                                          // The memory in bits
-  String name;                                                                  // The name of the memory
+  final String name;                                                            // The name of the memory
 
 //D1 Construct                                                                  // Memory provided in bits
 
-  Memory(int Size)                                                              // Create memory
-   {bits = new boolean[Size];
+  Memory(String Name, int Size)                                                 // Create memory
+   {name = Name; bits = new boolean[Size];
    }
 
-  static Memory memory(int Size) {z(); return new Memory(Size);}                // Create memory
+  static Memory memory(String Name, int Size)                                   // Create memory
+   {z(); return new Memory(Name, Size);
+   }
 
   public String toString()                                                      // Print memory in hex
    {final int N = 256;
@@ -42,8 +44,7 @@ class Memory extends Test                                                       
        }
       S.append(String.format("%4d  ", i)+(""+s.reverse()).trim()+"\n");
      }
-    final String title = name != null ? "Memory:" + name + "\n" : "";
-    return title+"      "+T+"\nLine  "+t+"\n"+S;
+    return "Memory: "+name+"\n      "+T+"\nLine  "+t+"\n"+S;
    }
 
   int size() {z(); return bits.length;}                                         // Size of memory
@@ -89,7 +90,7 @@ class Memory extends Test                                                       
   int getInt(int start, int width)                                              // Get an int from memory
    {//check(start, width);
     z();
-    if (start < 0 || start + width  > size()) stop("Out of range");
+    if (start < 0 || start + width  > size()) stop("Out of range in memory", name, "Start:", start, "width:", width, "size:", size());
     z();
     if  (width < 1) stop("width must be one or more, not:", width);
     z();
@@ -220,7 +221,7 @@ class Memory extends Test                                                       
 //D0                                                                            // Tests
 
   static void test_set_get()
-   {Memory m = memory(8);
+   {Memory m = memory(currentTestName(), 8);
     m.set(2, 2, 3);
     m.set(5, 1, 1);
 
@@ -233,7 +234,7 @@ class Memory extends Test                                                       
    }
 
   static void test_zero_ones()
-   {Memory m = memory(8);
+   {Memory m = memory(currentTestName(), 8);
     m.ones(2, 4);
     m.zero(4, 1);
 
@@ -241,11 +242,12 @@ class Memory extends Test                                                       
    }
 
   static void test_copy()
-   {Memory m = memory(8);
+   {Memory m = memory(currentTestName(), 8);
 
     m.ones(1, 2);
     //stop(m);
     ok(""+m, """
+Memory: test_copy
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0006
@@ -254,6 +256,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
     m.copyHigh(5, 1, 2);
     //stop(m);
     ok(""+m, """
+Memory: test_copy
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0066
@@ -261,11 +264,12 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
    }
 
   static void test_invert()
-   {Memory m = memory(8);
+   {Memory m = memory(currentTestName(), 8);
 
     m.ones(1, 2);
     //stop(m);
     ok(""+m, """
+Memory: test_invert
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0006
@@ -274,6 +278,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
     m.invert(2, 2);
     //stop(m);
     ok(""+m, """
+Memory: test_invert
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 000a
@@ -283,7 +288,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
   static void test_boolean()
    {for   (int i = 0; i <= 2; i++)
      {for (int j = 0; j <= 2; j++)
-       {Memory m = memory(8);
+       {Memory m = memory(currentTestName(), 8);
         m.set(0, 4, i);
         m.set(4, 4, j);
         ok(m.equals            (0, 4, 4) == (i == j));
@@ -297,10 +302,11 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
    }
 
   static void test_alternating()
-   {Memory m = memory(256);
+   {Memory m = memory(currentTestName(), 256);
     m.alternating(4);
     //stop(m);
     ok(""+m, """
+Memory: test_alternating
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0
@@ -308,11 +314,12 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
    }
 
   static void test_all_zeros_and_ones()
-   {Memory m = memory(256);
+   {Memory m = memory(currentTestName(), 256);
     m.alternating(4);
     m.ones();
     //stop(m);
     ok(""+m, """
+Memory: test_all_zeros_and_ones
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  ffff ffff ffff ffff ffff ffff ffff ffff ffff ffff ffff ffff ffff ffff ffff ffff
@@ -320,6 +327,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
     m.zero();
     //stop(m);
     ok(""+m, """
+Memory: test_all_zeros_and_ones
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
