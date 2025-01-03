@@ -41,9 +41,9 @@ abstract class StuckSA extends Test                                             
    {z();
     M.layout(layout());
     C.layout(M.layout);
-    C.memory(new Memory(C.layout.size()));
+    C.memory(new Memory("StuckSA", C.layout.size()));
     T.layout(transactionLayout());
-    T.memory(new Memory(T.layout.size()));
+    T.memory(new Memory("StuckSA", T.layout.size()));
    }
 
   void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
@@ -399,7 +399,7 @@ abstract class StuckSA extends Test                                             
       int bitsPerData () {return 16;}
       int bitsPerSize () {return 16;}
      };
-    s.M.memory(new Memory(s.M.layout.size()+offset));
+    s.M.memory(new Memory("StuckSA", s.M.layout.size()+offset));
     s.base(offset);
     return s;
    }
@@ -446,6 +446,7 @@ StuckSA(maxSize:8 size:4)
     m.at(s.tKey).setInt(12); m.at(s.tData).setInt(12); s.push();
     //stop(s.memoryLayout());
     ok(s.M, """
+Memory: StuckSA
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       16       272                                      stuck
    2 V       16        16                                  4     currentSize
@@ -470,6 +471,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
     //stop(s.memoryLayout.memory);
     ok(s.M.memory, """
+Memory: StuckSA
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 000c 000b 000a 0009 0000 0000 0000 0000 000c 000d 000e 000f 0004 0000
@@ -784,7 +786,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:
     l.layoutName = "aaa";
     MemoryLayout  M = new MemoryLayout();
     M.layout(l.compile());
-    M.memory(new Memory(l.size()));
+    M.memory(new Memory("StuckSA", l.size()));
 
 
     final StuckSA S = new StuckSA()
@@ -795,7 +797,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:
       int baseAt      () {return 0;}
      };
 
-    S.M.memory(new Memory(S.M.layout.size()*2));
+    S.M.memory(new Memory("StuckSA", S.M.layout.size()*2));
 
     final StuckSA       s = S.copy(); s.base(0);
     final MemoryLayout sm = s.T;
@@ -807,6 +809,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:
 
     M.at(a).setInt(S.M.layout.size());
     ok(M, """
+Memory: StuckSA
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        48                                      d
    2 V        0        16                                 72     a
@@ -823,6 +826,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(s.memoryLayout);
     ok(s.M, """
+Memory: StuckSA
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        72                                      stuck
    2 V        0         8                                  4     currentSize
@@ -840,6 +844,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(t.memoryLayout);
     ok(t.M, """
+Memory: StuckSA
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       72        72                                      stuck
    2 V       72         8                                  4     currentSize
@@ -857,6 +862,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(s.memoryLayout.memory);
     ok(s.M.memory, """
+Memory: StuckSA
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0806 0402 0403 0201 0404 0302 0108 0604 0204
