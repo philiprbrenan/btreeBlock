@@ -157,7 +157,7 @@ abstract class BtreePA extends Test                                             
         for (int i = N; i > 0; --i) setInt(free, (i == N ? 0 : i), i - 1);      // Link this node to the previous node
         setInt(freeList, root);                                                 // Root is first on free chain
        }
-      String v() {return "Construct Free list";}
+      String v() {return "/* Construct Free list */"+ traceComment();}
      };
     allocate(false);                                                            // The root is always at zero, which frees zero to act as the end of list marker on the free chain
     T.setIntInstruction(node_setLeaf, root);
@@ -591,7 +591,7 @@ abstract class BtreePA extends Test                                             
        {final MemoryLayoutPA.At a = M.at(leaf, T.at(node_leafBase)).setOff();
         T.at(leafBase).setInt(a.at);
        }
-      String v() {return "/* leafBase */";}
+      String v() {return T.at(leafBase).verilogAddress() + " = " + M.at(leaf, T.at(node_leafBase)).verilogAddress() + ";" + traceComment();}
      };
    }
 
@@ -602,7 +602,7 @@ abstract class BtreePA extends Test                                             
        {final MemoryLayoutPA.At a = M.at(branch, T.at(node_branchBase)).setOff();
         T.at(branchBase).setInt(a.at);
        }
-      String v() {return "/* branchBase */";}
+      String v() {return T.at(branchBase).verilogAddress() + " = " + M.at(branch, T.at(node_branchBase)).verilogAddress() + ";" + traceComment();}
      };
    }
 
@@ -899,7 +899,7 @@ abstract class BtreePA extends Test                                             
      {void a()
        {T.at(flKey).setInt((T.at(firstKey).getInt()+T.at(lastKey).getInt())/2);
        }
-      String v() {return "splitleafRoot";}
+      String v() {return "/* splitleafRoot */" + traceComment();}
      };
     bT.T.at(bT.tKey).move(T.at(flKey));
     bT.T.at(bT.tData).move(T.at(l));
@@ -1006,7 +1006,7 @@ abstract class BtreePA extends Test                                             
        {bT.T.at(bT.tKey).setInt((lR.T.at(lR.tKey).getInt() +
                                  lL.T.at(lL.tKey).getInt()) / 2);
        }
-      String v() {return "splitLeaf";}
+      String v() {return "/* splitLeaf */" + traceComment();}
      };
     bT.T.at(bT.tData).move(T.at(l));
     bT.T.at(bT.index).move(T.at(index));
@@ -1307,7 +1307,7 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + T.at(nr).getInt() <= maxKeysPerLeaf()) ?
                   1 : 0);
                }
-              String v() {return "mergeRoot";}
+              String v() {return "/* mergeRoot */" + traceComment();}
              };
 
             P.new If (T.at(mergeable))
@@ -1363,7 +1363,7 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + 1 + T.at(nr).getInt() <= maxKeysPerBranch()) ?
                   1 : 0);
                }
-              String v() {return "mergeRoot";}
+              String v() {return "/* mergeRoot */" + traceComment();}
              };
 
             P.new If (T.at(mergeable))
@@ -1481,7 +1481,7 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + T.at(nr).getInt() >= maxKeysPerLeaf()) ?
                   1 : 0);
                }
-              String v() {return "mergeLeftSibling leaves";}
+              String v() {return "/* mergeLeftSibling leaves */" + traceComment();}
              };
             stealNotPossible(end);
 
@@ -1513,7 +1513,7 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + 1 + T.at(nr).getInt() > maxKeysPerBranch()) ?
                   1 : 0);
                }
-              String v() {return "mergeLeftSibling branches";}
+              String v() {return "/* mergeLeftSibling branches */" + traceComment();}
              };
             stealNotPossible(end);
 
@@ -1604,7 +1604,7 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + T.at(nr).getInt() > maxKeysPerLeaf()) ?
                   1 : 0);
                }
-              String v() {return "mergeRightSibling leaves";}
+              String v() {return "/* mergeRightSibling leaves */" + traceComment();}
              };
             stealNotPossible(end);
 
@@ -1643,7 +1643,7 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + 1 + T.at(nr).getInt() > maxKeysPerBranch()) ?
                   1 : 0);
                }
-              String v() {return "mergeRightSibling branches";}
+              String v() {return "/* mergeRightSibling branches */" + traceComment();}
              };
             stealNotPossible(end);
 
@@ -2122,7 +2122,7 @@ abstract class BtreePA extends Test                                             
 
   String stuckMemory(StuckPA s)                                                 // Base address variable for one stuck
    {return
-     "reg ["+bitsPerAddress+":0]"+s.M.baseName()+";\n"+
+     "reg ["+bitsPerAddress+":0] "+s.M.baseName()+";\n"+
      s.T.declareVerilog(s.T.name());
    }
 
@@ -2137,15 +2137,18 @@ abstract class BtreePA extends Test                                             
 `timescale 10ps/1ps
 module doc(reset, stop, clock, pfd, Key, Data, data, found);                    // Database on a chip
   input                 reset;                                                  // Restart the program run sequence when this goes high
-  input                 stop;                                                   // Program has stopped when this goes high
   input                 clock;                                                  // Program counter clock
   input            [2:0]pfd;                                                    // Put, find delete
   input [$bitsPerKey :0]Key;                                                    // Input key
   input [$bitsPerData:0]Data;                                                   // Input data
+  output                 stop;                                                  // Program has stopped when this goes high
   output[$bitsPerData:0]data;                                                   // Output data
   output                found;                                                  // Whether the key was found on put, find delete
 
-  integer step;                                                                 // Program counter
+  integer  step;                                                                // Program counter
+  integer steps;                                                                // Number of steps executed
+  reg   stopped;                                                                // Set when we stop
+  assign stop = stopped > 0 ? 1 : 0;                                            // Show whether we have stopped yet or not
 
   `include "memory.sv"
 $temporaryStorage
@@ -2185,7 +2188,7 @@ module doc_tb;                                                                  
     integer i;
     begin
       Key = 2; Data = 3;
-      for(i = 0; i < 10; i = i + 1) begin;
+      for(i = 0; i < 100; i = i + 1) begin;
         clock = 0; #1; clock = 1; #1;
       end
     end
@@ -3070,6 +3073,7 @@ endmodule
       t.T.at(t.Data).setInt(N-i);
       t.P.run();
      }
+    //stop(t.M);
     //stop(t);
     ok(t, """
              4                    |
