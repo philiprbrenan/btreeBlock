@@ -107,13 +107,12 @@ abstract class BtreePA extends Test                                             
       branchTransactions = new StuckPA[N];
 
       for (int i = 0; i < N; i++)
-       {final StuckPA b = branchTransactions[i] = new StuckPA("branch_"+i, true)// Based stucks
+       {final StuckPA b = branchTransactions[i] = new StuckPA("branch_"+i, M)   // Based stucks
          {int     maxSize() {return BtreePA.this.maxKeysPerBranch()+1;}         // Not forgetting top next
           int  bitsPerKey() {return BtreePA.this.bitsPerKey();}
           int bitsPerData() {return BtreePA.this.bitsPerNext;}
           int bitsPerSize() {return BtreePA.this.bitsPerSize;}
          };
-         b.M.memory(M.memory());
          b.M.layout.layoutName = "branchMain"+i;
          b.T.layout.layoutName = "branch"+i;
          b.program(P);
@@ -124,13 +123,12 @@ abstract class BtreePA extends Test                                             
       leafTransactions = new StuckPA[N];
 
       for (int i = 0; i < N; i++)
-       {final StuckPA l = leafTransactions[i] = new StuckPA("leaf_"+i, true)    // Based stucks
+       {final StuckPA l = leafTransactions[i] = new StuckPA("leaf_"+i, M)       // Based stucks
          {int     maxSize() {return BtreePA.this.maxKeysPerLeaf();}
           int  bitsPerKey() {return BtreePA.this.bitsPerKey();}
           int bitsPerData() {return BtreePA.this.bitsPerData();}
           int bitsPerSize() {return BtreePA.this.bitsPerSize;}
          };
-         l.M.memory(M.memory());
          l.M.layout.layoutName = "leafMain"+i;
          l.T.layout.layoutName = "leaf"+i;
          l.program(P);
@@ -190,7 +188,7 @@ abstract class BtreePA extends Test                                             
    {z();
     final BtreePA btree = this;
 
-    final StuckPA leafStuck = new StuckPA("leaf", true)                         // Leaf
+    final StuckPA leafStuck = new StuckPA("leaf", M)                            // Leaf
      {int               maxSize() {return btree.maxKeysPerLeaf();}
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerData();}
@@ -198,7 +196,7 @@ abstract class BtreePA extends Test                                             
      };
     leafStuck.T.layout.layoutName = "leaf";
 
-    final StuckPA branchStuck = new StuckPA("branch", true)                     // Branch
+    final StuckPA branchStuck = new StuckPA("branch", M)                        // Branch
      {int               maxSize() {return btree.maxKeysPerBranch()+1;}          // Not forgetting top next
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerNext;}
@@ -593,7 +591,7 @@ abstract class BtreePA extends Test                                             
        {final MemoryLayoutPA.At a = M.at(leaf, T.at(node_leafBase)).setOff();
         T.at(leafBase).setInt(a.at);
        }
-      String v() {return "leafBase";}
+      String v() {return "/* leafBase */";}
      };
    }
 
@@ -604,7 +602,7 @@ abstract class BtreePA extends Test                                             
        {final MemoryLayoutPA.At a = M.at(branch, T.at(node_branchBase)).setOff();
         T.at(branchBase).setInt(a.at);
        }
-      String v() {return "branchBase";}
+      String v() {return "/* branchBase */";}
      };
    }
 
@@ -2113,6 +2111,21 @@ abstract class BtreePA extends Test                                             
 
 //D1 Verilog                                                                    // Generate verilog code that implements the instructions used to manipulate a btree
 
+  String stuckMemories()                                                        // Generate verilog for the variables holding the base addresses of all based memory elements
+   {final StringBuilder s = new StringBuilder();
+    final int B = branchTransactions.length;
+    final int L =   leafTransactions.length;
+    for  (int b = 0; b < B; b++) s.append(stuckMemory(branchTransactions[b]));
+    for  (int l = 0; l < L; l++) s.append(stuckMemory(  leafTransactions[l]));
+    return s.toString();
+   }
+
+  String stuckMemory(StuckPA s)                                                 // Base address variable for one stuck
+   {return
+     "reg ["+bitsPerAddress+":0]"+s.M.baseName()+";\n"+
+     s.T.declareVerilog(s.T.name());
+   }
+
   void dumpVerilog(String filePath)                                             // Write verilog
    {final String file = fileName(filePath), folder = folderName(filePath);      // Parse file name
      final StringBuilder s = new StringBuilder();                               // Chip
@@ -2135,21 +2148,10 @@ module doc(reset, stop, clock, pfd, Key, Data, data, found);                    
   integer step;                                                                 // Program counter
 
   `include "memory.sv"
-  $temporaryStorage
+$temporaryStorage
+$stuckBases
 
-  always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
-
-    if (reset) begin;                                                           // Reset
-      step <= 0;
-      $display("reset");
-    end
-
-    else begin;                                                                 // Run
-      step <= step + 1;
-      $instructions
-      $display("%4d  %4d  %4d", pc, Key, Data);
-    end
-  end
+$instructions
 endmodule
 """);
     final StringBuilder t = new StringBuilder();                                 // Test bench
@@ -2202,6 +2204,7 @@ endmodule
            s = s.replace("$bitsPerData",   ""+bitsPerData());
            s = s.replace("$instructions",     P.dumpVerilog());
            s = s.replace("$temporaryStorage", T.declareVerilog(T.name()));
+           s = s.replace("$stuckBases",       stuckMemories());
     return new StringBuilder(s);
    }
 
