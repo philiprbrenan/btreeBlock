@@ -1,4 +1,3 @@
-reg [8:0] M_base;
 reg [282:0] M;
 task initialize_memory_M;
     begin
