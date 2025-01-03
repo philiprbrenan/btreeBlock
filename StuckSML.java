@@ -46,7 +46,7 @@ abstract class StuckSML extends Test                                            
   StuckSML()                                                                    // Create the layout for the stuck
    {z();
     M.layout(layout());
-    M.memory(new Memory(M.layout.size()));                                      // Can be set after construction to address a different memory. You will also need to call base if the stuck is located some where other than at location zero in memory.
+    M.memory(new Memory("StuckSML", M.layout.size()));                          // Can be set after construction to address a different memory. You will also need to call base if the stuck is located some where other than at location zero in memory.
    }
 
   void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
@@ -509,7 +509,7 @@ abstract class StuckSML extends Test                                            
       int bitsPerData () {return 16;}
       int bitsPerSize () {return 16;}
      };
-    s.M.memory(new Memory(s.M.layout.size()+offset));
+    s.M.memory(new Memory("StuckSML", s.M.layout.size()+offset));
     s.base(offset);
     return s;
    }
@@ -541,6 +541,7 @@ StuckSML(maxSize:4 size:4)
     t.push(12, 12);
     //stop(t.M);
     ok(t.M, """
+Memory: StuckSML
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       16       144                                      stuck
    2 V       16        16                                  4     currentSize
@@ -557,6 +558,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
     //stop(t.memory());
     ok(t.M.memory, """
+Memory: StuckSML
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 000c 000b 000a 0009 000c 000d 000e 000f 0004 0000
@@ -926,12 +928,13 @@ CheckOrderExceptLast(inOrder:false outOfOrder:2)
       int baseAt      () {return 0;}
      };
     final int N = S.M.layout.size();
-    S.M.memory(new Memory(2 * N));
+    S.M.memory(new Memory("StuckSML", 2 * N));
 
     final StuckSML s = S.copy(); s.base(0); s.push(2, 1); s.push(4, 2); s.push(6, 3); s.push(8, 4);
     final StuckSML t = S.copy(); t.base(N); t.push(1, 2); t.push(2, 4); t.push(3, 6); t.push(4, 8);
     //stop(s.M));
     ok(s.M, """
+Memory: StuckSML
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        72                                      stuck
    2 V        0         8                                  4     currentSize
@@ -949,6 +952,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(t.M);
     ok(t.M, """
+Memory: StuckSML
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       72        72                                      stuck
    2 V       72         8                                  4     currentSize
@@ -966,6 +970,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(S.memory());
     ok(S.M.memory, """
+Memory: StuckSML
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0806 0402 0403 0201 0404 0302 0108 0604 0204
