@@ -27,7 +27,7 @@ module doc_tb;                                                                  
     integer i;
     begin
       Key = 2; Data = 3;
-      for(i = 0; i < 10; i = i + 1) begin;
+      for(i = 0; i < 100; i = i + 1) begin;
         clock = 0; #1; clock = 1; #1;
       end
     end
