@@ -3,48 +3,47 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Memory layout
-// Set base for each verilog memory
+
 import java.util.*;
 
 class MemoryLayoutPA extends Test                                               // Memory layout
- {final String     name;                                                        // Name of the memory layout
-  final boolean   based;                                                        // If true, then we are using some one else's memory with a base offset into it, otherwise if false we are the owner of the memory and the base offset is always zero
-  final Layout   layout;                                                        // Layout of part of memory
-  private Memory memory;                                                        // Memory containing layout
-  private int      base;                                                        // Base of layout in memory - like located in Pl1
-  boolean         debug;                                                        // Debug if true
-  ProgramPA P = new ProgramPA();                                                // Program containing generated code
+ {final String          name;                                                   // Name of the memory layout
+  final MemoryLayoutPA based;                                                   // If true, then we are using some one else's memory with a base offset into it, otherwise if false we are the owner of the memory and the base offset is always zero
+  final Layout        layout;                                                   // Layout of part of memory
+  private Memory      memory;                                                   // Memory containing layout
+  private int           base;                                                   // Base of layout in memory - like located in Pl1
+  boolean              debug;                                                   // Debug if true
+  ProgramPA                P = new ProgramPA();                                 // Program containing generated code
 
 //D1 Construction                                                               // Construct a memory layout
 
   MemoryLayoutPA(Layout Layout, String Name)                                    // Every memory layout needs a layout and a name so we can generate verilog from it
-   {this(Layout, Name, false);
+   {this(Layout, Name, null);                                                   // Not based
    }
 
-  MemoryLayoutPA(Layout Layout, String Name, boolean Based)                     // Like based storage in PL1.
-   {name = Name; based = Based; layout = Layout;
-    if (!based) memory = new Memory(layout.size());                             // If it is based it uses some one else's memory, if not based we must supply memory
+  MemoryLayoutPA(Layout Layout, String Name, MemoryLayoutPA Based)              // Like based storage in PL1.
+   {name   = Name; based = Based; layout = Layout;
+    memory = based != null ? Based.memory() : new Memory(Name, layout.size());  // If it is based it uses some one else's memory, if not based we must supply memory
+    if (based != null) P = based.P;                                             // Reusetheunderlying program by default as well
    }
 
 //D1 Control                                                                    // Testing, control and integrity
 
-  void memory (Memory  Memory)                                                  // Set the memory to be used and our base in it allowing such layouts to be relocated in other memories
-   {if (!based) stop("Not a based layout so cannot set memory");
-    memory = Memory;
-   }
+  Memory memory() {return based == null ? memory : based.memory();}             // Find the real memory used by this layout
+
 
   //void layout (Layout    Layout)  {layout = Layout;}                          // Set the base of the layout in memory allowing such layouts to be relocated
   void program(ProgramPA program) {P = program;}                                // Program in which to generate instructions
 
   void base(int Base)                                                           // Set the base of the layout in memory allowing such layouts to be relocated
-   {if (!based) stop("Memory layout is not based so cannot set a base");
+   {if (based == null) stop("Memory layout is not based so cannot set a base");
     base = Base;
    }
 
-  String name  () {return name;}                                                // Name of this mmeory layout
-  Memory memory() {return memory;}                                              // Get the memory used by a stuck
-  Layout layout() {return layout;}                                              // Get the layout in use
-  int    base  () {return base;}                                                // Get the base offset into memory being used
+  String name    () {return based == null ? name : based.name();}               // Name of this memory layout
+  Layout layout  () {return layout;}                                            // Get the layout in use
+  String baseName() {return name+"_base_offset";}                               // Name of the verilog field used to hold the base being used for this memory layout
+  int    base    () {return base;}                                              // Get the base offset into memory being used
 
   void ok(String Lines)                                                         // Check that specified lines are present in the memory layout
    {final String  m = toString();                                               // Memory as string
@@ -71,12 +70,6 @@ class MemoryLayoutPA extends Test                                               
     return i;
    }
 
-  int  getIntExterior(Layout.Field field, int...indices)                        // Get a value from memory occupied by the layout without confirming we are in an instruction
-   {z();
-    final int i = new At(field, indices).setOff(false).result;
-    return i;
-   }
-
   void setInt(Layout.Field field, int value, int...indices)                     // Set a value in memory occupoied by the layout
    {z();
     final At a = new At(field, indices).setOff();
@@ -90,7 +83,7 @@ class MemoryLayoutPA extends Test                                               
        {final At a = new At(field, indices).setOff();
         memory.set(a.at, a.width, value);
        }
-     String v() {return "setIntInstruction";}
+     String v() {return "/* setIntInstruction */";}
      };
    }
 
@@ -111,8 +104,9 @@ class MemoryLayoutPA extends Test                                               
     int  result;                                                                // The contents of memory at this location
 
     String verilogAddress()                                                     // A verilog representation of the address expression
-     {if (directs == null || directs.length == 0)
-       {return name()+"["+field.at+"+"+field.width+"-1 +: "+field.width+"] /* "+field.name+" */";
+     {final String base = based != null ? baseName()+"+" : "";                  // base field name if a based memory layput
+      if (directs == null || directs.length == 0)                               // An unindexed field
+       {return name()+"["+base+field.at+"+"+field.width+"-1 +: "+field.width+"] /* "+field.name+" */";
        }
       final int N = directs.length;
 
@@ -130,7 +124,7 @@ class MemoryLayoutPA extends Test                                               
        }
       final String name = field.name+(n.size() > 0 ?                            // Name of field plus any indexing fields
               "("+joinStrings(n, ",")+")" : "");
-      return name()+"["+field.at+"+"+field.width+"-1 +"+joinStrings(v, "+")+" +: "+field.width+"] /* "+name+" */";
+      return name()+"["+base+field.at+"+"+field.width+"-1 +"+joinStrings(v, "+")+" +: "+field.width+"] /* "+name+" */";
      }
 
     void locateDirectAddress()                                                  // Locate a direct address and its content
@@ -582,7 +576,7 @@ class MemoryLayoutPA extends Test                                               
   public String toString()                                                      // Print the values of the layout variable in memory
    {final PrintPosition pp = new PrintPosition();
     if (name        != null) pp.s.append("MemoryLayout: "+name+"\n");
-    if (memory.name != null) pp.s.append("Memory: "+memory.name+"\n");
+    if (memory.name != null) pp.s.append("Memory      : "+memory.name+"\n");
     pp.s.append(String.format
        ("%4s %1s %8s  %8s   %8s   %8s     %8s   %s\n",
         "Line", "T", "At", "Wide", "Size", "Indices", "Value", "Name"));
@@ -625,7 +619,7 @@ class MemoryLayoutPA extends Test                                               
     pp.s.append(switch(field)                                                   // Value
      {case Layout.Variable  v ->
        {final int a = field.locator.at(in);
-        final int n = getIntExterior(field, in);
+        final int n = new At(field, in).setOff(false).result;
         yield String.format("%13d", n);
        }
       case Layout.Array     a -> String.format("%13s", "");
@@ -684,8 +678,8 @@ class MemoryLayoutPA extends Test                                               
   String declareVerilog(String name)                                            // Declare matching memory  but do not initialize it
    {final int N = memory.bits.length-1, B = logTwo(N)-1;
     final StringBuilder s = new StringBuilder();
-                s.append("reg ["+B+":0] "+name+"_base;\n");                     // Base offset for this memory in case it is based
-    if (!based) s.append("reg ["+N+":0] "+name+";\n");                          // Actual memory if it is not based
+    if (based == null) s.append("reg ["+N+":0] "+name()+";\n");                 // Actual memory if it is not based
+    else               s.append("reg ["+B+":0] "+baseName()+";\n");             // Base offset for this memory
     return s.toString();
    }
 
@@ -801,96 +795,58 @@ class MemoryLayoutPA extends Test                                               
     Layout.Variable  c = l.variable ("c", 4);
     Layout.Variable  d = l.variable ("d", 4);
     Layout.Structure s = l.structure("s", a, b, c, d);
+    Layout.Array     A = l.array    ("A", s, 2);
     l.compile();
-    final int        N = l.size();
-
-    MemoryLayoutPA   m = new MemoryLayoutPA(l, "test", true);
-    ProgramPA        p = m.P;
-    m.memory(new Memory(2*N));
-    m.base(N);
+    MemoryLayoutPA   M = new MemoryLayoutPA(l, "test");
+    MemoryLayoutPA   m = new MemoryLayoutPA(l, "test", M);
+    ProgramPA        p = M.P;
+    p.new I() {void a() {m.base(M.at(s, 1).setOff().at);}};
     m.memory.alternating(4);
-    //stop(m);
-    m.ok("""
+    //stop(M);
+    M.ok("""
+MemoryLayout: test
+Memory      : test
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S       16        16                                      s
-   2 V       16         4                                  0     a
-   3 V       20         4                                 15     b
-   4 V       24         4                                  0     c
-   5 V       28         4                                 15     d
+   1 A        0        32          2                           A
+   2 S        0        16               0                        s
+   3 V        0         4               0                  0       a
+   4 V        4         4               0                 15       b
+   5 V        8         4               0                  0       c
+   6 V       12         4               0                 15       d
+   7 S       16        16               1                        s
+   8 V       16         4               1                  0       a
+   9 V       20         4               1                 15       b
+  10 V       24         4               1                  0       c
+  11 V       28         4               1                 15       d
 """);
-    ok(m.getIntExterior(a),  0);
-    ok(m.getIntExterior(b), 15);
 
 
     p.new I()
      {void a()
-       {m.setInt(a,  9);
-        m.setInt(b, 10);
-        m.setInt(c, 11);
-        m.setInt(d, 12);
+       {m.setInt(a,  9, 0);
+        m.setInt(b, 10, 0);
+        m.setInt(c, 11, 0);
+        m.setInt(d, 12, 0);
        }
      };
     m.P.run(); m.P.clear();
 
-    //stop(m);
-    m.ok("""
+    //stop(M);
+    M.ok("""
+MemoryLayout: test
+Memory      : test
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S       16        16                                      s
-   2 V       16         4                                  9     a
-   3 V       20         4                                 10     b
-   4 V       24         4                                 11     c
-   5 V       28         4                                 12     d
-""");
-   }
-
-  static void test_based_array()
-   {final int        B = 8;
-    Layout           l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", 4);
-    Layout.Array     A = l.array    ("A", a, 4);
-    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "test", true);
-    ProgramPA        p = m.P;
-
-    m.memory(new Memory(l.size()+B));
-    m.base(B);
-    m.memory.alternating(4);
-    //stop(m);
-    m.ok("""
-Line T       At      Wide       Size    Indices        Value   Name
-   1 A        8        16          4                           A
-   2 V        8         4               0                  0     a
-   3 V       12         4               1                 15     a
-   4 V       16         4               2                  0     a
-   5 V       20         4               3                 15     a
-""");
-    ok(m.getIntExterior(a,  0),  0);
-    ok(m.getIntExterior(a,  1), 15);
-    ok(m.getIntExterior(a,  2),  0);
-    ok(m.getIntExterior(a,  3), 15);
-
-    p.new I()
-     {void a()
-       {m.setInt(a,  9,  0);
-        m.setInt(a, 10,  1);
-        m.setInt(a, 11,  2);
-        m.setInt(a, 12,  3);
-       }
-     };
-
-    m.P.run(); m.P.clear();
-    ok(m.getIntExterior(a, 0),  9);
-    ok(m.getIntExterior(a, 1), 10);
-    ok(m.getIntExterior(a, 2), 11);
-    ok(m.getIntExterior(a, 3), 12);
-
-    //stop(m);
-    m.ok("""
-Line T       At      Wide       Size    Indices        Value   Name
-   1 A        8        16          4                           A
-   2 V        8         4               0                  9     a
-   3 V       12         4               1                 10     a
-   4 V       16         4               2                 11     a
-   5 V       20         4               3                 12     a
+   1 A        0        32          2                           A
+   2 S        0        16               0                        s
+   3 V        0         4               0                  0       a
+   4 V        4         4               0                 15       b
+   5 V        8         4               0                  0       c
+   6 V       12         4               0                 15       d
+   7 S       16        16               1                        s
+   8 V       16         4               1                  9       a
+   9 V       20         4               1                 10       b
+  10 V       24         4               1                 11       c
+  11 V       28         4               1                 12       d
 """);
    }
 
@@ -1009,6 +965,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(m.memory);
     ok(""+m.memory, """
+Memory: test
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0c0b 0a02 0100
@@ -1017,6 +974,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
     //stop(m);
     ok(""+m, """
 MemoryLayout: test
+Memory      : test
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        88                                      S
    2 V        0         8                                  0     z
@@ -1046,6 +1004,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     //stop(m);
     ok(""+m, """
 MemoryLayout: test
+Memory      : test
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        88                                      S
    2 V        0         8                                  0     z
@@ -1069,51 +1028,55 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Array     A = l.array    ("A", a, 6);
     l.compile();
 
-    MemoryLayoutPA     L = new MemoryLayoutPA(l.compile(), "test", true);
-    L.memory(new Memory(l.size()+16));
-    L.base(16);
+    MemoryLayoutPA   M = new MemoryLayoutPA(l.compile(), "test");
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "over", M);
+    m.base(12);
 
-    L.memory.alternating(4);
-    //stop(L.memory);
-    ok(L.memory, """
+    m.memory.alternating(4);
+    //stop(M.memory);
+    ok(M.memory, """
+Memory: test
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
-   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 00f0 f0f0 f0f0
+   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 00f0 f0f0
 """);
 
-    //stop(L);
-    ok(L, """
+    //stop(M);
+    ok(M, """
 MemoryLayout: test
+Memory      : test
 Line T       At      Wide       Size    Indices        Value   Name
-   1 A       16        24          6                           A
-   2 V       16         4               0                  0     a
-   3 V       20         4               1                 15     a
-   4 V       24         4               2                  0     a
-   5 V       28         4               3                 15     a
-   6 V       32         4               4                  0     a
-   7 V       36         4               5                 15     a
+   1 A        0        24          6                           A
+   2 V        0         4               0                  0     a
+   3 V        4         4               1                 15     a
+   4 V        8         4               2                  0     a
+   5 V       12         4               3                 15     a
+   6 V       16         4               4                  0     a
+   7 V       20         4               5                 15     a
 """);
 
-    L.zero();
+    M.zero();
 
-    //stop(L.memory);
-    ok(L.memory, """
+    //stop(M.memory);
+    ok(M.memory, """
+Memory: test
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
-   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 f0f0
+   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
 """);
 
-    //stop(L);
-    ok(L, """
+    //stop(M);
+    ok(M, """
 MemoryLayout: test
+Memory      : test
 Line T       At      Wide       Size    Indices        Value   Name
-   1 A       16        24          6                           A
-   2 V       16         4               0                  0     a
-   3 V       20         4               1                  0     a
-   4 V       24         4               2                  0     a
-   5 V       28         4               3                  0     a
-   6 V       32         4               4                  0     a
-   7 V       36         4               5                  0     a
+   1 A        0        24          6                           A
+   2 V        0         4               0                  0     a
+   3 V        4         4               1                  0     a
+   4 V        8         4               2                  0     a
+   5 V       12         4               3                  0     a
+   6 V       16         4               4                  0     a
+   7 V       20         4               5                  0     a
 """);
    }
 
@@ -1155,6 +1118,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     //stop(m);
     ok(m, """
 MemoryLayout: test
+Memory      : test
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        15                                      s
    2 V        0         4                                  0     a
@@ -1205,6 +1169,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     //stop(m);
     ok(m, """
 MemoryLayout: test
+Memory      : test
 Line T       At      Wide       Size    Indices        Value   Name
    1 A        0        48          4                           r
    2 U        0        12               0                        u
@@ -1263,6 +1228,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     //stop(m);
     ok(m, """
 MemoryLayout: M
+Memory      : M
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        32                                      S
    2 A        0        24          4                             A
@@ -1305,7 +1271,6 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_boolean();
     test_copy();
     test_base();
-    test_based_array();
     test_move();
     test_set_inc_dec_get();
     test_addressing();
