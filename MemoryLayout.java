@@ -483,7 +483,7 @@ class MemoryLayout extends Test                                                 
     TestMemoryLayout()
      {l.compile();
       M = new MemoryLayout();
-      M.memory(new Memory(l.size()));
+      M.memory(new Memory("ML", l.size()));
       M.layout(l);
       M.base(0);
       M.memory.alternating(4);
@@ -572,7 +572,7 @@ class MemoryLayout extends Test                                                 
 
     MemoryLayout     m = new MemoryLayout();
     m.layout(l);
-    m.memory(new Memory(2*N));
+    m.memory(new Memory("ML", 2*N));
     m.base(N);
     m.memory.alternating(4);
     //stop(m);
@@ -610,7 +610,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     l.compile();
     MemoryLayout     m = new MemoryLayout();
     m.layout(l);
-    m.memory(new Memory(l.size()+B));
+    m.memory(new Memory("ML", l.size()+B));
     m.base(B);
     m.memory.alternating(4);
     //stop(m);
@@ -657,7 +657,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     MemoryLayout     m = new MemoryLayout();
     m.layout(l);
-    m.memory(new Memory(l.size()));
+    m.memory(new Memory("ML", l.size()));
     m.memory.alternating(4);
     //stop(m);
     m.ok("""
@@ -698,11 +698,11 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     MemoryLayout     m1 = new MemoryLayout();
     m1.layout(l1);
-    m1.memory(new Memory(l1.size()));
+    m1.memory(new Memory("ML", l1.size()));
 
     MemoryLayout     m2 = new MemoryLayout();
     m2.layout(l2);
-    m2.memory(new Memory(l2.size()));
+    m2.memory(new Memory("ML", l2.size()));
     m1.at(l1.get("a")).setInt(1);
     m2.at(l2.get("b")).move(m1.at(l1.get("a")));
     //stop(m1);
@@ -730,7 +730,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     MemoryLayout     m = new MemoryLayout();
     m.layout(l);
-    m.memory(new Memory(l.size()));
+    m.memory(new Memory("ML", l.size()));
 
     m.at(a).setInt(1);
     m.at(b).setInt(3);
@@ -769,7 +769,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     MemoryLayout     m = new MemoryLayout();
     m.layout(l);
-    m.memory(new Memory(l.size()));
+    m.memory(new Memory("ML", l.size()));
     m.at(a).setInt(1);
 
     MemoryLayout.At A = m.at(a),
@@ -799,7 +799,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     MemoryLayout     m = new MemoryLayout();
     m.layout(l);
-    m.memory(new Memory(l.size()));
+    m.memory(new Memory("ML", l.size()));
 
     MemoryLayout.At  Z = m.at(z), I = m.at(i), J = m.at(j);
     Z.setOff().setInt(0);
@@ -816,6 +816,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(m.memory);
     ok(""+m.memory, """
+Memory: ML
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0c0b 0a02 0100
@@ -823,6 +824,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 
     //stop(m);
     ok(""+m, """
+Memory: ML
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        88                                      S
    2 V        0         8                                  0     z
@@ -845,6 +847,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     aj.setOff().setInt(14);
     //stop(m);
     ok(""+m, """
+Memory: ML
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        88                                      S
    2 V        0         8                                  0     z
@@ -878,17 +881,17 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     MemoryLayout     L = new MemoryLayout();
     L.layout(l);
-    L.memory(new Memory(l.size()));
+    L.memory(new Memory("ML", l.size()));
     MemoryLayout     W = new MemoryLayout();
     W.layout(w);
-    W.memory(new Memory(w.size()));
+    W.memory(new Memory("ML", w.size()));
 
     for (int j = 0; j < A.size; j++) L.at(a, j).setInt(10+j);
 
     W.at(i).setInt(2);
     L.at(A).moveUp(W.at(i), W.at(B));
   //L.at(A, W.at(z)).moveUp(W.at(i), W.at(B, W.at(z)));
-    //stop(L);
+  //stop(L);
     ok(L, """
 Line T       At      Wide       Size    Indices        Value   Name
    1 A        0        48          6                           A
@@ -932,10 +935,10 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     MemoryLayout     L = new MemoryLayout();
     L.layout(l);
-    L.memory(new Memory(l.size()));
+    L.memory(new Memory("ML", l.size()));
     MemoryLayout     W = new MemoryLayout();
     W.layout(w);
-    W.memory(new Memory(w.size()));
+    W.memory(new Memory("ML", w.size()));
 
     for (int j = 0; j < A.size; j++) L.at(a, j).setInt(10+j);
 
@@ -978,12 +981,13 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     MemoryLayout     L = new MemoryLayout();
     L.layout(l);
-    L.memory(new Memory(l.size()+16));
+    L.memory(new Memory("ML", l.size()+16));
     L.base(16);
 
     L.memory.alternating(4);
     //stop(L.memory);
     ok(L.memory, """
+Memory: ML
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 00f0 f0f0 f0f0
@@ -991,6 +995,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 
     //stop(L);
     ok(L, """
+Memory: ML
 Line T       At      Wide       Size    Indices        Value   Name
    1 A       16        24          6                           A
    2 V       16         4               0                  0     a
@@ -1005,6 +1010,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(L.memory);
     ok(L.memory, """
+Memory: ML
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 f0f0
@@ -1012,6 +1018,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 
     //stop(L);
     ok(L, """
+Memory: ML
 Line T       At      Wide       Size    Indices        Value   Name
    1 A       16        24          6                           A
    2 V       16         4               0                  0     a
@@ -1033,7 +1040,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     MemoryLayout     m = new MemoryLayout();
     m.layout(l);
-    m.memory(new Memory(l.size()));
+    m.memory(new Memory("ML", l.size()));
 
     m.at(a).setInt(1);
     m.at(b).setInt(2);
@@ -1052,13 +1059,14 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     MemoryLayout     m = new MemoryLayout();
     m.layout(l);
-    m.memory(new Memory(l.size()));
+    m.memory(new Memory("ML", l.size()));
 
     m.at(a).zero();
     m.at(b).setInt(2);
     m.at(c).ones();
 
     ok(m, """
+Memory: ML
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        12                                      s
    2 V        0         4                                  0     a
@@ -1083,7 +1091,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     try {m.at(a).zero();} catch(Exception e) {}
     m.layout(l.compile());
-    m.memory(new Memory(l.size()));
+    m.memory(new Memory("ML", l.size()));
     m.at(a).zero();
    }
 
@@ -1103,7 +1111,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     MemoryLayout  m = new MemoryLayout();
     m.layout(l);
-    m.memory(new Memory(l.size()));
+    m.memory(new Memory("ML", l.size()));
 
     m.at(a, 0).ones();  m.at(a, 1).ones();    m.at(a, 2).ones();    m.at(a, 3).ones();
     m.at(b, 0).zero();  m.at(b, 1).zero();    m.at(b, 2).zero();    m.at(b, 3).zero();
@@ -1111,6 +1119,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(m);
     ok(m, """
+Memory: ML
 Line T       At      Wide       Size    Indices        Value   Name
    1 A        0        48          4                           r
    2 U        0        12               0                        u
