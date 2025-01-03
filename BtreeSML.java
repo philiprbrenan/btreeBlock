@@ -57,7 +57,7 @@ abstract class BtreeSML extends Test                                            
   BtreeSML()                                                                    // Define a BTree with user specified dimensions
    {z();
     memoryLayout.layout = layout();
-    memoryLayout.memory(new Memory(memoryLayout.layout.size()));
+    memoryLayout.memory(new Memory("BtreeSML", memoryLayout.layout.size()));
 
           root = new Node();                                                    // The description ofthe root node
     parentNode = new Node();                                                    // Node used for initializing the tree and for the parent node
