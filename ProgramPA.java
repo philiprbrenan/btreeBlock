@@ -38,7 +38,9 @@ class ProgramPA extends Test                                                    
      }
     void   a() {}                                                               // Action performed by instruction
     String n() {return "instruction";}                                          // Instruction name
-    String v() {return "";}                                                     // Corresponding verilog
+    String v() {return "" + traceComment();}                                    // Corresponding verilog
+
+    String traceComment() {return "/* "+traceBack.replaceAll("\\n", " ")+" */";}// Trace back comment
    }
 
 //D1 Execute                                                                    // Execute the program
@@ -58,16 +60,10 @@ class ProgramPA extends Test                                                    
    {z();
     new I()
      {void   a() {say(O); /*say(traceBack);*/ running = false;}
-      String v() {return "/* Halt */";}
+      String v() {return "stopped <= 1; " + traceComment();}
       String n() {return "halt";}
      };
    }
-
-//  void stop(Object...O)                                                         // Stop everything with an explanatory message
-//   {z();
-//    new I() {void a() {say(O); say(traceBack); say("Stopping"); Test.stop();}
-//    String n() {return "stop";}};
-//   }
 
   void clear() {z(); code.clear(); running = false;}                            // Clear the program code
 
@@ -77,7 +73,7 @@ class ProgramPA extends Test                                                    
    {z();
     new I()
      {void   a() {z(); step = label.instruction-1;}                             // The program execution for loop will increment
-      String v() {return "step = "+(label.instruction-1)+";";}                  // The program execution for loop will increment
+      String v() {return "step = "+(label.instruction-1)+";" + traceComment();} // The program execution for loop will increment
       String n() {return "Go to "+(label.instruction+1);}                       // One based with no auto increment from run
      };
    }
@@ -87,7 +83,7 @@ class ProgramPA extends Test                                                    
      {void a()
        {z(); if (condition.setOff().getInt() > 0) step = label.instruction-1;
        }
-      String v() {return "if ("+condition.verilogAddress()+" > 0) step = "+(label.instruction-1)+";";} // The program execution for loop will increment
+      String v() {return "if ("+condition.verilogAddress()+" > 0) step = "+(label.instruction-1)+";" + traceComment();} // The program execution for loop will increment
       String n() {return "GoOn "+condition.field.name+" to "+(label.instruction+1);}
      };
    }
@@ -97,7 +93,7 @@ class ProgramPA extends Test                                                    
      {void a()
        {z(); if (condition.setOff().getInt() == 0) step = label.instruction-1;
        }
-      String v() {return "if ("+condition.verilogAddress()+" == 0) step = "+(label.instruction-1)+";";} // The program execution for loop will increment
+      String v() {return "if ("+condition.verilogAddress()+" == 0) step = "+(label.instruction-1)+";" + traceComment();} // The program execution for loop will increment
       String n() {return "GoOff "+condition.field.name+" to "+(label.instruction+1);}
      };
    }
@@ -108,12 +104,27 @@ class ProgramPA extends Test                                                    
 
     If (MemoryLayoutPA.At Condition)                                            // If a condition
      {condition = Condition;
+      final int t = code.size();
       GoOff(Else, condition);                                                   // Branch on the current value of if condition
       Then();
-      Goto(End);
-      Else.set();
-      Else();
-      End.set();
+      if (code.size() <= t+1)                                                   // No then block
+       {code.pop();
+        GoOn(End, condition);                                                   // Jump over else block to avoid executing it if the condition is true
+        final int e = code.size();
+        Else();
+        if (code.size() <= e)                                                   // Pointless if statement
+         {code.pop();
+          stop("Then or Else block required for If statement");
+         }
+       }
+      else                                                                      // There was a then block
+       {final int e = code.size();
+        Goto(End);
+        Else.set();
+        Else();
+        if (code.size() <= e)  code.pop();                                    // No else block so no need to jump over it
+       }
+      End.set();                                                                // E
      }
     void Then() {}
     void Else() {}
@@ -207,12 +218,15 @@ class ProgramPA extends Test                                                    
     s.append("""
   always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
 
-  if (reset) begin;                                                           // Reset
-    step <= 0;
+  if (reset) begin;                                                             // Reset
+    step     <= 0;
+    steps    <= 0;
+    stopped  <= 0;
+    initialize_memory_M();
     $display("reset");
   end
 
-  else begin;                                                                 // Run
+  else begin;                                                                   // Run
 """);
 
     s.append("    case(step)\n");
@@ -226,7 +240,8 @@ class ProgramPA extends Test                                                    
     s.append("""
     endcase
     step <= step + 1;
-    $display("%4d", step);
+    steps <= steps + 1;
+    $display("%4d %4d %4d", steps, step, stopped);
   end
 end
 """);
@@ -386,22 +401,41 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.at(a).setInt(1);
     m.at(b).setInt(0);
 
+    sayThisOrStop("Then or Else block required for If statement");
+    try {p.new If (m.at(a)){};} catch(Exception e) {}
+
     p.new If (m.at(a))
-     {void Then() {p.new I() {void a() {f.push(1);} String n() {return "f.push(1);";}};}
-      void Else() {p.new I() {void a() {f.push(2);} String n() {return "f.push(2);";}};}
+     {void Then() {p.new I() {void a() {f.push(0);} String n() {return "f.push(0);";}};}
      };
 
     p.new If (m.at(b))
-     {void Then() {p.new I() {void a() {f.push(3);} String n() {return "f.push(3);";}};}
-      void Else() {p.new I() {void a() {f.push(4);} String n() {return "f.push(4);";}};}
+     {void Then() {p.new I() {void a() {f.push(1);} String n() {return "f.push(1);";}};}
      };
-    p.run();
-    ok(f, "[1, 4]");
+
+    p.new If (m.at(a))
+     {void Else() {p.new I() {void a() {f.push(2);} String n() {return "f.push(2);";}};}
+     };
+
+    p.new If (m.at(b))
+     {void Else() {p.new I() {void a() {f.push(3);} String n() {return "f.push(3);";}};}
+     };
+
+    p.new If (m.at(a))
+     {void Then() {p.new I() {void a() {f.push(4);} String n() {return "f.push(4);";}};}
+      void Else() {p.new I() {void a() {f.push(5);} String n() {return "f.push(5);";}};}
+     };
+
+    p.new If (m.at(b))
+     {void Then() {p.new I() {void a() {f.push(6);} String n() {return "f.push(6);";}};}
+      void Else() {p.new I() {void a() {f.push(7);} String n() {return "f.push(7);";}};}
+     };
+    p.run(); say("AAAA", p.dumpVerilog());
+    ok(f, "[0, 3, 4, 7]"); f.clear();
 
     m.at(a).setInt(0);
     m.at(b).setInt(1);
     p.run();
-    ok(f, "[1, 4, 2, 3]");
+    ok(f, "[1, 2, 5, 6]");
    }
 
   static void test_goOn()
@@ -507,7 +541,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_if();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
