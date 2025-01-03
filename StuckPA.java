@@ -41,10 +41,10 @@ abstract class StuckPA extends Test                                             
 //D1 Construction                                                               // Create a stuck
 
   StuckPA(String Name)                                                          // Create the stuck with a maximum number of the specified elements
-   {this(Name, false);
+   {this(Name, null);
    }
 
-  StuckPA(String Name, boolean based)                                           // Create the stuck with a maximum number of the specified elements
+  StuckPA(String Name, MemoryLayoutPA based)                                    // Create the stuck with a maximum number of the specified elements
    {z();
     name = Name;
     final Layout layout = layout(), tl = transactionLayout();                   // Layout out the stuck
@@ -52,7 +52,7 @@ abstract class StuckPA extends Test                                             
     C = new MemoryLayoutPA(layout, name+"_StuckSA_Copy");                       // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
     T = new MemoryLayoutPA(tl,     name+"_StuckSA_Transaction");                // Memory for transaction intermediates
 
-    program(P);
+    program(M.P);
    }
 
   void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
@@ -74,13 +74,12 @@ abstract class StuckPA extends Test                                             
   StuckPA copy()                                                                // Copy a stuck definition
    {z();
     final StuckPA parent = this;
-    final StuckPA  child = new StuckPA(parent.name, true)
+    final StuckPA  child = new StuckPA(parent.name, parent.M)
      {int maxSize    () {return parent.maxSize    ();}
       int bitsPerKey () {return parent.bitsPerKey ();}
       int bitsPerData() {return parent.bitsPerData();}
       int bitsPerSize() {return parent.bitsPerSize();}
      };
-    child.M.memory(parent.M.memory());
     child.program(parent.P);
     return child;
    }
@@ -462,17 +461,31 @@ abstract class StuckPA extends Test                                             
 
   static StuckPA stuckPA()                                                      // Create a sample stuck
    {z();
-    final int offset = 16;                                                      // To make testing more relevant
-    final StuckPA s =  new StuckPA("test", true)
+    final int   offset = 16;                                                    // To make testing more relevant
+    final StuckPA    S = new StuckPA("original")
      {int maxSize     () {return  8;}
       int bitsPerKey  () {return 16;}
       int bitsPerData () {return 16;}
       int bitsPerSize () {return 16;}
      };
-    s.M.memory(new Memory(s.M.layout.size()+offset));
-    s.base(offset);
 
-    return s;
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", S.M.layout.size()+offset);
+    l.compile();
+
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
+
+    final StuckPA    T = new StuckPA("copyable", m)
+     {int maxSize     () {return  8;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
+    final StuckPA    t =  T.copy();
+    t.base(offset);
+
+    return t;
    }
 
   public void ok(String expected) {ok(toString(), expected);}                   // Check the stuck
@@ -520,8 +533,9 @@ StuckSML(maxSize:8 size:4)
     s.P.new I() {void a() {s.T.at(s.tKey).setInt(12); s.T.at(s.tData).setInt(12);}}; s.push();
     s.P.run();
     //stop(s.M);
-    ok(s.M, """
-MemoryLayout: test_StuckSA_Memory
+    ok(""+s.M, """
+MemoryLayout: copyable_StuckSA_Memory
+Memory      : M
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       16       272                                      stuck
    2 V       16        16                                  4     currentSize
@@ -546,6 +560,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
     //stop(s.memoryLayout.memory);
     ok(s.M.memory(), """
+Memory: M
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 000c 000b 000a 0009 0000 0000 0000 0000 000c 000d 000e 000f 0004 0000
@@ -899,17 +914,7 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:
   static void test_at()
    {final int     N = 16;
 
-    Layout               l = new Layout();
-    Layout.Variable  a = l.variable ("a", N);
-    Layout.Variable  b = l.variable ("b", N);
-    Layout.Variable  c = l.variable ("c", N);
-    Layout.Structure d = l.structure("d", a, b, c);
-    l.layoutName = "aaa";
-    MemoryLayoutPA  M = new MemoryLayoutPA(l.compile(), "M", true);
-    M.memory(new Memory(l.size()));
-
-
-    final StuckPA S = new StuckPA("test", true)
+    final StuckPA D = new StuckPA("test")
      {int maxSize     () {return 4;}
       int bitsPerKey  () {return 8;}
       int bitsPerData () {return 8;}
@@ -917,9 +922,62 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:
       int baseAt      () {return 0;}
      };
 
-    S.M.memory(new Memory(S.M.layout.size()*2));
+    Layout               l = new Layout();
+    Layout.Variable  a = l.variable ("a", N);
+    Layout.Variable  b = l.variable ("b", N);
+    Layout.Field     c = l.duplicate("c", D.M.layout());
+    Layout.Array     C = l.array    ("C", c, 2);
+    Layout.Structure d = l.structure("d", a, b, C);
 
-    final StuckPA       s = S.copy(); s.base(0);
+    MemoryLayoutPA   M = new MemoryLayoutPA(l.compile(), "M");
+    M.P.new I() {void a() {M.at(a).setInt(0); }};
+    M.P.new I() {void a() {M.at(b).setInt(1); }};
+    M.P.run();
+    //stop(M);
+    ok(M, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0       176                                      d
+   2 V        0        16                                  0     a
+   3 V       16        16                                  1     b
+   4 A       32       144          2                             C
+   5 S       32        72               0                          c
+   6 V       32         8               0                  0         currentSize
+   7 A       40        32          4    0                            Keys
+   8 V       40         8               0 0                0           key
+   9 V       48         8               0 1                0           key
+  10 V       56         8               0 2                0           key
+  11 V       64         8               0 3                0           key
+  12 A       72        32          4    0                            Data
+  13 V       72         8               0 0                0           data
+  14 V       80         8               0 1                0           data
+  15 V       88         8               0 2                0           data
+  16 V       96         8               0 3                0           data
+  17 S      104        72               1                          c
+  18 V      104         8               1                  0         currentSize
+  19 A      112        32          4    1                            Keys
+  20 V      112         8               1 0                0           key
+  21 V      120         8               1 1                0           key
+  22 V      128         8               1 2                0           key
+  23 V      136         8               1 3                0           key
+  24 A      144        32          4    1                            Data
+  25 V      144         8               1 0                0           data
+  26 V      152         8               1 1                0           data
+  27 V      160         8               1 2                0           data
+  28 V      168         8               1 3                0           data
+""");
+
+    final StuckPA S = new StuckPA("test", M)
+     {int maxSize     () {return 4;}
+      int bitsPerKey  () {return 8;}
+      int bitsPerData () {return 8;}
+      int bitsPerSize () {return 8;}
+      int baseAt      () {return 0;}
+     };
+
+    final StuckPA s = S.copy();
+    s.P.new I() {void a() {s.base(M.at(c, M.at(a)).setOff().at);}};
 
     s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt(1);}}; s.push();
     s.P.new I() {void a() {s.T.at(s.tKey).setInt(4); s.T.at(s.tData).setInt(2);}}; s.push();
@@ -927,64 +985,145 @@ Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:
     s.P.new I() {void a() {s.T.at(s.tKey).setInt(8); s.T.at(s.tData).setInt(4);}}; s.push();
     s.P.run(); s.P.clear();
 
-    M.at(a).setInt(S.M.layout.size());                                          // Use a field as an index in an at
-    ok(M, """
-MemoryLayout: M
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        48                                      d
-   2 V        0        16                                 72     a
-   3 V       16        16                                  0     b
-   4 V       32        16                                  0     c
-""");
-
-    final StuckPA t = S.copy(); t.M.memory(s.M.memory());
-    t.base(S.M.layout.size());
-    t.P.new I() {void a() {t.T.at(t.tKey).setInt(1); t.T.at(t.tData).setInt(2);}}; t.push();
-    t.P.new I() {void a() {t.T.at(t.tKey).setInt(2); t.T.at(t.tData).setInt(4);}}; t.push();
-    t.P.new I() {void a() {t.T.at(t.tKey).setInt(3); t.T.at(t.tData).setInt(6);}}; t.push();
-    t.P.new I() {void a() {t.T.at(t.tKey).setInt(4); t.T.at(t.tData).setInt(8);}}; t.push();
-    t.P.run(); t.P.clear();
+//stop(s); STuckSML needs to allocate memory of a specified size?
     //stop(s.M);
     ok(s.M, """
 MemoryLayout: test_StuckSA_Memory
+Memory      : M
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        72                                      stuck
-   2 V        0         8                                  4     currentSize
-   3 A        8        32          4                             Keys
-   4 V        8         8               0                  2       key
-   5 V       16         8               1                  4       key
-   6 V       24         8               2                  6       key
-   7 V       32         8               3                  8       key
-   8 A       40        32          4                             Data
-   9 V       40         8               0                  1       data
-  10 V       48         8               1                  2       data
-  11 V       56         8               2                  3       data
-  12 V       64         8               3                  4       data
+   1 S       32        72                                      stuck
+   2 V       32         8                                  4     currentSize
+   3 A       40        32          4                             Keys
+   4 V       40         8               0                  2       key
+   5 V       48         8               1                  4       key
+   6 V       56         8               2                  6       key
+   7 V       64         8               3                  8       key
+   8 A       72        32          4                             Data
+   9 V       72         8               0                  1       data
+  10 V       80         8               1                  2       data
+  11 V       88         8               2                  3       data
+  12 V       96         8               3                  4       data
+""");
+    //stop(M);
+    ok(M, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0       176                                      d
+   2 V        0        16                                  0     a
+   3 V       16        16                                  1     b
+   4 A       32       144          2                             C
+   5 S       32        72               0                          c
+   6 V       32         8               0                  4         currentSize
+   7 A       40        32          4    0                            Keys
+   8 V       40         8               0 0                2           key
+   9 V       48         8               0 1                4           key
+  10 V       56         8               0 2                6           key
+  11 V       64         8               0 3                8           key
+  12 A       72        32          4    0                            Data
+  13 V       72         8               0 0                1           data
+  14 V       80         8               0 1                2           data
+  15 V       88         8               0 2                3           data
+  16 V       96         8               0 3                4           data
+  17 S      104        72               1                          c
+  18 V      104         8               1                  0         currentSize
+  19 A      112        32          4    1                            Keys
+  20 V      112         8               1 0                0           key
+  21 V      120         8               1 1                0           key
+  22 V      128         8               1 2                0           key
+  23 V      136         8               1 3                0           key
+  24 A      144        32          4    1                            Data
+  25 V      144         8               1 0                0           data
+  26 V      152         8               1 1                0           data
+  27 V      160         8               1 2                0           data
+  28 V      168         8               1 3                0           data
 """);
 
-    //stop(t.memoryLayout);
-    ok(t.M, """
+
+    s.P.new I() {void a() {s.base(M.at(c, M.at(b)).setOff().at);}};
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(1); s.T.at(s.tData).setInt(2);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt(4);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(3); s.T.at(s.tData).setInt(6);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(4); s.T.at(s.tData).setInt(8);}}; s.push();
+    s.P.run(); s.P.clear();
+    //stop(s.M);
+    ok(s.M.toString(), """
 MemoryLayout: test_StuckSA_Memory
+Memory      : M
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S       72        72                                      stuck
-   2 V       72         8                                  4     currentSize
-   3 A       80        32          4                             Keys
-   4 V       80         8               0                  1       key
-   5 V       88         8               1                  2       key
-   6 V       96         8               2                  3       key
-   7 V      104         8               3                  4       key
-   8 A      112        32          4                             Data
-   9 V      112         8               0                  2       data
-  10 V      120         8               1                  4       data
-  11 V      128         8               2                  6       data
-  12 V      136         8               3                  8       data
+   1 S      104        72                                      stuck
+   2 V      104         8                                  4     currentSize
+   3 A      112        32          4                             Keys
+   4 V      112         8               0                  1       key
+   5 V      120         8               1                  2       key
+   6 V      128         8               2                  3       key
+   7 V      136         8               3                  4       key
+   8 A      144        32          4                             Data
+   9 V      144         8               0                  2       data
+  10 V      152         8               1                  4       data
+  11 V      160         8               2                  6       data
+  12 V      168         8               3                  8       data
+""");
+    //stop(M);
+    ok(M, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0       176                                      d
+   2 V        0        16                                  0     a
+   3 V       16        16                                  1     b
+   4 A       32       144          2                             C
+   5 S       32        72               0                          c
+   6 V       32         8               0                  4         currentSize
+   7 A       40        32          4    0                            Keys
+   8 V       40         8               0 0                2           key
+   9 V       48         8               0 1                4           key
+  10 V       56         8               0 2                6           key
+  11 V       64         8               0 3                8           key
+  12 A       72        32          4    0                            Data
+  13 V       72         8               0 0                1           data
+  14 V       80         8               0 1                2           data
+  15 V       88         8               0 2                3           data
+  16 V       96         8               0 3                4           data
+  17 S      104        72               1                          c
+  18 V      104         8               1                  4         currentSize
+  19 A      112        32          4    1                            Keys
+  20 V      112         8               1 0                1           key
+  21 V      120         8               1 1                2           key
+  22 V      128         8               1 2                3           key
+  23 V      136         8               1 3                4           key
+  24 A      144        32          4    1                            Data
+  25 V      144         8               1 0                2           data
+  26 V      152         8               1 1                4           data
+  27 V      160         8               1 2                6           data
+  28 V      168         8               1 3                8           data
 """);
 
-    //stop(s.memoryLayout.memory);
+    //stop(s.M);
+    ok(s.M, """
+MemoryLayout: test_StuckSA_Memory
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S      104        72                                      stuck
+   2 V      104         8                                  4     currentSize
+   3 A      112        32          4                             Keys
+   4 V      112         8               0                  1       key
+   5 V      120         8               1                  2       key
+   6 V      128         8               2                  3       key
+   7 V      136         8               3                  4       key
+   8 A      144        32          4                             Data
+   9 V      144         8               0                  2       data
+  10 V      152         8               1                  4       data
+  11 V      160         8               2                  6       data
+  12 V      168         8               3                  8       data
+""");
+
+    //stop(s.M.memory());
     ok(s.M.memory(), """
+Memory: M
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
-   0  0000 0000 0000 0000 0000 0000 0000 0806 0402 0403 0201 0404 0302 0108 0604 0204
+   0  0000 0000 0000 0000 0000 0806 0402 0403 0201 0404 0302 0108 0604 0204 0001 0000
 """);
    }
 
@@ -1009,6 +1148,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    //test_at();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
