@@ -82,7 +82,7 @@ abstract class BtreeSP extends Test                                             
    splitBranchSize = maxKeysPerBranch() >> 1;                                   // The number of key, next pairs to split out of a branch
 
     memoryLayout.layout(layout());
-    memoryLayout.memory(new Memory(memoryLayout.layout.size()));
+    memoryLayout.memory(new Memory("BtreeSP", memoryLayout.layout.size()));
 
      {final int N = Branch_length;                                              // Preallocate transactions used on branch stucks
       branchTransactions = new StuckSP[N];
