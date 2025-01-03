@@ -58,7 +58,7 @@ class ProgramPA extends Test                                                    
    {z();
     new I()
      {void   a() {say(O); /*say(traceBack);*/ running = false;}
-      String v() {return "Halt";}
+      String v() {return "/* Halt */";}
       String n() {return "halt";}
      };
    }
@@ -204,16 +204,31 @@ class ProgramPA extends Test                                                    
 
   String dumpVerilog()
    {final StringBuilder s = new StringBuilder();
-    s.append("case(pc)\n");
+    s.append("""
+  always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
+
+  if (reset) begin;                                                           // Reset
+    step <= 0;
+    $display("reset");
+  end
+
+  else begin;                                                                 // Run
+""");
+
+    s.append("    case(step)\n");
     int n = 0;
     for(int i = 0; i < code.size(); ++i)
      {final I I = code.elementAt(i);
       final String c = I.v();
       if (c.length() == 0) {++n; say(I.traceBack);}                             // Count empty verilog strings
-      s.append(String.format("  %4d : begin %s end\n", i+1, c));
+      s.append(String.format("        %4d : begin %s end\n", i, c));
      }
     s.append("""
-endcase
+    endcase
+    step <= step + 1;
+    $display("%4d", step);
+  end
+end
 """);
     if (n > 0) err("Program still has", n, "empty statements");
     return s.toString();
@@ -236,6 +251,7 @@ endcase
     //stop(m);
     ok(m, """
 MemoryLayout: M
+Memory      : M
 Line T       At      Wide       Size    Indices        Value   Name
    1 V        0         8                                  3   n
 """);
@@ -296,6 +312,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     //stop(m);
     ok(m, """
 MemoryLayout: M
+Memory      : M
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0        41                                      s
    2 V        0         8                                255     a
