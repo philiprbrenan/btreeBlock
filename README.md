@@ -4,19 +4,18 @@
 
 # Btree in a block
 
-For reasons why you might want to get involved in this project which puts a [B-Tree](https://en.wikipedia.org/wiki/B-tree) into a block of [memory](https://en.wikipedia.org/wiki/Computer_memory) on a [Silicon](https://en.wikipedia.org/wiki/Silicon) [chip](https://en.wikipedia.org/wiki/Integrated_circuit), see:
+The reasons why you might want to get involved in this implementation of the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [Silicon](https://en.wikipedia.org/wiki/Silicon) rather than [software](https://en.wikipedia.org/wiki/Software) are:
 
 http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html
 
 # Roadmap
 
-Initially I implemented the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [Java](https://en.wikipedia.org/wiki/Java_(programming_language)), then successively reduced
-the [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) [code](https://en.wikipedia.org/wiki/Computer_program) until it looked just like [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program), at which point it was
-easy to generate a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) in [Verilog](https://en.wikipedia.org/wiki/Verilog) to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program). 
+I implemented the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [Java](https://en.wikipedia.org/wiki/Java_(programming_language)), then successively reduced the [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) [code](https://en.wikipedia.org/wiki/Computer_program) until it looked just like [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program), at which point it was easy to
+generate a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) in [Verilog](https://en.wikipedia.org/wiki/Verilog) to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program): 
 ![Roadmap](flowChart/DevelopmentFlowChart.png)
 
-The [Verilog](https://en.wikipedia.org/wiki/Verilog) [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) will now be used to drive an implementation on an [fpga](https://en.wikipedia.org/wiki/Field-programmable_gate_array) and
-then on an [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) allowing the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm to be implemented in [hardware](https://en.wikipedia.org/wiki/Digital_electronics) rather than [software](https://en.wikipedia.org/wiki/Software). 
+The [Verilog](https://en.wikipedia.org/wiki/Verilog) [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) will now be implemented on an [fpga](https://en.wikipedia.org/wiki/Field-programmable_gate_array) and then on an [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) allowing
+the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm to be implemented in [hardware](https://en.wikipedia.org/wiki/Digital_electronics) rather than [software](https://en.wikipedia.org/wiki/Software). 
 # Deleting in ascending order
 
 The evolution of a [B-Tree](https://en.wikipedia.org/wiki/B-tree) as the lowest element is deleted successively until
