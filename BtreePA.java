@@ -2167,8 +2167,8 @@ module doc(reset, stop, clock, pfd, Key, Data, data, found);                    
   assign found = T[18];                                                         // Found the key
   assign data  = T[23+:4];                                                      // Data associated with key found
 
-  `include "M.sv"                                                               // Memory holding a pre built tree from test_dump()
-  `include "T.sv"                                                               // Transaction memory which is initialized to some values to reduce the complexity of Memory at by treating constants as variables
+  `include "M"+Verilog.ext                                                      // Memory holding a pre built tree from test_dump()
+  `include "T"+Verilog.ext                                                      // Transaction memory which is initialized to some values to reduce the complexity of Memory at by treating constants as variables
 $stuckBases
 
 $instructions
@@ -2218,8 +2218,8 @@ module doc_tb;                                                                  
 endmodule
 """);
 
-    writeFile(filePath+".sv", editVariables(s));
-    writeFile(filePath+".tb", editVariables(t));
+    writeFile(filePath+Verilog.ext, editVariables(s));
+    writeFile(filePath+".tb",       editVariables(t));
     M.dumpVerilog(folder);
     T.dumpVerilog(folder);
    }
