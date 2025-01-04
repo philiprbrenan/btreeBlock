@@ -103,7 +103,7 @@ END
         java -cp Classes $c/$j
 END
    }
-  $y = <<"END";
+  $y .= <<"END";
     - name: Verilog install
       run: |
         sudo apt install iverilog
