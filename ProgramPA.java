@@ -220,61 +220,6 @@ class ProgramPA extends Test                                                    
 
 //D1 Verilog                                                                    // Dump verilog equivalents of the instructions in this program
 
-  String dumpVerilog()
-   {final StringBuilder s = new StringBuilder();
-
-    s.append("""
-  always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
-
-  if (reset) begin                                                              // Reset
-    step     <= 0;
-    steps    <= 0;
-    stopped  <= 0;
-    initialize_memory_M();                                                      // Initialize btree memory
-    initialize_memory_T();                                                      // Initilize btree transaction
-    //("reset");
-    traceFile = $fopen("trace/trace.txt", "w");                                 // Open trace file
-    branch_0_StuckSA_Memory_base_offset <= 0;                                   // Stuck working storage
-    branch_0_StuckSA_Transaction <= 0;
-    branch_1_StuckSA_Memory_base_offset <= 0;
-    branch_1_StuckSA_Transaction <= 0;
-    branch_2_StuckSA_Memory_base_offset <= 0;
-    branch_2_StuckSA_Transaction <= 0;
-    branch_3_StuckSA_Memory_base_offset <= 0;
-    branch_3_StuckSA_Transaction <= 0;
-    leaf_0_StuckSA_Memory_base_offset <= 0;
-    leaf_0_StuckSA_Transaction <= 0;
-    leaf_1_StuckSA_Memory_base_offset <= 0;
-    leaf_1_StuckSA_Transaction <= 0;
-    leaf_2_StuckSA_Memory_base_offset <= 0;
-    leaf_2_StuckSA_Transaction <= 0;
-    leaf_3_StuckSA_Memory_base_offset <= 0;
-    leaf_3_StuckSA_Transaction <= 0;
-  end
-  else begin;                                                                   // Run
-""");
-
-    s.append("    case(step)\n");                                               // Case stamenbts to direct us to the code for the current instruction
-    int n = 0;
-    for(int i = 0; i < code.size(); ++i)
-     {final I I = code.elementAt(i);
-      final String c = I.v();
-      if (c.length() == 0) {++n; say(I.traceBack);}                             // Count empty verilog strings
-      s.append(String.format("        %5d : begin %s end\n", i, c));
-     }
-    s.append("      default : begin stopped <= 1; /* end of execution */ end\n"); // Any invalid instruction address causes the program to halt
-    s.append("""
-    endcase
-    step  <= step  + 1;
-    steps <= steps + 1;
-    //$display            ("%4d  %4d", steps, step);                              // Trace execution
-    $fdisplay(traceFile, "%4d  %4d", steps, step);                              // Trace execution in a file
-  end
-end
-""");
-    if (n > 0) err("Program still has", n, "empty statements");
-    return s.toString();
-   }
 
   void debugVerilog(String title, MemoryLayoutPA.At at)                         // Add a debug statement to both the program and the verilog version
    {final int N = code.size();
@@ -577,7 +522,6 @@ Line T       At      Wide       Size    Indices        Value   Name
     p.debugVerilog("AAAA", m.at(a));
     p.debugVerilog("BBBB", m.at(b));
     p.run();
-    say(p.dumpVerilog());
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
