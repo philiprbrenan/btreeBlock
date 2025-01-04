@@ -68,7 +68,7 @@ The [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)) being searched l
 """);
 ```
 
-Running the generated [Verilog](https://en.wikipedia.org/wiki/Verilog) [code](https://en.wikipedia.org/wiki/Computer_program) to [find](https://en.wikipedia.org/wiki/Find_(Unix)) the [data](https://en.wikipedia.org/wiki/Data) associated with [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) 2
+Running the generated [Verilog](https://en.wikipedia.org/wiki/Verilog) [code](https://en.wikipedia.org/wiki/Computer_program) to [find](https://en.wikipedia.org/wiki/Find_(Unix)) the [data](https://en.wikipedia.org/wiki/Data) associated with [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) **2**
 produces:
 
 ```
