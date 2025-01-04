@@ -260,9 +260,9 @@ class ProgramPA extends Test                                                    
      {final I I = code.elementAt(i);
       final String c = I.v();
       if (c.length() == 0) {++n; say(I.traceBack);}                             // Count empty verilog strings
-      s.append(String.format("        %4d : begin %s end\n", i, c));
+      s.append(String.format("        %5d : begin %s end\n", i, c));
      }
-    s.append("     default : begin stopped <= 1; end\n");                       // Any invalid instruction address causes the program to halt
+    s.append("      default : begin stopped <= 1; /* end of execution */ end\n"); // Any invalid instruction address causes the program to halt
     s.append("""
     endcase
     step  <= step  + 1;
