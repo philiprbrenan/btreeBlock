@@ -214,6 +214,11 @@ public class Test                                                               
     return f+" "+m+" "+l;
    }
 
+  static String traceComment()                                                  // Trace back comment
+   {final String t = traceBack();
+    return "; /* "+t.replaceAll("\\n", " ")+" */\n";                            // Finish a statement and show where it came from
+   }
+
 //D2 Coverage                                                                   // Analyze code coverage
 
   static final TreeMap<String, Integer> coverage = new TreeMap<>();             // Count of how many times each line has been executed
