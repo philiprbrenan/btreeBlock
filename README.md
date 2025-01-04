@@ -25,7 +25,8 @@ implement the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [hardw
 ```
 
 # Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) 
-For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)): ```
+For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)): 
+```
    BtreePA t = new BtreePA()
      {int maxSize         () {return  8;}
       int maxKeysPerLeaf  () {return  2;}
