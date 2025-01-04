@@ -103,6 +103,15 @@ END
         java -cp Classes $c/$j
 END
    }
+  $y = <<"END";
+    - name: Verilog install
+      run: |
+        sudo apt install iverilog
+
+    - name: Verilog Run
+      run: |
+        rm -f doc; iverilog -Iverilog/includes/ -g2012 -o doc verilog/doc.sv verilog/doc.tb && timeout 1m ./doc
+END
 
   my $f = writeFileUsingSavedToken $user, $repo, $wf, $y;                       # Upload workflow
   lll "$f  Ubuntu work flow for $repo";
