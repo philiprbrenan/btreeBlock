@@ -3,8 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-// Need binary add so we compute the mid key no matter how many bits
-// Need two versions of Two - one for leaf one for branch
+
 import java.util.*;
 
 abstract class BtreePA extends Test                                             // Manipulate a btree using static methods and memory
