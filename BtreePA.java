@@ -80,7 +80,7 @@ abstract class BtreePA extends Test                                             
   final StuckPA lL;                                                             // Process a left node
   final StuckPA lR;                                                             // Process a right node
 
-  static boolean debug = false;                                                 // Debugging enabled
+  boolean debug = false;                                                        // Debugging enabled
 
 //D1 Construction                                                               // Create a Btree from nodes which can be branches or leaves.  The data associated with the BTree is stored only in the leaves opposite the keys
 
@@ -591,7 +591,7 @@ abstract class BtreePA extends Test                                             
        {final MemoryLayoutPA.At a = M.at(leaf, T.at(node_leafBase)).setOff();
         T.at(leafBase).setInt(a.at);
        }
-      String v() {return T.at(leafBase).verilogAddress() + " = " + M.at(leaf, T.at(node_leafBase)).verilogAddress() + ";" + traceComment();}
+      String v() {return T.at(leafBase).verilogLoad() + " <= " + M.at(leaf, T.at(node_leafBase)).verilogAddr() + ";" + traceComment();}
      };
    }
 
@@ -602,7 +602,7 @@ abstract class BtreePA extends Test                                             
        {final MemoryLayoutPA.At a = M.at(branch, T.at(node_branchBase)).setOff();
         T.at(branchBase).setInt(a.at);
        }
-      String v() {return T.at(branchBase).verilogAddress() + " = " + M.at(branch, T.at(node_branchBase)).verilogAddress() + ";" + traceComment();}
+      String v() {return T.at(branchBase).verilogLoad() + " <= " + M.at(branch, T.at(node_branchBase)).verilogAddr() + ";" + traceComment();}
      };
    }
 
@@ -1351,7 +1351,7 @@ abstract class BtreePA extends Test                                             
                 z(); T.at(stolenOrMerged).ones(); P.Goto(Return);
                }
              };
-            z(); T.at(stolenOrMerged).zero(); P.Goto(Return);;
+            z(); T.at(stolenOrMerged).zero(); //Goto P.Goto(Return);;
            }
           void Else()                                                           // Branches
            {tt(node_branchSize, l); branchSize(); tt(nl, branchSize);
@@ -1418,7 +1418,7 @@ abstract class BtreePA extends Test                                             
                 z(); T.at(stolenOrMerged).ones(); P.Goto(Return);
                }
              };
-            z(); T.at(stolenOrMerged).zero(); P.Goto(Return);
+            z(); T.at(stolenOrMerged).zero(); //Goto P.Goto(Return);
            }
          };
        };
@@ -1818,7 +1818,6 @@ abstract class BtreePA extends Test                                             
             P.Goto(Return);
            }
          };
-
         T.at(parent).zero();                                                    // Parent starts at root which is now known to be a branch
         T.at(findDepth).zero();                                                 // Limit number of levels searched
 
@@ -1991,7 +1990,8 @@ abstract class BtreePA extends Test                                             
    {P.new Block()
      {void code()
        {find();                                                                 // Try direct insertion with no modifications to the shape of the tree
-        P.new If (T.at(found)) {void Else() {P.Goto(end);}};                    // Key not found so nothing to delete
+//      P.new If (T.at(found)) {void Else() {P.Goto(end);}};                    // Key not found so nothing to delete
+        P.GoOff(end, T.at(found));                                              // Key not found so nothing to delete
         z(); tt(node_leafBase, find); leafBase();                               // The leaf that contains the key
         lT.base(T.at(leafBase));                                                // The leaf that contains the key
         lT.T.at(lT.index).move(T.at(index)); lT.elementAt();                    // Position in the leaf of the key
@@ -2123,7 +2123,7 @@ abstract class BtreePA extends Test                                             
   String stuckMemory(StuckPA s)                                                 // Base address variable for one stuck
    {return
      "reg ["+bitsPerAddress+":0] "+s.M.baseName()+";\n"+
-     s.T.declareVerilog(s.T.name());
+     s.T.declareVerilog();
    }
 
   void dumpVerilog(String filePath)                                             // Write verilog
@@ -2147,11 +2147,14 @@ module doc(reset, stop, clock, pfd, Key, Data, data, found);                    
 
   integer  step;                                                                // Program counter
   integer steps;                                                                // Number of steps executed
+  integer traceFile;                                                            // File to write trace to
   reg   stopped;                                                                // Set when we stop
-  assign stop = stopped > 0 ? 1 : 0;                                            // Show whether we have stopped yet or not
+  assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
+  assign found = T[18];                                                         // Found the key
+  assign data  = T[23+:4];                                                      // Data associated with key found
 
-  `include "memory.sv"
-$temporaryStorage
+  `include "M.sv"                                                               // Memory holding a pre built tree from test_dump()
+  `include "T.sv"                                                               // Transaction memory which is initialized to some values to reduce the complexity of Memory at by treating constants as variables
 $stuckBases
 
 $instructions
@@ -2165,13 +2168,13 @@ endmodule
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
 module doc_tb;                                                                  // Test bench for database on a chip
-  parameter execs  = 140_000;                                                   // Maximum number of instructions to execute
+  parameter execs = 200;                                                        // Maximum number of instructions to execute
 
   reg                  reset;                                                   // Restart the program run sequence when this goes high
   reg                  stop;                                                    // Program has stopped when this goes high
   reg                  clock;                                                   // Program counter clock
   reg             [2:0]pfd;                                                     // Put, find delete
-  reg  [$bitsPerKey :0]Key;                                                     // Input key
+  reg  [$bitsPerKey :0]Key = 2;                                                 // Input key
   reg  [$bitsPerData:0]Data;                                                    // Input data
   reg  [$bitsPerData:0]data;                                                    // Output data
   reg                  found;                                                   // Whether the key was found on put, find delete
@@ -2179,17 +2182,20 @@ module doc_tb;                                                                  
   doc a1(.reset(reset), .stop(stop), .clock(clock),                             // Connect to the chip
     .Key(Key), .Data(Data), .data(data), .found(found));
 
-  initial begin                                                                 // Test the chip
-    reset = 0; #1; reset = 1; #1; reset = 0; #1;                                // Reset the chip
+  initial begin                                                                 // Test the module
+    reset = 0; #1; reset = 1; #1; reset = 0; #1;                                // Reset the module
     execute();
   end
 
-  task execute;                                                                 // Clock the chip
-    integer i;
+  task execute;                                                                 // Clock the module until it says it has stopped
+    integer step;
     begin
-      Key = 2; Data = 3;
-      for(i = 0; i < 100; i = i + 1) begin;
+      Key = 2;
+      for(step = 0; step < execs && !stop ; step = step + 1) begin;
         clock = 0; #1; clock = 1; #1;
+      end
+      if (stop) begin                                                       // Stopped
+        $display("Stopped after: %4d steps key %4d  data %4d", step, Key, data);
       end
     end
   endtask
@@ -2198,7 +2204,8 @@ endmodule
 
     writeFile(filePath+".sv", editVariables(s));
     writeFile(filePath+".tb", editVariables(t));
-    M.dumpVerilog(folder+"includes/memory.sv", M.name());
+    M.dumpVerilog(folder);
+    T.dumpVerilog(folder);
    }
 
   private StringBuilder editVariables(StringBuilder S)                          // Edit the variables in a string builder
@@ -2206,7 +2213,6 @@ endmodule
            s = s.replace("$bitsPerKey",    ""+bitsPerKey());
            s = s.replace("$bitsPerData",   ""+bitsPerData());
            s = s.replace("$instructions",     P.dumpVerilog());
-           s = s.replace("$temporaryStorage", T.declareVerilog(T.name()));
            s = s.replace("$stuckBases",       stuckMemories());
     return new StringBuilder(s);
    }
@@ -2354,7 +2360,7 @@ endmodule
 
   static void test_find()
    {final int N = 64;
-     final BtreePA    t = btreePA(8, 3);
+     final BtreePA t = btreePA(8, 3);
     t.P.run(); t.P.clear();
     t.put();
     for(int i = 2; i <= N; i += 2)
@@ -3087,8 +3093,16 @@ endmodule
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
     t.P.clear();
-    t.find() ;
-    t.dumpVerilog("verilog/doc");
+    t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
+    t.find();
+    t.dumpVerilog("verilog/doc");                                               // Constants and search key ready to go
+    t.P.trace = true;
+    t.P.run();
+    //say("AAAA11", t);
+    //say("AAAA22", t.P);
+    //say("AAAA22", t.T);
+    //say("AAAA22", t.M);
+    ok(t.T.at(t.data).getInt(), 7);                                             // Data associated with key
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -3108,7 +3122,6 @@ endmodule
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
     test_dump();
-    //test_put_ascending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
