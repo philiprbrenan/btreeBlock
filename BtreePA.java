@@ -2214,9 +2214,64 @@ endmodule
    {String s = S.toString();
            s = s.replace("$bitsPerKey",    ""+bitsPerKey());
            s = s.replace("$bitsPerData",   ""+bitsPerData());
-           s = s.replace("$instructions",     P.dumpVerilog());
+           s = s.replace("$instructions",     dumpVerilog());
            s = s.replace("$stuckBases",       stuckMemories());
     return new StringBuilder(s);
+   }
+  String dumpVerilog()
+   {final StringBuilder s = new StringBuilder();
+
+    s.append("""
+  always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
+
+  if (reset) begin                                                              // Reset
+    step      = 0;
+    steps    <= 0;
+    stopped  <= 0;
+    initialize_memory_M();                                                      // Initialize btree memory
+    initialize_memory_T();                                                      // Initilize btree transaction
+    //("reset");
+    traceFile = $fopen("trace/trace.txt", "w");                                 // Open trace file
+    branch_0_StuckSA_Memory_base_offset <= 0;                                   // Stuck working storage
+    branch_0_StuckSA_Transaction <= 0;
+    branch_1_StuckSA_Memory_base_offset <= 0;
+    branch_1_StuckSA_Transaction <= 0;
+    branch_2_StuckSA_Memory_base_offset <= 0;
+    branch_2_StuckSA_Transaction <= 0;
+    branch_3_StuckSA_Memory_base_offset <= 0;
+    branch_3_StuckSA_Transaction <= 0;
+    leaf_0_StuckSA_Memory_base_offset <= 0;
+    leaf_0_StuckSA_Transaction <= 0;
+    leaf_1_StuckSA_Memory_base_offset <= 0;
+    leaf_1_StuckSA_Transaction <= 0;
+    leaf_2_StuckSA_Memory_base_offset <= 0;
+    leaf_2_StuckSA_Transaction <= 0;
+    leaf_3_StuckSA_Memory_base_offset <= 0;
+    leaf_3_StuckSA_Transaction <= 0;
+  end
+  else begin;                                                                   // Run
+""");
+
+    s.append("    case(step)\n");                                               // Case staments to select the code for the current instruction
+    int n = 0;
+    for(int i = 0; i < P.code.size(); ++i)
+     {final ProgramPA.I I = P.code.elementAt(i);
+      final String c = I.v();
+      if (c.length() == 0) {++n; say(I.traceBack);}                             // Count empty verilog strings
+      s.append(String.format("        %5d : begin %s end\n", i, c));
+     }
+    s.append("      default : begin stopped <= 1; /* end of execution */ end\n"); // Any invalid instruction address causes the program to halt
+    s.append("""
+    endcase
+    step   = step  + 1;
+    steps <= steps + 1;
+    //$display            ("%4d  %4d", steps, step);                              // Trace execution
+    $fdisplay(traceFile, "%4d  %4d", steps, step);                              // Trace execution in a file
+  end
+end
+""");
+    if (n > 0) err("Program still has", n, "empty statements");
+    return s.toString();
    }
 
 //D0 Tests                                                                      // Testing
