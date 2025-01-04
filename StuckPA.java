@@ -63,7 +63,7 @@ abstract class StuckPA extends Test                                             
    {z();
     P.new I()
      {void   a() {M.base(Base.setOff().result);}
-      String v() {return M.baseName() + " = " + Base.verilogAddress()+";" + traceComment();}     // Set the base for this based data structure
+      String v() {return M.baseName() + " <= " + Base.verilogLoad()+";" + traceComment();}     // Set the base for this based data structure
      };
    }
 
@@ -385,7 +385,7 @@ abstract class StuckPA extends Test                                             
            {void Then()
              {setFound();
               moveData();
-              P.Goto(end);
+              if (i != maxSize()-1) P.Goto(end);                                // Goto superfluous on last iteration
              }
            };
          }
@@ -420,7 +420,7 @@ abstract class StuckPA extends Test                                             
              {setFound();
               moveKey();
               moveData();
-              P.Goto(end);
+              if (i != maxSize()-1) P.Goto(end);                                // Goto superfluous on last iteration
              }
            };
          }
