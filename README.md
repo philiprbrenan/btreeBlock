@@ -4,23 +4,19 @@
 
 # Btree in a block
 
-For reasons why you might want to get involved in this project to put a [B-Tree](https://en.wikipedia.org/wiki/B-tree) in a block on a [Silicon](https://en.wikipedia.org/wiki/Silicon) [chip](https://en.wikipedia.org/wiki/Integrated_circuit), see:
+For reasons why you might want to get involved in this project which puts a [B-Tree](https://en.wikipedia.org/wiki/B-tree) into an [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) on a block on a [Silicon](https://en.wikipedia.org/wiki/Silicon) [chip](https://en.wikipedia.org/wiki/Integrated_circuit), see:
 
 http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html
 
 # Roadmap
 
-Currently the implementation is in [Java](https://en.wikipedia.org/wiki/Java_(programming_language)), but the intent is to successively
-reduce the [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) [code](https://en.wikipedia.org/wiki/Computer_program) until it looks just like [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program), then use the
-reduced [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) as a macro [preprocessor](https://en.wikipedia.org/wiki/Preprocessor) to generate pseudo machine [code](https://en.wikipedia.org/wiki/Computer_program) for a
-machine optimized for manipulating a [B-Tree](https://en.wikipedia.org/wiki/B-tree) .
-
+Initially I implemented the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [Java](https://en.wikipedia.org/wiki/Java_(programming_language)), then successively reduced
+the  [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) [code](https://en.wikipedia.org/wiki/Computer_program) until it looked just like [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program), at which point it was
+easy to generate a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) in [Verilog](https://en.wikipedia.org/wiki/Verilog) to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program). 
 ![Roadmap](flowChart/DevelopmentFlowChart.png)
 
-The psuedo machine [code](https://en.wikipedia.org/wiki/Computer_program) will then be  optimized and reduced as far as possible
-to generate actual machine [code](https://en.wikipedia.org/wiki/Computer_program) for a [Verilog](https://en.wikipedia.org/wiki/Verilog) implementation of a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) just
-capable of running the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm on an [fpga](https://en.wikipedia.org/wiki/Field-programmable_gate_array) or [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) .
-
+The [Verilog](https://en.wikipedia.org/wiki/Verilog) [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) will now be used to drive an implementatuion on an [fpga](https://en.wikipedia.org/wiki/Field-programmable_gate_array) and
+then on an [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) allowing the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algoritm to be implemented in [hardware](https://en.wikipedia.org/wiki/Digital_electronics) rather than [software](https://en.wikipedia.org/wiki/Software). 
 # Deleting in ascending order
 
 The evolution of a [B-Tree](https://en.wikipedia.org/wiki/B-tree) as the lowest element is deleted successively until
