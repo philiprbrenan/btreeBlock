@@ -1,4 +1,4 @@
-# Test 2025-01-04 at 17:49:16
+# Test 2025-01-04 at 19:27:45
 
 name: Test
 run-name: btreeBlock
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        task: [Btree, BtreePA, BtreeSA, BtreeSML, BtreeSP, BtreeStuck, BtreeStuckStatic, If, Layout, Memory, MemoryLayout, MemoryLayoutPA, Program, ProgramPA, Stuck, StuckPA, StuckSA, StuckSML, StuckSP, StuckStatic, Test]
+        task: [Btree, BtreePA, BtreeSA, BtreeSML, BtreeSP, BtreeStuck, BtreeStuckStatic, If, Layout, Memory, MemoryLayout, MemoryLayoutPA, Program, ProgramPA, Stuck, StuckPA, StuckSA, StuckSML, StuckSP, StuckStatic, Test, Verilog]
 
     steps:
     - uses: actions/checkout@v4
@@ -173,6 +173,12 @@ jobs:
       if: matrix.task == 'Test'
       run: |
         java -cp Classes com/AppaApps/Silicon/Test
+
+
+    - name: Test Verilog
+      if: matrix.task == 'Verilog'
+      run: |
+        java -cp Classes com/AppaApps/Silicon/Verilog
 
     - name: Verilog install
       if: matrix.task == 'BtreePA'
