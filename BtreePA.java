@@ -2111,7 +2111,7 @@ abstract class BtreePA extends Test                                             
 
 //D1 Verilog                                                                    // Generate verilog code that implements the instructions used to manipulate a btree
 
-  String stuckMemories()                                                        // Generate verilog for the variables holding the base addresses of all based memory elements
+  String stuckMemories()                                                        // Declare variables holding the base addresses of all based memory elements
    {final StringBuilder s = new StringBuilder();
     final int B = branchTransactions.length;
     final int L =   leafTransactions.length;
@@ -2120,15 +2120,30 @@ abstract class BtreePA extends Test                                             
     return s.toString();
    }
 
+  String stuckMemoryInitialization()                                            // Initialize based memory
+   {final StringBuilder s = new StringBuilder();
+    final int B = branchTransactions.length;
+    final int L =   leafTransactions.length;
+    for  (int b = 0; b < B; b++) s.append(stuckMemoryInitialization(branchTransactions[b]));
+    for  (int l = 0; l < L; l++) s.append(stuckMemoryInitialization(  leafTransactions[l]));
+    return s.toString();
+   }
+
   String stuckMemory(StuckPA s)                                                 // Base address variable for one stuck
-   {return
-     "reg ["+bitsPerAddress+":0] "+s.M.baseName()+";\n"+
-     s.T.declareVerilog();
+   {return"reg ["+bitsPerAddress+":0] "+s.M.baseName()+traceComment() +
+      s.C.declareVerilog()+
+      s.T.declareVerilog();
+   }
+
+  String stuckMemoryInitialization(StuckPA s)                                   // Initialization for one stuck
+   {return s.M.baseName()+" <= 0"+traceComment()+
+           s.C.name()    +" <= 0"+traceComment()+
+           s.T.name()    +" <= 0"+traceComment();
    }
 
   void dumpVerilog(String filePath)                                             // Write verilog
-   {final String file = fileName(filePath), folder = folderName(filePath);      // Parse file name
-     final StringBuilder s = new StringBuilder();                               // Chip
+   {final String file = fileName(filePath), folder = folderName(filePath);      // Parse file name describing the desired location of the generated verilog code
+    final StringBuilder s = new StringBuilder();
     s.append("""
 //-----------------------------------------------------------------------------
 // Database on a chip
@@ -2212,10 +2227,11 @@ endmodule
 
   private StringBuilder editVariables(StringBuilder S)                          // Edit the variables in a string builder
    {String s = S.toString();
-           s = s.replace("$bitsPerKey",    ""+bitsPerKey());
-           s = s.replace("$bitsPerData",   ""+bitsPerData());
-           s = s.replace("$instructions",     dumpVerilog());
-           s = s.replace("$stuckBases",       stuckMemories());
+           s = s.replace("$bitsPerKey",    ""  + bitsPerKey());
+           s = s.replace("$bitsPerData",   ""  + bitsPerData());
+           s = s.replace("$instructions",        dumpVerilog());
+           s = s.replace("$stuckBases",          stuckMemories());
+           s = s.replace("$stuckInitialization", stuckMemoryInitialization());
     return new StringBuilder(s);
    }
   String dumpVerilog()
@@ -2232,22 +2248,7 @@ endmodule
     initialize_memory_T();                                                      // Initilize btree transaction
     //("reset");
     traceFile = $fopen("trace/trace.txt", "w");                                 // Open trace file
-    branch_0_StuckSA_Memory_base_offset <= 0;                                   // Stuck working storage
-    branch_0_StuckSA_Transaction <= 0;
-    branch_1_StuckSA_Memory_base_offset <= 0;
-    branch_1_StuckSA_Transaction <= 0;
-    branch_2_StuckSA_Memory_base_offset <= 0;
-    branch_2_StuckSA_Transaction <= 0;
-    branch_3_StuckSA_Memory_base_offset <= 0;
-    branch_3_StuckSA_Transaction <= 0;
-    leaf_0_StuckSA_Memory_base_offset <= 0;
-    leaf_0_StuckSA_Transaction <= 0;
-    leaf_1_StuckSA_Memory_base_offset <= 0;
-    leaf_1_StuckSA_Transaction <= 0;
-    leaf_2_StuckSA_Memory_base_offset <= 0;
-    leaf_2_StuckSA_Transaction <= 0;
-    leaf_3_StuckSA_Memory_base_offset <= 0;
-    leaf_3_StuckSA_Transaction <= 0;
+    $stuckInitialization
   end
   else begin;                                                                   // Run
 """);
