@@ -34,6 +34,8 @@ for my $s(@files)                                                               
 
 writeFileUsingSavedToken($user, $repo, q(.config/geany/snippets.conf),          # Save the snippets file as this was the thing I missed most after a rebuild
                    readFile(q(/home/phil/.config/geany/snippets.conf)));
+writeFileUsingSavedToken($user, $repo, q(.config/geany/keybindings.conf),       # Save the keybindings file for the same reason
+                  readFile(q(//home/phil/.config/geany/keybindings.conf)));
 
 if (1)                                                                          # Write workflow
  {my $d = dateTimeStamp;
