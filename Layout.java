@@ -617,7 +617,7 @@ V   10     4            C                    C
     //say(M); stop(N);
     ok(L, N);
 
-    //stop("AAAA", M.get("B.a"));
+    //stop(M.get("B.a"));
     ok(""+M.get("B.a"), """
 T   At  Wide  Size    Name                   Path
 V    2     2              a
