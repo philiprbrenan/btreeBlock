@@ -101,14 +101,17 @@ END
       if: matrix.task == '$j'
       run: |
         java -cp Classes $c/$j
+
 END
    }
   $y .= <<"END";
     - name: Verilog install
+      if: matrix.task == 'BtreePA'
       run: |
         sudo apt install iverilog
 
     - name: Verilog Run
+      if: matrix.task == 'BtreePA'
       run: |
         rm -f doc; iverilog -Iverilog/includes/ -g2012 -o doc verilog/doc.sv verilog/doc.tb && timeout 1m ./doc
 END
