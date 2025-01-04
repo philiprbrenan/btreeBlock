@@ -1,5 +1,5 @@
-reg [282:0] M;
-task initialize_memory_M;
+reg [282:0] M; /*   MemoryLayoutPA.java:0690:declareVerilog   MemoryLayoutPA.java:0675:dumpVerilog   BtreePA.java:2224:dumpVerilog   BtreePA.java:3156:test_dump   BtreePA.java:3182:newTests   BtreePA.java:3187:main  */
+task initialize_memory_M; /*   MemoryLayoutPA.java:0676:dumpVerilog   BtreePA.java:2224:dumpVerilog   BtreePA.java:3156:test_dump   BtreePA.java:3182:newTests   BtreePA.java:3187:main  */
     begin
         M[0] = 0;
         M[1] = 0;
