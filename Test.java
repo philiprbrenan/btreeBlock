@@ -51,6 +51,8 @@ public class Test                                                               
     return s.toString();
    }
 
+  static String joinLines(Stack<String> S) {return joinStrings(S, "\n");}       // Perl join lines
+
 //D2 Numeric routines                                                           // Numeric routines
 
   static int max(int n, int...rest)                                             // Maximum of some numbers
@@ -301,6 +303,10 @@ public class Test                                                               
     catch (Exception e)
      {stop("Cannot write file", filePath, e);
      }
+   }
+
+  static void writeFile(String filePath, String string)                         // Write a string to a file
+   {writeFile(filePath, new StringBuilder(string));
    }
 
   static void deleteFile(String filePath)                                       // Delete a file
