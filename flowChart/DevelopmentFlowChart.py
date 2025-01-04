@@ -3,14 +3,14 @@ from graphviz import Digraph
 # Create a Digraph object for the flowchart
 dot = Digraph(comment='Flowchart Example')
 
-dot.node('B',    'Btree\nThe Btree algorithm in normal Java')                   # Nodes
+dot.node('B',    'The Btree algorithm in normal Java')                          # Nodes
 dot.node('BS',   'BtreeStuck\nfixed key/value stack')
 dot.node('BSS',  'BtreeStuckStatic\nreduced use of new')
 dot.node('BSML', 'BtreeSML\nstatic bit memory')
 dot.node('BSP',  'BtreeSP\ntransactional')
 dot.node('BSA',  'BtreeSA\ntransaction in bit memory');
 dot.node('BPA',  'BtreePA\npseudo assembler');
-dot.node('BVL',  'BtreeVL\nBtree Algorithm in Verilog');
+dot.node('BVL',  'Generate the Btree Algorithm in synthesizable Verilog');
 
 dot.node('S',    'Stuck\nfixed key/value stack in normal Java')
 dot.node('SS',   'StuckStatic\nreduced use of new')
