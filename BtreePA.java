@@ -2194,8 +2194,10 @@ module doc_tb;                                                                  
       for(step = 0; step < execs && !stop ; step = step + 1) begin;
         clock = 0; #1; clock = 1; #1;
       end
-      if (stop) begin                                                       // Stopped
+      if (stop) begin                                                           // Stopped
         $display("Stopped after: %4d steps key %4d  data %4d", step, Key, data);
+        if (data == 7) $display("Passed all tests");
+        else           $display("FAILED data = %4d not 7", data);
       end
     end
   endtask
