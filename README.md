@@ -17,13 +17,64 @@ generate a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) in [Veri
 The [Verilog](https://en.wikipedia.org/wiki/Verilog) [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) will now be implemented on an [fpga](https://en.wikipedia.org/wiki/Field-programmable_gate_array) and then as an [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) to
 implement the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [hardware](https://en.wikipedia.org/wiki/Digital_electronics) rather than [software](https://en.wikipedia.org/wiki/Software). 
 ```
-Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
----------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
 | Design       : doc
 | Design State : Synthesized
----------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 ```
+
+# Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) 
+For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)): ```
+   BtreePA t = new BtreePA()
+     {int maxSize         () {return  8;}
+      int maxKeysPerLeaf  () {return  2;}
+      int maxKeysPerBranch() {return  3;}
+      int bitsPerKey      () {return  4;}
+      int bitsPerData     () {return  4;}
+     };
+```
+ [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) Synthesis uses the following resources to implement the **find**
+operation.
+
+```
++-------------------------+------+-------+------------+-----------+-------+
+|        Site Type        | Used | Fixed | Prohibited | Available | Util% |
++-------------------------+------+-------+------------+-----------+-------+
+| Slice LUTs*             |  581 |     0 |          0 |     41000 |  1.42 |
+|   LUT as Logic          |  581 |     0 |          0 |     41000 |  1.42 |
+|   LUT as Memory         |    0 |     0 |          0 |     13400 |  0.00 |
+| Slice Registers         |  131 |     0 |          0 |     82000 |  0.16 |
+|   Register as Flip Flop |  131 |     0 |          0 |     82000 |  0.16 |
+|   Register as Latch     |    0 |     0 |          0 |     82000 |  0.00 |
+| F7 Muxes                |   10 |     0 |          0 |     20500 |  0.05 |
+| F8 Muxes                |    0 |     0 |          0 |     10250 |  0.00 |
++-------------------------+------+-------+------------+-----------+-------+
+```
+
+The [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)) being searched looks like this:
+
+```
+    ok(t, """
+             4                    |
+             0                    |
+             5                    |
+             6                    |
+      2             6    7        |
+      5             6    6.1      |
+      1             4    7        |
+      3                  2        |
+1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
+""");
+```
+
+Running the generated [Verilog](https://en.wikipedia.org/wiki/Verilog) [code](https://en.wikipedia.org/wiki/Computer_program) to [find](https://en.wikipedia.org/wiki/Find_(Unix)) the [data](https://en.wikipedia.org/wiki/Data) associated with [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) 2
+produces:
+
+```
+Stopped after:  117 steps key    2  data    7
+```
+
 
 # Deleting in ascending order
 
