@@ -3,17 +3,17 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-// Remove pointless jumps to non existant then and else in If statement if these methods do not generate any code
+// Move  verilog code to BtreePA
 import java.util.*;
 
 class ProgramPA extends Test                                                    // A progam that manipulates a memory layout via si instructions
- {final Stack<I> code = new Stack<>();                                          // Code of the program
-  final int   maxTime = 100_000;                                                // Maximum number of steps permitted while running the program
-  int            step = 0;                                                      // Execution step
-  int            time = 0;                                                      // Execution time
-  boolean     running = false;                                                  // Executing if true
-  Stack<Label> labels = new Stack<>();                                          // Labels for some instructions
-
+ {final Stack<I>  code = new Stack<>();                                         // Code of the program
+  final int    maxTime = 100_000;                                               // Maximum number of steps permitted while running the program
+  int             step = 0;                                                     // Execution step
+  int             time = 0;                                                     // Execution time
+  boolean      running = false;                                                 // Executing if true
+  boolean        trace = false;                                                 // Trace execution if true
+  Stack<Label>  labels = new Stack<>();                                         // Labels for some instructions
 
   ProgramPA() {}                                                                // Create a program that instructions can be added to and then executed
 
@@ -40,27 +40,31 @@ class ProgramPA extends Test                                                    
     String n() {return "instruction";}                                          // Instruction name
     String v() {return "" + traceComment();}                                    // Corresponding verilog
 
-    String traceComment() {return "/* "+traceBack.replaceAll("\\n", " ")+" */";}// Trace back comment
+    String traceComment() {return " /*"+traceBack.replaceAll("\\n", " ")+" */";}// Trace back comment
    }
 
 //D1 Execute                                                                    // Execute the program
 
   void run()                                                                    // Run the program
    {z();
+    final Stack<String> Trace = new Stack<>();                                  // Trace execution steps
     running = true;
     final int N = code.size();
     for (step = 0, time = 0; step < N && time < maxTime && running; step++, time++)
      {z(); code.elementAt(step).a();
+      if (trace) Trace.push(String.format("%4d  %4d", time, step));
      }
     if (time >= maxTime) stop("Out of time: ", time);
     running = false;
+    if (trace) writeFile("trace/"+currentTestName()+".txt", joinLines(Trace));  // Write the trace
    }
 
   void halt(Object...O)                                                         // Halt execution with an explanatory message
    {z();
+    final String m = "/* "+saySb(O).toString()+" */";
     new I()
      {void   a() {say(O); /*say(traceBack);*/ running = false;}
-      String v() {return "stopped <= 1; " + traceComment();}
+      String v() {return "stopped <= 1; " + m + traceComment();}
       String n() {return "halt";}
      };
    }
@@ -83,7 +87,7 @@ class ProgramPA extends Test                                                    
      {void a()
        {z(); if (condition.setOff().getInt() > 0) step = label.instruction-1;
        }
-      String v() {return "if ("+condition.verilogAddress()+" > 0) step = "+(label.instruction-1)+";" + traceComment();} // The program execution for loop will increment
+      String v() {return "if ("+condition.verilogLoad()+" > 0) step = "+(label.instruction-1)+";" + traceComment();} // The program execution for loop will increment
       String n() {return "GoOn "+condition.field.name+" to "+(label.instruction+1);}
      };
    }
@@ -93,7 +97,7 @@ class ProgramPA extends Test                                                    
      {void a()
        {z(); if (condition.setOff().getInt() == 0) step = label.instruction-1;
        }
-      String v() {return "if ("+condition.verilogAddress()+" == 0) step = "+(label.instruction-1)+";" + traceComment();} // The program execution for loop will increment
+      String v() {return "if ("+condition.verilogLoad()+" == 0) step = "+(label.instruction-1)+";" + traceComment();} // The program execution for loop will increment
       String n() {return "GoOff "+condition.field.name+" to "+(label.instruction+1);}
      };
    }
@@ -122,9 +126,12 @@ class ProgramPA extends Test                                                    
         Goto(End);
         Else.set();
         Else();
-        if (code.size() <= e)  code.pop();                                    // No else block so no need to jump over it
+        if (code.size() <= e+1)
+         {code.pop();                                                           // No else block so no need to jump over it
+          Else.set();                                                           // Else is now end
+         }
        }
-      End.set();                                                                // E
+      End.set();                                                                // End of if
      }
     void Then() {}
     void Else() {}
@@ -215,21 +222,39 @@ class ProgramPA extends Test                                                    
 
   String dumpVerilog()
    {final StringBuilder s = new StringBuilder();
+
     s.append("""
   always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
 
-  if (reset) begin;                                                             // Reset
+  if (reset) begin                                                              // Reset
     step     <= 0;
     steps    <= 0;
     stopped  <= 0;
-    initialize_memory_M();
-    $display("reset");
+    initialize_memory_M();                                                      // Initialize btree memory
+    initialize_memory_T();                                                      // Initilize btree transaction
+    //("reset");
+    traceFile = $fopen("trace/trace.txt", "w");                                 // Open trace file
+    branch_0_StuckSA_Memory_base_offset <= 0;                                   // Stuck working storage
+    branch_0_StuckSA_Transaction <= 0;
+    branch_1_StuckSA_Memory_base_offset <= 0;
+    branch_1_StuckSA_Transaction <= 0;
+    branch_2_StuckSA_Memory_base_offset <= 0;
+    branch_2_StuckSA_Transaction <= 0;
+    branch_3_StuckSA_Memory_base_offset <= 0;
+    branch_3_StuckSA_Transaction <= 0;
+    leaf_0_StuckSA_Memory_base_offset <= 0;
+    leaf_0_StuckSA_Transaction <= 0;
+    leaf_1_StuckSA_Memory_base_offset <= 0;
+    leaf_1_StuckSA_Transaction <= 0;
+    leaf_2_StuckSA_Memory_base_offset <= 0;
+    leaf_2_StuckSA_Transaction <= 0;
+    leaf_3_StuckSA_Memory_base_offset <= 0;
+    leaf_3_StuckSA_Transaction <= 0;
   end
-
   else begin;                                                                   // Run
 """);
 
-    s.append("    case(step)\n");
+    s.append("    case(step)\n");                                               // Case stamenbts to direct us to the code for the current instruction
     int n = 0;
     for(int i = 0; i < code.size(); ++i)
      {final I I = code.elementAt(i);
@@ -237,16 +262,26 @@ class ProgramPA extends Test                                                    
       if (c.length() == 0) {++n; say(I.traceBack);}                             // Count empty verilog strings
       s.append(String.format("        %4d : begin %s end\n", i, c));
      }
+    s.append("     default : begin stopped <= 1; end\n");                       // Any invalid instruction address causes the program to halt
     s.append("""
     endcase
-    step <= step + 1;
+    step  <= step  + 1;
     steps <= steps + 1;
-    $display("%4d %4d %4d", steps, step, stopped);
+    //$display            ("%4d  %4d", steps, step);                              // Trace execution
+    $fdisplay(traceFile, "%4d  %4d", steps, step);                              // Trace execution in a file
   end
 end
 """);
     if (n > 0) err("Program still has", n, "empty statements");
     return s.toString();
+   }
+
+  void debugVerilog(String title, MemoryLayoutPA.At at)                         // Add a debug statement to both the program and the verilog version
+   {final int N = code.size();
+    new I()
+     {void   a() {say(N, title, at, at.setOff().getInt());}
+      String v() {return "$display(\""+N+" \", \""+title+" \", \""+at+" \", "+at.verilogLoad()+");";}
+     };
    }
 
 //D1 Tests                                                                      // Tests
@@ -429,7 +464,7 @@ Line T       At      Wide       Size    Indices        Value   Name
      {void Then() {p.new I() {void a() {f.push(6);} String n() {return "f.push(6);";}};}
       void Else() {p.new I() {void a() {f.push(7);} String n() {return "f.push(7);";}};}
      };
-    p.run(); say("AAAA", p.dumpVerilog());
+    p.run();
     ok(f, "[0, 3, 4, 7]"); f.clear();
 
     m.at(a).setInt(0);
@@ -528,6 +563,23 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(f, "[8, 7, 6, 5, 4, 3, 2, 1]");
    }
 
+  static void test_debug()
+   {Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 8);
+    Layout.Variable  b = l.variable ("b", 8);
+    Layout.Structure s = l.structure("s", a, b);
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
+    ProgramPA        p = m.P;
+
+    m.at(a).setInt(11);
+    m.at(b).setInt(22);
+
+    p.debugVerilog("AAAA", m.at(a));
+    p.debugVerilog("BBBB", m.at(b));
+    p.run();
+    say(p.dumpVerilog());
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_inc();
     test_fibonacci();
@@ -538,11 +590,11 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_stop();
     test_loop();
     test_pool();
+    //test_debug();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_if();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
