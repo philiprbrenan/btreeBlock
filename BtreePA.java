@@ -1306,7 +1306,12 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + T.at(nr).getInt() <= maxKeysPerLeaf()) ?
                   1 : 0);
                }
-              String v() {return "/* mergeRoot */" + traceComment();}
+              String v()
+               {return T.at(mergeable).verilogLoad() + " <= " +
+                          "("+T.at(nl).verilogLoad() + " + "  +
+                              T.at(nr).verilogLoad() + " <= " +
+                   maxKeysPerLeaf()+") ? 'b1 : 'b0;" + traceComment();
+               }
              };
 
             P.new If (T.at(mergeable))
@@ -1362,7 +1367,12 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + 1 + T.at(nr).getInt() <= maxKeysPerBranch()) ?
                   1 : 0);
                }
-              String v() {return "/* mergeRoot */" + traceComment();}
+              String v()
+               {return T.at(mergeable).verilogLoad() + " <= "   +
+                          "("+T.at(nl).verilogLoad() + "+ 1 +"  +
+                              T.at(nr).verilogLoad() + " <= "  +
+                   maxKeysPerBranch()+") ? 'b1 : 'b0;" + traceComment();
+               }
              };
 
             P.new If (T.at(mergeable))
@@ -1480,7 +1490,12 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + T.at(nr).getInt() >= maxKeysPerLeaf()) ?
                   1 : 0);
                }
-              String v() {return "/* mergeLeftSibling leaves */" + traceComment();}
+              String v()
+               {return T.at(stolenOrMerged).verilogLoad() + " <= " +
+                               "("+T.at(nl).verilogLoad() + " + "  +
+                                   T.at(nr).verilogLoad() + " >= " +
+                   maxKeysPerLeaf()+") ? 'b1 : 'b0;" + traceComment();
+               }
              };
             stealNotPossible(end);
 
@@ -1512,7 +1527,12 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + 1 + T.at(nr).getInt() > maxKeysPerBranch()) ?
                   1 : 0);
                }
-              String v() {return "/* mergeLeftSibling branches */" + traceComment();}
+              String v()
+               {return T.at(stolenOrMerged).verilogLoad() + " <= "   +
+                               "("+T.at(nl).verilogLoad() + "+ 1 +"  +
+                                   T.at(nr).verilogLoad() + " > "    +
+                   maxKeysPerBranch()+") ? 'b1 : 'b0;" + traceComment();
+               }
              };
             stealNotPossible(end);
 
@@ -1603,7 +1623,12 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + T.at(nr).getInt() > maxKeysPerLeaf()) ?
                   1 : 0);
                }
-              String v() {return "/* mergeRightSibling leaves */" + traceComment();}
+              String v()
+               {return T.at(stolenOrMerged).verilogLoad() + " <= " +
+                               "("+T.at(nl).verilogLoad() + " + "  +
+                                   T.at(nr).verilogLoad() + " > "  +
+                   maxKeysPerLeaf()+") ? 'b1 : 'b0;" + traceComment();
+               }
              };
             stealNotPossible(end);
 
@@ -1642,7 +1667,12 @@ abstract class BtreePA extends Test                                             
                  ((T.at(nl).getInt() + 1 + T.at(nr).getInt() > maxKeysPerBranch()) ?
                   1 : 0);
                }
-              String v() {return "/* mergeRightSibling branches */" + traceComment();}
+              String v()
+               {return T.at(stolenOrMerged).verilogLoad() + " <= "   +
+                               "("+T.at(nl).verilogLoad() + "+ 1 +"  +
+                                   T.at(nr).verilogLoad() + " > "    +
+                   maxKeysPerBranch()+") ? 'b1 : 'b0;" + traceComment();
+               }
              };
             stealNotPossible(end);
 
@@ -2140,16 +2170,26 @@ abstract class BtreePA extends Test                                             
            s.T.name()    +" <= 0"+traceComment();
    }
 
-  void dumpVerilog(String filePath)                                             // Write verilog
-   {final String file = fileName(filePath), folder = folderName(filePath);      // Parse file name describing the desired location of the generated verilog code
-    final StringBuilder s = new StringBuilder();
-    s.append("""
+  class GenVerilog                                                              // Generate verilog
+   {final String    project;                                                    // Project name - used to generate file names
+    final String     folder;                                                    // Folder in which to place verilog files
+    final ProgramPA program;                                                    // Programs containing the instructions to be converted to verilog
+    int Key     () {return    2;}                                               // Input key value
+    int Data    () {return    2;}                                               // Input data value
+    int data    () {return    7;}                                               // Expected output data value
+    int maxSteps() {return 2000;}                                               // Maxumum number if execution steps
+    int expSteps() {return  117;}                                               // Expected number of steps
+
+    GenVerilog(String Project, String Folder, ProgramPA Program)                // Generate verilog
+     {project = Project; folder = Folder; program = Program;
+      final StringBuilder s = new StringBuilder();
+      s.append("""
 //-----------------------------------------------------------------------------
 // Database on a chip
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
-module doc(reset, stop, clock, pfd, Key, Data, data, found);                    // Database on a chip
+module $project(reset, stop, clock, pfd, Key, Data, data, found);               // Database on a chip
   input                 reset;                                                  // Restart the program run sequence when this goes high
   input                 clock;                                                  // Program counter clock
   input            [2:0]pfd;                                                    // Put, find delete
@@ -2167,33 +2207,66 @@ module doc(reset, stop, clock, pfd, Key, Data, data, found);                    
   assign found = T[18];                                                         // Found the key
   assign data  = T[23+:4];                                                      // Data associated with key found
 
-  `include "M"+Verilog.ext                                                      // Memory holding a pre built tree from test_dump()
-  `include "T"+Verilog.ext                                                      // Transaction memory which is initialized to some values to reduce the complexity of Memory at by treating constants as variables
+  `include "M$verilogExt"                                                       // Memory holding a pre built tree from test_dump()
+  `include "T$verilogExt"                                                       // Transaction memory which is initialized to some values to reduce the complexity of Memory at by treating constants as variables
 $stuckBases
 
-$instructions
+  always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
+
+    if (reset) begin                                                              // Reset
+      step      = 0;
+      steps    <= 0;
+      stopped  <= 0;
+      initialize_memory_M();                                                      // Initialize btree memory
+      initialize_memory_T();                                                      // Initilize btree transaction
+      //("reset");
+      traceFile = $fopen("trace/trace.txt", "w");                                 // Open trace file
+      if (!traceFile) $fatal(1, "cannot open trace file");
+      $stuckInitialization
+    end
+    else begin;                                                                   // Run
+      $display            ("%4d  %4d", steps, step);                              // Trace execution
+      $fdisplay(traceFile, "%4d  %4d", steps, step);                              // Trace execution in a file
+      case(step)                                                                  // Case statements to select the code for the current instruction
+""");
+
+      int n = 0;
+      for(int i = 0; i < program.code.size(); ++i)
+       {final ProgramPA.I I = program.code.elementAt(i);
+        final String c = I.v();
+        if (c.length() == 0) {++n; say(I.traceBack);}                             // Count empty verilog strings
+        s.append(String.format("          %5d : begin %s end\n", i, c));
+       }
+      s.append("        default : begin stopped <= 1; /* end of execution */ end\n"); // Any invalid instruction address causes the program to halt
+      s.append("""
+      endcase
+      step   = step  + 1;
+      steps <= steps + 1;
+    end // Execute
+  end // Always
 endmodule
 """);
-    final StringBuilder t = new StringBuilder();                                 // Test bench
-    t.append("""
+
+      final StringBuilder t = new StringBuilder();                              // Test bench
+      t.append("""
 //-----------------------------------------------------------------------------
 // Database on a chip test bench
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
-module doc_tb;                                                                  // Test bench for database on a chip
-  parameter execs = 200;                                                        // Maximum number of instructions to execute
-
+module $project_tb;                                                             // Test bench for database on a chip
   reg                  reset;                                                   // Restart the program run sequence when this goes high
   reg                  stop;                                                    // Program has stopped when this goes high
   reg                  clock;                                                   // Program counter clock
   reg             [2:0]pfd;                                                     // Put, find delete
-  reg  [$bitsPerKey :0]Key = 2;                                                 // Input key
-  reg  [$bitsPerData:0]Data;                                                    // Input data
+  reg  [$bitsPerKey :0]Key  = $Key;                                             // Input key
+  reg  [$bitsPerData:0]Data = $Data;                                            // Input data
   reg  [$bitsPerData:0]data;                                                    // Output data
   reg                  found;                                                   // Whether the key was found on put, find delete
+  integer passes;                                                               // Number of tests passed
+  integer fails;                                                                // Number of tests failed
 
-  doc a1(.reset(reset), .stop(stop), .clock(clock),                             // Connect to the chip
+  $project a1(.reset(reset), .stop(stop), .clock(clock),                        // Connect to the module
     .Key(Key), .Data(Data), .data(data), .found(found));
 
   initial begin                                                                 // Test the module
@@ -2204,74 +2277,45 @@ module doc_tb;                                                                  
   task execute;                                                                 // Clock the module until it says it has stopped
     integer step;
     begin
-      Key = 2;
-      for(step = 0; step < execs && !stop ; step = step + 1) begin;
+      Key = $Key;
+      for(step = 0; step < $maxSteps && !stop ; step = step + 1) begin;
         clock = 0; #1; clock = 1; #1;
       end
       if (stop) begin                                                           // Stopped
-        $display("Stopped after: %4d steps key %4d  data %4d", step, Key, data);
-        if (data == 7) $display("Passed all tests");
-        else           $display("FAILED data = %4d not 7", data);
+        $display("Stopped after: %4d steps key %4d  data %4d", step, $Key, $data);
+        passes = 0; fails = 0;
+        if (data == $data)     passes = passes + 1; else begin fails = fails + 1; $display("Expected $data for data but got %d",    data); end
+        if (step == $expSteps) passes = passes + 1; else begin fails = fails + 1; $display("Expected $expSteps for expected steps but got %d", step); end
+        if (passes == 2) $display("Passed all tests");
+        else             $display("FAILED %d, passed %d", fails, passes);
       end
     end
   endtask
 endmodule
 """);
 
-    writeFile(filePath+Verilog.ext, editVariables(s));
-    writeFile(filePath+".tb",       editVariables(t));
-    M.dumpVerilog(folder);
-    T.dumpVerilog(folder);
-   }
-
-  private StringBuilder editVariables(StringBuilder S)                          // Edit the variables in a string builder
-   {String s = S.toString();
-           s = s.replace("$bitsPerKey",    ""  + bitsPerKey());
-           s = s.replace("$bitsPerData",   ""  + bitsPerData());
-           s = s.replace("$instructions",        dumpVerilog());
-           s = s.replace("$stuckBases",          stuckMemories());
-           s = s.replace("$stuckInitialization", stuckMemoryInitialization());
-    return new StringBuilder(s);
-   }
-  String dumpVerilog()
-   {final StringBuilder s = new StringBuilder();
-
-    s.append("""
-  always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
-
-  if (reset) begin                                                              // Reset
-    step      = 0;
-    steps    <= 0;
-    stopped  <= 0;
-    initialize_memory_M();                                                      // Initialize btree memory
-    initialize_memory_T();                                                      // Initilize btree transaction
-    //("reset");
-    traceFile = $fopen("trace/trace.txt", "w");                                 // Open trace file
-    $stuckInitialization
-  end
-  else begin;                                                                   // Run
-""");
-
-    s.append("    case(step)\n");                                               // Case staments to select the code for the current instruction
-    int n = 0;
-    for(int i = 0; i < P.code.size(); ++i)
-     {final ProgramPA.I I = P.code.elementAt(i);
-      final String c = I.v();
-      if (c.length() == 0) {++n; say(I.traceBack);}                             // Count empty verilog strings
-      s.append(String.format("        %5d : begin %s end\n", i, c));
+      writeFile(folder+project+Verilog.ext, editVariables(s));
+      writeFile(folder+project+".tb",       editVariables(t));
+      M.dumpVerilog(folder);
+      T.dumpVerilog(folder);
      }
-    s.append("      default : begin stopped <= 1; /* end of execution */ end\n"); // Any invalid instruction address causes the program to halt
-    s.append("""
-    endcase
-    step   = step  + 1;
-    steps <= steps + 1;
-    //$display            ("%4d  %4d", steps, step);                              // Trace execution
-    $fdisplay(traceFile, "%4d  %4d", steps, step);                              // Trace execution in a file
-  end
-end
-""");
-    if (n > 0) err("Program still has", n, "empty statements");
-    return s.toString();
+
+    private StringBuilder editVariables(StringBuilder S)                        // Edit the variables in a string builder
+     {String s = S.toString();
+             s = s.replace("$bitsPerKey",    ""  + bitsPerKey());
+             s = s.replace("$bitsPerData",   ""  + bitsPerData());
+//           s = s.replace("$instructions",        dumpVerilog());
+             s = s.replace("$stuckBases",          stuckMemories());
+             s = s.replace("$stuckInitialization", stuckMemoryInitialization());
+             s = s.replace("$verilogExt",          Verilog.ext);
+             s = s.replace("$project",             project);
+             s = s.replace("$Key",                 ""+Key());
+             s = s.replace("$Data",                ""+Data());
+             s = s.replace("$data",                ""+data());
+             s = s.replace("$maxSteps",            ""+maxSteps());
+             s = s.replace("$expSteps",            ""+expSteps());
+      return new StringBuilder(s);
+     }
    }
 
 //D0 Tests                                                                      // Testing
@@ -3125,7 +3169,7 @@ end
      }
    }
 
-  static void test_dump()
+  static void test_verilog_find()                                               // Find using generated verilog code
    {final BtreePA t = btreePA_small();
     t.P.run(); t.P.clear();
     t.put();
@@ -3152,7 +3196,7 @@ end
     t.P.clear();
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
-    t.dumpVerilog("verilog/doc");                                               // Constants and search key ready to go
+    GenVerilog v = t.new GenVerilog("find", "verilog/", t.P);                   // Generate verilog now that memories have beeninitialzied and the program written
     t.P.trace = true;
     t.P.run();
     //say("AAAA11", t);
@@ -3160,6 +3204,56 @@ end
     //say("AAAA22", t.T);
     //say("AAAA22", t.M);
     ok(t.T.at(t.data).getInt(), 7);                                             // Data associated with key
+   }
+
+  static void test_verilog_delete()                                             // Delete using generated verilog code
+   {final BtreePA t = btreePA_small();
+    t.P.run(); t.P.clear();
+    t.put();
+    final int N = 9;
+    for (int i = 1; i <= N; ++i)
+     {say(currentTestName(),  "a", i);
+      t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(N-i);
+      t.P.run();
+     }
+    //stop(t.M);
+    //stop(t);
+    ok(t, """
+             4                    |
+             0                    |
+             5                    |
+             6                    |
+      2             6    7        |
+      5             6    6.1      |
+      1             4    7        |
+      3                  2        |
+1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
+""");
+    t.P.clear();
+    t.T.at(t.Key).setInt(3);                                                    // Sets memory directly not via an instruction
+    t.delete();
+    GenVerilog v = t.new GenVerilog("delete", "verilog/", t.P)                  // Generate verilog now that memories have beeninitialzied and the program written
+     {int Key     () {return    3;}                                             // Input key value
+      int data    () {return    6;}                                             // Expected output data value
+      int maxSteps() {return 2000;}                                             // Maxumum number if execution steps
+      int expSteps() {return 1086;}                                             // Expected number of steps
+     };
+    t.P.trace = true;
+    t.P.run();
+    ok(t.T.at(t.data).getInt(), 6);                                             // Data associated with key
+    //stop(t);
+    ok(t, """
+                    6           |
+                    0           |
+                    5           |
+                    6           |
+      2    4             7      |
+      5    5.1           6      |
+      1    3             7      |
+           4             2      |
+1,2=1  4=3    5,6=4  7=7  8,9=2 |
+""");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -3173,12 +3267,13 @@ end
     test_delete_descending();
     //test_to_array();
     test_delete_small_random();
-    test_dump();
+    test_verilog_find();
    }
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_dump();
+    //test_verilog_find();
+    test_verilog_delete();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
