@@ -51,8 +51,8 @@ class ProgramPA extends Test                                                    
     running = true;
     final int N = code.size();
     for (step = 0, time = 0; step < N && time < maxTime && running; step++, time++)
-     {z(); code.elementAt(step).a();
-      if (trace) Trace.push(String.format("%4d  %4d", time, step));
+     {if (trace) Trace.push(String.format("%4d  %4d", time, step));
+      z(); code.elementAt(step).a();
      }
     if (time >= maxTime) stop("Out of time: ", time);
     running = false;
