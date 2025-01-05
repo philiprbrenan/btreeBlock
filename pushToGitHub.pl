@@ -113,7 +113,8 @@ END
     - name: Verilog Run
       if: matrix.task == 'BtreePA'
       run: |
-        rm -f doc; iverilog -Iverilog/includes/ -g2012 -o doc verilog/doc.sv verilog/doc.tb && timeout 1m ./doc
+        rm -f find;   iverilog -Iverilog/includes/ -g2012 -o find   verilog/find.v   verilog/find.tb   && timeout 1m ./find
+        rm -f delete; iverilog -Iverilog/includes/ -g2012 -o delete verilog/delete.v verilog/delete.tb && timeout 1m ./delete
 END
 
   my $f = writeFileUsingSavedToken $user, $repo, $wf, $y;                       # Upload workflow
