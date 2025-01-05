@@ -5,14 +5,16 @@
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
 
 class Verilog extends Test                                                      // Verilog constants and formatter
- {static final String ext    = ".v";                                            // File extension recognized by Vivado
-  static final String header = ".vh";                                           // Header file extension name recognized by Vivado
+ {static final String ext     = ".v";                                           // File extension recognized by Vivado
+  static final String header  = ".vh";                                          // Header file extension name recognized by Vivado
+  static final String testExt = ".tb";                                          // Extension for test bench
 
 //D0 Tests                                                                      // Testing
 
   static void test_ext()
-   {ok(Verilog.ext   .equals(".v"));
-    ok(Verilog.header.equals(".vh"));
+   {ok(Verilog.ext    .equals(".v"));
+    ok(Verilog.header .equals(".vh"));
+    ok(Verilog.testExt.equals(".tb"));
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
