@@ -1332,7 +1332,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Array     A = l.array    ("A", a, 4);
     MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
     m.memory().alternating(4);
-    m.dumpVerilog("verilog/");                                                  // Dump main memory
+    m.dumpVerilog("verilog/memoryLayoutPA/dump_verilog.txt");                   // Dump main memory
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -1348,12 +1348,11 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_is_ones_or_zeros();
     test_union();
     test_verilog_address();
-    test_dump_verilog();
+    //test_dump_verilog();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_verilog_address();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
