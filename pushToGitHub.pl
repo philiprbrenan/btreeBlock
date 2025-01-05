@@ -110,10 +110,14 @@ END
       run: |
         sudo apt install iverilog
 
-    - name: Verilog Run
+    - name: Verilog Run Find
       if: matrix.task == 'BtreePA'
       run: |
         rm -f find;   iverilog -Iverilog/includes/ -g2012 -o find   verilog/find.v   verilog/find.tb   && timeout 1m ./find
+
+    - name: Verilog Run Delete
+      if: matrix.task == 'BtreePA'
+      run: |
         rm -f delete; iverilog -Iverilog/includes/ -g2012 -o delete verilog/delete.v verilog/delete.tb && timeout 1m ./delete
 END
 
