@@ -3268,12 +3268,11 @@ endmodule
     //test_to_array();
     test_delete_small_random();
     test_verilog_find();
+    test_verilog_delete();
    }
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    //test_verilog_find();
-    test_verilog_delete();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
