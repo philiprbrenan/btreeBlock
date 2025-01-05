@@ -1,0 +1,13 @@
+reg [7:0] M; /*   MemoryLayoutPA.java:0744:declareVerilog   MemoryLayoutPA.java:0729:dumpVerilog   MemoryLayoutPA.java:1335:test_dump_verilog   MemoryLayoutPA.java:1356:newTests   MemoryLayoutPA.java:1361:main  */
+task initialize_memory_M; /*   MemoryLayoutPA.java:0730:dumpVerilog   MemoryLayoutPA.java:1335:test_dump_verilog   MemoryLayoutPA.java:1356:newTests   MemoryLayoutPA.java:1361:main  */
+    begin
+        M[0] = 0; /*   MemoryLayoutPA.java:0734:dumpVerilog   MemoryLayoutPA.java:1335:test_dump_verilog   MemoryLayoutPA.java:1356:newTests   MemoryLayoutPA.java:1361:main  */
+        M[1] = 0; /*   MemoryLayoutPA.java:0734:dumpVerilog   MemoryLayoutPA.java:1335:test_dump_verilog   MemoryLayoutPA.java:1356:newTests   MemoryLayoutPA.java:1361:main  */
+        M[2] = 0; /*   MemoryLayoutPA.java:0734:dumpVerilog   MemoryLayoutPA.java:1335:test_dump_verilog   MemoryLayoutPA.java:1356:newTests   MemoryLayoutPA.java:1361:main  */
+        M[3] = 0; /*   MemoryLayoutPA.java:0734:dumpVerilog   MemoryLayoutPA.java:1335:test_dump_verilog   MemoryLayoutPA.java:1356:newTests   MemoryLayoutPA.java:1361:main  */
+        M[4] = 1; /*   MemoryLayoutPA.java:0734:dumpVerilog   MemoryLayoutPA.java:1335:test_dump_verilog   MemoryLayoutPA.java:1356:newTests   MemoryLayoutPA.java:1361:main  */
+        M[5] = 1; /*   MemoryLayoutPA.java:0734:dumpVerilog   MemoryLayoutPA.java:1335:test_dump_verilog   MemoryLayoutPA.java:1356:newTests   MemoryLayoutPA.java:1361:main  */
+        M[6] = 1; /*   MemoryLayoutPA.java:0734:dumpVerilog   MemoryLayoutPA.java:1335:test_dump_verilog   MemoryLayoutPA.java:1356:newTests   MemoryLayoutPA.java:1361:main  */
+        M[7] = 1; /*   MemoryLayoutPA.java:0734:dumpVerilog   MemoryLayoutPA.java:1335:test_dump_verilog   MemoryLayoutPA.java:1356:newTests   MemoryLayoutPA.java:1361:main  */
+    end
+endtask
