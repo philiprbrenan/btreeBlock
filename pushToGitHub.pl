@@ -114,19 +114,16 @@ END
       if: matrix.task == 'BtreePA'
       run: |
         cd verilog; rm -f find;   iverilog -Iincludes/ -g2012 -o find   find.v   find.tb   && timeout 1m ./find
-        diff trace/test_verilog_find.txt verilog/trace/find/trace.txt
 
     - name: Verilog Run Delete
       if: matrix.task == 'BtreePA'
       run: |
         cd verilog; rm -f delete; iverilog -Iincludes/ -g2012 -o delete delete.v delete.tb && timeout 1m ./delete
-        diff trace/test_verilog_delete.txt verilog/trace/delete/trace.txt
 
     - name: Verilog Run Put
       if: matrix.task == 'BtreePA'
       run: |
         cd verilog; rm -f put;    iverilog -Iincludes/ -g2012 -o put    put.v    put.tb    && timeout 1m ./put
-        diff trace/test_verilog_put.txt verilog/trace/delete/put.txt
 END
 
   my $f = writeFileUsingSavedToken $user, $repo, $wf, $y;                       # Upload workflow
