@@ -5,6 +5,7 @@
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
 
 import java.util.*;
+import java.nio.file.*;
 
 abstract class BtreePA extends Test                                             // Manipulate a btree using static methods and memory
  {final MemoryLayoutPA M;                                                       // The memory layout of the btree
@@ -2179,9 +2180,15 @@ abstract class BtreePA extends Test                                             
    }
 
   class GenVerilog                                                              // Generate verilog
-   {final String    project;                                                    // Project name - used to generate file names
-    final String     folder;                                                    // Folder in which to place verilog files
-    final String   traceDir;                                                    // Folder in which to place execution trace files for comparison withthe equivalent fiels produced by emulating the program on java
+   {final String       project;                                                 // Project name - used to generate file names
+    final String        folder;                                                 // Folder in which to place project
+    final String projectFolder;                                                 // Folder in which to place verilog
+    final String sourceVerilog;                                                 // Source verilog file
+    final String   testVerilog;                                                 // Verilog test bench file
+    final String         mFile;                                                 // Folder in which to place include for btree memory
+    final String         tFile;                                                 // Folder in which to place include for btree transaction memory
+    final String     traceFile;                                                 // Folder in which to place execution trace file
+
     final ProgramPA program;                                                    // Programs containing the instructions to be converted to verilog
     int Key     () {return    2;}                                               // Input key value
     int Data    () {return    2;}                                               // Input data value
@@ -2190,8 +2197,17 @@ abstract class BtreePA extends Test                                             
     int expSteps() {return  117;}                                               // Expected number of steps
 
     GenVerilog(String Project, String Folder, ProgramPA Program)                // Generate verilog
-     {project  = Project; folder = Folder; program = Program;
-      traceDir = "trace/"+project+"/";                                          // Folder in which to place execution trace files for comparison withthe equivalent files produced by emulating the program on java
+     {project = Project; folder = Folder; program = Program;
+
+      projectFolder = ""+Paths.get(folder, project);
+      sourceVerilog = ""+Paths.get(projectFolder, project+Verilog.ext);
+        testVerilog = ""+Paths.get(projectFolder, project+Verilog.testExt);
+              mFile = ""+Paths.get(projectFolder,  "includes", "M"+Verilog.header);
+              tFile = ""+Paths.get(projectFolder,  "includes", "T"+Verilog.header);
+          traceFile = ""+Paths.get(projectFolder, "trace.txt");
+
+      makePath(projectFolder);
+
       final StringBuilder s = new StringBuilder();
       s.append("""
 //-----------------------------------------------------------------------------
@@ -2217,8 +2233,8 @@ module $project(reset, stop, clock, pfd, Key, Data, data, found);               
   assign found = T[18];                                                         // Found the key
   assign data  = T[23+:4];                                                      // Data associated with key found
 
-  `include "M$verilogHeader"                                                    // Memory holding a pre built tree from test_dump()
-  `include "T$verilogHeader"                                                    // Transaction memory which is initialized to some values to reduce the complexity of Memory at by treating constants as variables
+  `include "M.vh"                                                               // Memory holding a pre built tree from test_dump()
+  `include "T.vh"                                                               // Transaction memory which is initialized to some values to reduce the complexity of Memory at by treating constants as variables
 $stuckBases
 
   always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
@@ -2230,8 +2246,8 @@ $stuckBases
       initialize_memory_M();                                                    // Initialize btree memory
       initialize_memory_T();                                                    // Initilize btree transaction
       //("reset");
-      traceFile = $fopen("$traceDirtrace.txt", "w");                            // Open trace file
-      if (!traceFile) $fatal(1, "cannot open trace file");
+      traceFile = $fopen("trace.txt", "w");                                     // Open trace file
+      if (!traceFile) $fatal(1, "cannot open trace file trace.txt");
       $stuckInitialization
     end
     else begin;                                                                 // Run
@@ -2304,23 +2320,21 @@ module $project_tb;                                                             
 endmodule
 """);
 
-      writeFile(folder+project+Verilog.ext, editVariables(s));
-      writeFile(folder+project+".tb",       editVariables(t));
-      M.dumpVerilog(folder);
-      T.dumpVerilog(folder);
-      makePath(folder+traceDir);
+      writeFile(sourceVerilog, editVariables(s));
+      writeFile(testVerilog,   editVariables(t));
+      M.dumpVerilog(mFile);
+      T.dumpVerilog(tFile);
      }
 
     private StringBuilder editVariables(StringBuilder S)                        // Edit the variables in a string builder
      {String s = S.toString();
              s = s.replace("$bitsPerKey",    ""  + bitsPerKey());
              s = s.replace("$bitsPerData",   ""  + bitsPerData());
-//           s = s.replace("$instructions",        dumpVerilog());
              s = s.replace("$stuckBases",          stuckMemories());
              s = s.replace("$stuckInitialization", stuckMemoryInitialization());
-             s = s.replace("$verilogExt",          Verilog.ext);
-             s = s.replace("$verilogHeader",       Verilog.header);
-             s = s.replace("$traceDir",            traceDir);
+             s = s.replace("$mFile",               mFile);
+             s = s.replace("$tFile",               tFile);
+             s = s.replace("$traceFile",           traceFile);
              s = s.replace("$project",             project);
              s = s.replace("$Key",                 ""+Key());
              s = s.replace("$Data",                ""+Data());
@@ -3209,9 +3223,8 @@ endmodule
     t.P.clear();
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
-    GenVerilog v = t.new GenVerilog("find", "verilog/", t.P);                   // Generate verilog now that memories have beeninitialzied and the program written
+    GenVerilog v = t.new GenVerilog("find", "verilog", t.P);                    // Generate verilog now that memories have beeninitialzied and the program written
     t.P.trace = true;
-say("AAAA--------------------------------");
     t.P.run();
     //say("AAAA11", t);
     //say("AAAA22", t.P);
@@ -3247,7 +3260,7 @@ say("AAAA--------------------------------");
     t.P.clear();
     t.T.at(t.Key).setInt(3);                                                    // Sets memory directly not via an instruction
     t.delete();
-    GenVerilog v = t.new GenVerilog("delete", "verilog/", t.P)                  // Generate verilog now that memories have beeninitialzied and the program written
+    GenVerilog v = t.new GenVerilog("delete", "verilog", t.P)                   // Generate verilog now that memories have beeninitialzied and the program written
      {int Key     () {return    3;}                                             // Input key value
       int data    () {return    6;}                                             // Expected output data value
       int maxSteps() {return 2000;}                                             // Maximum number if execution steps
@@ -3298,7 +3311,7 @@ say("AAAA--------------------------------");
     t.T.at(t.Key ).setInt(N);                                                   // Sets memory directly not via an instruction
     t.T.at(t.Data).setInt(N);                                                   // Sets memory directly not via an instruction
     t.put();
-    GenVerilog v = t.new GenVerilog("put", "verilog/", t.P)                     // Generate verilog now that memories have beeninitialzied and the program written
+    GenVerilog v = t.new GenVerilog("put", "verilog", t.P)                      // Generate verilog now that memories have beeninitialzied and the program written
      {int Key     () {return    3;}                                             // Input key value
       int data    () {return    0;}                                             // Expected output data value
       int maxSteps() {return 2000;}                                             // Maximum number if execution steps
@@ -3338,8 +3351,8 @@ say("AAAA--------------------------------");
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    //test_verilog_delete();
-    //test_verilog_find();
+    test_verilog_delete();
+    test_verilog_find();
     test_verilog_put();
    }
 
