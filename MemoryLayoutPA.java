@@ -105,6 +105,24 @@ class MemoryLayoutPA extends Test                                               
 
     String verilogLoadAddr(boolean la)                                          // A verilog representation of an addressed location in memory
      {final String base = based != null ? baseName()+"+" : "";                  // Base field name if a based memory layot
+
+      final Stack<String>      v = new Stack<>();                               // Verilog expression, index variable names
+      Layout.Locator           L = field.locator;
+      final Stack<Layout.Array>A = L.arrays;                                    // The containing arrays
+
+      for (int i = 0; i < A.size(); ++i)                                        // Each array to index to reach this field
+       {final Layout.Array a = A.elementAt(i).toArray();                        // Each array to index to reach this field
+        final int          w = a.element.width;                                 // Width of containing array element
+        final String       o = directs == null ? ""+indices[i] :                // Numeric index
+                               directs[i].verilogLoad();                        // Indirect index loaded from memory
+        v.push(" + " + o + " * " + w);                                          // Access indexing field
+       }
+      return (la ? base+field.at+"/*"+field.name+"*/"+joinStrings(v, "") :                           // IBM S/360 Principles of Operation: LA
+        name()+"["+base+field.at+"/*"+field.name+"*/"+joinStrings(v, "")+" +: "+field.width+"]");     // IBM S/360 Principles of Operation: L
+     }
+
+    String verilogLoadAddr222(boolean la)                                          // A verilog representation of an addressed location in memory
+     {final String base = based != null ? baseName()+"+" : "";                  // Base field name if a based memory layot
       if (directs == null || directs.length == 0)                               // An unindexed field
        {return (la ? base+field.at :                                            // IBM S/360 Principles of Operation: LA
           name()+"["+base+field.at +" +: "+field.width+"]")                     // IBM S/360 Principles of Operation: L
@@ -273,17 +291,35 @@ class MemoryLayoutPA extends Test                                               
       if (!(field instanceof Layout.Array))  stop("Array required for moveUp");
       final At target = this;
       buffer.move(target);                                                      // Make a copy of the thing to be moved so we can move in parallel
+      final Layout.Array A = field.toArray();                                   // Array of elements tp be moved
+      final Layout.Array B = buffer.field.toArray();                            // Buffer containg a copy of the array to be moved
+      final Layout.Field a = A.element;                                         // Array element
+      final Layout.Field b = B.element;                                         // Buffer array element
+      final int          w = a.width;                                           // Width of array element
       P.new I()
-       {void a()
-         {final Layout.Array A = field.toArray();                               // Address field to be moved as an array
-          final  int w =     A.element.width;                                   // Width of array element
-          Index.setOff();
+       {void a()                                                                // Emulation
+         {Index.setOff();
           for   (int i = Index.result+1; i < A.size; i++)                       // Each element
            {for (int j = 0;              j < w;      j++)                       // Each bit in each element
              {final boolean b = buffer.getBit((i-1)*w + j);
               target.setBit(i*w+j, b);
              }
-            }
+           }
+         }
+        String v()                                                              // Verilog
+         {final StringBuilder   s = new StringBuilder("/* moveUp */");
+          final String      start = Index.verilogLoad();                        // Load above this index
+          final MemoryLayoutPA tm = ml();                                       // Target memory
+          final MemoryLayoutPA sm = buffer.ml();                                // Source memory
+          for   (int i = 1; i < A.size; i++)                                    // Each element
+           {s.append("if ("+i+" > "+start +") begin\n");                        // Start moving when we are above the index
+            s.append
+             (tm.at(a, i-0).verilogLoad()+ " <= " +
+              sm.at(b, i-1).verilogLoad()+ ";" +
+              traceComment());
+            s.append("end\n");
+           }
+          return s.toString();
          }
         String n() {return field.name+" moveUp @ "+Index.field.name+" using "+buffer.field.name;}
        };
@@ -294,17 +330,35 @@ class MemoryLayoutPA extends Test                                               
       if (!(field instanceof Layout.Array)) stop("Array required for moveDown");
       final At target = this;
       buffer.move(target);                                                      // Make a copy of the thing to be moved so we can move in parallel
+      final Layout.Array A = field.toArray();                                   // Array of elements tp be moved
+      final Layout.Array B = buffer.field.toArray();                            // Buffer containg a copy of the array to be moved
+      final Layout.Field a = A.element;                                         // Array element
+      final Layout.Field b = B.element;                                         // Buffer array element
+      final int          w = a.width;                                           // Width of array element
       P.new I()
        {void a()
-         {final Layout.Array A = field.toArray();                               // Address field to be moved as an array
-          final  int w =     A.element.width;                                   // Width of array element
-          Index.setOff();
+         {Index.setOff();
           for   (int i = Index.result; i < A.size-1; i++)                       // Each element
            {for (int j = 0;            j < w;        j++)                       // Each bit in each element
              {final boolean b = buffer.getBit((i+1)*w + j);
               target.setBit(i*w+j, b);
              }
            }
+         }
+        String v()                                                              // Verilog
+         {final StringBuilder   s = new StringBuilder("/* moveDown */");
+          final String      start = Index.verilogLoad();                        // Load above this index
+          final MemoryLayoutPA tm = ml();                                       // Target memory
+          final MemoryLayoutPA sm = buffer.ml();                                // Source memory
+          for   (int i = 0; i < A.size-1; i++)                                  // Each element
+           {s.append("if ("+i+" > "+start +") begin\n");                        // Start moving when we are above the index
+            s.append
+             (tm.at(a, i-0).verilogLoad()+ " <= " +
+              sm.at(b, i+1).verilogLoad()+ ";" +
+              traceComment());
+            s.append("end\n");
+           }
+          return s.toString();
          }
         String n() {return field.name+" moveDown @ "+Index.field.name+" using "+buffer.field.name;}
        };
@@ -681,7 +735,7 @@ class MemoryLayoutPA extends Test                                               
      }
     s.append("    end\n");
     s.append("endtask\n");
-    writeFile(folder+"includes/"+name+".sv", s);
+    writeFile(folder+"includes/"+name+Verilog.ext, s);
    }
 
   String declareVerilog()                                                       // Declare matching memory  but do not initialize it
@@ -1262,10 +1316,14 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
 
     MemoryLayoutPA.At at = m.at(a, m.at(I));
-    //stop(at.verilogLoad());
-    ok(at.verilogLoad(), "M[0+M[24 +: 4]*6 +: 2] /* a(I) */");
-    //stop(at.verilogAddr());
-    ok(at.verilogAddr(),   "0+M[24 +: 4]*6 /* a(I) */");
+    ok(at.verilogLoad(), "M[0/*a*/ + M[24/*I*/ +: 4] * 6 +: 2]");
+    ok(at.verilogAddr(),   "0/*a*/ + M[24/*I*/ +: 4] * 6");
+    ok(m.at(a, 0).verilogLoad(), "M[0/*a*/ + 0 * 6 +: 2]");
+    ok(m.at(a, 1).verilogLoad(), "M[0/*a*/ + 1 * 6 +: 2]");
+    ok(m.at(a, 2).verilogLoad(), "M[0/*a*/ + 2 * 6 +: 2]");
+    ok(m.at(b, 0).verilogLoad(), "M[2/*b*/ + 0 * 6 +: 2]");
+    ok(m.at(b, 1).verilogLoad(), "M[2/*b*/ + 1 * 6 +: 2]");
+    ok(m.at(b, 2).verilogLoad(), "M[2/*b*/ + 2 * 6 +: 2]");
    }
 
   static void test_dump_verilog()
@@ -1294,7 +1352,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_verilog_address();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
