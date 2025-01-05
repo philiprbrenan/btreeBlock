@@ -735,7 +735,7 @@ class MemoryLayoutPA extends Test                                               
      }
     s.append("    end\n");
     s.append("endtask\n");
-    writeFile(folder+"includes/"+name+Verilog.ext, s);
+    writeFile(folder+"includes/"+name+Verilog.header, s);
    }
 
   String declareVerilog()                                                       // Declare matching memory  but do not initialize it
