@@ -898,7 +898,11 @@ abstract class BtreePA extends Test                                             
      {void a()
        {T.at(flKey).setInt((T.at(firstKey).getInt()+T.at(lastKey).getInt())/2);
        }
-      String v() {return "/* splitleafRoot */" + traceComment();}
+      String v()
+       {return T.at(flKey)   .verilogLoad() + "<= " +
+           "("+T.at(firstKey).verilogLoad() + " + " +
+               T.at(lastKey) .verilogLoad() + ") / 2;";
+       }
      };
     bT.T.at(bT.tKey).move(T.at(flKey));
     bT.T.at(bT.tData).move(T.at(l));
@@ -1005,7 +1009,11 @@ abstract class BtreePA extends Test                                             
        {bT.T.at(bT.tKey).setInt((lR.T.at(lR.tKey).getInt() +
                                  lL.T.at(lL.tKey).getInt()) / 2);
        }
-      String v() {return "/* splitLeaf */" + traceComment();}
+      String v()
+       {return bT.T.at(bT.tKey).verilogLoad() + " <= "+
+           "("+lR.T.at(lR.tKey).verilogLoad() + " + " +
+               lL.T.at(lL.tKey).verilogLoad() + ") / 2;";
+       }
      };
     bT.T.at(bT.tData).move(T.at(l));
     bT.T.at(bT.index).move(T.at(index));
@@ -2173,7 +2181,7 @@ abstract class BtreePA extends Test                                             
   class GenVerilog                                                              // Generate verilog
    {final String    project;                                                    // Project name - used to generate file names
     final String     folder;                                                    // Folder in which to place verilog files
-    final String   traceDir = "trace/";                                         // Folder in which to place execution trace files for comparison withthe equivalent fiels produced by emulating the program on java
+    final String   traceDir;                                                    // Folder in which to place execution trace files for comparison withthe equivalent fiels produced by emulating the program on java
     final ProgramPA program;                                                    // Programs containing the instructions to be converted to verilog
     int Key     () {return    2;}                                               // Input key value
     int Data    () {return    2;}                                               // Input data value
@@ -2182,7 +2190,8 @@ abstract class BtreePA extends Test                                             
     int expSteps() {return  117;}                                               // Expected number of steps
 
     GenVerilog(String Project, String Folder, ProgramPA Program)                // Generate verilog
-     {project = Project; folder = Folder; program = Program;
+     {project  = Project; folder = Folder; program = Program;
+      traceDir = "trace/"+project+"/";                                          // Folder in which to place execution trace files for comparison withthe equivalent files produced by emulating the program on java
       final StringBuilder s = new StringBuilder();
       s.append("""
 //-----------------------------------------------------------------------------
@@ -2221,7 +2230,7 @@ $stuckBases
       initialize_memory_M();                                                    // Initialize btree memory
       initialize_memory_T();                                                    // Initilize btree transaction
       //("reset");
-      traceFile = $fopen({"$traceDir", "trace.txt"}, "w");                      // Open trace file
+      traceFile = $fopen("$traceDirtrace.txt", "w");                            // Open trace file
       if (!traceFile) $fatal(1, "cannot open trace file");
       $stuckInitialization
     end
@@ -2283,7 +2292,7 @@ module $project_tb;                                                             
         clock = 0; #1; clock = 1; #1;
       end
       if (stop) begin                                                           // Stopped
-        $display("Stopped after: %4d steps key %4d  data %4d", step, $Key, $data);
+        $display("Stopped after: %4d steps key %4d  data %4d", step, Key, data);
         passes = 0; fails = 0;
         if (data == $data)     passes = passes + 1; else begin fails = fails + 1; $display("Expected $data for data but got %d",    data); end
         if (step == $expSteps) passes = passes + 1; else begin fails = fails + 1; $display("Expected $expSteps for expected steps but got %d", step); end
@@ -3202,6 +3211,7 @@ endmodule
     t.find();
     GenVerilog v = t.new GenVerilog("find", "verilog/", t.P);                   // Generate verilog now that memories have beeninitialzied and the program written
     t.P.trace = true;
+say("AAAA--------------------------------");
     t.P.run();
     //say("AAAA11", t);
     //say("AAAA22", t.P);
@@ -3321,14 +3331,15 @@ endmodule
     test_delete_descending();
     //test_to_array();
     test_delete_small_random();
-    test_verilog_find();
     test_verilog_delete();
+    test_verilog_find();
     test_verilog_put();
    }
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
     //test_verilog_delete();
+    //test_verilog_find();
     test_verilog_put();
    }
 
