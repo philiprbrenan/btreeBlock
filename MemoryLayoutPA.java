@@ -722,6 +722,10 @@ class MemoryLayoutPA extends Test                                               
 
 //D1 Verilog                                                                    // Transfer memory to and from Verilog
 
+  String dumpVerilogFile(String folder)                                         // Initialize memory in verilog with the contents of this memory
+   {return folder+"includes/"+name+Verilog.header;
+   }
+
   void dumpVerilog(String folder)                                               // Initialize memory in verilog with the contents of this memory
    {final StringBuilder s = new StringBuilder();
     final int N = memory.bits.length-1, B = logTwo(N)-1;
@@ -735,7 +739,7 @@ class MemoryLayoutPA extends Test                                               
      }
     s.append("    end\n");
     s.append("endtask\n");
-    writeFile(folder+"includes/"+name+Verilog.header, s);
+    writeFile(dumpVerilogFile(folder), s);
    }
 
   String declareVerilog()                                                       // Declare matching memory  but do not initialize it
