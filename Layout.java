@@ -23,7 +23,6 @@ public class Layout extends Test                                                
     top.indexNames();                                                           // Index the names of the fields
     for (Field f: fields) f.locator  = new Locator(f);                          // Create a locator for each field
     for (Field f: fields) f.compiled = true;                                    // Mark field as having being compiled
-    for (Field f: fields) if (debug) say("AAAA", f.name);
     return this;
    }
 
@@ -151,7 +150,7 @@ public class Layout extends Test                                                
     Union     toUnion    () {z(); return (Union)    this;}                      // Try to cast a field to a union
 
     String verilogOnes()                                                        // A verilog binary value of all ones the width of the field
-     {return width+"'b1{"+width+"}";
+     {return width+"'b"+"1".repeat(width);
      }
    }
 
@@ -707,7 +706,7 @@ V   10     4            C                    C
     Variable  a = l.variable ("a", 2);
     l.compile();
     //stop(a.verilogOnes());
-    ok(a.verilogOnes(), "2'b1{2}");
+    ok(a.verilogOnes(), "2'b11");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
