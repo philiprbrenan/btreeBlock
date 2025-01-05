@@ -2173,11 +2173,12 @@ abstract class BtreePA extends Test                                             
   class GenVerilog                                                              // Generate verilog
    {final String    project;                                                    // Project name - used to generate file names
     final String     folder;                                                    // Folder in which to place verilog files
+    final String   traceDir = "trace/";                                         // Folder in which to place execution trace files for comparison withthe equivalent fiels produced by emulating the program on java
     final ProgramPA program;                                                    // Programs containing the instructions to be converted to verilog
     int Key     () {return    2;}                                               // Input key value
     int Data    () {return    2;}                                               // Input data value
     int data    () {return    7;}                                               // Expected output data value
-    int maxSteps() {return 2000;}                                               // Maxumum number if execution steps
+    int maxSteps() {return 2000;}                                               // Maximum number if execution steps
     int expSteps() {return  117;}                                               // Expected number of steps
 
     GenVerilog(String Project, String Folder, ProgramPA Program)                // Generate verilog
@@ -2207,34 +2208,34 @@ module $project(reset, stop, clock, pfd, Key, Data, data, found);               
   assign found = T[18];                                                         // Found the key
   assign data  = T[23+:4];                                                      // Data associated with key found
 
-  `include "M$verilogExt"                                                       // Memory holding a pre built tree from test_dump()
-  `include "T$verilogExt"                                                       // Transaction memory which is initialized to some values to reduce the complexity of Memory at by treating constants as variables
+  `include "M$verilogHeader"                                                    // Memory holding a pre built tree from test_dump()
+  `include "T$verilogHeader"                                                    // Transaction memory which is initialized to some values to reduce the complexity of Memory at by treating constants as variables
 $stuckBases
 
   always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
 
-    if (reset) begin                                                              // Reset
+    if (reset) begin                                                            // Reset
       step      = 0;
       steps    <= 0;
       stopped  <= 0;
-      initialize_memory_M();                                                      // Initialize btree memory
-      initialize_memory_T();                                                      // Initilize btree transaction
+      initialize_memory_M();                                                    // Initialize btree memory
+      initialize_memory_T();                                                    // Initilize btree transaction
       //("reset");
-      traceFile = $fopen("trace/trace.txt", "w");                                 // Open trace file
+      traceFile = $fopen({"$traceDir", "trace.txt"}, "w");                      // Open trace file
       if (!traceFile) $fatal(1, "cannot open trace file");
       $stuckInitialization
     end
-    else begin;                                                                   // Run
-      $display            ("%4d  %4d", steps, step);                              // Trace execution
-      $fdisplay(traceFile, "%4d  %4d", steps, step);                              // Trace execution in a file
-      case(step)                                                                  // Case statements to select the code for the current instruction
+    else begin;                                                                 // Run
+      $display            ("%4d  %4d", steps, step);                            // Trace execution
+      $fdisplay(traceFile, "%4d  %4d", steps, step);                            // Trace execution in a file
+      case(step)                                                                // Case statements to select the code for the current instruction
 """);
 
       int n = 0;
       for(int i = 0; i < program.code.size(); ++i)
        {final ProgramPA.I I = program.code.elementAt(i);
         final String c = I.v();
-        if (c.length() == 0) {++n; say(I.traceBack);}                             // Count empty verilog strings
+        if (c.length() == 0) {++n; say(I.traceBack);}                           // Count empty verilog strings
         s.append(String.format("          %5d : begin %s end\n", i, c));
        }
       s.append("        default : begin stopped <= 1; /* end of execution */ end\n"); // Any invalid instruction address causes the program to halt
@@ -2298,6 +2299,7 @@ endmodule
       writeFile(folder+project+".tb",       editVariables(t));
       M.dumpVerilog(folder);
       T.dumpVerilog(folder);
+      makePath(folder+traceDir);
      }
 
     private StringBuilder editVariables(StringBuilder S)                        // Edit the variables in a string builder
@@ -2308,6 +2310,8 @@ endmodule
              s = s.replace("$stuckBases",          stuckMemories());
              s = s.replace("$stuckInitialization", stuckMemoryInitialization());
              s = s.replace("$verilogExt",          Verilog.ext);
+             s = s.replace("$verilogHeader",       Verilog.header);
+             s = s.replace("$traceDir",            traceDir);
              s = s.replace("$project",             project);
              s = s.replace("$Key",                 ""+Key());
              s = s.replace("$Data",                ""+Data());
@@ -3236,7 +3240,7 @@ endmodule
     GenVerilog v = t.new GenVerilog("delete", "verilog/", t.P)                  // Generate verilog now that memories have beeninitialzied and the program written
      {int Key     () {return    3;}                                             // Input key value
       int data    () {return    6;}                                             // Expected output data value
-      int maxSteps() {return 2000;}                                             // Maxumum number if execution steps
+      int maxSteps() {return 2000;}                                             // Maximum number if execution steps
       int expSteps() {return 1086;}                                             // Expected number of steps
      };
     t.P.trace = true;
@@ -3256,6 +3260,56 @@ endmodule
 """);
    }
 
+  static void test_verilog_put()                                                // Delete using generated verilog code
+   {final BtreePA t = btreePA_small();
+    t.P.run(); t.P.clear();
+    t.put();
+    final int N = 9;
+    for (int i = 1; i < N; ++i)
+     {say(currentTestName(),  "a", i);
+      t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(N-i);
+      t.P.run();
+     }
+    //stop(t.M);
+    //stop(t);
+    ok(t, """
+             4             |
+             0             |
+             5             |
+             6             |
+      2             6      |
+      5             6      |
+      1             4      |
+      3             2      |
+1,2=1  3,4=3  5,6=4  7,8=2 |
+""");
+    t.P.clear();
+    t.T.at(t.Key ).setInt(N);                                                   // Sets memory directly not via an instruction
+    t.T.at(t.Data).setInt(N);                                                   // Sets memory directly not via an instruction
+    t.put();
+    GenVerilog v = t.new GenVerilog("put", "verilog/", t.P)                     // Generate verilog now that memories have beeninitialzied and the program written
+     {int Key     () {return    3;}                                             // Input key value
+      int data    () {return    0;}                                             // Expected output data value
+      int maxSteps() {return 2000;}                                             // Maximum number if execution steps
+      int expSteps() {return 1148;}                                             // Expected number of steps
+     };
+    t.P.trace = true;
+    t.P.run();
+    //stop(t);
+    ok(t, """
+             4                    |
+             0                    |
+             5                    |
+             6                    |
+      2             6    7        |
+      5             6    6.1      |
+      1             4    7        |
+      3                  2        |
+1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_put_ascending();
     test_put_ascending_wide();
@@ -3269,10 +3323,13 @@ endmodule
     test_delete_small_random();
     test_verilog_find();
     test_verilog_delete();
+    test_verilog_put();
    }
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
+    //test_verilog_delete();
+    test_verilog_put();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
