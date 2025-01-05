@@ -1,0 +1,2 @@
+ulimit -v 4000000            # Set memory limit to 4GB
+taskset -c 0 ./your_program  # Cpu 0
