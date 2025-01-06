@@ -300,7 +300,7 @@ abstract class BtreePA extends Test                                             
 
     tt(node_clear, allocate);
     clear();                                                                    // Construct and clear the node
-//    maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                                // Number of nodes in use
+//    maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                              // Number of nodes in use
    }
 
   private void allocate() {z(); allocate(true);}                                // Allocate a node checking for free space
@@ -2225,6 +2225,9 @@ module $project(reset, stop, clock, pfd, Key, Data, data, found);               
   output[$bitsPerData:0]data;                                                   // Output data
   output                found;                                                  // Whether the key was found on put, find delete
 
+  `include "M.vh"                                                               // Memory holding a pre built tree from test_dump()
+  `include "T.vh"                                                               // Transaction memory which is initialized to some values to reduce the complexity of Memory at by treating constants as variables
+
   integer  step;                                                                // Program counter
   integer steps;                                                                // Number of steps executed
   integer traceFile;                                                            // File to write trace to
@@ -2233,8 +2236,6 @@ module $project(reset, stop, clock, pfd, Key, Data, data, found);               
   assign found = T[18];                                                         // Found the key
   assign data  = T[23+:4];                                                      // Data associated with key found
 
-  `include "M.vh"                                                               // Memory holding a pre built tree from test_dump()
-  `include "T.vh"                                                               // Transaction memory which is initialized to some values to reduce the complexity of Memory at by treating constants as variables
 $stuckBases
 
   always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
@@ -2244,13 +2245,13 @@ $stuckBases
       steps    <= 0;
       stopped  <= 0;
       initialize_memory_M();                                                    // Initialize btree memory
-      initialize_memory_T();                                                    // Initilize btree transaction
+      initialize_memory_T();                                                    // Initialize btree transaction
       //("reset");
       traceFile = $fopen("trace.txt", "w");                                     // Open trace file
       if (!traceFile) $fatal(1, "cannot open trace file trace.txt");
       $stuckInitialization
     end
-    else begin;                                                                 // Run
+    else begin                                                                  // Run
       $display            ("%4d  %4d", steps, step);                            // Trace execution
       $fdisplay(traceFile, "%4d  %4d", steps, step);                            // Trace execution in a file
       case(step)                                                                // Case statements to select the code for the current instruction
@@ -2304,7 +2305,7 @@ module $project_tb;                                                             
     integer step;
     begin
       Key = $Key;
-      for(step = 0; step < $maxSteps && !stop ; step = step + 1) begin;
+      for(step = 0; step < $maxSteps && !stop ; step = step + 1) begin
         clock = 0; #1; clock = 1; #1;
       end
       if (stop) begin                                                           // Stopped
