@@ -83,13 +83,56 @@ class MemoryLayoutPA extends Test                                               
        {final At a = new At(field, indices).setOff();
         memory.set(a.at, a.width, value);
        }
-      String v() {return new At(field, indices).verilogLoad() + " <= " + value + ";" + traceComment();}
+      String v()
+       {return new At(field, indices).verilogLoad() +
+         " <= " + value + ";" + traceComment();
+       }
      };
    }
 
   void zero()                                                                   // Clear the memory associated with the layout to zeros
    {z();
     memory.set(base, layout.size(), 0);
+   }
+
+  void moveParallel(At...Fields)                                                // Move pairs of fields in parallel
+   {z();
+    final int N = Fields.length;
+    if (N % 2 == 1) stop("Move in parallel requires an even number of fields");
+    for(int i = 0; i < N; i += 2) Fields[i].sameSize(Fields[i+1]);
+    P.new I()
+     {void a()
+       {for(int i = 0; i < N; i += 2)
+         {final At target = Fields[i+0].setOff();
+          final At source = Fields[i+1].setOff();
+          for(int j = 0; j < target.width; ++j)
+           {z();
+            final boolean b = source.getBit(j);
+            target.setBit(j, b);
+           }
+         }
+       }
+      String v()
+       {final StringBuilder s = new StringBuilder();
+        for(int i = 0; i < N; i += 2)
+         {final At target = Fields[i+0];
+          final At source = Fields[i+1];
+          for(int j = 0; j < target.width; ++j)
+           {s.append(target.verilogLoad()+" <= "+source.verilogLoad() + ";" + traceComment());
+           }
+         }
+        return s.toString();
+       }
+      String n()
+       {final StringBuilder s = new StringBuilder();
+        for(int i = 0; i < N; i += 2)
+         {final At target = Fields[i+0];
+          final At source = Fields[i+1];
+          s.append(target.field.name+" = "+source.field.name);
+         }
+        return s.toString();
+       }
+     };
    }
 
 //D1 Components                                                                 // Locate a variable in memory via its indices
@@ -117,37 +160,8 @@ class MemoryLayoutPA extends Test                                               
                                directs[i].verilogLoad();                        // Indirect index loaded from memory
         v.push(" + " + o + " * " + w);                                          // Access indexing field
        }
-      return (la ? base+field.at+"/*"+field.name+"*/"+joinStrings(v, "") :                           // IBM S/360 Principles of Operation: LA
+      return (la ? base+field.at+"/*"+field.name+"*/"+joinStrings(v, "") :                            // IBM S/360 Principles of Operation: LA
         name()+"["+base+field.at+"/*"+field.name+"*/"+joinStrings(v, "")+" +: "+field.width+"]");     // IBM S/360 Principles of Operation: L
-     }
-
-    String verilogLoadAddr222(boolean la)                                          // A verilog representation of an addressed location in memory
-     {final String base = based != null ? baseName()+"+" : "";                  // Base field name if a based memory layot
-      if (directs == null || directs.length == 0)                               // An unindexed field
-       {return (la ? base+field.at :                                            // IBM S/360 Principles of Operation: LA
-          name()+"["+base+field.at +" +: "+field.width+"]")                     // IBM S/360 Principles of Operation: L
-          +" /* "+field.name+" */";
-       }
-      final int N = directs.length;
-
-      final Stack<String>      v = new Stack<>(), n = new Stack<>();            // Verilog expression, index variable names
-      Layout.Locator           L = field.locator;
-      final Stack<Layout.Array>A = L.arrays;                                    // The containing arrays
-
-      for (int i = 0; i < N; i++)                                               // Convolute locator
-       {final int w = A.elementAt(i).element.width;                             // Width of ontaining array element
-        final At  a = directs[i];
-        final int b = a.field.at + a.field.width;                               // The indexing field is assumed to have zero indices
-        v.push(a.ml().name+"["+a.field.at+" +: "+a.field.width+"]*"+w);         // Access indexing field
-        n.push(a.field.name);
-
-       }
-      final String name = field.name+(n.size() > 0 ?                            // Name of field plus any indexing fields
-              "("+joinStrings(n, ",")+")" : "");
-
-      return (la ? base+field.at+"+"+joinStrings(v, "+") :                      // IBM S/360 Principles of Operation: LA
-        name()+"["+base+field.at+"+"+joinStrings(v, "+")+" +: "+field.width+"]")// IBM S/360 Principles of Operation: L
-        +" /* "+name+" */";
      }
 
     String verilogLoad() {return verilogLoadAddr(false);}                       // Content of a memory location as a verilog expression
@@ -275,6 +289,35 @@ class MemoryLayoutPA extends Test                                               
          }
         String v()
          {return target.verilogLoad()+" <= "+source.verilogLoad() + ";" + traceComment();
+         }
+        String n() {return field.name+"="+source.field.name;}
+       };
+     }
+
+    void moveTo(At...Targets)                                                   // Move the data to the named fields
+     {z();
+      final int N = Targets.length;
+      final At source = this;
+      for(int i = 0; i < N; ++i) source.sameSize(Targets[i]);
+      P.new I()
+       {void a()
+         {source.setOff();
+          for(int i = 0; i < N; ++i)
+           {final At target = Targets[i];
+            target.setOff();
+            for(int j = 0; j < width; ++j)
+             {z();
+              final boolean b = source.getBit(j);
+              target.setBit(j, b);
+             }
+           }
+         }
+        String v()
+         {final StringBuilder s = new StringBuilder();
+          for(int i = 0; i < N; ++i)
+           {return Targets[i].verilogLoad()+" <= "+source.verilogLoad() + ";" + traceComment();
+           }
+          return s.toString();
          }
         String n() {return field.name+"="+source.field.name;}
        };
@@ -946,6 +989,66 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
+  static void test_move_to()
+   {Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Variable  c = l.variable ("c", 4);
+    Layout.Variable  d = l.variable ("d", 4);
+    Layout.Variable  e = l.variable ("e", 4);
+    Layout.Structure s = l.structure("s", a, b, c, d, e);
+
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "test");
+    m.setIntInstruction(a, 13);
+    m.at(a).moveTo(m.at(b), m.at(d));
+    m.P.run();
+
+    //stop(m);
+    m.ok("""
+MemoryLayout: test
+Memory      : test
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        20                                      s
+   2 V        0         4                                 13     a
+   3 V        4         4                                 13     b
+   4 V        8         4                                  0     c
+   5 V       12         4                                 13     d
+   6 V       16         4                                  0     e
+""");
+   }
+
+  static void test_move_parallel()
+   {Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable("a", 4);
+    Layout.Variable  b = l.variable("b", 4);
+    Layout.Variable  c = l.variable("c", 4);
+    Layout.Variable  d = l.variable("d", 4);
+    Layout.Variable  e = l.variable("e", 4);
+    Layout.Variable  f = l.variable("f", 4);
+    Layout.Structure s = l.structure("s", a, b, c, d, e, f);
+
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "test");
+    m.setIntInstruction(a, 14);
+    m.setIntInstruction(c, 13);
+    m.setIntInstruction(e, 12);
+    m.moveParallel(m.at(b), m.at(a), m.at(d), m.at(c), m.at(f), m.at(e));
+    m.P.run();
+
+    //stop(m);
+    m.ok("""
+MemoryLayout: test
+Memory      : test
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        24                                      s
+   2 V        0         4                                 14     a
+   3 V        4         4                                 14     b
+   4 V        8         4                                 13     c
+   5 V       12         4                                 13     d
+   6 V       16         4                                 12     e
+   7 V       20         4                                 12     f
+""");
+   }
+
   static void test_set_inc_dec_get()
    {Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
@@ -1341,6 +1444,8 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_copy();
     test_base();
     test_move();
+    test_move_to();
+    test_move_parallel();
     test_set_inc_dec_get();
     test_addressing();
     test_zero();
@@ -1353,6 +1458,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    test_move_parallel();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
