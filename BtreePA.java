@@ -707,9 +707,11 @@ abstract class BtreePA extends Test                                             
     lEqual.T.at(lEqual.search).move(T.at(search));
     lEqual.T.setIntInstruction(lEqual.limit, 0);
     lEqual.search();
-    T.at(found).move(lEqual.T.at(lEqual.found));
-    T.at(index).move(lEqual.T.at(lEqual.index));
-    T.at(data ).move(lEqual.T.at(lEqual.tData));
+    M.moveParallel
+     (T.at(found), lEqual.T.at(lEqual.found),                                   /// Parallel possible
+      T.at(index), lEqual.T.at(lEqual.index),
+      T.at(data ), lEqual.T.at(lEqual.tData)
+     );
    }
 
   public String findEqualInLeaf_toString()                                      // Print details of find equal in leaf node
@@ -732,7 +734,7 @@ abstract class BtreePA extends Test                                             
     lFirstLeaf.T.at(lFirstLeaf.search).move(T.at(search));
     lFirstLeaf.T.setIntInstruction(lFirstLeaf.limit, 0);
     lFirstLeaf.searchFirstGreaterThanOrEqual();
-    T.at(found).move(lFirstLeaf.T.at(lFirstLeaf.found));
+    T.at(found).move(lFirstLeaf.T.at(lFirstLeaf.found));                        /// Parallel possible
     T.at(first).move(lFirstLeaf.T.at(lFirstLeaf.index));
    }
 
@@ -745,7 +747,7 @@ abstract class BtreePA extends Test                                             
     bFirstBranch.T.setIntInstruction(bFirstBranch.limit, 1);
 
     bFirstBranch.searchFirstGreaterThanOrEqual();
-    T.at(found).move(bFirstBranch.T.at(bFirstBranch.found));
+    T.at(found).move(bFirstBranch.T.at(bFirstBranch.found));                    /// Parallel possible
     T.at(first).move(bFirstBranch.T.at(bFirstBranch.index));
     P.new If (T.at(found))                                                      // Next if key matches else top
      {void Then()
@@ -876,13 +878,13 @@ abstract class BtreePA extends Test                                             
 
     for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf from parent
      {z(); lT.shift();
-      lL.T.at(lL.tKey ).move(lT.T.at(lT.tKey ));
+      lL.T.at(lL.tKey ).move(lT.T.at(lT.tKey ));                                /// Parallel possible
       lL.T.at(lL.tData).move(lT.T.at(lT.tData));
       lL.push();
      }
     for (int i = 0; i < splitLeafSize; i++)                                     // Build right leaf from parent
      {z(); lT.shift();
-      lR.T.at(lR.tKey ).move(lT.T.at(lT.tKey));
+      lR.T.at(lR.tKey ).move(lT.T.at(lT.tKey));                                 /// Parallel possible
       lR.T.at(lR.tData).move(lT.T.at(lT.tData));
       lR.push();
      }
@@ -905,7 +907,7 @@ abstract class BtreePA extends Test                                             
                T.at(lastKey) .verilogLoad() + ") / 2;";
        }
      };
-    bT.T.at(bT.tKey).move(T.at(flKey));
+    bT.T.at(bT.tKey ).move(T.at(flKey));                                        /// Parallel possible
     bT.T.at(bT.tData).move(T.at(l));
     bT.push();                                                                  // Insert left leaf into root
     bT.T.at(bT.tKey).zero();
@@ -956,7 +958,7 @@ abstract class BtreePA extends Test                                             
     bR.push();                                                                  // Becomes top and so ignored by search ... except last
 
     bT.clear();                                                                 // Refer to new branches from root
-    bT.T.at(bT.tKey) .move(T.at(parentKey));
+    bT.T.at(bT.tKey) .move(T.at(parentKey));                                    /// Parallel possible
     bT.T.at(bT.tData).move(T.at(l));
     bT.push();
     bT.T.at(bT.tKey ).zero();
@@ -997,7 +999,7 @@ abstract class BtreePA extends Test                                             
 
     for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf
      {z(); lR.shift();
-      lL.T.at(lL.tKey ).move(lR.T.at(lR.tKey ));
+      lL.T.at(lL.tKey ).move(lR.T.at(lR.tKey ));                                /// Parallel possible
       lL.T.at(lL.tData).move(lR.T.at(lR.tData));
       lL.push();
      }
@@ -1016,7 +1018,7 @@ abstract class BtreePA extends Test                                             
                lL.T.at(lL.tKey).verilogLoad() + ") / 2;";
        }
      };
-    bT.T.at(bT.tData).move(T.at(l));
+    bT.T.at(bT.tData).move(T.at(l));                                            /// Parallel possible
     bT.T.at(bT.index).move(T.at(index));
     bT.insertElementAt();                                                       // Insert new key, next pair in parent
    }
@@ -1052,7 +1054,7 @@ abstract class BtreePA extends Test                                             
 
     for (int i = 0; i < splitBranchSize; i++)                                   // Build left branch from right
      {z(); bR.shift();
-      bL.T.at(bL.tKey ).move(bR.T.at(bR.tKey ));
+      bL.T.at(bL.tKey ).move(bR.T.at(bR.tKey ));                                /// Parallel possible
       bL.T.at(bL.tData).move(bR.T.at(bR.tData));
       bL.push();
      }
@@ -1060,7 +1062,7 @@ abstract class BtreePA extends Test                                             
     bL.T.at(bL.tKey ).zero();
     bL.T.at(bL.tData).move(bR.T.at(bR.tData));
     bL.push();                                                                  // Build right branch - becomes top and so is ignored by search ... except last
-    bT.T.at(bT.tKey ).move(bR.T.at(bR.tKey));
+    bT.T.at(bT.tKey ).move(bR.T.at(bR.tKey));                                   /// Parallel possible
     bT.T.at(bT.tData).move(T.at(l));
     bT.T.at(bT.index).move(T.at(index));
     bT.insertElementAt();
@@ -1120,7 +1122,7 @@ abstract class BtreePA extends Test                                             
 
             lL.lastElement();
 
-            lR.T.at(lR.tKey ).move(lL.T.at(lL.tKey ));
+            lR.T.at(lR.tKey ).move(lL.T.at(lL.tKey ));                          /// Parallel possible
             lR.T.at(lR.tData).move(lL.T.at(lL.tData));
             lR.unshift();                                                       // Increase right
 
@@ -1131,7 +1133,7 @@ abstract class BtreePA extends Test                                             
             lL.T.at(lL.index).dec();
             lL.elementAt();                                                     // Last key on left
 
-            bT.T.at(bT.tKey) .move(lL.T.at(lL.tKey));
+            bT.T.at(bT.tKey) .move(lL.T.at(lL.tKey));                           /// Parallel possible
             bT.T.at(bT.tData).move(T.at(l));
             bT.T.at(bT.index).move(T.at(index));
             bT.T.at(bT.index).dec();
@@ -1152,7 +1154,7 @@ abstract class BtreePA extends Test                                             
             bL.lastElement();                                                   // Increase right with left top
             bT.T.at(bT.index).move(T.at(index));
             bT.elementAt();                                                     // Top key
-            bR.T.at(bR.tKey) .move(bT.T.at(bT.tKey));
+            bR.T.at(bR.tKey) .move(bT.T.at(bT.tKey));                           /// Parallel possible
             bR.T.at(bR.tData).move(bL.T.at(bL.tData));
             bR.unshift();                                                       // Increase right with left top
             bL.pop();                                                           // Remove left top
@@ -1168,7 +1170,7 @@ abstract class BtreePA extends Test                                             
             bR.setElementAt();                                                  // Reduce key of parent of right
 
             bL.lastElement();                                                   // Last left key
-            bT.T.at(bT.tKey) .move(bL.T.at(bL.tKey));
+            bT.T.at(bT.tKey) .move(bL.T.at(bL.tKey));                           /// Parallel possible
             bT.T.at(bT.tData).move(T.at(l));
             bT.T.at(bT.index).move(T.at(index));
             bT.T.at(bT.index).dec();
@@ -1198,13 +1200,13 @@ abstract class BtreePA extends Test                                             
         bT.T.at(bT.index).move(T.at(index));
         bT.elementAt();
 
-        T.at(lk).move(bT.T.at(bT.tKey));
+        T.at(lk).move(bT.T.at(bT.tKey));                                        /// Parallel possible
         T.at(l) .move(bT.T.at(bT.tData));
         bT.T.at(bT.index).move(T.at(index));
         bT.T.at(bT.index).inc();
         bT.elementAt();
 
-        T.at(rk).move(bT.T.at(bT.tKey));
+        T.at(rk).move(bT.T.at(bT.tKey));                                        /// Parallel possible
         T.at(r) .move(bT.T.at(bT.tData));
 
         tt(node_hasLeavesForChildren, node_stealFromRight);
@@ -1228,11 +1230,11 @@ abstract class BtreePA extends Test                                             
 
             z();
             lR.firstElement();                                                  // First element of right child
-            lL.T.at(lL.tKey) .move(lR.T.at(lR.tKey));
+            lL.T.at(lL.tKey) .move(lR.T.at(lR.tKey));                           /// Parallel possible
             lL.T.at(lL.tData).move(lR.T.at(lR.tData));
             lL.push();                                                          // Increase left
 
-            bT.T.at(bT.tKey) .move(lR.T.at(lR.tKey));
+            bT.T.at(bT.tKey) .move(lR.T.at(lR.tKey));                           /// Parallel possible
             bT.T.at(bT.tData).move(T.at(l));
             bT.T.at(bT.index).move(T.at(index));
             bT.setElementAt();                                                  // Swap key of parent
@@ -1251,7 +1253,7 @@ abstract class BtreePA extends Test                                             
             stealNotPossible(end);
 
             bL.lastElement();                                                   // Last element of left child
-            bL.T.at(bL.tKey).move(T.at(lk));
+            bL.T.at(bL.tKey).move(T.at(lk));                                    /// Parallel possible
             bL.T.at(bL.index).move(T.at(nl));
             bL.setElementAt();                                                  // Left top becomes real
 
@@ -1261,7 +1263,7 @@ abstract class BtreePA extends Test                                             
             bL.T.at(bL.tData).move(bR.T.at(bR.tData));
             bL.push();                                                          // New top for left is ignored by search ,.. except last
 
-            bT.T.at(bT.tKey).move(bR.T.at(bR.tKey));
+            bT.T.at(bT.tKey).move(bR.T.at(bR.tKey));                            /// Parallel possible
             bT.T.at(bT.tData).move(T.at(l));
             bT.T.at(bT.index).move(T.at(index));
             bT.setElementAt();                                                  // Swap key of parent
@@ -1336,7 +1338,7 @@ abstract class BtreePA extends Test                                             
                       isEmpty();
                       P.GoOn(end, T.at(isEmpty));                               // Stop when left leaf  child is empty
                       lL.shift();
-                      lT.T.at(lT.tKey ).move(lL.T.at(lL.tKey));
+                      lT.T.at(lT.tKey ).move(lL.T.at(lL.tKey));                 /// Parallel possible
                       lT.T.at(lT.tData).move(lL.T.at(lL.tData));
                       lT.push();
                      }
@@ -1351,7 +1353,7 @@ abstract class BtreePA extends Test                                             
 
                       P.GoOn(end, T.at(isEmpty));                               // Stop when right leaf child is empty
                       lR.shift();
-                      lT.T.at(lT.tKey ).move(lR.T.at(lR.tKey));
+                      lT.T.at(lT.tKey ).move(lR.T.at(lR.tKey));                 /// Parallel possible
                       lT.T.at(lT.tData).move(lR.T.at(lR.tData));
                       lT.push();
                      }
@@ -1399,7 +1401,7 @@ abstract class BtreePA extends Test                                             
                       isEmpty();
                       P.GoOn(end, T.at(isEmpty));                               // Stop when left branch child is empty except for top
                       bL.shift();
-                      bT.T.at(bT.tKey) .move(bL.T.at(bL.tKey));
+                      bT.T.at(bT.tKey) .move(bL.T.at(bL.tKey));                 /// Parallel possible
                       bT.T.at(bT.tData).move(bL.T.at(bL.tData));
                       bT.push();
                      }
@@ -1407,7 +1409,7 @@ abstract class BtreePA extends Test                                             
                  };
 
                 bL.lastElement();
-                bT.T.at(bT.tKey ).move(T.at(parentKey));
+                bT.T.at(bT.tKey ).move(T.at(parentKey));                        /// Parallel possible
                 bT.T.at(bT.tData).move(bL.T.at(bL.tData));
                 bT.push();
 
@@ -1418,7 +1420,7 @@ abstract class BtreePA extends Test                                             
                       isEmpty();
                       P.GoOn(end, T.at(isEmpty));                               // Stop when right branch child is empty except for top
                       bR.shift();
-                      bT.T.at(bT.tKey ).move(bR.T.at(bR.tKey));
+                      bT.T.at(bT.tKey ).move(bR.T.at(bR.tKey));                 /// Parallel possible
                       bT.T.at(bT.tData).move(bR.T.at(bR.tData));
                       bT.push();
                      }
@@ -1562,7 +1564,7 @@ abstract class BtreePA extends Test                                             
                   tt(node_branchSize, l);                                       // Top is always present
                   branchSize();
                   bL.pop();
-                  bR.T.at(bR.tKey ).move(bL.T.at(bL.tKey));
+                  bR.T.at(bR.tKey ).move(bL.T.at(bL.tKey));                     /// Parallel possible
                   bR.T.at(bR.tData).move(bL.T.at(bL.tData));
                   bR.unshift();
                   P.GoOff(end, T.at(branchSize));                               // If zero then we just moved top
@@ -1649,7 +1651,7 @@ abstract class BtreePA extends Test                                             
                   leafSize();
                   P.GoOff(end, T.at(leafSize));
                   lR.shift();
-                  lL.T.at(lL.tKey ).move(lR.T.at(lR.tKey));
+                  lL.T.at(lL.tKey ).move(lR.T.at(lR.tKey));                     /// Parallel possible
                   lL.T.at(lL.tData).move(lR.T.at(lR.tData));
                   lL.push();
                  }
@@ -1700,7 +1702,7 @@ abstract class BtreePA extends Test                                             
                   tt(node_branchSize, r);                                       // Top is always present
                   branchSize();
                   bR.shift();
-                  bL.T.at(bL.tKey) .move(bR.T.at(bR.tKey));
+                  bL.T.at(bL.tKey) .move(bR.T.at(bR.tKey));                     /// Parallel possible
                   bL.T.at(bL.tData).move(bR.T.at(bR.tData));
                   bL.push();
                   P.GoOff(end, T.at(branchSize));                               // If zero then we just moved top
@@ -1716,7 +1718,7 @@ abstract class BtreePA extends Test                                             
         bT.T.at(bT.index).move(T.at(index));
         bT.T.at(bT.index).inc();
         bT.elementAt();
-
+                                                                                /// Parallel possible
         T.at(parentKey).move(bT.T.at(bT.tKey));                                 // One up from dividing point in parent
         bT.T.at(bT.index).move(T.at(index));
         bT.elementAt();                                                         // Dividing point in parent
@@ -1901,7 +1903,7 @@ abstract class BtreePA extends Test                                             
 
         P.new If (T.at(found))                                                  // Found the key in the leaf so update it with the new data
          {void Then()
-           {lT.T.at(lT.tKey ).move(T.at(Key));
+           {lT.T.at(lT.tKey ).move(T.at(Key));                                  /// Parallel possible
             lT.T.at(lT.tData).move(T.at(Data));
             lT.T.at(lT.index).move(T.at(index));
             lT.setElementAt();
@@ -1923,14 +1925,14 @@ abstract class BtreePA extends Test                                             
             P.new If(T.at(found))                                               // Overwrite existing key
              {void Then()
                {z();
-                lT.T.at(lT.tKey ).move(T.at(Key));
+                lT.T.at(lT.tKey ).move(T.at(Key));                              /// Parallel possible
                 lT.T.at(lT.tData).move(T.at(Data));
                 lT.T.at(lT.index).move(T.at(first));
                 lT.insertElementAt();
                }
               void Else()                                                       // Insert into position
                {z();
-                lT.T.at(lT.tKey ).move(T.at(Key));
+                lT.T.at(lT.tKey ).move(T.at(Key));                              /// Parallel possible
                 lT.T.at(lT.tData).move(T.at(Data));
                 lT.push();
                }
