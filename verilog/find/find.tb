@@ -27,7 +27,7 @@ module find_tb;                                                             // T
     integer step;
     begin
       Key = 2;
-      for(step = 0; step < 2000 && !stop ; step = step + 1) begin;
+      for(step = 0; step < 2000 && !stop ; step = step + 1) begin
         clock = 0; #1; clock = 1; #1;
       end
       if (stop) begin                                                           // Stopped
