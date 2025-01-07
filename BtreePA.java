@@ -710,8 +710,7 @@ abstract class BtreePA extends Test                                             
     M.moveParallel
      (T.at(found), lEqual.T.at(lEqual.found),                                   /// Parallel possible
       T.at(index), lEqual.T.at(lEqual.index),
-      T.at(data ), lEqual.T.at(lEqual.tData)
-     );
+      T.at(data ), lEqual.T.at(lEqual.tData));
    }
 
   public String findEqualInLeaf_toString()                                      // Print details of find equal in leaf node
@@ -734,8 +733,9 @@ abstract class BtreePA extends Test                                             
     lFirstLeaf.T.at(lFirstLeaf.search).move(T.at(search));
     lFirstLeaf.T.setIntInstruction(lFirstLeaf.limit, 0);
     lFirstLeaf.searchFirstGreaterThanOrEqual();
-    T.at(found).move(lFirstLeaf.T.at(lFirstLeaf.found));                        /// Parallel possible
-    T.at(first).move(lFirstLeaf.T.at(lFirstLeaf.index));
+    M.moveParallel
+     (T.at(found), lFirstLeaf.T.at(lFirstLeaf.found),                           /// Parallel possible
+      T.at(first), lFirstLeaf.T.at(lFirstLeaf.index));
    }
 
   private void findFirstGreaterThanOrEqualInBranch()                            // Find the first key in the branch that is equal to or greater than the search key
@@ -747,8 +747,10 @@ abstract class BtreePA extends Test                                             
     bFirstBranch.T.setIntInstruction(bFirstBranch.limit, 1);
 
     bFirstBranch.searchFirstGreaterThanOrEqual();
-    T.at(found).move(bFirstBranch.T.at(bFirstBranch.found));                    /// Parallel possible
-    T.at(first).move(bFirstBranch.T.at(bFirstBranch.index));
+    M.moveParallel
+     (T.at(found), bFirstBranch.T.at(bFirstBranch.found),                       /// Parallel possible
+      T.at(first), bFirstBranch.T.at(bFirstBranch.index));
+
     P.new If (T.at(found))                                                      // Next if key matches else top
      {void Then()
        {T.at(next).move(bFirstBranch.T.at(bFirstBranch.tData));
