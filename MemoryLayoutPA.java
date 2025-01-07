@@ -621,7 +621,7 @@ class MemoryLayoutPA extends Test                                               
 
 //D2 Binary                                                                     // Arithmetic on binary integers
 
-    void inc()                                                                  // Increment a variable treated as an signed binary integer with wrap around on overflow.  Return the result after  the increment.
+    void inc()                                                                  // Increment a variable treated as an unsigned binary integer with wrap around on overflow.  Return the result after  the increment.
      {z();
       final At a = this;
       P.new I()
@@ -638,7 +638,7 @@ class MemoryLayoutPA extends Test                                               
          }
        };
      }
-    void dec()                                                                  // Decrement a variable treated as an signed binary integer with wrap around on overflow.  Return the result after  the increment.
+    void dec()                                                                  // Decrement a variable treated as an unsigned binary integer with wrap around on overflow.  Return the result after  the increment.
      {z();
       final At a = this;
       P.new I()
@@ -652,6 +652,23 @@ class MemoryLayoutPA extends Test                                               
          }
         String n()
          {return "--"+field.name;
+         }
+       };
+     }
+    void dec(int n)                                                             // Decrement a variable treated as an unsigned binary integer by a constant amount with wrap around on overflow.  Return the result after  the increment.
+     {z();
+      final At a = this;
+      P.new I()
+       {void a()
+         {setOff();
+          final int i = getInt()-n;
+          setInt(i);
+         }
+        String v()
+         {return a.verilogLoad()+" <= "+a.verilogLoad()+"- "+n+";" + traceComment();
+         }
+        String n()
+         {return field.name + "-= " + n;
          }
        };
      }
@@ -1091,6 +1108,21 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     ok(m.at(a).getInt(), 1);
     ok(m.at(b).getInt(), 3);
+
+    m.P.clear();
+    m.at(a).dec(3);
+    m.at(b).dec(4);
+    m.P.run();
+    //stop(m);
+
+    m.ok("""
+MemoryLayout: test
+Memory      : test
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0         8                                      s
+   2 V        0         4                                 14     a
+   3 V        4         4                                 15     b
+""");
    }
 
   static void test_addressing()
