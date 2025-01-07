@@ -370,13 +370,13 @@ abstract class StuckPA extends Test                                             
        }
      };
 
-    T.setIntInstruction(found, 0);                                              // Assume we will not find a match
+    T.setIntInstruction(found, 0, index, 0);                                    // Assume we will not find a match
 
     P.new Block()
      {void code()
        {for (int I = 0; I < maxSize(); I++)                                     // Search
          {final int i = I;
-          T.setIntInstruction(index, i);
+          //T.setIntInstruction(index, i);
           T.at(index).equal(T.at(size), T.at(equal));
           P.GoOn(end, T.at(equal));                                             // Reached the upper limit of the stuck
           moveKey();
@@ -388,7 +388,7 @@ abstract class StuckPA extends Test                                             
               if (i != maxSize()-1) P.Goto(end);                                // Goto superfluous on last iteration
              }
            };
-          if (i != maxSize()-1) T.setIntInstruction(index, i);                  // Not needed on last iteration
+          if (i != maxSize()-1) T.setIntInstruction(index, i+1);                // Not needed on last iteration
          }
        }
      };
@@ -404,14 +404,14 @@ abstract class StuckPA extends Test                                             
        }
      };
 
-    T.setIntInstruction(found, 0);                                              // Assume we will not find a match
-    T.at(index).move(T.at(size));                                               // Index top if no match found
+    //T.at(index).move(T.at(size));                                               // Index top if no match found
+    T.setIntInstruction(found, 0, index, 0);                                    // Assume we will not find a match
 
     P.new Block()
      {void code()
        {for (int I = 0; I < maxSize(); I++)                                     // Search
          {final int i = I;
-          T.setIntInstruction(index, i);
+          //T.setIntInstruction(index, i);
           T.at(index).equal(T.at(size), T.at(equal));
           P.GoOn(end, T.at(equal));                                             // Reached the upper limit of the stuck
           moveKey();
@@ -424,7 +424,7 @@ abstract class StuckPA extends Test                                             
               if (i != maxSize()-1) P.Goto(end);                                // Goto superfluous on last iteration
              }
            };
-          if (i != maxSize()-1) T.setIntInstruction(index, i);                  // Not needed on last iteration
+          if (i != maxSize()-1) T.setIntInstruction(index, i+1);                  // Not needed on last iteration
          }
        }
      };
