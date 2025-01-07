@@ -308,6 +308,12 @@ abstract class BtreePA extends Test                                             
 
 //D1 Components                                                                 // A branch or leaf in the tree
 
+  Layout.Variable               Key;                                            // Key being found, inserted or deleted
+  Layout.Variable              Data;                                            // Data associated with the key being inserted
+  Layout.Bit                  found;                                            // Whether the key was found
+  Layout.Variable               key;                                            // Key to insert
+  Layout.Variable              data;                                            // Data associated with the key found
+
   Layout.Variable          allocate;                                            // The latest allocation result
   Layout.Variable          nextFree;                                            // Next element of the free chain
 
@@ -318,9 +324,6 @@ abstract class BtreePA extends Test                                             
   Layout.Variable              next;                                            // The corresponding next field or top if no such key was found
                                                                                 // Find equal in leaf
   Layout.Variable            search;                                            // Search key
-  Layout.Bit                  found;                                            // Whether the key was found
-  Layout.Variable               key;                                            // Key to insert
-  Layout.Variable              data;                                            // Data associated with the key found
 
   Layout.Variable          firstKey;                                            // First of right leaf
   Layout.Variable           lastKey;                                            // Last of left leaf
@@ -342,6 +345,9 @@ abstract class BtreePA extends Test                                             
   Layout.Variable       splitParent;                                            // The parent during a splitting operation
   Layout.Bit                 IsLeaf;                                            // On a leaf
   Layout.Bit                 isFull;                                            // The node is full
+  Layout.Bit             leafIsFull;                                            // The leaf node is full
+  Layout.Bit           branchIsFull;                                            // The branch node is full
+  Layout.Bit           parentIsFull;                                            // The parent branch node is full
   Layout.Bit                isEmpty;                                            // The node is empty
   Layout.Bit                  isLow;                                            // The node has too few children for a delete
   Layout.Bit   hasLeavesForChildren;                                            // The node has leaves for children
@@ -357,8 +363,6 @@ abstract class BtreePA extends Test                                             
   Layout.Variable        branchSize;                                            // Number of children in body of branch taking top for granted as it is always there
   Layout.Variable               top;                                            // The top next element of a branch - only used in printing
                                                                                 // Find, insert, delete - the public entry points to this module
-  Layout.Variable               Key;                                            // Key being found, inserted or deleted
-  Layout.Variable              Data;                                            // Data associated with the key being inserted
   Layout.Variable              find;                                            // Results of a find operation
   Layout.Variable     findAndInsert;                                            // Results of a find and insert operation
   Layout.Variable            parent;                                            // Parent node in a descent through the tree
@@ -389,6 +393,9 @@ abstract class BtreePA extends Test                                             
   Layout.Variable  node_leafSize;
   Layout.Variable  node_branchSize;
   Layout.Variable  node_isFull;
+  Layout.Variable  node_leafIsFull;
+  Layout.Variable  node_branchIsFull;
+  Layout.Variable  node_parentIsFull;
   Layout.Variable  node_isEmpty;
   Layout.Variable  node_isLow;
   Layout.Variable  node_hasLeavesForChildren;
@@ -440,6 +447,9 @@ abstract class BtreePA extends Test                                             
                                  splitParent = L.variable ("splitParent"                                   , bitsPerNext);
                                       IsLeaf = L.bit      ("IsLeaf"                                        );
                                       isFull = L.bit      ("isFull"                                        );
+                                  leafIsFull = L.bit      ("leafIsFull"                                    );
+                                branchIsFull = L.bit      ("branchIsFull"                                  );
+                                parentIsFull = L.bit      ("parentIsFull"                                  );
                                      isEmpty = L.bit      ("isEmpty"                                       );
                                        isLow = L.bit      ("isLow"                                         );
                         hasLeavesForChildren = L.bit      ("hasLeavesForChildren"                          );
@@ -488,6 +498,9 @@ abstract class BtreePA extends Test                                             
                                node_leafSize = L.variable ("node_leafSize"                                 , bitsPerNext);
                              node_branchSize = L.variable ("node_branchSize"                               , bitsPerNext);
                                  node_isFull = L.variable ("node_isFull"                                   , bitsPerNext);
+                             node_leafIsFull = L.variable ("node_leafIsFull"                               , bitsPerNext);
+                           node_branchIsFull = L.variable ("node_branchIsFull"                             , bitsPerNext);
+                           node_parentIsFull = L.variable ("node_parentIsFull"                             , bitsPerNext);
                                 node_isEmpty = L.variable ("node_isEmpty"                                  , bitsPerNext);
                                   node_isLow = L.variable ("node_isLow"                                    , bitsPerNext);
                    node_hasLeavesForChildren = L.variable ("node_hasLeavesForChildren"                     , bitsPerNext);
@@ -506,18 +519,18 @@ abstract class BtreePA extends Test                                             
 
     final Layout.Structure transaction = L.structure("transaction", allocate,
       nextFree, success, inserted, first, next, search, found, key, data,
-      firstKey, lastKey, flKey, parentKey, lk, ld, rk, rd, index, nl, nr,
-      l, r, splitParent, IsLeaf, isFull, isEmpty, isLow, hasLeavesForChildren,
-      stolenOrMerged, pastMaxDepth, nodeMerged, mergeable, deleted, leafBase, branchBase, leafSize, branchSize,
-      top, Key, Data, find, findAndInsert, parent, child, leafFound,
-      maxKeysPerLeaf, maxKeysPerBranch, two, MaxDepth,
-      findDepth, putDepth, deleteDepth, mergeDepth, mergeIndex,
-      node_isLeaf, node_setLeaf, node_setBranch, node_assertLeaf,
-      node_assertBranch, allocLeaf, allocBranch, node_free,
-      node_clear, node_erase, node_leafBase, node_branchBase,
-      node_leafSize, node_branchSize, node_isFull, node_isEmpty, node_isLow,
-      node_hasLeavesForChildren, node_top, node_findEqualInLeaf,
-      node_findFirstGreaterThanOrEqualInLeaf,
+      firstKey, lastKey, flKey, parentKey, lk, ld, rk, rd, index, nl, nr, l, r,
+      splitParent, IsLeaf, isFull, leafIsFull, branchIsFull, parentIsFull, isEmpty, isLow,
+      hasLeavesForChildren, stolenOrMerged, pastMaxDepth, nodeMerged,
+      mergeable, deleted, leafBase, branchBase, leafSize, branchSize, top, Key,
+      Data, find, findAndInsert, parent, child, leafFound, maxKeysPerLeaf,
+      maxKeysPerBranch, two, MaxDepth, findDepth, putDepth, deleteDepth,
+      mergeDepth, mergeIndex, node_isLeaf, node_setLeaf, node_setBranch,
+      node_assertLeaf, node_assertBranch, allocLeaf, allocBranch, node_free,
+      node_clear, node_erase, node_leafBase, node_branchBase, node_leafSize,
+      node_branchSize, node_isFull, node_branchIsFull, node_parentIsFull, node_leafIsFull,
+      node_isEmpty, node_isLow, node_hasLeavesForChildren, node_top,
+      node_findEqualInLeaf, node_findFirstGreaterThanOrEqualInLeaf,
       node_findFirstGreaterThanOrEqualInBranch, node_splitLeaf,
       node_splitBranch, node_stealFromLeft, node_stealFromRight,
       node_mergeRoot, node_mergeLeftSibling, node_mergeRightSibling,
@@ -660,17 +673,17 @@ abstract class BtreePA extends Test                                             
      };
    }
 
-//  private void leafIsFull()                                                     // Whether a node known to be a leaf is full
-//   {tt(node_leafSize, node_isFull);
-//    leafSize();
-//    T.at(leafSize)  .equal(T.at(maxKeysPerLeaf),   T.at(leafIsFull));
-//   }
-//
-//  private void branchIsFull()                                                   // Whether a node known to be a branch is full
-//   {tt(node_branchSize, node_branchIsFull);
-//    branchSize();
-//    T.at(branchSize).equal(T.at(maxKeysPerBranch), T.at(branchIsFull));
-//   }
+  private void leafIsFull()                                                     // Whether a node known to be a leaf is full
+   {tt(node_leafSize, node_leafIsFull);
+    leafSize();
+    T.at(leafSize)  .equal(T.at(maxKeysPerLeaf),   T.at(leafIsFull));
+   }
+
+  private void branchIsFull()                                                   // Whether a node known to be a branch is full
+   {tt(node_branchSize, node_branchIsFull);
+    branchSize();
+    T.at(branchSize).equal(T.at(maxKeysPerBranch), T.at(branchIsFull));
+   }
 
   private void isLow()                                                          // The node is low on children making it impossible to merge two sibling children
    {z(); tt(node_isLeaf, node_isLow); isLeaf();
@@ -872,8 +885,8 @@ abstract class BtreePA extends Test                                             
 
   private void splitLeafRoot()                                                  // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
    {if (Assert) {T.setIntInstruction(node_assertLeaf, root); assertLeaf();}
-    T.setIntInstruction(node_isFull, root); isFull();
-    P.new If (T.at(isFull))
+    T.setIntInstruction(node_leafIsFull, root); leafIsFull();
+    P.new If (T.at(leafIsFull))
      {void Else()
        {P.halt("Root is not full");
        }
@@ -891,7 +904,6 @@ abstract class BtreePA extends Test                                             
       M.moveParallel
        (lL.T.at(lL.tKey ), lT.T.at(lT.tKey ),                                   /// Parallel possible
         lL.T.at(lL.tData), lT.T.at(lT.tData));
-//      lL.T.at(lL.tData), lT.T.at(lT.Data));
       lL.push();
      }
     for (int i = 0; i < splitLeafSize; i++)                                     // Build right leaf from parent
@@ -932,8 +944,8 @@ abstract class BtreePA extends Test                                             
 
   private void splitBranchRoot()                                                // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
    {if (Assert) {T.setIntInstruction(node_assertBranch, root); assertBranch();}
-    T.setIntInstruction(node_isFull,       root); isFull();
-    P.new If (T.at(isFull))
+    T.setIntInstruction(node_branchIsFull, root); branchIsFull();
+    P.new If (T.at(branchIsFull))
      {void Else()
        {P.halt("Root is not full");
        }
@@ -990,18 +1002,18 @@ abstract class BtreePA extends Test                                             
        }
      };
 
-    tt(node_leafSize, node_splitLeaf); leafSize();
-    tt(node_isFull,   node_splitLeaf); isFull();
+    tt(node_leafSize,   node_splitLeaf); leafSize();
+    tt(node_leafIsFull, node_splitLeaf); leafIsFull();
 
-    P.new If (T.at(isFull))
+    P.new If (T.at(leafIsFull))
      {void Else()
        {P.halt("Leaf is not full");
        }
      };
-    tt(node_isFull, splitParent);
 
-    isFull();
-    P.new If (T.at(isFull))
+    tt(node_branchIsFull, splitParent); branchIsFull();
+
+    P.new If (T.at(branchIsFull))
      {void Then()
        {P.halt("Leaf split parent must not be full");
        }
@@ -1049,8 +1061,8 @@ abstract class BtreePA extends Test                                             
        }
      };
 
-    tt(node_isFull, node_splitBranch); isFull();
-    P.new If (T.at(isFull))
+    tt(node_branchIsFull, node_splitBranch); branchIsFull();
+    P.new If (T.at(branchIsFull))
      {void Else()
        {P.halt("Branch is not full");
        }
@@ -1950,8 +1962,8 @@ abstract class BtreePA extends Test                                             
            }
          };
 
-        tt(node_isFull, leafFound); isFull();
-        P.new If(T.at(isFull))                                                  // Leaf is not full so we can insert immediately
+        tt(node_leafIsFull, leafFound); leafIsFull();
+        P.new If(T.at(leafIsFull))                                              // Leaf is not full so we can insert immediately
          {void Else()
            {z();
             tt(search, Key);
@@ -2236,7 +2248,7 @@ abstract class BtreePA extends Test                                             
     int Data    () {return    2;}                                               // Input data value
     int data    () {return    7;}                                               // Expected output data value
     int maxSteps() {return 2000;}                                               // Maximum number if execution steps
-    int expSteps() {return  117;}                                               // Expected number of steps
+    int expSteps() {return   96;}                                               // Expected number of steps
 
     GenVerilog(String Project, String Folder, ProgramPA Program)                // Generate verilog
      {project = Project; folder = Folder; program = Program;
@@ -2275,8 +2287,8 @@ module $project(reset, stop, clock, pfd, Key, Data, data, found);               
   integer traceFile;                                                            // File to write trace to
   reg   stopped;                                                                // Set when we stop
   assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
-  assign found = T[18];                                                         // Found the key
-  assign data  = T[23+:4];                                                      // Data associated with key found
+  assign found = T[$found_at];                                                  // Found the key
+  assign data  = T[$data_at+:$data_width];                                      // Data associated with key found
 
 $stuckBases
 
@@ -2381,9 +2393,12 @@ endmodule
              s = s.replace("$project",             project);
              s = s.replace("$Key",                 ""+Key());
              s = s.replace("$Data",                ""+Data());
+             s = s.replace("$data_at",             ""+data.at);
+             s = s.replace("$data_width",          ""+data.width);
              s = s.replace("$data",                ""+data());
              s = s.replace("$maxSteps",            ""+maxSteps());
              s = s.replace("$expSteps",            ""+expSteps());
+             s = s.replace("$found_at",            ""+found.at);
       return new StringBuilder(s);
      }
    }
@@ -3327,7 +3342,7 @@ endmodule
      {int Key     () {return    3;}                                             // Input key value
       int data    () {return    6;}                                             // Expected output data value
       int maxSteps() {return 2000;}                                             // Maximum number if execution steps
-      int expSteps() {return 1086;}                                             // Expected number of steps
+      int expSteps() {return  978;}                                             // Expected number of steps
      };
     t.P.trace = true;
     t.P.run();
@@ -3378,7 +3393,7 @@ endmodule
      {int Key     () {return    3;}                                             // Input key value
       int data    () {return    0;}                                             // Expected output data value
       int maxSteps() {return 2000;}                                             // Maximum number if execution steps
-      int expSteps() {return 1148;}                                             // Expected number of steps
+      int expSteps() {return 1018;}                                             // Expected number of steps
      };
     t.P.trace = true;
     t.P.run();
@@ -3415,11 +3430,11 @@ endmodule
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    //test_verilog_delete();
-    //test_verilog_find();
-    //test_verilog_put();
+    test_verilog_delete();
+    test_verilog_find();
+    test_verilog_put();
     //test_put_large_random();
-    test_delete_small_random();
+    //test_delete_small_random();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
