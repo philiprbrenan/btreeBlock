@@ -76,16 +76,32 @@ class MemoryLayoutPA extends Test                                               
     memory.set(a.at, a.width, value);
    }
 
-  void setIntInstruction(Layout.Field field, int value, int...indices)          // Set a value in memory occupied by the layout
+  void setIntInstruction(Layout.Field field, int value)                         // Set a value in memory occupied by the layout
    {z();
     P.new I()
      {void a()
-       {final At a = new At(field, indices).setOff();
+       {final At a = new At(field).setOff();
         memory.set(a.at, a.width, value);
        }
       String v()
-       {return new At(field, indices).verilogLoad() +
+       {return new At(field).verilogLoad() +
          " <= " + value + ";" + traceComment();
+       }
+     };
+   }
+
+  void setIntInstruction(Layout.Field field1, int value1,                       // Set values in memory occupied by the layout
+                         Layout.Field field2, int value2)                         // Set a value in memory occupied by the layout
+   {z();
+    P.new I()
+     {void a()
+       {final At a1 = new At(field1).setOff(), a2 = new At(field2).setOff();
+        memory.set(a1.at, a1.width, value1);
+        memory.set(a2.at, a2.width, value2);
+       }
+      String v()
+       {return new At(field1).verilogLoad() + " <= " + value1 + ";" + traceComment()
+             + new At(field2).verilogLoad() + " <= " + value2 + ";" + traceComment();
        }
      };
    }
@@ -350,17 +366,17 @@ class MemoryLayoutPA extends Test                                               
            }
          }
         String v()                                                              // Verilog
-         {final StringBuilder   s = new StringBuilder("/* moveUp */");
+         {final StringBuilder   s = new StringBuilder("/* Move Up */\n");
           final String      start = Index.verilogLoad();                        // Load above this index
           final MemoryLayoutPA tm = ml();                                       // Target memory
           final MemoryLayoutPA sm = buffer.ml();                                // Source memory
           for   (int i = 1; i < A.size; i++)                                    // Each element
-           {s.append("if ("+i+" > "+start +") begin\n");                        // Start moving when we are above the index
+           {s.append("\nif ("+i+" > "+start +") begin\n  ");                    // Start moving when we are above the index
             s.append
              (tm.at(a, i-0).verilogLoad()+ " <= " +
               sm.at(b, i-1).verilogLoad()+ ";" +
               traceComment());
-            s.append("end\n");
+            s.append("\nend\n");
            }
           return s.toString();
          }
@@ -389,17 +405,17 @@ class MemoryLayoutPA extends Test                                               
            }
          }
         String v()                                                              // Verilog
-         {final StringBuilder   s = new StringBuilder("/* moveDown */");
+         {final StringBuilder   s = new StringBuilder("/* Move Down */\n");
           final String      start = Index.verilogLoad();                        // Load above this index
           final MemoryLayoutPA tm = ml();                                       // Target memory
           final MemoryLayoutPA sm = buffer.ml();                                // Source memory
           for   (int i = 0; i < A.size-1; i++)                                  // Each element
-           {s.append("if ("+i+" > "+start +") begin\n");                        // Start moving when we are above the index
+           {s.append("\nif ("+i+" > "+start +") begin\n  ");                    // Start moving when we are above the index
             s.append
              (tm.at(a, i-0).verilogLoad()+ " <= " +
               sm.at(b, i+1).verilogLoad()+ ";" +
               traceComment());
-            s.append("end\n");
+            s.append("\nend\n");
            }
           return s.toString();
          }
@@ -1030,6 +1046,24 @@ Line T       At      Wide       Size    Indices        Value   Name
    3 V        4         4                                 13     b
    4 V        8         4                                  0     c
    5 V       12         4                                 13     d
+   6 V       16         4                                  0     e
+""");
+
+    m.P.clear();
+    m.setIntInstruction(a, 13, b, 12);
+    m.setIntInstruction(c, 11, d, 10);
+    m.P.run();
+
+    //stop(m);
+    m.ok("""
+MemoryLayout: test
+Memory      : test
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        20                                      s
+   2 V        0         4                                 13     a
+   3 V        4         4                                 12     b
+   4 V        8         4                                 11     c
+   5 V       12         4                                 10     d
    6 V       16         4                                  0     e
 """);
    }
