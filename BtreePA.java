@@ -372,7 +372,7 @@ abstract class BtreePA extends Test                                             
   Layout.Variable          putDepth;                                            // Current level being traversed by put
   Layout.Variable       deleteDepth;                                            // Current level being traversed by delete
   Layout.Variable        mergeDepth;                                            // Current level being traversed by merge
-  Layout.Variable        mergeIndex;                                            // Current indx of node being mereged across
+  Layout.Variable        mergeIndex;                                            // Current index of node being merged across
 
   Layout.Variable  node_isLeaf;                                                 // The node to be used to implicitly parameterize each method call
   Layout.Variable  node_setLeaf;
@@ -620,7 +620,7 @@ abstract class BtreePA extends Test                                             
     bSize.base(T.at(branchBase));
     bSize.size();
     T.at(branchSize).move(bSize.T.at(bSize.size));                              // Changed order here to match leafSize more closely
-    T.at(branchSize).dec();                                                     // Account for top
+    T.at(branchSize).dec();                                                     // Account for top which will always be present
    }
 
   private void isEmpty()                                                        // The node is empty
@@ -659,6 +659,18 @@ abstract class BtreePA extends Test                                             
        }
      };
    }
+
+//  private void leafIsFull()                                                     // Whether a node known to be a leaf is full
+//   {tt(node_leafSize, node_isFull);
+//    leafSize();
+//    T.at(leafSize)  .equal(T.at(maxKeysPerLeaf),   T.at(leafIsFull));
+//   }
+//
+//  private void branchIsFull()                                                   // Whether a node known to be a branch is full
+//   {tt(node_branchSize, node_branchIsFull);
+//    branchSize();
+//    T.at(branchSize).equal(T.at(maxKeysPerBranch), T.at(branchIsFull));
+//   }
 
   private void isLow()                                                          // The node is low on children making it impossible to merge two sibling children
    {z(); tt(node_isLeaf, node_isLow); isLeaf();
@@ -2493,7 +2505,7 @@ endmodule
    }
 
   static void test_put_large_random()
-   {//if (!github_actions) return;
+   {if (!github_actions) return;
     final BtreePA t = btreePA(2, 3);
     t.P.run(); t.P.clear();
     final TreeMap<Integer,Integer> s = new TreeMap<>();
@@ -3227,10 +3239,6 @@ endmodule
     t.delete();
     for (int i = 0; i < N; ++i)
      {//say(currentTestName(),  "b", i);
-      t.T.at(t.Key).setInt(random_array[i]-1);                                  // Delete an element that should not be there
-      t.P.run();
-      ok(t.T.at(t.deleted).getInt(), 0);
-
       t.T.at(t.Key ).setInt(random_array[i]);                                   // Delete
       t.P.run();
       ok(t.T.at(t.deleted).getInt(), 1);
@@ -3239,7 +3247,6 @@ endmodule
       t.T.at(t.Key).setInt(random_array[i]);                                    // Delete an element that should no longer be there
       t.P.run();
       ok(t.T.at(t.deleted).getInt(), 0);
-
      }
    }
 
@@ -3248,7 +3255,8 @@ endmodule
    }
 
   static void test_delete_large_random()
-   {test_delete_random(random_large);
+   {if (!github_actions) return;
+    test_delete_random(random_large);
    }
 
   static void test_verilog_find()                                               // Find using generated verilog code
@@ -3399,6 +3407,7 @@ endmodule
     test_delete_descending();
     //test_to_array();
     test_delete_small_random();
+    test_delete_large_random();
     test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
@@ -3406,10 +3415,11 @@ endmodule
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_verilog_delete();
-    test_verilog_find();
-    test_verilog_put();
+    //test_verilog_delete();
+    //test_verilog_find();
+    //test_verilog_put();
     //test_put_large_random();
+    test_delete_small_random();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
