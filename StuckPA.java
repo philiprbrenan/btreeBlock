@@ -388,6 +388,7 @@ abstract class StuckPA extends Test                                             
               if (i != maxSize()-1) P.Goto(end);                                // Goto superfluous on last iteration
              }
            };
+          if (i != maxSize()-1) T.setIntInstruction(index, i);                  // Not needed on last iteration
          }
        }
      };
@@ -423,6 +424,7 @@ abstract class StuckPA extends Test                                             
               if (i != maxSize()-1) P.Goto(end);                                // Goto superfluous on last iteration
              }
            };
+          if (i != maxSize()-1) T.setIntInstruction(index, i);                  // Not needed on last iteration
          }
        }
      };
