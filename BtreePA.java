@@ -3383,7 +3383,7 @@ endmodule
     test_put_ascending_wide();
     test_put_descending();
     test_put_small_random();
-    //test_put_large_random();
+    test_put_large_random();
     test_find();
     test_delete_ascending();
     test_delete_descending();
