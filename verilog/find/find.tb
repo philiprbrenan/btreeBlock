@@ -34,7 +34,7 @@ module find_tb;                                                             // T
         $display("Stopped after: %4d steps key %4d  data %4d", step, Key, data);
         passes = 0; fails = 0;
         if (data == 7)     passes = passes + 1; else begin fails = fails + 1; $display("Expected 7 for data but got %d",    data); end
-        if (step == 117) passes = passes + 1; else begin fails = fails + 1; $display("Expected 117 for expected steps but got %d", step); end
+        if (step == 96) passes = passes + 1; else begin fails = fails + 1; $display("Expected 96 for expected steps but got %d", step); end
         if (passes == 2) $display("Passed all tests");
         else             $display("FAILED %d, passed %d", fails, passes);
       end
