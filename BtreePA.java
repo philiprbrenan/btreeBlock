@@ -3210,14 +3210,15 @@ endmodule
      }
    }
 
-  static void test_delete_small_random()
+  static void test_delete_random(int[]random_array)
    {final BtreePA t = btreePA(4, 3);
     t.P.run(); t.P.clear();
     t.put();
-    final int N = random_small.length;
-    for (int i = 0; i < N; ++i)
+    final int N = random_array.length;
+
+    for (int i = 0; i < N; ++i)                                                 // Build tree
      {//say(currentTestName(),  "a", i);
-      t.T.at(t.Key).setInt( random_small[i]);
+      t.T.at(t.Key ).setInt(random_array[i]);
       t.T.at(t.Data).setInt(i);
       t.P.run();
      }
@@ -3226,15 +3227,28 @@ endmodule
     t.delete();
     for (int i = 0; i < N; ++i)
      {//say(currentTestName(),  "b", i);
-      t.T.at(t.Key).setInt( -1);
+      t.T.at(t.Key).setInt(random_array[i]-1);                                  // Delete an element that should not be there
       t.P.run();
       ok(t.T.at(t.deleted).getInt(), 0);
 
-      t.T.at(t.Key ).setInt(random_small[i]);
+      t.T.at(t.Key ).setInt(random_array[i]);                                   // Delete
       t.P.run();
       ok(t.T.at(t.deleted).getInt(), 1);
       ok(t.T.at(t.Data)   .getInt(), i);
+
+      t.T.at(t.Key).setInt(random_array[i]);                                    // Delete an element that should no longer be there
+      t.P.run();
+      ok(t.T.at(t.deleted).getInt(), 0);
+
      }
+   }
+
+  static void test_delete_small_random()
+   {test_delete_random(random_small);
+   }
+
+  static void test_delete_large_random()
+   {test_delete_random(random_large);
    }
 
   static void test_verilog_find()                                               // Find using generated verilog code
@@ -3392,10 +3406,10 @@ endmodule
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    //test_verilog_delete();
-    //test_verilog_find();
-    //test_verilog_put();
-    test_put_large_random();
+    test_verilog_delete();
+    test_verilog_find();
+    test_verilog_put();
+    //test_put_large_random();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
