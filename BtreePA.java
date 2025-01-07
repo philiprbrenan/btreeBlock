@@ -1144,8 +1144,7 @@ abstract class BtreePA extends Test                                             
             lL.pop();                                                           // Reduce left
 
             lL.T.at(lL.index).move(T.at(nl));
-            lL.T.at(lL.index).dec();
-            lL.T.at(lL.index).dec();
+            lL.T.at(lL.index).dec(2);
             lL.elementAt();                                                     // Last key on left
 
             M.moveParallel
@@ -2165,7 +2164,11 @@ abstract class BtreePA extends Test                                             
                 T.at(index).move(T.at(mergeIndex));
                 tt(node_mergeLeftSibling, parent);
                 mergeLeftSibling();
-                P.new If (T.at(stolenOrMerged)) {void Then() {T.at(mergeIndex).dec();}};// A successful merge of the left  sibling reduces the current index and the upper limit
+                P.new If (T.at(stolenOrMerged))                                 // A successful merge of the left  sibling reduces the current index and the upper limit
+                 {void Then()
+                   {T.at(mergeIndex).dec();
+                   }
+                 };
                 T.at(index).move(T.at(mergeIndex));
                 tt(node_mergeRightSibling, parent);
                 mergeRightSibling();                                            // A successful merge of the right sibling maintains the current position but reduces the upper limit
