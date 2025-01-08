@@ -176,12 +176,15 @@ class MemoryLayoutPA extends Test                                               
                                directs[i].verilogLoad();                        // Indirect index loaded from memory
         v.push(" + " + o + " * " + w);                                          // Access indexing field
        }
-      return (la ? base+field.at+"/*"+field.name+"*/"+joinStrings(v, "") :                            // IBM S/360 Principles of Operation: LA
-        name()+"["+base+field.at+"/*"+field.name+"*/"+joinStrings(v, "")+" +: "+field.width+"]");     // IBM S/360 Principles of Operation: L
+      return (la ? c(base)+i(field.at)+"/*"+c(field.name)+"*/"+joinStrings(v, "") :                               // IBM S/360 Principles of Operation: LA
+        name()+"["+c(base)+i(field.at)+"/*"+c(field.name)+"*/"+joinStrings(v, "")+" +: "+w(field.width)+"]");     // IBM S/360 Principles of Operation: L
      }
 
     String verilogLoad() {return verilogLoadAddr(false);}                       // Content of a memory location as a verilog expression
     String verilogAddr() {return verilogLoadAddr(true);}                        // Address of a memory location
+    String i(int i)      {return String.format("%4d", i);}                      // Format an index
+    String w(int w)      {return String.format("%1d", w);}                      // Format a width
+    String c(String s)   {while(s.length() % 4 > 0) s = s+" "; return s;}       // Format a field name
 
     void locateDirectAddress()                                                  // Locate a direct address and its content
      {delta  = field.locator.at(indices);
@@ -1485,14 +1488,14 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
 
     MemoryLayoutPA.At at = m.at(a, m.at(I));
-    ok(at.verilogLoad(), "M[0/*a*/ + M[24/*I*/ +: 4] * 6 +: 2]");
-    ok(at.verilogAddr(),   "0/*a*/ + M[24/*I*/ +: 4] * 6");
-    ok(m.at(a, 0).verilogLoad(), "M[0/*a*/ + 0 * 6 +: 2]");
-    ok(m.at(a, 1).verilogLoad(), "M[0/*a*/ + 1 * 6 +: 2]");
-    ok(m.at(a, 2).verilogLoad(), "M[0/*a*/ + 2 * 6 +: 2]");
-    ok(m.at(b, 0).verilogLoad(), "M[2/*b*/ + 0 * 6 +: 2]");
-    ok(m.at(b, 1).verilogLoad(), "M[2/*b*/ + 1 * 6 +: 2]");
-    ok(m.at(b, 2).verilogLoad(), "M[2/*b*/ + 2 * 6 +: 2]");
+    ok(at.verilogLoad(), "M[   0/*a   */ + M[  24/*I   */ +: 4] * 6 +: 2]");
+    ok(at.verilogAddr(),   "   0/*a   */ + M[  24/*I   */ +: 4] * 6");
+    ok(m.at(a, 0).verilogLoad(), "M[   0/*a   */ + 0 * 6 +: 2]");
+    ok(m.at(a, 1).verilogLoad(), "M[   0/*a   */ + 1 * 6 +: 2]");
+    ok(m.at(a, 2).verilogLoad(), "M[   0/*a   */ + 2 * 6 +: 2]");
+    ok(m.at(b, 0).verilogLoad(), "M[   2/*b   */ + 0 * 6 +: 2]");
+    ok(m.at(b, 1).verilogLoad(), "M[   2/*b   */ + 1 * 6 +: 2]");
+    ok(m.at(b, 2).verilogLoad(), "M[   2/*b   */ + 2 * 6 +: 2]");
    }
 
   static void test_dump_verilog()
