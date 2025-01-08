@@ -51,6 +51,14 @@ public class Test                                                               
     return s.toString();
    }
 
+  static String joinStrings(Set<String> S, String join)                         // Perl join
+   {final StringBuilder t = new StringBuilder();
+    final int N = S.size();
+    if (N == 0) return "";
+    for (String s: S) t.append(s+join);
+    return t.toString().substring(0, t.length() - join.length());
+   }
+
   static String joinLines(Stack<String> S) {return joinStrings(S, "\n");}       // Perl join lines
 
 //D2 Numeric routines                                                           // Numeric routines
@@ -700,12 +708,21 @@ CCCCC
     ok(folderName(a), "/tmp/z/z/");
    }
 
-  static void test_join()
+  static void test_join_stack()
    {final Stack<String> s = new Stack<>();
     ok(joinStrings(s, ","), "");
     s.push("a");
     ok(joinStrings(s, ","), "a");
     s.push("b");
+    ok(joinStrings(s, ","), "a,b");
+   }
+
+  static void test_join_set()
+   {final TreeSet<String> s = new TreeSet<>();
+    ok(joinStrings(s, ","), "");
+    s.add("a");
+    ok(joinStrings(s, ","), "a");
+    s.add("b");
     ok(joinStrings(s, ","), "a,b");
    }
 
@@ -715,7 +732,8 @@ CCCCC
     test_string();
     test_longest_line();
     test_files();
-    test_join();
+    test_join_stack();
+    test_join_set();
    }
 
   static void newTests()                                                        // Tests being worked on
