@@ -1397,8 +1397,7 @@ abstract class BtreePA extends Test                                             
                 P.new Block()
                  {void code()
                    {for (int i = 0; i < maxKeysPerLeaf(); ++i)                  // Merge in left child leaf
-                     {tt(node_isEmpty, l); isEmpty();
-                      P.GoOn(end, T.at(isEmpty));                               // Stop when left leaf  child is empty
+                     {tt(node_isEmpty, l); isEmpty(); P.GoOn(end,T.at(isEmpty));// Stop when left leaf  child is empty
                       lL.shift();
                       M.moveParallel
                        (lT.T.at(lT.tKey ), lL.T.at(lL.tKey),                    /// Parallel possible
@@ -1411,9 +1410,7 @@ abstract class BtreePA extends Test                                             
                 P.new Block()
                  {void code()
                    {for (int i = 0; i < maxKeysPerLeaf(); ++i)                  // Merge in right child leaf
-                     {tt(node_isEmpty, r); isEmpty();
-
-                      P.GoOn(end, T.at(isEmpty));                               // Stop when right leaf child is empty
+                     {tt(node_isEmpty, r); isEmpty(); P.GoOn(end,T.at(isEmpty));// Stop when right leaf child is empty
                       lR.shift();
                       M.moveParallel
                        (lT.T.at(lT.tKey ), lR.T.at(lR.tKey),                    /// Parallel possible
@@ -1459,9 +1456,7 @@ abstract class BtreePA extends Test                                             
                 P.new Block()
                  {void code()
                    {for (int i = 0; i < maxKeysPerBranch(); ++i)                // Merge left child branch
-                     {tt(node_isEmpty, l);
-                      isEmpty();
-                      P.GoOn(end, T.at(isEmpty));                               // Stop when left branch child is empty except for top
+                     {tt(node_isEmpty, l); isEmpty(); P.GoOn(end,T.at(isEmpty));// Stop when left branch child is empty except for top
                       bL.shift();
                       M.moveParallel
                        (bT.T.at(bT.tKey) , bL.T.at(bL.tKey),                    /// Parallel possible
@@ -1480,9 +1475,7 @@ abstract class BtreePA extends Test                                             
                 P.new Block()
                  {void code()
                    {for (int i = 0; i < maxKeysPerBranch(); ++i)                // Merge right child branch
-                     {tt(node_isEmpty, r);
-                      isEmpty();
-                      P.GoOn(end, T.at(isEmpty));                               // Stop when right branch child is empty except for top
+                     {tt(node_isEmpty, r); isEmpty(); P.GoOn(end,T.at(isEmpty));// Stop when right branch child is empty except for top
                       bR.shift();
                       M.moveParallel
                        (bT.T.at(bT.tKey ), bR.T.at(bR.tKey),                    /// Parallel possible
