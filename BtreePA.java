@@ -653,18 +653,14 @@ abstract class BtreePA extends Test                                             
 
   private void leafSize()                                                       // Number of children in body of leaf
    {z();
-    tt(node_leafBase, node_leafSize); leafBase();
-    lSize.base(T.at(leafBase));
-    lSize.size();
-    T.at(leafSize).move(lSize.T.at(lSize.size));
+    tt(node_leafBase, node_leafSize); leafBase(); lSize.base(T.at(leafBase));
+    lSize.size(); T.at(leafSize).move(lSize.T.at(lSize.size));
    }
 
   private void branchSize()                                                     // Number of children in body of branch taking top for granted as it is always there
    {z();
-    tt(node_branchBase, node_branchSize); branchBase();
-    bSize.base(T.at(branchBase));
-    bSize.size();
-    T.at(branchSize).move(bSize.T.at(bSize.size));                              // Changed order here to match leafSize more closely
+    tt(node_branchBase, node_branchSize); branchBase(); bSize.base(T.at(branchBase));
+    bSize.size(); T.at(branchSize).move(bSize.T.at(bSize.size));                // Changed order here to match leafSize more closely
     T.at(branchSize).dec();                                                     // Account for top which will always be present
    }
 
@@ -733,8 +729,7 @@ abstract class BtreePA extends Test                                             
 
   private void hasLeavesForChildren()                                           // The node has leaves for children
    {if (Assert) {tt(node_assertBranch, node_hasLeavesForChildren); assertBranch();}
-    tt(node_branchBase, node_hasLeavesForChildren); branchBase();
-    bLeaf.base(T.at(branchBase));
+    tt(node_branchBase, node_hasLeavesForChildren); branchBase(); bLeaf.base(T.at(branchBase));
     bLeaf.lastElement();
     T.at(node_isLeaf).move(bLeaf.T.at(bLeaf.tData)); isLeaf();
     tt(hasLeavesForChildren, IsLeaf);
@@ -742,10 +737,8 @@ abstract class BtreePA extends Test                                             
 
   private void top()                                                            // The top next element of a branch - only used in printing
    {if (Assert) {tt(node_assertBranch, node_top); assertBranch();}
-    tt(node_branchBase, node_top); branchBase();
-    bTop.base(T.at(branchBase));
-    tt(node_branchSize, node_top); branchSize();
-    bTop.T.at(bTop.index).move(T.at(branchSize));
+    tt(node_branchBase, node_top); branchBase(); bTop.base(T.at(branchBase));
+    tt(node_branchSize, node_top); branchSize(); bTop.T.at(bTop.index).move(T.at(branchSize));
     bTop.elementAt();
     T.at(top).move(bTop.T.at(bTop.tData));
    }
@@ -754,7 +747,7 @@ abstract class BtreePA extends Test                                             
 
   private void findEqualInLeaf()                                                // Find the first key in the leaf that is equal to the search key
    {if (Assert) {tt(node_assertLeaf, node_findEqualInLeaf); assertLeaf();}
-    tt(node_leafBase, node_findEqualInLeaf);   leafBase();
+    tt(node_leafBase, node_findEqualInLeaf); leafBase();
     lEqual.base(T.at(leafBase));
 
     lEqual.T.at(lEqual.search).move(T.at(search));
@@ -823,8 +816,7 @@ abstract class BtreePA extends Test                                             
     leafSize();
     final int     K = T.at(leafSize).getInt();
     final StuckPA t = lLeaf.copy();
-    T.at(node_leafBase).setInt(node); leafBase();
-    t.base(T.at(leafBase));
+    T.at(node_leafBase).setInt(node); leafBase(); t.base(T.at(leafBase));
     for  (int i = 0; i < K; i++)
      {z();
       t.T.at(t.index).setInt(i); t.elementAt();
@@ -840,8 +832,7 @@ abstract class BtreePA extends Test                                             
     if (K > 0)                                                                  // Branch has key, next pairs
      {z();
       final StuckPA t = bLeaf.copy();
-      T.at(node_branchBase).setInt(node); branchBase();
-      t.base(T.at(branchBase));
+      T.at(node_branchBase).setInt(node); branchBase(); t.base(T.at(branchBase));
       for  (int i = 0; i < K; i++)
        {z();
         t.T.at(t.index).setInt(i); t.elementAt();                               // Each node in the branch
@@ -985,10 +976,10 @@ abstract class BtreePA extends Test                                             
     allocBranch(); tt(l, allocBranch);                                          // New left branch
     allocBranch(); tt(r, allocBranch);                                          // New right branch
 
-    T.setIntInstruction(node_branchBase, root);
-                                        branchBase(); bT.base(T.at(branchBase));// Set address of the referenced branch stuck
-    tt(node_branchBase, l);             branchBase(); bL.base(T.at(branchBase));// Set address of the referenced branch stuck
-    tt(node_branchBase, r);             branchBase(); bR.base(T.at(branchBase));// Set address of the referenced branch stuck
+    T.setIntInstruction(node_branchBase1, root);
+                             branchBase1(); bT.base(T.at(branchBase1));         // Set address of the referenced branch stuck
+    tt(node_branchBase2, l); branchBase2(); bL.base(T.at(branchBase2));         // Set address of the referenced branch stuck
+    tt(node_branchBase3, r); branchBase3(); bR.base(T.at(branchBase3));         // Set address of the referenced branch stuck
 
     for (int i = 0; i < splitBranchSize; i++)                                   // Build left child from parent
      {z(); bT.shift();
@@ -1063,8 +1054,7 @@ abstract class BtreePA extends Test                                             
      }
     lR.firstElement();
     lL. lastElement();
-    tt(node_branchBase, splitParent); branchBase();                             // The parent branch
-    bT.base(T.at(branchBase));                                                  // The parent branch
+    tt(node_branchBase, splitParent); branchBase(); bT.base(T.at(branchBase));  // The parent branch
     P.new I()                                                                   // Splitting key
      {void a()
        {bT.T.at(bT.tKey).setInt((lR.T.at(lR.tKey).getInt() +
@@ -1107,9 +1097,9 @@ abstract class BtreePA extends Test                                             
 
     z();
     allocBranch(); tt(l, allocBranch);
-    tt(node_branchBase, splitParent);      branchBase(); bT.base(T.at(branchBase)); // The parent branch
-    tt(node_branchBase, l);                branchBase(); bL.base(T.at(branchBase)); // The branch being split into
-    tt(node_branchBase, node_splitBranch); branchBase(); bR.base(T.at(branchBase)); // The branch being split
+    tt(node_branchBase1, splitParent);      branchBase1(); bT.base(T.at(branchBase1)); // The parent branch
+    tt(node_branchBase2, l);                branchBase2(); bL.base(T.at(branchBase2)); // The branch being split into
+    tt(node_branchBase3, node_splitBranch); branchBase3(); bR.base(T.at(branchBase3)); // The branch being split
 
     for (int i = 0; i < splitBranchSize; i++)                                   // Build left branch from right
      {z(); bR.shift();
@@ -1151,9 +1141,7 @@ abstract class BtreePA extends Test                                             
            }
          };
 
-        tt(node_branchBase, node_stealFromLeft);
-        branchBase();
-        bT.base(T.at(branchBase));
+        tt(node_branchBase, node_stealFromLeft); branchBase(); bT.base(T.at(branchBase));
 
         bT.T.at(bT.index).move(T.at(index));
         bT.T.at(bT.index).dec();
@@ -1258,8 +1246,7 @@ abstract class BtreePA extends Test                                             
         stealNotPossible(end);
         z();
 
-        tt(node_branchBase, node_stealFromRight);
-        branchBase();
+        tt(node_branchBase, node_stealFromRight); branchBase();
 
         bT.base(T.at(branchBase));
         bT.T.at(bT.index).move(T.at(index));
@@ -1307,8 +1294,8 @@ abstract class BtreePA extends Test                                             
            }
           void Else()                                                           // Children are branches
            {z();
-            tt(node_branchBase, l); branchBase(); bL.base(T.at(branchBase));
-            tt(node_branchBase, r); branchBase(); bR.base(T.at(branchBase));
+            tt(node_branchBase1, l); branchBase1(); bL.base(T.at(branchBase1));
+            tt(node_branchBase2, r); branchBase2(); bR.base(T.at(branchBase2));
             tt(node_branchSize, l); branchSize(); tt(nl, branchSize);
             tt(node_branchSize, r); branchSize(); tt(nr, branchSize);
 
@@ -1447,8 +1434,8 @@ abstract class BtreePA extends Test                                             
 
             P.new If (T.at(mergeable))
              {void Then()
-               {tt(node_branchBase, l); branchBase(); bL.base(T.at(branchBase));
-                tt(node_branchBase, r); branchBase(); bR.base(T.at(branchBase));
+               {tt(node_branchBase1, l); branchBase1(); bL.base(T.at(branchBase1));
+                tt(node_branchBase2, r); branchBase2(); bR.base(T.at(branchBase2));
                 bT.firstElement();
                 T.at(parentKey).move(bT.T.at(bT.tKey));
                 bT.clear();
@@ -1523,9 +1510,7 @@ abstract class BtreePA extends Test                                             
         stealNotPossible(end);
 
         z();
-        tt(node_branchBase, node_mergeLeftSibling);
-        branchBase();
-        bT.base(T.at(branchBase));
+        tt(node_branchBase, node_mergeLeftSibling); branchBase(); bT.base(T.at(branchBase));
         bT.T.at(bT.index).move(T.at(index));
         bT.T.at(bT.index).dec();
         bT.elementAt();
@@ -1577,8 +1562,8 @@ abstract class BtreePA extends Test                                             
            }
           void Else()                                                           // Children are branches
            {z();
-            tt(node_branchBase, l); branchBase(); bL.base(T.at(branchBase));
-            tt(node_branchBase, r); branchBase(); bR.base(T.at(branchBase));
+            tt(node_branchBase1, l); branchBase1(); bL.base(T.at(branchBase1));
+            tt(node_branchBase2, r); branchBase2(); bR.base(T.at(branchBase2));
             tt(node_branchSize, l); branchSize(); tt(nl, branchSize);
             tt(node_branchSize, r); branchSize(); tt(nr, branchSize);
 
@@ -1648,8 +1633,7 @@ abstract class BtreePA extends Test                                             
         stealNotPossible(end);
 
         z();
-        tt(node_branchBase, node_mergeRightSibling);
-        branchBase();
+        tt(node_branchBase, node_mergeRightSibling); branchBase();
         bT.base(T.at(branchBase));
         bT.T.at(bT.index).move(T.at(index));
         bT.elementAt();
@@ -1688,8 +1672,7 @@ abstract class BtreePA extends Test                                             
              {void code()
                {for (int i = 0; i < maxKeysPerLeaf(); i++)                      // Transfer right to left
                  {z();
-                  tt(node_leafBase, r); leafSize();
-                  P.GoOff(end, T.at(leafSize));
+                  tt(node_leafBase, r); leafSize(); P.GoOff(end, T.at(leafSize));
                   lR.shift();
                   M.moveParallel
                    (lL.T.at(lL.tKey ), lR.T.at(lR.tKey),                        /// Parallel possible
@@ -1700,18 +1683,10 @@ abstract class BtreePA extends Test                                             
              };
            }
           void Else()                                                           // Children are branches
-           {tt(node_branchBase, l);
-            branchBase();
-            bL.base(T.at(branchBase));
-            tt(node_branchBase, r);
-            branchBase();
-            bR.base(T.at(branchBase));
-            tt(node_branchSize, l);
-            branchSize();
-            tt(nl, branchSize);
-            tt(node_branchSize, r);
-            branchSize();
-            tt(nr, branchSize);
+           {tt(node_branchBase1, l); branchBase1(); bL.base(T.at(branchBase1));
+            tt(node_branchBase2, r); branchBase2(); bR.base(T.at(branchBase2));
+            tt(node_branchSize, l); branchSize(); tt(nl, branchSize);
+            tt(node_branchSize, r); branchSize(); tt(nr, branchSize);
 
             P.new I()                                                           // Check that combined node would not be too big
              {void a()
@@ -1940,9 +1915,7 @@ abstract class BtreePA extends Test                                             
        {final ProgramPA.Label Return = end;
         find();
         tt(leafFound, find);                                                    // Find the leaf that should contain this key
-        tt(node_leafBase, leafFound);
-        leafBase();
-        lT.base(T.at(leafBase));
+        tt(node_leafBase, leafFound); leafBase(); lT.base(T.at(leafBase));
 
         P.new If (T.at(found))                                                  // Found the key in the leaf so update it with the new data
          {void Then()
@@ -2075,8 +2048,7 @@ abstract class BtreePA extends Test                                             
        {find();                                                                 // Try direct insertion with no modifications to the shape of the tree
 //      P.new If (T.at(found)) {void Else() {P.Goto(end);}};                    // Key not found so nothing to delete
         P.GoOff(end, T.at(found));                                              // Key not found so nothing to delete
-        z(); tt(node_leafBase, find); leafBase();                               // The leaf that contains the key
-        lT.base(T.at(leafBase));                                                // The leaf that contains the key
+        z(); tt(node_leafBase, find); leafBase(); lT.base(T.at(leafBase));      // The leaf that contains the key
         lT.T.at(lT.index).move(T.at(index)); lT.elementAt();                    // Position in the leaf of the key
 
         T.at(Data).move(lT.T.at(lT.tData));                                     // Key, data pairs in the leaf
