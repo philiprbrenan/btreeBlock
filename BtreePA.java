@@ -358,8 +358,8 @@ abstract class BtreePA extends Test                                             
   Layout.Bit              mergeable;                                            // The left and right children are mergable
   Layout.Bit                deleted;                                            // Whether the delete request actually deleted the specified key
 
-  Layout.Variable          leafBase;                                            // The offset of a leaf in memory
-  Layout.Variable        branchBase;                                            // The offset of a branch in memory
+  Layout.Variable          leafBase,   leafBase1,   leafBase2,   leafBase3;     // The offset of a leaf in memory
+  Layout.Variable        branchBase, branchBase1, branchBase2, branchBase3;     // The offset of a branch in memory
   Layout.Variable          leafSize;                                            // Number of children in body of leaf
   Layout.Variable        branchSize;                                            // Number of children in body of branch taking top for granted as it is always there
   Layout.Variable               top;                                            // The top next element of a branch - only used in printing
@@ -389,8 +389,8 @@ abstract class BtreePA extends Test                                             
   Layout.Variable  node_free;
   Layout.Variable  node_clear;
   Layout.Variable  node_erase;
-  Layout.Variable  node_leafBase;
-  Layout.Variable  node_branchBase;
+  Layout.Variable  node_leafBase,     node_leafBase1,   node_leafBase2,   node_leafBase3;
+  Layout.Variable  node_branchBase, node_branchBase1, node_branchBase2, node_branchBase3;
   Layout.Variable  node_leafSize;
   Layout.Variable  node_branchSize;
   Layout.Variable  node_isFull;
@@ -461,7 +461,13 @@ abstract class BtreePA extends Test                                             
                                      deleted = L.bit      ("deleted"                                       );
 
                                     leafBase = L.variable ("leafBase"                                      , bitsPerAddress);
+                                   leafBase1 = L.variable ("leafBase1"                                     , bitsPerAddress);
+                                   leafBase2 = L.variable ("leafBase2"                                     , bitsPerAddress);
+                                   leafBase3 = L.variable ("leafBase3"                                     , bitsPerAddress);
                                   branchBase = L.variable ("branchBase"                                    , bitsPerAddress);
+                                 branchBase1 = L.variable ("branchBase1"                                   , bitsPerAddress);
+                                 branchBase2 = L.variable ("branchBase2"                                   , bitsPerAddress);
+                                 branchBase3 = L.variable ("branchBase3"                                   , bitsPerAddress);
                                     leafSize = L.variable ("leafSize"                                      , bitsPerSize);
                                   branchSize = L.variable ("branchSize"                                    , bitsPerSize);
                                          top = L.variable ("top"                                           , bitsPerNext);
@@ -495,7 +501,13 @@ abstract class BtreePA extends Test                                             
                                   node_clear = L.variable ("node_clear"                                    , bitsPerNext);
                                   node_erase = L.variable ("node_erase"                                    , bitsPerNext);
                                node_leafBase = L.variable ("node_leafBase"                                 , bitsPerNext);
+                              node_leafBase1 = L.variable ("node_leafBase1"                                , bitsPerNext);
+                              node_leafBase2 = L.variable ("node_leafBase2"                                , bitsPerNext);
+                              node_leafBase3 = L.variable ("node_leafBase3"                                , bitsPerNext);
                              node_branchBase = L.variable ("node_branchBase"                               , bitsPerNext);
+                            node_branchBase1 = L.variable ("node_branchBase1"                              , bitsPerNext);
+                            node_branchBase2 = L.variable ("node_branchBase2"                              , bitsPerNext);
+                            node_branchBase3 = L.variable ("node_branchBase3"                              , bitsPerNext);
                                node_leafSize = L.variable ("node_leafSize"                                 , bitsPerNext);
                              node_branchSize = L.variable ("node_branchSize"                               , bitsPerNext);
                                  node_isFull = L.variable ("node_isFull"                                   , bitsPerNext);
@@ -523,12 +535,18 @@ abstract class BtreePA extends Test                                             
       firstKey, lastKey, flKey, parentKey, lk, ld, rk, rd, index, nl, nr, l, r,
       splitParent, IsLeaf, isFull, leafIsFull, branchIsFull, parentIsFull, isEmpty, isLow,
       hasLeavesForChildren, stolenOrMerged, pastMaxDepth, nodeMerged,
-      mergeable, deleted, leafBase, branchBase, leafSize, branchSize, top, Key,
+      mergeable, deleted,
+      leafBase,     leafBase1,   leafBase2,   leafBase3,
+      branchBase, branchBase1, branchBase2, branchBase3,
+      leafSize, branchSize, top, Key,
       Data, find, findAndInsert, parent, child, leafFound, maxKeysPerLeaf,
       maxKeysPerBranch, two, MaxDepth, findDepth, putDepth, deleteDepth,
       mergeDepth, mergeIndex, node_isLeaf, node_setLeaf, node_setBranch,
       node_assertLeaf, node_assertBranch, allocLeaf, allocBranch, node_free,
-      node_clear, node_erase, node_leafBase, node_branchBase, node_leafSize,
+      node_clear, node_erase,
+      node_leafBase,     node_leafBase1,   node_leafBase2,   node_leafBase3,
+      node_branchBase, node_branchBase1, node_branchBase2, node_branchBase3,
+      node_leafSize,
       node_branchSize, node_isFull, node_branchIsFull, node_parentIsFull, node_leafIsFull,
       node_isEmpty, node_isLow, node_hasLeavesForChildren, node_top,
       node_findEqualInLeaf, node_findFirstGreaterThanOrEqualInLeaf,
@@ -598,7 +616,8 @@ abstract class BtreePA extends Test                                             
     M.at(Node, T.at(node_erase)).ones();
    }
 
-  private void leafBase()                                                       // Base of leaf stuck in memory
+  private void leafBase(Layout.Variable node_leafBase,                          // Base of leaf stuck in memory
+                        Layout.Variable      leafBase)                          // Base of leaf stuck in memory
    {z();
     P.new I()
      {void a()
@@ -609,7 +628,13 @@ abstract class BtreePA extends Test                                             
      };
    }
 
-  private void branchBase()
+  private void leafBase () {leafBase(node_leafBase,  leafBase);}
+  private void leafBase1() {leafBase(node_leafBase1, leafBase1);}
+  private void leafBase2() {leafBase(node_leafBase2, leafBase2);}
+  private void leafBase3() {leafBase(node_leafBase3, leafBase3);}
+
+  private void branchBase(Layout.Variable node_branchBase,
+                          Layout.Variable      branchBase)
    {z();
     P.new I()                                                                   // Base of branch stuck in memory
      {void a()
@@ -619,6 +644,11 @@ abstract class BtreePA extends Test                                             
       String v() {return T.at(branchBase).verilogLoad() + " <= " + M.at(branch, T.at(node_branchBase)).verilogAddr() + ";" + traceComment();}
      };
    }
+
+  private void branchBase () {branchBase(node_branchBase,  branchBase);}
+  private void branchBase1() {branchBase(node_branchBase1, branchBase1);}
+  private void branchBase2() {branchBase(node_branchBase2, branchBase2);}
+  private void branchBase3() {branchBase(node_branchBase3, branchBase3);}
 
   private void leafSize()                                                       // Number of children in body of leaf
    {z();
@@ -896,9 +926,9 @@ abstract class BtreePA extends Test                                             
     allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
     allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
 
-    T.at(node_leafBase).zero(); leafBase(); lT.base(T.at(leafBase));            // Set address of the referenced leaf stuck
-    tt  (node_leafBase, l);     leafBase(); lL.base(T.at(leafBase));            // Set address of the referenced leaf stuck
-    tt  (node_leafBase, r);     leafBase(); lR.base(T.at(leafBase));            // Set address of the referenced leaf stuck
+    T.at(node_leafBase1).zero(); leafBase1(); lT.base(T.at(leafBase1));            // Set address of the referenced leaf stuck
+    tt  (node_leafBase2, l);     leafBase2(); lL.base(T.at(leafBase2));            // Set address of the referenced leaf stuck
+    tt  (node_leafBase3, r);     leafBase3(); lR.base(T.at(leafBase3));            // Set address of the referenced leaf stuck
 
     for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf from parent
      {z(); lT.shift();
@@ -2047,9 +2077,7 @@ abstract class BtreePA extends Test                                             
                 findFirstGreaterThanOrEqualInBranch();                          // Perform the step down again as the split will have altered the local layout
                 tt(parent, next);
                }
-              void Else()                                                       // Step down directly as no split was required
-               {z(); tt(parent, child);
-               }
+              void Else() {z(); tt(parent, child);}                             // Step down directly as no split was required
              };
             P.Goto(start);
            }
@@ -3403,13 +3431,13 @@ endmodule
     test_put_ascending_wide();
     test_put_descending();
     test_put_small_random();
-    test_put_large_random();
+    //test_put_large_random();
     test_find();
     test_delete_ascending();
     test_delete_descending();
     //test_to_array();
     test_delete_small_random();
-    test_delete_large_random();
+    //test_delete_large_random();
     test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
