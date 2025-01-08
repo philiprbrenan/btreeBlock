@@ -12,6 +12,7 @@ abstract class BtreePA extends Test                                             
   final MemoryLayoutPA T;                                                       // The memory used to hold temporary variable used during a transaction on the btree
   final ProgramPA      P = new ProgramPA();                                     // Program in which to generate instructions
   final boolean   Assert = false;                                               // Execute asserts if true
+  final boolean     Halt = false;                                               // Execute tests that result in a halt
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -886,7 +887,7 @@ abstract class BtreePA extends Test                                             
   private void splitLeafRoot()                                                  // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
    {if (Assert) {T.setIntInstruction(node_assertLeaf, root); assertLeaf();}
     T.setIntInstruction(node_leafIsFull, root); leafIsFull();
-    P.new If (T.at(leafIsFull))
+    if (Halt) P.new If (T.at(leafIsFull))
      {void Else()
        {P.halt("Root is not full");
        }
@@ -945,7 +946,7 @@ abstract class BtreePA extends Test                                             
   private void splitBranchRoot()                                                // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
    {if (Assert) {T.setIntInstruction(node_assertBranch, root); assertBranch();}
     T.setIntInstruction(node_branchIsFull, root); branchIsFull();
-    P.new If (T.at(branchIsFull))
+    if (Halt) P.new If (T.at(branchIsFull))
      {void Else()
        {P.halt("Root is not full");
        }
@@ -996,7 +997,7 @@ abstract class BtreePA extends Test                                             
 
   private void splitLeaf()                                                      // Split a leaf which is not the root
    {if (Assert) {tt(node_assertLeaf, node_splitLeaf); assertLeaf();}
-    P.new If (T.at(node_splitLeaf))
+    if (Halt) P.new If (T.at(node_splitLeaf))
      {void Else()
        {P.halt("Cannot split root with this method");
        }
@@ -1005,7 +1006,7 @@ abstract class BtreePA extends Test                                             
     tt(node_leafSize,   node_splitLeaf); leafSize();
     tt(node_leafIsFull, node_splitLeaf); leafIsFull();
 
-    P.new If (T.at(leafIsFull))
+    if (Halt) P.new If (T.at(leafIsFull))
      {void Else()
        {P.halt("Leaf is not full");
        }
@@ -1013,7 +1014,7 @@ abstract class BtreePA extends Test                                             
 
     tt(node_branchIsFull, splitParent); branchIsFull();
 
-    P.new If (T.at(branchIsFull))
+    if (Halt) P.new If (T.at(branchIsFull))
      {void Then()
        {P.halt("Leaf split parent must not be full");
        }
@@ -1055,22 +1056,24 @@ abstract class BtreePA extends Test                                             
   private void splitBranch()                                                    // Split a branch which is not the root by splitting right to left
    {if (Assert) {tt(node_assertBranch, node_splitBranch); assertBranch();}
     tt(node_branchSize, node_splitBranch); branchSize();
-    P.new If (T.at(node_splitBranch))
+    if (Halt) P.new If (T.at(node_splitBranch))
      {void Else()
        {P.halt("Cannot split root with this method");
        }
      };
 
     tt(node_branchIsFull, node_splitBranch); branchIsFull();
-    P.new If (T.at(branchIsFull))
+    if (Halt) P.new If (T.at(branchIsFull))
      {void Else()
        {P.halt("Branch is not full");
        }
      };
 
-    tt(node_isFull, splitParent); isFull();
-    P.new If (T.at(isFull))
-     {void Then() {P.halt("Branch split parent must not be full");}
+    tt(node_branchIsFull, splitParent); branchIsFull();
+    if (Halt) P.new If (T.at(branchIsFull))
+     {void Then()
+       {P.halt("Branch split parent must not be full");
+       }
      };
 
     z();
@@ -1221,7 +1224,7 @@ abstract class BtreePA extends Test                                             
     P.new Block()
      {void code()
        {if (Assert) {tt(node_assertBranch, node_stealFromRight); assertBranch();}
-        tt(node_branchSize,   node_stealFromRight); branchSize();
+        tt(node_branchSize, node_stealFromRight); branchSize();
         T.at(index).equal(T.at(branchSize), T.at(stolenOrMerged));
         stealNotPossible(end);
         z();
@@ -1251,12 +1254,8 @@ abstract class BtreePA extends Test                                             
            {z();
             tt(node_leafBase, l); leafBase(); lL.base(T.at(leafBase));
             tt(node_leafBase, r); leafBase(); lR.base(T.at(leafBase));
-            tt(node_leafSize, l);
-            leafSize();
-            tt(nl, leafSize);
-            tt(node_leafSize, r);
-            leafSize();
-            tt(nr, leafSize);
+            tt(node_leafSize, l); leafSize(); tt(nl, leafSize);
+            tt(node_leafSize, r); leafSize(); tt(nr, leafSize);
 
             T.at(nl).greaterThanOrEqual(T.at(maxKeysPerLeaf), T.at(stolenOrMerged));
             stealNotPossible(end);
@@ -1343,12 +1342,8 @@ abstract class BtreePA extends Test                                             
         hasLeavesForChildren();
         P.new If (T.at(hasLeavesForChildren))                                   // Leaves
          {void Then()
-           {tt(node_leafSize, l);
-            leafSize();
-            tt(nl, leafSize);
-            tt(node_leafSize, r);
-            leafSize();
-            tt(nr, leafSize);
+           {tt(node_leafSize, l); leafSize(); tt(nl, leafSize);
+            tt(node_leafSize, r); leafSize(); tt(nr, leafSize);
 
             P.new I()                                                           // Check that combined node would not be too big
              {void a()
@@ -1500,7 +1495,7 @@ abstract class BtreePA extends Test                                             
         branchSize();
 
         T.at(index).greaterThan(T.at(branchSize), T.at(stolenOrMerged));
-        P.new If (T.at(stolenOrMerged))
+        if (Halt) P.new If (T.at(stolenOrMerged))
          {void Then()
            {P.halt("Index too big");
            }
@@ -1526,18 +1521,10 @@ abstract class BtreePA extends Test                                             
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
            {z();
-            tt(node_leafBase, l);
-            leafBase();
-            lL.base(T.at(leafBase));
-            tt(node_leafBase, r);
-            leafBase();
-            lR.base(T.at(leafBase));
-            tt(node_leafSize, l);
-            leafSize();
-            tt(nl, leafSize);
-            tt(node_leafSize, r);
-            leafSize();
-            tt(nr, leafSize);
+            tt(node_leafBase, l); leafBase(); lL.base(T.at(leafBase));
+            tt(node_leafBase, r); leafBase(); lR.base(T.at(leafBase));
+            tt(node_leafSize, l); leafSize(); tt(nl, leafSize);
+            tt(node_leafSize, r); leafSize(); tt(nr, leafSize);
 
             P.new I()                                                           // Check that combined node would not be too big
              {void a()
@@ -1789,7 +1776,7 @@ abstract class BtreePA extends Test                                             
        {if (Assert) {tt(node_assertBranch, node_balance); assertBranch();}
         tt(node_branchSize,   node_balance); branchSize();
         T.at(index).greaterThan(T.at(branchSize), T.at(stolenOrMerged));
-        P.new If (T.at(stolenOrMerged))
+        if (Halt) P.new If (T.at(stolenOrMerged))
          {void Then()
            {P.halt("Index too big");
            }
@@ -1809,7 +1796,7 @@ abstract class BtreePA extends Test                                             
         tt(node_stealFromRight,    node_balance); stealFromRight   (); P.GoOn(end, T.at(stolenOrMerged));
         tt(node_mergeLeftSibling,  node_balance); mergeLeftSibling (); P.GoOn(end, T.at(stolenOrMerged));
         tt(node_mergeRightSibling, node_balance); mergeRightSibling(); P.GoOn(end, T.at(stolenOrMerged));
-        P.halt("Unable to balance child");
+        if (Halt) P.halt("Unable to balance child");
        }
      };
    }
@@ -1932,7 +1919,7 @@ abstract class BtreePA extends Test                                             
             P.Goto(start);
            }
          };
-        P.halt("Search did not terminate in a leaf");
+        if (Halt) P.halt("Search did not terminate in a leaf");
        }
      };
    }
@@ -2067,7 +2054,7 @@ abstract class BtreePA extends Test                                             
             P.Goto(start);
            }
          };
-        P.halt("Fallen off the end of the tree");                               // The tree must be missing a leaf
+        if (Halt) P.halt("Fallen off the end of the tree");                     // The tree must be missing a leaf
        }
      };
    }
@@ -2136,7 +2123,7 @@ abstract class BtreePA extends Test                                             
             P.Goto(start);
            }
          };
-        P.halt("Fallen off the end of the tree");                               // The tree must be missing a leaf
+        if (Halt) P.halt("Fallen off the end of the tree");                     // The tree must be missing a leaf
        };
      };
    }
@@ -2196,7 +2183,7 @@ abstract class BtreePA extends Test                                             
             P.Goto(start);
            }
          };
-        P.halt("Fallen off the end of the tree");                               // The tree must be missing a leaf
+        if (Halt) P.halt("Fallen off the end of the tree");                     // The tree must be missing a leaf
        }
      };
    }
@@ -3342,7 +3329,7 @@ endmodule
      {int Key     () {return    3;}                                             // Input key value
       int data    () {return    6;}                                             // Expected output data value
       int maxSteps() {return 2000;}                                             // Maximum number if execution steps
-      int expSteps() {return  978;}                                             // Expected number of steps
+      int expSteps() {return  975;}                                             // Expected number of steps
      };
     t.P.trace = true;
     t.P.run();
@@ -3393,7 +3380,7 @@ endmodule
      {int Key     () {return    3;}                                             // Input key value
       int data    () {return    0;}                                             // Expected output data value
       int maxSteps() {return 2000;}                                             // Maximum number if execution steps
-      int expSteps() {return 1018;}                                             // Expected number of steps
+      int expSteps() {return 1014;}                                             // Expected number of steps
      };
     t.P.trace = true;
     t.P.run();
