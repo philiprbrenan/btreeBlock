@@ -1,4 +1,5 @@
 //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // BtreeSA in pseudo assembler
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
@@ -673,14 +674,12 @@ abstract class BtreePA extends Test                                             
     isLeaf();
     P.new If (T.at(IsLeaf))
      {void Then()
-       {tt(node_leafSize, node_isEmpty);
-        leafSize();
+       {tt(node_leafSize, node_isEmpty); leafSize();
         T.at(leafSize).isZero(T.at(isEmpty));
        }
       void Else()
        {z();
-        tt(node_branchSize, node_isEmpty);
-        branchSize();
+        tt(node_branchSize, node_isEmpty); branchSize();
         T.at(branchSize).isZero(T.at(isEmpty));                                 // Allow for top which must always be present
        }
      };
@@ -1051,8 +1050,8 @@ abstract class BtreePA extends Test                                             
      };
     allocLeaf(); tt(l, allocLeaf);                                              // New  split out leaf
 
-    tt(node_leafBase, l);              leafBase(); lL.base(T.at(leafBase));     // The leaf being split into
-    tt(node_leafBase, node_splitLeaf); leafBase(); lR.base(T.at(leafBase));     // The leaf being split on the right
+    tt(node_leafBase1, l);              leafBase1(); lL.base(T.at(leafBase1));  // The leaf being split into
+    tt(node_leafBase2, node_splitLeaf); leafBase2(); lR.base(T.at(leafBase2));  // The leaf being split on the right
 
     for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf
      {z(); lR.shift();
@@ -1170,8 +1169,8 @@ abstract class BtreePA extends Test                                             
 
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
-           {tt(node_leafBase, l); leafBase(); lL.base(T.at(leafBase));
-            tt(node_leafBase, r); leafBase(); lR.base(T.at(leafBase));
+           {tt(node_leafBase1, l); leafBase1(); lL.base(T.at(leafBase1));
+            tt(node_leafBase2, r); leafBase2(); lR.base(T.at(leafBase2));
 
             tt(node_leafSize, l); leafSize(); tt(nl, leafSize);
             tt(node_leafSize, r); leafSize(); tt(nr, leafSize);
@@ -1204,8 +1203,8 @@ abstract class BtreePA extends Test                                             
            }
           void Else()                                                           // Children are branches
            {z();
-            tt(node_branchBase, l); branchBase(); bL.base(T.at(branchBase));
-            tt(node_branchBase, r); branchBase(); bR.base(T.at(branchBase));
+            tt(node_branchBase1, l); branchBase1(); bL.base(T.at(branchBase1));
+            tt(node_branchBase2, r); branchBase2(); bR.base(T.at(branchBase2));
             tt(node_branchSize, l); branchSize(); tt(nl, branchSize);
             tt(node_branchSize, r); branchSize(); tt(nr, branchSize);
 
@@ -1282,8 +1281,8 @@ abstract class BtreePA extends Test                                             
         P.new If(T.at(hasLeavesForChildren))                                    // Children are leaves
          {void Then()
            {z();
-            tt(node_leafBase, l); leafBase(); lL.base(T.at(leafBase));
-            tt(node_leafBase, r); leafBase(); lR.base(T.at(leafBase));
+            tt(node_leafBase1, l); leafBase1(); lL.base(T.at(leafBase1));
+            tt(node_leafBase2, r); leafBase2(); lR.base(T.at(leafBase2));
             tt(node_leafSize, l); leafSize(); tt(nl, leafSize);
             tt(node_leafSize, r); leafSize(); tt(nr, leafSize);
 
@@ -1392,14 +1391,13 @@ abstract class BtreePA extends Test                                             
             P.new If (T.at(mergeable))
              {void Then()
                {z(); bT.clear();
-                T.at(node_leafBase).zero(); leafBase(); lT.base(T.at(leafBase));
-                tt(node_leafBase, l);       leafBase(); lL.base(T.at(leafBase));
-                tt(node_leafBase, r);       leafBase(); lR.base(T.at(leafBase));
+                T.at(node_leafBase1).zero(); leafBase1(); lT.base(T.at(leafBase1));
+                tt(node_leafBase2, l);       leafBase2(); lL.base(T.at(leafBase2));
+                tt(node_leafBase3, r);       leafBase3(); lR.base(T.at(leafBase3));
                 P.new Block()
                  {void code()
                    {for (int i = 0; i < maxKeysPerLeaf(); ++i)                  // Merge in left child leaf
-                     {tt(node_isEmpty, l);
-                      isEmpty();
+                     {tt(node_isEmpty, l); isEmpty();
                       P.GoOn(end, T.at(isEmpty));                               // Stop when left leaf  child is empty
                       lL.shift();
                       M.moveParallel
@@ -1413,8 +1411,7 @@ abstract class BtreePA extends Test                                             
                 P.new Block()
                  {void code()
                    {for (int i = 0; i < maxKeysPerLeaf(); ++i)                  // Merge in right child leaf
-                     {tt(node_isEmpty, r);
-                      isEmpty();
+                     {tt(node_isEmpty, r); isEmpty();
 
                       P.GoOn(end, T.at(isEmpty));                               // Stop when right leaf child is empty
                       lR.shift();
@@ -1425,8 +1422,7 @@ abstract class BtreePA extends Test                                             
                      }
                    }
                  };
-                T.setIntInstruction(node_setLeaf, root);                        // The root is now a leaf
-                setLeaf();
+                T.setIntInstruction(node_setLeaf, root);  setLeaf();            // The root is now a leaf
                 tt(node_free, l); free();                                       // Free the children
                 tt(node_free, r); free();
                 z(); T.at(stolenOrMerged).ones(); P.Goto(Return);
@@ -1551,8 +1547,8 @@ abstract class BtreePA extends Test                                             
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
            {z();
-            tt(node_leafBase, l); leafBase(); lL.base(T.at(leafBase));
-            tt(node_leafBase, r); leafBase(); lR.base(T.at(leafBase));
+            tt(node_leafBase1, l); leafBase1(); lL.base(T.at(leafBase1));
+            tt(node_leafBase2, r); leafBase2(); lR.base(T.at(leafBase2));
             tt(node_leafSize, l); leafSize(); tt(nl, leafSize);
             tt(node_leafSize, r); leafSize(); tt(nr, leafSize);
 
@@ -1674,19 +1670,11 @@ abstract class BtreePA extends Test                                             
         hasLeavesForChildren();
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
-           {tt(node_leafBase, l);
-            leafBase();
-            lL.base(T.at(leafBase));
-            tt(node_leafBase, r);
-            leafBase();
-            lR.base(T.at(leafBase));
+           {tt(node_leafBase1, l); leafBase1(); lL.base(T.at(leafBase1));
+            tt(node_leafBase2, r); leafBase2(); lR.base(T.at(leafBase2));
 
-            tt(node_leafSize, l);
-            leafSize();
-            tt(nl, leafSize);
-            tt(node_leafSize, r);
-            leafSize();
-            tt(nr, leafSize);
+            tt(node_leafSize, l); leafSize(); tt(nl, leafSize);
+            tt(node_leafSize, r); leafSize(); tt(nr, leafSize);
 
             P.new I()                                                           // Check that combined node would not be too big
              {void a()
@@ -1707,8 +1695,7 @@ abstract class BtreePA extends Test                                             
              {void code()
                {for (int i = 0; i < maxKeysPerLeaf(); i++)                      // Transfer right to left
                  {z();
-                  tt(node_leafBase, r);
-                  leafSize();
+                  tt(node_leafBase, r); leafSize();
                   P.GoOff(end, T.at(leafSize));
                   lR.shift();
                   M.moveParallel
