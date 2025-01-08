@@ -163,7 +163,7 @@ class MemoryLayoutPA extends Test                                               
     int  result;                                                                // The contents of memory at this location
 
     String verilogLoadAddr(boolean la)                                          // A verilog representation of an addressed location in memory
-     {final String base = based != null ? baseName()+"+" : "";                  // Base field name if a based memory layot
+     {final String base = based != null ? baseName()+"+" : "";                  // Base field name if a based memory layout
 
       final Stack<String>      v = new Stack<>();                               // Verilog expression, index variable names
       Layout.Locator           L = field.locator;
@@ -172,7 +172,7 @@ class MemoryLayoutPA extends Test                                               
       for (int i = 0; i < A.size(); ++i)                                        // Each array to index to reach this field
        {final Layout.Array a = A.elementAt(i).toArray();                        // Each array to index to reach this field
         final int          w = a.element.width;                                 // Width of containing array element
-        final String       o = directs == null ? ""+indices[i] :                // Numeric index
+        final String       o = !hasIndirection() ? ""+indices[i] :              // Numeric index
                                directs[i].verilogLoad();                        // Indirect index loaded from memory
         v.push(" + " + o + " * " + w);                                          // Access indexing field
        }
@@ -255,6 +255,8 @@ class MemoryLayoutPA extends Test                                               
       z(); return true;
      }
 
+    boolean hasIndirection() {return directs != null;}                          // Is indirection used in this at reference ?
+
     int width() {z(); return field.width();}                                    // Width of the field in memory
 
     At setOff() {z(); return setOff(true);}                                     // Set the base address of the field from its indices confirming that we are inside an executing instruction
@@ -262,8 +264,8 @@ class MemoryLayoutPA extends Test                                               
     At setOff(boolean checkSetOff)                                              // Set the base address of the field
      {z();
       if (checkSetOff && !P.running) stop("Set off must be inside an instruction");
-      if (directs != null) {z(); locateInDirectAddress();}                      // Evaluate indirect indices
-      else                 {z(); locateDirectAddress();}                        // Evaluate direct indices
+      if (hasIndirection()) {z(); locateInDirectAddress();}                     // Evaluate indirect indices
+      else                  {z(); locateDirectAddress();}                       // Evaluate direct indices
       return this;
      }
 
@@ -310,6 +312,10 @@ class MemoryLayoutPA extends Test                                               
          {return target.verilogLoad()+" <= "+source.verilogLoad() + ";" + traceComment();
          }
         String n() {return field.name+"="+source.field.name;}
+        void   i()
+         {if (target.hasIndirection() || source.hasIndirection()) {}
+          else {out(target); in(source); mergeableInstruction = true;}
+         }
        };
      }
 
