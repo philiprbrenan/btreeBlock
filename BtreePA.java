@@ -2219,6 +2219,7 @@ abstract class BtreePA extends Test                                             
 
     GenVerilog(String Project, String Folder, ProgramPA Program)                // Generate verilog
      {project = Project; folder = Folder; program = Program;
+      program.compile();
 
       projectFolder = ""+Paths.get(folder, project);
       sourceVerilog = ""+Paths.get(projectFolder, project+Verilog.ext);
@@ -2278,12 +2279,15 @@ $stuckBases
       case(step)                                                                // Case statements to select the code for the current instruction
 """);
 
-      int n = 0;
       for(int i = 0; i < program.code.size(); ++i)
-       {final ProgramPA.I I = program.code.elementAt(i);
-        final String c = I.v();
-        if (c.length() == 0) {++n; say(I.traceBack);}                           // Count empty verilog strings
-        s.append(String.format("          %5d : begin %s end\n", i, c));
+       {final ProgramPA.I   I = program.code.elementAt(i);
+        final StringBuilder t = new StringBuilder();
+        t.append(I.merge == null ? I.v()+";"+I.traceComment() :
+         "/* merged into: "+I.merge.instructionNumber+" */");
+
+        for (ProgramPA.I c : I.merged) t.append(c.v()+";"+c.traceComment());
+
+        s.append(String.format("          %5d : begin %s end\n", i, t));
        }
       s.append("        default : begin stopped <= 1; /* end of execution */ end\n"); // Any invalid instruction address causes the program to halt
       s.append("""
@@ -3268,7 +3272,7 @@ endmodule
     t.P.clear();
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
-    GenVerilog v = t.new GenVerilog("find", "verilog", t.P);                    // Generate verilog now that memories have beeninitialzied and the program written
+    GenVerilog v = t.new GenVerilog("find", "verilog", t.P);                    // Generate verilog now that memories have been initialized and the program written
     t.P.trace = true;
     t.P.run();
     //say("AAAA11", t);
@@ -3389,7 +3393,7 @@ endmodule
     test_delete_descending();
     //test_to_array();
     test_delete_small_random();
-    //test_delete_large_random();
+    test_delete_large_random();
     test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
