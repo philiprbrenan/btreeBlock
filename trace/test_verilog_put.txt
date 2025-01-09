@@ -1,1013 +1,1013 @@
-   0     0
-   1     1
-   2     2
-   3    33
-   4    34
-   5    35
-   6    36
-   7    37
-   8    38
-   9    39
-  10    40
-  11    41
-  12    42
-  13    43
-  14    44
-  15    45
-  16    46
-  17    47
-  18    48
-  19    49
-  20    50
-  21    51
-  22    52
-  23    53
-  24    58
-  25    59
-  26    60
-  27    87
-  28    88
-  29    91
-  30    92
-  31    93
-  32    94
-  33    96
-  34    97
-  35    98
-  36    99
-  37   100
-  38   101
-  39   102
-  40   103
-  41   104
-  42   105
-  43   136
-  44   137
-  45    35
-  46    36
-  47    37
-  48    38
-  49    39
-  50    40
-  51    41
-  52    42
-  53    43
-  54    44
-  55    45
-  56    46
-  57    47
-  58    48
-  59    49
-  60    50
-  61    51
-  62    52
-  63    53
-  64    58
-  65    59
-  66    60
-  67    87
-  68    88
-  69    91
-  70    92
-  71    93
-  72    94
-  73    96
-  74    97
-  75    98
-  76    99
-  77   100
-  78   101
-  79   102
-  80   103
-  81   104
-  82   105
-  83   106
-  84   107
-  85   108
-  86   109
-  87   110
-  88   111
-  89   112
-  90   113
-  91   114
-  92   116
-  93   117
-  94   118
-  95   119
-  96   120
-  97   121
-  98   125
-  99   126
- 100   127
- 101   128
- 102   129
- 103   130
- 104   133
- 105   134
- 106   135
- 107   138
- 108   139
- 109   140
- 110   141
- 111   142
- 112   162
- 113   163
- 114   164
- 115   165
- 116   166
- 117   167
- 118   168
- 119   169
- 120   170
- 121   241
- 122   242
- 123   243
- 124   244
- 125   245
- 126   246
- 127   255
- 128   256
- 129   257
- 130   258
- 131   259
- 132   260
- 133   261
- 134   262
- 135   263
- 136   938
- 137   939
- 138   940
- 139   941
- 140   942
- 141   943
- 142   944
- 143   945
- 144   946
- 145   947
- 146   948
- 147   949
- 148   950
- 149   951
- 150   952
- 151   953
- 152   954
- 153   955
- 154   956
- 155   957
- 156   958
- 157   963
- 158   964
- 159   965
- 160   992
- 161   993
- 162   996
- 163   997
- 164   998
- 165   999
- 166  1001
- 167  1002
- 168  1003
- 169  1004
- 170  1005
- 171  1006
- 172  1007
- 173  1008
- 174  1009
- 175  1010
- 176  3201
- 177  3202
- 178  3203
- 179  3204
- 180  3213
- 181  3214
- 182  3215
- 183  3216
- 184  3217
- 185  3218
- 186  3219
- 187  3220
- 188  3221
- 189  3431
- 190  3432
- 191   940
- 192   941
- 193   942
- 194   943
- 195   944
- 196   945
- 197   946
- 198   947
- 199   948
- 200   949
- 201   950
- 202   951
- 203   952
- 204   953
- 205   954
- 206   955
- 207   956
- 208   957
- 209   958
- 210   963
- 211   964
- 212   965
- 213   992
- 214   993
- 215   996
- 216   997
- 217   998
- 218   999
- 219  1001
- 220  1002
- 221  1003
- 222  1004
- 223  1005
- 224  1006
- 225  1007
- 226  1008
- 227  1009
- 228  1010
- 229  1011
- 230  1012
- 231  1013
- 232  1014
- 233  1015
- 234  1016
- 235  1017
- 236  1018
- 237  1019
- 238  1020
- 239  1021
- 240  1022
- 241  1023
- 242  1024
- 243  1025
- 244  1026
- 245  1027
- 246  1028
- 247  1029
- 248  1030
- 249  1031
- 250  1032
- 251  1033
- 252  1034
- 253  1035
- 254  1036
- 255  1037
- 256  1038
- 257  1040
- 258  1041
- 259  1042
- 260  1043
- 261  1044
- 262  1045
- 263  1046
- 264  1047
- 265  1048
- 266  1049
- 267  1050
- 268  1051
- 269  1052
- 270  1053
- 271  1054
- 272  1055
- 273  1056
- 274  1058
- 275  1059
- 276  1060
- 277  1061
- 278  1062
- 279  1063
- 280  1064
- 281  1065
- 282  1066
- 283  1068
- 284  1069
- 285  1070
- 286  1071
- 287  1072
- 288  1073
- 289  1074
- 290  1075
- 291  1076
- 292  1077
- 293  1078
- 294  1080
- 295  1081
- 296  1082
- 297  1083
- 298  1084
- 299  1086
- 300  1087
- 301  1088
- 302  1089
- 303  1090
- 304  1091
- 305  1092
- 306  1093
- 307  1094
- 308  1095
- 309  1097
- 310  1098
- 311  1099
- 312  1100
- 313  1101
- 314  1102
- 315  1103
- 316  1104
- 317  1106
- 318  1107
- 319  1108
- 320  1109
- 321  1110
- 322  1111
- 323  1112
- 324  1113
- 325  1114
- 326  1115
- 327  1116
- 328  1117
- 329  1118
- 330  1119
- 331  1120
- 332  1121
- 333  1122
- 334  1123
- 335  1124
- 336  1125
- 337  1126
- 338  1127
- 339  1128
- 340  1129
- 341  1130
- 342  1131
- 343  1132
- 344  1133
- 345  1134
- 346  1165
- 347  1166
- 348  1167
- 349  1168
- 350  1169
- 351  1170
- 352  1171
- 353  1172
- 354  1173
- 355  1174
- 356  1175
- 357  1176
- 358  1177
- 359  1178
- 360  1179
- 361  1180
- 362  1181
- 363  1182
- 364  1183
- 365  1184
- 366  1185
- 367  1190
- 368  1191
- 369  1192
- 370  1219
- 371  1220
- 372  1223
- 373  1224
- 374  1225
- 375  1226
- 376  1228
- 377  1229
- 378  1230
- 379  1231
- 380  1232
- 381  1233
- 382  1234
- 383  1235
- 384  1236
- 385  1237
- 386  1268
- 387  1269
- 388  1167
- 389  1168
- 390  1169
- 391  1170
- 392  1171
- 393  1172
- 394  1173
- 395  1174
- 396  1175
- 397  1176
- 398  1177
- 399  1178
- 400  1179
- 401  1180
- 402  1181
- 403  1182
- 404  1183
- 405  1184
- 406  1185
- 407  1190
- 408  1191
- 409  1192
- 410  1193
- 411  1194
- 412  1195
- 413  1200
- 414  1201
- 415  1202
- 416  1219
- 417  1220
- 418  1223
- 419  1224
- 420  1225
- 421  1226
- 422  1228
- 423  1229
- 424  1230
- 425  1231
- 426  1232
- 427  1233
- 428  1234
- 429  1235
- 430  1236
- 431  1237
- 432  1238
- 433  1239
- 434  1240
- 435  1241
- 436  1242
- 437  1243
- 438  1244
- 439  1245
- 440  1246
- 441  1248
- 442  1249
- 443  1250
- 444  1251
- 445  1252
- 446  1253
- 447  1257
- 448  1258
- 449  1259
- 450  1265
- 451  1266
- 452  1267
- 453  1270
- 454  1271
- 455  1272
- 456  1273
- 457  1274
- 458  1294
- 459  1295
- 460  1296
- 461  1297
- 462  1298
- 463  1299
- 464  1300
- 465  1301
- 466  1302
- 467  1303
- 468  1304
- 469  1305
- 470  1306
- 471  1307
- 472  1308
- 473  1309
- 474  1310
- 475  1311
- 476  1313
- 477  1314
- 478  1315
- 479  1316
- 480  1317
- 481  1318
- 482  1323
- 483  1324
- 484  1325
- 485  1332
- 486  1333
- 487  1352
- 488  1353
- 489  1354
- 490  1355
- 491  1356
- 492  1358
- 493  1359
- 494  1360
- 495  1361
- 496  1362
- 497  1364
- 498  1365
- 499  1366
- 500  1367
- 501  1368
- 502  1369
- 503  1370
- 504  1371
- 505  1372
- 506  1374
- 507  1375
- 508  1376
- 509  1379
- 510  1380
- 511  1381
- 512  1382
- 513  1383
- 514  1384
- 515  1385
- 516  1386
- 517  1387
- 518  1390
- 519  1391
- 520  1392
- 521  1393
- 522  1394
- 523  1395
- 524  1396
- 525  1398
- 526  1399
- 527  1400
- 528  1401
- 529  1402
- 530  1403
- 531  1404
- 532  1405
- 533  1406
- 534  1408
- 535  1409
- 536  1410
- 537  1411
- 538  1412
- 539  1413
- 540  1414
- 541  1415
- 542  1416
- 543  1417
- 544  1418
- 545  1419
- 546  1420
- 547  1421
- 548  1423
- 549  1424
- 550  1425
- 551  1426
- 552  1427
- 553  1428
- 554  1429
- 555  1430
- 556  1431
- 557  1723
- 558  1724
- 559  1725
- 560  1726
- 561  1727
- 562  1728
- 563  1729
- 564  1730
- 565  1731
- 566  1732
- 567  1733
- 568  1734
- 569  1735
- 570  1736
- 571  1737
- 572  1738
- 573  1739
- 574  1740
- 575  2196
- 576  2197
- 577  2198
- 578  2199
- 579  2200
- 580  2201
- 581  2202
- 582  2203
- 583  2204
- 584  2205
- 585  2206
- 586  2207
- 587  2208
- 588  2209
- 589  2210
- 590  2211
- 591  2212
- 592  2213
- 593  2214
- 594  2215
- 595  2216
- 596  2217
- 597  2218
- 598  2219
- 599  2220
- 600  2221
- 601  2222
- 602  2223
- 603  2224
- 604  2225
- 605  2226
- 606  2227
- 607  2650
- 608  2652
- 609  2653
- 610  2654
- 611  2655
- 612  2656
- 613  2658
- 614  2659
- 615  2660
- 616  2661
- 617  2662
- 618  2663
- 619  2664
- 620  2665
- 621  2666
- 622  2669
- 623  2670
- 624  2671
- 625  2672
- 626  3125
- 627  3126
- 628  3127
- 629  3128
- 630  3129
- 631  3130
- 632  3131
- 633  3132
- 634  3133
- 635  2213
- 636  2214
- 637  2215
- 638  2216
- 639  2217
- 640  2218
- 641  2219
- 642  2220
- 643  2221
- 644  3134
- 645  3135
- 646  3136
- 647  3137
- 648  3138
- 649  3139
- 650  3140
- 651  3141
- 652  3142
- 653  3143
- 654  3144
- 655  3145
- 656  3146
- 657  3147
- 658  3148
- 659  3149
- 660  3154
- 661  3155
- 662  3156
- 663  3183
- 664  3184
- 665  3187
- 666  3188
- 667  3189
- 668  3190
- 669  3192
- 670  3193
- 671  3194
- 672  3195
- 673  3196
- 674  3197
- 675  3198
- 676  3199
- 677  2199
- 678  2200
- 679  2201
- 680  2202
- 681  2203
- 682  2204
- 683  2205
- 684  2206
- 685  2207
- 686  2208
- 687  2209
- 688  2210
- 689  2211
- 690  2212
- 691  2213
- 692  2214
- 693  2215
- 694  2216
- 695  2217
- 696  2218
- 697  2219
- 698  2220
- 699  2221
- 700  2222
- 701  2223
- 702  2224
- 703  2225
- 704  2226
- 705  2227
- 706  2650
- 707  2652
- 708  2653
- 709  2654
- 710  2655
- 711  2656
- 712  2658
- 713  2659
- 714  2660
- 715  2661
- 716  2662
- 717  2663
- 718  2664
- 719  2665
- 720  2666
- 721  2669
- 722  2670
- 723  2673
- 724  2674
- 725  2675
- 726  2676
- 727  2677
- 728  2678
- 729  2679
- 730  2680
- 731  2681
- 732  2682
- 733  2683
- 734  2684
- 735  2685
- 736  2686
- 737  2687
- 738  2688
- 739  2689
- 740  2690
- 741  2691
- 742  2692
- 743  2693
- 744  2694
- 745  2695
- 746  2696
- 747  2697
- 748  2698
- 749  2700
- 750  2701
- 751  2702
- 752  2703
- 753  2704
- 754  2705
- 755  2706
- 756  2707
- 757  2708
- 758  2709
- 759  2710
- 760  2711
- 761  2712
- 762  2713
- 763  2714
- 764  2715
- 765  2716
- 766  2717
- 767  2718
- 768  2719
- 769  2720
- 770  2721
- 771  2722
- 772  2723
- 773  2724
- 774  2725
- 775  2726
- 776  2727
- 777  2728
- 778  2729
- 779  2730
- 780  2731
- 781  2732
- 782  3125
- 783  3126
- 784  3127
- 785  3128
- 786  3129
- 787  3130
- 788  3131
- 789  3132
- 790  3133
- 791  2213
- 792  2214
- 793  2215
- 794  2216
- 795  2217
- 796  2218
- 797  2219
- 798  2220
- 799  2221
- 800  2222
- 801  2223
- 802  2224
- 803  2225
- 804  2228
- 805  2229
- 806  2230
- 807  2231
- 808  2232
- 809  2233
- 810  2234
- 811  2235
- 812  2236
- 813  2237
- 814  2240
- 815  2241
- 816  2242
- 817  2243
- 818  2244
- 819  2245
- 820  2246
- 821  2247
- 822  2248
- 823  2249
- 824  2250
- 825  2251
- 826  2252
- 827  2253
- 828  2254
- 829  2255
- 830  2256
- 831  2257
- 832  2258
- 833  2259
- 834  2260
- 835  2261
- 836  2262
- 837  2263
- 838  2264
- 839  2265
- 840  2267
- 841  2268
- 842  2269
- 843  2270
- 844  2271
- 845  2272
- 846  2273
- 847  2274
- 848  2275
- 849  2276
- 850  2277
- 851  2278
- 852  2279
- 853  2280
- 854  2281
- 855  2282
- 856  2283
- 857  2284
- 858  2285
- 859  2286
- 860  2287
- 861  2288
- 862  2289
- 863  2290
- 864  2291
- 865  2292
- 866  2293
- 867  2294
- 868  2295
- 869  2296
- 870  2297
- 871  2298
- 872  2299
- 873  2650
- 874  2652
- 875  2653
- 876  2654
- 877  2655
- 878  2656
- 879  2658
- 880  2659
- 881  2660
- 882  2661
- 883  2662
- 884  2663
- 885  2664
- 886  2665
- 887  2666
- 888  2669
- 889  2670
- 890  2673
- 891  2674
- 892  2675
- 893  2676
- 894  2677
- 895  2678
- 896  2679
- 897  2680
- 898  2681
- 899  2682
- 900  2683
- 901  2684
- 902  2685
- 903  2686
- 904  2687
- 905  2688
- 906  2689
- 907  2690
- 908  2691
- 909  2692
- 910  2693
- 911  2694
- 912  2695
- 913  2696
- 914  2697
- 915  2698
- 916  2700
- 917  2701
- 918  2702
- 919  2703
- 920  2704
- 921  2705
- 922  2706
- 923  2707
- 924  2708
- 925  2709
- 926  2710
- 927  2711
- 928  2712
- 929  2713
- 930  2714
- 931  2715
- 932  2716
- 933  2717
- 934  2718
- 935  2719
- 936  2720
- 937  2721
- 938  2722
- 939  2723
- 940  2724
- 941  2725
- 942  2726
- 943  2727
- 944  2728
- 945  2729
- 946  2730
- 947  2731
- 948  2732
- 949  3125
- 950  3126
- 951  3127
- 952  3128
- 953  3129
- 954  3130
- 955  3131
- 956  3132
- 957  3133
- 958  2213
- 959  2214
- 960  2215
- 961  2216
- 962  2217
- 963  2218
- 964  2219
- 965  2220
- 966  2221
- 967  3134
- 968  3135
- 969  3136
- 970  3137
- 971  3138
- 972  3139
- 973  3140
- 974  3141
- 975  3142
- 976  3143
- 977  3144
- 978  3145
- 979  3146
- 980  3147
- 981  3148
- 982  3149
- 983  3154
- 984  3155
- 985  3156
- 986  3157
- 987  3158
- 988  3159
- 989  3164
- 990  3165
- 991  3166
- 992  3183
- 993  3184
- 994  3187
- 995  3188
- 996  3189
- 997  3190
- 998  3192
- 999  3193
-1000  3194
-1001  3195
-1002  3196
-1003  3197
-1004  3198
-1005  3199
-1006  2199
-1007  2200
-1008  2201
-1009  2202
-1010  2203
-1011  2204
-1012  3200
+   0     0     0  node_isLeaf <= 0
+   1     1     1  IsLeaf=isLeaf
+   2     2     2  GoOff IsLeaf to 34
+   3    33    33  parent <= 0
+   4    34    34  findDepth <= 0
+   5    35    35  ++findDepth
+   6    36    36  pastMaxDepth=findDepth>maxDepth
+   7    37    37  GoOn pastMaxDepth to 137
+   8    38    38  search=Key
+   8    38    39  node_findFirstGreaterThanOrEqualInBranch=parent
+   9    39    40  node_branchBase=node_findFirstGreaterThanOrEqualInBranch
+  10    40    41  instruction
+  11    41    42  instruction
+  12    42    43  search=search
+  13    43    44  instruction
+  14    44    45  size=currentSize
+  15    45    46  GoOff limit to 48
+  16    46    47  --size
+  17    47    48  instruction
+  18    48    49  equal=index == size
+  19    49    50  GoOn equal to 87
+  20    50    51  key=key
+  21    51    52  equal=key>=search
+  22    52    53  GoOff equal to 58
+  23    57    58  instruction
+  24    58    59  equal=index == size
+  25    59    60  GoOn equal to 87
+  26    86    87  found = foundfirst = index
+  27    87    88  GoOff found to 91
+  28    90    91  size=currentSize
+  29    91    92  instruction
+  30    92    93  isEmpty=size == full
+  31    93    94  GoOff isEmpty to 96
+  32    95    96  instruction
+  33    96    97  index=currentSize
+  34    97    98  --index
+  35    98    99  key=key
+  36    99   100  data=data
+  37   100   101  next=data
+  38   101   102  child=next
+  39   102   103  node_isLeaf=child
+  40   103   104  IsLeaf=isLeaf
+  41   104   105  GoOff IsLeaf to 135
+  42   134   136  parent=child
+  43   135   137  Go to 36
+  44    35    35  ++findDepth
+  45    36    36  pastMaxDepth=findDepth>maxDepth
+  46    37    37  GoOn pastMaxDepth to 137
+  47    38    38  search=Key
+  47    38    39  node_findFirstGreaterThanOrEqualInBranch=parent
+  48    39    40  node_branchBase=node_findFirstGreaterThanOrEqualInBranch
+  49    40    41  instruction
+  50    41    42  instruction
+  51    42    43  search=search
+  52    43    44  instruction
+  53    44    45  size=currentSize
+  54    45    46  GoOff limit to 48
+  55    46    47  --size
+  56    47    48  instruction
+  57    48    49  equal=index == size
+  58    49    50  GoOn equal to 87
+  59    50    51  key=key
+  60    51    52  equal=key>=search
+  61    52    53  GoOff equal to 58
+  62    57    58  instruction
+  63    58    59  equal=index == size
+  64    59    60  GoOn equal to 87
+  65    86    87  found = foundfirst = index
+  66    87    88  GoOff found to 91
+  67    90    91  size=currentSize
+  68    91    92  instruction
+  69    92    93  isEmpty=size == full
+  70    93    94  GoOff isEmpty to 96
+  71    95    96  instruction
+  72    96    97  index=currentSize
+  73    97    98  --index
+  74    98    99  key=key
+  75    99   100  data=data
+  76   100   101  next=data
+  77   101   102  child=next
+  78   102   103  node_isLeaf=child
+  79   103   104  IsLeaf=isLeaf
+  80   104   105  GoOff IsLeaf to 135
+  81   105   106  search=Key
+  81   105   107  node_findEqualInLeaf=child
+  82   106   108  node_leafBase=node_findEqualInLeaf
+  83   107   109  instruction
+  84   108   110  instruction
+  85   109   111  search=search
+  86   110   112  instruction
+  87   111   113  size=currentSize
+  88   112   114  GoOff limit to 115
+  89   114   116  instruction
+  90   115   117  equal=index == size
+  91   116   118  GoOn equal to 132
+  92   117   119  key=key
+  93   118   120  equal=key == search
+  94   119   121  GoOff equal to 124
+  95   123   125  instruction
+  96   124   126  equal=index == size
+  97   125   127  GoOn equal to 132
+  98   126   128  key=key
+  99   127   129  equal=key == search
+ 100   128   130  GoOff equal to 132
+ 101   131   133  found = foundindex = indexdata = data
+ 102   132   134  find=child
+ 103   133   135  Go to 137
+ 104   136   138  leafFound=find
+ 105   137   139  node_leafBase=leafFound
+ 106   138   140  instruction
+ 107   139   141  instruction
+ 108   140   142  GoOff found to 161
+ 109   160   162  node_leafIsFull=leafFound
+ 110   161   163  node_leafSize=node_leafIsFull
+ 111   162   164  node_leafBase=node_leafSize
+ 112   163   165  instruction
+ 113   164   166  instruction
+ 114   165   167  size=currentSize
+ 115   166   168  leafSize=size
+ 116   167   169  leafIsFull=leafSize == maxKeysPerLeaf
+ 117   168   170  GoOn leafIsFull to 239
+ 118   238   241  success <= 0
+ 119   239   242  GoOn success to 3434
+ 120   240   243  node_isFull <= 0
+ 121   241   244  node_isLeaf=node_isFull
+ 122   242   245  IsLeaf=isLeaf
+ 123   243   246  GoOff IsLeaf to 253
+ 124   252   255  node_branchSize=node_isFull
+ 125   253   256  node_branchBase=node_branchSize
+ 126   254   257  instruction
+ 127   255   258  instruction
+ 128   256   259  size=currentSize
+ 129   257   260  branchSize=size
+ 130   258   261  --branchSize
+ 131   259   262  isFull=branchSize == maxKeysPerBranch
+ 132   260   263  GoOff isFull to 918
+ 133   917   938  parent <= 0
+ 134   918   939  putDepth <= 0
+ 135   919   940  ++putDepth
+ 136   920   941  pastMaxDepth=putDepth>maxDepth
+ 137   921   942  GoOn pastMaxDepth to 3434
+ 138   922   943  search=Key
+ 138   922   944  node_findFirstGreaterThanOrEqualInBranch=parent
+ 139   923   945  node_branchBase=node_findFirstGreaterThanOrEqualInBranch
+ 140   924   946  instruction
+ 141   925   947  instruction
+ 142   926   948  search=search
+ 143   927   949  instruction
+ 144   928   950  size=currentSize
+ 145   929   951  GoOff limit to 932
+ 146   930   952  --size
+ 147   931   953  instruction
+ 148   932   954  equal=index == size
+ 149   933   955  GoOn equal to 971
+ 150   934   956  key=key
+ 151   935   957  equal=key>=search
+ 152   936   958  GoOff equal to 942
+ 153   941   963  instruction
+ 154   942   964  equal=index == size
+ 155   943   965  GoOn equal to 971
+ 156   970   992  found = foundfirst = index
+ 157   971   993  GoOff found to 975
+ 158   974   996  size=currentSize
+ 159   975   997  instruction
+ 160   976   998  isEmpty=size == full
+ 161   977   999  GoOff isEmpty to 980
+ 162   979  1001  instruction
+ 163   980  1002  index=currentSize
+ 164   981  1003  --index
+ 165   982  1004  key=key
+ 166   983  1005  data=data
+ 167   984  1006  next=data
+ 168   985  1007  child=next
+ 169   986  1008  node_isLeaf=child
+ 170   987  1009  IsLeaf=isLeaf
+ 171   988  1010  GoOff IsLeaf to 3146
+ 172  3145  3201  node_isFull=child
+ 173  3146  3202  node_isLeaf=node_isFull
+ 174  3147  3203  IsLeaf=isLeaf
+ 175  3148  3204  GoOff IsLeaf to 3158
+ 176  3157  3213  node_branchSize=node_isFull
+ 177  3158  3214  node_branchBase=node_branchSize
+ 178  3159  3215  instruction
+ 179  3160  3216  instruction
+ 180  3161  3217  size=currentSize
+ 181  3162  3218  branchSize=size
+ 182  3163  3219  --branchSize
+ 183  3164  3220  isFull=branchSize == maxKeysPerBranch
+ 184  3165  3221  GoOff isFull to 3370
+ 185  3369  3431  parent=child
+ 186  3370  3432  Go to 920
+ 187   919   940  ++putDepth
+ 188   920   941  pastMaxDepth=putDepth>maxDepth
+ 189   921   942  GoOn pastMaxDepth to 3434
+ 190   922   943  search=Key
+ 190   922   944  node_findFirstGreaterThanOrEqualInBranch=parent
+ 191   923   945  node_branchBase=node_findFirstGreaterThanOrEqualInBranch
+ 192   924   946  instruction
+ 193   925   947  instruction
+ 194   926   948  search=search
+ 195   927   949  instruction
+ 196   928   950  size=currentSize
+ 197   929   951  GoOff limit to 932
+ 198   930   952  --size
+ 199   931   953  instruction
+ 200   932   954  equal=index == size
+ 201   933   955  GoOn equal to 971
+ 202   934   956  key=key
+ 203   935   957  equal=key>=search
+ 204   936   958  GoOff equal to 942
+ 205   941   963  instruction
+ 206   942   964  equal=index == size
+ 207   943   965  GoOn equal to 971
+ 208   970   992  found = foundfirst = index
+ 209   971   993  GoOff found to 975
+ 210   974   996  size=currentSize
+ 211   975   997  instruction
+ 212   976   998  isEmpty=size == full
+ 213   977   999  GoOff isEmpty to 980
+ 214   979  1001  instruction
+ 215   980  1002  index=currentSize
+ 216   981  1003  --index
+ 217   982  1004  key=key
+ 218   983  1005  data=data
+ 219   984  1006  next=data
+ 220   985  1007  child=next
+ 221   986  1008  node_isLeaf=child
+ 222   987  1009  IsLeaf=isLeaf
+ 223   988  1010  GoOff IsLeaf to 3146
+ 224   989  1011  splitParent=parent
+ 224   989  1012  index=first
+ 224   989  1013  node_splitLeaf=child
+ 225   990  1014  node_leafSize=node_splitLeaf
+ 226   991  1015  node_leafBase=node_leafSize
+ 227   992  1016  instruction
+ 228   993  1017  instruction
+ 229   994  1018  size=currentSize
+ 229   994  1020  node_leafIsFull=node_splitLeaf
+ 230   995  1019  leafSize=size
+ 231   996  1021  node_leafSize=node_leafIsFull
+ 232   997  1022  node_leafBase=node_leafSize
+ 233   998  1023  instruction
+ 234   999  1024  instruction
+ 235  1000  1025  size=currentSize
+ 236  1001  1026  leafSize=size
+ 237  1002  1027  leafIsFull=leafSize == maxKeysPerLeaf
+ 238  1003  1028  node_branchIsFull=splitParent
+ 239  1004  1029  node_branchSize=node_branchIsFull
+ 240  1005  1030  node_branchBase=node_branchSize
+ 241  1006  1031  instruction
+ 242  1007  1032  instruction
+ 243  1008  1033  size=currentSize
+ 244  1009  1034  branchSize=size
+ 245  1010  1035  --branchSize
+ 246  1011  1036  branchIsFull=branchSize == maxKeysPerBranch
+ 247  1012  1037  allocate=freeList
+ 248  1013  1038  GoOn allocate to 1016
+ 249  1015  1040  freeList=free
+ 250  1016  1041  node_clear=allocate
+ 251  1017  1042  node <= 0
+ 252  1018  1043  allocLeaf=allocate
+ 252  1018  1044  node_setLeaf=allocate
+ 253  1019  1045  isLeaf <= 1'b1
+ 254  1020  1046  l=allocLeaf
+ 255  1021  1047  node_leafBase1=l
+ 256  1022  1048  instruction
+ 257  1023  1049  instruction
+ 258  1024  1050  node_leafBase2=node_splitLeaf
+ 259  1025  1051  instruction
+ 260  1026  1052  instruction
+ 261  1027  1053  size=currentSize
+ 262  1028  1054  instruction
+ 263  1029  1055  isEmpty=size == full
+ 264  1030  1056  GoOff isEmpty to 1033
+ 265  1032  1058  instruction
+ 266  1033  1059  instruction
+ 267  1034  1060  key=key
+ 268  1035  1061  data=data
+ 269  1036  1062  Keys=Keys
+ 270  1037  1063  Keys moveDown @ index using Keys
+ 271  1038  1064  Data=Data
+ 272  1039  1065  Data moveDown @ index using Data
+ 273  1040  1066  GoOff isEmpty to 1043
+ 274  1042  1068  --currentSize
+ 275  1043  1069  size=currentSize
+ 276  1044  1070  instruction
+ 277  1045  1071  isFull=size>=full
+ 278  1046  1072  instruction
+ 279  1047  1073  isEmpty=size == full
+ 280  1048  1074  key = keydata = data
+ 281  1049  1075  size=currentSize
+ 282  1050  1076  instruction
+ 283  1051  1077  isFull=size>=full
+ 284  1052  1078  GoOff isFull to 1055
+ 285  1054  1080  size=currentSize
+ 286  1055  1081  index=size
+ 287  1056  1082  key=key
+ 288  1057  1083  data=data
+ 289  1058  1084  GoOff isFull to 1061
+ 290  1060  1086  ++currentSize
+ 291  1061  1087  size=currentSize
+ 292  1062  1088  instruction
+ 293  1063  1089  isFull=size>=full
+ 294  1064  1090  instruction
+ 295  1065  1091  isEmpty=size == full
+ 296  1066  1092  size=currentSize
+ 297  1067  1093  instruction
+ 298  1068  1094  isEmpty=size == full
+ 299  1069  1095  GoOff isEmpty to 1072
+ 300  1071  1097  instruction
+ 301  1072  1098  instruction
+ 302  1073  1099  key=key
+ 303  1074  1100  data=data
+ 304  1075  1101  size=currentSize
+ 305  1076  1102  instruction
+ 306  1077  1103  isEmpty=size == full
+ 307  1078  1104  GoOff isEmpty to 1081
+ 308  1080  1106  instruction
+ 309  1081  1107  index=currentSize
+ 310  1082  1108  --index
+ 311  1083  1109  key=key
+ 312  1084  1110  data=data
+ 313  1085  1111  node_branchBase=splitParent
+ 314  1086  1112  instruction
+ 315  1087  1113  instruction
+ 316  1088  1114  instruction
+ 317  1089  1115  data = lindex = index
+ 318  1090  1116  size=currentSize
+ 319  1091  1117  instruction
+ 320  1092  1118  isFull=size>=full
+ 321  1093  1119  instruction
+ 322  1094  1120  Keys=Keys
+ 323  1095  1121  Keys moveUp @ index using Keys
+ 324  1096  1122  Data=Data
+ 325  1097  1123  Data moveUp @ index using Data
+ 326  1098  1124  ++currentSize
+ 327  1099  1125  key=key
+ 328  1100  1126  data=data
+ 329  1101  1127  size=currentSize
+ 330  1102  1128  instruction
+ 331  1103  1129  isFull=size>=full
+ 332  1104  1130  instruction
+ 333  1105  1131  isEmpty=size == full
+ 334  1106  1132  node_isLeaf <= 0
+ 335  1107  1133  IsLeaf=isLeaf
+ 336  1108  1134  GoOff IsLeaf to 1140
+ 337  1139  1165  parent <= 0
+ 338  1140  1166  findDepth <= 0
+ 339  1141  1167  ++findDepth
+ 340  1142  1168  pastMaxDepth=findDepth>maxDepth
+ 341  1143  1169  GoOn pastMaxDepth to 1243
+ 342  1144  1170  search=Key
+ 342  1144  1171  node_findFirstGreaterThanOrEqualInBranch=parent
+ 343  1145  1172  node_branchBase=node_findFirstGreaterThanOrEqualInBranch
+ 344  1146  1173  instruction
+ 345  1147  1174  instruction
+ 346  1148  1175  search=search
+ 347  1149  1176  instruction
+ 348  1150  1177  size=currentSize
+ 349  1151  1178  GoOff limit to 1154
+ 350  1152  1179  --size
+ 351  1153  1180  instruction
+ 352  1154  1181  equal=index == size
+ 353  1155  1182  GoOn equal to 1193
+ 354  1156  1183  key=key
+ 355  1157  1184  equal=key>=search
+ 356  1158  1185  GoOff equal to 1164
+ 357  1163  1190  instruction
+ 358  1164  1191  equal=index == size
+ 359  1165  1192  GoOn equal to 1193
+ 360  1192  1219  found = foundfirst = index
+ 361  1193  1220  GoOff found to 1197
+ 362  1196  1223  size=currentSize
+ 363  1197  1224  instruction
+ 364  1198  1225  isEmpty=size == full
+ 365  1199  1226  GoOff isEmpty to 1202
+ 366  1201  1228  instruction
+ 367  1202  1229  index=currentSize
+ 368  1203  1230  --index
+ 369  1204  1231  key=key
+ 370  1205  1232  data=data
+ 371  1206  1233  next=data
+ 372  1207  1234  child=next
+ 373  1208  1235  node_isLeaf=child
+ 374  1209  1236  IsLeaf=isLeaf
+ 375  1210  1237  GoOff IsLeaf to 1241
+ 376  1240  1268  parent=child
+ 377  1241  1269  Go to 1142
+ 378  1141  1167  ++findDepth
+ 379  1142  1168  pastMaxDepth=findDepth>maxDepth
+ 380  1143  1169  GoOn pastMaxDepth to 1243
+ 381  1144  1170  search=Key
+ 381  1144  1171  node_findFirstGreaterThanOrEqualInBranch=parent
+ 382  1145  1172  node_branchBase=node_findFirstGreaterThanOrEqualInBranch
+ 383  1146  1173  instruction
+ 384  1147  1174  instruction
+ 385  1148  1175  search=search
+ 386  1149  1176  instruction
+ 387  1150  1177  size=currentSize
+ 388  1151  1178  GoOff limit to 1154
+ 389  1152  1179  --size
+ 390  1153  1180  instruction
+ 391  1154  1181  equal=index == size
+ 392  1155  1182  GoOn equal to 1193
+ 393  1156  1183  key=key
+ 394  1157  1184  equal=key>=search
+ 395  1158  1185  GoOff equal to 1164
+ 396  1163  1190  instruction
+ 397  1164  1191  equal=index == size
+ 398  1165  1192  GoOn equal to 1193
+ 399  1166  1193  key=key
+ 400  1167  1194  equal=key>=search
+ 401  1168  1195  GoOff equal to 1174
+ 402  1173  1200  instruction
+ 403  1174  1201  equal=index == size
+ 404  1175  1202  GoOn equal to 1193
+ 405  1192  1219  found = foundfirst = index
+ 406  1193  1220  GoOff found to 1197
+ 407  1196  1223  size=currentSize
+ 408  1197  1224  instruction
+ 409  1198  1225  isEmpty=size == full
+ 410  1199  1226  GoOff isEmpty to 1202
+ 411  1201  1228  instruction
+ 412  1202  1229  index=currentSize
+ 413  1203  1230  --index
+ 414  1204  1231  key=key
+ 415  1205  1232  data=data
+ 416  1206  1233  next=data
+ 417  1207  1234  child=next
+ 418  1208  1235  node_isLeaf=child
+ 419  1209  1236  IsLeaf=isLeaf
+ 420  1210  1237  GoOff IsLeaf to 1241
+ 421  1211  1238  search=Key
+ 421  1211  1239  node_findEqualInLeaf=child
+ 422  1212  1240  node_leafBase=node_findEqualInLeaf
+ 423  1213  1241  instruction
+ 424  1214  1242  instruction
+ 425  1215  1243  search=search
+ 426  1216  1244  instruction
+ 427  1217  1245  size=currentSize
+ 428  1218  1246  GoOff limit to 1221
+ 429  1220  1248  instruction
+ 430  1221  1249  equal=index == size
+ 431  1222  1250  GoOn equal to 1238
+ 432  1223  1251  key=key
+ 433  1224  1252  equal=key == search
+ 434  1225  1253  GoOff equal to 1230
+ 435  1229  1257  instruction
+ 436  1230  1258  equal=index == size
+ 437  1231  1259  GoOn equal to 1238
+ 438  1237  1265  found = foundindex = indexdata = data
+ 439  1238  1266  find=child
+ 440  1239  1267  Go to 1243
+ 441  1242  1270  leafFound=find
+ 442  1243  1271  node_leafBase=leafFound
+ 443  1244  1272  instruction
+ 444  1245  1273  instruction
+ 445  1246  1274  GoOff found to 1267
+ 446  1266  1294  node_leafIsFull=leafFound
+ 447  1267  1295  node_leafSize=node_leafIsFull
+ 448  1268  1296  node_leafBase=node_leafSize
+ 449  1269  1297  instruction
+ 450  1270  1298  instruction
+ 451  1271  1299  size=currentSize
+ 452  1272  1300  leafSize=size
+ 453  1273  1301  leafIsFull=leafSize == maxKeysPerLeaf
+ 454  1274  1302  GoOn leafIsFull to 1345
+ 455  1275  1303  search=Key
+ 455  1275  1304  node_findFirstGreaterThanOrEqualInLeaf=leafFound
+ 456  1276  1305  node_leafBase=node_findFirstGreaterThanOrEqualInLeaf
+ 457  1277  1306  instruction
+ 458  1278  1307  instruction
+ 459  1279  1308  search=search
+ 460  1280  1309  instruction
+ 461  1281  1310  size=currentSize
+ 462  1282  1311  GoOff limit to 1285
+ 463  1284  1313  instruction
+ 464  1285  1314  equal=index == size
+ 465  1286  1315  GoOn equal to 1304
+ 466  1287  1316  key=key
+ 467  1288  1317  equal=key>=search
+ 468  1289  1318  GoOff equal to 1295
+ 469  1294  1323  instruction
+ 470  1295  1324  equal=index == size
+ 471  1296  1325  GoOn equal to 1304
+ 472  1303  1332  found = foundfirst = index
+ 473  1304  1333  GoOff found to 1324
+ 474  1323  1352  key = Keydata = Data
+ 475  1324  1353  size=currentSize
+ 476  1325  1354  instruction
+ 477  1326  1355  isFull=size>=full
+ 478  1327  1356  GoOff isFull to 1330
+ 479  1329  1358  size=currentSize
+ 480  1330  1359  index=size
+ 481  1331  1360  key=key
+ 482  1332  1361  data=data
+ 483  1333  1362  GoOff isFull to 1336
+ 484  1335  1364  ++currentSize
+ 485  1336  1365  size=currentSize
+ 486  1337  1366  instruction
+ 487  1338  1367  isFull=size>=full
+ 488  1339  1368  instruction
+ 489  1340  1369  isEmpty=size == full
+ 490  1341  1370  success <= 1'b1
+ 491  1342  1371  findAndInsert=leafFound
+ 492  1343  1372  Go to 1346
+ 493  1345  1374  node_isLeaf <= 0
+ 494  1346  1375  IsLeaf=isLeaf
+ 495  1347  1376  GoOff IsLeaf to 1351
+ 496  1350  1379  node_branchSize <= 0
+ 497  1351  1380  node_branchBase=node_branchSize
+ 498  1352  1381  instruction
+ 499  1353  1382  instruction
+ 500  1354  1383  size=currentSize
+ 501  1355  1384  branchSize=size
+ 502  1356  1385  --branchSize
+ 503  1357  1386  stolenOrMerged=branchSize>=two
+ 504  1358  1387  GoOff stolenOrMerged to 1362
+ 505  1361  1390  node_branchBase <= 0
+ 506  1362  1391  instruction
+ 507  1363  1392  instruction
+ 508  1364  1393  size=currentSize
+ 509  1365  1394  instruction
+ 510  1366  1395  isEmpty=size == full
+ 511  1367  1396  GoOff isEmpty to 1370
+ 512  1369  1398  instruction
+ 513  1370  1399  instruction
+ 514  1371  1400  key=key
+ 515  1372  1401  data=data
+ 516  1373  1402  l=data
+ 516  1373  1403  size=currentSize
+ 517  1374  1404  instruction
+ 518  1375  1405  isEmpty=size == full
+ 519  1376  1406  GoOff isEmpty to 1379
+ 520  1378  1408  instruction
+ 521  1379  1409  index=currentSize
+ 522  1380  1410  --index
+ 523  1381  1411  key=key
+ 524  1382  1412  data=data
+ 525  1383  1413  r=data
+ 526  1384  1414  instruction
+ 527  1385  1415  node_branchBase=node_hasLeavesForChildren
+ 528  1386  1416  instruction
+ 529  1387  1417  instruction
+ 530  1388  1418  size=currentSize
+ 531  1389  1419  instruction
+ 532  1390  1420  isEmpty=size == full
+ 533  1391  1421  GoOff isEmpty to 1394
+ 534  1393  1423  instruction
+ 535  1394  1424  index=currentSize
+ 536  1395  1425  --index
+ 537  1396  1426  key=key
+ 538  1397  1427  data=data
+ 539  1398  1428  node_isLeaf=data
+ 540  1399  1429  IsLeaf=isLeaf
+ 541  1400  1430  hasLeavesForChildren=IsLeaf
+ 542  1401  1431  GoOff hasLeavesForChildren to 1693
+ 543  1692  1723  node_branchSize=l
+ 544  1693  1724  node_branchBase=node_branchSize
+ 545  1694  1725  instruction
+ 546  1695  1726  instruction
+ 547  1696  1727  size=currentSize
+ 548  1697  1728  branchSize=size
+ 549  1698  1729  --branchSize
+ 550  1699  1730  nl=branchSize
+ 550  1699  1731  node_branchSize=r
+ 551  1700  1732  node_branchBase=node_branchSize
+ 552  1701  1733  instruction
+ 553  1702  1734  instruction
+ 554  1703  1735  size=currentSize
+ 555  1704  1736  branchSize=size
+ 556  1705  1737  --branchSize
+ 557  1706  1738  nr=branchSize
+ 558  1707  1739  instruction
+ 559  1708  1740  GoOff mergeable to 2164
+ 560  2163  2196  stolenOrMerged <= 0
+ 561  2164  2197  parent <= 0
+ 562  2165  2198  mergeDepth <= 0
+ 563  2166  2199  ++mergeDepth
+ 564  2167  2200  pastMaxDepth=mergeDepth>maxDepth
+ 565  2168  2201  GoOn pastMaxDepth to 3145
+ 566  2169  2202  node_isLeaf=parent
+ 567  2170  2203  IsLeaf=isLeaf
+ 568  2171  2204  GoOn IsLeaf to 3145
+ 569  2172  2205  node_branchSize=parent
+ 570  2173  2206  node_branchBase=node_branchSize
+ 571  2174  2207  instruction
+ 572  2175  2208  instruction
+ 573  2176  2209  size=currentSize
+ 574  2177  2210  branchSize=size
+ 575  2178  2211  --branchSize
+ 576  2179  2212  mergeIndex <= 0
+ 577  2180  2213  node_branchSize=parent
+ 578  2181  2214  node_branchBase=node_branchSize
+ 579  2182  2215  instruction
+ 580  2183  2216  instruction
+ 581  2184  2217  size=currentSize
+ 582  2185  2218  branchSize=size
+ 583  2186  2219  --branchSize
+ 584  2187  2220  nodeMerged=mergeIndex>=branchSize
+ 585  2188  2221  GoOn nodeMerged to 3079
+ 586  2189  2222  index=mergeIndex
+ 586  2189  2223  node_mergeLeftSibling=parent
+ 587  2190  2224  stolenOrMerged <= isZero index
+ 588  2191  2225  GoOff stolenOrMerged to 2195
+ 589  2192  2226  stolenOrMerged <= 0
+ 590  2193  2227  Go to 2605
+ 591  2604  2650  GoOff stolenOrMerged to 2607
+ 592  2606  2652  index=mergeIndex
+ 593  2607  2653  node_mergeRightSibling=parent
+ 594  2608  2654  node_isLeaf=node_assertBranch
+ 595  2609  2655  IsLeaf=isLeaf
+ 596  2610  2656  GoOff IsLeaf to 2613
+ 597  2612  2658  node_branchSize=node_mergeRightSibling
+ 598  2613  2659  node_branchBase=node_branchSize
+ 599  2614  2660  instruction
+ 600  2615  2661  instruction
+ 601  2616  2662  size=currentSize
+ 602  2617  2663  branchSize=size
+ 603  2618  2664  --branchSize
+ 604  2619  2665  stolenOrMerged=index>=branchSize
+ 605  2620  2666  GoOff stolenOrMerged to 2624
+ 606  2623  2669  stolenOrMerged=branchSize<two
+ 607  2624  2670  GoOff stolenOrMerged to 2628
+ 608  2625  2671  stolenOrMerged <= 0
+ 609  2626  2672  Go to 3070
+ 610  3069  3125  node_branchSize=parent
+ 611  3070  3126  node_branchBase=node_branchSize
+ 612  3071  3127  instruction
+ 613  3072  3128  instruction
+ 614  3073  3129  size=currentSize
+ 615  3074  3130  branchSize=size
+ 616  3075  3131  --branchSize
+ 617  3076  3132  ++mergeIndex
+ 618  3077  3133  Go to 2181
+ 619  2180  2213  node_branchSize=parent
+ 620  2181  2214  node_branchBase=node_branchSize
+ 621  2182  2215  instruction
+ 622  2183  2216  instruction
+ 623  2184  2217  size=currentSize
+ 624  2185  2218  branchSize=size
+ 625  2186  2219  --branchSize
+ 626  2187  2220  nodeMerged=mergeIndex>=branchSize
+ 627  2188  2221  GoOn nodeMerged to 3079
+ 628  3078  3134  search=Key
+ 629  3079  3135  node_findFirstGreaterThanOrEqualInBranch=parent
+ 630  3080  3136  node_branchBase=node_findFirstGreaterThanOrEqualInBranch
+ 631  3081  3137  instruction
+ 632  3082  3138  instruction
+ 633  3083  3139  search=search
+ 634  3084  3140  instruction
+ 635  3085  3141  size=currentSize
+ 636  3086  3142  GoOff limit to 3089
+ 637  3087  3143  --size
+ 638  3088  3144  instruction
+ 639  3089  3145  equal=index == size
+ 640  3090  3146  GoOn equal to 3128
+ 641  3091  3147  key=key
+ 642  3092  3148  equal=key>=search
+ 643  3093  3149  GoOff equal to 3099
+ 644  3098  3154  instruction
+ 645  3099  3155  equal=index == size
+ 646  3100  3156  GoOn equal to 3128
+ 647  3127  3183  found = foundfirst = index
+ 648  3128  3184  GoOff found to 3132
+ 649  3131  3187  size=currentSize
+ 650  3132  3188  instruction
+ 651  3133  3189  isEmpty=size == full
+ 652  3134  3190  GoOff isEmpty to 3137
+ 653  3136  3192  instruction
+ 654  3137  3193  index=currentSize
+ 655  3138  3194  --index
+ 656  3139  3195  key=key
+ 657  3140  3196  data=data
+ 658  3141  3197  next=data
+ 659  3142  3198  parent=next
+ 660  3143  3199  Go to 2167
+ 661  2166  2199  ++mergeDepth
+ 662  2167  2200  pastMaxDepth=mergeDepth>maxDepth
+ 663  2168  2201  GoOn pastMaxDepth to 3145
+ 664  2169  2202  node_isLeaf=parent
+ 665  2170  2203  IsLeaf=isLeaf
+ 666  2171  2204  GoOn IsLeaf to 3145
+ 667  2172  2205  node_branchSize=parent
+ 668  2173  2206  node_branchBase=node_branchSize
+ 669  2174  2207  instruction
+ 670  2175  2208  instruction
+ 671  2176  2209  size=currentSize
+ 672  2177  2210  branchSize=size
+ 673  2178  2211  --branchSize
+ 674  2179  2212  mergeIndex <= 0
+ 675  2180  2213  node_branchSize=parent
+ 676  2181  2214  node_branchBase=node_branchSize
+ 677  2182  2215  instruction
+ 678  2183  2216  instruction
+ 679  2184  2217  size=currentSize
+ 680  2185  2218  branchSize=size
+ 681  2186  2219  --branchSize
+ 682  2187  2220  nodeMerged=mergeIndex>=branchSize
+ 683  2188  2221  GoOn nodeMerged to 3079
+ 684  2189  2222  index=mergeIndex
+ 684  2189  2223  node_mergeLeftSibling=parent
+ 685  2190  2224  stolenOrMerged <= isZero index
+ 686  2191  2225  GoOff stolenOrMerged to 2195
+ 687  2192  2226  stolenOrMerged <= 0
+ 688  2193  2227  Go to 2605
+ 689  2604  2650  GoOff stolenOrMerged to 2607
+ 690  2606  2652  index=mergeIndex
+ 691  2607  2653  node_mergeRightSibling=parent
+ 692  2608  2654  node_isLeaf=node_assertBranch
+ 693  2609  2655  IsLeaf=isLeaf
+ 694  2610  2656  GoOff IsLeaf to 2613
+ 695  2612  2658  node_branchSize=node_mergeRightSibling
+ 696  2613  2659  node_branchBase=node_branchSize
+ 697  2614  2660  instruction
+ 698  2615  2661  instruction
+ 699  2616  2662  size=currentSize
+ 700  2617  2663  branchSize=size
+ 701  2618  2664  --branchSize
+ 702  2619  2665  stolenOrMerged=index>=branchSize
+ 703  2620  2666  GoOff stolenOrMerged to 2624
+ 704  2623  2669  stolenOrMerged=branchSize<two
+ 705  2624  2670  GoOff stolenOrMerged to 2628
+ 706  2627  2673  node_branchBase=node_mergeRightSibling
+ 707  2628  2674  instruction
+ 708  2629  2675  instruction
+ 709  2630  2676  index=index
+ 709  2630  2677  size=currentSize
+ 710  2631  2678  instruction
+ 711  2632  2679  instruction
+ 712  2633  2680  key=key
+ 713  2634  2681  data=data
+ 714  2635  2682  l=data
+ 714  2635  2683  index=index
+ 715  2636  2684  ++index
+ 716  2637  2685  size=currentSize
+ 717  2638  2686  instruction
+ 718  2639  2687  instruction
+ 719  2640  2688  key=key
+ 720  2641  2689  data=data
+ 721  2642  2690  r=data
+ 721  2642  2691  node_hasLeavesForChildren=node_mergeRightSibling
+ 722  2643  2692  node_branchBase=node_hasLeavesForChildren
+ 723  2644  2693  instruction
+ 724  2645  2694  instruction
+ 725  2646  2695  size=currentSize
+ 726  2647  2696  instruction
+ 727  2648  2697  isEmpty=size == full
+ 728  2649  2698  GoOff isEmpty to 2652
+ 729  2651  2700  instruction
+ 730  2652  2701  index=currentSize
+ 731  2653  2702  --index
+ 732  2654  2703  key=key
+ 733  2655  2704  data=data
+ 734  2656  2705  node_isLeaf=data
+ 735  2657  2706  IsLeaf=isLeaf
+ 736  2658  2707  hasLeavesForChildren=IsLeaf
+ 737  2659  2708  GoOff hasLeavesForChildren to 2777
+ 738  2660  2709  node_leafBase1=l
+ 739  2661  2710  instruction
+ 740  2662  2711  instruction
+ 741  2663  2712  node_leafBase2=r
+ 742  2664  2713  instruction
+ 743  2665  2714  instruction
+ 744  2666  2715  node_leafSize=l
+ 745  2667  2716  node_leafBase=node_leafSize
+ 746  2668  2717  instruction
+ 747  2669  2718  instruction
+ 748  2670  2719  size=currentSize
+ 748  2670  2722  node_leafSize=r
+ 749  2671  2720  leafSize=size
+ 750  2672  2721  nl=leafSize
+ 751  2673  2723  node_leafBase=node_leafSize
+ 752  2674  2724  instruction
+ 753  2675  2725  instruction
+ 754  2676  2726  size=currentSize
+ 755  2677  2727  leafSize=size
+ 756  2678  2728  nr=leafSize
+ 757  2679  2729  instruction
+ 758  2680  2730  GoOff stolenOrMerged to 2684
+ 759  2681  2731  stolenOrMerged <= 0
+ 760  2682  2732  Go to 3070
+ 761  3069  3125  node_branchSize=parent
+ 762  3070  3126  node_branchBase=node_branchSize
+ 763  3071  3127  instruction
+ 764  3072  3128  instruction
+ 765  3073  3129  size=currentSize
+ 766  3074  3130  branchSize=size
+ 767  3075  3131  --branchSize
+ 768  3076  3132  ++mergeIndex
+ 769  3077  3133  Go to 2181
+ 770  2180  2213  node_branchSize=parent
+ 771  2181  2214  node_branchBase=node_branchSize
+ 772  2182  2215  instruction
+ 773  2183  2216  instruction
+ 774  2184  2217  size=currentSize
+ 775  2185  2218  branchSize=size
+ 776  2186  2219  --branchSize
+ 777  2187  2220  nodeMerged=mergeIndex>=branchSize
+ 778  2188  2221  GoOn nodeMerged to 3079
+ 779  2189  2222  index=mergeIndex
+ 779  2189  2223  node_mergeLeftSibling=parent
+ 780  2190  2224  stolenOrMerged <= isZero index
+ 781  2191  2225  GoOff stolenOrMerged to 2195
+ 782  2194  2228  node_branchSize=node_mergeLeftSibling
+ 783  2195  2229  node_branchBase=node_branchSize
+ 784  2196  2230  instruction
+ 785  2197  2231  instruction
+ 786  2198  2232  size=currentSize
+ 787  2199  2233  branchSize=size
+ 788  2200  2234  --branchSize
+ 789  2201  2235  stolenOrMerged=index>branchSize
+ 790  2202  2236  stolenOrMerged=branchSize<two
+ 791  2203  2237  GoOff stolenOrMerged to 2207
+ 792  2206  2240  node_branchBase=node_mergeLeftSibling
+ 793  2207  2241  instruction
+ 794  2208  2242  instruction
+ 795  2209  2243  index=index
+ 796  2210  2244  --index
+ 797  2211  2245  size=currentSize
+ 798  2212  2246  instruction
+ 799  2213  2247  instruction
+ 800  2214  2248  key=key
+ 801  2215  2249  data=data
+ 802  2216  2250  l=data
+ 802  2216  2251  index=index
+ 802  2216  2252  size=currentSize
+ 803  2217  2253  instruction
+ 804  2218  2254  instruction
+ 805  2219  2255  key=key
+ 806  2220  2256  data=data
+ 807  2221  2257  r=data
+ 807  2221  2258  node_hasLeavesForChildren=node_mergeLeftSibling
+ 808  2222  2259  node_branchBase=node_hasLeavesForChildren
+ 809  2223  2260  instruction
+ 810  2224  2261  instruction
+ 811  2225  2262  size=currentSize
+ 812  2226  2263  instruction
+ 813  2227  2264  isEmpty=size == full
+ 814  2228  2265  GoOff isEmpty to 2231
+ 815  2230  2267  instruction
+ 816  2231  2268  index=currentSize
+ 817  2232  2269  --index
+ 818  2233  2270  key=key
+ 819  2234  2271  data=data
+ 820  2235  2272  node_isLeaf=data
+ 821  2236  2273  IsLeaf=isLeaf
+ 822  2237  2274  hasLeavesForChildren=IsLeaf
+ 823  2238  2275  GoOff hasLeavesForChildren to 2356
+ 824  2239  2276  node_leafBase1=l
+ 825  2240  2277  instruction
+ 826  2241  2278  instruction
+ 827  2242  2279  node_leafBase2=r
+ 828  2243  2280  instruction
+ 829  2244  2281  instruction
+ 830  2245  2282  node_leafSize=l
+ 831  2246  2283  node_leafBase=node_leafSize
+ 832  2247  2284  instruction
+ 833  2248  2285  instruction
+ 834  2249  2286  size=currentSize
+ 834  2249  2289  node_leafSize=r
+ 835  2250  2287  leafSize=size
+ 836  2251  2288  nl=leafSize
+ 837  2252  2290  node_leafBase=node_leafSize
+ 838  2253  2291  instruction
+ 839  2254  2292  instruction
+ 840  2255  2293  size=currentSize
+ 841  2256  2294  leafSize=size
+ 842  2257  2295  nr=leafSize
+ 843  2258  2296  instruction
+ 844  2259  2297  GoOff stolenOrMerged to 2263
+ 845  2260  2298  stolenOrMerged <= 0
+ 846  2261  2299  Go to 2605
+ 847  2604  2650  GoOff stolenOrMerged to 2607
+ 848  2606  2652  index=mergeIndex
+ 849  2607  2653  node_mergeRightSibling=parent
+ 850  2608  2654  node_isLeaf=node_assertBranch
+ 851  2609  2655  IsLeaf=isLeaf
+ 852  2610  2656  GoOff IsLeaf to 2613
+ 853  2612  2658  node_branchSize=node_mergeRightSibling
+ 854  2613  2659  node_branchBase=node_branchSize
+ 855  2614  2660  instruction
+ 856  2615  2661  instruction
+ 857  2616  2662  size=currentSize
+ 858  2617  2663  branchSize=size
+ 859  2618  2664  --branchSize
+ 860  2619  2665  stolenOrMerged=index>=branchSize
+ 861  2620  2666  GoOff stolenOrMerged to 2624
+ 862  2623  2669  stolenOrMerged=branchSize<two
+ 863  2624  2670  GoOff stolenOrMerged to 2628
+ 864  2627  2673  node_branchBase=node_mergeRightSibling
+ 865  2628  2674  instruction
+ 866  2629  2675  instruction
+ 867  2630  2676  index=index
+ 867  2630  2677  size=currentSize
+ 868  2631  2678  instruction
+ 869  2632  2679  instruction
+ 870  2633  2680  key=key
+ 871  2634  2681  data=data
+ 872  2635  2682  l=data
+ 872  2635  2683  index=index
+ 873  2636  2684  ++index
+ 874  2637  2685  size=currentSize
+ 875  2638  2686  instruction
+ 876  2639  2687  instruction
+ 877  2640  2688  key=key
+ 878  2641  2689  data=data
+ 879  2642  2690  r=data
+ 879  2642  2691  node_hasLeavesForChildren=node_mergeRightSibling
+ 880  2643  2692  node_branchBase=node_hasLeavesForChildren
+ 881  2644  2693  instruction
+ 882  2645  2694  instruction
+ 883  2646  2695  size=currentSize
+ 884  2647  2696  instruction
+ 885  2648  2697  isEmpty=size == full
+ 886  2649  2698  GoOff isEmpty to 2652
+ 887  2651  2700  instruction
+ 888  2652  2701  index=currentSize
+ 889  2653  2702  --index
+ 890  2654  2703  key=key
+ 891  2655  2704  data=data
+ 892  2656  2705  node_isLeaf=data
+ 893  2657  2706  IsLeaf=isLeaf
+ 894  2658  2707  hasLeavesForChildren=IsLeaf
+ 895  2659  2708  GoOff hasLeavesForChildren to 2777
+ 896  2660  2709  node_leafBase1=l
+ 897  2661  2710  instruction
+ 898  2662  2711  instruction
+ 899  2663  2712  node_leafBase2=r
+ 900  2664  2713  instruction
+ 901  2665  2714  instruction
+ 902  2666  2715  node_leafSize=l
+ 903  2667  2716  node_leafBase=node_leafSize
+ 904  2668  2717  instruction
+ 905  2669  2718  instruction
+ 906  2670  2719  size=currentSize
+ 906  2670  2722  node_leafSize=r
+ 907  2671  2720  leafSize=size
+ 908  2672  2721  nl=leafSize
+ 909  2673  2723  node_leafBase=node_leafSize
+ 910  2674  2724  instruction
+ 911  2675  2725  instruction
+ 912  2676  2726  size=currentSize
+ 913  2677  2727  leafSize=size
+ 914  2678  2728  nr=leafSize
+ 915  2679  2729  instruction
+ 916  2680  2730  GoOff stolenOrMerged to 2684
+ 917  2681  2731  stolenOrMerged <= 0
+ 918  2682  2732  Go to 3070
+ 919  3069  3125  node_branchSize=parent
+ 920  3070  3126  node_branchBase=node_branchSize
+ 921  3071  3127  instruction
+ 922  3072  3128  instruction
+ 923  3073  3129  size=currentSize
+ 924  3074  3130  branchSize=size
+ 925  3075  3131  --branchSize
+ 926  3076  3132  ++mergeIndex
+ 927  3077  3133  Go to 2181
+ 928  2180  2213  node_branchSize=parent
+ 929  2181  2214  node_branchBase=node_branchSize
+ 930  2182  2215  instruction
+ 931  2183  2216  instruction
+ 932  2184  2217  size=currentSize
+ 933  2185  2218  branchSize=size
+ 934  2186  2219  --branchSize
+ 935  2187  2220  nodeMerged=mergeIndex>=branchSize
+ 936  2188  2221  GoOn nodeMerged to 3079
+ 937  3078  3134  search=Key
+ 938  3079  3135  node_findFirstGreaterThanOrEqualInBranch=parent
+ 939  3080  3136  node_branchBase=node_findFirstGreaterThanOrEqualInBranch
+ 940  3081  3137  instruction
+ 941  3082  3138  instruction
+ 942  3083  3139  search=search
+ 943  3084  3140  instruction
+ 944  3085  3141  size=currentSize
+ 945  3086  3142  GoOff limit to 3089
+ 946  3087  3143  --size
+ 947  3088  3144  instruction
+ 948  3089  3145  equal=index == size
+ 949  3090  3146  GoOn equal to 3128
+ 950  3091  3147  key=key
+ 951  3092  3148  equal=key>=search
+ 952  3093  3149  GoOff equal to 3099
+ 953  3098  3154  instruction
+ 954  3099  3155  equal=index == size
+ 955  3100  3156  GoOn equal to 3128
+ 956  3101  3157  key=key
+ 957  3102  3158  equal=key>=search
+ 958  3103  3159  GoOff equal to 3109
+ 959  3108  3164  instruction
+ 960  3109  3165  equal=index == size
+ 961  3110  3166  GoOn equal to 3128
+ 962  3127  3183  found = foundfirst = index
+ 963  3128  3184  GoOff found to 3132
+ 964  3131  3187  size=currentSize
+ 965  3132  3188  instruction
+ 966  3133  3189  isEmpty=size == full
+ 967  3134  3190  GoOff isEmpty to 3137
+ 968  3136  3192  instruction
+ 969  3137  3193  index=currentSize
+ 970  3138  3194  --index
+ 971  3139  3195  key=key
+ 972  3140  3196  data=data
+ 973  3141  3197  next=data
+ 974  3142  3198  parent=next
+ 975  3143  3199  Go to 2167
+ 976  2166  2199  ++mergeDepth
+ 977  2167  2200  pastMaxDepth=mergeDepth>maxDepth
+ 978  2168  2201  GoOn pastMaxDepth to 3145
+ 979  2169  2202  node_isLeaf=parent
+ 980  2170  2203  IsLeaf=isLeaf
+ 981  2171  2204  GoOn IsLeaf to 3145
+ 982  3144  3200  Go to 3434
