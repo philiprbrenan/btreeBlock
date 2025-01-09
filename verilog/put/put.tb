@@ -9,7 +9,7 @@ module put_tb;                                                             // Te
   reg                  clock;                                                   // Program counter clock
   reg             [2:0]pfd;                                                     // Put, find delete
   reg  [4 :0]Key  = 3;                                             // Input key
-  reg  [4:0]Data = 2;                                            // Input data
+  reg  [4:0]Data = 3;                                            // Input data
   reg  [4:0]data;                                                    // Output data
   reg                  found;                                                   // Whether the key was found on put, find delete
   integer passes;                                                               // Number of tests passed
@@ -34,7 +34,7 @@ module put_tb;                                                             // Te
         $display("Stopped after: %4d steps key %4d  data %4d", step, Key, data);
         passes = 0; fails = 0;
         if (data == 0)     passes = passes + 1; else begin fails = fails + 1; $display("Expected 0 for data but got %d",    data); end
-        if (step == 1014) passes = passes + 1; else begin fails = fails + 1; $display("Expected 1014 for expected steps but got %d", step); end
+        if (step == 984) passes = passes + 1; else begin fails = fails + 1; $display("Expected 984 for expected steps but got %d", step); end
         if (passes == 2) $display("Passed all tests");
         else             $display("FAILED %d, passed %d", fails, passes);
       end
