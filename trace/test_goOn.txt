@@ -1,0 +1,3 @@
+   0     0     0  f.push(1)
+   1     1     1  GoOn a to 4
+   2     2     2  f.push(2)
