@@ -1,95 +1,95 @@
-   0     0
-   1     1
-   2     2
-   3    33
-   4    34
-   5    35
-   6    36
-   7    37
-   8    38
-   9    39
-  10    40
-  11    41
-  12    42
-  13    43
-  14    44
-  15    45
-  16    46
-  17    47
-  18    48
-  19    49
-  20    50
-  21    51
-  22    52
-  23    53
-  24    54
-  25    55
-  26    56
-  27    57
-  28    87
-  29    88
-  30    89
-  31    90
-  32   102
-  33   103
-  34   104
-  35   105
-  36   136
-  37   137
-  38    35
-  39    36
-  40    37
-  41    38
-  42    39
-  43    40
-  44    41
-  45    42
-  46    43
-  47    44
-  48    45
-  49    46
-  50    47
-  51    48
-  52    49
-  53    50
-  54    51
-  55    52
-  56    53
-  57    54
-  58    55
-  59    56
-  60    57
-  61    87
-  62    88
-  63    89
-  64    90
-  65   102
-  66   103
-  67   104
-  68   105
-  69   106
-  70   107
-  71   108
-  72   109
-  73   110
-  74   111
-  75   112
-  76   113
-  77   114
-  78   116
-  79   117
-  80   118
-  81   119
-  82   120
-  83   121
-  84   125
-  85   126
-  86   127
-  87   128
-  88   129
-  89   130
-  90   131
-  91   132
-  92   133
-  93   134
-  94   135
+   0     0     0  node_isLeaf <= 0
+   1     1     1  IsLeaf=isLeaf
+   2     2     2  GoOff IsLeaf to 34
+   3    33    33  parent <= 0
+   4    34    34  findDepth <= 0
+   5    35    35  ++findDepth
+   6    36    36  pastMaxDepth=findDepth>maxDepth
+   7    37    37  GoOn pastMaxDepth to 139
+   8    38    38  search=Key
+   8    38    39  node_findFirstGreaterThanOrEqualInBranch=parent
+   9    39    40  node_branchBase=node_findFirstGreaterThanOrEqualInBranch
+  10    40    41  instruction
+  11    41    42  instruction
+  12    42    43  search=search
+  13    43    44  instruction
+  14    44    45  size=currentSize
+  15    45    46  GoOff limit to 48
+  16    46    47  --size
+  17    47    48  instruction
+  18    48    49  equal=index == size
+  19    49    50  GoOn equal to 87
+  20    50    51  key=key
+  21    51    52  equal=key>=search
+  22    52    53  GoOff equal to 58
+  23    53    54  instruction
+  24    54    55  key=key
+  25    55    56  data=data
+  26    56    57  Go to 87
+  27    86    87  found = foundfirst = index
+  28    87    88  GoOff found to 91
+  29    88    89  next=data
+  30    89    90  Go to 102
+  31   101   102  child=next
+  32   102   103  node_isLeaf=child
+  33   103   104  IsLeaf=isLeaf
+  34   104   105  GoOff IsLeaf to 135
+  35   134   136  parent=child
+  36   135   137  Go to 36
+  37    35    35  ++findDepth
+  38    36    36  pastMaxDepth=findDepth>maxDepth
+  39    37    37  GoOn pastMaxDepth to 139
+  40    38    38  search=Key
+  40    38    39  node_findFirstGreaterThanOrEqualInBranch=parent
+  41    39    40  node_branchBase=node_findFirstGreaterThanOrEqualInBranch
+  42    40    41  instruction
+  43    41    42  instruction
+  44    42    43  search=search
+  45    43    44  instruction
+  46    44    45  size=currentSize
+  47    45    46  GoOff limit to 48
+  48    46    47  --size
+  49    47    48  instruction
+  50    48    49  equal=index == size
+  51    49    50  GoOn equal to 87
+  52    50    51  key=key
+  53    51    52  equal=key>=search
+  54    52    53  GoOff equal to 58
+  55    53    54  instruction
+  56    54    55  key=key
+  57    55    56  data=data
+  58    56    57  Go to 87
+  59    86    87  found = foundfirst = index
+  60    87    88  GoOff found to 91
+  61    88    89  next=data
+  62    89    90  Go to 102
+  63   101   102  child=next
+  64   102   103  node_isLeaf=child
+  65   103   104  IsLeaf=isLeaf
+  66   104   105  GoOff IsLeaf to 135
+  67   105   106  search=Key
+  67   105   107  node_findEqualInLeaf=child
+  68   106   108  node_leafBase=node_findEqualInLeaf
+  69   107   109  instruction
+  70   108   110  instruction
+  71   109   111  search=search
+  72   110   112  instruction
+  73   111   113  size=currentSize
+  74   112   114  GoOff limit to 115
+  75   114   116  instruction
+  76   115   117  equal=index == size
+  77   116   118  GoOn equal to 132
+  78   117   119  key=key
+  79   118   120  equal=key == search
+  80   119   121  GoOff equal to 124
+  81   123   125  instruction
+  82   124   126  equal=index == size
+  83   125   127  GoOn equal to 132
+  84   126   128  key=key
+  85   127   129  equal=key == search
+  86   128   130  GoOff equal to 132
+  87   129   131  instruction
+  88   130   132  data=data
+  89   131   133  found = foundindex = indexdata = data
+  90   132   134  find=child
+  91   133   135  Go to 139
