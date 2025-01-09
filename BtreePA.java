@@ -2200,7 +2200,7 @@ abstract class BtreePA extends Test                                             
            s.T.name()    +" <= 0"+traceComment();
    }
 
-  class GenVerilog                                                              // Generate verilog
+  abstract class GenVerilog                                                     // Generate verilog
    {final String       project;                                                 // Project name - used to generate file names
     final String        folder;                                                 // Folder in which to place project
     final String projectFolder;                                                 // Folder in which to place verilog
@@ -2211,15 +2211,15 @@ abstract class BtreePA extends Test                                             
     final String     traceFile;                                                 // Folder in which to place execution trace file
 
     final ProgramPA program;                                                    // Programs containing the instructions to be converted to verilog
-    int Key     () {return    2;}                                               // Input key value
-    int Data    () {return    2;}                                               // Input data value
-    int data    () {return    7;}                                               // Expected output data value
-    int maxSteps() {return 2000;}                                               // Maximum number if execution steps
-    int expSteps() {return   96;}                                               // Expected number of steps
+    abstract int Key     ();                                                    // Input key value
+    abstract int Data    ();                                                    // Input data value
+    abstract int data    ();                                                    // Expected output data value
+    abstract int maxSteps();                                                    // Maximum number if execution steps
+    abstract int expSteps();                                                    // Expected number of steps
 
     GenVerilog(String Project, String Folder, ProgramPA Program)                // Generate verilog
      {project = Project; folder = Folder; program = Program;
-      program.compile();
+      program.optimize();
 
       projectFolder = ""+Paths.get(folder, project);
       sourceVerilog = ""+Paths.get(projectFolder, project+Verilog.ext);
@@ -2279,15 +2279,15 @@ $stuckBases
       case(step)                                                                // Case statements to select the code for the current instruction
 """);
 
-      for(int i = 0; i < program.code.size(); ++i)
-       {final ProgramPA.I   I = program.code.elementAt(i);
+      for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
+       {final ProgramPA.I   I = program.code.elementAt(i);                      // The instruction to write
         final StringBuilder t = new StringBuilder();
-        t.append(I.merge == null ? I.v()+";"+I.traceComment() :
-         "/* merged into: "+I.merge.instructionNumber+" */");
+        t.append(!I.merged() ? I.v()+";"+I.traceComment() :
+            "/* merged into: "+I.merge.instructionNumber+" */");
 
-        for (ProgramPA.I c : I.merged) t.append(c.v()+";"+c.traceComment());
+        for (ProgramPA.I c : I.merged) t.append(c.v()+";"+c.traceComment());    // Add any merged instructions
 
-        s.append(String.format("          %5d : begin %s end\n", i, t));
+        s.append(String.format("          %5d : begin %s end\n", i, t));        // Bracket instructions in this block with op code
        }
       s.append("        default : begin stopped <= 1; /* end of execution */ end\n"); // Any invalid instruction address causes the program to halt
       s.append("""
@@ -3272,7 +3272,13 @@ endmodule
     t.P.clear();
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
-    GenVerilog v = t.new GenVerilog("find", "verilog", t.P);                    // Generate verilog now that memories have been initialized and the program written
+    GenVerilog v = t.new GenVerilog("find", "verilog", t.P)                     // Generate verilog now that memories have been initialized and the program written
+     {int Key     () {return    2;}                                               // Input key value
+      int Data    () {return    2;}                                               // Input data value
+      int data    () {return    7;}                                               // Expected output data value
+      int maxSteps() {return 2000;}                                               // Maximum number if execution steps
+      int expSteps() {return   93;}                                               // Expected number of steps
+     };
     t.P.trace = true;
     t.P.run();
     //say("AAAA11", t);
@@ -3311,9 +3317,10 @@ endmodule
     t.delete();
     GenVerilog v = t.new GenVerilog("delete", "verilog", t.P)                   // Generate verilog now that memories have beeninitialzied and the program written
      {int Key     () {return    3;}                                             // Input key value
+      int Data    () {return    3;}                                             // Input key value
       int data    () {return    6;}                                             // Expected output data value
       int maxSteps() {return 2000;}                                             // Maximum number if execution steps
-      int expSteps() {return  975;}                                             // Expected number of steps
+      int expSteps() {return  948;}                                             // Expected number of steps
      };
     t.P.trace = true;
     t.P.run();
@@ -3362,9 +3369,10 @@ endmodule
     t.put();
     GenVerilog v = t.new GenVerilog("put", "verilog", t.P)                      // Generate verilog now that memories have beeninitialzied and the program written
      {int Key     () {return    3;}                                             // Input key value
+      int Data    () {return    3;}                                             // Input key value
       int data    () {return    0;}                                             // Expected output data value
       int maxSteps() {return 2000;}                                             // Maximum number if execution steps
-      int expSteps() {return 1014;}                                             // Expected number of steps
+      int expSteps() {return  984;}                                             // Expected number of steps
      };
     t.P.trace = true;
     t.P.run();
