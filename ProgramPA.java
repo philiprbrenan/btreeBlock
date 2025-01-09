@@ -12,8 +12,9 @@ class ProgramPA extends Test                                                    
   int             step = 0;                                                     // Execution step
   int             time = 0;                                                     // Execution time
   boolean      running = false;                                                 // Executing if true
-  boolean        trace = false;                                                 // Trace execution if true
+  boolean        trace = !false;                                                 // Trace execution if true
   Stack<Label>  labels = new Stack<>();                                         // Labels for some instructions
+  final Stack<String> Trace = new Stack<>();                                    // Trace execution steps
 
   ProgramPA() {}                                                                // Create a program that instructions can be added to and then executed
 
@@ -25,8 +26,8 @@ class ProgramPA extends Test                                                    
   ProgramPA programPA() {return this;}                                          // Address containing class
 
   class Label                                                                   // Label definition
-   {int instruction;                                                            // The instruction to which this labels applies
-    Label() {set(); labels.push(this);}                                         // A label assigned to an instruction
+   {int instruction;                                                            // The instruction location to which this labels applies
+    Label() {set(); labels.push(this);}                                         // A label assigned to an instruction location
     void set() {instruction = code.size();}                                     // Reassign the label to an instruction
    }
 
@@ -35,8 +36,8 @@ class ProgramPA extends Test                                                    
     final String traceBack = traceBack();                                       // Location of code that defined this instruction
     final TreeSet<String>outputs = new TreeSet<>();                             // The set of outputs written by this instruction
     final TreeSet<String> inputs = new TreeSet<>();                             // The set of inputs read by this instruction
-    final TreeSet<I>      merged = new TreeSet<>();                             // The refenced instructions can eb executed at the same time as this one
-    I merge ;                                                                   // These instructions can be excuted at the same time as this instruction as they affect differendt fields
+    final TreeSet<I>      merged = new TreeSet<>();                             // The referenced instructions can eb executed at the same time as this one
+    I merge ;                                                                   // This instruction has been merged into the referenced  instruction.
     boolean mergeableInstruction;                                               // This instruction can be merged with earlier instructions as long as there are no collisions
     boolean mightJump;                                                          // This instruction might change the flow of control
 
@@ -51,6 +52,11 @@ class ProgramPA extends Test                                                    
     void   i() {}                                                               // initialization for each instruction
     void out(MemoryLayoutPA.At at) {outputs.add(at.verilogLoad());}             // Record an output of this instruction
     void  in(MemoryLayoutPA.At at) { inputs.add(at.verilogLoad());}             // Record an input of this instruction
+
+    void execute()                                                              // Execute an instruction
+     {if (trace) Trace.push(String.format("%4d  %4d  %4d  %s", time, step, instructionNumber, n()));
+      a();
+     }
 
     String traceComment() {return " /*"+traceBack.replaceAll("\\n", " ")+" */";}// Trace back comment
 
@@ -67,6 +73,8 @@ class ProgramPA extends Test                                                    
       return true;
      }
 
+    boolean merged() {return merge != null;}                                    // Whether this instruction has been merged into anitehr one  and so does not need to be executed
+
     void merge(I source)                                                        // Merge the specified  instruction into this one
      {source.merge = this;                                                      // Instruction can be merged with this one
       outputs.addAll(source.outputs);                                           // Include outputs of merged instruction in current instruction making it harder to move subsequent instructions back through this instruction
@@ -81,7 +89,26 @@ class ProgramPA extends Test                                                    
 
 //D1 Execute                                                                    // Execute the program
 
-  void compile()                                                                // Compile the program
+  void squeeze()                                                                // Remove empty instructions from a program and update its labels to match
+   {final TreeMap<Integer,Integer> relocation = new TreeMap<>();                // Where each instruction was relocated to
+    final Stack<I> squeezed = new Stack<>();                                    // The instructions minus the empty ones
+    final int N = code.size();
+    for (step = 0; step < N; step++)                                            // Remove empty instructions and pack non empty instructions together recording their new positions
+     {final I i = code.elementAt(step);                                         // Source instruction that we want to merge into  a target instruction
+      if (i.merged()) continue;                                                 // Instruction should be removed as it has been merged into an earlier one
+      relocation.put(step, squeezed.size());                                    // Map old location of instruction to its new location
+      squeezed.push(i);                                                         // Retain instruction
+     }
+    for (int i = 0; i < labels.size(); ++i)                                     // Adjust each label to account for removed instructions
+     {final Label   l = labels.elementAt(i);
+      final Integer r = relocation.get(l.instruction);                          // Location of relocated instruction at this location
+      if (r != null) l.instruction = r;                                         // Relocate label
+     }
+    code.clear();
+    for (I i : squeezed) code.push(i);                                          // Replace code with compressed sequence of instructions with labels adjusted to match
+   }
+
+  void optimize()                                                               // Optimize the program
    {final int N = code.size();
     for (step = 1; step < N; step++)                                            // Initialize each instruction
      {code.elementAt(step).i();
@@ -89,7 +116,8 @@ class ProgramPA extends Test                                                    
     final TreeSet<Integer>  ls = new TreeSet<Integer>();                        // Values of labels
     for (Label l : labels) ls.add(l.instruction);                               // Values of labels as sets
 
-    for (step = 1; step < N; step++)                                            // Move each instruction back as far as it will go without colliding with a prior instruction
+//  for (step = 1; step < N; step++)                                            // Move each instruction back as far as it will go without colliding with a prior instruction
+    for (step = N-1; step > 0; step--)                                           // Move each instruction back as far as it will go without colliding with a prior instruction
      {if (ls.contains(step)) continue;                                          // This instruction might be a target of a jump
       final I s = code.elementAt(step);                                         // Source instruction that we want to merge into  a target instruction
       if (!s.mergeableInstruction) continue;                                    // Cannot merge this instruction
@@ -106,16 +134,18 @@ class ProgramPA extends Test                                                    
         else if (i == 1) t.merge(s);                                            // Every preceding instruction can accept the current instruction so merge it with the first instructon
        }
      }
+    squeeze();                                                                  // Squeeze out space in code occupied by instructions merged into others
    }
 
   void run()                                                                    // Run the program
    {z();
-    final Stack<String> Trace = new Stack<>();                                  // Trace execution steps
+    Trace.clear();
     running = true;
     final int N = code.size();
     for (step = 0, time = 0; step < N && time < maxTime && running; step++, time++)
-     {if (trace) Trace.push(String.format("%4d  %4d", time, step));
-      z(); code.elementAt(step).a();
+     {final I i = code.elementAt(step);
+      i.execute();
+      for (I j : i.merged) j.execute();
      }
     if (time >= maxTime) stop("Out of time: ", time);
     running = false;
@@ -285,9 +315,10 @@ class ProgramPA extends Test                                                    
       if (c.outputs.size() > 0) s.append("    Outputs: "+joinStrings(c.outputs, " ")+"\n");
       if (c. inputs.size() > 0) s.append("    Inputs : "+joinStrings(c. inputs, " ")+"\n");
       if (c.merged.size() > 0)                                                  // List of merged instructions
-       {s.append("    Merged:");
-        for (I j : c.merged) s.append(" "+(j.instructionNumber+1));
-        s.append("\n");
+       {s.append("    Merged:\n");
+        for (I j : c.merged)
+         {s.append("      "+(j.instructionNumber+1)+" "+j.n()+"\n");
+         }
        }
      }
     return s.toString();
@@ -609,24 +640,71 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Structure s = l.structure("s", a, b, c, d, e);
     MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
     ProgramPA        p = m.P;
+    m.at(a).setInt(1);
 
     m.at(b).move(m.at(a));
     m.at(c).move(m.at(a));
     m.at(d).move(m.at(b));
     m.at(e).move(m.at(b));
-    p.compile();
+    //stop(p);
+    ok(p, """
+   1        b=a
+   2        c=a
+   3        d=b
+   4        e=b
+""");
+    p.run();
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        40                                      s
+   2 V        0         8                                  1     a
+   3 V        8         8                                  1     b
+   4 V       16         8                                  1     c
+   5 V       24         8                                  1     d
+   6 V       32         8                                  1     e
+""");
+
+    m.clear();
+    m.at(a).setInt(1);
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        40                                      s
+   2 V        0         8                                  1     a
+   3 V        8         8                                  0     b
+   4 V       16         8                                  0     c
+   5 V       24         8                                  0     d
+   6 V       32         8                                  0     e
+""");
+
+    p.optimize();
+    //stop(p);
     ok(p, """
    1        b=a
    2        c=a
     Outputs: M[  16/*c   */ +: 8] M[  24/*d   */ +: 8] M[  32/*e   */ +: 8]
     Inputs : M[   0/*a   */ +: 8] M[   8/*b   */ +: 8]
-    Merged: 3 4
-   3     1  d=b
-    Outputs: M[  24/*d   */ +: 8]
-    Inputs : M[   8/*b   */ +: 8]
-   4     1  e=b
-    Outputs: M[  32/*e   */ +: 8]
-    Inputs : M[   8/*b   */ +: 8]
+    Merged:
+      3 d=b
+      4 e=b
+""");
+    p.run();
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        40                                      s
+   2 V        0         8                                  1     a
+   3 V        8         8                                  1     b
+   4 V       16         8                                  1     c
+   5 V       24         8                                  1     d
+   6 V       32         8                                  1     e
 """);
    }
 
@@ -640,6 +718,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Structure s = l.structure("s", a, b, c, d, e);
     MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
     ProgramPA        p = m.P;
+    m.at(a).setInt(1);
 
     m.at(b).move(m.at(a));
     m.at(c).move(m.at(a));
@@ -657,48 +736,48 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.at(c).move(m.at(a));
     m.at(d).move(m.at(b));
     m.at(e).move(m.at(b));
-    p.compile();
-    //stop(p);
+    p.optimize();
     ok(p, """
    1        b=a
    2        c=a
     Outputs: M[  16/*c   */ +: 8] M[  24/*d   */ +: 8] M[  32/*e   */ +: 8]
     Inputs : M[   0/*a   */ +: 8] M[   8/*b   */ +: 8]
-    Merged: 3 4
-   3     1  d=b
-    Outputs: M[  24/*d   */ +: 8]
-    Inputs : M[   8/*b   */ +: 8]
-   4     1  e=b
-    Outputs: M[  32/*e   */ +: 8]
-    Inputs : M[   8/*b   */ +: 8]
-   5        GoOff a to 10
-   6        b=a
-    Outputs: M[   8/*b   */ +: 8] M[  16/*c   */ +: 8]
-    Inputs : M[   0/*a   */ +: 8]
-    Merged: 7
-   7     5  c=a
-    Outputs: M[  16/*c   */ +: 8] M[  24/*d   */ +: 8] M[  32/*e   */ +: 8]
-    Inputs : M[   0/*a   */ +: 8] M[   8/*b   */ +: 8]
-    Merged: 8 9
-   8     6  d=b
-    Outputs: M[  24/*d   */ +: 8]
-    Inputs : M[   8/*b   */ +: 8]
-   9     6  e=b
-    Outputs: M[  32/*e   */ +: 8]
-    Inputs : M[   8/*b   */ +: 8]
-  10        b=a
+    Merged:
+      3 d=b
+      4 e=b
+   3        GoOff a to 6
+   4        b=a
     Outputs: M[   8/*b   */ +: 8]
     Inputs : M[   0/*a   */ +: 8]
-  11        c=a
+   5        c=a
     Outputs: M[  16/*c   */ +: 8] M[  24/*d   */ +: 8] M[  32/*e   */ +: 8]
     Inputs : M[   0/*a   */ +: 8] M[   8/*b   */ +: 8]
-    Merged: 12 13
-  12    10  d=b
-    Outputs: M[  24/*d   */ +: 8]
-    Inputs : M[   8/*b   */ +: 8]
-  13    10  e=b
-    Outputs: M[  32/*e   */ +: 8]
-    Inputs : M[   8/*b   */ +: 8]
+    Merged:
+      8 d=b
+      9 e=b
+   6        b=a
+    Outputs: M[   8/*b   */ +: 8]
+    Inputs : M[   0/*a   */ +: 8]
+   7        c=a
+    Outputs: M[  16/*c   */ +: 8] M[  24/*d   */ +: 8] M[  32/*e   */ +: 8]
+    Inputs : M[   0/*a   */ +: 8] M[   8/*b   */ +: 8]
+    Merged:
+      12 d=b
+      13 e=b
+""");
+
+    p.run();
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        40                                      s
+   2 V        0         8                                  1     a
+   3 V        8         8                                  1     b
+   4 V       16         8                                  1     c
+   5 V       24         8                                  1     d
+   6 V       32         8                                  1     e
 """);
    }
 
@@ -719,7 +798,6 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_merge_if();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
