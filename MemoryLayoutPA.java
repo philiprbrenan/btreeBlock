@@ -44,6 +44,7 @@ class MemoryLayoutPA extends Test                                               
   Layout layout  () {return layout;}                                            // Get the layout in use
   String baseName() {return name+"_base_offset";}                               // Name of the verilog field used to hold the base being used for this memory layout
   int    base    () {return base;}                                              // Get the base offset into memory being used
+  void   clear   () {memory.zero();}                                            // Clear underlying memory
 
   void ok(String Lines)                                                         // Check that specified lines are present in the memory layout
    {final String  m = toString();                                               // Memory as string
