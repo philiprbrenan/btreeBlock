@@ -4,7 +4,8 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-
+// see isLeaf(...) for treatment needed for other early parameter setting options to sqeeze code.
+// Send final memory to test benches so we can check the results of put and delete with confidence.
 import java.util.*;
 import java.nio.file.*;
 
@@ -563,6 +564,11 @@ abstract class BtreePA extends Test                                             
   private void   setLeaf() {z(); M.at(isLeaf, T.at(node_setLeaf))  .ones();}    // Set as leaf
   private void setBranch() {z(); M.at(isLeaf, T.at(node_setBranch)).zero();}    // Set as branch
 
+  private void isLeaf(MemoryLayoutPA.At node)                                   // A leaf if true
+   {z();
+    T.at(IsLeaf).move(M.at(isLeaf, node));
+   }
+
   private void assertLeaf()
    {z();
     tt(node_isLeaf, node_assertLeaf); isLeaf();
@@ -731,7 +737,7 @@ abstract class BtreePA extends Test                                             
    {if (Assert) {tt(node_assertBranch, node_hasLeavesForChildren); assertBranch();}
     tt(node_branchBase, node_hasLeavesForChildren); branchBase(); bLeaf.base(T.at(branchBase));
     bLeaf.lastElement();
-    T.at(node_isLeaf).move(bLeaf.T.at(bLeaf.tData)); isLeaf();
+    T.at(node_isLeaf).move(bLeaf.T.at(bLeaf.tData)); isLeaf(bLeaf.T.at(bLeaf.tData));
     tt(hasLeavesForChildren, IsLeaf);
    }
 
@@ -837,7 +843,7 @@ abstract class BtreePA extends Test                                             
        {z();
         t.T.at(t.index).setInt(i); t.elementAt();                               // Each node in the branch
 
-        T.at(node_isLeaf).move(t.T.at(t.tData)); isLeaf();
+        T.at(node_isLeaf).move(t.T.at(t.tData)); isLeaf(t.T.at(t.tData));
         if (T.at(IsLeaf).isOnes())
          {z();
           leafToArray(t.T.at(t.tData).getInt(), s);
@@ -1890,7 +1896,7 @@ abstract class BtreePA extends Test                                             
             findFirstGreaterThanOrEqualInBranch();                              // Find next child in search path of key
             tt(child, next);
             tt(node_isLeaf, child);
-            isLeaf();
+            isLeaf(T.at(next));
             P.new If (T.at(IsLeaf))                                             // Found the containing leaf
              {void Then()
                {tt(search, Key);
@@ -2002,7 +2008,7 @@ abstract class BtreePA extends Test                                             
             tt(node_findFirstGreaterThanOrEqualInBranch, parent);
                     findFirstGreaterThanOrEqualInBranch();
             tt(child, next);
-            tt(node_isLeaf, child); isLeaf();
+            tt(node_isLeaf, child); isLeaf(T.at(next));
             P.new If (T.at(IsLeaf))                                             // Reached a leaf
              {void Then()
                {z();
@@ -2088,8 +2094,7 @@ abstract class BtreePA extends Test                                             
 
             tt(index, first); tt(node_balance, parent); balance();              // Make sure there are enough entries in the parent to permit a deletion
             tt(child, next);
-
-            tt(node_isLeaf, child); isLeaf();
+            tt(node_isLeaf, child); isLeaf(T.at(next));
             P.new If (T.at(IsLeaf))                                             // Reached a leaf
              {void Then()
                {z();
@@ -2125,7 +2130,7 @@ abstract class BtreePA extends Test                                             
             P.GoOn(end, T.at(pastMaxDepth));                                    // Prevent runaway searches
 
             tt(node_isLeaf, parent);
-            isLeaf();
+            isLeaf(T.at(parent));
             P.GoOn(Return, T.at(IsLeaf));                                       // Reached a leaf
             tt(node_branchSize, parent);
             branchSize();
