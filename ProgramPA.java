@@ -61,14 +61,9 @@ class ProgramPA extends Test                                                    
     String traceComment() {return " /*"+traceBack.replaceAll("\\n", " ")+" */";}// Trace back comment
 
     boolean canAccept(I source)                                                 // Whether the specified instruction could be merged into this instruction
-     {for (String o : source.outputs)                                           // Each output of the instruction being moved
-       {if  (outputs.contains(o)) return false;                                 // Collision - two outputs write to the same field
-       }
-      for (String o : source.outputs)                                           // Each output of the instruction being moved
-       {if  (inputs.contains(o)) return false;                                  // Collision - output of the source instruction would overwrite input of target instruction
-       }
-      for (String i : source.inputs)                                            // Each output of the instruction being moved
-       {if  (outputs.contains(i)) return false;                                 // Collision - an input to the source instruction is an output of the target instructrion
+     {for (String o : outputs)                                                  // Each output of the target instruction being moved to as it will have fewer or the same number of entries
+       {if (source.outputs.contains(o)) return false;                           // Collision - two outputs write to the same field
+        if (source.inputs .contains(o)) return false;                           // Collision - input of the source instruction is an output of the source instruction and so must came later
        }
       return true;
      }
@@ -630,7 +625,95 @@ Line T       At      Wide       Size    Indices        Value   Name
     p.run();
    }
 
-  static void test_merge()
+  static void test_merge_chain()
+   {Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 8);
+    Layout.Variable  b = l.variable ("b", 8);
+    Layout.Variable  c = l.variable ("c", 8);
+    Layout.Variable  d = l.variable ("d", 8);
+    Layout.Variable  e = l.variable ("e", 8);
+    Layout.Variable  f = l.variable ("f", 8);
+    Layout.Variable  g = l.variable ("g", 8);
+    Layout.Structure s = l.structure("s", a, b, c, d, e, f, g);
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
+    ProgramPA        p = m.P;
+    m.at(a).setInt(1);
+    m.at(b).setInt(2);
+
+    m.at(b).move(m.at(a));
+    m.at(c).move(m.at(b));
+    m.at(e).move(m.at(d));
+    m.at(g).move(m.at(f));
+    //stop(p);
+    ok(p, """
+   1        b=a
+   2        c=b
+   3        e=d
+   4        g=f
+""");
+    p.run();
+
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        56                                      s
+   2 V        0         8                                  1     a
+   3 V        8         8                                  1     b
+   4 V       16         8                                  1     c
+   5 V       24         8                                  0     d
+   6 V       32         8                                  0     e
+   7 V       40         8                                  0     f
+   8 V       48         8                                  0     g
+""");
+
+    m.clear();
+    m.at(a).setInt(1);
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        56                                      s
+   2 V        0         8                                  1     a
+   3 V        8         8                                  0     b
+   4 V       16         8                                  0     c
+   5 V       24         8                                  0     d
+   6 V       32         8                                  0     e
+   7 V       40         8                                  0     f
+   8 V       48         8                                  0     g
+""");
+
+    p.optimize();
+    //stop(p);
+    ok(p, """
+   1        b=a
+   2        c=b
+    Outputs: M[  16/*c   */ +: 8] M[  32/*e   */ +: 8] M[  48/*g   */ +: 8]
+    Inputs : M[   8/*b   */ +: 8] M[  24/*d   */ +: 8] M[  40/*f   */ +: 8]
+    Merged:
+      3 e=d
+      4 g=f
+""");
+    p.run();
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        56                                      s
+   2 V        0         8                                  1     a
+   3 V        8         8                                  1     b
+   4 V       16         8                                  1     c
+   5 V       24         8                                  0     d
+   6 V       32         8                                  0     e
+   7 V       40         8                                  0     f
+   8 V       48         8                                  0     g
+""");
+   }
+
+  static void test_merge_double()
    {Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 8);
     Layout.Variable  b = l.variable ("b", 8);
@@ -791,7 +874,8 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_stop();
     test_loop();
     test_pool();
-    test_merge();
+    test_merge_chain();
+    test_merge_double();
     test_merge_if();
     //test_debug();
    }
