@@ -32,22 +32,9 @@ jobs:
       with:
         website: jdk.java.net
 
-    - name: Install Tree
-      run:
-        sudo apt install tree
-
-    - name: Position files in package
-      run: |
-        mkdir -p com/AppaApps/Silicon
-        cp `find .  -name "*.java"` com/AppaApps/Silicon
-
-    - name: Files
-      run:
-        tree
-
     - name: Compile
       run: |
-        javac -g -d Classes -cp Classes `find com/AppaApps/Silicon -name "*.java"`
+        javac -g -d Classes *.java`
 
     - name: Test Btree
       if: matrix.task == 'Btree'
