@@ -186,3 +186,11 @@ jobs:
       if: matrix.task == 'BtreePA'
       run: |
         cd verilog/put;    iverilog -Iincludes/ -g2012 -o put    put.v    put.tb    && timeout 1m ./put
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: verilog
+        path: |
+          verilog/
+          trace/
