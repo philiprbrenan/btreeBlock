@@ -12,8 +12,9 @@ class ProgramPA extends Test                                                    
   int             step = 0;                                                     // Execution step
   int             time = 0;                                                     // Execution time
   boolean      running = false;                                                 // Executing if true
-  boolean        trace = !false;                                                 // Trace execution if true
+  boolean        trace = !false;                                                // Trace execution if true
   Stack<Label>  labels = new Stack<>();                                         // Labels for some instructions
+  Memory   traceMemory;                                                         // Labels for some instructions
   final Stack<String> Trace = new Stack<>();                                    // Trace execution steps
 
   ProgramPA() {}                                                                // Create a program that instructions can be added to and then executed
@@ -54,7 +55,17 @@ class ProgramPA extends Test                                                    
     void  in(MemoryLayoutPA.At at) { inputs.add(at.verilogLoad());}             // Record an input of this instruction
 
     void execute()                                                              // Execute an instruction
-     {if (trace) Trace.push(String.format("%4d  %4d  %4d  %s", time, step, instructionNumber, n()));
+     {if (trace)
+       {if (traceMemory == null)
+         {Trace.push(String.format("%4d  %4d  %s", time, step, n()));
+         }
+        else
+         {final StringBuilder s = new StringBuilder();
+          final boolean[]b = traceMemory.bits;
+          for(int i = 0; i < b.length; i++) s.append(b[i] ? "1" : "0");
+          Trace.push(String.format("%4d  %4d  %s", time, step, s));
+         }
+       }
       a();
      }
 
