@@ -1,4 +1,5 @@
 //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // BtreeSA in pseudo assembler
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
@@ -2273,13 +2274,13 @@ $stuckBases
       initialize_memory_M();                                                    // Initialize btree memory
       initialize_memory_T();                                                    // Initialize btree transaction
       //("reset");
-      traceFile = $fopen("trace.txt", "w");                                     // Open trace file
-      if (!traceFile) $fatal(1, "cannot open trace file trace.txt");
+      traceFile = $fopen("$traceFile", "w");                                    // Open trace file
+      if (!traceFile) $fatal(1, "Cannot open trace file $traceFile");
       $stuckInitialization
     end
     else begin                                                                  // Run
-      $display            ("%4d  %4d", steps, step);                            // Trace execution
-      $fdisplay(traceFile, "%4d  %4d", steps, step);                            // Trace execution in a file
+      $display            ("%4d  %4d",     steps, step);                        // Trace execution
+      $fdisplay(traceFile, "%4d  %4d  %b", steps, step, M);                     // Trace execution in a file
       case(step)                                                                // Case statements to select the code for the current instruction
 """);
 
@@ -3405,7 +3406,7 @@ endmodule
     test_delete_descending();
     //test_to_array();
     test_delete_small_random();
-    //test_delete_large_random();
+    test_delete_large_random();
     test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
