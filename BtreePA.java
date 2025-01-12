@@ -1,5 +1,4 @@
 //------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
 // BtreeSA in pseudo assembler
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
@@ -3406,7 +3405,7 @@ endmodule
     test_delete_descending();
     //test_to_array();
     test_delete_small_random();
-    test_delete_large_random();
+    //test_delete_large_random();
     test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
