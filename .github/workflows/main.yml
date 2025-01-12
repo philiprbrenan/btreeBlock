@@ -34,7 +34,7 @@ jobs:
 
     - name: Compile
       run: |
-        javac -g -d Classes *.java`
+        javac -g -d Classes *.java
 
     - name: Test Btree
       if: matrix.task == 'Btree'
