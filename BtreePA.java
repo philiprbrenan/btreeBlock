@@ -3328,6 +3328,7 @@ endmodule
       int expSteps() {return  948;}                                             // Expected number of steps
      };
     t.P.trace = true;
+    t.P.traceMemory = t.M.memory();
     t.P.run();
     ok(t.T.at(t.data).getInt(), 6);                                             // Data associated with key
     //stop(t);
