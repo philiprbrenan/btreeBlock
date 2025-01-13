@@ -2276,11 +2276,10 @@ $stuckBases
       traceFile = $fopen("$traceFile", "w");                                    // Open trace file
       if (!traceFile) $fatal(1, "Cannot open trace file $traceFile");
       $stuckInitialization
-      $display            ("AAAAAA");                                           // Trace execution
     end
     else begin                                                                  // Run
-      $display            ("%4d  %4d %b BBB",     steps, step, M);                        // Trace execution
-      $fdisplay(traceFile, "%4d  %4d  %b BB\\n", steps, step, M);                     // Trace execution in a file
+      $display            ("%4d  %4d  %b", steps, step, M);                     // Trace execution
+      $fdisplay(traceFile, "%4d  %4d  %b", steps, step, M);                     // Trace execution in a file
       case(step)                                                                // Case statements to select the code for the current instruction
 """);
 
