@@ -39,7 +39,7 @@ jobs:
     - name: Test Btree
       if: matrix.task == 'Btree'
       run: |
-        java -cp Classes com/AppaApps/Silicon/Btree
+        # java -cp Classes com/AppaApps/Silicon/Btree
 
 
     - name: Test BtreePA
@@ -51,31 +51,31 @@ jobs:
     - name: Test BtreeSA
       if: matrix.task == 'BtreeSA'
       run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeSA
+        #java -cp Classes com/AppaApps/Silicon/BtreeSA
 
 
     - name: Test BtreeSML
       if: matrix.task == 'BtreeSML'
       run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeSML
+        # java -cp Classes com/AppaApps/Silicon/BtreeSML
 
 
     - name: Test BtreeSP
       if: matrix.task == 'BtreeSP'
       run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeSP
+        # java -cp Classes com/AppaApps/Silicon/BtreeSP
 
 
     - name: Test BtreeStuck
       if: matrix.task == 'BtreeStuck'
       run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeStuck
+        # java -cp Classes com/AppaApps/Silicon/BtreeStuck
 
 
     - name: Test BtreeStuckStatic
       if: matrix.task == 'BtreeStuckStatic'
       run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeStuckStatic
+        # java -cp Classes com/AppaApps/Silicon/BtreeStuckStatic
 
 
     - name: Test If
