@@ -175,7 +175,7 @@ jobs:
     - name: Verilog Run Find
       if: matrix.task == 'BtreePA'
       run: |
-        cd verilog/find;   iverilog -Iincludes/ -g2012 -o find   find.v   find.tb   && timeout 1m ./find
+        cd verilog/find;   cat find.v; iverilog -Iincludes/ -g2012 -o find   find.v   find.tb   && timeout 1m ./find
 
     - name: Verilog Run Delete
       if: matrix.task == 'BtreePA'
