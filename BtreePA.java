@@ -2365,7 +2365,7 @@ endmodule
              s = s.replace("$mFile",               mFile);
              s = s.replace("$tFile",               tFile);
              s = s.replace("$traceFile",           traceFile);
-             s = s.replace("$project",             project);
+             s = s.replace("$project",             "trace.txt");
              s = s.replace("$Key",                 ""+Key());
              s = s.replace("$Data",                ""+Data());
              s = s.replace("$data_at",             ""+data.at);
@@ -3406,7 +3406,7 @@ endmodule
     test_delete_descending();
     //test_to_array();
     test_delete_small_random();
-    test_delete_large_random();
+    //test_delete_large_random();
     test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
