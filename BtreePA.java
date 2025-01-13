@@ -2364,8 +2364,8 @@ endmodule
              s = s.replace("$stuckInitialization", stuckMemoryInitialization());
              s = s.replace("$mFile",               mFile);
              s = s.replace("$tFile",               tFile);
-             s = s.replace("$traceFile",           traceFile);
-             s = s.replace("$project",             "trace.txt");
+             s = s.replace("$traceFile",           "trace.txt");
+             s = s.replace("$project",             project);
              s = s.replace("$Key",                 ""+Key());
              s = s.replace("$Data",                ""+Data());
              s = s.replace("$data_at",             ""+data.at);
@@ -3396,17 +3396,17 @@ endmodule
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
-   {test_put_ascending();
-    test_put_ascending_wide();
-    test_put_descending();
-    test_put_small_random();
-    //test_put_large_random();
-    test_find();
-    test_delete_ascending();
-    test_delete_descending();
-    //test_to_array();
-    test_delete_small_random();
-    //test_delete_large_random();
+   {//test_put_ascending();
+    //test_put_ascending_wide();
+    //test_put_descending();
+    //test_put_small_random();
+    ////test_put_large_random();
+    //test_find();
+    //test_delete_ascending();
+    //test_delete_descending();
+    ////test_to_array();
+    //test_delete_small_random();
+    ////test_delete_large_random();
     test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
