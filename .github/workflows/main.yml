@@ -175,17 +175,17 @@ jobs:
     - name: Verilog Run Find
       if: matrix.task == 'BtreePA'
       run: |
-        cd verilog/find;   cat find.v; iverilog -Iincludes/ -g2012 -o find   find.v   find.tb   && timeout 1m ./find
+        cd verilog/find;  iverilog -Iincludes/ -g2012 -o find   find.v   find.tb   && timeout 1m ./find;  cat trace.txt 
 
     - name: Verilog Run Delete
       if: matrix.task == 'BtreePA'
       run: |
-        cd verilog/delete; iverilog -Iincludes/ -g2012 -o delete delete.v delete.tb && timeout 1m ./delete
+        cd verilog/delete; iverilog -Iincludes/ -g2012 -o delete delete.v delete.tb && timeout 1m ./delete;  cat trace.txt
 
     - name: Verilog Run Put
       if: matrix.task == 'BtreePA'
       run: |
-        cd verilog/put;    iverilog -Iincludes/ -g2012 -o put    put.v    put.tb    && timeout 1m ./put
+        cd verilog/put;    iverilog -Iincludes/ -g2012 -o put    put.v    put.tb    && timeout 1m ./put;  cat trace.txt
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
