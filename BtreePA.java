@@ -2279,7 +2279,7 @@ $stuckBases
     end
     else begin                                                                  // Run
       $display            ("%4d  %4d",     steps, step);                        // Trace execution
-      $fdisplay(traceFile, "%4d  %4d  %b", steps, step, M);                     // Trace execution in a file
+      $fdisplay(traceFile, "%4d  %4d  %b BB\n", steps, step, M);                     // Trace execution in a file
       case(step)                                                                // Case statements to select the code for the current instruction
 """);
 
