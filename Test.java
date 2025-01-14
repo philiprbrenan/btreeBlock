@@ -638,7 +638,7 @@ public class Test                                                               
 
     ExecCommand(String command)
      {try
-       {final ProcessBuilder b = new ProcessBuilder(command);
+       {final ProcessBuilder b = new ProcessBuilder("bash", "-c", command);
         b.redirectErrorStream(false);
         final Process p = b.inheritIO().start();
 
