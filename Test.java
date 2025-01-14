@@ -106,7 +106,7 @@ public class Test                                                               
    {int v = 1; for (int i = 0; i < b; ++i) v *= a; return v;
    }
 
-//D1 Array routines                                                             // Routines operating on arrays
+//D2 Array routines                                                             // Routines operating on arrays
 
    static void reverseArray(Object[] array)                                     // Reverse an array in situ
     {final int N = array.length;
@@ -126,8 +126,6 @@ public class Test                                                               
                                 array[j] = temp;
       }
     }
-
-//D1 Logging                                                                    // Logging and tracing
 
 //D2 Traceback                                                                  // Trace back so we know where we are
 
@@ -294,7 +292,7 @@ public class Test                                                               
      }
    }
 
-//D1 Files                                                                      // Operations on files
+//D2 Files                                                                      // Operations on files
 
   static Stack<String> readFile(String filePath)                                // Read a file into stack of strings
    {try
@@ -631,6 +629,51 @@ public class Test                                                               
     System.exit(testsFailed > 0 ? 1 : 0);                                       // Set the return code
    }
 
+//D2 Command Execution                                                          // Execute a comamnd and return its stdout and stderr
+
+  static class ExecCommand
+   {final StringBuilder out = new StringBuilder();
+    final StringBuilder err = new StringBuilder();
+    int exitCode;
+
+    ExecCommand(String command)
+     {try
+       {final ProcessBuilder b = new ProcessBuilder(command);
+        b.redirectErrorStream(false);
+        final Process p = b.inheritIO().start();
+
+        final Thread o = new Thread(() ->
+         {try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream())))
+           {String line;
+            while ((line = reader.readLine()) != null)
+             {out.append(line).append(System.lineSeparator());
+             }
+           }
+          catch (IOException x)
+           {x.printStackTrace();
+           }
+         }); o.start();
+
+        final Thread e = new Thread(() ->
+         {try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getErrorStream())))
+           {String line;
+            while ((line = reader.readLine()) != null)
+             {err.append(line).append(System.lineSeparator());
+             }
+           }
+          catch (IOException x)
+           {x.printStackTrace();
+           }
+         }); e.start();
+
+        exitCode = p.waitFor();
+        o.join();
+        e.join();
+       }
+      catch (Exception e) {e.printStackTrace();}
+     }
+   }
+
 //D0                                                                            // Tests
 
   static void test_log_two()
@@ -726,6 +769,13 @@ CCCCC
     ok(joinStrings(s, ","), "a,b");
    }
 
+  static void test_command()
+   {final ExecCommand e = new ExecCommand("echo AAAA; echo BBBB 1>&2");
+    say("aaaa", e.out);
+    say("bbbb", e.err);
+    //ok(joinStrings(s, ","), "a,b");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_log_two();
     test_max_min();
@@ -734,10 +784,12 @@ CCCCC
     test_files();
     test_join_stack();
     test_join_set();
+    test_command();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_command();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
