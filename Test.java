@@ -770,9 +770,13 @@ CCCCC
 
   static void test_command()
    {final ExecCommand e = new ExecCommand("echo AAAA; echo BBBB 1>&2");
-    say("aaaa", e.out);
-    say("bbbb", e.err);
-    //ok(joinStrings(s, ","), "a,b");
+    ok(e.out, """
+AAAA
+""");
+    ok(e.err, """
+BBBB
+""");
+    ok(e.exitCode, 0);
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
