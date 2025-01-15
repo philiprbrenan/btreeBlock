@@ -639,8 +639,7 @@ public class Test                                                               
     ExecCommand(String command)
      {try
        {final ProcessBuilder b = new ProcessBuilder("bash", "-c", command);
-        b.redirectErrorStream(false);
-        final Process p = b.inheritIO().start();
+        final Process p = b.start();
 
         final Thread o = new Thread(() ->
          {try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream())))
