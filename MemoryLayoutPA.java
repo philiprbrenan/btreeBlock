@@ -420,11 +420,11 @@ class MemoryLayoutPA extends Test                                               
           final MemoryLayoutPA tm = ml();                                       // Target memory
           final MemoryLayoutPA sm = buffer.ml();                                // Source memory
           for   (int i = 0; i < A.size-1; i++)                                  // Each element
-           {s.append("\nif ("+i+" > "+start +") begin\n  ");                    // Start moving when we are above the index
+//         {s.append("\nif ("+i+" > "+start +") begin\n  ");                    // Start moving when we are above the index
+           {s.append("\nif ("+i+" >= "+start +") begin\n  ");                   // Start moving when we are at the index
             s.append
              (tm.at(a, i-0).verilogLoad()+ " <= " +
-              sm.at(b, i+1).verilogLoad()+ ";" +
-              traceComment());
+              sm.at(b, i+1).verilogLoad()+ ";" + traceComment());               // Trace in situ
             s.append("\nend\n");
            }
           return s.toString();

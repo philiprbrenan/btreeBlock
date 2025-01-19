@@ -5,6 +5,8 @@
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
 // see isLeaf(...) for treatment needed for other early parameter setting options to sqeeze code.
 // Send final memory to test benches so we can check the results of put and delete with confidence.
+// TraceComment should only be used in genVerilog because otherwise we get duplication
+// Copy entire stuck in one go rather than keys and data separately
 import java.util.*;
 import java.nio.file.*;
 
@@ -2356,25 +2358,37 @@ endmodule
       T.dumpVerilog(tFile);
      }
 
-    private StringBuilder editVariables(StringBuilder S)                        // Edit the variables in a string builder
-     {String s = S.toString();
-             s = s.replace("$bitsPerKey",    ""  + bitsPerKey());
-             s = s.replace("$bitsPerData",   ""  + bitsPerData());
-             s = s.replace("$stuckBases",          stuckMemories());
-             s = s.replace("$stuckInitialization", stuckMemoryInitialization());
-             s = s.replace("$mFile",               mFile);
-             s = s.replace("$tFile",               tFile);
-             s = s.replace("$traceFile",           "trace.txt");
-             s = s.replace("$project",             project);
-             s = s.replace("$Key",                 ""+Key());
-             s = s.replace("$Data",                ""+Data());
-             s = s.replace("$data_at",             ""+data.at);
-             s = s.replace("$data_width",          ""+data.width);
-             s = s.replace("$data",                ""+data());
-             s = s.replace("$maxSteps",            ""+maxSteps());
-             s = s.replace("$expSteps",            ""+expSteps());
-             s = s.replace("$found_at",            ""+found.at);
-      return new StringBuilder(s);
+    void execTest()                                                            // Execute the verilog test and compare it with the results from execution under Java
+     {final StringBuilder s = new StringBuilder("cd verilog/$project; iverilog $project.tb $project.v -Iincludes -g2012 -o $project ; ./$project");
+      final String        E = "trace/test_verilog_"+project+".txt";
+      final String        e = joinLines(readFile(E));
+      final String        G = "verilog/"+project+"/trace.txt";
+      final String        g = joinLines(readFile(G));
+//say("Expected: "+e);
+//say("Got     : "+g);
+      ok(g, e);
+     }
+    
+    private String editVariables(StringBuilder S) {return editVariables(""+S);}// Edit the variables in a string builder
+    
+    private String editVariables(String s)                                     // Edit the variables in a string builder
+     {s = s.replace("$bitsPerKey",    ""  + bitsPerKey());
+      s = s.replace("$bitsPerData",   ""  + bitsPerData());
+      s = s.replace("$stuckBases",          stuckMemories());
+      s = s.replace("$stuckInitialization", stuckMemoryInitialization());
+      s = s.replace("$mFile",               mFile);
+      s = s.replace("$tFile",               tFile);
+      s = s.replace("$traceFile",           "trace.txt");
+      s = s.replace("$project",             project);
+      s = s.replace("$Key",                 ""+Key());
+      s = s.replace("$Data",                ""+Data());
+      s = s.replace("$data_at",             ""+data.at);
+      s = s.replace("$data_width",          ""+data.width);
+      s = s.replace("$data",                ""+data());
+      s = s.replace("$maxSteps",            ""+maxSteps());
+      s = s.replace("$expSteps",            ""+expSteps());
+      s = s.replace("$found_at",            ""+found.at);
+      return s;
      }
    }
 
@@ -3284,7 +3298,9 @@ endmodule
       int expSteps() {return   93;}                                               // Expected number of steps
      };
     t.P.trace = true;
+    t.P.traceMemory = t.M.memory(); 
     t.P.run();
+    v.execTest();                                                               // Exeute the verilog test  
     //say("AAAA11", t);
     //say("AAAA22", t.P);
     //say("AAAA22", t.T);
@@ -3327,8 +3343,9 @@ endmodule
       int expSteps() {return  948;}                                             // Expected number of steps
      };
     t.P.trace = true;
-    t.P.traceMemory = t.M.memory();
+    t.P.traceMemory = t.M.memory();  
     t.P.run();
+    v.execTest();                                                               // Exeute the verilog test  
     ok(t.T.at(t.data).getInt(), 6);                                             // Data associated with key
     //stop(t);
     ok(t, """
@@ -3372,7 +3389,7 @@ endmodule
     t.T.at(t.Key ).setInt(N);                                                   // Sets memory directly not via an instruction
     t.T.at(t.Data).setInt(N);                                                   // Sets memory directly not via an instruction
     t.put();
-    GenVerilog v = t.new GenVerilog("put", "verilog", t.P)                      // Generate verilog now that memories have beeninitialzied and the program written
+    GenVerilog v = t.new GenVerilog("put", "verilog", t.P)                      // Generate verilog now that memories have been initialzied and the program written
      {int Key     () {return    3;}                                             // Input key value
       int Data    () {return    3;}                                             // Input key value
       int data    () {return    0;}                                             // Expected output data value
@@ -3380,7 +3397,9 @@ endmodule
       int expSteps() {return  984;}                                             // Expected number of steps
      };
     t.P.trace = true;
+    t.P.traceMemory = t.M.memory(); 
     t.P.run();
+    v.execTest();                                                               // Exeute the verilog test  
     //stop(t);
     ok(t, """
              4                    |
@@ -3396,17 +3415,17 @@ endmodule
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
-   {//test_put_ascending();
-    //test_put_ascending_wide();
-    //test_put_descending();
-    //test_put_small_random();
-    ////test_put_large_random();
-    //test_find();
-    //test_delete_ascending();
-    //test_delete_descending();
-    ////test_to_array();
-    //test_delete_small_random();
-    ////test_delete_large_random();
+   {test_put_ascending();
+    test_put_ascending_wide();
+    test_put_descending();
+    test_put_small_random();
+    //test_put_large_random();
+    test_find();
+    test_delete_ascending();
+    test_delete_descending();
+    //test_to_array();
+    test_delete_small_random();
+    //test_delete_large_random();
     test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
@@ -3417,8 +3436,6 @@ endmodule
     test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
-    //test_put_large_random();
-    //test_delete_small_random();
    }
 
   public static void main(String[] args)                                        // Test if called as a program

@@ -38,7 +38,7 @@ class ProgramPA extends Test                                                    
     final TreeSet<String>outputs = new TreeSet<>();                             // The set of outputs written by this instruction
     final TreeSet<String> inputs = new TreeSet<>();                             // The set of inputs read by this instruction
     final TreeSet<I>      merged = new TreeSet<>();                             // The referenced instructions can eb executed at the same time as this one
-    I merge ;                                                                   // This instruction has been merged into the referenced  instruction.
+    I merge;                                                                    // This instruction has been merged into the referenced instruction.
     boolean mergeableInstruction;                                               // This instruction can be merged with earlier instructions as long as there are no collisions
     boolean mightJump;                                                          // This instruction might change the flow of control
 
@@ -53,21 +53,6 @@ class ProgramPA extends Test                                                    
     void   i() {}                                                               // initialization for each instruction
     void out(MemoryLayoutPA.At at) {outputs.add(at.verilogLoad());}             // Record an output of this instruction
     void  in(MemoryLayoutPA.At at) { inputs.add(at.verilogLoad());}             // Record an input of this instruction
-
-    void execute()                                                              // Execute an instruction
-     {if (trace)
-       {if (traceMemory == null)
-         {Trace.push(String.format("%4d  %4d  %s", time, step, n()));
-         }
-        else
-         {final StringBuilder s = new StringBuilder();
-          final boolean[]b = traceMemory.bits;
-          for(int i = 0; i < b.length; i++) s.append(b[i] ? "1" : "0");
-          Trace.push(String.format("%4d  %4d  %s", time, step, s));
-         }
-       }
-      a();
-     }
 
     String traceComment() {return " /*"+traceBack.replaceAll("\\n", " ")+" */";}// Trace back comment
 
@@ -143,16 +128,29 @@ class ProgramPA extends Test                                                    
     squeeze();                                                                  // Squeeze out space in code occupied by instructions merged into others
    }
 
+  void traceMemory()                                                            // Trace memory
+   {if (trace && traceMemory != null)
+     {final StringBuilder s = new StringBuilder();
+      final boolean[]b = traceMemory.bits;
+      for(int i = 0; i < b.length; i++) s.append(b[i] ? "1" : "0");
+       {s.reverse();                                                            // Match iverilog 
+        Trace.push(String.format("%4d  %4d  %s", time, step, s));
+       }
+     }
+   }
+
   void run()                                                                    // Run the program
    {z();
     Trace.clear();
     running = true;
     final int N = code.size();
     for (step = 0, time = 0; step < N && time < maxTime && running; step++, time++)
-     {final I i = code.elementAt(step);
-      i.execute();
-      for (I j : i.merged) j.execute();
+     {traceMemory();
+      final I i = code.elementAt(step);
+      i.a();
+      for (I j : i.merged) j.a();
      }
+    traceMemory(); 
     if (time >= maxTime) stop("Out of time: ", time);
     running = false;
     if (trace) writeFile("trace/"+currentTestName()+".txt", joinLines(Trace));  // Write the trace
