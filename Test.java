@@ -10,6 +10,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.stream.*;
 import java.text.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 //D1 Construct                                                                  // Develop and test a java program
 
@@ -620,16 +622,20 @@ public class Test                                                               
    }
 
   static void testSummary()                                                     // Print a summary of the testing
-   {final double delta = (System.nanoTime() - start) / (double)(1<<30);         // Run time in seconds
-    final String d = String.format("tests in %5.2f seconds.", delta);           // Format run time
+   {final double d = (System.nanoTime() - start) / (double)(1<<30);             // Run time in seconds
+    final String 
+      a = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")),      // Time at which run was executed
+      C = Thread.currentThread().getStackTrace()[2].getClassName(),             // Containing class
+      c = C.substring(C.lastIndexOf('.') + 1),                                  // Short name of containing class 
+      m = String.format("tests in %5.2f seconds from %s at %s", d, c, a);       // Format test summary
     if (false) {}                                                               // Analyze results of tests
-    else if (testsPassed == 0 && testsFailed == 0) say("No",    d);             // No tests
-    else if (testsFailed == 0)   say("PASSed ALL", testsPassed, d);             // Passed all tests
-    else say("Passed "+testsPassed+",    FAILed:", testsFailed, d);             // Failed some tests
+    else if (testsPassed == 0 && testsFailed == 0) say("No",    m);             // No tests
+    else if (testsFailed == 0)   say("PASSed ALL", testsPassed, m);             // Passed all tests
+    else say("Passed "+testsPassed+",    FAILed:", testsFailed, m);             // Failed some tests
     System.exit(testsFailed > 0 ? 1 : 0);                                       // Set the return code
    }
 
-//D2 Command Execution                                                          // Execute a comamnd and return its stdout and stderr
+//D2 Command Execution                                                          // Execute a command and return its stdout and stderr
 
   static class ExecCommand
    {final StringBuilder out = new StringBuilder();
