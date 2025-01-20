@@ -797,7 +797,7 @@ CCCCC
 
     sayThisOrStop("""
 Character 2, expected=D= got=B=
-0----+----1----+----2----+----3----+----4----+----5----+----6
+0----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----
 AAAAA
 BBBBB
   ^
@@ -889,8 +889,7 @@ BBBB
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_command();
-    test_differentiate_lines();
+    test_string();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
