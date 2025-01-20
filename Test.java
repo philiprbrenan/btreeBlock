@@ -13,15 +13,15 @@ import java.text.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-//D1 Construct                                                                  // Develop and test a java program
+//D1 Utility routines                                                           // Utility routines
+
+//D2 Construct                                                                  // Develop and test a java program
 
 public class Test                                                               // Describe a chip and emulate its operation.
  {final static boolean github_actions =                                         // Whether we are on a github
     "true".equals(System.getenv("GITHUB_ACTIONS"));
   final static long start = System.nanoTime();                                  // Start time
   final static Stack<String> sayThisOrStop = new Stack<>();                     // The next says should say this or else we should stop
-
-//D1 Utility routines                                                           // Utility routines
 
 //D2 String routines                                                            // String routines
 
@@ -514,6 +514,40 @@ public class Test                                                               
     for (Object o : O) sayThisOrStop.push(o.toString());
    }
 
+  static void ii(Object s, Object[] a)
+   {final Object[] b = new Object[a.length + 1];
+    b[0] = s;
+    System.arraycopy(a, 0, b, 1, a.length);
+    say(b);
+   }
+
+  static void sa(Object...O) {ii("AAAA", O);}
+  static void sb(Object...O) {ii("BBBB", O);}
+  static void sc(Object...O) {ii("CCCC", O);}
+  static void sd(Object...O) {ii("DDDD", O);}
+  static void se(Object...O) {ii("EEEE", O);}
+  static void sf(Object...O) {ii("FFFF", O);}
+  static void sg(Object...O) {ii("GGGG", O);}
+  static void sh(Object...O) {ii("HHHH", O);}
+  static void si(Object...O) {ii("IIII", O);}
+  static void sj(Object...O) {ii("JJJJ", O);}
+  static void sk(Object...O) {ii("KKKK", O);}
+  static void sl(Object...O) {ii("LLLL", O);}
+  static void sm(Object...O) {ii("MMMM", O);}
+  static void sn(Object...O) {ii("NNNN", O);}
+  static void so(Object...O) {ii("OOOO", O);}
+  static void sp(Object...O) {ii("PPPP", O);}
+  static void sq(Object...O) {ii("QQQQ", O);}
+  static void sr(Object...O) {ii("RRRR", O);}
+  static void ss(Object...O) {ii("SSSS", O);}
+  static void st(Object...O) {ii("TTTT", O);}
+  static void su(Object...O) {ii("UUUU", O);}
+  static void sv(Object...O) {ii("VVVV", O);}
+  static void sw(Object...O) {ii("WWWW", O);}
+  static void sx(Object...O) {ii("XXXX", O);}
+  static void sy(Object...O) {ii("YYYY", O);}
+  static void sz(Object...O) {ii("ZZZZ", O);}
+
 //D1 Testing                                                                    // Test expected output against got output
 
   static int testsPassed = 0, testsFailed = 0;                                  // Number of tests passed and failed
@@ -623,10 +657,10 @@ public class Test                                                               
 
   static void testSummary()                                                     // Print a summary of the testing
    {final double d = (System.nanoTime() - start) / (double)(1<<30);             // Run time in seconds
-    final String 
+    final String
       a = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")),      // Time at which run was executed
       C = Thread.currentThread().getStackTrace()[2].getClassName(),             // Containing class
-      c = C.substring(C.lastIndexOf('.') + 1),                                  // Short name of containing class 
+      c = C.substring(C.lastIndexOf('.') + 1),                                  // Short name of containing class
       m = String.format("tests in %5.2f seconds from %s at %s", d, c, a);       // Format test summary
     if (false) {}                                                               // Analyze results of tests
     else if (testsPassed == 0 && testsFailed == 0) say("No",    m);             // No tests
@@ -677,7 +711,7 @@ public class Test                                                               
        }
       catch (Exception e) {e.printStackTrace();}
      }
-    ExecCommand(StringBuilder command) {this(""+command);} 
+    ExecCommand(StringBuilder command) {this(""+command);}
    }
 
 //D0                                                                            // Tests
@@ -800,6 +834,7 @@ BBBB
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
     test_command();
+sa("aaaaa");
    }
 
   public static void main(String[] args)                                        // Test if called as a program
