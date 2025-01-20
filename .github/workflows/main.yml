@@ -6,7 +6,7 @@ run-name: btreeBlock
 on:
   push:
     paths:
-      - '**/main.yml'
+      - '**/*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
