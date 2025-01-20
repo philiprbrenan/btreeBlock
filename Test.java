@@ -63,6 +63,27 @@ public class Test                                                               
 
   static String joinLines(Stack<String> S) {return joinStrings(S, "\n");}       // Perl join lines
 
+  static String differentiateLines(String input)                                // Show differences between each line and its predecessor
+   {final String[] L = input.split("\n");
+    final int      N = L.length;
+    if (N < 2) return input;                                                    // No action required
+
+    final StringBuilder d = new StringBuilder(L[0]+'\n');                       // First line is all new
+
+    for (int i = 1; i < N; i++)                                                 // Check each subsequent line against the prior one
+     {final String a = L[i-1], b = L[i];
+      final int C = min(a.length(), b.length());                                // Valid overlap
+
+      for (int j = 0; j < C; j++)                                               // Compare each character in the valid overlap with the previous one
+       {final char A = a.charAt(j), B = b.charAt(j);
+        d.append(A == B ? '.' : B);
+       }
+
+      d.append(b.substring(C, b.length())+'\n');                                // Remainder of current line outside valid overlap
+     }
+    return ""+d;
+   }
+
 //D2 Numeric routines                                                           // Numeric routines
 
   static int max(int n, int...rest)                                             // Maximum of some numbers
@@ -514,7 +535,7 @@ public class Test                                                               
     for (Object o : O) sayThisOrStop.push(o.toString());
    }
 
-  static void ii(Object s, Object[] a)
+  private static void ii(Object s, Object[] a)
    {final Object[] b = new Object[a.length + 1];
     b[0] = s;
     System.arraycopy(a, 0, b, 1, a.length);
@@ -820,6 +841,14 @@ BBBB
     ok(e.exitCode, 0);
    }
 
+  static void test_differentiate_lines()
+   {say(differentiateLines("""
+AAAA
+BBAA
+BBCC
+"""));
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_log_two();
     test_max_min();
@@ -834,7 +863,7 @@ BBBB
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
     test_command();
-sa("aaaaa");
+    test_differentiate_lines();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
