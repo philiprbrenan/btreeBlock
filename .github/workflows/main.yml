@@ -32,6 +32,10 @@ jobs:
       with:
         website: jdk.java.net
 
+    - name: Verilog install
+      run: |
+        sudo apt install iverilog        
+
     - name: Compile
       run: |
         javac -g -d Classes *.java
@@ -166,26 +170,6 @@ jobs:
       if: matrix.task == 'Verilog'
       run: |
         java -cp Classes com/AppaApps/Silicon/Verilog
-
-    - name: Verilog install
-      if: matrix.task == 'BtreePA'
-      run: |
-        sudo apt install iverilog
-
-    - name: Verilog Run Find
-      if: matrix.task == 'BtreePA'
-      run: |
-        cd verilog/find;  iverilog -Iincludes/ -g2012 -o find   find.v   find.tb   && timeout 1m ./find;  cat trace.txt 
-
-    - name: Verilog Run Delete
-      if: matrix.task == 'BtreePA'
-      run: |
-        cd verilog/delete; iverilog -Iincludes/ -g2012 -o delete delete.v delete.tb && timeout 1m ./delete;  cat trace.txt
-
-    - name: Verilog Run Put
-      if: matrix.task == 'BtreePA'
-      run: |
-        cd verilog/put;    iverilog -Iincludes/ -g2012 -o put    put.v    put.tb    && timeout 1m ./put;  cat trace.txt
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
