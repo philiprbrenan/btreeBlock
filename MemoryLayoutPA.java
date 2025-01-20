@@ -408,7 +408,8 @@ class MemoryLayoutPA extends Test                                               
        {void a()
          {Index.setOff();
           for   (int i = Index.result; i < A.size-1; i++)                       // Each element
-           {for (int j = 0;            j < w;        j++)                       // Each bit in each element
+           {//sa(target.at+i*w, buffer.at+i*w+w);
+            for (int j = 0;            j < w;        j++)                       // Each bit in each element
              {final boolean b = buffer.getBit((i+1)*w + j);
               target.setBit(i*w+j, b);
              }
@@ -425,6 +426,11 @@ class MemoryLayoutPA extends Test                                               
             s.append
              (tm.at(a, i-0).verilogLoad()+ " <= " +
               sm.at(b, i+1).verilogLoad()+ ";" + traceComment());               // Trace in situ
+            //s.append                                                            // Debug address of move
+            // ("$display(\"AAAA %d <= %d = %d\", ("+
+            //      tm.at(a, i-0).verilogAddr()+"), ("+
+            //      sm.at(b, i+1).verilogAddr()+"), ("+
+            //      sm.at(b, i+1).verilogLoad()+"));");
             s.append("\nend\n");
            }
           return s.toString();

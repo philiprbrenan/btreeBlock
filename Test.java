@@ -63,25 +63,31 @@ public class Test                                                               
 
   static String joinLines(Stack<String> S) {return joinStrings(S, "\n");}       // Perl join lines
 
-  static String differentiateLines(String input)                                // Show differences between each line and its predecessor
+  static String differentiateLines(int margin, String input)                    // Show differences between each line and its predecessor
    {final String[] L = input.split("\n");
     final int      N = L.length;
     if (N < 2) return input;                                                    // No action required
 
-    final StringBuilder d = new StringBuilder(L[0]+'\n');                       // First line is all new
+    final StringBuilder D = new StringBuilder(L[0]+'\n');                       // First line is all new
 
     for (int i = 1; i < N; i++)                                                 // Check each subsequent line against the prior one
      {final String a = L[i-1], b = L[i];
-      final int C = min(a.length(), b.length());                                // Valid overlap
+      final int    v = min(a.length(), b.length());                             // Valid overlap
 
-      for (int j = 0; j < C; j++)                                               // Compare each character in the valid overlap with the previous one
-       {final char A = a.charAt(j), B = b.charAt(j);
-        d.append(A == B ? '.' : B);
+      if (v > margin)                                                           // Something beyond the margin in the valid overlap
+       {int c = 0;
+        final StringBuilder d = new StringBuilder(b.substring(0, margin));      // Load the margin
+        for (int j = margin; j < v; j++)                                        // Compare each character in the valid overlap with the previous one
+         {final char A = a.charAt(j), B = b.charAt(j);
+          if (A == B && (A == '0' || A == '1')) d.append('.');
+          else                           { ++c; d.append(B);}
+         }
+        d.append(b.substring(v, b.length())+'\n');                              // Remainder of current line outside valid overlap
+        if (c > 0) D.append(d);
        }
-
-      d.append(b.substring(C, b.length())+'\n');                                // Remainder of current line outside valid overlap
+      else D.append(b+'\n');                                                    // A s hort line that did not reach he margin
      }
-    return ""+d;
+    return ""+D;
    }
 
 //D2 Numeric routines                                                           // Numeric routines
@@ -595,8 +601,8 @@ public class Test                                                               
     boolean matchesLen = true, matches = true;
     if (le != lg)                                                               // Failed on length
      {matchesLen = false;
-      err(b, currentTestName(), "Failed: mismatched length, expected",
-        le, "got", lg, "for text:\n"+G);
+      say(b, currentTestName(), "Failed: mismatched length, expected",
+        le, "got", lg);
 
 //    for (int i = 0; i < G.length(); i++)                                      // Check each character side by side
 //     {final int  g = G.charAt(i);
@@ -615,7 +621,7 @@ public class Test                                                               
         final String gg = g == '\n' ? "new-line" : ""+(char)g;
 
         say(b, "Character "+c+", expected="+ee+"= got="+gg+"=");
-        say(b, "0----+----1----+----2----+----3----+----4----+----5----+----6");
+        say(b, "0----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----");
         final String[]t = G.split("\\n");
         for(int k = 0; k < t.length; k++)                                       // Details of  mismatch
          {say(b, t[k]);
@@ -627,6 +633,16 @@ public class Test                                                               
      }
 
     if (matchesLen && matches) ++testsPassed; else {++testsFailed; err(b);}     // Show error location with a trace back so we know where the failure occurred
+   }
+
+  static void ok(int margin, String got, String expected)                       // Confirm two strings match
+   {final String G = differentiateLines(margin, got),
+                 E = differentiateLines(margin, expected);
+    if (!G.equals(E))
+     {say("Got:\n"+G);
+      say("Expected:\n"+E);
+     }
+    ok(G, E);
    }
 
   static void ok(Integer G, Integer E)                                          // Check that two integers are equal
@@ -693,12 +709,14 @@ public class Test                                                               
 //D2 Command Execution                                                          // Execute a command and return its stdout and stderr
 
   static class ExecCommand
-   {final StringBuilder out = new StringBuilder();
+   {final String    command;
+    final StringBuilder out = new StringBuilder();
     final StringBuilder err = new StringBuilder();
     int exitCode;
 
-    ExecCommand(String command)
-     {try
+    ExecCommand(String Command)
+     {command = Command;
+      try
        {final ProcessBuilder b = new ProcessBuilder("bash", "-c", command);
         final Process p = b.start();
 
@@ -729,6 +747,13 @@ public class Test                                                               
         exitCode = p.waitFor();
         o.join();
         e.join();
+        if (exitCode != 0)
+         {stop(
+          "Command:", command,
+          "code   :", exitCode,
+          "stdout :", out,
+          "stderr :", err);
+         }
        }
       catch (Exception e) {e.printStackTrace();}
      }
@@ -842,10 +867,12 @@ BBBB
    }
 
   static void test_differentiate_lines()
-   {say(differentiateLines("""
-AAAA
-BBAA
-BBCC
+   {say(differentiateLines(4, """
+ 1  AAAAAAAA
+ 2  BBBBAAAA
+ 3  CCCCAAAA
+ 4  CCCCAAAA
+ 5  DDDDAAAA
 """));
    }
 
