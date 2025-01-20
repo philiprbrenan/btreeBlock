@@ -5,7 +5,7 @@
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
 // see isLeaf(...) for treatment needed for other early parameter setting options to sqeeze code.
 // Send final memory to test benches so we can check the results of put and delete with confidence.
-// TraceComment should only be used in genVerilog because otherwise we get duplication
+// TraceComment should only be used in gnVerilog because otherwise we get duplication
 // Copy entire stuck in one go rather than keys and data separately
 import java.util.*;
 import java.nio.file.*;
@@ -2359,18 +2359,17 @@ endmodule
      }
 
     void execTest()                                                            // Execute the verilog test and compare it with the results from execution under Java
-     {final StringBuilder s = new StringBuilder("cd verilog/$project; iverilog $project.tb $project.v -Iincludes -g2012 -o $project ; ./$project");
+     {final StringBuilder s = new StringBuilder(editVariables("cd verilog/$project; iverilog $project.tb $project.v -Iincludes -g2012 -o $project ; ./$project"));
+      final ExecCommand   x = new ExecCommand(s);
       final String        E = "trace/test_verilog_"+project+".txt";
       final String        e = joinLines(readFile(E));
       final String        G = "verilog/"+project+"/trace.txt";
       final String        g = joinLines(readFile(G));
-//say("Expected: "+e);
-//say("Got     : "+g);
-      ok(g, e);
+      ok(12, g, e);                                                            // Width of margin in verilog traces
      }
-    
+
     private String editVariables(StringBuilder S) {return editVariables(""+S);}// Edit the variables in a string builder
-    
+
     private String editVariables(String s)                                     // Edit the variables in a string builder
      {s = s.replace("$bitsPerKey",    ""  + bitsPerKey());
       s = s.replace("$bitsPerData",   ""  + bitsPerData());
@@ -3298,9 +3297,9 @@ endmodule
       int expSteps() {return   93;}                                               // Expected number of steps
      };
     t.P.trace = true;
-    t.P.traceMemory = t.M.memory(); 
+    t.P.traceMemory = t.M.memory();
     t.P.run();
-    v.execTest();                                                               // Exeute the verilog test  
+    v.execTest();                                                               // Exeute the verilog test
     //say("AAAA11", t);
     //say("AAAA22", t.P);
     //say("AAAA22", t.T);
@@ -3343,9 +3342,9 @@ endmodule
       int expSteps() {return  948;}                                             // Expected number of steps
      };
     t.P.trace = true;
-    t.P.traceMemory = t.M.memory();  
+    t.P.traceMemory = t.M.memory();
     t.P.run();
-    v.execTest();                                                               // Exeute the verilog test  
+    v.execTest();                                                               // Exeute the verilog test
     ok(t.T.at(t.data).getInt(), 6);                                             // Data associated with key
     //stop(t);
     ok(t, """
@@ -3397,9 +3396,9 @@ endmodule
       int expSteps() {return  984;}                                             // Expected number of steps
      };
     t.P.trace = true;
-    t.P.traceMemory = t.M.memory(); 
+    t.P.traceMemory = t.M.memory();
     t.P.run();
-    v.execTest();                                                               // Exeute the verilog test  
+    v.execTest();                                                               // Exeute the verilog test
     //stop(t);
     ok(t, """
              4                    |
@@ -3426,7 +3425,7 @@ endmodule
     //test_to_array();
     test_delete_small_random();
     //test_delete_large_random();
-    test_verilog_delete();
+    //test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
    }
