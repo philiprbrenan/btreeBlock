@@ -745,6 +745,7 @@ public class Test                                                               
          }); e.start();
 
         exitCode = p.waitFor();
+
         o.join();
         e.join();
         if (exitCode != 0)

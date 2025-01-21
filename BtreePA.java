@@ -2194,15 +2194,15 @@ abstract class BtreePA extends Test                                             
    }
 
   String stuckMemory(StuckPA s)                                                 // Base address variable for one stuck
-   {return"reg ["+bitsPerAddress+":0] "+s.M.baseName() +
+   {return"reg ["+bitsPerAddress+":0] "+s.M.baseName() + ";\n"+
       s.C.declareVerilog()+
       s.T.declareVerilog();
    }
 
   String stuckMemoryInitialization(StuckPA s)                                   // Initialization for one stuck
-   {return s.M.baseName()+" <= 0"+
-           s.C.name()    +" <= 0"+
-           s.T.name()    +" <= 0";
+   {return s.M.baseName()+" <= 0;"+
+           s.C.name()    +" <= 0;"+
+           s.T.name()    +" <= 0;"+traceComment();
    }
 
   abstract class GenVerilog                                                     // Generate verilog
@@ -2287,10 +2287,10 @@ $stuckBases
       for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
        {final ProgramPA.I   I = program.code.elementAt(i);                      // The instruction to write
         final StringBuilder t = new StringBuilder();
-        t.append(!I.merged() ? I.v()+";"+I.traceComment() :
+        t.append(!I.merged() ? I.v()+I.traceComment() :
             "/* merged into: "+I.merge.instructionNumber+" */");
 
-        for (ProgramPA.I c : I.merged) t.append(c.v()+";"+c.traceComment());    // Add any merged instructions
+        for (ProgramPA.I c : I.merged) t.append(c.v()+c.traceComment());        // Add any merged instructions
 
         s.append(String.format("          %5d : begin %s end\n", i, t));        // Bracket instructions in this block with op code
        }
@@ -2358,7 +2358,7 @@ endmodule
      }
 
     void execTest()                                                            // Execute the verilog test and compare it with the results from execution under Java
-     {final StringBuilder s = new StringBuilder(editVariables("cd verilog/$project; iverilog $project.tb $project.v -Iincludes -g2012 -o $project ; ./$project"));
+     {final StringBuilder s = new StringBuilder(editVariables("cd verilog/$project && iverilog $project.tb $project.v -Iincludes -g2012 -o $project && ./$project"));
       final ExecCommand   x = new ExecCommand(s);
       final String        E = "trace/test_verilog_"+project+".txt";
       final String        e = joinLines(readFile(E));
