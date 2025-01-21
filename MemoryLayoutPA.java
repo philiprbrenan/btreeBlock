@@ -384,8 +384,7 @@ class MemoryLayoutPA extends Test                                               
            {s.append("\nif ("+i+" > "+start +") begin\n  ");                    // Start moving when we are above the index
             s.append
              (tm.at(a, i-0).verilogLoad()+ " <= " +
-              sm.at(b, i-1).verilogLoad()+ ";" +
-              traceComment());
+              sm.at(b, i-1).verilogLoad()+ ";");
             s.append("\nend\n");
            }
           return s.toString();
@@ -819,11 +818,11 @@ class MemoryLayoutPA extends Test                                               
     final int N = memory.bits.length-1, B = logTwo(N)-1;
     final String name = name();
     s.append(declareVerilog());
-    s.append("task initialize_memory_"+name+traceComment());
+    s.append("task initialize_memory_"+name+";");
     s.append("    begin\n");
     for(int i = 0; i<= N; ++i)
      {final int b = memory.bits[i] ? 1 : 0;
-      s.append("        "+name+"["+i+"] = "+b+traceComment());
+      s.append("        "+name+"["+i+"] = "+b+";");
      }
     s.append("    end\n");
     s.append("endtask\n");
@@ -833,8 +832,9 @@ class MemoryLayoutPA extends Test                                               
   String declareVerilog()                                                       // Declare matching memory  but do not initialize it
    {final int N = memory.bits.length-1, B = logTwo(N)-1;
     final StringBuilder s = new StringBuilder();
-    if (based == null) s.append("reg ["+N+":0] "+name()    +traceComment());    // Actual memory if it is not based
-    else               s.append("reg ["+B+":0] "+baseName()+traceComment());    // Base offset for this memory
+    if (based == null) s.append("reg ["+N+":0] "+name()    +"; ");              // Actual memory if it is not based
+    else               s.append("reg ["+B+":0] "+baseName()+"; ");              // Base offset for this memory
+    s.append(traceComment());
     return s.toString();
    }
 
