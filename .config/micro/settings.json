@@ -1,0 +1,11 @@
+{
+    "clipboard": "terminal",
+    "colorcolumn": 80,
+    "hlsearch": true,
+    "hltrailingws": true,
+    "matchbracestyle": "highlight",
+    "rmtrailingws": true,
+    "savecursor": true,
+    "saveundo": true,
+    "scrollbar": true
+}
