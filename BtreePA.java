@@ -5,7 +5,6 @@
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
 // see isLeaf(...) for treatment needed for other early parameter setting options to sqeeze code.
 // Send final memory to test benches so we can check the results of put and delete with confidence.
-// TraceComment should only be used in gnVerilog because otherwise we get duplication
 // Copy entire stuck in one go rather than keys and data separately
 import java.util.*;
 import java.nio.file.*;
@@ -162,7 +161,7 @@ abstract class BtreePA extends Test                                             
         for (int i = N; i > 0; --i) setInt(free, (i == N ? 0 : i), i - 1);      // Link this node to the previous node
         setInt(freeList, root);                                                 // Root is first on free chain
        }
-      String v() {return "/* Construct Free list */"+ traceComment();}
+      String v() {return "/* Construct Free list */";}
      };
     allocate(false);                                                            // The root is always at zero, which frees zero to act as the end of list marker on the free chain
     T.setIntInstruction(node_setLeaf, root);
@@ -632,7 +631,7 @@ abstract class BtreePA extends Test                                             
        {final MemoryLayoutPA.At a = M.at(leaf, T.at(node_leafBase)).setOff();
         T.at(leafBase).setInt(a.at);
        }
-      String v() {return T.at(leafBase).verilogLoad() + " <= " + M.at(leaf, T.at(node_leafBase)).verilogAddr() + ";" + traceComment();}
+      String v() {return T.at(leafBase).verilogLoad() + " <= " + M.at(leaf, T.at(node_leafBase)).verilogAddr() + ";";}
      };
    }
 
@@ -649,7 +648,7 @@ abstract class BtreePA extends Test                                             
        {final MemoryLayoutPA.At a = M.at(branch, T.at(node_branchBase)).setOff();
         T.at(branchBase).setInt(a.at);
        }
-      String v() {return T.at(branchBase).verilogLoad() + " <= " + M.at(branch, T.at(node_branchBase)).verilogAddr() + ";" + traceComment();}
+      String v() {return T.at(branchBase).verilogLoad() + " <= " + M.at(branch, T.at(node_branchBase)).verilogAddr() + ";";}
      };
    }
 
@@ -1378,7 +1377,7 @@ abstract class BtreePA extends Test                                             
                {return T.at(mergeable).verilogLoad() + " <= " +
                           "("+T.at(nl).verilogLoad() + " + "  +
                               T.at(nr).verilogLoad() + " <= " +
-                   maxKeysPerLeaf()+") ? 'b1 : 'b0;" + traceComment();
+                   maxKeysPerLeaf()+") ? 'b1 : 'b0;";
                }
              };
 
@@ -1435,7 +1434,7 @@ abstract class BtreePA extends Test                                             
                {return T.at(mergeable).verilogLoad() + " <= "   +
                           "("+T.at(nl).verilogLoad() + "+ 1 +"  +
                               T.at(nr).verilogLoad() + " <= "  +
-                   maxKeysPerBranch()+") ? 'b1 : 'b0;" + traceComment();
+                   maxKeysPerBranch()+") ? 'b1 : 'b0;";
                }
              };
 
@@ -1547,7 +1546,7 @@ abstract class BtreePA extends Test                                             
                {return T.at(stolenOrMerged).verilogLoad() + " <= " +
                                "("+T.at(nl).verilogLoad() + " + "  +
                                    T.at(nr).verilogLoad() + " >= " +
-                   maxKeysPerLeaf()+") ? 'b1 : 'b0;" + traceComment();
+                   maxKeysPerLeaf()+") ? 'b1 : 'b0;";
                }
              };
             stealNotPossible(end);
@@ -1584,7 +1583,7 @@ abstract class BtreePA extends Test                                             
                {return T.at(stolenOrMerged).verilogLoad() + " <= "   +
                                "("+T.at(nl).verilogLoad() + "+ 1 +"  +
                                    T.at(nr).verilogLoad() + " > "    +
-                   maxKeysPerBranch()+") ? 'b1 : 'b0;" + traceComment();
+                   maxKeysPerBranch()+") ? 'b1 : 'b0;";
                }
              };
             stealNotPossible(end);
@@ -1670,7 +1669,7 @@ abstract class BtreePA extends Test                                             
                {return T.at(stolenOrMerged).verilogLoad() + " <= " +
                                "("+T.at(nl).verilogLoad() + " + "  +
                                    T.at(nr).verilogLoad() + " > "  +
-                   maxKeysPerLeaf()+") ? 'b1 : 'b0;" + traceComment();
+                   maxKeysPerLeaf()+") ? 'b1 : 'b0;";
                }
              };
             stealNotPossible(end);
@@ -1705,7 +1704,7 @@ abstract class BtreePA extends Test                                             
                {return T.at(stolenOrMerged).verilogLoad() + " <= "   +
                                "("+T.at(nl).verilogLoad() + "+ 1 +"  +
                                    T.at(nr).verilogLoad() + " > "    +
-                   maxKeysPerBranch()+") ? 'b1 : 'b0;" + traceComment();
+                   maxKeysPerBranch()+") ? 'b1 : 'b0;";
                }
              };
             stealNotPossible(end);
@@ -2195,15 +2194,15 @@ abstract class BtreePA extends Test                                             
    }
 
   String stuckMemory(StuckPA s)                                                 // Base address variable for one stuck
-   {return"reg ["+bitsPerAddress+":0] "+s.M.baseName()+traceComment() +
+   {return"reg ["+bitsPerAddress+":0] "+s.M.baseName() +
       s.C.declareVerilog()+
       s.T.declareVerilog();
    }
 
   String stuckMemoryInitialization(StuckPA s)                                   // Initialization for one stuck
-   {return s.M.baseName()+" <= 0"+traceComment()+
-           s.C.name()    +" <= 0"+traceComment()+
-           s.T.name()    +" <= 0"+traceComment();
+   {return s.M.baseName()+" <= 0"+
+           s.C.name()    +" <= 0"+
+           s.T.name()    +" <= 0";
    }
 
   abstract class GenVerilog                                                     // Generate verilog

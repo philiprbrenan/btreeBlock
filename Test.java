@@ -251,7 +251,7 @@ public class Test                                                               
 
   static String traceComment()                                                  // Trace back comment
    {final String t = traceBack();
-    return "; /* "+t.replaceAll("\\n", " ")+" */\n";                            // Finish a statement and show where it came from
+    return " /* "+t.replaceAll("\\n", " ")+" */\n";                             // Finish a statement and show where it came from
    }
 
 //D2 Coverage                                                                   // Analyze code coverage
