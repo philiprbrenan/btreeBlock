@@ -3305,6 +3305,21 @@ endmodule
     ok(t.T.at(t.data).getInt(), 7);                                             // Data associated with key
    }
 
+  void runVerilogDeleteTest(int key, int Data, String expected)                 // Run the java and verilog versions and compare the resulting memory traces
+   {T.at(Key).setInt(key);                                                      // Sets memory directly not via an instruction
+      GenVerilog v = new GenVerilog("delete", "verilog")                        // Generate verilog now that memories have beeninitialzied and the program written
+       {int Key     () {return    3;}                                           // Input key value
+        int Data    () {return    3;}                                           // Input key value
+        int data    () {return    6;}                                           // Expected output data value
+        int maxSteps() {return 2000;}                                           // Maximum number if execution steps
+        int expSteps() {return  948;}                                           // Expected number of steps
+       };
+
+      ok(T.at(data).getInt(), Data);                                            // Data associated with key
+      if (debug) stop(this);                                                    // Print tree if debugging
+      ok(this, expected);                                                       // Check resultin tree
+     }
+
   static void test_verilog_delete()                                             // Delete using generated verilog code
    {final BtreePA t = btreePA_small();
     t.P.run(); t.P.clear();
@@ -3329,19 +3344,11 @@ endmodule
       3                  2        |
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
-    t.P.clear();
-    t.T.at(t.Key).setInt(3);                                                    // Sets memory directly not via an instruction
-    t.delete();
-    GenVerilog v = t.new GenVerilog("delete", "verilog")                        // Generate verilog now that memories have beeninitialzied and the program written
-     {int Key     () {return    3;}                                             // Input key value
-      int Data    () {return    3;}                                             // Input key value
-      int data    () {return    6;}                                             // Expected output data value
-      int maxSteps() {return 2000;}                                             // Maximum number if execution steps
-      int expSteps() {return  948;}                                             // Expected number of steps
-     };
-    ok(t.T.at(t.data).getInt(), 6);                                             // Data associated with key
-    //stop(t);
-    ok(t, """
+
+    t.P.clear();                                                                // Replace program with delete
+    t.delete();                                                                 // Delete code
+
+    t.runVerilogDeleteTest(3, 6, """
                     6           |
                     0           |
                     5           |
@@ -3351,6 +3358,62 @@ endmodule
       1    3             7      |
            4             2      |
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
+""");
+
+    t.runVerilogDeleteTest(4, 5, """
+             6           |
+             0           |
+             5           |
+             6           |
+      4           7      |
+      5           6      |
+      1           7      |
+      4           2      |
+1,2=1  5,6=4  7=7  8,9=2 |
+""");
+
+    t.runVerilogDeleteTest(2, 7, """
+    4      6      7        |
+    0      0.1    0.2      |
+    1      4      7        |
+                  2        |
+1=1  5,6=4    7=7    8,9=2 |
+""");
+
+    t.runVerilogDeleteTest(1, 8, """
+      6    7        |
+      0    0.1      |
+      1    7        |
+           2        |
+5,6=1  7=7    8,9=2 |
+""");
+
+    t.runVerilogDeleteTest(5, 4, """
+      7      |
+      0      |
+      1      |
+      2      |
+6,7=1  8,9=2 |
+""");
+
+    t.runVerilogDeleteTest(6, 3, """
+    7      |
+    0      |
+    1      |
+    2      |
+7=1  8,9=2 |
+""");
+
+    t.runVerilogDeleteTest(7, 2, """
+8,9=0 |
+""");
+
+    t.runVerilogDeleteTest(8, 1, """
+9=0 |
+""");
+
+    t.runVerilogDeleteTest(9, 0, """
+=0 |
 """);
    }
 
