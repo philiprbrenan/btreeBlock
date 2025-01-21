@@ -12,7 +12,6 @@ class ProgramPA extends Test                                                    
   int             step = 0;                                                     // Execution step
   int             time = 0;                                                     // Execution time
   boolean      running = false;                                                 // Executing if true
-  boolean        trace = !false;                                                // Trace execution if true
   Stack<Label>  labels = new Stack<>();                                         // Labels for some instructions
   Memory   traceMemory;                                                         // Labels for some instructions
   final Stack<String> Trace = new Stack<>();                                    // Trace execution steps
@@ -129,7 +128,7 @@ class ProgramPA extends Test                                                    
    }
 
   void traceMemory()                                                            // Trace memory
-   {if (trace && traceMemory != null)
+   {if (traceMemory != null)
      {final StringBuilder s = new StringBuilder();
       final boolean[]b = traceMemory.bits;
       for(int i = 0; i < b.length; i++) s.append(b[i] ? "1" : "0");
@@ -153,7 +152,7 @@ class ProgramPA extends Test                                                    
     traceMemory();
     if (time >= maxTime) stop("Out of time: ", time);
     running = false;
-    if (trace) writeFile("trace/"+currentTestName()+".txt", joinLines(Trace));  // Write the trace
+    if (traceMemory != null) writeFile("trace/"+currentTestName()+".txt", joinLines(Trace));  // Write the trace
    }
 
   void halt(Object...O)                                                         // Halt execution with an explanatory message
