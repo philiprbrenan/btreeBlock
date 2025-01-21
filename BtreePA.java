@@ -2214,16 +2214,16 @@ abstract class BtreePA extends Test                                             
     final String         mFile;                                                 // Folder in which to place include for btree memory
     final String         tFile;                                                 // Folder in which to place include for btree transaction memory
     final String     traceFile;                                                 // Folder in which to place execution trace file
+    final ProgramPA    program;                                                 // Program associated with this tree
 
-    final ProgramPA program;                                                    // Programs containing the instructions to be converted to verilog
     abstract int Key     ();                                                    // Input key value
     abstract int Data    ();                                                    // Input data value
     abstract int data    ();                                                    // Expected output data value
     abstract int maxSteps();                                                    // Maximum number if execution steps
     abstract int expSteps();                                                    // Expected number of steps
 
-    GenVerilog(String Project, String Folder, ProgramPA Program)                // Generate verilog
-     {project = Project; folder = Folder; program = Program;
+    GenVerilog(String Project, String Folder)                                   // Generate verilog
+     {project = Project; folder = Folder; program = P;
       program.optimize();
 
       projectFolder = ""+Paths.get(folder, project);
@@ -2351,25 +2351,28 @@ module $project_tb;                                                             
 endmodule
 """);
 
-      writeFile(sourceVerilog, editVariables(s));
-      writeFile(testVerilog,   editVariables(t));
-      M.dumpVerilog(mFile);
-      T.dumpVerilog(tFile);
+      writeFile(sourceVerilog, editVariables(s));                               // Write verilog module
+      writeFile(testVerilog,   editVariables(t));                               // Write tverilog test bench
+      M.dumpVerilog(mFile);                                                     // Write include file to initialize main memory
+      T.dumpVerilog(tFile);                                                     // Write include file to initialize transaction memory
+      P.traceMemory = M.memory();                                               // Request memory tracing
+      P.run();                                                                  // Run the java version
+      execTest();                                                               // Exeute the verilog test
      }
 
-    void execTest()                                                            // Execute the verilog test and compare it with the results from execution under Java
+    void execTest()                                                             // Execute the verilog test and compare it with the results from execution under Java
      {final StringBuilder s = new StringBuilder(editVariables("cd verilog/$project && iverilog $project.tb $project.v -Iincludes -g2012 -o $project && ./$project"));
       final ExecCommand   x = new ExecCommand(s);
       final String        E = "trace/test_verilog_"+project+".txt";
       final String        e = joinLines(readFile(E));
       final String        G = "verilog/"+project+"/trace.txt";
       final String        g = joinLines(readFile(G));
-      ok(12, g, e);                                                            // Width of margin in verilog traces
+      ok(12, g, e);                                                             // Width of margin in verilog traces
      }
 
-    private String editVariables(StringBuilder S) {return editVariables(""+S);}// Edit the variables in a string builder
+    private String editVariables(StringBuilder S) {return editVariables(""+S);} // Edit the variables in a string builder
 
-    private String editVariables(String s)                                     // Edit the variables in a string builder
+    private String editVariables(String s)                                      // Edit the variables in a string builder
      {s = s.replace("$bitsPerKey",    ""  + bitsPerKey());
       s = s.replace("$bitsPerData",   ""  + bitsPerData());
       s = s.replace("$stuckBases",          stuckMemories());
@@ -3288,17 +3291,13 @@ endmodule
     t.P.clear();
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
-    GenVerilog v = t.new GenVerilog("find", "verilog", t.P)                     // Generate verilog now that memories have been initialized and the program written
-     {int Key     () {return    2;}                                               // Input key value
-      int Data    () {return    2;}                                               // Input data value
-      int data    () {return    7;}                                               // Expected output data value
-      int maxSteps() {return 2000;}                                               // Maximum number if execution steps
-      int expSteps() {return   93;}                                               // Expected number of steps
+    GenVerilog v = t.new GenVerilog("find", "verilog")                          // Generate verilog now that memories have been initialized and the program written
+     {int Key     () {return    2;}                                             // Input key value
+      int Data    () {return    2;}                                             // Input data value
+      int data    () {return    7;}                                             // Expected output data value
+      int maxSteps() {return 2000;}                                             // Maximum number if execution steps
+      int expSteps() {return   93;}                                             // Expected number of steps
      };
-    t.P.trace = true;
-    t.P.traceMemory = t.M.memory();
-    t.P.run();
-    v.execTest();                                                               // Exeute the verilog test
     //say("AAAA11", t);
     //say("AAAA22", t.P);
     //say("AAAA22", t.T);
@@ -3333,17 +3332,13 @@ endmodule
     t.P.clear();
     t.T.at(t.Key).setInt(3);                                                    // Sets memory directly not via an instruction
     t.delete();
-    GenVerilog v = t.new GenVerilog("delete", "verilog", t.P)                   // Generate verilog now that memories have beeninitialzied and the program written
+    GenVerilog v = t.new GenVerilog("delete", "verilog")                        // Generate verilog now that memories have beeninitialzied and the program written
      {int Key     () {return    3;}                                             // Input key value
       int Data    () {return    3;}                                             // Input key value
       int data    () {return    6;}                                             // Expected output data value
       int maxSteps() {return 2000;}                                             // Maximum number if execution steps
       int expSteps() {return  948;}                                             // Expected number of steps
      };
-    t.P.trace = true;
-    t.P.traceMemory = t.M.memory();
-    t.P.run();
-    v.execTest();                                                               // Exeute the verilog test
     ok(t.T.at(t.data).getInt(), 6);                                             // Data associated with key
     //stop(t);
     ok(t, """
@@ -3387,17 +3382,13 @@ endmodule
     t.T.at(t.Key ).setInt(N);                                                   // Sets memory directly not via an instruction
     t.T.at(t.Data).setInt(N);                                                   // Sets memory directly not via an instruction
     t.put();
-    GenVerilog v = t.new GenVerilog("put", "verilog", t.P)                      // Generate verilog now that memories have been initialzied and the program written
+    GenVerilog v = t.new GenVerilog("put", "verilog")                           // Generate verilog now that memories have been initialzied and the program written
      {int Key     () {return    3;}                                             // Input key value
       int Data    () {return    3;}                                             // Input key value
       int data    () {return    0;}                                             // Expected output data value
       int maxSteps() {return 2000;}                                             // Maximum number if execution steps
       int expSteps() {return  984;}                                             // Expected number of steps
      };
-    t.P.trace = true;
-    t.P.traceMemory = t.M.memory();
-    t.P.run();
-    v.execTest();                                                               // Exeute the verilog test
     //stop(t);
     ok(t, """
              4                    |
