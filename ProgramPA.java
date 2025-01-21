@@ -49,7 +49,7 @@ class ProgramPA extends Test                                                    
      }
     void   a() {}                                                               // Action performed by instruction
     String n() {return "instruction";}                                          // Instruction name
-    String v() {return "" + traceComment();}                                    // Corresponding verilog
+    String v() {return "";}                                                     // Corresponding verilog
     void   i() {}                                                               // initialization for each instruction
     void out(MemoryLayoutPA.At at) {outputs.add(at.verilogLoad());}             // Record an output of this instruction
     void  in(MemoryLayoutPA.At at) { inputs.add(at.verilogLoad());}             // Record an input of this instruction
@@ -133,7 +133,7 @@ class ProgramPA extends Test                                                    
      {final StringBuilder s = new StringBuilder();
       final boolean[]b = traceMemory.bits;
       for(int i = 0; i < b.length; i++) s.append(b[i] ? "1" : "0");
-       {s.reverse();                                                            // Match iverilog 
+       {s.reverse();                                                            // Match iverilog
         Trace.push(String.format("%4d  %4d  %s", time, step, s));
        }
      }
@@ -150,7 +150,7 @@ class ProgramPA extends Test                                                    
       i.a();
       for (I j : i.merged) j.a();
      }
-    traceMemory(); 
+    traceMemory();
     if (time >= maxTime) stop("Out of time: ", time);
     running = false;
     if (trace) writeFile("trace/"+currentTestName()+".txt", joinLines(Trace));  // Write the trace
@@ -161,7 +161,7 @@ class ProgramPA extends Test                                                    
     final String m = "/* "+saySb(O).toString()+" */";
     new I()
      {void   a() {say(O); /*say(traceBack);*/ running = false;}
-      String v() {return "stopped <= 1; " + m + traceComment();}
+      String v() {return "stopped <= 1; " + m;}
       String n() {return "halt";}
      };
    }
@@ -174,7 +174,7 @@ class ProgramPA extends Test                                                    
    {z();
     new I()
      {void   a() {z(); step = label.instruction-1;}                             // The program execution for loop will increment
-      String v() {return "step = "+(label.instruction-1)+";" + traceComment();} // The program execution for loop will increment
+      String v() {return "step = "+(label.instruction-1)+";";}                  // The program execution for loop will increment
       String n() {return "Go to "+(label.instruction+1);}                       // One based with no auto increment from run
       void   i() {mightJump = true;}                                            // Will certainly jump
      };
@@ -185,7 +185,7 @@ class ProgramPA extends Test                                                    
      {void a()
        {z(); if (condition.setOff().getInt() > 0) step = label.instruction-1;
        }
-      String v() {return "if ("+condition.verilogLoad()+" > 0) step = "+(label.instruction-1)+";" + traceComment();} // The program execution for loop will increment
+      String v() {return "if ("+condition.verilogLoad()+" > 0) step = "+(label.instruction-1)+";";} // The program execution for loop will increment
       String n() {return "GoOn "+condition.field.name+" to "+(label.instruction+1);}
       void   i() {mightJump = true;}                                            // Might jump
      };
@@ -196,7 +196,7 @@ class ProgramPA extends Test                                                    
      {void a()
        {z(); if (condition.setOff().getInt() == 0) step = label.instruction-1;
        }
-      String v() {return "if ("+condition.verilogLoad()+" == 0) step = "+(label.instruction-1)+";" + traceComment();} // The program execution for loop will increment
+      String v() {return "if ("+condition.verilogLoad()+" == 0) step = "+(label.instruction-1)+";";} // The program execution for loop will increment
       String n() {return "GoOff "+condition.field.name+" to "+(label.instruction+1);}
       void   i() {mightJump = true;}                                            // Might jump
      };

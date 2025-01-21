@@ -63,7 +63,7 @@ abstract class StuckPA extends Test                                             
    {z();
     P.new I()
      {void   a() {M.base(Base.setOff().result);}
-      String v() {return M.baseName() + " <= " + Base.verilogLoad()+";" + traceComment();}     // Set the base for this based data structure
+      String v() {return M.baseName() + " <= " + Base.verilogLoad()+";";}       // Set the base for this based data structure
      };
    }
 
