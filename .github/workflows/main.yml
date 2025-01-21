@@ -34,7 +34,7 @@ jobs:
 
     - name: Verilog install
       run: |
-        sudo apt install iverilog        
+        sudo apt install iverilog
 
     - name: Compile
       run: |
@@ -55,7 +55,7 @@ jobs:
     - name: Test BtreeSA
       if: matrix.task == 'BtreeSA'
       run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeSA
+        # java -cp Classes com/AppaApps/Silicon/BtreeSA # Takes longer than BtreePA yet BtreePA is the desired end point
 
 
     - name: Test BtreeSML
