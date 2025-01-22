@@ -2226,7 +2226,7 @@ abstract class BtreePA extends Test                                             
      {project = Project; folder = Folder; program = P;
       program.optimize();
 
-      projectFolder = ""+Paths.get(folder, project);
+      projectFolder = ""+Paths.get(folder, project, ""+Key());
       sourceVerilog = ""+Paths.get(projectFolder, project+Verilog.ext);
         testVerilog = ""+Paths.get(projectFolder, project+Verilog.testExt);
               mFile = ""+Paths.get(projectFolder,  "includes", "M"+Verilog.header);
@@ -2359,11 +2359,11 @@ endmodule
      }
 
     void execTest()                                                             // Execute the verilog test and compare it with the results from execution under Java
-     {final StringBuilder s = new StringBuilder(editVariables("cd verilog/$project && iverilog $project.tb $project.v -Iincludes -g2012 -o $project && ./$project"));
+     {final StringBuilder s = new StringBuilder(editVariables("cd $projectFolder && iverilog $project.tb $project.v -Iincludes -g2012 -o $project && ./$project"));
       final ExecCommand   x = new ExecCommand(s);
       final String        E = "trace/test_verilog_"+project+".txt";
       final String        e = joinLines(readFile(E));
-      final String        G = "verilog/"+project+"/trace.txt";
+      final String        G = traceFile;
       final String        g = joinLines(readFile(G));
       ok(12, g, e);                                                             // Width of margin in verilog traces
      }
@@ -2378,6 +2378,7 @@ endmodule
       s = s.replace("$mFile",               mFile);
       s = s.replace("$tFile",               tFile);
       s = s.replace("$traceFile",           "trace.txt");
+      s = s.replace("$projectFolder",       projectFolder);
       s = s.replace("$project",             project);
       s = s.replace("$Key",                 ""+Key());
       s = s.replace("$Data",                ""+Data());
@@ -3303,14 +3304,14 @@ endmodule
     ok(t.T.at(t.data).getInt(), 7);                                             // Data associated with key
    }
 
-  void runVerilogDeleteTest(int Key, int data, String expected)                 // Run the java and verilog versions and compare the resulting memory traces
+  void runVerilogDeleteTest(int Key, int data, int steps, String expected)      // Run the java and verilog versions and compare the resulting memory traces
    {T.at(this.Key).setInt(Key);                                                 // Sets memory directly not via an instruction
       GenVerilog v = new GenVerilog("delete", "verilog")                        // Generate verilog now that memories have beeninitialzied and the program written
-       {int Key     () {return  Key;}                                           // Input key value
-        int Data    () {return    3;}                                           // Input key value
-        int data    () {return data;}                                           // Expected output data value
-        int maxSteps() {return 2000;}                                           // Maximum number if execution steps
-        int expSteps() {return  948;}                                           // Expected number of steps
+       {int Key     () {return   Key;}                                          // Input key value
+        int Data    () {return     3;}                                          // Input key value
+        int data    () {return  data;}                                          // Expected output data value
+        int maxSteps() {return  2000;}                                          // Maximum number if execution steps
+        int expSteps() {return steps;}                                          // Expected number of steps
        };
 
       ok(T.at(this.data).getInt(), data);                                       // Data associated with key
@@ -3346,7 +3347,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, """
+    t.runVerilogDeleteTest(3, 6, 948, """
                     6           |
                     0           |
                     5           |
@@ -3358,7 +3359,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, """
+    t.runVerilogDeleteTest(4, 5, 849, """
              6           |
              0           |
              5           |
@@ -3370,7 +3371,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, """
+    t.runVerilogDeleteTest(2, 7, 902, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3378,7 +3379,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, """
+    t.runVerilogDeleteTest(1, 8, 697, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3386,7 +3387,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, """
+    t.runVerilogDeleteTest(5, 4, 417, """
       7      |
       0      |
       1      |
@@ -3394,7 +3395,7 @@ endmodule
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(6, 3, """
+    t.runVerilogDeleteTest(6, 3, 379, """
     7      |
     0      |
     1      |
@@ -3402,15 +3403,15 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, """
+    t.runVerilogDeleteTest(7, 2, 565, """
 8,9=0 |
 """);
 
-    t.runVerilogDeleteTest(8, 1, """
+    t.runVerilogDeleteTest(8, 1, 60, """
 9=0 |
 """);
 
-    t.runVerilogDeleteTest(9, 0, """
+    t.runVerilogDeleteTest(9, 0, 60, """
 =0 |
 """);
    }
