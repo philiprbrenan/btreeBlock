@@ -1,2 +1,0 @@
-Stopped after:   60 steps key    9  data    0
-Passed all tests
