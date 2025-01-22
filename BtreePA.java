@@ -2213,7 +2213,8 @@ abstract class BtreePA extends Test                                             
     final String   testVerilog;                                                 // Verilog test bench file
     final String         mFile;                                                 // Folder in which to place include for btree memory
     final String         tFile;                                                 // Folder in which to place include for btree transaction memory
-    final String     traceFile;                                                 // Folder in which to place execution trace file
+    final String     traceFile;                                                 // Folder in which to place verilog execution trace file
+    final String javaTraceFile;                                                 // Folder in which to place java    execution trace file
     final ProgramPA    program;                                                 // Program associated with this tree
 
     abstract int Key     ();                                                    // Input key value
@@ -2232,6 +2233,7 @@ abstract class BtreePA extends Test                                             
               mFile = ""+Paths.get(projectFolder,  "includes", "M"+Verilog.header);
               tFile = ""+Paths.get(projectFolder,  "includes", "T"+Verilog.header);
           traceFile = ""+Paths.get(projectFolder, "trace.txt");
+      javaTraceFile = ""+Paths.get(projectFolder, "traceJava.txt");
 
       makePath(projectFolder);
 
@@ -2357,17 +2359,15 @@ endmodule
       M.dumpVerilog(mFile);                                                     // Write include file to initialize main memory
       T.dumpVerilog(tFile);                                                     // Write include file to initialize transaction memory
       P.traceMemory = M.memory();                                               // Request memory tracing
-      P.run();                                                                  // Run the java version
+      P.run(javaTraceFile);                                                     // Run the java version and trace it
       execTest();                                                               // Exeute the verilog test
      }
 
     void execTest()                                                             // Execute the verilog test and compare it with the results from execution under Java
      {final StringBuilder s = new StringBuilder(editVariables("cd $projectFolder && iverilog $project.tb $project.v -Iincludes -g2012 -o $project && ./$project"));
       final ExecCommand   x = new ExecCommand(s);
-      final String        E = "trace/test_verilog_"+project+".txt";
-      final String        e = joinLines(readFile(E));
-      final String        G = traceFile;
-      final String        g = joinLines(readFile(G));
+      final String        e = joinLines(readFile(javaTraceFile));
+      final String        g = joinLines(readFile(traceFile));
       ok(12, g, e);                                                             // Width of margin in verilog traces
      }
 
