@@ -2273,7 +2273,6 @@ $stuckBases
       stopped  <= 0;
       initialize_memory_M();                                                    // Initialize btree memory
       initialize_memory_T();                                                    // Initialize btree transaction
-      //("reset");
       traceFile = $fopen("$traceFile", "w");                                    // Open trace file
       if (!traceFile) $fatal(1, "Cannot open trace file $traceFile");
       $stuckInitialization
@@ -2334,7 +2333,6 @@ module $project_tb;                                                             
   task execute;                                                                 // Clock the module until it says it has stopped
     integer step;
     begin
-      Key = $Key;
       for(step = 0; step < $maxSteps && !stop ; step = step + 1) begin
         clock = 0; #1; clock = 1; #1;
       end
@@ -3305,17 +3303,17 @@ endmodule
     ok(t.T.at(t.data).getInt(), 7);                                             // Data associated with key
    }
 
-  void runVerilogDeleteTest(int key, int Data, String expected)                 // Run the java and verilog versions and compare the resulting memory traces
-   {T.at(Key).setInt(key);                                                      // Sets memory directly not via an instruction
+  void runVerilogDeleteTest(int Key, int data, String expected)                 // Run the java and verilog versions and compare the resulting memory traces
+   {T.at(this.Key).setInt(Key);                                                 // Sets memory directly not via an instruction
       GenVerilog v = new GenVerilog("delete", "verilog")                        // Generate verilog now that memories have beeninitialzied and the program written
-       {int Key     () {return    3;}                                           // Input key value
+       {int Key     () {return  Key;}                                           // Input key value
         int Data    () {return    3;}                                           // Input key value
-        int data    () {return    6;}                                           // Expected output data value
+        int data    () {return data;}                                           // Expected output data value
         int maxSteps() {return 2000;}                                           // Maximum number if execution steps
         int expSteps() {return  948;}                                           // Expected number of steps
        };
 
-      ok(T.at(data).getInt(), Data);                                            // Data associated with key
+      ok(T.at(this.data).getInt(), data);                                       // Data associated with key
       if (debug) stop(this);                                                    // Print tree if debugging
       ok(this, expected);                                                       // Check resultin tree
      }
