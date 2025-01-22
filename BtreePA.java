@@ -2319,6 +2319,7 @@ module $project_tb;                                                             
   reg  [$bitsPerData:0]Data = $Data;                                            // Input data
   reg  [$bitsPerData:0]data;                                                    // Output data
   reg                  found;                                                   // Whether the key was found on put, find delete
+  integer testResults;                                                          // Test results file
   integer passes;                                                               // Number of tests passed
   integer fails;                                                                // Number of tests failed
 
@@ -2337,12 +2338,14 @@ module $project_tb;                                                             
         clock = 0; #1; clock = 1; #1;
       end
       if (stop) begin                                                           // Stopped
-        $display("Stopped after: %4d steps key %4d  data %4d", step, Key, data);
+        testResults = $fopen("tests.txt", "w");
+        $fdisplay(testResults, "Stopped after: %4d steps key %4d  data %4d", step, Key, data);
         passes = 0; fails = 0;
-        if (data == $data)     passes = passes + 1; else begin fails = fails + 1; $display("Expected $data for data but got %d",    data); end
-        if (step == $expSteps) passes = passes + 1; else begin fails = fails + 1; $display("Expected $expSteps for expected steps but got %d", step); end
-        if (passes == 2) $display("Passed all tests");
-        else             $display("FAILED %d, passed %d", fails, passes);
+        if (data == $data)     passes = passes + 1; else begin fails = fails + 1; $fdisplay(testResults, "Expected $data for data but got %d",    data); end
+        if (step == $expSteps) passes = passes + 1; else begin fails = fails + 1; $fdisplay(testResults, "Expected $expSteps for expected steps but got %d", step); end
+        if (passes == 2) $fdisplay(testResults, "Passed all tests");
+        else             $fdisplay(testResults, "FAILED %d, passed %d", fails, passes);
+        $fclose(testResults);
       end
     end
   endtask
