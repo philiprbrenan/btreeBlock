@@ -138,7 +138,7 @@ class ProgramPA extends Test                                                    
      }
    }
 
-  void run()                                                                    // Run the program
+  void run(String traceFile)                                                    // Run the program tracin to the named file
    {z();
     Trace.clear();
     running = true;
@@ -152,7 +152,11 @@ class ProgramPA extends Test                                                    
     traceMemory();
     if (time >= maxTime) stop("Out of time: ", time);
     running = false;
-    if (traceMemory != null) writeFile("trace/"+currentTestName()+".txt", joinLines(Trace));  // Write the trace
+    if (traceMemory != null) writeFile(traceFile, joinLines(Trace));            // Write the trace
+   }
+
+  void run()                                                                    // Run the program tracing to a default file
+   {run("trace/"+currentTestName()+".txt");
    }
 
   void halt(Object...O)                                                         // Halt execution with an explanatory message
