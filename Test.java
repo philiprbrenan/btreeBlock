@@ -372,25 +372,34 @@ public class Test                                                               
     try
      {final Path dir = Paths.get(filePath);
       Files.walk(dir).filter(Files::isRegularFile).forEach(files::push);
+      final List<Path> f = new ArrayList<>(files);
+      Collections.sort(f);
+      files.clear();
+      files.addAll(f);
      }
     catch (Exception e) {}
     return files;
    }
 
-  static void deleteAllFiles(String filePath, int limit)                        // Delete files and folders in the specified folder and its sub folders until the limit on the number of files has been reached or the specified folder has been removed
+  static void deleteAllFiles(String filePath, int limit)                        // Delete files and folders in the specified folder and its sub folders iuf the number of such files is less than the limit specifiedd
    {final Path dir = Paths.get(filePath);                                       // Specify the directory path
     final int[]limits = {limit};
+    final int N = findFiles(filePath).size();
+    if (N > limit)                                                              // Check that the request would not result in the deletion of an unexpectdly large number of files
+     {stop("Delete request would delete "+N+
+       " files, which is more than the specified limit of: "+limit+
+       " files under folder:\n"+filePath);
+
+     }
     try
      {Files.walkFileTree(dir, new SimpleFileVisitor<Path>()
        {public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException
-         {if (limits[0] > 0) Files.delete(file);                                    // Delete the file
-            --limits[0];
-          return limits[0] > 0 ? FileVisitResult.CONTINUE : FileVisitResult.TERMINATE;
+         {Files.delete(file);
+          return FileVisitResult.CONTINUE;
          }
         public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException
-         {if (limits[0] > 0) Files.delete(dir);                                     // Delete the folder
-            --limits[0];
-          return limits[0] > 0 ? FileVisitResult.CONTINUE : FileVisitResult.TERMINATE;
+         {Files.delete(dir);                                     // Delete the folder
+          return FileVisitResult.CONTINUE;
          }
        });
      }
@@ -824,12 +833,11 @@ CCCCC
     writeFile(a, s);
     writeFile(b, s);
     ok(readFile(a),  "[Hello, World]");
+    final Stack<Path> f = findFiles(p);
     ok(findFiles(p), "[/tmp/z/z/aaa.txt, /tmp/z/z/bbb.txt]");
-    deleteAllFiles(p, 1);
-    ok(findFiles(p), "[/tmp/z/z/bbb.txt]");
-    ok(!fileExists("/tmp/z/z/aaa.txt"));
-    ok( fileExists("/tmp/z/z/bbb.txt"));
-    ok( folderExists("/tmp/z/z/"));
+    sayThisOrStop("Delete request would delete 2 files, which is more than the specified limit of: 1");
+    try {deleteAllFiles(p, 1);} catch(Exception e) {}
+    ok(findFiles(p), "[/tmp/z/z/aaa.txt, /tmp/z/z/bbb.txt]");
     deleteAllFiles(p, 2);
     ok(findFiles(p), "[]");
     ok(!folderExists("/tmp/z/z/"));
@@ -889,7 +897,7 @@ BBBB
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
+   {oldTests();
     test_string();
    }
 
