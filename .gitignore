@@ -6,5 +6,6 @@
 !j.sh
 !pushToGitHub.pl
 !trace/
+!trace/**
 !verilog/
 !verilog/**
