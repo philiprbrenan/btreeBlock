@@ -1,0 +1,10 @@
+*
+!.gitignore
+!*.java
+!flowChart/
+!j.bat
+!j.sh
+!pushToGitHub.pl
+!trace/
+!verilog/
+!verilog/**
