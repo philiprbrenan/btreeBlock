@@ -1,0 +1,2 @@
+Stopped after:   93 steps key    2  data    7
+Passed all tests
