@@ -26,7 +26,6 @@ module find_tb;                                                             // T
   task execute;                                                                 // Clock the module until it says it has stopped
     integer step;
     begin
-      Key = 2;
       for(step = 0; step < 2000 && !stop ; step = step + 1) begin
         clock = 0; #1; clock = 1; #1;
       end

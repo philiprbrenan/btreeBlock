@@ -26,7 +26,6 @@ module put_tb;                                                             // Te
   task execute;                                                                 // Clock the module until it says it has stopped
     integer step;
     begin
-      Key = 3;
       for(step = 0; step < 2000 && !stop ; step = step + 1) begin
         clock = 0; #1; clock = 1; #1;
       end
