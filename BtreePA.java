@@ -300,8 +300,8 @@ abstract class BtreePA extends Test                                             
      }
     M.at(freeList).move(M.at(free, T.at(allocate)));                            // Second node on free list
 
-    tt(node_clear, allocate);
-    clear();                                                                    // Construct and clear the node
+    //tt(node_clear, allocate);
+    clear(T.at(allocate));                                                      // Construct and clear the node
 //    maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                              // Number of nodes in use
    }
 
@@ -921,9 +921,9 @@ abstract class BtreePA extends Test                                             
     allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
     allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
 
-    T.at(node_leafBase1).zero(); leafBase1(); lT.base(T.at(leafBase1));            // Set address of the referenced leaf stuck
-    tt  (node_leafBase2, l);     leafBase2(); lL.base(T.at(leafBase2));            // Set address of the referenced leaf stuck
-    tt  (node_leafBase3, r);     leafBase3(); lR.base(T.at(leafBase3));            // Set address of the referenced leaf stuck
+    T.at(node_leafBase1).zero(); leafBase1(); lT.base(T.at(leafBase1));         // Set address of the referenced leaf stuck
+    tt  (node_leafBase2, l);     leafBase2(); lL.base(T.at(leafBase2));         // Set address of the referenced leaf stuck
+    tt  (node_leafBase3, r);     leafBase3(); lR.base(T.at(leafBase3));         // Set address of the referenced leaf stuck
 
     for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf from parent
      {z(); lT.shift();
@@ -2212,6 +2212,7 @@ abstract class BtreePA extends Test                                             
     final String   testVerilog;                                                 // Verilog test bench file
     final String         mFile;                                                 // Folder in which to place include for btree memory
     final String         tFile;                                                 // Folder in which to place include for btree transaction memory
+    final String     testsFile;                                                 // File in which to place verilog test results sumamry
     final String     traceFile;                                                 // Folder in which to place verilog execution trace file
     final String javaTraceFile;                                                 // Folder in which to place java    execution trace file
     final ProgramPA    program;                                                 // Program associated with this tree
@@ -2229,8 +2230,9 @@ abstract class BtreePA extends Test                                             
       projectFolder = ""+Paths.get(folder, project, ""+Key());
       sourceVerilog = ""+Paths.get(projectFolder, project+Verilog.ext);
         testVerilog = ""+Paths.get(projectFolder, project+Verilog.testExt);
-              mFile = ""+Paths.get(projectFolder,  "includes", "M"+Verilog.header);
-              tFile = ""+Paths.get(projectFolder,  "includes", "T"+Verilog.header);
+              mFile = ""+Paths.get(projectFolder, "includes", "M"+Verilog.header);
+              tFile = ""+Paths.get(projectFolder, "includes", "T"+Verilog.header);
+          testsFile = ""+Paths.get(projectFolder, "tests.txt");
           traceFile = ""+Paths.get(projectFolder, "trace.txt");
       javaTraceFile = ""+Paths.get(projectFolder, "traceJava.txt");
 
@@ -2321,8 +2323,6 @@ module $project_tb;                                                             
   reg  [$bitsPerData:0]data;                                                    // Output data
   reg                  found;                                                   // Whether the key was found on put, find delete
   integer testResults;                                                          // Test results file
-  integer passes;                                                               // Number of tests passed
-  integer fails;                                                                // Number of tests failed
 
   $project a1(.reset(reset), .stop(stop), .clock(clock),                        // Connect to the module
     .Key(Key), .Data(Data), .data(data), .found(found));
@@ -2339,13 +2339,9 @@ module $project_tb;                                                             
         clock = 0; #1; clock = 1; #1;
       end
       if (stop) begin                                                           // Stopped
-        testResults = $fopen("tests.txt", "w");
-        $fdisplay(testResults, "Stopped after: %4d steps key %4d  data %4d", step, Key, data);
-        passes = 0; fails = 0;
-        if (data == $data)     passes = passes + 1; else begin fails = fails + 1; $fdisplay(testResults, "Expected $data for data but got %d",    data); end
-        if (step == $expSteps) passes = passes + 1; else begin fails = fails + 1; $fdisplay(testResults, "Expected $expSteps for expected steps but got %d", step); end
-        if (passes == 2) $fdisplay(testResults, "Passed all tests");
-        else             $fdisplay(testResults, "FAILED %d, passed %d", fails, passes);
+        testResults = $fopen("$testsFile", "w");
+        $fdisplay(testResults, "Steps=%1d\\nKey=%1d\\ndata=%1d\\n",
+          step, Key, data);
         $fclose(testResults);
       end
     end
@@ -2359,6 +2355,7 @@ endmodule
       T.dumpVerilog(tFile);                                                     // Write include file to initialize transaction memory
       P.traceMemory = M.memory();                                               // Request memory tracing
       P.run(javaTraceFile);                                                     // Run the java version and trace it
+      say(Project, Folder, Key());                                              // Identify the test
       execTest();                                                               // Exeute the verilog test
      }
 
@@ -2367,7 +2364,11 @@ endmodule
       final ExecCommand   x = new ExecCommand(s);
       final String        e = joinLines(readFile(javaTraceFile));
       final String        g = joinLines(readFile(traceFile));
+      ok(x.exitCode, 0);                                                        // Confirm exit code
       ok(12, g, e);                                                             // Width of margin in verilog traces
+      final TreeMap<String,String> p = readProperties(testsFile);               // Load test results
+      ok(p.get("Steps"), ""+expSteps());
+      ok(p.get("data"),  ""+data());
      }
 
     private String editVariables(StringBuilder S) {return editVariables(""+S);} // Edit the variables in a string builder
@@ -2379,7 +2380,8 @@ endmodule
       s = s.replace("$stuckInitialization", stuckMemoryInitialization());
       s = s.replace("$mFile",               mFile);
       s = s.replace("$tFile",               tFile);
-      s = s.replace("$traceFile",           "trace.txt");
+      s = s.replace("$testsFile",           fileName(testsFile));
+      s = s.replace("$traceFile",           fileName(traceFile));
       s = s.replace("$projectFolder",       projectFolder);
       s = s.replace("$project",             project);
       s = s.replace("$Key",                 ""+Key());
@@ -3349,7 +3351,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 948, """
+    t.runVerilogDeleteTest(3, 6, 950, """
                     6           |
                     0           |
                     5           |
@@ -3361,7 +3363,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 849, """
+    t.runVerilogDeleteTest(4, 5, 851, """
              6           |
              0           |
              5           |
@@ -3381,7 +3383,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 697, """
+    t.runVerilogDeleteTest(1, 8, 698, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3389,7 +3391,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 417, """
+    t.runVerilogDeleteTest(5, 4, 418, """
       7      |
       0      |
       1      |
@@ -3397,7 +3399,7 @@ endmodule
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(6, 3, 379, """
+    t.runVerilogDeleteTest(6, 3, 381, """
     7      |
     0      |
     1      |
@@ -3405,7 +3407,7 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 565, """
+    t.runVerilogDeleteTest(7, 2, 568, """
 8,9=0 |
 """);
 
@@ -3451,7 +3453,7 @@ endmodule
       int Data    () {return    3;}                                             // Input key value
       int data    () {return    0;}                                             // Expected output data value
       int maxSteps() {return 2000;}                                             // Maximum number if execution steps
-      int expSteps() {return  984;}                                             // Expected number of steps
+      int expSteps() {return  983;}                                             // Expected number of steps
      };
     //stop(t);
     ok(t, """

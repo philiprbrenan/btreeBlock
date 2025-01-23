@@ -107,7 +107,7 @@ public class Test                                                               
      {properties.load(f);                                                       // Load properties from the file
 
       for (String key : properties.stringPropertyNames())                       // Insert key-value pair into TreeMap
-       {treeMap.put(key, properties.getProperty(key));
+       {treeMap.put(key.trim(), properties.getProperty(key).trim());            // Normalize keys and values
        }
      }
     catch(Exception e)
