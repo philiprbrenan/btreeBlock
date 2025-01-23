@@ -90,6 +90,32 @@ public class Test                                                               
     return ""+D;
    }
 
+  static void writeProperties                                                   // Write a properties file
+   (String fileName, TreeMap<String,String> properties)
+   {final StringBuilder s = new StringBuilder();                                // Properties written outparser
+    for (String k : properties.keySet())                                        // Each key
+     {s.append(k.trim()+"="+properties.get(k).trim()+"\n");                     // One key=value per line
+     }
+    writeFile(fileName, s);                                                     // Write propertie to file
+   }
+
+  static TreeMap<String,String> readProperties(String filename)                 // Parse a properties file
+   {final Properties              properties = new Properties();                // Properties parser
+    final TreeMap<String, String> treeMap    = new TreeMap<> ();                // TreeMap to store key-value pairs
+
+    try (FileInputStream f = new FileInputStream(filename))                     // Read file
+     {properties.load(f);                                                       // Load properties from the file
+
+      for (String key : properties.stringPropertyNames())                       // Insert key-value pair into TreeMap
+       {treeMap.put(key, properties.getProperty(key));
+       }
+     }
+    catch(Exception e)
+     {e.printStackTrace();
+     }
+    return treeMap;                                                             // Return treemap
+   }
+
 //D2 Numeric routines                                                           // Numeric routines
 
   static int max(int n, int...rest)                                             // Maximum of some numbers
@@ -885,6 +911,19 @@ BBBB
 """));
    }
 
+  static void test_properties()
+   {final String f = "/tmp/z.txt";
+    final TreeMap<String,String> p = new TreeMap<>();
+    p.put("A", "a");
+    p.put("B", "b");
+    p.put("C", "c");
+    writeProperties(f, p);
+    final Stack<String> s = readFile(f);
+    final TreeMap<String,String> q = readProperties(f);
+    ok(s, "[A=a, B=b, C=c]");
+    ok(q, "{A=a, B=b, C=c}");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_log_two();
     test_max_min();
@@ -894,11 +933,13 @@ BBBB
     test_join_stack();
     test_join_set();
     test_command();
+    test_string();
+    test_properties();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_string();
+    test_properties();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
