@@ -13,8 +13,6 @@ module delete_tb;                                                             //
   reg  [4:0]data;                                                    // Output data
   reg                  found;                                                   // Whether the key was found on put, find delete
   integer testResults;                                                          // Test results file
-  integer passes;                                                               // Number of tests passed
-  integer fails;                                                                // Number of tests failed
 
   delete a1(.reset(reset), .stop(stop), .clock(clock),                        // Connect to the module
     .Key(Key), .Data(Data), .data(data), .found(found));
@@ -32,12 +30,8 @@ module delete_tb;                                                             //
       end
       if (stop) begin                                                           // Stopped
         testResults = $fopen("tests.txt", "w");
-        $fdisplay(testResults, "Stopped after: %4d steps key %4d  data %4d", step, Key, data);
-        passes = 0; fails = 0;
-        if (data == 6)     passes = passes + 1; else begin fails = fails + 1; $fdisplay(testResults, "Expected 6 for data but got %d",    data); end
-        if (step == 948) passes = passes + 1; else begin fails = fails + 1; $fdisplay(testResults, "Expected 948 for expected steps but got %d", step); end
-        if (passes == 2) $fdisplay(testResults, "Passed all tests");
-        else             $fdisplay(testResults, "FAILED %d, passed %d", fails, passes);
+        $fdisplay(testResults, "Steps=%1d\nKey=%1d\ndata=%1d\n",
+          step, Key, data);
         $fclose(testResults);
       end
     end

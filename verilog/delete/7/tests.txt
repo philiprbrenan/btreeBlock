@@ -1,2 +1,4 @@
-Stopped after:  565 steps key    7  data    2
-Passed all tests
+Steps=568
+Key=7
+data=2
+

@@ -1,2 +1,4 @@
-Stopped after:   60 steps key    8  data    1
-Passed all tests
+Steps=60
+Key=8
+data=1
+
