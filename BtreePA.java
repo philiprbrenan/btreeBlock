@@ -3,8 +3,6 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-// see isLeaf(...) for treatment needed for other early parameter setting options to sqeeze code.
-// Send final memory to test benches so we can check the results of put and delete with confidence.
 // Copy entire stuck in one go rather than keys and data separately
 import java.util.*;
 import java.nio.file.*;
@@ -613,9 +611,10 @@ abstract class BtreePA extends Test                                             
     maxNodeUsed = max(maxNodeUsed, --nodeUsed);                                 // Number of nodes in use
    }
 
-  private void clear()                                                          // Clear a new node to zeros ready for use
-   {z();
-    M.at(Node, T.at(node_clear)).zero();
+  private void clear() {z();  clear(T.at(node_clear));}                         // Clear a new node to zeros ready for use
+
+  private void clear(MemoryLayoutPA.At node)                                    // Clear a new node to zeros ready for use
+   {z(); M.at(Node, node).zero();
    }
 
   private void erase()                                                          // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
