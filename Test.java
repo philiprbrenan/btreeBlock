@@ -118,6 +118,12 @@ public class Test                                                               
 
 //D2 Numeric routines                                                           // Numeric routines
 
+  static int ifs(String n)                                                      // Integer from string
+   {final Integer i = Integer.parseInt(n);
+    if (i == null) stop("Invalid integer;", n);
+    return i;
+   }
+
   static int max(int n, int...rest)                                             // Maximum of some numbers
    {int m = n;
     for (int i = 0; i < rest.length; i++) m = m < rest[i] ? rest[i] : m;
@@ -924,6 +930,10 @@ BBBB
     ok(q, "{A=a, B=b, C=c}");
    }
 
+  static void test_ifs()
+   {ok(ifs("22"), 22);
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_log_two();
     test_max_min();
@@ -935,11 +945,12 @@ BBBB
     test_command();
     test_string();
     test_properties();
+    test_ifs();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
-    test_properties();
+   {//oldTests();
+    test_ifs();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
