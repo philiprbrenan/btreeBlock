@@ -624,8 +624,8 @@ abstract class BtreePA extends Test                                             
     M.at(Node, T.at(node_erase)).ones();
    }
 
-  private void leafBase(Layout.Variable node_leafBase,                          // Base of leaf stuck in memory
-                        Layout.Variable      leafBase)                          // Base of leaf stuck in memory
+  private void leafBase(Layout.Variable      leafBase,                          // Base of leaf stuck in memory
+                        Layout.Variable node_leafBase)
    {z();
     P.new I()
      {void a()
@@ -636,15 +636,15 @@ abstract class BtreePA extends Test                                             
      };
    }
 
-  private void leafBase () {leafBase(node_leafBase,  leafBase);}
-  private void leafBase1() {leafBase(node_leafBase1, leafBase1);}
-  private void leafBase2() {leafBase(node_leafBase2, leafBase2);}
-  private void leafBase3() {leafBase(node_leafBase3, leafBase3);}
+  private void leafBase () {leafBase(leafBase , node_leafBase );}
+  private void leafBase1() {leafBase(leafBase1, node_leafBase1);}
+  private void leafBase2() {leafBase(leafBase2, node_leafBase2);}
+  private void leafBase3() {leafBase(leafBase3, node_leafBase3);}
 
-  private void branchBase(Layout.Variable node_branchBase,
-                          Layout.Variable      branchBase)
+  private void branchBase(Layout.Variable      branchBase,                      // Base of branch stuck in memory
+                          Layout.Variable node_branchBase)
    {z();
-    P.new I()                                                                   // Base of branch stuck in memory
+    P.new I()
      {void a()
        {final MemoryLayoutPA.At a = M.at(branch, T.at(node_branchBase)).setOff();
         T.at(branchBase).setInt(a.at);
@@ -653,10 +653,10 @@ abstract class BtreePA extends Test                                             
      };
    }
 
-  private void branchBase () {branchBase(node_branchBase,  branchBase);}
-  private void branchBase1() {branchBase(node_branchBase1, branchBase1);}
-  private void branchBase2() {branchBase(node_branchBase2, branchBase2);}
-  private void branchBase3() {branchBase(node_branchBase3, branchBase3);}
+  private void branchBase () {branchBase(branchBase,  node_branchBase );}
+  private void branchBase1() {branchBase(branchBase1, node_branchBase1);}
+  private void branchBase2() {branchBase(branchBase2, node_branchBase2);}
+  private void branchBase3() {branchBase(branchBase3, node_branchBase3);}
 
   private void leafSize()                                                       // Number of children in body of leaf
    {z();
