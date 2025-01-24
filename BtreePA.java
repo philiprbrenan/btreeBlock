@@ -300,8 +300,10 @@ abstract class BtreePA extends Test                                             
      }
     M.at(freeList).move(M.at(free, T.at(allocate)));                            // Second node on free list
 
-    //tt(node_clear, allocate);
-    clear(T.at(allocate));                                                      // Construct and clear the node
+    tt(node_clear, allocate);
+    clear();                                                                    // Construct and clear the node
+//  tt(node_clear, allocate);
+//  clear(T.at(allocate));                                                      // Construct and clear the node
 //    maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                              // Number of nodes in use
    }
 
@@ -2367,8 +2369,8 @@ endmodule
       ok(x.exitCode, 0);                                                        // Confirm exit code
       ok(12, g, e);                                                             // Width of margin in verilog traces
       final TreeMap<String,String> p = readProperties(testsFile);               // Load test results
-      ok(p.get("Steps"), ""+expSteps());
-      ok(p.get("data"),  ""+data());
+      ok(ifs(p.get("Steps")), expSteps());
+      ok(ifs(p.get("data")),  data());
      }
 
     private String editVariables(StringBuilder S) {return editVariables(""+S);} // Edit the variables in a string builder
@@ -3351,7 +3353,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 950, """
+    t.runVerilogDeleteTest(3, 6, 948, """
                     6           |
                     0           |
                     5           |
@@ -3363,7 +3365,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 851, """
+    t.runVerilogDeleteTest(4, 5, 849, """
              6           |
              0           |
              5           |
@@ -3383,7 +3385,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 698, """
+    t.runVerilogDeleteTest(1, 8, 697, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3391,7 +3393,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 418, """
+    t.runVerilogDeleteTest(5, 4, 417, """
       7      |
       0      |
       1      |
@@ -3399,7 +3401,7 @@ endmodule
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(6, 3, 381, """
+    t.runVerilogDeleteTest(6, 3, 379, """
     7      |
     0      |
     1      |
@@ -3407,7 +3409,7 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 568, """
+    t.runVerilogDeleteTest(7, 2, 565, """
 8,9=0 |
 """);
 
@@ -3453,7 +3455,7 @@ endmodule
       int Data    () {return    3;}                                             // Input key value
       int data    () {return    0;}                                             // Expected output data value
       int maxSteps() {return 2000;}                                             // Maximum number if execution steps
-      int expSteps() {return  983;}                                             // Expected number of steps
+      int expSteps() {return  984;}                                             // Expected number of steps
      };
     //stop(t);
     ok(t, """
