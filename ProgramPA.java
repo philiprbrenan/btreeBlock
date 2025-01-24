@@ -8,6 +8,7 @@ import java.util.*;
 
 class ProgramPA extends Test                                                    // A progam that manipulates a memory layout via si instructions
  {final Stack<I>  code = new Stack<>();                                         // Code of the program
+  I currentInstruction;                                                         // The currently executing instruction
   final int    maxTime = 100_000;                                               // Maximum number of steps permitted while running the program
   int             step = 0;                                                     // Execution step
   int             time = 0;                                                     // Execution time
@@ -145,9 +146,9 @@ class ProgramPA extends Test                                                    
     final int N = code.size();
     for (step = 0, time = 0; step < N && time < maxTime && running; step++, time++)
      {traceMemory();
-      final I i = code.elementAt(step);
+      final I i = currentInstruction = code.elementAt(step);                    // Base instruction
       i.a();
-      for (I j : i.merged) j.a();
+      for (I j : i.merged) {currentInstruction = j; j.a();}                     // Merged instructions
      }
     traceMemory();
     if (time >= maxTime) stop("Out of time: ", time);
@@ -159,11 +160,11 @@ class ProgramPA extends Test                                                    
    {run("trace/"+currentTestName()+".txt");
    }
 
-  void halt(Object...O)                                                         // Halt execution with an explanatory message
+  void halt(Object...O)                                                         // Halt execution with an explanatory message and traceback of current instruction
    {z();
     final String m = "/* "+saySb(O).toString()+" */";
     new I()
-     {void   a() {say(O); /*say(traceBack);*/ running = false;}
+     {void   a() {say(O); say(currentInstruction.traceBack); running = false;}
       String v() {return "stopped <= 1; " + m;}
       String n() {return "halt";}
      };
