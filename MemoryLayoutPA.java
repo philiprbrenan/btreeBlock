@@ -24,12 +24,12 @@ class MemoryLayoutPA extends Test                                               
   MemoryLayoutPA(Layout Layout, String Name, MemoryLayoutPA Based)              // Like based storage in PL1.
    {name   = Name; based = Based; layout = Layout;
     memory = based != null ? Based.memory() : new Memory(Name, layout.size());  // If it is based it uses some one else's memory, if not based we must supply memory
-    if (based != null) P = based.P;                                             // Reusetheunderlying program by default as well
+    if (based != null) P = based.P;                                             // Reuse the underlying program by default as well
    }
 
 //D1 Control                                                                    // Testing, control and integrity
 
-  Memory memory() {return based == null ? memory : based.memory();}             // Find the real memory used by this layout
+  Memory memory() {return memory;}                                              // Real memory used by this layout
 
 
   //void layout (Layout    Layout)  {layout = Layout;}                          // Set the base of the layout in memory allowing such layouts to be relocated
