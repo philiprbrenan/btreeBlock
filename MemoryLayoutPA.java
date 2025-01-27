@@ -438,6 +438,21 @@ class MemoryLayoutPA extends Test                                               
        };
      }
 
+    void copy(At Source, At Length)                                             // Copy he specified number of bits from the location addressed by th source to the location addressed by the target.
+     {z(); P.new I()
+       {void a()
+         {setOff();
+          Source.setOff();
+          Length.setOff();
+          final int L = Length.result, S = Source.at, T = at;                   // Adddress and length of move
+          for   (int i = 0; i < L; i++)                                         // Each element
+           {final boolean b = memory.getBit(S+i);
+            memory.set(T+i, b);
+           }
+         }
+       };
+     }
+
 //D2 Bits                                                                       // Bit operations in a memory.
 
     void zero()                                                                 // Zero some memory
@@ -1520,6 +1535,47 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.dumpVerilog("verilog/memoryLayoutPA/dump_verilog.txt");                   // Dump main memory
    }
 
+  static void test_copy_bits()
+   {Layout               l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 2);
+    Layout.Array     A = l.array    ("A", a, 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Array     B = l.array    ("B", b, 4);
+    Layout.Variable  i = l.variable ("i", 4);
+    Layout.Variable  j = l.variable ("j", 4);
+    Layout.Variable  L = l.variable ("l", 4);
+    Layout.Structure S = l.structure("S", A, B, i, j, L);
+    l.compile();
+
+    MemoryLayoutPA   m = new MemoryLayoutPA(l, "M");
+    for(int I = 0; I < 4; ++I) m.at(a, I).setInt(I);
+    m.at(i).setInt(2);
+    m.at(j).setInt(1);
+    m.at(L).setInt(4);
+    m.at(b, m.at(i)).copy(m.at(a, m.at(j)), m.at(L));
+    m.P.run();
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        36                                      S
+   2 A        0         8          4                             A
+   3 V        0         2               0                  0       a
+   4 V        2         2               1                  1       a
+   5 V        4         2               2                  2       a
+   6 V        6         2               3                  3       a
+   7 A        8        16          4                             B
+   8 V        8         4               0                  0       b
+   9 V       12         4               1                  0       b
+  10 V       16         4               2                  9       b
+  11 V       20         4               3                  0       b
+  12 V       24         4                                  2     i
+  13 V       28         4                                  1     j
+  14 V       32         4                                  4     l
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_get_set();
     test_boolean();
@@ -1536,11 +1592,12 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_union();
     test_verilog_address();
     //test_dump_verilog();
+    test_copy_bits();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
-    test_move_parallel();
+   {//oldTests();
+    test_copy_bits();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
