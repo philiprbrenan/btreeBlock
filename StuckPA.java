@@ -6,9 +6,9 @@ package com.AppaApps.Silicon;                                                   
 
 abstract class StuckPA extends Test                                             // A fixed size stack of ordered key, data pairs
  {abstract int maxSize();                                                       // The maximum number of entries in the stuck.
-  abstract int bitsPerKey();                                                    // The number of bits per key
-  abstract int bitsPerData();                                                   // The number of bits per data
-  abstract int bitsPerSize();                                                   // The number of bits in size field
+  abstract int bitsPerKey();                                                    // The number of bits needed to define a key
+  abstract int bitsPerData();                                                   // The number of bits needed to define a data field
+  abstract int bitsPerSize();                                                   // The number of bits needed to define the size field
 
   final String      name;                                                       // Name of the stuck
   final MemoryLayoutPA M;                                                       // Memory for stuck
@@ -33,6 +33,9 @@ abstract class StuckPA extends Test                                             
   Layout.Variable   size;                                                       // The current size of the stuck
   Layout.Variable   full;                                                       // Used by isFull
   Layout.Bit       equal;                                                       // The result of an equal operation
+  Layout.Variable sourceIndex;                                                  // Source index when copying an array
+  Layout.Variable targetIndex;                                                  // Target index when copying an array
+  Layout.Variable   copyCount;                                                  // Number of elements top copy in a copy operation
   Layout.Structure  temp;                                                       // Transaction intermediate fields
 
   String action;                                                                // Last action performed
@@ -102,18 +105,22 @@ abstract class StuckPA extends Test                                             
   Layout transactionLayout()                                                    // Layout of temporary memory used by a transaction
    {z();
     final Layout l = Layout.layout();
-     search = l.variable ( "search", bitsPerKey());
-      limit = l.variable (  "limit", bitsPerSize());
-     isFull = l.bit      ( "isFull");
-    isEmpty = l.bit      ("isEmpty");
-      found = l.bit      (  "found");
-      index = l.variable (  "index", bitsPerSize());
-       tKey = l.variable (    "key", bitsPerKey());
-      tData = l.variable (   "data", bitsPerData());
-       size = l.variable (   "size", bitsPerSize());
-       full = l.variable (   "full", bitsPerSize());
-      equal = l.bit      (  "equal");
-       temp = l.structure("temp", search, limit, isFull, isEmpty, found, index, tKey, tData, size, full, equal);
+         search = l.variable (     "search", bitsPerKey());
+          limit = l.variable (      "limit", bitsPerSize());
+         isFull = l.bit      (     "isFull");
+        isEmpty = l.bit      (    "isEmpty");
+          found = l.bit      (      "found");
+          index = l.variable (      "index", bitsPerSize());
+           tKey = l.variable (        "key", bitsPerKey());
+          tData = l.variable (       "data", bitsPerData());
+           size = l.variable (       "size", bitsPerSize());
+           full = l.variable (       "full", bitsPerSize());
+          equal = l.bit      (      "equal");
+    sourceIndex = l.variable ("sourceIndex", bitsPerSize());
+    targetIndex = l.variable ("targetIndex", bitsPerSize());
+      copyCount = l.variable (  "copyCount", bitsPerSize());
+           temp = l.structure("temp", search, limit, isFull, isEmpty, found, index,
+         tKey, tData, size, full, equal, sourceIndex, targetIndex, copyCount);
     return l.compile();
    }
 
