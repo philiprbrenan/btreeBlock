@@ -23,17 +23,17 @@ push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              
 my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
 
 if (0)
- {for my $s(@files)                                                               # Upload each selected file
-   {my $c = readBinaryFile $s;                                                    # Load file
+ {for my $s(@files)                                                             # Upload each selected file
+   {my $c = readBinaryFile $s;                                                  # Load file
 
-    $c = expandWellKnownWordsAsUrlsInMdFormat $c if $s =~ m(README);              # Expand README
+    $c = expandWellKnownWordsAsUrlsInMdFormat $c if $s =~ m(README);            # Expand README
 
-    my $t = swapFilePrefix $s, $home;                                             # File on github
-    my $w = writeFileUsingSavedToken($user, $repo, $t, $c);                       # Write file into github
+    my $t = swapFilePrefix $s, $home;                                           # File on github
+    my $w = writeFileUsingSavedToken($user, $repo, $t, $c);                     # Write file into github
     lll "$w  $t";
    }
  }
-else
+else                                                                            # Upload files via git
  {qx(git add *; git commit -m aaa; git push);
  }
 
@@ -81,6 +81,11 @@ jobs:
       with:
         website: jdk.java.net
 
+    - name: Verilog install
+      if: matrix.task == 'BtreePA'
+      run: |
+        sudo apt install iverilog
+
     - name: Install Tree
       run:
         sudo apt install tree
@@ -109,27 +114,6 @@ END
 
 END
    }
-  $y .= <<"END";
-    - name: Verilog install
-      if: matrix.task == 'BtreePA'
-      run: |
-        sudo apt install iverilog
-
-    - name: Verilog Run Find
-      if: matrix.task == 'BtreePA'
-      run: |
-        cd verilog/find;   iverilog -Iincludes/ -g2012 -o find   find.v   find.tb   && timeout 1m ./find
-
-    - name: Verilog Run Delete
-      if: matrix.task == 'BtreePA'
-      run: |
-        cd verilog/delete; iverilog -Iincludes/ -g2012 -o delete delete.v delete.tb && timeout 1m ./delete
-
-    - name: Verilog Run Put
-      if: matrix.task == 'BtreePA'
-      run: |
-        cd verilog/put;    iverilog -Iincludes/ -g2012 -o put    put.v    put.tb    && timeout 1m ./put
-END
 
   my $f = writeFileUsingSavedToken $user, $repo, $wf, $y;                       # Upload workflow
   lll "$f  Ubuntu work flow for $repo";
