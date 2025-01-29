@@ -20,9 +20,11 @@ my @ext  = qw(.java .md .pl .txt .png .py .sv .tb .v);                          
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
         @files = grep {!m(z/|machine|perl|vivado/)} @files;                     # Remove files that do not need to be saved
+        @files = grep {!m(verilog/|git/objects/)}   @files;                     # Remove files that do not need to be saved
+        @files = grep {!m(verilog/|git/objects/)}   @files;                     # Remove files that do not need to be saved
 my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
 
-if (0)
+if (0)                                                                          # Upload via github crud
  {for my $s(@files)                                                             # Upload each selected file
    {my $c = readBinaryFile $s;                                                  # Load file
 
@@ -34,7 +36,7 @@ if (0)
    }
  }
 else                                                                            # Upload files via git
- {qx(git add *; git commit -m aaa; git push);
+ {qx(git add *; git commit -m aaa; git push --force);
  }
 
 writeFileUsingSavedToken($user, $repo, q(.config/geany/snippets.conf),          # Save the snippets file as this was the thing I missed most after a rebuild
