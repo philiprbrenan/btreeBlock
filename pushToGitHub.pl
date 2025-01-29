@@ -15,21 +15,26 @@ my $home = q(/home/phil/btreeBlock/);                                           
 my $user = q(philiprbrenan);                                                    # User
 my $repo = q(btreeBlock);                                                       # Repo
 my $wf   = q(.github/workflows/main.yml);                                       # Work flow on Ubuntu
-my @ext  = qw(.java .md .pl .txt .png .py .sv .tb .v);                             # All files to upload to github
+my @ext  = qw(.java .md .pl .txt .png .py .sv .tb .v);                          # All files to upload to github
 #  @ext  = qw(.java .md .pl .txt);                                              # Reduced set of files to upload to github
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
-        @files = grep {!m(z/|machine|perl|vivado/)} @files;                     # Remove fiels that do not need to be saved
+        @files = grep {!m(z/|machine|perl|vivado/)} @files;                     # Remove files that do not need to be saved
 my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
 
-for my $s(@files)                                                               # Upload each selected file
- {my $c = readBinaryFile $s;                                                    # Load file
+if (0)
+ {for my $s(@files)                                                               # Upload each selected file
+   {my $c = readBinaryFile $s;                                                    # Load file
 
-  $c = expandWellKnownWordsAsUrlsInMdFormat $c if $s =~ m(README);              # Expand README
+    $c = expandWellKnownWordsAsUrlsInMdFormat $c if $s =~ m(README);              # Expand README
 
-  my $t = swapFilePrefix $s, $home;                                             # File on github
-  my $w = writeFileUsingSavedToken($user, $repo, $t, $c);                       # Write file into github
-  lll "$w  $t";
+    my $t = swapFilePrefix $s, $home;                                             # File on github
+    my $w = writeFileUsingSavedToken($user, $repo, $t, $c);                       # Write file into github
+    lll "$w  $t";
+   }
+ }
+else
+ {qx(git add *; git commit -m aaa; git push);
  }
 
 writeFileUsingSavedToken($user, $repo, q(.config/geany/snippets.conf),          # Save the snippets file as this was the thing I missed most after a rebuild
