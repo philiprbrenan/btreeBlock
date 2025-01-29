@@ -1,4 +1,4 @@
-# Test 2025-01-10 at 00:07:21
+# Test 2025-01-29 at 15:33:53
 
 name: Test
 run-name: btreeBlock
@@ -6,7 +6,7 @@ run-name: btreeBlock
 on:
   push:
     paths:
-      - '**/*'
+      - '**/main.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -32,13 +32,22 @@ jobs:
       with:
         website: jdk.java.net
 
-    - name: Verilog install
+    - name: Install Tree
+      run:
+        sudo apt install tree
+
+    - name: Position files in package
       run: |
-        sudo apt install iverilog
+        mkdir -p com/AppaApps/Silicon
+        cp `find .  -name "*.java"` com/AppaApps/Silicon
+
+    - name: Files
+      run:
+        tree
 
     - name: Compile
       run: |
-        javac -g -d Classes *.java
+        javac -g -d Classes -cp Classes `find com/AppaApps/Silicon -name "*.java"`
 
     - name: Test Btree
       if: matrix.task == 'Btree'
@@ -55,7 +64,7 @@ jobs:
     - name: Test BtreeSA
       if: matrix.task == 'BtreeSA'
       run: |
-        # java -cp Classes com/AppaApps/Silicon/BtreeSA # Takes longer than BtreePA yet BtreePA is the desired end point
+        java -cp Classes com/AppaApps/Silicon/BtreeSA
 
 
     - name: Test BtreeSML
@@ -171,10 +180,22 @@ jobs:
       run: |
         java -cp Classes com/AppaApps/Silicon/Verilog
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: verilog
-        path: |
-          verilog/
-          trace/
+    - name: Verilog install
+      if: matrix.task == 'BtreePA'
+      run: |
+        sudo apt install iverilog
+
+    - name: Verilog Run Find
+      if: matrix.task == 'BtreePA'
+      run: |
+        cd verilog/find;   iverilog -Iincludes/ -g2012 -o find   find.v   find.tb   && timeout 1m ./find
+
+    - name: Verilog Run Delete
+      if: matrix.task == 'BtreePA'
+      run: |
+        cd verilog/delete; iverilog -Iincludes/ -g2012 -o delete delete.v delete.tb && timeout 1m ./delete
+
+    - name: Verilog Run Put
+      if: matrix.task == 'BtreePA'
+      run: |
+        cd verilog/put;    iverilog -Iincludes/ -g2012 -o put    put.v    put.tb    && timeout 1m ./put
