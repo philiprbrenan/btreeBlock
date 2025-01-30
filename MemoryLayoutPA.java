@@ -264,7 +264,7 @@ class MemoryLayoutPA extends Test                                               
 
     At setOff(boolean checkSetOff)                                              // Set the base address of the field
      {z();
-      if (checkSetOff && !P.running) stop("Set off must be inside an instruction");
+      if (checkSetOff && !P.running) P.halt("Set off must be inside an instruction");
       if (hasIndirection()) {z(); locateInDirectAddress();}                     // Evaluate indirect indices
       else                  {z(); locateDirectAddress();}                       // Evaluate direct indices
       return this;
@@ -438,16 +438,18 @@ class MemoryLayoutPA extends Test                                               
        };
      }
 
-    void copy(At Source, At Length)                                             // Copy he specified number of bits from the location addressed by th source to the location addressed by the target.
-     {z(); P.new I()
+    void copy(At Source, At Length)                                             // Copy the specified number of bits from the location addressed by th source to the location addressed by the target.
+     {z();
+      final At Target = this;
+      P.new I()
        {void a()
-         {setOff();
+         {Target.setOff();
           Source.setOff();
           Length.setOff();
-          final int L = Length.result, S = Source.at, T = at;                   // Adddress and length of move
+          final int L = Length.result, S = Source.at, T = at;                   // Address and length of move
           for   (int i = 0; i < L; i++)                                         // Each element
-           {final boolean b = memory.getBit(S+i);
-            memory.set(T+i, b);
+           {final boolean b = Source.ml().memory.getBit(S+i);
+            Target.ml().memory.set(T+i, b);
            }
          }
        };
