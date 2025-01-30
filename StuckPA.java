@@ -456,7 +456,7 @@ abstract class StuckPA extends Test                                             
 
 //D1 Merge and Split                                                            // Merge and split stucks
 
-  void concatenate(StuckPA Source)                                              // Concatenate two stucks
+  void concatenate(StuckPA Source)                                              // Concatenate two stucks placing the source at the end of the target while not modifying the source
    {z(); action = "concatenate";
     final StuckPA Target = this;
     size(); Source.size();                                                      // Get the size of the stucks
@@ -466,6 +466,34 @@ abstract class StuckPA extends Test                                             
     Target.T.at(Target.copyCount).move(Source.T.at(Source.size));               // Number of elements to copy into the target
     Target.copyKeys(Source);                                                    // Copy keys
     Target.copyData(Source);                                                    // Copy data
+    P.new I()                                                                   // Update size of target
+     {void a()
+       {Target.T.at(Target.size).setInt
+         (Target.T.at(Target.size).getInt() +
+          Source.T.at(Source.size).getInt());
+       }
+     };
+    Target.setSize();
+   }
+
+  void prepend(StuckPA Source)                                                  // Concatenate two stucks placing the source at the start of the target while (apparently) not modifying the target
+   {z(); action = "prepend";
+    final StuckPA Target = this;
+    size(); Source.size();                                                      // Get the size of the stucks
+
+    Target.T.at(Target.index    ).setInt(0);                                    // Concatenate the target to the source
+    Source.T.at(Source.index    ).move(Source.T.at(Source.size));               // Extend source
+    Source.T.at(Source.copyCount).move(Target.T.at(Target.size));               // Number of elements to copy into the target
+    Source.copyKeys(Target);                                                    // Copy keys
+    Source.copyData(Target);                                                    // Copy data
+
+    Target.T.at(Target.index    ).setInt(0);                                    // Copy the source to the target leaving the lenmgth of the source unchanged so it looks as if it has not been changed
+    Source.T.at(Source.index    ).setInt(0);                                    // Extend source
+    Source.T.at(Source.copyCount).move(Target.T.at(Target.size));               // Number of elements to copy into the target
+    Source.copyKeys(Target);                                                    // Copy keys
+    Source.copyData(Target);                                                    // Copy data
+
+
     P.new I()                                                                   // Update size of target
      {void a()
        {Target.T.at(Target.size).setInt
@@ -1308,6 +1336,70 @@ StuckSML(maxSize:8 size:8)
 """);
    }
 
+  static void test_prepend()
+   {z();
+    if (true) return;
+    final StuckPA s = new StuckPA("source")
+     {int maxSize     () {return  8;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(5); s.T.at(s.tData).setInt(5);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(6); s.T.at(s.tData).setInt(6);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(7); s.T.at(s.tData).setInt(7);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(8); s.T.at(s.tData).setInt(8);}}; s.push();
+    s.P.run(); s.P.clear();
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:8 size:4)
+  0 key:5 data:5
+  1 key:6 data:6
+  2 key:7 data:7
+  3 key:8 data:8
+""");
+
+    final StuckPA t = new StuckPA("source")
+     {int maxSize     () {return s.maxSize     ();}
+      int bitsPerKey  () {return s.bitsPerKey  ();}
+      int bitsPerData () {return s.bitsPerData ();}
+      int bitsPerSize () {return s.bitsPerSize ();}
+     };
+
+    t.P.new I() {void a() {t.T.at(t.tKey).setInt(1); t.T.at(t.tData).setInt(1);}}; t.push();
+    t.P.new I() {void a() {t.T.at(t.tKey).setInt(2); t.T.at(t.tData).setInt(2);}}; t.push();
+    t.P.new I() {void a() {t.T.at(t.tKey).setInt(3); t.T.at(t.tData).setInt(3);}}; t.push();
+    t.P.new I() {void a() {t.T.at(t.tKey).setInt(4); t.T.at(t.tData).setInt(4);}}; t.push();
+    t.P.run(); t.P.clear();
+
+    //stop(t);
+    ok(t, """
+StuckSML(maxSize:8 size:4)
+  0 key:1 data:1
+  1 key:2 data:2
+  2 key:3 data:3
+  3 key:4 data:4
+""");
+
+    t.prepend(s);
+    t.P.run(); t.P.clear();
+
+    //stop(t);
+    ok(t, """
+StuckSML(maxSize:8 size:8)
+  0 key:5 data:5
+  1 key:6 data:6
+  2 key:7 data:7
+  3 key:8 data:8
+  4 key:1 data:1
+  5 key:2 data:2
+  6 key:3 data:3
+  7 key:4 data:4
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_load();
     test_clear();
@@ -1327,11 +1419,12 @@ StuckSML(maxSize:8 size:8)
     test_at();
     test_copy();
     test_concatenate();
+    test_prepend();
    }
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_concatenate();
+    test_prepend();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
