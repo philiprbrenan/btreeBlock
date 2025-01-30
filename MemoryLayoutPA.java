@@ -23,7 +23,7 @@ class MemoryLayoutPA extends Test                                               
 
   MemoryLayoutPA(Layout Layout, String Name, MemoryLayoutPA Based)              // Like based storage in PL1.
    {name   = Name; based = Based; layout = Layout;
-    memory = based != null ? Based.memory() : new Memory(Name, layout.size());  // If it is based it uses some one else's memory, if not based we must supply memory
+    memory = based != null ? Based.memory() : new Memory(Name, size());         // If it is based it uses some one else's memory, if not based we must supply memory
     if (based != null) P = based.P;                                             // Reuse the underlying program by default as well
    }
 
@@ -31,8 +31,6 @@ class MemoryLayoutPA extends Test                                               
 
   Memory memory() {return memory;}                                              // Real memory used by this layout
 
-
-  //void layout (Layout    Layout)  {layout = Layout;}                          // Set the base of the layout in memory allowing such layouts to be relocated
   void program(ProgramPA program) {P = program;}                                // Program in which to generate instructions
 
   void base(int Base)                                                           // Set the base of the layout in memory allowing such layouts to be relocated
@@ -44,6 +42,7 @@ class MemoryLayoutPA extends Test                                               
   Layout layout  () {return layout;}                                            // Get the layout in use
   String baseName() {return name+"_base_offset";}                               // Name of the verilog field used to hold the base being used for this memory layout
   int    base    () {return base;}                                              // Get the base offset into memory being used
+  int    size    () {return layout.size();}                                     // Size of memory
   void   clear   () {memory.zero();}                                            // Clear underlying memory
 
   void ok(String Lines)                                                         // Check that specified lines are present in the memory layout
@@ -109,7 +108,7 @@ class MemoryLayoutPA extends Test                                               
 
   void zero()                                                                   // Clear the memory associated with the layout to zeros
    {z();
-    memory.set(base, layout.size(), 0);
+    memory.set(base, size(), 0);
    }
 
   void moveParallel(At...Fields)                                                // Move pairs of fields in parallel
