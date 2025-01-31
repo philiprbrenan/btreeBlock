@@ -470,6 +470,13 @@ abstract class StuckPA extends Test                                             
     if (p != T.P.number)        stop("Mismatched programs");
    }
 
+  void copy(StuckPA Source)                                                     // Copy the source stuck inot the target replacing the target completely
+   {z(); action = "copy";
+    checkSameProgram(Source);                                                   // Confirm that we are writing into the same program
+    final StuckPA Target = this;
+    Target.M.copy(Source.M);                                                    // Copy the source into the target
+   }
+
   void concatenate(StuckPA Source)                                              // Concatenate two stucks placing the source at the end of the target while not modifying the source.
    {z(); action = "concatenate";
     checkSameProgram(Source);                                                   // Confirm that we are writing into the same program
@@ -513,6 +520,29 @@ abstract class StuckPA extends Test                                             
        }
      };
     Target.setSize();
+   }
+
+  void split(StuckPA Low, StuckPA High)                                         // Split a full stuck into two halves
+   {z(); action = "split";
+    final StuckPA Target = this;
+    checkSameProgram(Low); checkSameProgram(High);                              // Confirm that we are writing into the same program
+
+//    Target.T.at(Target.index    ).setInt(0);                                    // Concatenate the target to the source
+//    Source.T.at(Source.index    ).move(Source.T.at(Source.size));               // Extend source
+//    Source.T.at(Source.copyCount).move(Target.T.at(Target.size));               // Number of elements to copy into the target
+//    Source.copyKeys(Target);                                                    // Copy keys
+//    Source.copyData(Target);                                                    // Copy data
+//
+//    Target.M.copy(Source.M);                                                    // Copy the source to the target leaving the length of the source unchanged so it looks as if it has not been changed
+//
+//    P.new I()                                                                   // Update size of target
+//     {void a()
+//       {Target.T.at(Target.size).setInt
+//         (Target.T.at(Target.size).getInt() +
+//          Source.T.at(Source.size).getInt());
+//       }
+//     };
+//    Target.setSize();
    }
 
 //D1 Print                                                                      // Print a stuck
@@ -1222,7 +1252,45 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 """);
    }
 
-  static void test_copy()                                                       // Copy part of one stuck into another
+  static void test_copy()                                                       // Copy one stuck into another
+   {z();
+
+    final MemoryLayoutPA m = new MemoryLayoutPA(1000);
+
+    final StuckPA    s = new StuckPA("source", m)
+     {int maxSize     () {return  4;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(1); s.T.at(s.tData).setInt(2);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt(4);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(3); s.T.at(s.tData).setInt(6);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(4); s.T.at(s.tData).setInt(8);}}; s.push();
+    s.P.run(); s.P.clear();
+
+    final StuckPA    t = new StuckPA("target", m)
+     {int maxSize     () {return  4;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
+    t.copy(s);
+    t.P.run(); t.P.clear();
+
+    //stop(t);
+    ok(t, """
+StuckSML(maxSize:4 size:4)
+  0 key:1 data:2
+  1 key:2 data:4
+  2 key:3 data:6
+  3 key:4 data:8
+""");
+   }
+
+  static void test_copy_keys_and_data()                                         // Copy part of one stuck into another
    {z();
     final StuckPA    s = new StuckPA("source")
      {int maxSize     () {return  8;}
@@ -1443,14 +1511,14 @@ StuckSML(maxSize:8 size:8)
     test_search_first_greater_than_or_equal_except_last();
     test_at();
     test_copy();
+    test_copy_keys_and_data();
     test_concatenate();
     test_prepend();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
-    test_concatenate();
-    test_prepend();
+   {//oldTests();
+    test_copy();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
