@@ -822,7 +822,7 @@ abstract class BtreePA extends Test                                             
     T.at(node_leafSize).setInt(node);
     leafSize();
     final int     K = T.at(leafSize).getInt();
-    final StuckPA t = lLeaf.copy();
+    final StuckPA t = lLeaf.copyDef();
     T.at(node_leafBase).setInt(node); leafBase(); t.base(T.at(leafBase));
     for  (int i = 0; i < K; i++)
      {z();
@@ -838,7 +838,7 @@ abstract class BtreePA extends Test                                             
 
     if (K > 0)                                                                  // Branch has key, next pairs
      {z();
-      final StuckPA t = bLeaf.copy();
+      final StuckPA t = bLeaf.copyDef();
       T.at(node_branchBase).setInt(node); branchBase(); t.base(T.at(branchBase));
       for  (int i = 0; i < K; i++)
        {z();
