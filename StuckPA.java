@@ -76,10 +76,10 @@ abstract class StuckPA extends Test                                             
     T.program(P);
    }
 
-  StuckPA copy()                                                                // Copy a stuck definition
+  StuckPA copyDef()                                                             // Copy a stuck definition
    {z();
     final StuckPA parent = this;
-    final StuckPA  child = new StuckPA(parent.name, parent.M)
+    final StuckPA  child = new StuckPA(parent.name, parent.M.based)             // Address the underlying memory layout which is not based so wil force a new based memory to be created for this copy
      {int maxSize    () {return parent.maxSize    ();}
       int bitsPerKey () {return parent.bitsPerKey ();}
       int bitsPerData() {return parent.bitsPerData();}
@@ -510,7 +510,7 @@ abstract class StuckPA extends Test                                             
     Source.copyKeys(Target);                                                    // Copy keys
     Source.copyData(Target);                                                    // Copy data
 
-    Target.M.copy(Source.M);                                                    // Copy the source to the target leaving the length of the source unchanged so it looks as if it has not been changed
+    Target.copy(Source);                                                        // Copy the source to the target leaving the length of the source unchanged so it looks as if it has not been changed
 
     P.new I()                                                                   // Update size of target
      {void a()
@@ -524,25 +524,28 @@ abstract class StuckPA extends Test                                             
 
   void split(StuckPA Low, StuckPA High)                                         // Split a full stuck into two halves
    {z(); action = "split";
-    final StuckPA Target = this;
+    final int H = Low.maxSize()>>1;                                             // Should check theat Low, High, Source all have the same shape
+    final StuckPA Source = this;
     checkSameProgram(Low); checkSameProgram(High);                              // Confirm that we are writing into the same program
 
-//    Target.T.at(Target.index    ).setInt(0);                                    // Concatenate the target to the source
-//    Source.T.at(Source.index    ).move(Source.T.at(Source.size));               // Extend source
-//    Source.T.at(Source.copyCount).move(Target.T.at(Target.size));               // Number of elements to copy into the target
-//    Source.copyKeys(Target);                                                    // Copy keys
-//    Source.copyData(Target);                                                    // Copy data
-//
-//    Target.M.copy(Source.M);                                                    // Copy the source to the target leaving the length of the source unchanged so it looks as if it has not been changed
-//
-//    P.new I()                                                                   // Update size of target
-//     {void a()
-//       {Target.T.at(Target.size).setInt
-//         (Target.T.at(Target.size).getInt() +
-//          Source.T.at(Source.size).getInt());
-//       }
-//     };
-//    Target.setSize();
+    Low.copy(Source);
+
+    P.new I()                                                                   // Set size of low
+     {void a() {Low.T.at(Low.size).setInt(H);}                                  // Size of half in elements
+     };
+    Low.setSize();                                                              // Set size of lower half
+
+
+    High  .T.at(High  .index    ).setInt(0);                                    // High takes the upper half
+    High  .T.at(High  .copyCount).setInt(H);                                    // Number of elements to copy into the target
+    Source.T.at(Source.index).setInt(Source.maxSize() - H);                     // Upper half
+    High  .copyKeys(Source);                                                    // Copy keys
+    High  .copyData(Source);                                                    // Copy data
+
+    P.new I()                                                                   // Set size of High
+     {void a() {High.T.at(High.size).setInt(H);}
+     };
+    High.setSize();
    }
 
 //D1 Print                                                                      // Print a stuck
@@ -1103,7 +1106,7 @@ Line T       At      Wide       Size    Indices        Value   Name
       int baseAt      () {return 0;}
      };
 
-    final StuckPA s = S.copy();
+    final StuckPA s = S.copyDef();
     s.P.new I() {void a() {s.base(M.at(c, M.at(a)).setOff().at);}};
 
     s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt(1);}}; s.push();
@@ -1493,6 +1496,66 @@ StuckSML(maxSize:8 size:8)
 """);
    }
 
+  static void test_split()
+   {z();
+    final MemoryLayoutPA m = new MemoryLayoutPA(1000);
+
+    final StuckPA s = new StuckPA("source", m)
+     {int maxSize     () {return  5;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
+    s.base(0);
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(1); s.T.at(s.tData).setInt( 2);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt( 4);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(3); s.T.at(s.tData).setInt( 6);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(4); s.T.at(s.tData).setInt( 8);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(5); s.T.at(s.tData).setInt(10);}}; s.push();
+    s.P.run(); s.P.clear();
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:5 size:5)
+  0 key:1 data:2
+  1 key:2 data:4
+  2 key:3 data:6
+  3 key:4 data:8
+  4 key:5 data:10
+""");
+
+    final StuckPA l = s.copyDef(), h = s.copyDef();
+    l.base(s.M.size()*1);
+    h.base(s.M.size()*2);
+    s.split(l, h);
+    s.P.run(); s.P.clear();
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:5 size:5)
+  0 key:1 data:2
+  1 key:2 data:4
+  2 key:3 data:6
+  3 key:4 data:8
+  4 key:5 data:10
+""");
+
+    //stop(l);
+    ok(l, """
+StuckSML(maxSize:5 size:2)
+  0 key:1 data:2
+  1 key:2 data:4
+""");
+
+    //stop(h);
+    ok(h, """
+StuckSML(maxSize:5 size:2)
+  0 key:4 data:8
+  1 key:5 data:10
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_load();
     test_clear();
@@ -1514,11 +1577,12 @@ StuckSML(maxSize:8 size:8)
     test_copy_keys_and_data();
     test_concatenate();
     test_prepend();
+    test_split();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_copy();
+   {oldTests();
+    test_split();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
