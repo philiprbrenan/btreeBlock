@@ -182,10 +182,10 @@ class MemoryLayoutPA extends Test                                               
   void copy(MemoryLayoutPA source)                                              // Copy all the bits from the source into the target as long as the source and target are the same size
    {z();
     if (size() != source.size()) stop("Memory layouts have different sizes");
+    final int N = size();
     P.new I()
      {void a()
-       {final int N = size();
-        for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
+       {for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
        }
      };
    }
