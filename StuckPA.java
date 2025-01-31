@@ -548,6 +548,54 @@ abstract class StuckPA extends Test                                             
     High.setSize();
    }
 
+  void splitLow(StuckPA Low)                                                    // Split out the lower half of a full stuck
+   {z(); action = "splitLow";
+    final int H = Low.maxSize()>>1;                                             // Should check theat Low, High, Source all have the same shape
+    final StuckPA Source = this;
+    checkSameProgram(Low);                                                      // Confirm that we are writing into the same program
+
+    Low.copy(Source);
+
+    P.new I()                                                                   // Set size of low
+     {void a() {Low.T.at(Low.size).setInt(Source.maxSize() - H);}               // Size of half in elements
+     };
+    Low.setSize();                                                              // Set size of lower half
+
+    Source.T.at(Source.index    ).setInt(0);                                    // High takes the upper half
+    Source.T.at(Source.copyCount).setInt(H);                                    // Number of elements to copy into the target
+    Low   .T.at(Low   .index    ).setInt(Source.maxSize() - H);                 // Upper half
+    Source.copyKeys(Low);                                                       // Copy keys
+    Source.copyData(Low);                                                       // Copy data
+
+    P.new I()                                                                   // Set size of low
+     {void a() {Source.T.at(Source.size).setInt(H);}
+     };
+    Source.setSize();
+   }
+
+  void splitHigh(StuckPA High)                                                  // Split out the upper half of a full stuck
+   {z(); action = "splitHigh";
+    final int H = High.maxSize()>>1;                                            // Should check theat Low, High, Source all have the same shape
+    final StuckPA Source = this;
+    checkSameProgram(High);                                                     // Confirm that we are writing into the same program
+
+    P.new I()                                                                   // Set size of low
+     {void a() {Source.T.at(Source.size).setInt(Source.maxSize() - H);}         // Size of half in elements
+     };
+    Source.setSize();                                                           // Set size of lower half in source
+
+    Source.T.at(Source.index    ).setInt(Source.maxSize() - H);                 // High takes the upper half
+    High  .T.at(Source.copyCount).setInt(H);                                    // Number of elements to copy into the target
+    High  .T.at(High  .index    ).setInt(0);                                    // Upper half
+    High.copyKeys(Source);                                                      // Copy keys
+    High.copyData(Source);                                                      // Copy data
+
+    P.new I()                                                                   // Set size of low
+     {void a() {High.T.at(High.size).setInt(H);}
+     };
+    High.setSize();
+   }
+
 //D1 Print                                                                      // Print a stuck
 
   public String print()
@@ -1556,6 +1604,106 @@ StuckSML(maxSize:5 size:2)
 """);
    }
 
+  static void test_split_low()
+   {z();
+    final MemoryLayoutPA m = new MemoryLayoutPA(1000);
+
+    final StuckPA s = new StuckPA("source", m)
+     {int maxSize     () {return  5;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
+    s.base(0);
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(1); s.T.at(s.tData).setInt( 2);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt( 4);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(3); s.T.at(s.tData).setInt( 6);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(4); s.T.at(s.tData).setInt( 8);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(5); s.T.at(s.tData).setInt(10);}}; s.push();
+    s.P.run(); s.P.clear();
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:5 size:5)
+  0 key:1 data:2
+  1 key:2 data:4
+  2 key:3 data:6
+  3 key:4 data:8
+  4 key:5 data:10
+""");
+
+    final StuckPA l = s.copyDef();
+    l.base(s.M.size()*1);
+    s.splitLow(l);
+    s.P.run(); s.P.clear();
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:5 size:2)
+  0 key:4 data:8
+  1 key:5 data:10
+""");
+
+    //stop(l);
+    ok(l, """
+StuckSML(maxSize:5 size:3)
+  0 key:1 data:2
+  1 key:2 data:4
+  2 key:3 data:6
+""");
+   }
+
+  static void test_split_high()
+   {z();
+    final MemoryLayoutPA m = new MemoryLayoutPA(1000);
+
+    final StuckPA s = new StuckPA("source", m)
+     {int maxSize     () {return  5;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
+    s.base(0);
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(1); s.T.at(s.tData).setInt( 2);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt( 4);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(3); s.T.at(s.tData).setInt( 6);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(4); s.T.at(s.tData).setInt( 8);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(5); s.T.at(s.tData).setInt(10);}}; s.push();
+    s.P.run(); s.P.clear();
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:5 size:5)
+  0 key:1 data:2
+  1 key:2 data:4
+  2 key:3 data:6
+  3 key:4 data:8
+  4 key:5 data:10
+""");
+
+    final StuckPA h = s.copyDef();
+    h.base(s.M.size()*1);
+    s.splitHigh(h);
+    s.P.run(); s.P.clear();
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:5 size:3)
+  0 key:1 data:2
+  1 key:2 data:4
+  2 key:3 data:6
+""");
+
+    //stop(h);
+    ok(h, """
+StuckSML(maxSize:5 size:2)
+  0 key:4 data:8
+  1 key:5 data:10
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_load();
     test_clear();
@@ -1578,11 +1726,13 @@ StuckSML(maxSize:5 size:2)
     test_concatenate();
     test_prepend();
     test_split();
+    test_split_low();
+    test_split_high();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
-    test_split();
+   {//oldTests();
+    test_split_high();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
