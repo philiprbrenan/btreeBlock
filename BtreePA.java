@@ -3,7 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-// Copy entire stuck in one go rather than keys and data separately
+// Is optimize() moving code inside then clauses?
 import java.util.*;
 import java.nio.file.*;
 
@@ -2227,7 +2227,7 @@ abstract class BtreePA extends Test                                             
 
     GenVerilog(String Project, String Folder)                                   // Generate verilog
      {project = Project; folder = Folder; program = P;
-      program.optimize();
+      //program.optimize();                                                     // Optimize not reliable enough yet and does not make a big enough differnce versus algorithmic improvements
 
       projectFolder = ""+Paths.get(folder, project, ""+Key());
       sourceVerilog = ""+Paths.get(projectFolder, project+Verilog.ext);
@@ -2236,6 +2236,7 @@ abstract class BtreePA extends Test                                             
               tFile = ""+Paths.get(projectFolder, "includes", "T"+Verilog.header);
           testsFile = ""+Paths.get(projectFolder, "tests.txt");
           traceFile = ""+Paths.get(projectFolder, "trace.txt");
+//    javaTraceFile = ""+Paths.get(projectFolder, "traceJavaGood.txt");
       javaTraceFile = ""+Paths.get(projectFolder, "traceJava.txt");
 
       makePath(projectFolder);
@@ -3301,7 +3302,7 @@ endmodule
       int Data    () {return    2;}                                             // Input data value
       int data    () {return    7;}                                             // Expected output data value
       int maxSteps() {return 2000;}                                             // Maximum number if execution steps
-      int expSteps() {return   93;}                                             // Expected number of steps
+      int expSteps() {return   96;}                                             // Expected number of steps
      };
     //say("AAAA11", t);
     //say("AAAA22", t.P);
@@ -3353,7 +3354,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 948, """
+    t.runVerilogDeleteTest(3, 6, 945, """
                     6           |
                     0           |
                     5           |
@@ -3365,7 +3366,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 849, """
+    t.runVerilogDeleteTest(4, 5, 846, """
              6           |
              0           |
              5           |
@@ -3377,7 +3378,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 902, """
+    t.runVerilogDeleteTest(2, 7, 906, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3385,7 +3386,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 697, """
+    t.runVerilogDeleteTest(1, 8, 699, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3393,7 +3394,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 417, """
+    t.runVerilogDeleteTest(5, 4, 419, """
       7      |
       0      |
       1      |
@@ -3401,7 +3402,7 @@ endmodule
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(6, 3, 379, """
+    t.runVerilogDeleteTest(6, 3, 384, """
     7      |
     0      |
     1      |
@@ -3409,7 +3410,7 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 565, """
+    t.runVerilogDeleteTest(7, 2, 554, """
 8,9=0 |
 """);
 
@@ -3455,7 +3456,7 @@ endmodule
       int Data    () {return    3;}                                             // Input key value
       int data    () {return    0;}                                             // Expected output data value
       int maxSteps() {return 2000;}                                             // Maximum number if execution steps
-      int expSteps() {return  984;}                                             // Expected number of steps
+      int expSteps() {return  985;}                                             // Expected number of steps
      };
     //stop(t);
     ok(t, """
@@ -3511,4 +3512,3 @@ endmodule
      }
    }
  }
-// git status; git add *; git commit -m "aaa"; git push

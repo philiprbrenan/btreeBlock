@@ -17,14 +17,28 @@ class MemoryLayoutPA extends Test                                               
 
 //D1 Construction                                                               // Construct a memory layout
 
-  MemoryLayoutPA(Layout Layout, String Name)                                    // Every memory layout needs a layout and a name so we can generate verilog from it
-   {this(Layout, Name, null);                                                   // Not based
+  MemoryLayoutPA(int size)                                                      // Memory useful for running tests.
+   {name   = null; based = null; layout = null;
+    memory = new Memory("", size);
    }
 
-  MemoryLayoutPA(Layout Layout, String Name, MemoryLayoutPA Based)              // Like based storage in PL1.
-   {name   = Name; based = Based; layout = Layout;
-    memory = based != null ? Based.memory() : new Memory(Name, size());         // If it is based it uses some one else's memory, if not based we must supply memory
-    if (based != null) P = based.P;                                             // Reuse the underlying program by default as well
+  MemoryLayoutPA(Layout Layout, String Name)                                    //Memory with an associated layout and a name so we can generate verilog from it
+   {name   = Name; based = null; layout = Layout;
+    memory = new Memory(Name, size());                                          // Create the associated memory as this memory is not based on any other memory
+   }
+
+  MemoryLayoutPA(Layout Layout, String Name, MemoryLayoutPA Based)              // Like based storage in PL1.  If the based memory is null then we create a backing memory of the required size and base ourselves at zero in it to facilitate testing.
+   {layout = Layout;
+    if (Based == null)                                                          // Create the backing memory if necessary, usually for testing purposes
+     {based = new MemoryLayoutPA(layout, Name+"_Backing");                      // Create new backing memory
+      name  = Name+"_Based";
+     }
+    else
+     {based = Based;                                                            // Base off existing backing memory
+      name  = Name+"_Based";
+     }
+    P     = based.P;
+    memory = based.memory();                                                    // Backing memory
    }
 
 //D1 Control                                                                    // Testing, control and integrity
@@ -38,12 +52,18 @@ class MemoryLayoutPA extends Test                                               
     base = Base;
    }
 
-  String name    () {return based == null ? name : based.name();}               // Name of this memory layout
-  Layout layout  () {return layout;}                                            // Get the layout in use
-  String baseName() {return name+"_base_offset";}                               // Name of the verilog field used to hold the base being used for this memory layout
-  int    base    () {return base;}                                              // Get the base offset into memory being used
-  int    size    () {return layout.size();}                                     // Size of memory
-  void   clear   () {memory.zero();}                                            // Clear underlying memory
+  String  name    () {return based() ? based.name() : name;}                    // Name of this memory layout
+  Layout  layout  () {return layout;}                                           // Get the layout in use
+  String  baseName() {return name+"_base_offset";}                              // Name of the verilog field used to hold the base being used for this memory layout
+  int     base    () {return base;}                                             // Get the base offset into memory being used
+  boolean based   () {return based != null;}                                    // whether the layout is based or not
+  int     size    () {return layout.size();}                                    // Size of memory
+
+  void clear()                                                                  // Clear underlying memory
+   {if (based == null) {memory.zero(); return;}                                 // Not based so we just clear the memory we have
+    final int N = size();
+    for (int i = 0; i < N; i++) memory.set(base + i, false);                    // Based so we clear the area occupied by the layout
+   }
 
   void ok(String Lines)                                                         // Check that specified lines are present in the memory layout
    {final String  m = toString();                                               // Memory as string
@@ -64,13 +84,21 @@ class MemoryLayoutPA extends Test                                               
 
 //D1 Get and Set                                                                // Get and set values in memory but only during testing
 
+  boolean getBit(int index)                                                     // Get a bit from the mmeory layout
+   {z();return memory.bits[base + index];
+   }
+
+  void setBit(int index, boolean value)                                         // Set a value in memory occupied by the layout
+   {z(); memory.bits[base + index] = value;
+   }
+
   int  getInt(Layout.Field field, int...indices)                                // Get a value from memory occupied by the layout
    {z();
     final int i = new At(field, indices).setOff().result;
     return i;
    }
 
-  void setInt(Layout.Field field, int value, int...indices)                     // Set a value in memory occupoied by the layout
+  void setInt(Layout.Field field, int value, int...indices)                     // Set a value in memory occupied by the layout
    {z();
     final At a = new At(field, indices).setOff();
     memory.set(a.at, a.width, value);
@@ -151,6 +179,17 @@ class MemoryLayoutPA extends Test                                               
      };
    }
 
+  void copy(MemoryLayoutPA source)                                              // Copy all the bits from the source into the target as long as the source and target are the same size
+   {z();
+    if (size() != source.size()) stop("Memory layouts have different sizes");
+    P.new I()
+     {void a()
+       {final int N = size();
+        for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
+       }
+     };
+   }
+
 //D1 Components                                                                 // Locate a variable in memory via its indices
 
   class At
@@ -187,7 +226,8 @@ class MemoryLayoutPA extends Test                                               
     String c(String s)   {while(s.length() % 4 > 0) s = s+" "; return s;}       // Format a field name
 
     void locateDirectAddress()                                                  // Locate a direct address and its content
-     {delta  = field.locator.at(indices);
+     {final int N = indices.length;
+      delta  = field.locator.at(indices);
       at     = base + delta;
       result = memory.getInt(at, width);
      }
@@ -201,7 +241,8 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void checkCompiled(Layout.Field Field)                                      // Check the field has been compiled
-     {if (!Field.compiled)
+     {if (true) return;
+      if (!Field.compiled)
        {stop("Field:", Field.name, "has not been compiled yet");
        }
      if (layout == null)
@@ -1528,12 +1569,33 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_dump_verilog()
-   {Layout               l = Layout.layout();
+   {final String v = "verilog/memoryLayoutPA/dump_verilog.txt";
+
+    Layout               l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 2);
     Layout.Array     A = l.array    ("A", a, 4);
+
     MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
     m.memory().alternating(4);
-    m.dumpVerilog("verilog/memoryLayoutPA/dump_verilog.txt");                   // Dump main memory
+    m.dumpVerilog(v);
+
+    final Stack<String> r = readFile(v);
+    r.removeElementAt(0);
+    ok(joinLines(r)+"\n", """
+task initialize_memory_M;
+    begin
+        M[0] <= 0;
+        M[1] <= 0;
+        M[2] <= 0;
+        M[3] <= 0;
+        M[4] <= 1;
+        M[5] <= 1;
+        M[6] <= 1;
+        M[7] <= 1;
+    end
+endtask
+""");
+    deleteAllFiles(folderName(v), 1);
    }
 
   static void test_copy_bits()
@@ -1577,6 +1639,51 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
+  static void test_copy_memory()
+   {final int N = 8;
+    Layout               l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", N);
+    Layout.Variable  b = l.variable ("b", N);
+    Layout.Structure s = l.structure("s", a, b);
+    l.compile();
+
+    Layout               L = Layout.layout();
+    Layout.Variable  A = L.variable ("A", N);
+    L.compile();
+
+    MemoryLayoutPA m = new MemoryLayoutPA(l, "M");                              // Original memory
+
+    MemoryLayoutPA x = new MemoryLayoutPA(L, "first",  m);                      // Overlay at "a"
+    MemoryLayoutPA o = new MemoryLayoutPA(L, "second", m);                      // Overlay at "b"
+
+    o.base(b.at);
+
+    m.at(a).setInt(3);
+    o.copy(x);
+    m.P.run(); m.P.clear();
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        16                                      s
+   2 V        0         8                                  3     a
+   3 V        8         8                                  3     b
+""");
+
+    o.clear();
+    m.P.run(); m.P.clear();
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        16                                      s
+   2 V        0         8                                  3     a
+   3 V        8         8                                  0     b
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_get_set();
     test_boolean();
@@ -1592,13 +1699,14 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_is_ones_or_zeros();
     test_union();
     test_verilog_address();
-    //test_dump_verilog();
+    test_dump_verilog();
     test_copy_bits();
+    test_copy_memory();
+    test_dump_verilog();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_copy_bits();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program

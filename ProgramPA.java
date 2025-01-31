@@ -16,6 +16,8 @@ class ProgramPA extends Test                                                    
   Stack<Label>  labels = new Stack<>();                                         // Labels for some instructions
   Memory   traceMemory;                                                         // Labels for some instructions
   final Stack<String> Trace = new Stack<>();                                    // Trace execution steps
+  static int   numbers = 0;                                                     // Program numbers
+  final  int    number = ++numbers;                                              // Program number
 
   ProgramPA() {}                                                                // Create a program that instructions can be added to and then executed
 
@@ -34,7 +36,7 @@ class ProgramPA extends Test                                                    
 
   class I implements Comparable<I>                                              // Instruction definition
    {int instructionNumber;                                                      // Instruction number
-    final String traceBack = traceBack();                                       // Location of code that defined this instruction
+    final String traceBack;                                                     // Location of code that defined this instruction
     final TreeSet<String>outputs = new TreeSet<>();                             // The set of outputs written by this instruction
     final TreeSet<String> inputs = new TreeSet<>();                             // The set of inputs read by this instruction
     final TreeSet<I>      merged = new TreeSet<>();                             // The referenced instructions can eb executed at the same time as this one
@@ -43,7 +45,8 @@ class ProgramPA extends Test                                                    
     boolean mightJump;                                                          // This instruction might change the flow of control
 
     I()                                                                         // Define an instruction
-     {if (running) stop("Cannot define instructions during program execution",
+     {traceBack = traceBack();                                                  // Location of code that defined this instruction
+      if (running) stop("Cannot define instructions during program execution",
         traceBack);
       instructionNumber = code.size(); code.push(this);
      }
@@ -108,7 +111,7 @@ class ProgramPA extends Test                                                    
     for (Label l : labels) ls.add(l.instruction);                               // Values of labels as sets
 
 //  for (step = 1; step < N; step++)                                            // Move each instruction back as far as it will go without colliding with a prior instruction
-    for (step = N-1; step > 0; step--)                                           // Move each instruction back as far as it will go without colliding with a prior instruction
+    for (step = N-1; step > 0; step--)                                          // Move each instruction back as far as it will go without colliding with a prior instruction
      {if (ls.contains(step)) continue;                                          // This instruction might be a target of a jump
       final I s = code.elementAt(step);                                         // Source instruction that we want to merge into  a target instruction
       if (!s.mergeableInstruction) continue;                                    // Cannot merge this instruction
@@ -139,7 +142,7 @@ class ProgramPA extends Test                                                    
      }
    }
 
-  void run(String traceFile)                                                    // Run the program tracin to the named file
+  void run(String traceFile)                                                    // Run the program tracing to the named file
    {z();
     Trace.clear();
     running = true;
@@ -160,7 +163,7 @@ class ProgramPA extends Test                                                    
    {run("trace/"+currentTestName()+".txt");
    }
 
-  void halt(Object...O)                                                         // Halt execution with an explanatory message and traceback of current instruction
+  void halt(final Object...O)                                                   // Halt execution with an explanatory message and traceback of current instruction
    {z();
     final String m = "/* "+saySb(O).toString()+" */";
     new I()
