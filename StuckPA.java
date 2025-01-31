@@ -483,7 +483,7 @@ abstract class StuckPA extends Test                                             
     final StuckPA Target = this;
     size(); Source.size();                                                      // Get the size of the stucks
 
-    Source.T.at(Source.index    ).setInt(0);                                    // Start at start of source
+    Source.T.setIntInstruction(Source.index, 0);                                // Start at start of source
     Target.T.at(Target.index    ).move(Target.T.at(Target.size));               // Extend target
     Target.T.at(Target.copyCount).move(Source.T.at(Source.size));               // Number of elements to copy into the target
     Target.copyKeys(Source);                                                    // Copy keys
@@ -504,7 +504,7 @@ abstract class StuckPA extends Test                                             
     final StuckPA Target = this;
     size(); Source.size();                                                      // Get the size of the stucks
 
-    Target.T.at(Target.index    ).setInt(0);                                    // Concatenate the target to the source
+    Target.T.setIntInstruction(Target.index, 0);                                // Concatenate the target to the source
     Source.T.at(Source.index    ).move(Source.T.at(Source.size));               // Extend source
     Source.T.at(Source.copyCount).move(Target.T.at(Target.size));               // Number of elements to copy into the target
     Source.copyKeys(Target);                                                    // Copy keys
@@ -536,15 +536,13 @@ abstract class StuckPA extends Test                                             
     Low.setSize();                                                              // Set size of lower half
 
 
-    High  .T.at(High  .index    ).setInt(0);                                    // High takes the upper half
-    High  .T.at(High  .copyCount).setInt(H);                                    // Number of elements to copy into the target
-    Source.T.at(Source.index).setInt(Source.maxSize() - H);                     // Upper half
+    High  .T.setIntInstruction(High.index    , 0);                              // High takes the upper half
+    High  .T.setIntInstruction(High.copyCount, H);                              // Number of elements to copy into the target
+    Source.T.setIntInstruction(Source.index, Source.maxSize() - H);             // Upper half
     High  .copyKeys(Source);                                                    // Copy keys
     High  .copyData(Source);                                                    // Copy data
 
-    P.new I()                                                                   // Set size of High
-     {void a() {High.T.at(High.size).setInt(H);}
-     };
+    High.T.setIntInstruction(High.size, H);
     High.setSize();
    }
 
@@ -556,9 +554,7 @@ abstract class StuckPA extends Test                                             
 
     Low.copy(Source);
 
-    P.new I()                                                                   // Set size of low
-     {void a() {Low.T.at(Low.size).setInt(Source.maxSize() - H);}               // Size of half in elements
-     };
+    Low.T.setIntInstruction(Low.size, Source.maxSize() - H);                    // Size of half in elements
     Low.setSize();                                                              // Set size of lower half
 
     Source.T.at(Source.index    ).setInt(0);                                    // High takes the upper half
@@ -1731,7 +1727,7 @@ StuckSML(maxSize:5 size:2)
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
+   {oldTests();
     test_split_high();
    }
 
