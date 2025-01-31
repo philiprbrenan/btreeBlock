@@ -15,6 +15,9 @@ abstract class StuckPA extends Test                                             
   final MemoryLayoutPA C;                                                       // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
   final MemoryLayoutPA T;                                                       // Memory for transaction intermediates
   ProgramPA            P = new ProgramPA();                                     // The program to be written to to describe the actions on the stuck.  The caller can provide a different one as this field is not final
+  final static boolean Assert = false;                                          // Whether asserts should be executed or not
+  static boolean   debug;                                                       // Debug when true
+  String          action;                                                       // Last action performed
 
   Layout.Variable         sKey;                                                 // Key in a stuck
   Layout.Array            Keys;                                                 // Array of keys
@@ -37,20 +40,17 @@ abstract class StuckPA extends Test                                             
   Layout.Variable     copyBits;                                                 // Number of bits to copy in a copy operation
   Layout.Structure        temp;                                                 // Transaction intermediate fields
 
-  String action;                                                                // Last action performed
-  static boolean debug;                                                         // Debug when true
-
 //D1 Construction                                                               // Create a stuck
 
   StuckPA(String Name)                                                          // Create the stuck with a maximum number of the specified elements
    {this(Name, null);
    }
 
-  StuckPA(String Name, MemoryLayoutPA based)                                    // Create the stuck with a maximum number of the specified elements
-   {z();
-    name = Name;
+  StuckPA(String Name, MemoryLayoutPA Based)                                    // Create the stuck with a maximum number of the specified elements
+   {z(); name = Name;
     final Layout layout = layout(), tl = transactionLayout();                   // Layout out the stuck
-    M = new MemoryLayoutPA(layout, name+"_StuckSA_Memory",     based);          // Memory for stuck
+    if (Based != null && Based.based()) M = Based;                              // Some usable memory has been supplied
+    else M = new MemoryLayoutPA(layout, Name+"_StuckSA_Memory", Based);         // No memory has been supplied, so create some memory and then base off it to assist in testing.
     C = new MemoryLayoutPA(layout, name+"_StuckSA_Copy");                       // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
     T = new MemoryLayoutPA(tl,     name+"_StuckSA_Transaction");                // Memory for transaction intermediates
 
@@ -148,33 +148,36 @@ abstract class StuckPA extends Test                                             
 
   void assertNotFull()                                                          // Assert the stuck is not full
    {z();
-   final StuckPA t = this;
-    P.new If(T.at(isFull))
-     {void Then()
-       {P.halt("Stuck full");
-       }
-     };
+    if (Assert)
+     {P.new If(T.at(isFull))
+       {void Then() {P.halt("Stuck full");}
+       };
+     }
    }
 
   void assertNotEmpty()                                                         // Assert the stuck is not empty
    {z();
-    P.new If(T.at(isEmpty))
-     {void Then() {P.halt("Empty");}
-     };
+    if (Assert)
+     {P.new If(T.at(isEmpty))
+       {void Then() {P.halt("Empty");}
+       };
+     }
    }
 
   void assertInNormal()                                                         // Check that the index would yield a valid element
    {z();
-    P.new I()
-     {void a()
-       {final int i = T.at(index).getInt();
-        final int n = T.at(size) .getInt();
-        if (i < 0 || i >= n) stop("Out of normal range",   i, "for size", n, traceBack);
-       }
-      String v()
-       {return "/* assertInNormal */";
-       }
-     };
+    if (Assert)
+     {P.new I()
+       {void a()
+         {final int i = T.at(index).getInt();
+          final int n = T.at(size) .getInt();
+          if (i < 0 || i >= n) stop("Out of normal range",   i, "for size", n, traceBack);
+         }
+        String v()
+         {return "/* assertInNormal */";
+         }
+       };
+     }
    }
 
   void copyKeys(StuckPA source)                                                 // Copy the specified number of elements from the source array of keys at the specified index into the target array of keys at the specified target index
@@ -193,16 +196,18 @@ abstract class StuckPA extends Test                                             
 
   void assertInExtended()                                                       // Check that the index would yield a valid element
    {z();
-    P.new I()
-     {void a()
-       {final int i = T.at(index).getInt();
-        final int n = T.at(size) .getInt();
-        if (i < 0 || i > n) stop("Out of extended range", i, "for size", n, traceBack);
-       }
-      String v()
-       {return "/* assertInEXtended */";
-       }
-     };
+    if (Assert)                                                                 // Delete fails
+     {P.new I()
+       {void a()
+         {final int i = T.at(index).getInt();
+          final int n = T.at(size) .getInt();
+          if (i < 0 || i > n) stop("Out of extended range", i, "for size", n, traceBack);
+         }
+        String v()
+         {return "/* assertInEXtended */";
+         }
+       };
+     }
    }
 
   void inc()                                                                    // Increment the current size
@@ -456,8 +461,18 @@ abstract class StuckPA extends Test                                             
 
 //D1 Merge and Split                                                            // Merge and split stucks
 
-  void concatenate(StuckPA Source)                                              // Concatenate two stucks placing the source at the end of the target while not modifying the source
+  void checkSameProgram(StuckPA source)                                         // Confirm that we are writing into the same program
+   {final int p = P.number;
+    if (p != source.M.P.number) stop("Mismatched programs");
+    if (p != source.T.P.number) stop("Mismatched programs");
+    if (p != source.P.number)   stop("Mismatched programs");
+    if (p != M.P.number)        stop("Mismatched programs");
+    if (p != T.P.number)        stop("Mismatched programs");
+   }
+
+  void concatenate(StuckPA Source)                                              // Concatenate two stucks placing the source at the end of the target while not modifying the source.
    {z(); action = "concatenate";
+    checkSameProgram(Source);                                                   // Confirm that we are writing into the same program
     final StuckPA Target = this;
     size(); Source.size();                                                      // Get the size of the stucks
 
@@ -478,6 +493,7 @@ abstract class StuckPA extends Test                                             
 
   void prepend(StuckPA Source)                                                  // Concatenate two stucks placing the source at the start of the target while (apparently) not modifying the target
    {z(); action = "prepend";
+    checkSameProgram(Source);                                                   // Confirm that we are writing into the same program
     final StuckPA Target = this;
     size(); Source.size();                                                      // Get the size of the stucks
 
@@ -487,12 +503,7 @@ abstract class StuckPA extends Test                                             
     Source.copyKeys(Target);                                                    // Copy keys
     Source.copyData(Target);                                                    // Copy data
 
-    Target.T.at(Target.index    ).setInt(0);                                    // Copy the source to the target leaving the lenmgth of the source unchanged so it looks as if it has not been changed
-    Source.T.at(Source.index    ).setInt(0);                                    // Extend source
-    Source.T.at(Source.copyCount).move(Target.T.at(Target.size));               // Number of elements to copy into the target
-    Source.copyKeys(Target);                                                    // Copy keys
-    Source.copyData(Target);                                                    // Copy data
-
+    Target.M.copy(Source.M);                                                    // Copy the source to the target leaving the length of the source unchanged so it looks as if it has not been changed
 
     P.new I()                                                                   // Update size of target
      {void a()
@@ -536,40 +547,19 @@ abstract class StuckPA extends Test                                             
     return t.toString();
    }
 
-//D1 Testing                                                                    // Test the stuck
+//D0 Testing                                                                    // Test the stuck
 
   static StuckPA stuckPA()                                                      // Create a sample stuck
    {z();
-    final int   offset = 16;                                                    // To make testing more relevant
-    final StuckPA    S = new StuckPA("original")
+    return  new StuckPA("original")
      {int maxSize     () {return  8;}
       int bitsPerKey  () {return 16;}
       int bitsPerData () {return 16;}
       int bitsPerSize () {return 16;}
      };
-
-    Layout           l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", S.M.layout.size()+offset);
-    l.compile();
-
-    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
-
-    final StuckPA    T = new StuckPA("copyable", m)
-     {int maxSize     () {return  8;}
-      int bitsPerKey  () {return 16;}
-      int bitsPerData () {return 16;}
-      int bitsPerSize () {return 16;}
-     };
-
-    final StuckPA    t =  T.copy();
-    t.base(offset);
-
-    return t;
    }
 
   public void ok(String expected) {ok(toString(), expected);}                   // Check the stuck
-
-//D0 Tests                                                                      // Test stuck
 
   static StuckPA test_load()
    {StuckPA s = stuckPA();
@@ -613,36 +603,36 @@ StuckSML(maxSize:8 size:4)
     s.P.run();
     //stop(s.M);
     ok(""+s.M, """
-MemoryLayout: copyable_StuckSA_Memory
-Memory      : M
+MemoryLayout: original_StuckSA_Memory_Based
+Memory      : original_StuckSA_Memory_Backing
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S       16       272                                      stuck
-   2 V       16        16                                  4     currentSize
-   3 A       32       128          8                             Keys
-   4 V       32        16               0                 15       key
-   5 V       48        16               1                 14       key
-   6 V       64        16               2                 13       key
-   7 V       80        16               3                 12       key
-   8 V       96        16               4                  0       key
-   9 V      112        16               5                  0       key
-  10 V      128        16               6                  0       key
-  11 V      144        16               7                  0       key
-  12 A      160       128          8                             Data
-  13 V      160        16               0                  9       data
-  14 V      176        16               1                 10       data
-  15 V      192        16               2                 11       data
-  16 V      208        16               3                 12       data
-  17 V      224        16               4                  0       data
-  18 V      240        16               5                  0       data
-  19 V      256        16               6                  0       data
-  20 V      272        16               7                  0       data
+   1 S        0       272                                      stuck
+   2 V        0        16                                  4     currentSize
+   3 A       16       128          8                             Keys
+   4 V       16        16               0                 15       key
+   5 V       32        16               1                 14       key
+   6 V       48        16               2                 13       key
+   7 V       64        16               3                 12       key
+   8 V       80        16               4                  0       key
+   9 V       96        16               5                  0       key
+  10 V      112        16               6                  0       key
+  11 V      128        16               7                  0       key
+  12 A      144       128          8                             Data
+  13 V      144        16               0                  9       data
+  14 V      160        16               1                 10       data
+  15 V      176        16               2                 11       data
+  16 V      192        16               3                 12       data
+  17 V      208        16               4                  0       data
+  18 V      224        16               5                  0       data
+  19 V      240        16               6                  0       data
+  20 V      256        16               7                  0       data
 """);
-    //stop(s.memoryLayout.memory);
+    //stop(s.M.memory());
     ok(s.M.memory(), """
-Memory: M
+Memory: original_StuckSA_Memory_Backing
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
-   0  0000 0000 000c 000b 000a 0009 0000 0000 0000 0000 000c 000d 000e 000f 0004 0000
+   0  0000 0000 0000 000c 000b 000a 0009 0000 0000 0000 0000 000c 000d 000e 000f 0004
    1  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
 """);
 
@@ -663,9 +653,12 @@ StuckSML(maxSize:8 size:4)
     s.T.at(s.tKey).setInt( 9); s.T.at(s.tData  ).setInt( 9); s.push();
     s.T.at(s.tKey).setInt( 8); s.T.at(s.tData  ).setInt( 8); s.push();
     s.P.new I() {void a() {ok(s.T.at(s.isFull  ).getInt() == 1);}};
-    s.P.new I() {void a() {sayThisOrStop("Stuck full");}};
-    s.T.at(s.tKey).setInt(7); s.T.at(s.tData).setInt(7); s.push();
-    try {s.P.run();} catch(RuntimeException e) {}
+
+    if (Assert)
+     {s.P.new I() {void a() {sayThisOrStop("Stuck full");}};
+      s.T.at(s.tKey).setInt(7); s.T.at(s.tData).setInt(7); s.push();            // Will produce a traceback clickable in Geany because the stuck is now full
+      try {s.P.run();} catch(RuntimeException e) {}
+     }
    }
 
   static void test_pop()
@@ -689,9 +682,12 @@ StuckSML(maxSize:8 size:3)
     s.P.new I() {void a() {ok(s.T.at(s.isEmpty).getInt() == 0);}};
     s.clear();
     s.P.new I() {void a() {ok(s.T.at(s.isEmpty).getInt() == 1);}};
-    s.P.new I() {void a() {sayThisOrStop("Empty");}};
-    s.pop();
-    try {s.P.run();} catch(RuntimeException e) {}
+
+    if (Assert)
+     {s.P.new I() {void a() {sayThisOrStop("Empty");}};
+      s.pop();
+      try {s.P.run();} catch(RuntimeException e) {}
+     }
    }
 
   static void test_shift()
@@ -714,9 +710,11 @@ StuckSML(maxSize:8 size:3)
     s.clear();
     s.P.run(); s.P.clear();
     ok(s.T.at(s.isEmpty).getInt() == 1);
-    sayThisOrStop("Empty");
-    s.pop();
-    try {s.P.run();} catch(RuntimeException e) {}
+    if (Assert)
+     {sayThisOrStop("Empty");
+      s.pop();
+      try {s.P.run();} catch(RuntimeException e) {}
+     }
    }
 
   static void test_unshift()
@@ -744,9 +742,11 @@ StuckSML(maxSize:8 size:5)
     s.unshift(); s.unshift(); s.unshift();
     s.P.run(); s.P.clear();
     ok(s.T.at(s.isFull).getInt() == 1);
-    sayThisOrStop("Stuck full");
-    s.unshift();
-    try {s.P.run();} catch(RuntimeException e) {}
+    if (Assert)
+     {sayThisOrStop("Stuck full");
+      s.unshift();
+      try {s.P.run();} catch(RuntimeException e) {}
+     }
    }
 
   static void test_elementAt()
@@ -761,13 +761,18 @@ Transaction(action:elementAt search:0 limit:0 found:1 index:2 key:6 data:3 size:
 """);
 
     s.T.at(s.index).setInt(-2);
-    sayThisOrStop("Out of normal range 65534 for size 4");
-    s.elementAt();
-    try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
 
-    s.T.at(s.index).setInt(4);
-    sayThisOrStop("Out of normal range 4 for size 4");
-    try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
+    if (Assert)
+     {sayThisOrStop("Out of normal range 65534 for size 4");
+      s.elementAt();
+      try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
+     }
+
+    if (Assert)
+     {s.T.at(s.index).setInt(4);
+      sayThisOrStop("Out of normal range 4 for size 4");
+      try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
+     }
    }
 
   static void test_set_element_at()
@@ -803,14 +808,19 @@ StuckSML(maxSize:8 size:5)
 """);
 
     s.P.new I() {void a() {s.T.at(s.index).setInt(-2);}};
-    sayThisOrStop("Out of normal range 65534 for size 5");
-    s.setElementAt();
-    try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
 
-    s.P.new I() {void a() {s.T.at(s.index).setInt(6);}};
-    sayThisOrStop("Out of normal range 6 for size 5");
-    s.setElementAt();
-    try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
+    if (Assert)
+     {sayThisOrStop("Out of normal range 65534 for size 5");
+      s.setElementAt();
+      try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
+     }
+
+    if (Assert)
+     {s.P.new I() {void a() {s.T.at(s.index).setInt(6);}};
+      sayThisOrStop("Out of normal range 6 for size 5");
+      s.setElementAt();
+      try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
+     }
    }
 
   static void test_insert_element_at()
@@ -848,9 +858,12 @@ StuckSML(maxSize:8 size:6)
 """);
 
     s.P.new I() {void a() {s.T.at(s.index).setInt(7);}};
-    sayThisOrStop("Out of extended range 7 for size 6");
-    s.insertElementAt();
-    try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
+
+    if (Assert)
+     {sayThisOrStop("Out of extended range 7 for size 6");
+      s.insertElementAt();
+      try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
+     }
    }
 
   static void test_remove_element_at()
@@ -873,9 +886,12 @@ StuckSML(maxSize:8 size:3)
 """);
 
     s.P.new I() {void a() {s.T.at(s.index).setInt(3);}};
-    sayThisOrStop("Out of normal range 3 for size 3");
-    s.removeElementAt();
-    try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
+
+    if (Assert)
+     {sayThisOrStop("Out of normal range 3 for size 3");
+      s.removeElementAt();
+      try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
+     }
    }
 
   static void test_first_last()
@@ -896,9 +912,11 @@ Transaction(action:lastElement search:0 limit:0 found:1 index:3 key:8 data:4 siz
 """);
 
     s.clear();
-    sayThisOrStop("Empty");
-    s.firstElement();
-    try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
+    if (Assert)
+     {sayThisOrStop("Empty");
+      s.firstElement();
+      try {s.P.run();} catch(RuntimeException e) {} finally {s.P.clear();}
+     }
    }
 
   static void test_search()
@@ -1066,7 +1084,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(s.M);
     ok(s.M, """
-MemoryLayout: test_StuckSA_Memory
+MemoryLayout: test_StuckSA_Memory_Based
 Memory      : M
 Line T       At      Wide       Size    Indices        Value   Name
    1 S       32        72                                      stuck
@@ -1125,7 +1143,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     s.P.run(); s.P.clear();
     //stop(s.M);
     ok(s.M.toString(), """
-MemoryLayout: test_StuckSA_Memory
+MemoryLayout: test_StuckSA_Memory_Based
 Memory      : M
 Line T       At      Wide       Size    Indices        Value   Name
    1 S      104        72                                      stuck
@@ -1178,7 +1196,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     //stop(s.M);
     ok(s.M, """
-MemoryLayout: test_StuckSA_Memory
+MemoryLayout: test_StuckSA_Memory_Based
 Memory      : M
 Line T       At      Wide       Size    Indices        Value   Name
    1 S      104        72                                      stuck
@@ -1233,7 +1251,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
     t.P.run(); t.P.clear();
 
     ok(s.M.memory(), """
-Memory: source_StuckSA_Memory
+Memory: source_StuckSA_Memory_Backing
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0004 0003 0002 0001 0000 0000 0000 0000 0008 0006 0004 0002 0004
@@ -1241,7 +1259,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 """);
 
     ok(t.M.memory(), """
-Memory: target_StuckSA_Memory
+Memory: target_StuckSA_Memory_Backing
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0006 0004 0000 0000 0000
@@ -1252,7 +1270,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
     t.copyData(s);
     t.P.run(); t.P.clear();
     ok(t.M.memory(), """
-Memory: target_StuckSA_Memory
+Memory: target_StuckSA_Memory_Backing
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0002 0000 0000 0000 0000 0000 0000 0006 0004 0000 0000 0000
@@ -1275,7 +1293,8 @@ StuckSML(maxSize:8 size:5)
 
   static void test_concatenate()
    {z();
-    final StuckPA s = new StuckPA("source")
+    final MemoryLayoutPA m = new MemoryLayoutPA(1000);
+    final StuckPA s = new StuckPA("source", m)
      {int maxSize     () {return  8;}
       int bitsPerKey  () {return 16;}
       int bitsPerData () {return 16;}
@@ -1297,12 +1316,14 @@ StuckSML(maxSize:8 size:4)
   3 key:8 data:8
 """);
 
-    final StuckPA t = new StuckPA("source")
+    final StuckPA t = new StuckPA("target", m)
      {int maxSize     () {return s.maxSize     ();}
       int bitsPerKey  () {return s.bitsPerKey  ();}
       int bitsPerData () {return s.bitsPerData ();}
       int bitsPerSize () {return s.bitsPerSize ();}
      };
+
+    t.base(s.M.layout.size());
 
     t.P.new I() {void a() {t.T.at(t.tKey).setInt(1); t.T.at(t.tData).setInt(1);}}; t.push();
     t.P.new I() {void a() {t.T.at(t.tKey).setInt(2); t.T.at(t.tData).setInt(2);}}; t.push();
@@ -1338,14 +1359,16 @@ StuckSML(maxSize:8 size:8)
 
   static void test_prepend()
    {z();
-    if (true) return;
-    final StuckPA s = new StuckPA("source")
+    final MemoryLayoutPA m = new MemoryLayoutPA(1000);
+
+    final StuckPA s = new StuckPA("source", m)
      {int maxSize     () {return  8;}
       int bitsPerKey  () {return 16;}
       int bitsPerData () {return 16;}
       int bitsPerSize () {return 16;}
      };
 
+    s.base(0);
     s.P.new I() {void a() {s.T.at(s.tKey).setInt(5); s.T.at(s.tData).setInt(5);}}; s.push();
     s.P.new I() {void a() {s.T.at(s.tKey).setInt(6); s.T.at(s.tData).setInt(6);}}; s.push();
     s.P.new I() {void a() {s.T.at(s.tKey).setInt(7); s.T.at(s.tData).setInt(7);}}; s.push();
@@ -1361,13 +1384,14 @@ StuckSML(maxSize:8 size:4)
   3 key:8 data:8
 """);
 
-    final StuckPA t = new StuckPA("source")
+    final StuckPA t = new StuckPA("target", m)
      {int maxSize     () {return s.maxSize     ();}
       int bitsPerKey  () {return s.bitsPerKey  ();}
       int bitsPerData () {return s.bitsPerData ();}
       int bitsPerSize () {return s.bitsPerSize ();}
      };
 
+    t.base(s.M.layout.size());
     t.P.new I() {void a() {t.T.at(t.tKey).setInt(1); t.T.at(t.tData).setInt(1);}}; t.push();
     t.P.new I() {void a() {t.T.at(t.tKey).setInt(2); t.T.at(t.tData).setInt(2);}}; t.push();
     t.P.new I() {void a() {t.T.at(t.tKey).setInt(3); t.T.at(t.tData).setInt(3);}}; t.push();
@@ -1386,6 +1410,7 @@ StuckSML(maxSize:8 size:4)
     t.prepend(s);
     t.P.run(); t.P.clear();
 
+    //stop(s.M);
     //stop(t);
     ok(t, """
 StuckSML(maxSize:8 size:8)
@@ -1423,7 +1448,8 @@ StuckSML(maxSize:8 size:8)
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
+   {oldTests();
+    test_concatenate();
     test_prepend();
    }
 
