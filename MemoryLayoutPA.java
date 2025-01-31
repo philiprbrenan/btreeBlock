@@ -119,7 +119,7 @@ class MemoryLayoutPA extends Test                                               
    }
 
   void setIntInstruction(Layout.Field field1, int value1,                       // Set values in memory occupied by the layout
-                         Layout.Field field2, int value2)                         // Set a value in memory occupied by the layout
+                         Layout.Field field2, int value2)                       // Set a value in memory occupied by the layout
    {z();
     P.new I()
      {void a()

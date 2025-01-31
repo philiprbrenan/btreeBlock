@@ -923,24 +923,26 @@ abstract class BtreePA extends Test                                             
     allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
     allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
 
-    T.at(node_leafBase1).zero(); leafBase1(); lT.base(T.at(leafBase1));         // Set address of the referenced leaf stuck
+    T.at(node_leafBase1).zero(); leafBase1(); lT.base(T.at(leafBase1));         // Set address of the referenced root stuck
     tt  (node_leafBase2, l);     leafBase2(); lL.base(T.at(leafBase2));         // Set address of the referenced leaf stuck
     tt  (node_leafBase3, r);     leafBase3(); lR.base(T.at(leafBase3));         // Set address of the referenced leaf stuck
 
-    for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf from parent
-     {z(); lT.shift();
-      M.moveParallel
-       (lL.T.at(lL.tKey ), lT.T.at(lT.tKey ),                                   /// Parallel possible
-        lL.T.at(lL.tData), lT.T.at(lT.tData));
-      lL.push();
-     }
-    for (int i = 0; i < splitLeafSize; i++)                                     // Build right leaf from parent
-     {z(); lT.shift();
-      M.moveParallel
-       (lR.T.at(lR.tKey ), lT.T.at(lT.tKey),                                    /// Parallel possible
-        lR.T.at(lR.tData), lT.T.at(lT.tData));
-      lR.push();
-     }
+//  for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf from parent
+//   {z(); lT.shift();
+//    M.moveParallel
+//     (lL.T.at(lL.tKey ), lT.T.at(lT.tKey ),                                   /// Parallel possible
+//      lL.T.at(lL.tData), lT.T.at(lT.tData));
+//    lL.push();
+//   }
+//  for (int i = 0; i < splitLeafSize; i++)                                     // Build right leaf from parent
+//   {z(); lT.shift();
+//    M.moveParallel
+//     (lR.T.at(lR.tKey ), lT.T.at(lT.tKey),                                    /// Parallel possible
+//      lR.T.at(lR.tData), lT.T.at(lT.tData));
+//    lR.push();
+//   }
+
+    lT.split(lL, lR);                                                           // Split root leaf into child leaves
 
     lR.firstElement();
     lL. lastElement();
@@ -3491,9 +3493,10 @@ endmodule
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_verilog_delete();
-    test_verilog_find();
-    test_verilog_put();
+    //test_verilog_delete();
+    //test_verilog_find();
+    //test_verilog_put();
+    test_delete_ascending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
