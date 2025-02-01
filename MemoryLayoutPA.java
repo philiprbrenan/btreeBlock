@@ -56,7 +56,7 @@ class MemoryLayoutPA extends Test                                               
 
   String  name    () {return based() ? based.name() : name+"_"+number;}         // Name of this memory layout
   Layout  layout  () {return layout;}                                           // Get the layout in use
-  String  baseName() {return name+"_base_offset";}                              // Name of the verilog field used to hold the base being used for this memory layout
+  String  baseName() {return name+"_"+number+"_base_offset";}                   // Name of the verilog field used to hold the base being used for this memory layout
 
   String  initializeMemory() {return "initialize_memory_"+name();}              // Name of the verilog field used to hold the base being used for this memory layout
 
@@ -90,8 +90,8 @@ class MemoryLayoutPA extends Test                                               
 
 //D1 Copy control                                                               // Verilog variables used to implement a variable length copy
 
-  String  copyIndex() {return "index_"     +name();}                            // Index to a location in this memory layout
-  String copyLength() {return "copyLength_"+name();}                            // Length of a copy in this memory layout
+  String  copyIndex() {return "index_"     +baseName();}                        // Index to a location in this memory layout
+  String copyLength() {return "copyLength_"+baseName();}                        // Length of a copy in this memory layout
   int      copySize() {return logTwo(baseSize());}                              // Size of bits for a length or index into this memory
 
   String copyVerilogDec()                                                       // Verilog declaration
@@ -523,7 +523,7 @@ class MemoryLayoutPA extends Test                                               
                        t = Target.ml().copyIndex(),                             // Target of move in backing memory
                        m = Target.ml().name();                                  // Name of backing memory
 
-          v.append(l + " = " + Length.verilogAddr() + ";\n");
+          v.append(l + " = " + Length.verilogLoad() + ";/*XXXXX*/\n");
           v.append(s + " = " + Source.verilogAddr() + ";\n");
           v.append(t + " = " + Target.verilogAddr() + ";\n");
 
@@ -1749,8 +1749,8 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(M.contains("reg[4: 0] index_M"));
     ok(M.contains("reg[4: 0] copyLength_M"));
 
-    ok(N.contains("reg[4: 0] index_M"));
-    ok(N.contains("reg[4: 0] copyLength_M"));
+    ok(N.contains("reg[4: 0] index_N"));
+    ok(N.contains("reg[4: 0] copyLength_N"));
    }
 
   static void test_copy_variable()
