@@ -2239,7 +2239,6 @@ abstract class BtreePA extends Test                                             
           testsFile = ""+Paths.get(projectFolder, "tests.txt");
           traceFile = ""+Paths.get(projectFolder, "trace.txt");
       javaTraceFile = ""+Paths.get(projectFolder, "traceJava.txt");
-say("AAAA", projectFolder);
       makePath(projectFolder);
 
       final StringBuilder s = new StringBuilder();
@@ -2267,8 +2266,8 @@ module $project(reset, stop, clock, pfd, Key, Data, data, found);               
   integer traceFile;                                                            // File to write trace to
   reg   stopped;                                                                // Set when we stop
   assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
-  assign found = T[$found_at];                                                  // Found the key
-  assign data  = T[$data_at+:$data_width];                                      // Data associated with key found
+  assign found = $T[$found_at];                                                 // Found the key
+  assign data  = $T[$data_at+:$data_width];                                     // Data associated with key found
 
 $stuckBases
 
@@ -2278,15 +2277,15 @@ $stuckBases
       step      = 0;
       steps    <= 0;
       stopped  <= 0;
-      initialize_memory_M();                                                    // Initialize btree memory
-      initialize_memory_T();                                                    // Initialize btree transaction
+      $initialize_memory_M();                                                   // Initialize btree memory
+      $initialize_memory_T();                                                   // Initialize btree transaction
       traceFile = $fopen("$traceFile", "w");                                    // Open trace file
       if (!traceFile) $fatal(1, "Cannot open trace file $traceFile");
       $stuckInitialization
     end
     else begin                                                                  // Run
-      $display            ("%4d  %4d  %b", steps, step, M);                     // Trace execution
-      $fdisplay(traceFile, "%4d  %4d  %b", steps, step, M);                     // Trace execution in a file
+      $display            ("%4d  %4d  %b", steps, step, $M);                    // Trace execution
+      $fdisplay(traceFile, "%4d  %4d  %b", steps, step, $M);                    // Trace execution in a file
       case(step)                                                                // Case statements to select the code for the current instruction
 """);
 
@@ -2396,6 +2395,11 @@ endmodule
       s = s.replace("$maxSteps",            ""+maxSteps());
       s = s.replace("$expSteps",            ""+expSteps());
       s = s.replace("$found_at",            ""+found.at);
+      s = s.replace("$M",                   ""+M.name());
+      s = s.replace("$T",                   ""+T.name());
+      s = s.replace("$initialize_memory_M", ""+M.initializeMemory());           // Initialize btree memory
+      s = s.replace("$initialize_memory_T", ""+T.initializeMemory());           // Initialize btree transaction
+
       return s;
      }
    }
