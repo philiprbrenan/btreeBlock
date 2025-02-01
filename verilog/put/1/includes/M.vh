@@ -1,4 +1,4 @@
-reg [282:0] M;  /*   MemoryLayoutPA.java:0929:declareVerilog   MemoryLayoutPA.java:0912:dumpVerilog   BtreePA.java:2358:<init>   BtreePA.java:3431:<init>   BtreePA.java:3430:runVerilogPutTest   BtreePA.java:3454:test_verilog_put   BtreePA.java:3540:newTests   BtreePA.java:3546:main  */
+reg [282:0] M;  /*   MemoryLayoutPA.java:0929:declareVerilog   MemoryLayoutPA.java:0912:dumpVerilog   BtreePA.java:2358:<init>   BtreePA.java:3431:<init>   BtreePA.java:3430:runVerilogPutTest   BtreePA.java:3446:test_verilog_put   BtreePA.java:3540:newTests   BtreePA.java:3546:main  */
 task initialize_memory_M;
     begin
         M[0] <= 1;
@@ -9,22 +9,22 @@ task initialize_memory_M;
         M[5] <= 0;
         M[6] <= 0;
         M[7] <= 0;
-        M[8] <= 1;
+        M[8] <= 0;
         M[9] <= 0;
-        M[10] <= 1;
+        M[10] <= 0;
         M[11] <= 0;
         M[12] <= 0;
         M[13] <= 0;
         M[14] <= 0;
-        M[15] <= 1;
+        M[15] <= 0;
         M[16] <= 0;
         M[17] <= 0;
-        M[18] <= 1;
+        M[18] <= 0;
         M[19] <= 0;
         M[20] <= 0;
         M[21] <= 0;
         M[22] <= 0;
-        M[23] <= 1;
+        M[23] <= 0;
         M[24] <= 0;
         M[25] <= 0;
         M[26] <= 0;

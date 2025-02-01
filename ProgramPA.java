@@ -52,7 +52,7 @@ class ProgramPA extends Test                                                    
      }
     void   a() {}                                                               // Action performed by instruction
     String n() {return "instruction";}                                          // Instruction name
-    String v() {return "";}                                                     // Corresponding verilog
+    String v() {return " /* NOT SET */";}                                       // Corresponding verilog
     void   i() {}                                                               // initialization for each instruction
     void out(MemoryLayoutPA.At at) {outputs.add(at.verilogLoad());}             // Record an output of this instruction
     void  in(MemoryLayoutPA.At at) { inputs.add(at.verilogLoad());}             // Record an input of this instruction

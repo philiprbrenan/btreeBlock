@@ -927,22 +927,22 @@ abstract class BtreePA extends Test                                             
     tt  (node_leafBase2, l);     leafBase2(); lL.base(T.at(leafBase2));         // Set address of the referenced leaf stuck
     tt  (node_leafBase3, r);     leafBase3(); lR.base(T.at(leafBase3));         // Set address of the referenced leaf stuck
 
-//  for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf from parent
-//   {z(); lT.shift();
-//    M.moveParallel
-//     (lL.T.at(lL.tKey ), lT.T.at(lT.tKey ),                                   /// Parallel possible
-//      lL.T.at(lL.tData), lT.T.at(lT.tData));
-//    lL.push();
-//   }
-//  for (int i = 0; i < splitLeafSize; i++)                                     // Build right leaf from parent
-//   {z(); lT.shift();
-//    M.moveParallel
-//     (lR.T.at(lR.tKey ), lT.T.at(lT.tKey),                                    /// Parallel possible
-//      lR.T.at(lR.tData), lT.T.at(lT.tData));
-//    lR.push();
-//   }
+ for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf from parent
+  {z(); lT.shift();
+   M.moveParallel
+    (lL.T.at(lL.tKey ), lT.T.at(lT.tKey ),                                   /// Parallel possible
+     lL.T.at(lL.tData), lT.T.at(lT.tData));
+   lL.push();
+  }
+ for (int i = 0; i < splitLeafSize; i++)                                     // Build right leaf from parent
+  {z(); lT.shift();
+   M.moveParallel
+    (lR.T.at(lR.tKey ), lT.T.at(lT.tKey),                                    /// Parallel possible
+     lR.T.at(lR.tData), lT.T.at(lT.tData));
+   lR.push();
+  }
 
-    lT.split(lL, lR);                                                           // Split root leaf into child leaves
+//    lT.split(lL, lR);                                                           // Split root leaf into child leaves
 
     lR.firstElement();
     lL. lastElement();
@@ -2238,9 +2238,8 @@ abstract class BtreePA extends Test                                             
               tFile = ""+Paths.get(projectFolder, "includes", "T"+Verilog.header);
           testsFile = ""+Paths.get(projectFolder, "tests.txt");
           traceFile = ""+Paths.get(projectFolder, "trace.txt");
-//    javaTraceFile = ""+Paths.get(projectFolder, "traceJavaGood.txt");
       javaTraceFile = ""+Paths.get(projectFolder, "traceJava.txt");
-
+say("AAAA", projectFolder);
       makePath(projectFolder);
 
       final StringBuilder s = new StringBuilder();
@@ -3315,18 +3314,18 @@ endmodule
 
   void runVerilogDeleteTest(int Key, int data, int steps, String expected)      // Run the java and verilog versions and compare the resulting memory traces
    {T.at(this.Key).setInt(Key);                                                 // Sets memory directly not via an instruction
-      GenVerilog v = new GenVerilog("delete", "verilog")                        // Generate verilog now that memories have beeninitialzied and the program written
-       {int Key     () {return   Key;}                                          // Input key value
-        int Data    () {return     3;}                                          // Input key value
-        int data    () {return  data;}                                          // Expected output data value
-        int maxSteps() {return  2000;}                                          // Maximum number if execution steps
-        int expSteps() {return steps;}                                          // Expected number of steps
-       };
+    GenVerilog v = new GenVerilog("delete", "verilog")                          // Generate verilog now that memories have beeninitialzied and the program written
+     {int Key     () {return   Key;}                                            // Input key value
+      int Data    () {return     3;}                                            // Input key value
+      int data    () {return  data;}                                            // Expected output data value
+      int maxSteps() {return  2000;}                                            // Maximum number if execution steps
+      int expSteps() {return steps;}                                            // Expected number of steps
+     };
 
-      ok(T.at(this.data).getInt(), data);                                       // Data associated with key
-      if (debug) stop(this);                                                    // Print tree if debugging
-      ok(this, expected);                                                       // Check resultin tree
-     }
+    ok(T.at(this.data).getInt(), data);                                         // Data associated with key
+    if (debug) stop(this);                                                      // Print tree if debugging
+    ok(this, expected);                                                         // Check resultin tree
+   }
 
   static void test_verilog_delete()                                             // Delete using generated verilog code
    {final BtreePA t = btreePA_small();
@@ -3425,20 +3424,74 @@ endmodule
 """);
    }
 
+  void runVerilogPutTest(int value, int steps, String expected)                 // Run the java and verilog versions and compare the resulting memory traces
+   {T.at(Key ).setInt(value);                                                   // Sets memory directly not via an instruction
+    T.at(Data).setInt(value);                                                   // Sets memory directly not via an instruction
+    GenVerilog v = new GenVerilog("put", "verilog")                             // Generate verilog now that memories have been initialzied and the program written
+     {int Key     () {return value;}                                            // Input key value
+      int Data    () {return     3;}                                            // Input data value
+      int data    () {return     0;}                                            // Expected output data value
+      int maxSteps() {return  2000;}                                            // Maximum number if execution steps
+      int expSteps() {return steps;}                                            // Expected number of steps
+     };
+    if (debug) stop(this);
+    ok(this, expected);
+   }
+
   static void test_verilog_put()                                                // Delete using generated verilog code
    {final BtreePA t = btreePA_small();
     t.P.run(); t.P.clear();
     t.put();
-    final int N = 9;
-    for (int i = 1; i < N; ++i)
-     {say(currentTestName(),  "a", i);
-      t.T.at(t.Key ).setInt(i);
-      t.T.at(t.Data).setInt(N-i);
-      t.P.run();
-     }
-    //stop(t.M);
-    //stop(t);
-    ok(t, """
+
+    t.runVerilogPutTest(1, 65, """
+1=0 |
+""");
+
+    t.runVerilogPutTest(2, 77, """
+1,2=0 |
+""");
+
+    t.runVerilogPutTest(3, 331, """
+    1      |
+    0      |
+    1      |
+    2      |
+1=1  2,3=2 |
+""");
+
+    t.runVerilogPutTest(4, 622, """
+      2      |
+      0      |
+      1      |
+      2      |
+1,2=1  3,4=2 |
+""");
+
+    t.runVerilogPutTest(5, 704, """
+      2    3        |
+      0    0.1      |
+      1    3        |
+           2        |
+1,2=1  3=3    4,5=2 |
+""");
+
+    t.runVerilogPutTest(6, 807, """
+      2      4        |
+      0      0.1      |
+      1      3        |
+             2        |
+1,2=1  3,4=3    5,6=2 |
+""");
+
+    t.runVerilogPutTest(7, 889, """
+      2      4      5        |
+      0      0.1    0.2      |
+      1      3      4        |
+                    2        |
+1,2=1  3,4=3    5=4    6,7=2 |
+""");
+
+    t.runVerilogPutTest(8, 1200, """
              4             |
              0             |
              5             |
@@ -3449,19 +3502,8 @@ endmodule
       3             2      |
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
-    t.P.clear();
-    t.T.at(t.Key ).setInt(N);                                                   // Sets memory directly not via an instruction
-    t.T.at(t.Data).setInt(N);                                                   // Sets memory directly not via an instruction
-    t.put();
-    GenVerilog v = t.new GenVerilog("put", "verilog")                           // Generate verilog now that memories have been initialzied and the program written
-     {int Key     () {return    3;}                                             // Input key value
-      int Data    () {return    3;}                                             // Input key value
-      int data    () {return    0;}                                             // Expected output data value
-      int maxSteps() {return 2000;}                                             // Maximum number if execution steps
-      int expSteps() {return  985;}                                             // Expected number of steps
-     };
-    //stop(t);
-    ok(t, """
+
+    t.runVerilogPutTest(9, 985, """
              4                    |
              0                    |
              5                    |
@@ -3495,8 +3537,8 @@ endmodule
    {//oldTests();
     //test_verilog_delete();
     //test_verilog_find();
-    //test_verilog_put();
-    test_delete_ascending();
+    test_verilog_put();
+    //test_delete_ascending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
