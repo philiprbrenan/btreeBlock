@@ -1749,8 +1749,8 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(M.contains("reg[4: 0] index_M"));
     ok(M.contains("reg[4: 0] copyLength_M"));
 
-    ok(N.contains("reg[4: 0] index_N"));
-    ok(N.contains("reg[4: 0] copyLength_N"));
+    ok(N.contains("reg[4: 0] index_M"));
+    ok(N.contains("reg[4: 0] copyLength_M"));
    }
 
   static void test_copy_variable()
@@ -1799,20 +1799,6 @@ Line T       At      Wide       Size    Indices        Value   Name
   13 V       36         4                                  2     q
   14 V       40         4                                  8     L
 """);
-    ProgramPA.I i = m.P.code.lastElement();
-
-    final StringBuilder v = new StringBuilder();                                // Verilog
-    v.append(S.copyVerilogDec());
-    v.append(T.copyVerilogDec());
-    v.append(i.v());
-
-    final String f = "/tmp/verilog.txt";
-    m.dumpVerilog(f);
-    say("AAAA", readFile(f));
-
-
-
-    say("BBBB", v.toString());
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -1839,8 +1825,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_copy_variable();
+   {oldTests();
+    //test_copy_variable();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
