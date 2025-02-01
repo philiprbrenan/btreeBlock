@@ -183,7 +183,7 @@ abstract class StuckPA extends Test                                             
   void copyKeys(StuckPA source)                                                 // Copy the specified number of elements from the source array of keys at the specified index into the target array of keys at the specified target index
    {P.new I()
      {void   a() {T.at(copyBits).setInt(T.at(copyCount).getInt()*bitsPerKey());}
-      String v() {return T.at(copyBits).verilogLoad()+ " <= " + T.at(copyCount).verilogLoad() + "*" + bitsPerKey()+";";}
+      String v() {return T.at(copyBits).verilogLoad()+ " <= " + T.at(copyCount).verilogLoad() + "*" + bitsPerKey()+";" + traceComment();}
      };
     final MemoryLayoutPA.At ti = T.at(index);
     final MemoryLayoutPA.At si = source.T.at(source.index);
@@ -534,7 +534,7 @@ abstract class StuckPA extends Test                                             
     final StuckPA Source = this;
     checkSameProgram(Low); checkSameProgram(High);                              // Confirm that we are writing into the same program
 
-    Low.copy(Source);
+    Low.copy(Source);                                                           // Copy source into low stuck
 
     P.new I()                                                                   // Set size of low
      {void   a() {Low.T.at(Low.size).setInt(H);}                                // Size of half in elements

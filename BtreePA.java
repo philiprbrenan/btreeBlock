@@ -927,22 +927,22 @@ abstract class BtreePA extends Test                                             
     tt  (node_leafBase2, l);     leafBase2(); lL.base(T.at(leafBase2));         // Set address of the referenced leaf stuck
     tt  (node_leafBase3, r);     leafBase3(); lR.base(T.at(leafBase3));         // Set address of the referenced leaf stuck
 
- for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf from parent
-  {z(); lT.shift();
-   M.moveParallel
-    (lL.T.at(lL.tKey ), lT.T.at(lT.tKey ),                                   /// Parallel possible
-     lL.T.at(lL.tData), lT.T.at(lT.tData));
-   lL.push();
-  }
- for (int i = 0; i < splitLeafSize; i++)                                     // Build right leaf from parent
-  {z(); lT.shift();
-   M.moveParallel
-    (lR.T.at(lR.tKey ), lT.T.at(lT.tKey),                                    /// Parallel possible
-     lR.T.at(lR.tData), lT.T.at(lT.tData));
-   lR.push();
-  }
+// for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf from parent
+//  {z(); lT.shift();
+//   M.moveParallel
+//    (lL.T.at(lL.tKey ), lT.T.at(lT.tKey ),                                   /// Parallel possible
+//     lL.T.at(lL.tData), lT.T.at(lT.tData));
+//   lL.push();
+//  }
+// for (int i = 0; i < splitLeafSize; i++)                                     // Build right leaf from parent
+//  {z(); lT.shift();
+//   M.moveParallel
+//    (lR.T.at(lR.tKey ), lT.T.at(lT.tKey),                                    /// Parallel possible
+//     lR.T.at(lR.tData), lT.T.at(lT.tData));
+//   lR.push();
+//  }
 
-//    lT.split(lL, lR);                                                           // Split root leaf into child leaves
+    lT.split(lL, lR);                                                           // Split root leaf into child leaves
 
     lR.firstElement();
     lL. lastElement();
@@ -2199,7 +2199,8 @@ abstract class BtreePA extends Test                                             
   String stuckMemory(StuckPA s)                                                 // Base address variable for one stuck
    {return"reg ["+bitsPerAddress+":0] "+s.M.baseName() + ";\n"+
       s.C.declareVerilog()+
-      s.T.declareVerilog();
+      s.T.declareVerilog()+
+      s.M.copyVerilogDec();
    }
 
   String stuckMemoryInitialization(StuckPA s)                                   // Initialization for one stuck
@@ -3454,8 +3455,8 @@ endmodule
     t.runVerilogPutTest(2, 77, """
 1,2=0 |
 """);
-
-    t.runVerilogPutTest(3, 331, """
+                                                                                // Split instruction
+    t.runVerilogPutTest(3, 281, """
     1      |
     0      |
     1      |
