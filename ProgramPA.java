@@ -652,6 +652,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  g = l.variable ("g", 8);
     Layout.Structure s = l.structure("s", a, b, c, d, e, f, g);
     MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
+    final String     n = m.name();
     ProgramPA        p = m.P;
     m.at(a).setInt(1);
     m.at(b).setInt(2);
@@ -703,15 +704,15 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     p.optimize();
     //stop(p);
-    ok(p, """
+    ok(p, String.format("""
    1        b=a
    2        c=b
-    Outputs: M[  16/*c   */ +: 8] M[  32/*e   */ +: 8] M[  48/*g   */ +: 8]
-    Inputs : M[   8/*b   */ +: 8] M[  24/*d   */ +: 8] M[  40/*f   */ +: 8]
+    Outputs: %s[  16/*c   */ +: 8] %s[  32/*e   */ +: 8] %s[  48/*g   */ +: 8]
+    Inputs : %s[   8/*b   */ +: 8] %s[  24/*d   */ +: 8] %s[  40/*f   */ +: 8]
     Merged:
       3 e=d
       4 g=f
-""");
+""", n, n, n, n, n, n));
     p.run();
     //stop(m);
     ok(m, """
@@ -738,6 +739,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  e = l.variable ("e", 8);
     Layout.Structure s = l.structure("s", a, b, c, d, e);
     MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
+    final String     n = m.name();
     ProgramPA        p = m.P;
     m.at(a).setInt(1);
 
@@ -783,15 +785,15 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     p.optimize();
     //stop(p);
-    ok(p, """
+    ok(p, String.format("""
    1        b=a
    2        c=a
-    Outputs: M[  16/*c   */ +: 8] M[  24/*d   */ +: 8] M[  32/*e   */ +: 8]
-    Inputs : M[   0/*a   */ +: 8] M[   8/*b   */ +: 8]
+    Outputs: %s[  16/*c   */ +: 8] %s[  24/*d   */ +: 8] %s[  32/*e   */ +: 8]
+    Inputs : %s[   0/*a   */ +: 8] %s[   8/*b   */ +: 8]
     Merged:
       3 d=b
       4 e=b
-""");
+""", n, n, n, n, n, n));
     p.run();
     //stop(m);
     ok(m, """
@@ -816,6 +818,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  e = l.variable ("e", 8);
     Layout.Structure s = l.structure("s", a, b, c, d, e);
     MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
+    final String     n = m.name();
     ProgramPA        p = m.P;
     m.at(a).setInt(1);
 
@@ -836,34 +839,34 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.at(d).move(m.at(b));
     m.at(e).move(m.at(b));
     p.optimize();
-    ok(p, """
+    ok(p, String.format("""
    1        b=a
    2        c=a
-    Outputs: M[  16/*c   */ +: 8] M[  24/*d   */ +: 8] M[  32/*e   */ +: 8]
-    Inputs : M[   0/*a   */ +: 8] M[   8/*b   */ +: 8]
+    Outputs: %s[  16/*c   */ +: 8] %s[  24/*d   */ +: 8] %s[  32/*e   */ +: 8]
+    Inputs : %s[   0/*a   */ +: 8] %s[   8/*b   */ +: 8]
     Merged:
       3 d=b
       4 e=b
    3        GoOff a to 6
    4        b=a
-    Outputs: M[   8/*b   */ +: 8]
-    Inputs : M[   0/*a   */ +: 8]
+    Outputs: %s[   8/*b   */ +: 8]
+    Inputs : %s[   0/*a   */ +: 8]
    5        c=a
-    Outputs: M[  16/*c   */ +: 8] M[  24/*d   */ +: 8] M[  32/*e   */ +: 8]
-    Inputs : M[   0/*a   */ +: 8] M[   8/*b   */ +: 8]
+    Outputs: %s[  16/*c   */ +: 8] %s[  24/*d   */ +: 8] %s[  32/*e   */ +: 8]
+    Inputs : %s[   0/*a   */ +: 8] %s[   8/*b   */ +: 8]
     Merged:
       8 d=b
       9 e=b
    6        b=a
-    Outputs: M[   8/*b   */ +: 8]
-    Inputs : M[   0/*a   */ +: 8]
+    Outputs: %s[   8/*b   */ +: 8]
+    Inputs : %s[   0/*a   */ +: 8]
    7        c=a
-    Outputs: M[  16/*c   */ +: 8] M[  24/*d   */ +: 8] M[  32/*e   */ +: 8]
-    Inputs : M[   0/*a   */ +: 8] M[   8/*b   */ +: 8]
+    Outputs: %s[  16/*c   */ +: 8] %s[  24/*d   */ +: 8] %s[  32/*e   */ +: 8]
+    Inputs : %s[   0/*a   */ +: 8] %s[   8/*b   */ +: 8]
     Merged:
       12 d=b
       13 e=b
-""");
+""", n, n, n, n, n,  n, n, n, n, n,  n, n, n, n, n,  n, n, n, n));
 
     p.run();
     //stop(m);
