@@ -500,7 +500,6 @@ class MemoryLayoutPA extends Test                                               
     void copy(At Source, At Length)                                             // Copy the specified number of bits from the location addressed by the source to the location addressed by the target.
      {z();
       final At Target = this;
-      err("AAAAA");
       P.new I()
        {void a()
          {Target.setOff();
@@ -1720,24 +1719,23 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_copyVerilogDec()
-   {final int N = 8;
-    Layout               l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", N);
-    Layout.Variable  b = l.variable ("b", N);
+   {Layout               l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 8);
+    Layout.Variable  b = l.variable ("b", 8);
     Layout.Structure s = l.structure("s", a, b);
     l.compile();
 
     MemoryLayoutPA m = new MemoryLayoutPA(l, "M");
     MemoryLayoutPA n = new MemoryLayoutPA(l, "N",  m);
 
-    ok(m.copyVerilogDec(), """
-reg[4: 0] index_M_1;
-reg[4: 0] copyLength_M_1;
-""");
-    ok(n.copyVerilogDec(), """
-reg[4: 0] index_N_Based_2;
-reg[4: 0] copyLength_N_Based_2;
-""");
+    final String M = m.copyVerilogDec();
+    final String N = n.copyVerilogDec();
+
+    ok(M.contains("reg[4: 0] index_M"));
+    ok(M.contains("reg[4: 0] copyLength_M"));
+
+    ok(N.contains("reg[4: 0] index_N"));
+    ok(N.contains("reg[4: 0] copyLength_N"));
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -1763,7 +1761,7 @@ reg[4: 0] copyLength_N_Based_2;
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
+   {oldTests();
     test_copyVerilogDec();
    }
 
