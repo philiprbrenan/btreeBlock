@@ -181,14 +181,20 @@ abstract class StuckPA extends Test                                             
    }
 
   void copyKeys(StuckPA source)                                                 // Copy the specified number of elements from the source array of keys at the specified index into the target array of keys at the specified target index
-   {P.new I() {void a() {T.at(copyBits).setInt(T.at(copyCount).getInt()*bitsPerKey());}};
+   {P.new I()
+     {void   a() {T.at(copyBits).setInt(T.at(copyCount).getInt()*bitsPerKey());}
+      String v() {return T.at(copyBits).verilogLoad()+ " <= " + T.at(copyCount).verilogLoad() + "*" + bitsPerKey()+";";}
+     };
     final MemoryLayoutPA.At ti = T.at(index);
     final MemoryLayoutPA.At si = source.T.at(source.index);
     M.at(sKey, ti).copy(source.M.at(source.sKey, si), T.at(copyBits));
    }
 
   void copyData(StuckPA source)                                                 // Copy the specified number of elements from the source array of data at the specified index into the target array of data at the specified target index
-   {P.new I() {void a() {T.at(copyBits).setInt(T.at(copyCount).getInt()*bitsPerKey());}};
+   {P.new I()
+     {void   a() {T.at(copyBits).setInt(T.at(copyCount).getInt()*bitsPerData());}
+      String v() {return T.at(copyBits).verilogLoad()+ " <= " + T.at(copyCount).verilogLoad() + "*" + bitsPerData()+";";}
+     };
     final MemoryLayoutPA.At ti = T.at(index);
     final MemoryLayoutPA.At si = source.T.at(source.index);
     M.at(sData, ti).copy(source.M.at(source.sData, si), T.at(copyBits));
@@ -531,10 +537,10 @@ abstract class StuckPA extends Test                                             
     Low.copy(Source);
 
     P.new I()                                                                   // Set size of low
-     {void a() {Low.T.at(Low.size).setInt(H);}                                  // Size of half in elements
+     {void   a() {Low.T.at(Low.size).setInt(H);}                                // Size of half in elements
+      String v() {return Low.T.at(Low.size).verilogLoad() + " <= "+H+";";}      // Size of half in elements
      };
     Low.setSize();                                                              // Set size of lower half
-
 
     High  .T.setIntInstruction(High.index    , 0);                              // High takes the upper half
     High  .T.setIntInstruction(High.copyCount, H);                              // Number of elements to copy into the target

@@ -14,6 +14,8 @@ class MemoryLayoutPA extends Test                                               
   private int           base;                                                   // Base of layout in memory - like located in Pl1
   boolean              debug;                                                   // Debug if true
   ProgramPA                P = new ProgramPA();                                 // Program containing generated code
+  static int         numbers = 0;
+  final  int          number = ++numbers;                                       // Number each memory layout
 
 //D1 Construction                                                               // Construct a memory layout
 
@@ -22,7 +24,7 @@ class MemoryLayoutPA extends Test                                               
     memory = new Memory("", size);
    }
 
-  MemoryLayoutPA(Layout Layout, String Name)                                    //Memory with an associated layout and a name so we can generate verilog from it
+  MemoryLayoutPA(Layout Layout, String Name)                                    // Memory with an associated layout and a name so we can generate verilog from it
    {name   = Name; based = null; layout = Layout;
     memory = new Memory(Name, size());                                          // Create the associated memory as this memory is not based on any other memory
    }
@@ -56,8 +58,9 @@ class MemoryLayoutPA extends Test                                               
   Layout  layout  () {return layout;}                                           // Get the layout in use
   String  baseName() {return name+"_base_offset";}                              // Name of the verilog field used to hold the base being used for this memory layout
   int     base    () {return base;}                                             // Get the base offset into memory being used
-  boolean based   () {return based != null;}                                    // whether the layout is based or not
-  int     size    () {return layout.size();}                                    // Size of memory
+  boolean based   () {return based  != null;}                                    // Whether the layout is based or not
+  int     size    () {return layout != null ? layout.size() : memory.bits.length;} // Size of memory
+  int baseSize    () {return based() ? based.size() : size();}                  // Size of underlying memory
 
   void clear()                                                                  // Clear underlying memory
    {if (based == null) {memory.zero(); return;}                                 // Not based so we just clear the memory we have
@@ -82,9 +85,22 @@ class MemoryLayoutPA extends Test                                               
     ++Layout.testsPassed;                                                       // Lines found
    }
 
+//D1 Copy control                                                               // Verilog variables used to implement a variable length copy
+
+  String  copyIndex() {return "index_"     +name+"_"+number;}                   // Index to a location in this memory layout
+  String copyLength() {return "copyLength_"+name+"_"+number;}                   // Length of a copy in this memory layout
+  int      copySize() {return logTwo(baseSize());}                              // Size of bits for a length or index into this memory
+
+  String copyVerilogDec()                                                       // Verilog declaration
+   {final StringBuilder s = new StringBuilder();                                // Text of declaration
+    s.append("reg["+copySize()+": 0] "+copyIndex ()+";\n");
+    s.append("reg["+copySize()+": 0] "+copyLength()+";\n");
+    return ""+s;
+   }
+
 //D1 Get and Set                                                                // Get and set values in memory but only during testing
 
-  boolean getBit(int index)                                                     // Get a bit from the mmeory layout
+  boolean getBit(int index)                                                     // Get a bit from the memory layout
    {z();return memory.bits[base + index];
    }
 
@@ -186,6 +202,9 @@ class MemoryLayoutPA extends Test                                               
     P.new I()
      {void a()
        {for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
+       }
+      String v()
+       {return "M["+baseName()+" +: "+N+"] <= M["+source.baseName()+" +: "+N+"];";
        }
      };
    }
@@ -478,9 +497,10 @@ class MemoryLayoutPA extends Test                                               
        };
      }
 
-    void copy(At Source, At Length)                                             // Copy the specified number of bits from the location addressed by th source to the location addressed by the target.
+    void copy(At Source, At Length)                                             // Copy the specified number of bits from the location addressed by the source to the location addressed by the target.
      {z();
       final At Target = this;
+      err("AAAAA");
       P.new I()
        {void a()
          {Target.setOff();
@@ -491,6 +511,21 @@ class MemoryLayoutPA extends Test                                               
            {final boolean b = Source.ml().memory.getBit(S+i);
             Target.ml().memory.set(T+i, b);
            }
+         }
+        String v()                                                              // Logarithmic move
+         {final StringBuilder a = new StringBuilder();
+          final int    N = Length.width;                                        // Log2 of the largest possible copy
+          final String l = Length.verilogAddr(),
+                       s = Source.verilogAddr(),
+                       t = Target.verilogAddr();
+
+          for (int i = N; i > 0; --i)
+           {final int u = 1<<N;
+             a.append("if ("+l+" >= "+u+") begin\n");
+             a.append("  M["+t+" +: "+u+"] <= M["+s+" +: "+u+"];\n");
+             a.append("  M["+t+" +: "+u+"] <= M["+s+" +: "+u+"];\n");
+           }
+          return a.toString();
          }
        };
      }
@@ -1684,6 +1719,27 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
+  static void test_copyVerilogDec()
+   {final int N = 8;
+    Layout               l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", N);
+    Layout.Variable  b = l.variable ("b", N);
+    Layout.Structure s = l.structure("s", a, b);
+    l.compile();
+
+    MemoryLayoutPA m = new MemoryLayoutPA(l, "M");
+    MemoryLayoutPA n = new MemoryLayoutPA(l, "N",  m);
+
+    ok(m.copyVerilogDec(), """
+reg[4: 0] index_M_1;
+reg[4: 0] copyLength_M_1;
+""");
+    ok(n.copyVerilogDec(), """
+reg[4: 0] index_N_Based_2;
+reg[4: 0] copyLength_N_Based_2;
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_get_set();
     test_boolean();
@@ -1703,10 +1759,12 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_copy_bits();
     test_copy_memory();
     test_dump_verilog();
+    test_copyVerilogDec();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_copyVerilogDec();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
