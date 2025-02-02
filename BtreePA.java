@@ -1584,21 +1584,22 @@ abstract class BtreePA extends Test                                             
              };
             stealNotPossible(end);
 
-//          P.new Block()                                                       // Transfer left to right
-//           {void code()
-//             {for (int i = 0; i < maxKeysPerLeaf(); i++)
-//               {z();
-//                tt(node_leafSize, l);
-//                leafSize();
-//                P.GoOff(end, T.at(leafSize));
-//                lL.pop();
-//                lR.T.at(lR.tKey ).move(lL.T.at(lL.tKey));
-//                lR.T.at(lR.tData).move(lL.T.at(lL.tData));
-//                lR.unshift();
-//               }
-//             }
-//           };
-            lR.prepend(lL);
+            P.new Block()                                                       // Transfer left to right
+             {void code()
+               {for (int i = 0; i < maxKeysPerLeaf(); i++)
+                 {z();
+                  tt(node_leafSize, l);
+                  leafSize();
+                  P.GoOff(end, T.at(leafSize));
+                  lL.pop();
+                  lR.T.at(lR.tKey ).move(lL.T.at(lL.tKey));
+                  lR.T.at(lR.tData).move(lL.T.at(lL.tData));
+                  lR.unshift();
+                 }
+               }
+             };
+            stop("Unable to test this so far");
+//          lR.prepend(lL);                                                     // Unable to test this so far
            }
           void Else()                                                           // Children are branches
            {z();
@@ -1627,12 +1628,12 @@ abstract class BtreePA extends Test                                             
             bT.T.at(bT.index).dec();                                            // Top key
             bT.elementAt();                                                     // Top key
 
-//          bL.lastElement();                                                   // Last element of left child
-//          bR.T.at(bR.tKey ).move(bT.T.at(bT.tKey));
-//          bR.T.at(bR.tData).move(bL.T.at(bL.tData));
-//          bR.unshift();                                                       // Left top to right
-//
-//          bL.pop();                                                           // Remove left top
+            bL.lastElement();                                                   // Last element of left child
+            bR.T.at(bR.tKey ).move(bT.T.at(bT.tKey));
+            bR.T.at(bR.tData).move(bL.T.at(bL.tData));
+            bR.unshift();                                                       // Left top to right
+            bL.pop();                                                           // Remove left top
+
 //          P.new Block()                                                       // Transfer left to right
 //           {void code()
 //             {for (int i = 0; i < maxKeysPerBranch(); i++)                    // Transfer left to right
@@ -1769,6 +1770,7 @@ abstract class BtreePA extends Test                                             
 //               }
 //             }
 //           };
+//          P.new I() {void a() {say("AAAA");}};
             bL.concatenate(bR);
            } // Else
          };
@@ -3575,10 +3577,11 @@ endmodule
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_verilog_delete();
-    test_verilog_find();
-    test_verilog_put();
+    //test_verilog_delete();
+    //test_verilog_find();
+    //test_verilog_put();
     //test_put_ascending();
+    test_delete_descending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
