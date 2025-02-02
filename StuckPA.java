@@ -587,9 +587,9 @@ if (debug)
     Source.T.setIntInstruction(Source.size, Source.maxSize() - H);              // Size of half in elements
     Source.setSize();                                                           // Set size of lower half in source
 
-    Source.T.setInt(Source.index    , Source.maxSize() - H);                    // High takes the upper half
-    High  .T.setInt(Source.copyCount, H);                                       // Number of elements to copy into the target
-    High  .T.setInt(High  .index    , 0);                                       // Upper half
+    Source.T.setIntInstruction(Source.index    , Source.maxSize() - H);         // High takes the upper half
+    High  .T.setIntInstruction(Source.copyCount, H);                            // Number of elements to copy into the target
+    High  .T.setIntInstruction(High  .index    , 0);                            // Upper half
     High.copyKeys(Source);                                                      // Copy keys
     High.copyData(Source);                                                      // Copy data
 
@@ -1822,10 +1822,7 @@ StuckSML(maxSize:5 size:2)
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    //test_split_high();
-    //test_split_low_even();
-    test_split_low_2();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
