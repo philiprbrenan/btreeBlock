@@ -187,6 +187,11 @@ abstract class StuckPA extends Test                                             
      };
     final MemoryLayoutPA.At ti = T.at(index);
     final MemoryLayoutPA.At si = source.T.at(source.index);
+if (debug)
+ {source.M.debug = true;
+  P.new I() {void a() {say("DDDDD", si.getInt(), source.M.at(source.sKey, si).getInt(), source);}};
+  source.M.debug = false;
+ }
     M.at(sKey, ti).copy(source.M.at(source.sKey, si), T.at(copyBits));
    }
 
@@ -563,15 +568,13 @@ abstract class StuckPA extends Test                                             
     Low.T.setIntInstruction(Low.size, Source.maxSize() - H);                    // Size of half in elements
     Low.setSize();                                                              // Set size of lower half
 
-    Source.T.at(Source.index    ).setInt(0);                                    // High takes the upper half
-    Source.T.at(Source.copyCount).setInt(H);                                    // Number of elements to copy into the target
-    Low   .T.at(Low   .index    ).setInt(Source.maxSize() - H);                 // Upper half
-    Source.copyKeys(Low);                                                       // Copy keys
-    Source.copyData(Low);                                                       // Copy data
+    Source.T.setIntInstruction(Source.index,     0);                            // Source - high - takes the upper half moved down
+    Source.T.setIntInstruction(Source.copyCount, H);                            // Number of elements to copy into source
+    Low   .T.setIntInstruction(Low   .index,     Source.maxSize() - H);         // Upper half
+    Source.copyKeys(Low);                                                       // Copy keys back into source at the low position
+    Source.copyData(Low);                                                       // Copy data back into source at the low position
 
-    P.new I()                                                                   // Set size of low
-     {void a() {Source.T.at(Source.size).setInt(H);}
-     };
+    Source.T.setIntInstruction(Source.size, H);
     Source.setSize();
    }
 
@@ -581,20 +584,16 @@ abstract class StuckPA extends Test                                             
     final StuckPA Source = this;
     checkSameProgram(High);                                                     // Confirm that we are writing into the same program
 
-    P.new I()                                                                   // Set size of low
-     {void a() {Source.T.at(Source.size).setInt(Source.maxSize() - H);}         // Size of half in elements
-     };
+    Source.T.setIntInstruction(Source.size, Source.maxSize() - H);              // Size of half in elements
     Source.setSize();                                                           // Set size of lower half in source
 
-    Source.T.at(Source.index    ).setInt(Source.maxSize() - H);                 // High takes the upper half
-    High  .T.at(Source.copyCount).setInt(H);                                    // Number of elements to copy into the target
-    High  .T.at(High  .index    ).setInt(0);                                    // Upper half
+    Source.T.setInt(Source.index    , Source.maxSize() - H);                    // High takes the upper half
+    High  .T.setInt(Source.copyCount, H);                                       // Number of elements to copy into the target
+    High  .T.setInt(High  .index    , 0);                                       // Upper half
     High.copyKeys(Source);                                                      // Copy keys
     High.copyData(Source);                                                      // Copy data
 
-    P.new I()                                                                   // Set size of low
-     {void a() {High.T.at(High.size).setInt(H);}
-     };
+    High.T.setIntInstruction(High.size, H);                                     // New size of high
     High.setSize();
    }
 
@@ -1606,7 +1605,95 @@ StuckSML(maxSize:5 size:2)
 """);
    }
 
-  static void test_split_low()
+  static void test_split_low_2()
+   {z();
+    final MemoryLayoutPA m = new MemoryLayoutPA(1000);
+
+    final StuckPA s = new StuckPA("source", m)
+     {int maxSize     () {return  2;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
+    s.base(0);
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(1); s.T.at(s.tData).setInt( 2);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt( 4);}}; s.push();
+    s.P.run(); s.P.clear();
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:2 size:2)
+  0 key:1 data:2
+  1 key:2 data:4
+""");
+
+    final StuckPA l = s.copyDef();
+    l.base(s.M.size()*1);
+    s.splitLow(l);
+    s.P.run(); s.P.clear();
+
+    //stop(l);
+    ok(l, """
+StuckSML(maxSize:2 size:1)
+  0 key:1 data:2
+""");
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:2 size:1)
+  0 key:2 data:4
+""");
+   }
+
+  static void test_split_low_even()
+   {z();
+    final MemoryLayoutPA m = new MemoryLayoutPA(1000);
+
+    final StuckPA s = new StuckPA("source", m)
+     {int maxSize     () {return  4;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
+    s.base(0);
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(1); s.T.at(s.tData).setInt( 2);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt( 4);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(3); s.T.at(s.tData).setInt( 6);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(4); s.T.at(s.tData).setInt( 8);}}; s.push();
+    s.P.run(); s.P.clear();
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:4 size:4)
+  0 key:1 data:2
+  1 key:2 data:4
+  2 key:3 data:6
+  3 key:4 data:8
+""");
+
+    final StuckPA l = s.copyDef();
+    l.base(s.M.size()*1);
+    s.splitLow(l);
+    s.P.run(); s.P.clear();
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:4 size:2)
+  0 key:3 data:6
+  1 key:4 data:8
+""");
+
+    //stop(l);
+    ok(l, """
+StuckSML(maxSize:4 size:2)
+  0 key:1 data:2
+  1 key:2 data:4
+""");
+   }
+
+  static void test_split_low_odd()
    {z();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
@@ -1728,13 +1815,17 @@ StuckSML(maxSize:5 size:2)
     test_concatenate();
     test_prepend();
     test_split();
-    test_split_low();
+    test_split_low_2();
+    test_split_low_even();
+    test_split_low_odd();
     test_split_high();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
-    test_split_high();
+   {//oldTests();
+    //test_split_high();
+    //test_split_low_even();
+    test_split_low_2();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
