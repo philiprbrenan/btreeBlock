@@ -400,6 +400,18 @@ if (debug)
     moveData();
    }
 
+  void zeroLastKey()                                                            // Save last key in the transaction buffer and zero it in the stuck
+   {z(); action = "zeroLastKey";
+    size();
+    isEmpty();
+    assertNotEmpty();
+    setFound();
+    T.at(index).move(M.at(currentSize));
+    T.at(index).dec();
+    moveKey();
+    key().zero();
+   }
+
   void search()                                                                 // Search for an element within all elements of the stuck
    {z(); action = "search";
     size();
@@ -481,7 +493,7 @@ if (debug)
     if (p != T.P.number)        stop("Mismatched programs");
    }
 
-  void copy(StuckPA Source)                                                     // Copy the source stuck inot the target replacing the target completely
+  void copy(StuckPA Source)                                                     // Copy the source stuck into the target replacing the target completely
    {z(); action = "copy";
     checkSameProgram(Source);                                                   // Confirm that we are writing into the same program
     final StuckPA Target = this;
@@ -1798,6 +1810,49 @@ StuckSML(maxSize:5 size:2)
 """);
    }
 
+  static void test_zero_last_key()
+   {z();
+    final MemoryLayoutPA m = new MemoryLayoutPA(1000);
+
+    final StuckPA s = new StuckPA("source", m)
+     {int maxSize     () {return  4;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
+    s.base(0);
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(1); s.T.at(s.tData).setInt( 2);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt( 4);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(3); s.T.at(s.tData).setInt( 6);}}; s.push();
+    s.zeroLastKey();
+    s.P.run(); s.P.clear();
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:4 size:3)
+  0 key:1 data:2
+  1 key:2 data:4
+  2 key:0 data:6
+""");
+
+    ok(s.T.at(s.tKey).getInt(), 3);
+
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(4); s.T.at(s.tData).setInt( 8);}}; s.push();
+    s.zeroLastKey();
+    s.P.run(); s.P.clear();
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:4 size:4)
+  0 key:1 data:2
+  1 key:2 data:4
+  2 key:0 data:6
+  3 key:0 data:8
+""");
+    ok(s.T.at(s.tKey).getInt(), 4);
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_load();
     test_clear();
@@ -1824,10 +1879,12 @@ StuckSML(maxSize:5 size:2)
     test_split_low_even();
     test_split_low_odd();
     test_split_high();
+    test_zero_last_key();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    test_zero_last_key();
    }
 
   public static void main(String[] args)                                        // Test if called as a program

@@ -1132,14 +1132,16 @@ abstract class BtreePA extends Test                                             
 //   }
 
     bR.splitLow(bL);
+    bL.zeroLastKey();
 
-    bR.shift();
-    bL.T.at(bL.tKey ).zero();
-    bL.T.at(bL.tData).move(bR.T.at(bR.tData));
-    bL.push();                                                                  // Build right branch - becomes top and so is ignored by search ... except last
+//  bR.shift();
+//  bL.T.at(bL.tKey ).zero();
+//  bL.T.at(bL.tData).move(bR.T.at(bR.tData));
+//  bL.push();                                                                  // Build right branch - becomes top and so is ignored by search ... except last
 
-    M.moveParallel
-     (bT.T.at(bT.tKey ), bR.T.at(bR.tKey),                                      /// Parallel possible
+    M.moveParallel                                                              /// Parallel possible
+//   (bT.T.at(bT.tKey ), bR.T.at(bR.tKey),
+     (bT.T.at(bT.tKey ), bL.T.at(bL.tKey),
       bT.T.at(bT.tData), T.at(l),
       bT.T.at(bT.index), T.at(index));
     bT.insertElementAt();
@@ -1406,33 +1408,36 @@ abstract class BtreePA extends Test                                             
                 T.at(node_leafBase1).zero(); leafBase1(); lT.base(T.at(leafBase1));
                 tt(node_leafBase2, l);       leafBase2(); lL.base(T.at(leafBase2));
                 tt(node_leafBase3, r);       leafBase3(); lR.base(T.at(leafBase3));
-//                P.new Block()
-//                 {void code()
-//                   {for (int i = 0; i < maxKeysPerLeaf(); ++i)                  // Merge in left child leaf
-//                     {tt(node_isEmpty, l); isEmpty(); P.GoOn(end,T.at(isEmpty));// Stop when left leaf  child is empty
-//                      lL.shift();
-//                      M.moveParallel
-//                       (lT.T.at(lT.tKey ), lL.T.at(lL.tKey),                    /// Parallel possible
-//                        lT.T.at(lT.tData), lL.T.at(lL.tData));
-//                      lT.push();
-//                     }
-//                   }
-//                 };
-//
-//                P.new Block()
-//                 {void code()
-//                   {for (int i = 0; i < maxKeysPerLeaf(); ++i)                  // Merge in right child leaf
-//                     {tt(node_isEmpty, r); isEmpty(); P.GoOn(end,T.at(isEmpty));// Stop when right leaf child is empty
-//                      lR.shift();
-//                      M.moveParallel
-//                       (lT.T.at(lT.tKey ), lR.T.at(lR.tKey),                    /// Parallel possible
-//                        lT.T.at(lT.tData), lR.T.at(lR.tData));
-//                      lT.push();
-//                     }
-//                   }
-//                 };
-                lT.concatenate(lL);                                             // Merge in left  child leaf
-                lT.concatenate(lR);                                             // Merge in right child leaf
+//concatenate
+                P.new Block()
+                 {void code()
+                   {for (int i = 0; i < maxKeysPerLeaf(); ++i)                  // Merge in left child leaf
+                     {tt(node_isEmpty, l); isEmpty(); P.GoOn(end,T.at(isEmpty));// Stop when left leaf  child is empty
+                      lL.shift();
+                      M.moveParallel
+                       (lT.T.at(lT.tKey ), lL.T.at(lL.tKey),                    /// Parallel possible
+                        lT.T.at(lT.tData), lL.T.at(lL.tData));
+                      lT.push();
+                     }
+                   }
+                 };
+
+                P.new Block()
+                 {void code()
+                   {for (int i = 0; i < maxKeysPerLeaf(); ++i)                  // Merge in right child leaf
+                     {tt(node_isEmpty, r); isEmpty(); P.GoOn(end,T.at(isEmpty));// Stop when right leaf child is empty
+                      lR.shift();
+                      M.moveParallel
+                       (lT.T.at(lT.tKey ), lR.T.at(lR.tKey),                    /// Parallel possible
+                        lT.T.at(lT.tData), lR.T.at(lR.tData));
+                      lT.push();
+                     }
+                   }
+                 };
+
+//              lT.concatenate(lL);                                             // Merge in left  child leaf
+//              lT.concatenate(lR);                                             // Merge in right child leaf
+
                 T.setIntInstruction(node_setLeaf, root);  setLeaf();            // The root is now a leaf
                 tt(node_free, l); free();                                       // Free the children
                 tt(node_free, r); free();
@@ -3558,10 +3563,10 @@ endmodule
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_verilog_delete();
-    test_verilog_find();
-    test_verilog_put();
-    //test_delete_ascending();
+    //test_verilog_delete();
+    //test_verilog_find();
+    //test_verilog_put();
+    test_put_ascending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
