@@ -3439,7 +3439,7 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 462, """
+    t.runVerilogDeleteTest(7, 2,554, """
 8,9=0 |
 """);
 
@@ -3563,10 +3563,10 @@ endmodule
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    //test_verilog_delete();
+    test_verilog_delete();
     //test_verilog_find();
     //test_verilog_put();
-    test_put_ascending();
+    //test_put_ascending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
