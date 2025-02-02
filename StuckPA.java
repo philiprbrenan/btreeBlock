@@ -505,6 +505,11 @@ if (debug)
          (Target.T.at(Target.size).getInt() +
           Source.T.at(Source.size).getInt());
        }
+      String v()
+       {return Target.T.at(Target.size).verilogLoad() + " <= " +
+               Target.T.at(Target.size).verilogLoad() + " +  " +
+               Source.T.at(Source.size).verilogLoad() + ";";
+       }
      };
     Target.setSize();
    }
