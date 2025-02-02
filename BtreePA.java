@@ -1063,14 +1063,17 @@ abstract class BtreePA extends Test                                             
     tt(node_leafBase1, l);              leafBase1(); lL.base(T.at(leafBase1));  // The leaf being split into
     tt(node_leafBase2, node_splitLeaf); leafBase2(); lR.base(T.at(leafBase2));  // The leaf being split on the right
 
-    for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf
-     {z(); lR.shift();
+//  for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf
+//   {z(); lR.shift();
+//
+//    M.moveParallel
+//     (lL.T.at(lL.tKey ), lR.T.at(lR.tKey ),                                   /// Parallel possible
+//      lL.T.at(lL.tData), lR.T.at(lR.tData));
+//    lL.push();
+//   }
 
-      M.moveParallel
-       (lL.T.at(lL.tKey ), lR.T.at(lR.tKey ),                                   /// Parallel possible
-        lL.T.at(lL.tData), lR.T.at(lR.tData));
-      lL.push();
-     }
+    lR.splitLow(lL);                                                            // Split out the lower half
+
     lR.firstElement();
     lL. lastElement();
     tt(node_branchBase, splitParent); branchBase(); bT.base(T.at(branchBase));  // The parent branch
@@ -3442,7 +3445,7 @@ endmodule
   void runVerilogPutTest(int value, int steps, String expected)                 // Run the java and verilog versions and compare the resulting memory traces
    {T.at(Key ).setInt(value);                                                   // Sets memory directly not via an instruction
     T.at(Data).setInt(value);                                                   // Sets memory directly not via an instruction
-    GenVerilog v = new GenVerilog("put", "verilog")                             // Generate verilog now that memories have been initialzied and the program written
+    GenVerilog v = new GenVerilog("put", "verilog")                             // Generate verilog now that memories have been initialized and the program written
      {int Key     () {return value;}                                            // Input key value
       int Data    () {return     3;}                                            // Input data value
       int data    () {return     0;}                                            // Expected output data value
@@ -3474,7 +3477,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 622, """
+    t.runVerilogPutTest(4, 603, """
       2      |
       0      |
       1      |
@@ -3482,7 +3485,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 704, """
+    t.runVerilogPutTest(5, 685, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -3490,7 +3493,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 807, """
+    t.runVerilogPutTest(6, 788, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3498,7 +3501,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 889, """
+    t.runVerilogPutTest(7, 870, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -3506,7 +3509,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 1115, """
+    t.runVerilogPutTest(8, 1096, """
              4             |
              0             |
              5             |
@@ -3518,7 +3521,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 985, """
+    t.runVerilogPutTest(9, 966, """
              4                    |
              0                    |
              5                    |
