@@ -990,29 +990,39 @@ abstract class BtreePA extends Test                                             
     tt(node_branchBase2, l); branchBase2(); bL.base(T.at(branchBase2));         // Set address of the referenced branch stuck
     tt(node_branchBase3, r); branchBase3(); bR.base(T.at(branchBase3));         // Set address of the referenced branch stuck
 
-    for (int i = 0; i < splitBranchSize; i++)                                   // Build left child from parent
-     {z(); bT.shift();
-      bL.T.at(bL.tKey ).move(bT.T.at(bT.tKey ));
-      bL.T.at(bL.tData).move(bT.T.at(bT.tData));
-      bL.push();
-     }
-    bT.shift();                                                                 // This key, next pair will be part of the root
+    bT.split(bL, bR);                                                           // Split the root as a branch
+
+//    for (int i = 0; i < splitBranchSize; i++)                                 // Build left child from parent
+//     {z(); bT.shift();
+//      bL.T.at(bL.tKey ).move(bT.T.at(bT.tKey ));
+//      bL.T.at(bL.tData).move(bT.T.at(bT.tData));
+//      bL.push();
+//     }
+//    bT.shift();                                                               // This key, next pair will be part of the root
+//    T.at(parentKey).move(bT.T.at(bT.tKey));
+    bL.T.setIntInstruction(bL.tKey, 0);
+    bT.T.setIntInstruction(bT.index, splitBranchSize);
+    bT.elementAt();
     T.at(parentKey).move(bT.T.at(bT.tKey));
-    bL.T.at(bL.tKey).zero();
     bL.T.at(bL.tData).move(bT.T.at(bT.tData));
-    bL.push();                                                                  // Becomes top and so ignored by search ... except last
+    bL.T.setIntInstruction(bL.index, splitBranchSize);
+    bL.setElementAt();
+//  bL.push();                                                                  // Becomes top and so ignored by search ... except last
 
-    for(int i = 0; i < splitBranchSize; i++)                                    // Build right child from parent
-     {z(); bT.shift();
-      bR.T.at(bR.tKey ).move(bT.T.at(bT.tKey ));
-      bR.T.at(bR.tData).move(bT.T.at(bT.tData));
-      bR.push();
-     }
-
-    bT.shift();
-    bR.T.at(bR.tKey).zero();
+//    for(int i = 0; i < splitBranchSize; i++)                                  // Build right child from parent
+//     {z(); bT.shift();
+//      bR.T.at(bR.tKey ).move(bT.T.at(bT.tKey ));
+//      bR.T.at(bR.tData).move(bT.T.at(bT.tData));
+//      bR.push();
+//     }
+//
+//    bT.shift();
+    bR.T.setIntInstruction(bR.tKey, 0);
+    bT.lastElement();
     bR.T.at(bR.tData).move(bT.T.at(bT.tData));
-    bR.push();                                                                  // Becomes top and so ignored by search ... except last
+    bR.T.setIntInstruction(bR.index, splitBranchSize);
+    bR.setElementAt();
+//  bR.push();                                                                  // Becomes top and so ignored by search ... except last
 
     bT.clear();                                                                 // Refer to new branches from root
     M.moveParallel
@@ -3496,7 +3506,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 1200, """
+    t.runVerilogPutTest(8, 1115, """
              4             |
              0             |
              5             |
