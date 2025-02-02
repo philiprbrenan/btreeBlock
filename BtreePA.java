@@ -1584,22 +1584,21 @@ abstract class BtreePA extends Test                                             
              };
             stealNotPossible(end);
 
-            P.new Block()                                                       // Transfer left to right
-             {void code()
-               {for (int i = 0; i < maxKeysPerLeaf(); i++)
-                 {z();
-                  tt(node_leafSize, l);
-                  leafSize();
-                  P.GoOff(end, T.at(leafSize));
-                  lL.pop();
-                  lR.T.at(lR.tKey ).move(lL.T.at(lL.tKey));
-                  lR.T.at(lR.tData).move(lL.T.at(lL.tData));
-                  lR.unshift();
-                 }
-               }
-             };
-            stop("Unable to test this so far");
-//          lR.prepend(lL);                                                     // Unable to test this so far
+//          P.new Block()                                                       // Transfer left to right
+//           {void code()
+//             {for (int i = 0; i < maxKeysPerLeaf(); i++)
+//               {z();
+//                tt(node_leafSize, l);
+//                leafSize();
+//                P.GoOff(end, T.at(leafSize));
+//                lL.pop();
+//                lR.T.at(lR.tKey ).move(lL.T.at(lL.tKey));
+//                lR.T.at(lR.tData).move(lL.T.at(lL.tData));
+//                lR.unshift();
+//               }
+//             }
+//           };
+            lR.prepend(lL);
            }
           void Else()                                                           // Children are branches
            {z();
@@ -3580,8 +3579,8 @@ endmodule
     //test_verilog_delete();
     //test_verilog_find();
     //test_verilog_put();
-    //test_put_ascending();
-    test_delete_descending();
+    test_put_ascending();
+    //test_delete_descending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
