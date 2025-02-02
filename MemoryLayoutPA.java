@@ -510,6 +510,7 @@ class MemoryLayoutPA extends Test                                               
           Source.setOff();
           Length.setOff();
           final int L = Length.result, S = Source.at, T = at;                   // Address and length of move
+//say("Length=", L, S, T);
           for   (int i = 0; i < L; i++)                                         // Each element
            {final boolean b = Source.ml().memory.getBit(S+i);
             Target.ml().memory.set(T+i, b);
@@ -523,17 +524,19 @@ class MemoryLayoutPA extends Test                                               
                        t = Target.ml().copyIndex(),                             // Target of move in backing memory
                        m = Target.ml().name();                                  // Name of backing memory
 
-          v.append(l + " = " + Length.verilogLoad() + ";/*XXXXX*/\n");
+          v.append(l + " = " + Length.verilogLoad() + ";\n");
           v.append(s + " = " + Source.verilogAddr() + ";\n");
           v.append(t + " = " + Target.verilogAddr() + ";\n");
+//v.append("$fdisplay(traceFile, \"Length=%d %d, %d\", " + l+"," + s+","+t+");\n");
 
           for (int i = N+1; i > 0; --i)
            {final int u = 1<<(i-1);
             v.append("if (" +l+" >= "+u+") begin\n");
+//v.append("$fdisplay(traceFile, \"Block"+i+" L=%d %d, %d\", " + l+"," + s+","+t+");\n");
             v.append("   "+m+"["+t+" +: "+u+"] <= "+m+"["+s+" +: "+u+"];\n");
-            v.append("   "  +l+" <= "+l+" - "+u+";\n");
-            v.append("   "  +s+" <= "+s+" + "+u+";\n");
-            v.append("   "  +t+" <= "+t+" + "+u+";\n");
+            v.append("   "  +l+" = "+l+" - "+u+";\n");
+            v.append("   "  +s+" = "+s+" + "+u+";\n");
+            v.append("   "  +t+" = "+t+" + "+u+";\n");
             v.append("end\n");
            }
           return v.toString();
