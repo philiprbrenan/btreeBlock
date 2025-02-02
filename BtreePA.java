@@ -1472,43 +1472,50 @@ abstract class BtreePA extends Test                                             
                 T.at(parentKey).move(bT.T.at(bT.tKey));
                 bT.clear();
 
-                P.new Block()
-                 {void code()
-                   {for (int i = 0; i < maxKeysPerBranch(); ++i)                // Merge left child branch
-                     {tt(node_isEmpty, l); isEmpty(); P.GoOn(end,T.at(isEmpty));// Stop when left branch child is empty except for top
-                      bL.shift();
-                      M.moveParallel
-                       (bT.T.at(bT.tKey) , bL.T.at(bL.tKey),                    /// Parallel possible
-                        bT.T.at(bT.tData), bL.T.at(bL.tData));
-                      bT.push();
-                     }
-                   }
-                 };
+//              P.new Block()
+//               {void code()
+//                 {for (int i = 0; i < maxKeysPerBranch(); ++i)                // Merge left child branch
+//                   {tt(node_isEmpty, l); isEmpty(); P.GoOn(end,T.at(isEmpty));// Stop when left branch child is empty except for top
+//                    bL.shift();
+//                    M.moveParallel
+//                     (bT.T.at(bT.tKey) , bL.T.at(bL.tKey),                    /// Parallel possible
+//                      bT.T.at(bT.tData), bL.T.at(bL.tData));
+//                    bT.push();
+//                   }
+//                 }
+//               };
+//
+//              bL.lastElement();
+//              M.moveParallel
+//               (bT.T.at(bT.tKey ), T.at(parentKey),                           /// Parallel possible
+//                bT.T.at(bT.tData), bL.T.at(bL.tData));
+//              bT.push();
 
-                bL.lastElement();
-                M.moveParallel
-                 (bT.T.at(bT.tKey ), T.at(parentKey),                           /// Parallel possible
-                  bT.T.at(bT.tData), bL.T.at(bL.tData));
-                bT.push();
+                bT.concatenate(bL);
+                bT.T.at(bT.tKey).move(T.at(parentKey));
+                bT.setLastKey();
 
-                P.new Block()
-                 {void code()
-                   {for (int i = 0; i < maxKeysPerBranch(); ++i)                // Merge right child branch
-                     {tt(node_isEmpty, r); isEmpty(); P.GoOn(end,T.at(isEmpty));// Stop when right branch child is empty except for top
-                      bR.shift();
-                      M.moveParallel
-                       (bT.T.at(bT.tKey ), bR.T.at(bR.tKey),                    /// Parallel possible
-                        bT.T.at(bT.tData), bR.T.at(bR.tData));
-                      bT.push();
-                     }
-                   }
-                 };
+//              P.new Block()
+//               {void code()
+//                 {for (int i = 0; i < maxKeysPerBranch(); ++i)                // Merge right child branch
+//                   {tt(node_isEmpty, r); isEmpty(); P.GoOn(end,T.at(isEmpty));// Stop when right branch child is empty except for top
+//                    bR.shift();
+//                    M.moveParallel
+//                     (bT.T.at(bT.tKey ), bR.T.at(bR.tKey),                    /// Parallel possible
+//                      bT.T.at(bT.tData), bR.T.at(bR.tData));
+//                    bT.push();
+//                   }
+//                 }
+//               };
+//
+//              bR.lastElement();                                               // Top next
+//
+//              bT.T.at(bT.tKey ).zero();
+//              bT.T.at(bT.tData).move(bR.T.at(bR.tData));
+//              bT.push();                                                      // Top so ignored by search ... except last
 
-                bR.lastElement();                                               // Top next
-
-                bT.T.at(bT.tKey ).zero();
-                bT.T.at(bT.tData).move(bR.T.at(bR.tData));
-                bT.push();                                                      // Top so ignored by search ... except last
+                bT.concatenate(bR);
+                bT.zeroLastKey();
 
                 tt(node_free, l); free();                                       // Free the children
                 tt(node_free, r); free();
@@ -3407,7 +3414,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 906, """
+    t.runVerilogDeleteTest(2, 7, 785, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
