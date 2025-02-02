@@ -1,4 +1,4 @@
-reg [337:0] T_10;  /*   MemoryLayoutPA.java:0940:declareVerilog   MemoryLayoutPA.java:0923:dumpVerilog   BtreePA.java:2382:<init>   BtreePA.java:3346:<init>   BtreePA.java:3345:runVerilogDeleteTest   BtreePA.java:3418:test_verilog_delete   BtreePA.java:3566:newTests   BtreePA.java:3574:main  */
+reg [337:0] T_10;  /*   MemoryLayoutPA.java:0940:declareVerilog   MemoryLayoutPA.java:0923:dumpVerilog   BtreePA.java:2389:<init>   BtreePA.java:3353:<init>   BtreePA.java:3352:runVerilogDeleteTest   BtreePA.java:3425:test_verilog_delete   BtreePA.java:3573:newTests   BtreePA.java:3581:main  */
 task initialize_memory_T_10;
     begin
         T_10[0] <= 1;
@@ -83,7 +83,7 @@ task initialize_memory_T_10;
         T_10[79] <= 0;
         T_10[80] <= 0;
         T_10[81] <= 0;
-        T_10[82] <= 1;
+        T_10[82] <= 0;
         T_10[83] <= 0;
         T_10[84] <= 1;
         T_10[85] <= 0;
@@ -295,8 +295,8 @@ task initialize_memory_T_10;
         T_10[291] <= 1;
         T_10[292] <= 0;
         T_10[293] <= 0;
-        T_10[294] <= 1;
-        T_10[295] <= 1;
+        T_10[294] <= 0;
+        T_10[295] <= 0;
         T_10[296] <= 1;
         T_10[297] <= 0;
         T_10[298] <= 0;

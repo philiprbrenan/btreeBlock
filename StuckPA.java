@@ -412,6 +412,17 @@ if (debug)
     key().zero();
    }
 
+  void setLastKey()                                                             // Set the last active key in the stuck from the one in the transaction buffer
+   {z(); action = "setLastKey";
+    size();
+    isEmpty();
+    assertNotEmpty();
+    setFound();
+    T.at(index).move(M.at(currentSize));
+    T.at(index).dec();
+    setKey();
+   }
+
   void search()                                                                 // Search for an element within all elements of the stuck
    {z(); action = "search";
     size();
@@ -1836,7 +1847,7 @@ StuckSML(maxSize:4 size:3)
   2 key:0 data:6
 """);
 
-    ok(s.T.at(s.tKey).getInt(), 3);
+    ok(s.T.at(s.tKey).getInt(), 3);                                             // The value of the key before it was zeroed
 
     s.P.new I() {void a() {s.T.at(s.tKey).setInt(4); s.T.at(s.tData).setInt( 8);}}; s.push();
     s.zeroLastKey();
@@ -1851,6 +1862,48 @@ StuckSML(maxSize:4 size:4)
   3 key:0 data:8
 """);
     ok(s.T.at(s.tKey).getInt(), 4);
+   }
+
+  static void test_set_last_key()
+   {z();
+    final MemoryLayoutPA m = new MemoryLayoutPA(1000);
+
+    final StuckPA s = new StuckPA("source", m)
+     {int maxSize     () {return  4;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
+    s.base(0);
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(1); s.T.at(s.tData).setInt( 2);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt( 4);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(3); s.T.at(s.tData).setInt( 6);}}; s.push();
+    s.T.setIntInstruction(s.tKey, 4);
+    s.setLastKey();
+    s.P.run(); s.P.clear();
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:4 size:3)
+  0 key:1 data:2
+  1 key:2 data:4
+  2 key:4 data:6
+""");
+
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(5); s.T.at(s.tData).setInt( 8);}}; s.push();
+    s.T.setIntInstruction(s.tKey, 6);
+    s.setLastKey();
+    s.P.run(); s.P.clear();
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:4 size:4)
+  0 key:1 data:2
+  1 key:2 data:4
+  2 key:4 data:6
+  3 key:6 data:8
+""");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -1880,11 +1933,13 @@ StuckSML(maxSize:4 size:4)
     test_split_low_odd();
     test_split_high();
     test_zero_last_key();
+    test_set_last_key();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
-    test_zero_last_key();
+   {//oldTests();
+    //test_zero_last_key();
+    test_set_last_key();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
