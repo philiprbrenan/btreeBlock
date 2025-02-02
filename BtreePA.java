@@ -1584,20 +1584,21 @@ abstract class BtreePA extends Test                                             
              };
             stealNotPossible(end);
 
-            P.new Block()                                                       // Transfer left to right
-             {void code()
-               {for (int i = 0; i < maxKeysPerLeaf(); i++)
-                 {z();
-                  tt(node_leafSize, l);
-                  leafSize();
-                  P.GoOff(end, T.at(leafSize));
-                  lL.pop();
-                  lR.T.at(lR.tKey ).move(lL.T.at(lL.tKey));
-                  lR.T.at(lR.tData).move(lL.T.at(lL.tData));
-                  lR.unshift();
-                 }
-               }
-             };
+//          P.new Block()                                                       // Transfer left to right
+//           {void code()
+//             {for (int i = 0; i < maxKeysPerLeaf(); i++)
+//               {z();
+//                tt(node_leafSize, l);
+//                leafSize();
+//                P.GoOff(end, T.at(leafSize));
+//                lL.pop();
+//                lR.T.at(lR.tKey ).move(lL.T.at(lL.tKey));
+//                lR.T.at(lR.tData).move(lL.T.at(lL.tData));
+//                lR.unshift();
+//               }
+//             }
+//           };
+            lL.splitHigh(lR);
            }
           void Else()                                                           // Children are branches
            {z();
