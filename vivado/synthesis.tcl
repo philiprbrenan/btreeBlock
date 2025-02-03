@@ -1,5 +1,6 @@
 # Set the project directory
-set project_dir "~/btreeBlock/verilog/find/2"
+set home $env(HOME)
+set project_dir "${home}/btreeBlock/verilog/find/2"
 
 # Set the path to the includes directory
 set includes_dir "${project_dir}/includes"
