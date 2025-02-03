@@ -6,7 +6,7 @@ set project_dir "${home}/btreeBlock/verilog/find/2"
 set includes_dir "${project_dir}/includes"
 
 # Create a new Vivado project
-create_project find ${project_dir}/vivado -part xc7z020clg484-1
+create_project find ${project_dir}/vivado -part xc7z020clg484-1 -force
 
 # Add the main Verilog file and the include files
 add_files ${project_dir}/find.v
