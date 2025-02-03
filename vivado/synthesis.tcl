@@ -10,8 +10,8 @@ create_project find ${project_dir}/vivado -part xc7z020clg484-1 -force
 
 # Add the main Verilog file and the include files
 add_files ${project_dir}/find.v
-add_files -norecurse ${includes_dir}/file1.v
-add_files -norecurse ${includes_dir}/file2.v
+add_files -norecurse ${includes_dir}/M.vh
+add_files -norecurse ${includes_dir}/T.vh
 
 # Set the include directory for Verilog files
 set_property include_dirs [list ${includes_dir}] [current_fileset]
