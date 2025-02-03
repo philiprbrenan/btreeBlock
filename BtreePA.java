@@ -3576,10 +3576,10 @@ endmodule
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    //test_verilog_delete();
+    test_verilog_delete();
     //test_verilog_find();
     //test_verilog_put();
-    test_put_ascending();
+    //test_put_ascending();
     //test_delete_descending();
    }
 

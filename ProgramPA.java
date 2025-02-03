@@ -39,7 +39,7 @@ class ProgramPA extends Test                                                    
     final String traceBack;                                                     // Location of code that defined this instruction
     final TreeSet<String>outputs = new TreeSet<>();                             // The set of outputs written by this instruction
     final TreeSet<String> inputs = new TreeSet<>();                             // The set of inputs read by this instruction
-    final TreeSet<I>      merged = new TreeSet<>();                             // The referenced instructions can eb executed at the same time as this one
+    final TreeSet<I>      merged = new TreeSet<>();                             // The referenced instructions can be executed at the same time as this one
     I merge;                                                                    // This instruction has been merged into the referenced instruction.
     boolean mergeableInstruction;                                               // This instruction can be merged with earlier instructions as long as there are no collisions
     boolean mightJump;                                                          // This instruction might change the flow of control
@@ -135,10 +135,9 @@ class ProgramPA extends Test                                                    
    {if (traceMemory != null)
      {final StringBuilder s = new StringBuilder();
       final boolean[]b = traceMemory.bits;
-      for(int i = 0; i < b.length; i++) s.append(b[i] ? "1" : "0");
-       {s.reverse();                                                            // Match iverilog
-        Trace.push(String.format("%4d  %4d  %s", time, step, s));
-       }
+      for(int i = 0; i < b.length; i++) s.append(b[i] ? "1" : "0");             // Match iverilog
+      s.reverse();
+      Trace.push(String.format("%4d  %4d  %s", time, step, s));
      }
    }
 
