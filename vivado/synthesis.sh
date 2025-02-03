@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set Vivado installation path
-VIVADO_PATH="~/path/to/vivado/installation"
+VIVADO_PATH="~/Vivado/2024.2/"
 
 # Check if Vivado is installed
 if [ ! -d "$VIVADO_PATH" ]; then
