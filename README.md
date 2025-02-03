@@ -40,6 +40,7 @@ For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)):
 operation.
 
 ```
+INFO: [Synth 8-6157] synthesizing module 'find' [/home/azureuser/btreeBlock/verilog/find/2/find.v:6]
 +------+---------+-------+------+
 |      |Instance |Module |Cells |
 +------+---------+-------+------+
@@ -55,7 +56,7 @@ Synthesis finished with 0 errors, 0 critical warnings and 53 warnings.
 operation.
 
 ```
-Report Instance Areas:
+INFO: [Synth 8-6157] synthesizing module 'put' [/home/azureuser/btreeBlock/verilog/put/2/put.v:6]
 +------+---------+-------+-------+
 |      |Instance |Module |Cells  |
 +------+---------+-------+-------+
@@ -71,6 +72,16 @@ Synthesis finished with 0 errors, 0 critical warnings and 80 warnings.
 operation.
 
 ```
+INFO: [Synth 8-6157] synthesizing module 'delete' [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:6]
++------+---------+-------+-------+
+|      |Instance |Module |Cells  |
++------+---------+-------+-------+
+|1     |top      |       | 119947|
++------+---------+-------+-------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:19:27 ; elapsed = 00:20:11 . Memory (MB): peak = 3132.988 ; gain = 1699.551 ;
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 55 warnings.
 ```
 
 
