@@ -12,10 +12,11 @@ Update the Ubunbtu instance:
 
 ```
 sudo apt update
+
 sudo apt install build-essential tcsh libssl-dev libx11-dev libboost-all-dev \
   libncurses5-dev x11-apps  libxext-dev libxrender-dev \
   libxtst-dev openjdk-21-jdk-headless​ micro
-``
+```
 
 ## AMD installer
 
@@ -32,7 +33,7 @@ Start the installer on the instance:
 XINSTALLER_SCALE=2 bash FPGAs_AdaptiveSoCs_Unified_2024.2_1113_1001_Lin64.bin
 ```
 
-Supply login details for: ```https://login.amd.com```
+Supply login details for: (https://login.amd.com)
 
 
 ## Clone GitHub
@@ -56,6 +57,8 @@ ssh-keygen -y -f Azure.pem > Azure.pub
 
 ### Clone the GitHub repo
 
+Clone the github repo: (https://github.com/philiprbrenan/btreeBlock)
+
 ```
 GIT_TRACE=1 GIT_CURL_VERBOSE=1  GIT_SSH_COMMAND="ssh -i .ssh/Azure.pem" git clone git@github.com:philiprbrenan/btreeBlock.git
 ​GIT_SSH_COMMAND="ssh -i ~/.ssh/Azure.pem" git pull
@@ -64,9 +67,9 @@ GIT_TRACE=1 GIT_CURL_VERBOSE=1  GIT_SSH_COMMAND="ssh -i .ssh/Azure.pem" git clon
 # Synthesis
 
 Change to folder ```btreeBlock/vivado``` and edit ```synthesis.tcl``` to point
-to the verilog folder containing the project to be synthesised.
+to the verilog folder containing the project to be synthesized.
 
-Synthesise the Vivado project:
+Synthesize the Vivado project:
 
 ```
 perl synthesis.pl

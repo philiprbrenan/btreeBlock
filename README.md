@@ -11,11 +11,11 @@ http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html
 # Roadmap
 
 I implemented the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [Java](https://en.wikipedia.org/wiki/Java_(programming_language)), then successively reduced the [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) [code](https://en.wikipedia.org/wiki/Computer_program) until it looked just like [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program), at which point it was easy to
-generate a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) in [Verilog](https://en.wikipedia.org/wiki/Verilog) to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program): 
+generate a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) in [Verilog](https://en.wikipedia.org/wiki/Verilog) to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program):
 ![Roadmap](flowChart/DevelopmentFlowChart.png)
 
 The [Verilog](https://en.wikipedia.org/wiki/Verilog) [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) will now be implemented on an [fpga](https://en.wikipedia.org/wiki/Field-programmable_gate_array) and then as an [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) to
-implement the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [hardware](https://en.wikipedia.org/wiki/Digital_electronics) rather than [software](https://en.wikipedia.org/wiki/Software). 
+implement the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [hardware](https://en.wikipedia.org/wiki/Digital_electronics) rather than [software](https://en.wikipedia.org/wiki/Software).
 ```
 -----------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
@@ -24,8 +24,8 @@ implement the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [hardw
 -----------------------------------------------------------------------------------
 ```
 
-# Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) 
-For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)): 
+# Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database)
+For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)):
 ```
    BtreePA t = new BtreePA()
      {int maxSize         () {return  8;}
@@ -35,23 +35,44 @@ For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)):
       int bitsPerData     () {return  4;}
      };
 ```
- [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) Synthesis uses the following resources to implement the **find**
+
+[Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) Synthesis uses the following resources to implement the **find**
 operation.
 
 ```
-+-------------------------+------+-------+------------+-----------+-------+
-|        Site Type        | Used | Fixed | Prohibited | Available | Util% |
-+-------------------------+------+-------+------------+-----------+-------+
-| Slice LUTs*             |  581 |     0 |          0 |     41000 |  1.42 |
-|   LUT as Logic          |  581 |     0 |          0 |     41000 |  1.42 |
-|   LUT as Memory         |    0 |     0 |          0 |     13400 |  0.00 |
-| Slice Registers         |  131 |     0 |          0 |     82000 |  0.16 |
-|   Register as Flip Flop |  131 |     0 |          0 |     82000 |  0.16 |
-|   Register as Latch     |    0 |     0 |          0 |     82000 |  0.00 |
-| F7 Muxes                |   10 |     0 |          0 |     20500 |  0.05 |
-| F8 Muxes                |    0 |     0 |          0 |     10250 |  0.00 |
-+-------------------------+------+-------+------------+-----------+-------+
++------+---------+-------+------+
+|      |Instance |Module |Cells |
++------+---------+-------+------+
+|1     |top      |       |   532|
++------+---------+-------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:30 ; elapsed = 00:00:32 . Memory (MB): peak = 2154.945 ; gain = 721.441 ;
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 53 warnings.
 ```
+
+[Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) Synthesis uses the following resources to implement the **put**
+operation.
+
+```
+Report Instance Areas:
++------+---------+-------+-------+
+|      |Instance |Module |Cells  |
++------+---------+-------+-------+
+|1     |top      |       | 148348|
++------+---------+-------+-------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:24:57 ; elapsed = 00:25:45 . Memory (MB): peak = 3180.359 ; gain = 1746.855 ;
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 80 warnings.
+```
+
+[Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) Synthesis uses the following resources to implement the **delete**
+operation.
+
+```
+```
+
 
 The [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)) being searched looks like this:
 
