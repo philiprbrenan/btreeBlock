@@ -528,11 +528,11 @@ node_setBranch =  node_setLeaf = node_isLeaf = L.variable ("node_isLeaf"        
 //  node_findFirstGreaterThanOrEqualInBranch = L.variable ("node_findFirstGreaterThanOrEqualInBranch"      , bitsPerNext);
            node_splitBranch = node_splitLeaf = L.variable ("node_splitLeaf"                                , bitsPerNext);
 //                          node_splitBranch = L.variable ("node_splitBranch"                              , bitsPerNext);
-                          node_stealFromLeft = L.variable ("node_stealFromLeft"                            , bitsPerNext);
-                         node_stealFromRight = L.variable ("node_stealFromRight"                           , bitsPerNext);
-                              node_mergeRoot = L.variable ("node_mergeRoot"                                , bitsPerNext);
-                       node_mergeLeftSibling = L.variable ("node_mergeLeftSibling"                         , bitsPerNext);
-                      node_mergeRightSibling = L.variable ("node_mergeRightSibling"                        , bitsPerNext);
+                          node_stealFromLeft = //L.variable ("node_stealFromLeft"                            , bitsPerNext);
+                         node_stealFromRight = //L.variable ("node_stealFromRight"                           , bitsPerNext);
+                              node_mergeRoot = //L.variable ("node_mergeRoot"                                , bitsPerNext);
+                       node_mergeLeftSibling = //L.variable ("node_mergeLeftSibling"                         , bitsPerNext);
+                      node_mergeRightSibling = //L.variable ("node_mergeRightSibling"                        , bitsPerNext);
                                 node_balance = L.variable ("node_balance"                                  , bitsPerNext);
 
     final Layout.Structure transaction = L.structure("transaction", allocate,
@@ -574,11 +574,11 @@ node_setBranch =  node_setLeaf = node_isLeaf = L.variable ("node_isLeaf"        
     //node_findFirstGreaterThanOrEqualInBranch,
       node_splitLeaf,
     //node_splitBranch,
-      node_stealFromLeft,
-      node_stealFromRight,
-      node_mergeRoot,
-      node_mergeLeftSibling,
-      node_mergeRightSibling,
+    //node_stealFromLeft,
+    //node_stealFromRight,
+    //node_mergeRoot,
+    //node_mergeLeftSibling,
+    //node_mergeRightSibling,
       node_balance);
 
     return L.compile();
@@ -3420,7 +3420,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 945, """
+    t.runVerilogDeleteTest(3, 6, 943, """
                     6           |
                     0           |
                     5           |
@@ -3432,7 +3432,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 811, """
+    t.runVerilogDeleteTest(4, 5, 810, """
              6           |
              0           |
              5           |
@@ -3452,7 +3452,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 664, """
+    t.runVerilogDeleteTest(1, 8, 662, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3476,7 +3476,7 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 460, """
+    t.runVerilogDeleteTest(7, 2, 458, """
 8,9=0 |
 """);
 
