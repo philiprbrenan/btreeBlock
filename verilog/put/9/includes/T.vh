@@ -1,4 +1,4 @@
-reg [319:0] T_44;  /*   MemoryLayoutPA.java:0944:declareVerilog   MemoryLayoutPA.java:0927:dumpVerilog   BtreePA.java:2399:<init>   BtreePA.java:3476:<init>   BtreePA.java:3475:runVerilogPutTest   BtreePA.java:3551:test_verilog_put   BtreePA.java:3585:newTests   BtreePA.java:3592:main  */
+reg [316:0] T_44;  /*   MemoryLayoutPA.java:0944:declareVerilog   MemoryLayoutPA.java:0927:dumpVerilog   BtreePA.java:2416:<init>   BtreePA.java:3493:<init>   BtreePA.java:3492:runVerilogPutTest   BtreePA.java:3568:test_verilog_put   BtreePA.java:3602:newTests   BtreePA.java:3609:main  */
 task initialize_memory_T_44;
     begin
         T_44[0] <= 1;
@@ -280,25 +280,25 @@ task initialize_memory_T_44;
         T_44[276] <= 0;
         T_44[277] <= 0;
         T_44[278] <= 0;
-        T_44[279] <= 0;
-        T_44[280] <= 0;
+        T_44[279] <= 1;
+        T_44[280] <= 1;
         T_44[281] <= 0;
-        T_44[282] <= 1;
-        T_44[283] <= 1;
+        T_44[282] <= 0;
+        T_44[283] <= 0;
         T_44[284] <= 0;
-        T_44[285] <= 0;
+        T_44[285] <= 1;
         T_44[286] <= 0;
         T_44[287] <= 0;
         T_44[288] <= 1;
         T_44[289] <= 0;
         T_44[290] <= 0;
         T_44[291] <= 1;
-        T_44[292] <= 0;
+        T_44[292] <= 1;
         T_44[293] <= 0;
         T_44[294] <= 1;
-        T_44[295] <= 1;
+        T_44[295] <= 0;
         T_44[296] <= 0;
-        T_44[297] <= 1;
+        T_44[297] <= 0;
         T_44[298] <= 0;
         T_44[299] <= 0;
         T_44[300] <= 0;
@@ -310,16 +310,13 @@ task initialize_memory_T_44;
         T_44[306] <= 0;
         T_44[307] <= 0;
         T_44[308] <= 0;
-        T_44[309] <= 0;
-        T_44[310] <= 0;
+        T_44[309] <= 1;
+        T_44[310] <= 1;
         T_44[311] <= 0;
         T_44[312] <= 1;
         T_44[313] <= 1;
         T_44[314] <= 0;
-        T_44[315] <= 1;
-        T_44[316] <= 1;
-        T_44[317] <= 0;
-        T_44[318] <= 0;
-        T_44[319] <= 0;
+        T_44[315] <= 0;
+        T_44[316] <= 0;
     end
 endtask

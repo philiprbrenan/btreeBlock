@@ -514,8 +514,8 @@ node_setBranch =  node_setLeaf = node_isLeaf = L.variable ("node_isLeaf"        
                              node_branchSize = L.variable ("node_branchSize"                               , bitsPerNext);
                node_leafIsFull = node_isFull = L.variable ("node_isFull"                                   , bitsPerNext);
 //                           node_leafIsFull = L.variable ("node_leafIsFull"                               , bitsPerNext);
-                           node_branchIsFull = L.variable ("node_branchIsFull"                             , bitsPerNext);
-                           node_parentIsFull = L.variable ("node_parentIsFull"                             , bitsPerNext);
+       node_parentIsFull = node_branchIsFull = L.variable ("node_branchIsFull"                             , bitsPerNext);
+//                         node_parentIsFull = L.variable ("node_parentIsFull"                             , bitsPerNext);
                                 node_isEmpty = L.variable ("node_isEmpty"                                  , bitsPerNext);
                                   node_isLow = L.variable ("node_isLow"                                    , bitsPerNext);
                    node_hasLeavesForChildren = L.variable ("node_hasLeavesForChildren"                     , bitsPerNext);
@@ -543,22 +543,39 @@ node_setBranch =  node_setLeaf = node_isLeaf = L.variable ("node_isLeaf"        
       leafSize, branchSize, top, Key,
       Data, find, findAndInsert, parent, child, leafFound, maxKeysPerLeaf,
       maxKeysPerBranch, two, MaxDepth, findDepth, putDepth, deleteDepth,
-      mergeDepth, mergeIndex, node_isLeaf, //node_setLeaf,
-      // node_setBranch,
-      node_assertLeaf, node_assertBranch, allocLeaf,
-      // allocBranch,
+      mergeDepth, mergeIndex,
+      node_isLeaf,
+    //node_setLeaf,
+    //node_setBranch,
+      node_assertLeaf,
+      node_assertBranch,
+      allocLeaf,
+    //allocBranch,
       node_free,
-      //  node_clear, node_erase,
+    //node_clear,
+    //node_erase,
       node_leafBase,     node_leafBase1,   node_leafBase2,   node_leafBase3,
       node_branchBase, node_branchBase1, node_branchBase2, node_branchBase3,
       node_leafSize,
-      node_branchSize, node_isFull, node_branchIsFull, node_parentIsFull,
+      node_branchSize,
+      node_isFull,
+      node_branchIsFull,
+      //node_parentIsFull,
       //node_leafIsFull,
-      node_isEmpty, node_isLow, node_hasLeavesForChildren, node_top,
-      node_findEqualInLeaf, node_findFirstGreaterThanOrEqualInLeaf,
-      node_findFirstGreaterThanOrEqualInBranch, node_splitLeaf,
-      node_splitBranch, node_stealFromLeft, node_stealFromRight,
-      node_mergeRoot, node_mergeLeftSibling, node_mergeRightSibling,
+      node_isEmpty,
+      node_isLow,
+      node_hasLeavesForChildren,
+      node_top,
+      node_findEqualInLeaf,
+      node_findFirstGreaterThanOrEqualInLeaf,
+      node_findFirstGreaterThanOrEqualInBranch,
+      node_splitLeaf,
+      node_splitBranch,
+      node_stealFromLeft,
+      node_stealFromRight,
+      node_mergeRoot,
+      node_mergeLeftSibling,
+      node_mergeRightSibling,
       node_balance);
 
     return L.compile();
