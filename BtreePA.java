@@ -492,8 +492,8 @@ abstract class BtreePA extends Test                                             
                                   mergeDepth = L.variable ("mergeDepth"                                    , bitsPerNext);
                                   mergeIndex = L.variable ("mergeIndex"                                    , bitsPerSize);
 
-                                 node_isLeaf = L.variable ("node_isLeaf"                                   , bitsPerNext);
-                                node_setLeaf = L.variable ("node_setLeaf"                                  , bitsPerNext);
+                  node_setLeaf = node_isLeaf = L.variable ("node_isLeaf"                                   , bitsPerNext);
+//                              node_setLeaf = L.variable ("node_setLeaf"                                  , bitsPerNext);
                               node_setBranch = L.variable ("node_setBranch"                                , bitsPerNext);
                              node_assertLeaf = L.variable ("node_assertLeaf"                               , bitsPerNext);
                            node_assertBranch = L.variable ("node_assertBranch"                             , bitsPerNext);
@@ -501,7 +501,7 @@ abstract class BtreePA extends Test                                             
                                  allocBranch = L.variable ("allocBranch"                                   , bitsPerNext);
                                    node_free = L.variable ("node_free"                                     , bitsPerNext);
                      node_erase = node_clear = L.variable ("node_clear"                                    , bitsPerNext);
-//                                node_erase = L.variable ("node_erase"                                    , bitsPerNext);
+//                                node_erase = L.variable ("node_erase"                                    , bitsPerNext);  // no change
                                node_leafBase = L.variable ("node_leafBase"                                 , bitsPerNext);
                               node_leafBase1 = L.variable ("node_leafBase1"                                , bitsPerNext);
                               node_leafBase2 = L.variable ("node_leafBase2"                                , bitsPerNext);
@@ -543,8 +543,8 @@ abstract class BtreePA extends Test                                             
       leafSize, branchSize, top, Key,
       Data, find, findAndInsert, parent, child, leafFound, maxKeysPerLeaf,
       maxKeysPerBranch, two, MaxDepth, findDepth, putDepth, deleteDepth,
-      mergeDepth, mergeIndex, node_isLeaf, node_setLeaf, node_setBranch,
-      node_assertLeaf, node_assertBranch, allocLeaf, allocBranch, node_free,
+      mergeDepth, mergeIndex, node_isLeaf, //node_setLeaf,
+      node_setBranch, node_assertLeaf, node_assertBranch, allocLeaf, allocBranch, node_free,
       node_clear, //node_erase,
       node_leafBase,     node_leafBase1,   node_leafBase2,   node_leafBase3,
       node_branchBase, node_branchBase1, node_branchBase2, node_branchBase3,
