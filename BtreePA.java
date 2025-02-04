@@ -495,7 +495,7 @@ abstract class BtreePA extends Test                                             
 node_setBranch =  node_setLeaf = node_isLeaf = L.variable ("node_isLeaf"                                   , bitsPerNext);  // No change
 //                              node_setLeaf = L.variable ("node_setLeaf"                                  , bitsPerNext);  // No change
 //                            node_setBranch = L.variable ("node_setBranch"                                , bitsPerNext);
-                             node_assertLeaf = L.variable ("node_assertLeaf"                               , bitsPerNext);
+                             node_assertLeaf = //L.variable ("node_assertLeaf"                               , bitsPerNext);
                            node_assertBranch = L.variable ("node_assertBranch"                             , bitsPerNext);
                      allocBranch = allocLeaf = L.variable ("allocLeaf"                                     , bitsPerNext);  // No change
                               // allocBranch = L.variable ("allocBranch"                                   , bitsPerNext);
@@ -550,7 +550,7 @@ node_setBranch =  node_setLeaf = node_isLeaf = L.variable ("node_isLeaf"        
       node_isLeaf,
     //node_setLeaf,
     //node_setBranch,
-      node_assertLeaf,
+    //node_assertLeaf,
       node_assertBranch,
       allocLeaf,
     //allocBranch,
