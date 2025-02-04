@@ -21,7 +21,7 @@ my $vivadoX   = "$home/Vivado/2024.2/bin/vivado";                               
 die "No such path: $vivado"    unless -d $vivado;
 die "No such file: $vivadoX"   unless -f $vivadoX;
 
-owf($synthesis, <<"END");                                                       # Write tcl to run the synthesis
+owf($synthesis, <<"END");                                                       # Write tcl to run the synthesis and write the resukting netlist
 create_project ${project} ${project_dir}/vivado -part $part -force
 
 add_files ${project_dir}/${project}.v
