@@ -516,15 +516,18 @@ node_setBranch =  node_setLeaf = node_isLeaf = L.variable ("node_isLeaf"        
 //                           node_leafIsFull = L.variable ("node_leafIsFull"                               , bitsPerNext);
        node_parentIsFull = node_branchIsFull = L.variable ("node_branchIsFull"                             , bitsPerNext);
 //                         node_parentIsFull = L.variable ("node_parentIsFull"                             , bitsPerNext);
-                                node_isEmpty = L.variable ("node_isEmpty"                                  , bitsPerNext);
-                                  node_isLow = L.variable ("node_isLow"                                    , bitsPerNext);
-                   node_hasLeavesForChildren = L.variable ("node_hasLeavesForChildren"                     , bitsPerNext);
+                   node_hasLeavesForChildren =
+                   node_isLow = node_isEmpty = L.variable ("node_isEmpty"                                  , bitsPerNext);
+//                                node_isLow = L.variable ("node_isLow"                                    , bitsPerNext);
+//                 node_hasLeavesForChildren = L.variable ("node_hasLeavesForChildren"                     , bitsPerNext);
                                     node_top = L.variable ("node_top"                                      , bitsPerNext);
-                        node_findEqualInLeaf = L.variable ("node_findEqualInLeaf"                          , bitsPerNext);
+//                      node_findEqualInLeaf = L.variable ("node_findEqualInLeaf"                          , bitsPerNext);
+                        node_findEqualInLeaf =
+    node_findFirstGreaterThanOrEqualInBranch =
       node_findFirstGreaterThanOrEqualInLeaf = L.variable ("node_findFirstGreaterThanOrEqualInLeaf"        , bitsPerNext);
-    node_findFirstGreaterThanOrEqualInBranch = L.variable ("node_findFirstGreaterThanOrEqualInBranch"      , bitsPerNext);
-                              node_splitLeaf = L.variable ("node_splitLeaf"                                , bitsPerNext);
-                            node_splitBranch = L.variable ("node_splitBranch"                              , bitsPerNext);
+//  node_findFirstGreaterThanOrEqualInBranch = L.variable ("node_findFirstGreaterThanOrEqualInBranch"      , bitsPerNext);
+           node_splitBranch = node_splitLeaf = L.variable ("node_splitLeaf"                                , bitsPerNext);
+//                          node_splitBranch = L.variable ("node_splitBranch"                              , bitsPerNext);
                           node_stealFromLeft = L.variable ("node_stealFromLeft"                            , bitsPerNext);
                          node_stealFromRight = L.variable ("node_stealFromRight"                           , bitsPerNext);
                               node_mergeRoot = L.variable ("node_mergeRoot"                                , bitsPerNext);
@@ -560,17 +563,17 @@ node_setBranch =  node_setLeaf = node_isLeaf = L.variable ("node_isLeaf"        
       node_branchSize,
       node_isFull,
       node_branchIsFull,
-      //node_parentIsFull,
-      //node_leafIsFull,
+    //node_parentIsFull,
+    //node_leafIsFull,
       node_isEmpty,
-      node_isLow,
-      node_hasLeavesForChildren,
+    //node_isLow,
+    //node_hasLeavesForChildren,
       node_top,
-      node_findEqualInLeaf,
+    //node_findEqualInLeaf,
       node_findFirstGreaterThanOrEqualInLeaf,
-      node_findFirstGreaterThanOrEqualInBranch,
+    //node_findFirstGreaterThanOrEqualInBranch,
       node_splitLeaf,
-      node_splitBranch,
+    //node_splitBranch,
       node_stealFromLeft,
       node_stealFromRight,
       node_mergeRoot,
@@ -3598,7 +3601,7 @@ endmodule
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
     test_verilog_delete();
-    //test_verilog_find();
+    test_verilog_find();
     test_verilog_put();
     //test_put_ascending();
     //test_delete_descending();

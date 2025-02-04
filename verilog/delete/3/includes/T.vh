@@ -1,4 +1,4 @@
-reg [316:0] T_10;  /*   MemoryLayoutPA.java:0944:declareVerilog   MemoryLayoutPA.java:0927:dumpVerilog   BtreePA.java:2416:<init>   BtreePA.java:3380:<init>   BtreePA.java:3379:runVerilogDeleteTest   BtreePA.java:3420:test_verilog_delete   BtreePA.java:3600:newTests   BtreePA.java:3609:main  */
+reg [301:0] T_10;  /*   MemoryLayoutPA.java:0944:declareVerilog   MemoryLayoutPA.java:0927:dumpVerilog   BtreePA.java:2419:<init>   BtreePA.java:3383:<init>   BtreePA.java:3382:runVerilogDeleteTest   BtreePA.java:3423:test_verilog_delete   BtreePA.java:3603:newTests   BtreePA.java:3612:main  */
 task initialize_memory_T_10;
     begin
         T_10[0] <= 1;
@@ -274,8 +274,8 @@ task initialize_memory_T_10;
         T_10[270] <= 1;
         T_10[271] <= 1;
         T_10[272] <= 0;
-        T_10[273] <= 0;
-        T_10[274] <= 0;
+        T_10[273] <= 1;
+        T_10[274] <= 1;
         T_10[275] <= 0;
         T_10[276] <= 0;
         T_10[277] <= 0;
@@ -283,40 +283,25 @@ task initialize_memory_T_10;
         T_10[279] <= 1;
         T_10[280] <= 1;
         T_10[281] <= 0;
-        T_10[282] <= 0;
+        T_10[282] <= 1;
         T_10[283] <= 0;
         T_10[284] <= 0;
-        T_10[285] <= 1;
+        T_10[285] <= 0;
         T_10[286] <= 0;
         T_10[287] <= 0;
-        T_10[288] <= 1;
+        T_10[288] <= 0;
         T_10[289] <= 0;
         T_10[290] <= 0;
-        T_10[291] <= 1;
-        T_10[292] <= 1;
+        T_10[291] <= 0;
+        T_10[292] <= 0;
         T_10[293] <= 0;
         T_10[294] <= 1;
-        T_10[295] <= 0;
+        T_10[295] <= 1;
         T_10[296] <= 0;
-        T_10[297] <= 0;
-        T_10[298] <= 0;
+        T_10[297] <= 1;
+        T_10[298] <= 1;
         T_10[299] <= 0;
         T_10[300] <= 0;
         T_10[301] <= 0;
-        T_10[302] <= 0;
-        T_10[303] <= 0;
-        T_10[304] <= 0;
-        T_10[305] <= 0;
-        T_10[306] <= 0;
-        T_10[307] <= 0;
-        T_10[308] <= 0;
-        T_10[309] <= 1;
-        T_10[310] <= 1;
-        T_10[311] <= 0;
-        T_10[312] <= 1;
-        T_10[313] <= 1;
-        T_10[314] <= 0;
-        T_10[315] <= 0;
-        T_10[316] <= 0;
     end
 endtask
