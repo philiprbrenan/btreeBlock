@@ -3408,7 +3408,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 812, """
+    t.runVerilogDeleteTest(4, 5, 811, """
              6           |
              0           |
              5           |
@@ -3420,7 +3420,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 785, """
+    t.runVerilogDeleteTest(2, 7, 783, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3428,7 +3428,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 665, """
+    t.runVerilogDeleteTest(1, 8, 664, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3436,7 +3436,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 385, """
+    t.runVerilogDeleteTest(5, 4, 384, """
       7      |
       0      |
       1      |
@@ -3452,7 +3452,7 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 462, """
+    t.runVerilogDeleteTest(7, 2, 460, """
 8,9=0 |
 """);
 
@@ -3500,7 +3500,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 569, """
+    t.runVerilogPutTest(4, 568, """
       2      |
       0      |
       1      |
@@ -3516,7 +3516,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 754, """
+    t.runVerilogPutTest(6, 753, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3532,7 +3532,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 1062, """
+    t.runVerilogPutTest(8, 1061, """
              4             |
              0             |
              5             |
@@ -3578,7 +3578,7 @@ endmodule
    {//oldTests();
     test_verilog_delete();
     //test_verilog_find();
-    //test_verilog_put();
+    test_verilog_put();
     //test_put_ascending();
     //test_delete_descending();
    }
