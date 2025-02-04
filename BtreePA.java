@@ -492,12 +492,12 @@ abstract class BtreePA extends Test                                             
                                   mergeDepth = L.variable ("mergeDepth"                                    , bitsPerNext);
                                   mergeIndex = L.variable ("mergeIndex"                                    , bitsPerSize);
 
-  node_setBranch =  node_setLeaf = node_isLeaf = L.variable ("node_isLeaf"                                   , bitsPerNext);  // No change
-//                              node_setLeaf = L.variable ("node_setLeaf"                                  , bitsPerNext);  // no change
+node_setBranch =  node_setLeaf = node_isLeaf = L.variable ("node_isLeaf"                                   , bitsPerNext);  // No change
+//                              node_setLeaf = L.variable ("node_setLeaf"                                  , bitsPerNext);  // No change
 //                            node_setBranch = L.variable ("node_setBranch"                                , bitsPerNext);
                              node_assertLeaf = L.variable ("node_assertLeaf"                               , bitsPerNext);
                            node_assertBranch = L.variable ("node_assertBranch"                             , bitsPerNext);
-                     allocBranch = allocLeaf = L.variable ("allocLeaf"                                     , bitsPerNext);
+                     allocBranch = allocLeaf = L.variable ("allocLeaf"                                     , bitsPerNext);  // No change
                               // allocBranch = L.variable ("allocBranch"                                   , bitsPerNext);
          node_erase = node_clear = node_free = L.variable ("node_free"                                     , bitsPerNext);
 //                   node_erase = node_clear = L.variable ("node_clear"                                    , bitsPerNext);  // -1
@@ -512,8 +512,8 @@ abstract class BtreePA extends Test                                             
                             node_branchBase3 = L.variable ("node_branchBase3"                              , bitsPerNext);
                                node_leafSize = L.variable ("node_leafSize"                                 , bitsPerNext);
                              node_branchSize = L.variable ("node_branchSize"                               , bitsPerNext);
-                                 node_isFull = L.variable ("node_isFull"                                   , bitsPerNext);
-                             node_leafIsFull = L.variable ("node_leafIsFull"                               , bitsPerNext);
+               node_leafIsFull = node_isFull = L.variable ("node_isFull"                                   , bitsPerNext);
+//                           node_leafIsFull = L.variable ("node_leafIsFull"                               , bitsPerNext);
                            node_branchIsFull = L.variable ("node_branchIsFull"                             , bitsPerNext);
                            node_parentIsFull = L.variable ("node_parentIsFull"                             , bitsPerNext);
                                 node_isEmpty = L.variable ("node_isEmpty"                                  , bitsPerNext);
@@ -552,7 +552,8 @@ abstract class BtreePA extends Test                                             
       node_leafBase,     node_leafBase1,   node_leafBase2,   node_leafBase3,
       node_branchBase, node_branchBase1, node_branchBase2, node_branchBase3,
       node_leafSize,
-      node_branchSize, node_isFull, node_branchIsFull, node_parentIsFull, node_leafIsFull,
+      node_branchSize, node_isFull, node_branchIsFull, node_parentIsFull,
+      //node_leafIsFull,
       node_isEmpty, node_isLow, node_hasLeavesForChildren, node_top,
       node_findEqualInLeaf, node_findFirstGreaterThanOrEqualInLeaf,
       node_findFirstGreaterThanOrEqualInBranch, node_splitLeaf,
