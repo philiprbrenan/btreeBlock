@@ -1,0 +1,27 @@
+#-----------------------------------------------------------
+# Vivado v2024.2 (64-bit)
+# SW Build 5239630 on Fri Nov 08 22:34:34 MST 2024
+# IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
+# SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
+# Start of session at: Tue Feb  4 00:25:43 2025
+# Process ID         : 186775
+# Current directory  : /home/phil/btreeBlock/vivado
+# Command line       : vivado -mode batch -source /home/phil/btreeBlock/vivado/synthesis.tcl
+# Log file           : /home/phil/btreeBlock/vivado/vivado.log
+# Journal file       : /home/phil/btreeBlock/vivado/vivado.jou
+# Running On         : pousadouros
+# Platform           : Ubuntu
+# Operating System   : Ubuntu 24.04.1 LTS
+# Processor Detail   : Intel(R) Core(TM) i5-7400 CPU @ 3.00GHz
+# CPU Frequency      : 3308.563 MHz
+# CPU Physical cores : 4
+# CPU Logical cores  : 4
+# Host memory        : 8278 MB
+# Swap memory        : 536 MB
+# Total Virtual      : 8815 MB
+# Available Virtual  : 2744 MB
+#-----------------------------------------------------------
+source /home/phil/btreeBlock/vivado/synthesis.tcl
+# create_project find /home/phil/btreeBlock/verilog/find/2/vivado -part XC7A200T -force           # Create a new Vivado project with a specified part
+ERROR: [Common 17-165] Too many positional options when parsing 'part', please type 'create_project -help' for usage info.
+INFO: [Common 17-206] Exiting Vivado at Tue Feb  4 00:25:48 2025...

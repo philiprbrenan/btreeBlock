@@ -1,36 +1,14 @@
-# Set the project directory
-set project find
-set key     2
-set home $env(HOME)
-set project_dir "${home}/btreeBlock/verilog/${project}/${key}"
+create_project find /home/phil/btreeBlock/verilog/find/2/vivado -part XC7A200T -force
 
-# Set the path to the includes directory
-set includes_dir "${project_dir}/includes"
+add_files /home/phil/btreeBlock/verilog/find/2/find.v
+add_files -norecurse /home/phil/btreeBlock/verilog/find/2/includes/M.vh
+add_files -norecurse /home/phil/btreeBlock/verilog/find/2/includes/T.vh
 
-# Create a new Vivado project
-#create_project ${project} ${project_dir}/vivado -part xc7z020clg484-1 -force
-create_project ${project} ${project_dir}/vivado -part XC7A200T -force
+set_property include_dirs [list /home/phil/btreeBlock/verilog/find/2/includes] [current_fileset]
 
-# Add the main Verilog file and the include files
-add_files ${project_dir}/${project}.v
-add_files -norecurse ${includes_dir}/M.vh
-add_files -norecurse ${includes_dir}/T.vh
-
-# Set the include directory for Verilog files
-set_property include_dirs [list ${includes_dir}] [current_fileset]
-
-# Run synthesis
 launch_runs synth_1
+wait_on_runs synth_1
 
-# Wait for the synthesis to finish
-wait_on_run synth_1
+write_checkpoint -force /home/phil/btreeBlock/verilog/find/2/netlist.v
 
-# Check the synthesis results
-#if { [get_runs -completed] == 0 } {
-#    puts "Synthesis failed."
-#} else {
-#    puts "Synthesis completed successfully."
-#}
-
-# Close the project
 close_project
