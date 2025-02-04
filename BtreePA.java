@@ -492,16 +492,16 @@ abstract class BtreePA extends Test                                             
                                   mergeDepth = L.variable ("mergeDepth"                                    , bitsPerNext);
                                   mergeIndex = L.variable ("mergeIndex"                                    , bitsPerSize);
 
-node_setBranch =  node_setLeaf = node_isLeaf = L.variable ("node_isLeaf"                                   , bitsPerNext);  // No change
-//                              node_setLeaf = L.variable ("node_setLeaf"                                  , bitsPerNext);  // No change
-//                            node_setBranch = L.variable ("node_setBranch"                                , bitsPerNext);
+                                 node_isLeaf = //L.variable ("node_isLeaf"                                   , bitsPerNext);
+                                node_setLeaf = //L.variable ("node_setLeaf"                                  , bitsPerNext);
+                              node_setBranch = L.variable ("node_setBranch"                                , bitsPerNext);
                              node_assertLeaf = //L.variable ("node_assertLeaf"                               , bitsPerNext);
                            node_assertBranch = L.variable ("node_assertBranch"                             , bitsPerNext);
-                     allocBranch = allocLeaf = L.variable ("allocLeaf"                                     , bitsPerNext);  // No change
-                              // allocBranch = L.variable ("allocBranch"                                   , bitsPerNext);
-         node_erase = node_clear = node_free = L.variable ("node_free"                                     , bitsPerNext);
-//                   node_erase = node_clear = L.variable ("node_clear"                                    , bitsPerNext);  // -1
-//                                node_erase = L.variable ("node_erase"                                    , bitsPerNext);  // no change
+                                   allocLeaf = //L.variable ("allocLeaf"                                     , bitsPerNext);
+                                 allocBranch = L.variable ("allocBranch"                                   , bitsPerNext);
+                                   node_free = //L.variable ("node_free"                                     , bitsPerNext);
+                                  node_clear = //L.variable ("node_clear"                                    , bitsPerNext);
+                                  node_erase = L.variable ("node_erase"                                    , bitsPerNext);
                                node_leafBase = L.variable ("node_leafBase"                                 , bitsPerNext);
                               node_leafBase1 = L.variable ("node_leafBase1"                                , bitsPerNext);
                               node_leafBase2 = L.variable ("node_leafBase2"                                , bitsPerNext);
@@ -510,24 +510,21 @@ node_setBranch =  node_setLeaf = node_isLeaf = L.variable ("node_isLeaf"        
                             node_branchBase1 = L.variable ("node_branchBase1"                              , bitsPerNext);
                             node_branchBase2 = L.variable ("node_branchBase2"                              , bitsPerNext);
                             node_branchBase3 = L.variable ("node_branchBase3"                              , bitsPerNext);
-                               node_leafSize = L.variable ("node_leafSize"                                 , bitsPerNext);
-                             node_branchSize = L.variable ("node_branchSize"                               , bitsPerNext);
-               node_leafIsFull = node_isFull = L.variable ("node_isFull"                                   , bitsPerNext);
-//                           node_leafIsFull = L.variable ("node_leafIsFull"                               , bitsPerNext);
-       node_parentIsFull = node_branchIsFull = L.variable ("node_branchIsFull"                             , bitsPerNext);
-//                         node_parentIsFull = L.variable ("node_parentIsFull"                             , bitsPerNext);
-                   node_hasLeavesForChildren =
-                   node_isLow = node_isEmpty = L.variable ("node_isEmpty"                                  , bitsPerNext);
-//                                node_isLow = L.variable ("node_isLow"                                    , bitsPerNext);
-//                 node_hasLeavesForChildren = L.variable ("node_hasLeavesForChildren"                     , bitsPerNext);
-                                    node_top = L.variable ("node_top"                                      , bitsPerNext);
-//                      node_findEqualInLeaf = L.variable ("node_findEqualInLeaf"                          , bitsPerNext);
-                        node_findEqualInLeaf =
-    node_findFirstGreaterThanOrEqualInBranch =
-      node_findFirstGreaterThanOrEqualInLeaf = L.variable ("node_findFirstGreaterThanOrEqualInLeaf"        , bitsPerNext);
-//  node_findFirstGreaterThanOrEqualInBranch = L.variable ("node_findFirstGreaterThanOrEqualInBranch"      , bitsPerNext);
-           node_splitBranch = node_splitLeaf = L.variable ("node_splitLeaf"                                , bitsPerNext);
-//                          node_splitBranch = L.variable ("node_splitBranch"                              , bitsPerNext);
+                               node_leafSize = //L.variable ("node_leafSize"                                 , bitsPerNext);
+                             node_branchSize = //L.variable ("node_branchSize"                               , bitsPerNext);
+                                 node_isFull = //L.variable ("node_isFull"                                   , bitsPerNext);
+                             node_leafIsFull = //L.variable ("node_leafIsFull"                               , bitsPerNext);
+                           node_branchIsFull = //L.variable ("node_branchIsFull"                             , bitsPerNext);
+                           node_parentIsFull = //L.variable ("node_parentIsFull"                             , bitsPerNext);
+                                node_isEmpty = //L.variable ("node_isEmpty"                                  , bitsPerNext);
+                                  node_isLow = L.variable ("node_isLow"                                    , bitsPerNext);
+                   node_hasLeavesForChildren = //L.variable ("node_hasLeavesForChildren"                     , bitsPerNext);
+                                    node_top = //L.variable ("node_top"                                      , bitsPerNext);
+                        node_findEqualInLeaf = //L.variable ("node_findEqualInLeaf"                          , bitsPerNext);
+      node_findFirstGreaterThanOrEqualInLeaf = //L.variable ("node_findFirstGreaterThanOrEqualInLeaf"        , bitsPerNext);
+    node_findFirstGreaterThanOrEqualInBranch = //L.variable ("node_findFirstGreaterThanOrEqualInBranch"      , bitsPerNext);
+                              node_splitLeaf = //L.variable ("node_splitLeaf"                                , bitsPerNext);
+                            node_splitBranch = //L.variable ("node_splitBranch"                              , bitsPerNext);
                           node_stealFromLeft = //L.variable ("node_stealFromLeft"                            , bitsPerNext);
                          node_stealFromRight = //L.variable ("node_stealFromRight"                           , bitsPerNext);
                               node_mergeRoot = //L.variable ("node_mergeRoot"                                , bitsPerNext);
@@ -547,38 +544,44 @@ node_setBranch =  node_setLeaf = node_isLeaf = L.variable ("node_isLeaf"        
       Data, find, findAndInsert, parent, child, leafFound, maxKeysPerLeaf,
       maxKeysPerBranch, two, MaxDepth, findDepth, putDepth, deleteDepth,
       mergeDepth, mergeIndex,
-      node_isLeaf,
-    //node_setLeaf,
-    //node_setBranch,
-    //node_assertLeaf,
+      //node_isLeaf,
+      //node_setLeaf,
+      node_setBranch,
+      //node_assertLeaf,
       node_assertBranch,
-      allocLeaf,
-    //allocBranch,
-      node_free,
-    //node_clear,
-    //node_erase,
-      node_leafBase,     node_leafBase1,   node_leafBase2,   node_leafBase3,
-      node_branchBase, node_branchBase1, node_branchBase2, node_branchBase3,
-      node_leafSize,
-      node_branchSize,
-      node_isFull,
-      node_branchIsFull,
-    //node_parentIsFull,
-    //node_leafIsFull,
-      node_isEmpty,
-    //node_isLow,
-    //node_hasLeavesForChildren,
-      node_top,
-    //node_findEqualInLeaf,
-      node_findFirstGreaterThanOrEqualInLeaf,
-    //node_findFirstGreaterThanOrEqualInBranch,
-      node_splitLeaf,
-    //node_splitBranch,
-    //node_stealFromLeft,
-    //node_stealFromRight,
-    //node_mergeRoot,
-    //node_mergeLeftSibling,
-    //node_mergeRightSibling,
+      //allocLeaf,
+      allocBranch,
+      //node_free,
+      //node_clear,
+      node_erase,
+      node_leafBase,
+      node_leafBase1,
+      node_leafBase2,
+      node_leafBase3,
+      node_branchBase,
+      node_branchBase1,
+      node_branchBase2,
+      node_branchBase3,
+      //node_leafSize,
+      //node_branchSize,
+      //node_isFull,
+      //node_leafIsFull,
+      //node_branchIsFull,
+      //node_parentIsFull,
+      //node_isEmpty,
+      node_isLow,
+      //node_hasLeavesForChildren,
+      //node_top,
+      //node_findEqualInLeaf,
+      //node_findFirstGreaterThanOrEqualInLeaf,
+      //node_findFirstGreaterThanOrEqualInBranch,
+      //node_splitLeaf,
+      //node_splitBranch,
+      //node_stealFromLeft,
+      //node_stealFromRight,
+      //node_mergeRoot,
+      //node_mergeLeftSibling,
+      //node_mergeRightSibling,
       node_balance);
 
     return L.compile();
@@ -3420,7 +3423,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 943, """
+    t.runVerilogDeleteTest(3, 6, 937, """
                     6           |
                     0           |
                     5           |
@@ -3432,7 +3435,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 810, """
+    t.runVerilogDeleteTest(4, 5, 806, """
              6           |
              0           |
              5           |
@@ -3444,7 +3447,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 783, """
+    t.runVerilogDeleteTest(2, 7, 777, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3452,7 +3455,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 662, """
+    t.runVerilogDeleteTest(1, 8, 657, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3460,7 +3463,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 384, """
+    t.runVerilogDeleteTest(5, 4, 382, """
       7      |
       0      |
       1      |
@@ -3468,7 +3471,7 @@ endmodule
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(6, 3, 384, """
+    t.runVerilogDeleteTest(6, 3, 383, """
     7      |
     0      |
     1      |
@@ -3476,7 +3479,7 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 458, """
+    t.runVerilogDeleteTest(7, 2, 456, """
 8,9=0 |
 """);
 
@@ -3508,15 +3511,15 @@ endmodule
     t.P.run(); t.P.clear();
     t.put();
 
-    t.runVerilogPutTest(1, 65, """
+    t.runVerilogPutTest(1, 64, """
 1=0 |
 """);
 
-    t.runVerilogPutTest(2, 77, """
+    t.runVerilogPutTest(2, 76, """
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest(3, 281, """
+    t.runVerilogPutTest(3, 277, """
     1      |
     0      |
     1      |
@@ -3524,7 +3527,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 568, """
+    t.runVerilogPutTest(4, 562, """
       2      |
       0      |
       1      |
@@ -3532,7 +3535,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 685, """
+    t.runVerilogPutTest(5, 677, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -3540,7 +3543,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 753, """
+    t.runVerilogPutTest(6, 745, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3548,7 +3551,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 870, """
+    t.runVerilogPutTest(7, 860, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -3556,7 +3559,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 1061, """
+    t.runVerilogPutTest(8, 1052, """
              4             |
              0             |
              5             |
@@ -3568,7 +3571,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 966, """
+    t.runVerilogPutTest(9, 957, """
              4                    |
              0                    |
              5                    |
