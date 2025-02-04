@@ -362,6 +362,7 @@ class MemoryLayoutPA extends Test                                               
     void move(At source)                                                        // Copy the specified number of bits from source to target assuming no overlap. The source and target can be in the same or a different memory.
      {z(); sameSize(source);
       final At target = this;
+      if (target == source) return;                                             // No need to copy a field into itself
       P.new I()
        {void a()
          {source.setOff();
