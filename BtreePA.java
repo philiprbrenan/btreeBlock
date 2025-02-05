@@ -1076,12 +1076,14 @@ abstract class BtreePA extends Test                                             
 
   private void splitBranchRoot()                                                // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
    {if (Assert) {T.setIntInstruction(node_assertBranch, root); assertBranch();}
-    T.setIntInstruction(node_branchIsFull, root); branchIsFull();
-    if (Halt) P.new If (T.at(branchIsFull))
-     {void Else()
-       {P.halt("Root is not full");
-       }
-     };
+    if (Halt)                                                                   // Confirm the root is fiull
+     {T.setIntInstruction(node_branchIsFull, root); branchIsFull();
+      P.new If (T.at(branchIsFull))
+       {void Else()
+         {P.halt("Root is not full");
+         }
+       };
+     }
     z();
 
     allocBranch(); tt(l, allocBranch);                                          // New left branch
@@ -3643,7 +3645,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 1050, """
+    t.runVerilogPutTest(8, 1042, """
              4             |
              0             |
              5             |
