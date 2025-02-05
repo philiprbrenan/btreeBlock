@@ -460,7 +460,7 @@ abstract class BtreePA extends Test                                             
                               stolenOrMerged = //L.bit      ("stolenOrMerged"                                );
                                 pastMaxDepth = //L.bit      ("pastMaxDepth"                                  );
                                   nodeMerged = //L.bit      ("nodeMerged"                                    );
-                                   mergeable = //L.bit      ("mergeable"                                     );
+                                   mergeable = L.bit      ("mergeable"                                     );
                                      deleted = L.bit      ("deleted"                                       );
 
                                     leafBase = L.variable ("leafBase"                                      , bitsPerAddress);
@@ -485,11 +485,11 @@ abstract class BtreePA extends Test                                             
 
                               maxKeysPerLeaf = L.variable ("maxKeysPerLeaf"                                , bitsPerSize);
                             maxKeysPerBranch = L.variable ("maxKeysPerBranch"                              , bitsPerSize);
-                                    MaxDepth = L.variable ("maxDepth"                                      , bitsPerNext);
                                          two = L.variable ("two"                                           , bitsPerSize);
-                                   findDepth = L.variable ("findDepth"                                     , bitsPerNext);
-                                    putDepth = L.variable ("putDepth"                                      , bitsPerNext);
-                                 deleteDepth = L.variable ("deleteDepth"                                   , bitsPerNext);
+                                    MaxDepth = //L.variable ("maxDepth"                                      , bitsPerNext);
+                                   findDepth = //L.variable ("findDepth"                                     , bitsPerNext);
+                                    putDepth = //L.variable ("putDepth"                                      , bitsPerNext);
+                                 deleteDepth = //L.variable ("deleteDepth"                                   , bitsPerNext);
                                   mergeDepth = L.variable ("mergeDepth"                                    , bitsPerNext);
                                   mergeIndex = L.variable ("mergeIndex"                                    , bitsPerSize);
 
@@ -571,7 +571,7 @@ abstract class BtreePA extends Test                                             
       //stolenOrMerged,
       //pastMaxDepth,
       //nodeMerged,
-      //mergeable,
+      mergeable,
       deleted,
 
       leafBase,     leafBase1,   leafBase2,   leafBase3,
@@ -589,10 +589,10 @@ abstract class BtreePA extends Test                                             
       maxKeysPerLeaf,
       maxKeysPerBranch,
       two,
-      MaxDepth,
-      findDepth,
-      putDepth,
-      deleteDepth,
+      //MaxDepth,
+      //findDepth,
+      //putDepth,
+      //deleteDepth,
       mergeDepth,
       mergeIndex,
       //node_isLeaf,
@@ -3654,6 +3654,7 @@ endmodule
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
+    //test_delete_small_random();
     test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
