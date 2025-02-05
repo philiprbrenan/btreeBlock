@@ -3,7 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-// Is optimize() moving code inside then clauses?
+// Isoptimize() moving code inside then clauses?
 import java.util.*;
 import java.nio.file.*;
 
