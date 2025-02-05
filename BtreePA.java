@@ -990,20 +990,30 @@ abstract class BtreePA extends Test                                             
 //D2 Split                                                                      // Split nodes in half to increase the number of nodes in the tree
 
   private void splitLeafRoot()                                                  // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
-   {if (Assert) {T.setIntInstruction(node_assertLeaf, root); assertLeaf();}
-    T.setIntInstruction(node_leafIsFull, root); leafIsFull();
-    if (Halt) P.new If (T.at(leafIsFull))
-     {void Else()
-       {P.halt("Root is not full");
-       }
-     };
+   {if (Assert)                                                                 // Assert that we are indeed  on a leaf
+     {T.setIntInstruction(node_assertLeaf, root);
+      assertLeaf();
+     }
+    if (Halt)                                                                   // Confirm that the leaf is full and tso can be split
+     {T.setIntInstruction(node_leafIsFull, root);
+      leafIsFull();
+      P.new If (T.at(leafIsFull))
+       {void Else()
+         {P.halt("Root is not full");
+         }
+       };
+     }
 
     allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
     allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
 
-    T.at(node_leafBase1).zero(); leafBase1(); lT.base(T.at(leafBase1));         // Set address of the referenced root stuck
-    tt  (node_leafBase2, l);     leafBase2(); lL.base(T.at(leafBase2));         // Set address of the referenced leaf stuck
-    tt  (node_leafBase3, r);     leafBase3(); lR.base(T.at(leafBase3));         // Set address of the referenced leaf stuck
+    P.parallelStart();
+      T.at(node_leafBase1).zero(); leafBase1(); lT.base(T.at(leafBase1));       // Set address of the referenced root stuck
+    P.parallelSection();
+      tt  (node_leafBase2, l);     leafBase2(); lL.base(T.at(leafBase2));       // Set address of the referenced left leaf stuck
+    P.parallelSection();
+      tt  (node_leafBase3, r);     leafBase3(); lR.base(T.at(leafBase3));       // Set address of the referenced right leaf stuck
+    P.parallelEnd();
 
 // for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf from parent
 //  {z(); lT.shift();
@@ -3579,7 +3589,7 @@ endmodule
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest(3, 277, """
+    t.runVerilogPutTest(3, 264, """
     1      |
     0      |
     1      |
