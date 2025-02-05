@@ -61,7 +61,7 @@ class ProgramPA extends Test                                                    
     String v() {return " /* NOT SET */";}                                       // Corresponding verilog
     void   i() {}                                                               // initialization for each instruction
 
-    String traceComment() {return " /*"+traceBack.replaceAll("\\n", " ")+" */";}// Trace back comment
+    String traceComment() {return " /* " + traceBack + " */";}                  // Traceback as a comment
 
     public int compareTo(I that)
      {return Integer.compare(instructionNumber, that.instructionNumber);
@@ -682,12 +682,3 @@ Line T       At      Wide       Size    Indices        Value   Name
      }
    }
  }
-
-/*
-
-Fields written that always have the same value
-Fields that are never read
-Field propogation across move
-Instruction eager evaluation - in progress
-
-*/
