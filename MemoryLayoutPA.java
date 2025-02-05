@@ -362,8 +362,10 @@ class MemoryLayoutPA extends Test                                               
     void move(At source)                                                        // Copy the specified number of bits from source to target assuming no overlap. The source and target can be in the same or a different memory.
      {z(); sameSize(source);
       final At target = this;
-      if (target.ml() == source.ml() && target.field == source.field && target.indices.length == 0 && source.indices.length == 0)                                         // No need to copy a field into itself
-       {say("AAAA", "no need to move", source.field.name, target.field.name);
+      if (target.ml()  == source.ml()  &&
+          target.field == source.field &&
+          target.indices.length == 0 && source.indices.length == 0)             // No need to copy an unindexed field into itself
+       {//err("No need to move", source.field.name, target.field.name);
         return;
        }
       P.new I()
