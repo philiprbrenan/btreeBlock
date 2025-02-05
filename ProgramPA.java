@@ -68,7 +68,7 @@ class ProgramPA extends Test                                                    
      }
    }
 
-  void  parallelStart()                                                         // Start a parallel block.  Only one parallel block is allowed at a time
+  void  parallelStart()                                                         // Start a parallel block.  Only one parallel block is allowed at a time.  Parallel blocks are much easoer to deal with than automated optimization as we can make local incremental changes.
    {if (currentParallel >= 0) stop("Only one parallel block can be active at a time");
     currentParallel = code.size()-1;
    }
