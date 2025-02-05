@@ -940,7 +940,7 @@ class MemoryLayoutPA extends Test                                               
     final StringBuilder s = new StringBuilder();
     if (based == null) s.append("reg ["+N+":0] "+name()    +"; ");              // Actual memory if it is not based
     else               s.append("reg ["+B+":0] "+baseName()+"; ");              // Base offset for this memory
-    s.append(traceComment());
+    s.append(traceComment()); s.append("\n");
     return s.toString();
    }
 
