@@ -2407,11 +2407,7 @@ $stuckBases
       for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
        {final ProgramPA.I   I = program.code.elementAt(i);                      // The instruction to write
         final StringBuilder t = new StringBuilder();
-        t.append(!I.merged() ? I.v()+I.traceComment() :
-            "/* merged into: "+I.merge.instructionNumber+" */");
-
-        for (ProgramPA.I c : I.merged) t.append(c.v()+c.traceComment());        // Add any merged instructions
-
+        t.append(I.v()+I.traceComment());
         s.append(String.format("          %5d : begin %s end\n", i, t));        // Bracket instructions in this block with op code
        }
       s.append("        default : begin stopped <= 1; /* end of execution */ end\n"); // Any invalid instruction address causes the program to halt
