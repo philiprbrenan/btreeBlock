@@ -1032,14 +1032,24 @@ abstract class BtreePA extends Test                                             
 
     lT.split(lL, lR);                                                           // Split root leaf into child leaves
 
-    lR.firstElement();
-    lL. lastElement();
-    T.setIntInstruction(node_setBranch,  root); setBranch();                    // The root is now a branch
-    T.setIntInstruction(node_branchBase, root); branchBase();                   // Set address of the referenced leaf stuck
-    bT.base(T.at(branchBase));                                                  // Set address of the referenced leaf stuck
-    bT.clear();                                                                 // Clear the branch
-    T.at(firstKey).move(lR.T.at(lR.tKey));                                      // First of right leaf
-    T.at(lastKey ).move(lL.T.at(lL.tKey));                                      // Last of left leaf
+    P.parallelStart();
+      lR.firstElement();
+    P.parallelSection();
+      lL. lastElement();
+    P.parallelSection();
+      T.setIntInstruction(node_setBranch,  root); setBranch();                  // The root is now a branch
+    P.parallelSection();
+      T.setIntInstruction(node_branchBase, root); branchBase();                 // Set address of the referenced leaf stuck
+      bT.base(T.at(branchBase));                                                // Set address of the referenced leaf stuck
+      bT.clear();                                                               // Clear the branch
+    P.parallelEnd();
+
+    P.parallelStart();
+      T.at(firstKey).move(lR.T.at(lR.tKey));                                    // First of right leaf
+    P.parallelSection();
+      T.at(lastKey ).move(lL.T.at(lL.tKey));                                    // Last of left leaf
+    P.parallelEnd();
+
     P.new I()                                                                   // Mid key - keys are likely to be bigger than 31 bits
      {void a()
        {T.at(flKey).setInt((T.at(firstKey).getInt()+T.at(lastKey).getInt())/2);
@@ -1055,8 +1065,12 @@ abstract class BtreePA extends Test                                             
      (bT.T.at(bT.tKey ), T.at(flKey),                                           /// Parallel possible
       bT.T.at(bT.tData), T.at(l));
     bT.push();                                                                  // Insert left leaf into root
-    bT.T.at(bT.tKey).zero();
-    bT.T.at(bT.tData).move(T.at(r));
+
+    P.parallelStart();
+      bT.T.at(bT.tKey).zero();
+    P.parallelSection();
+      bT.T.at(bT.tData).move(T.at(r));
+    P.parallelEnd();
     bT.push();                                                                  // Insert right into root. This will be the top node and so ignored by search ... except last.
    }
 
@@ -3589,7 +3603,7 @@ endmodule
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest(3, 264, """
+    t.runVerilogPutTest(3, 245, """
     1      |
     0      |
     1      |
