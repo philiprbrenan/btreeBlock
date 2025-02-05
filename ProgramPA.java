@@ -37,11 +37,6 @@ class ProgramPA extends Test                                                    
   class I implements Comparable<I>                                              // Instruction definition
    {int instructionNumber;                                                      // Instruction number
     final String traceBack;                                                     // Location of code that defined this instruction
-    final TreeSet<String>outputs = new TreeSet<>();                             // The set of outputs written by this instruction
-    final TreeSet<String> inputs = new TreeSet<>();                             // The set of inputs read by this instruction
-    final TreeSet<I>      merged = new TreeSet<>();                             // The referenced instructions can be executed at the same time as this one
-    I merge;                                                                    // This instruction has been merged into the referenced instruction.
-    boolean mergeableInstruction;                                               // This instruction can be merged with earlier instructions as long as there are no collisions
     boolean mightJump;                                                          // This instruction might change the flow of control
 
     I()                                                                         // Define an instruction
@@ -54,27 +49,8 @@ class ProgramPA extends Test                                                    
     String n() {return "instruction";}                                          // Instruction name
     String v() {return " /* NOT SET */";}                                       // Corresponding verilog
     void   i() {}                                                               // initialization for each instruction
-    void out(MemoryLayoutPA.At at) {outputs.add(at.verilogLoad());}             // Record an output of this instruction
-    void  in(MemoryLayoutPA.At at) { inputs.add(at.verilogLoad());}             // Record an input of this instruction
 
     String traceComment() {return " /*"+traceBack.replaceAll("\\n", " ")+" */";}// Trace back comment
-
-    boolean canAccept(I source)                                                 // Whether the specified instruction could be merged into this instruction
-     {for (String o : outputs)                                                  // Each output of the target instruction being moved to as it will have fewer or the same number of entries
-       {if (source.outputs.contains(o)) return false;                           // Collision - two outputs write to the same field
-        if (source.inputs .contains(o)) return false;                           // Collision - input of the source instruction is an output of the source instruction and so must came later
-       }
-      return true;
-     }
-
-    boolean merged() {return merge != null;}                                    // Whether this instruction has been merged into anitehr one  and so does not need to be executed
-
-    void merge(I source)                                                        // Merge the specified  instruction into this one
-     {source.merge = this;                                                      // Instruction can be merged with this one
-      outputs.addAll(source.outputs);                                           // Include outputs of merged instruction in current instruction making it harder to move subsequent instructions back through this instruction
-      inputs .addAll(source.inputs);                                            // Include outputs of merged instruction in current instruction making it harder to move subsequent instructions back through this instruction
-      merged.add(source);                                                       // Merge source to target
-     }
 
     public int compareTo(I that)
      {return Integer.compare(instructionNumber, that.instructionNumber);
@@ -82,54 +58,6 @@ class ProgramPA extends Test                                                    
    }
 
 //D1 Execute                                                                    // Execute the program
-
-  void squeeze()                                                                // Remove empty instructions from a program and update its labels to match
-   {final TreeMap<Integer,Integer> relocation = new TreeMap<>();                // Where each instruction was relocated to
-    final Stack<I> squeezed = new Stack<>();                                    // The instructions minus the empty ones
-    final int N = code.size();
-    for (step = 0; step < N; step++)                                            // Remove empty instructions and pack non empty instructions together recording their new positions
-     {final I i = code.elementAt(step);                                         // Source instruction that we want to merge into  a target instruction
-      if (i.merged()) continue;                                                 // Instruction should be removed as it has been merged into an earlier one
-      relocation.put(step, squeezed.size());                                    // Map old location of instruction to its new location
-      squeezed.push(i);                                                         // Retain instruction
-     }
-    for (int i = 0; i < labels.size(); ++i)                                     // Adjust each label to account for removed instructions
-     {final Label   l = labels.elementAt(i);
-      final Integer r = relocation.get(l.instruction);                          // Location of relocated instruction at this location
-      if (r != null) l.instruction = r;                                         // Relocate label
-     }
-    code.clear();
-    for (I i : squeezed) code.push(i);                                          // Replace code with compressed sequence of instructions with labels adjusted to match
-   }
-
-  void optimize()                                                               // Optimize the program
-   {final int N = code.size();
-    for (step = 1; step < N; step++)                                            // Initialize each instruction
-     {code.elementAt(step).i();
-     }
-    final TreeSet<Integer>  ls = new TreeSet<Integer>();                        // Values of labels
-    for (Label l : labels) ls.add(l.instruction);                               // Values of labels as sets
-
-//  for (step = 1; step < N; step++)                                            // Move each instruction back as far as it will go without colliding with a prior instruction
-    for (step = N-1; step > 0; step--)                                          // Move each instruction back as far as it will go without colliding with a prior instruction
-     {if (ls.contains(step)) continue;                                          // This instruction might be a target of a jump
-      final I s = code.elementAt(step);                                         // Source instruction that we want to merge into  a target instruction
-      if (!s.mergeableInstruction) continue;                                    // Cannot merge this instruction
-      if (s.mightJump)    continue;                                             // Cannot merge a jump
-      for (int i = step; i > 0; --i)                                            // Possible target instructions
-       {final I t = code.elementAt(i-1);                                        // Can we move to this instruction?
-        if (!t.mergeableInstruction || t.mightJump ||                           // Nergeable instructions are done by block to enable this feature to be rolled out incrementally
-            ls.contains(t.instructionNumber) || !t.canAccept(s))                // Target cannot accept source or the target might jump or the target might be a target of a jump
-         {if (i != step)                                                        // Cannot merge an instruction into itself
-           {code.elementAt(i).merge(s);                                         // Merge into the preceding instruction if it exists because it must have been viable to permit progress to this instruction
-           }
-          break;
-         }
-        else if (i == 1) t.merge(s);                                            // Every preceding instruction can accept the current instruction so merge it with the first instructon
-       }
-     }
-    squeeze();                                                                  // Squeeze out space in code occupied by instructions merged into others
-   }
 
   void traceMemory()                                                            // Trace memory
    {if (traceMemory != null)
@@ -150,7 +78,6 @@ class ProgramPA extends Test                                                    
      {traceMemory();
       final I i = currentInstruction = code.elementAt(step);                    // Base instruction
       i.a();
-      for (I j : i.merged) {currentInstruction = j; j.a();}                     // Merged instructions
      }
     traceMemory();
     if (time >= maxTime) stop("Out of time: ", time);
@@ -320,16 +247,7 @@ class ProgramPA extends Test                                                    
    {final StringBuilder s = new StringBuilder();
     for(int i = 0; i < code.size(); ++i)
      {final I c = code.elementAt(i);
-      final String m = c.merge != null ? String.format("%4d", c.merge.instructionNumber) : "";
-      s.append(String.format("%4d  %4s  %s\n", i+1, m, code.elementAt(i).n()));
-      if (c.outputs.size() > 0) s.append("    Outputs: "+joinStrings(c.outputs, " ")+"\n");
-      if (c. inputs.size() > 0) s.append("    Inputs : "+joinStrings(c. inputs, " ")+"\n");
-      if (c.merged.size() > 0)                                                  // List of merged instructions
-       {s.append("    Merged:\n");
-        for (I j : c.merged)
-         {s.append("      "+(j.instructionNumber+1)+" "+j.n()+"\n");
-         }
-       }
+      s.append(String.format("%4d  %s\n", i+1, code.elementAt(i).n()));
      }
     return s.toString();
    }
@@ -398,17 +316,17 @@ Line T       At      Wide       Size    Indices        Value   Name
     p.GoOn(start, m.at(f));
 
     ok(p, """
-   1        n = 0;
-   2        u = 8;
-   3        a = 0;
-   4        b = 1;
-   5        c = a + b;
-   6        a = b
-   7        b = c;
-   8        F.push(c);
-   9        ++n
-  10        f=n<u
-  11        GoOn f to 5
+   1  n = 0;
+   2  u = 8;
+   3  a = 0;
+   4  b = 1;
+   5  c = a + b;
+   6  a = b
+   7  b = c;
+   8  F.push(c);
+   9  ++n
+  10  f=n<u
+  11  GoOn f to 5
 """);
 
     p.run();
@@ -469,17 +387,17 @@ Line T       At      Wide       Size    Indices        Value   Name
        }
      };
     ok(p, """
-   1        a =  0
-   2        u = 15
-   3        g = 0
-   4        fizzbuzz
-   5        GoOn g to 8
-   6        fizz
-   7        buzz
-   8        ++a
-   9        g=a>u
-  10        GoOn g to 12
-  11        Go to 3
+   1  a =  0
+   2  u = 15
+   3  g = 0
+   4  fizzbuzz
+   5  GoOn g to 8
+   6  fizz
+   7  buzz
+   8  ++a
+   9  g=a>u
+  10  GoOn g to 12
+  11  Go to 3
 """);
     p.run();
     ok(f, "[0 fizzbuzz, 2 fizz, 3 buzz, 4 fizz, 6 fizzbuzz, 8 fizz, 9 buzz, 10 fizz, 12 fizzbuzz, 14 fizz, 15 buzz]");
@@ -640,248 +558,6 @@ Line T       At      Wide       Size    Indices        Value   Name
     p.run();
    }
 
-  static void test_merge_chain()
-   {Layout           l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", 8);
-    Layout.Variable  b = l.variable ("b", 8);
-    Layout.Variable  c = l.variable ("c", 8);
-    Layout.Variable  d = l.variable ("d", 8);
-    Layout.Variable  e = l.variable ("e", 8);
-    Layout.Variable  f = l.variable ("f", 8);
-    Layout.Variable  g = l.variable ("g", 8);
-    Layout.Structure s = l.structure("s", a, b, c, d, e, f, g);
-    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
-    final String     n = m.name();
-    ProgramPA        p = m.P;
-    m.at(a).setInt(1);
-    m.at(b).setInt(2);
-
-    m.at(b).move(m.at(a));
-    m.at(c).move(m.at(b));
-    m.at(e).move(m.at(d));
-    m.at(g).move(m.at(f));
-    //stop(p);
-    ok(p, """
-   1        b=a
-   2        c=b
-   3        e=d
-   4        g=f
-""");
-    p.run();
-
-    //stop(m);
-    ok(m, """
-MemoryLayout: M
-Memory      : M
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        56                                      s
-   2 V        0         8                                  1     a
-   3 V        8         8                                  1     b
-   4 V       16         8                                  1     c
-   5 V       24         8                                  0     d
-   6 V       32         8                                  0     e
-   7 V       40         8                                  0     f
-   8 V       48         8                                  0     g
-""");
-
-    m.clear();
-    m.at(a).setInt(1);
-    //stop(m);
-    ok(m, """
-MemoryLayout: M
-Memory      : M
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        56                                      s
-   2 V        0         8                                  1     a
-   3 V        8         8                                  0     b
-   4 V       16         8                                  0     c
-   5 V       24         8                                  0     d
-   6 V       32         8                                  0     e
-   7 V       40         8                                  0     f
-   8 V       48         8                                  0     g
-""");
-
-    p.optimize();
-    //stop(p);
-    ok(p, String.format("""
-   1        b=a
-   2        c=b
-    Outputs: %s[  16/*c   */ +: 8] %s[  32/*e   */ +: 8] %s[  48/*g   */ +: 8]
-    Inputs : %s[   8/*b   */ +: 8] %s[  24/*d   */ +: 8] %s[  40/*f   */ +: 8]
-    Merged:
-      3 e=d
-      4 g=f
-""", n, n, n, n, n, n));
-    p.run();
-    //stop(m);
-    ok(m, """
-MemoryLayout: M
-Memory      : M
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        56                                      s
-   2 V        0         8                                  1     a
-   3 V        8         8                                  1     b
-   4 V       16         8                                  1     c
-   5 V       24         8                                  0     d
-   6 V       32         8                                  0     e
-   7 V       40         8                                  0     f
-   8 V       48         8                                  0     g
-""");
-   }
-
-  static void test_merge_double()
-   {Layout           l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", 8);
-    Layout.Variable  b = l.variable ("b", 8);
-    Layout.Variable  c = l.variable ("c", 8);
-    Layout.Variable  d = l.variable ("d", 8);
-    Layout.Variable  e = l.variable ("e", 8);
-    Layout.Structure s = l.structure("s", a, b, c, d, e);
-    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
-    final String     n = m.name();
-    ProgramPA        p = m.P;
-    m.at(a).setInt(1);
-
-    m.at(b).move(m.at(a));
-    m.at(c).move(m.at(a));
-    m.at(d).move(m.at(b));
-    m.at(e).move(m.at(b));
-    //stop(p);
-    ok(p, """
-   1        b=a
-   2        c=a
-   3        d=b
-   4        e=b
-""");
-    p.run();
-    //stop(m);
-    ok(m, """
-MemoryLayout: M
-Memory      : M
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        40                                      s
-   2 V        0         8                                  1     a
-   3 V        8         8                                  1     b
-   4 V       16         8                                  1     c
-   5 V       24         8                                  1     d
-   6 V       32         8                                  1     e
-""");
-
-    m.clear();
-    m.at(a).setInt(1);
-    //stop(m);
-    ok(m, """
-MemoryLayout: M
-Memory      : M
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        40                                      s
-   2 V        0         8                                  1     a
-   3 V        8         8                                  0     b
-   4 V       16         8                                  0     c
-   5 V       24         8                                  0     d
-   6 V       32         8                                  0     e
-""");
-
-    p.optimize();
-    //stop(p);
-    ok(p, String.format("""
-   1        b=a
-   2        c=a
-    Outputs: %s[  16/*c   */ +: 8] %s[  24/*d   */ +: 8] %s[  32/*e   */ +: 8]
-    Inputs : %s[   0/*a   */ +: 8] %s[   8/*b   */ +: 8]
-    Merged:
-      3 d=b
-      4 e=b
-""", n, n, n, n, n, n));
-    p.run();
-    //stop(m);
-    ok(m, """
-MemoryLayout: M
-Memory      : M
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        40                                      s
-   2 V        0         8                                  1     a
-   3 V        8         8                                  1     b
-   4 V       16         8                                  1     c
-   5 V       24         8                                  1     d
-   6 V       32         8                                  1     e
-""");
-   }
-
-  static void test_merge_if()
-   {Layout           l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", 8);
-    Layout.Variable  b = l.variable ("b", 8);
-    Layout.Variable  c = l.variable ("c", 8);
-    Layout.Variable  d = l.variable ("d", 8);
-    Layout.Variable  e = l.variable ("e", 8);
-    Layout.Structure s = l.structure("s", a, b, c, d, e);
-    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
-    final String     n = m.name();
-    ProgramPA        p = m.P;
-    m.at(a).setInt(1);
-
-    m.at(b).move(m.at(a));
-    m.at(c).move(m.at(a));
-    m.at(d).move(m.at(b));
-    m.at(e).move(m.at(b));
-    p.new If (m.at(a))
-     {void Then()
-       {m.at(b).move(m.at(a));
-        m.at(c).move(m.at(a));
-        m.at(d).move(m.at(b));
-        m.at(e).move(m.at(b));
-       }
-     };
-    m.at(b).move(m.at(a));
-    m.at(c).move(m.at(a));
-    m.at(d).move(m.at(b));
-    m.at(e).move(m.at(b));
-    p.optimize();
-    ok(p, String.format("""
-   1        b=a
-   2        c=a
-    Outputs: %s[  16/*c   */ +: 8] %s[  24/*d   */ +: 8] %s[  32/*e   */ +: 8]
-    Inputs : %s[   0/*a   */ +: 8] %s[   8/*b   */ +: 8]
-    Merged:
-      3 d=b
-      4 e=b
-   3        GoOff a to 6
-   4        b=a
-    Outputs: %s[   8/*b   */ +: 8]
-    Inputs : %s[   0/*a   */ +: 8]
-   5        c=a
-    Outputs: %s[  16/*c   */ +: 8] %s[  24/*d   */ +: 8] %s[  32/*e   */ +: 8]
-    Inputs : %s[   0/*a   */ +: 8] %s[   8/*b   */ +: 8]
-    Merged:
-      8 d=b
-      9 e=b
-   6        b=a
-    Outputs: %s[   8/*b   */ +: 8]
-    Inputs : %s[   0/*a   */ +: 8]
-   7        c=a
-    Outputs: %s[  16/*c   */ +: 8] %s[  24/*d   */ +: 8] %s[  32/*e   */ +: 8]
-    Inputs : %s[   0/*a   */ +: 8] %s[   8/*b   */ +: 8]
-    Merged:
-      12 d=b
-      13 e=b
-""", n, n, n, n, n,  n, n, n, n, n,  n, n, n, n, n,  n, n, n, n));
-
-    p.run();
-    //stop(m);
-    ok(m, """
-MemoryLayout: M
-Memory      : M
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        40                                      s
-   2 V        0         8                                  1     a
-   3 V        8         8                                  1     b
-   4 V       16         8                                  1     c
-   5 V       24         8                                  1     d
-   6 V       32         8                                  1     e
-""");
-   }
-
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_inc();
     test_fibonacci();
@@ -892,9 +568,6 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_stop();
     test_loop();
     test_pool();
-    test_merge_chain();
-    test_merge_double();
-    test_merge_if();
     //test_debug();
    }
 
