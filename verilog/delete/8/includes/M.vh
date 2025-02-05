@@ -1,5 +1,4 @@
-reg [282:0] M_9;  /*   MemoryLayoutPA.java:0946:declareVerilog   MemoryLayoutPA.java:0929:dumpVerilog   BtreePA.java:2468:<init>   BtreePA.java:3433:<init>   BtreePA.java:3432:runVerilogDeleteTest   BtreePA.java:3533:test_verilog_delete   BtreePA.java:3654:newTests   BtreePA.java:3663:main  */
-task initialize_memory_M_9;
+reg [282:0] M_9;  /*   MemoryLayoutPA.java:0943:declareVerilog   MemoryLayoutPA.java:0926:dumpVerilog   BtreePA.java:2481:<init>   BtreePA.java:3446:<init>   BtreePA.java:3445:runVerilogDeleteTest   BtreePA.java:3546:test_verilog_delete   BtreePA.java:3667:newTests   BtreePA.java:3676:main  */task initialize_memory_M_9;
     begin
         M_9[0] <= 0;
         M_9[1] <= 1;

@@ -2404,11 +2404,24 @@ $stuckBases
       case(step)                                                                // Case statements to select the code for the current instruction
 """);
 
+      final String p = " ".repeat(10);                                          // Indentation for Verilog
+      final String q = " ".repeat(16);
+
       for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
-       {final ProgramPA.I   I = program.code.elementAt(i);                      // The instruction to write
-        final StringBuilder t = new StringBuilder();
-        t.append(I.v()+I.traceComment());
-        s.append(String.format("          %5d : begin %s end\n", i, t));        // Bracket instructions in this block with op code
+       {final Stack<ProgramPA.I> I = program.code.elementAt(i);                 // The block of parallel instructions to write
+        final int N = I.size();
+        if (N > 1)
+         {final StringBuilder t = new StringBuilder();
+
+          for(ProgramPA.I j : I) t.append(q+j.v()+j.traceComment() + "\n");
+          s.append(String.format("%s%5d : begin\n", p, i));
+          s.append(q+"  "+t);
+          s.append(q+"end\n");
+         }
+        else if (N == 1)
+         {final String t = I.firstElement().v()+traceComment();
+          s.append(String.format("%s%5d : begin %s end\n", p, i, t));           // Bracket instructions in this block with op code
+         }
        }
       s.append("        default : begin stopped <= 1; /* end of execution */ end\n"); // Any invalid instruction address causes the program to halt
       s.append("""
