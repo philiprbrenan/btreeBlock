@@ -430,9 +430,9 @@ abstract class BtreePA extends Test                                             
                                          key = L.variable ("key"                                           , bitsPerKey());
                                         data = L.variable ("data"                                          , bitsPerData());
 
-                                    firstKey = L.variable ("firstKey"                                      , bitsPerKey());
-                                     lastKey = L.variable ("lastKey"                                       , bitsPerKey());
-                                       flKey = L.variable ("flKey"                                         , bitsPerKey());
+                                    firstKey = //L.variable ("firstKey"                                      , bitsPerKey());
+                                     lastKey = //L.variable ("lastKey"                                       , bitsPerKey());
+                                       flKey = //L.variable ("flKey"                                         , bitsPerKey());
                                    parentKey = L.variable ("parentKey"                                     , bitsPerKey());
 
                                           lk = L.variable ("lk"                                            , bitsPerKey());
@@ -532,18 +532,65 @@ abstract class BtreePA extends Test                                             
                       node_mergeRightSibling = //L.variable ("node_mergeRightSibling"                        , bitsPerNext);
                                 node_balance = L.variable ("node_balance"                                  , bitsPerNext);
 
-    final Layout.Structure transaction = L.structure("transaction", allocate,
-      nextFree, success, inserted, first, next, search, found, key, data,
-      firstKey, lastKey, flKey, parentKey, lk, ld, rk, rd, index, nl, nr, l, r,
-      splitParent, IsLeaf, isFull, leafIsFull, branchIsFull, parentIsFull, isEmpty, isLow,
-      hasLeavesForChildren, stolenOrMerged, pastMaxDepth, nodeMerged,
-      mergeable, deleted,
+    final Layout.Structure transaction = L.structure("transaction",
+      allocate,
+      nextFree,
+      success,
+      inserted,
+      first,
+      next,
+      search,
+      found,
+      key,
+      data,
+      //firstKey,
+      //lastKey,
+      //flKey,
+      parentKey,
+      lk,
+      ld,
+      rk,
+      rd,
+      index,
+      nl,
+      nr,
+      l,
+      r,
+      splitParent,
+      IsLeaf,
+      isFull,
+      leafIsFull,
+      branchIsFull,
+      parentIsFull,
+      isEmpty,
+      isLow,
+      hasLeavesForChildren,
+      stolenOrMerged,
+      pastMaxDepth,
+      nodeMerged,
+      mergeable,
+      deleted,
       leafBase,     leafBase1,   leafBase2,   leafBase3,
       branchBase, branchBase1, branchBase2, branchBase3,
-      leafSize, branchSize, top, Key,
-      Data, find, findAndInsert, parent, child, leafFound, maxKeysPerLeaf,
-      maxKeysPerBranch, two, MaxDepth, findDepth, putDepth, deleteDepth,
-      mergeDepth, mergeIndex,
+      leafSize,
+      branchSize,
+      top,
+      Key,
+      Data,
+      find,
+      findAndInsert,
+      parent,
+      child,
+      leafFound,
+      maxKeysPerLeaf,
+      maxKeysPerBranch,
+      two,
+      MaxDepth,
+      findDepth,
+      putDepth,
+      deleteDepth,
+      mergeDepth,
+      mergeIndex,
       //node_isLeaf,
       //node_setLeaf,
       node_setBranch,
