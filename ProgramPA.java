@@ -7,23 +7,25 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 class ProgramPA extends Test                                                    // A progam that manipulates a memory layout via si instructions
- {final Stack<I>  code = new Stack<>();                                         // Code of the program
-  I currentInstruction;                                                         // The currently executing instruction
-  final int    maxTime = 100_000;                                               // Maximum number of steps permitted while running the program
-  int             step = 0;                                                     // Execution step
-  int             time = 0;                                                     // Execution time
-  boolean      running = false;                                                 // Executing if true
-  Stack<Label>  labels = new Stack<>();                                         // Labels for some instructions
-  Memory   traceMemory;                                                         // Labels for some instructions
-  final Stack<String> Trace = new Stack<>();                                    // Trace execution steps
-  static int   numbers = 0;                                                     // Program numbers
-  final  int    number = ++numbers;                                              // Program number
+ {final Stack<Stack<I>> code = new Stack<>();                                   // Code of the program
+  int            currentCode =  0;                                              // Point at which we are currently adding instsructions to the program. Instructions can run in parallel so the current point is not always at the end as it is with non parallel instruction execution
+  int        currentParallel = -1;                                              // Point at which the current parallel block started
+  I       currentInstruction;                                                   // The currently executing instruction
+  final int          maxTime = 100_000;                                         // Maximum number of steps permitted while running the program
+  int                   step = 0;                                               // Execution step
+  int                   time = 0;                                               // Execution time
+  boolean            running = false;                                           // Executing if true
+  Stack<Label>        labels = new Stack<>();                                   // Labels for some instructions
+  Memory         traceMemory;                                                   // Labels for some instructions
+  final Stack<String>  Trace = new Stack<>();                                   // Trace execution steps
+  static int         numbers = 0;                                               // Program numbers
+  final  int          number = ++numbers;                                       // Program number
 
   ProgramPA() {}                                                                // Create a program that instructions can be added to and then executed
 
   ProgramPA(ProgramPA Program)                                                  // Copy a program
-   {for(I     i : Program.code  ) code  .push(i);
-    for(Label l : Program.labels) labels.push(l);
+   {for(Stack<I> i : Program.code)   code  .push(i);
+    for(Label    l : Program.labels) labels.push(l);
    }
 
   ProgramPA programPA() {return this;}                                          // Address containing class
@@ -43,7 +45,16 @@ class ProgramPA extends Test                                                    
      {traceBack = traceBack();                                                  // Location of code that defined this instruction
       if (running) stop("Cannot define instructions during program execution",
         traceBack);
-      instructionNumber = code.size(); code.push(this);
+      ++currentCode;
+      if (currentCode >= code.size())                                           // Start a new  block of parallel instructions
+       {final Stack<I> I = new Stack<>();
+        I.push(this);
+        code.push(I);
+       }
+      else                                                                      // Append to an existing block of instructions
+       {final Stack<I> I = code.elementAt(currentCode);
+        I.push(this);
+       }
      }
     void   a() {}                                                               // Action performed by instruction
     String n() {return "instruction";}                                          // Instruction name
@@ -55,6 +66,21 @@ class ProgramPA extends Test                                                    
     public int compareTo(I that)
      {return Integer.compare(instructionNumber, that.instructionNumber);
      }
+   }
+
+  void  parallelStart()                                                         // Start a parallel block.  Only one parallel block is allowed at a time
+   {if (currentParallel >= 0) stop("Only one parallel block can be active at a time");
+    currentParallel = code.size()-1;
+   }
+
+  void  parallelSection()                                                       // Start a parallel block.  Only one parallel block is allowed at a time
+   {if (currentParallel < 0) stop("No active parallel section");
+    currentCode = currentParallel;                                              // Add the instructions in this section from the start of the block
+   }
+
+  void  parallelEnd()                                                           // End a parallel block
+   {currentParallel = -1;
+    currentCode = code.size();                                                  // Resume appending instructions at the end
    }
 
 //D1 Execute                                                                    // Execute the program
@@ -76,8 +102,7 @@ class ProgramPA extends Test                                                    
     final int N = code.size();
     for (step = 0, time = 0; step < N && time < maxTime && running; step++, time++)
      {traceMemory();
-      final I i = currentInstruction = code.elementAt(step);                    // Base instruction
-      i.a();
+      for (I i : code.elementAt(step)) {currentInstruction =i; i.a();}          // Execute each instruction in the parallel block
      }
     traceMemory();
     if (time >= maxTime) stop("Out of time: ", time);
@@ -99,7 +124,7 @@ class ProgramPA extends Test                                                    
      };
    }
 
-  void clear() {z(); code.clear(); running = false;}                            // Clear the program code
+  void clear() {z(); code.clear(); currentCode = 0; running = false;}           // Clear the program code
 
 //D1 Blocks                                                                     // Blocks of code used to implement if statements and for loops
 
@@ -246,8 +271,15 @@ class ProgramPA extends Test                                                    
   public String toString()
    {final StringBuilder s = new StringBuilder();
     for(int i = 0; i < code.size(); ++i)
-     {final I c = code.elementAt(i);
-      s.append(String.format("%4d  %s\n", i+1, code.elementAt(i).n()));
+     {final Stack<I> I = code.elementAt(i);
+      final int N = I.size();
+      if (N == 1)                                                               // Only one instruction in parallel  block
+       {s.append(String.format("%4d  %s\n", i+1, I.firstElement().n()));
+       }
+      else if (N > 1)                                                           // Severale instructions in parallel  block
+       {s.append(String.format("%4d\n", i+1));
+        for(I j: I) s.append(String.format("      %s\n", j.n()));
+       }
      }
     return s.toString();
    }
@@ -558,6 +590,63 @@ Line T       At      Wide       Size    Indices        Value   Name
     p.run();
    }
 
+  static void test_parallel()
+   {Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Variable  c = l.variable ("c", 4);
+    Layout.Variable  d = l.variable ("d", 4);
+    Layout.Structure s = l.structure("s", a, b, c, d);
+    Layout.Array     A = l.array    ("A", s, 2);
+
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
+    ProgramPA        p = m.P;
+
+    p.new I() {void a() {m.at(a, 0).setInt(1);} String n() {return "a[0] = 1";}};
+    p.new I() {void a() {m.at(a, 1).setInt(2);} String n() {return "a[1] = 2";}};
+    p.parallelStart();
+    p.new I() {void a() {m.at(b, 0).setInt(3);} String n() {return "b[0] = 3";}};
+    p.new I() {void a() {m.at(b, 1).setInt(4);} String n() {return "b[1] = 4";}};
+    p.parallelSection();
+    p.new I() {void a() {m.at(c, 0).setInt(5);} String n() {return "c[0] = 5";}};
+    p.new I() {void a() {m.at(c, 1).setInt(6);} String n() {return "c[1] = 6";}};
+    p.parallelEnd();
+    p.new I() {void a() {m.at(d, 0).setInt(7);} String n() {return "d[0] = 7";}};
+    p.new I() {void a() {m.at(d, 1).setInt(8);} String n() {return "d[1] = 8";}};
+
+    p.run();
+    //stop(p);
+    ok(p, """
+   1  a[0] = 1
+   2  a[1] = 2
+   3
+      b[0] = 3
+      c[0] = 5
+   4
+      b[1] = 4
+      c[1] = 6
+   5  d[0] = 7
+   6  d[1] = 8
+""");
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 A        0        32          2                           A
+   2 S        0        16               0                        s
+   3 V        0         4               0                  1       a
+   4 V        4         4               0                  3       b
+   5 V        8         4               0                  5       c
+   6 V       12         4               0                  7       d
+   7 S       16        16               1                        s
+   8 V       16         4               1                  2       a
+   9 V       20         4               1                  4       b
+  10 V       24         4               1                  6       c
+  11 V       28         4               1                  8       d
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_inc();
     test_fibonacci();
@@ -568,11 +657,13 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_stop();
     test_loop();
     test_pool();
+    test_parallel();
     //test_debug();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    test_parallel();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
