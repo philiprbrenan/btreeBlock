@@ -430,9 +430,9 @@ abstract class BtreePA extends Test                                             
                                          key = L.variable ("key"                                           , bitsPerKey());
                                         data = L.variable ("data"                                          , bitsPerData());
 
-                                    firstKey = //L.variable ("firstKey"                                      , bitsPerKey());
-                                     lastKey = //L.variable ("lastKey"                                       , bitsPerKey());
-                                       flKey = //L.variable ("flKey"                                         , bitsPerKey());
+                                    firstKey = L.variable ("firstKey"                                      , bitsPerKey());
+                                     lastKey = L.variable ("lastKey"                                       , bitsPerKey());
+                                       flKey = L.variable ("flKey"                                         , bitsPerKey());
                                    parentKey = L.variable ("parentKey"                                     , bitsPerKey());
 
                                           lk = L.variable ("lk"                                            , bitsPerKey());
@@ -543,9 +543,9 @@ abstract class BtreePA extends Test                                             
       found,
       key,
       data,
-      //firstKey,
-      //lastKey,
-      //flKey,
+      firstKey,
+      lastKey,
+      flKey,
       parentKey,
       lk,
       ld,
@@ -557,6 +557,7 @@ abstract class BtreePA extends Test                                             
       l,
       r,
       splitParent,
+
       IsLeaf,
       isFull,
       leafIsFull,
@@ -570,6 +571,7 @@ abstract class BtreePA extends Test                                             
       nodeMerged,
       mergeable,
       deleted,
+
       leafBase,     leafBase1,   leafBase2,   leafBase3,
       branchBase, branchBase1, branchBase2, branchBase3,
       leafSize,
