@@ -448,18 +448,19 @@ abstract class BtreePA extends Test                                             
                                            r = L.variable ("r"                                             , bitsPerNext);
 
                                  splitParent = L.variable ("splitParent"                                   , bitsPerNext);
-                                      IsLeaf = L.bit      ("IsLeaf"                                        );
-                                      isFull = L.bit      ("isFull"                                        );
-                                  leafIsFull = L.bit      ("leafIsFull"                                    );
-                                branchIsFull = L.bit      ("branchIsFull"                                  );
-                                parentIsFull = L.bit      ("parentIsFull"                                  );
-                                     isEmpty = L.bit      ("isEmpty"                                       );
-                                       isLow = L.bit      ("isLow"                                         );
-                        hasLeavesForChildren = L.bit      ("hasLeavesForChildren"                          );
-                              stolenOrMerged = L.bit      ("stolenOrMerged"                                );
-                                pastMaxDepth = L.bit      ("pastMaxDepth"                                  );
-                                  nodeMerged = L.bit      ("nodeMerged"                                    );
-                                   mergeable = L.bit      ("mergeable"                                     );
+
+                                      IsLeaf = //L.bit      ("IsLeaf"                                        );
+                                      isFull = //L.bit      ("isFull"                                        );
+                                  leafIsFull = //L.bit      ("leafIsFull"                                    );
+                                branchIsFull = //L.bit      ("branchIsFull"                                  );
+                                parentIsFull = //L.bit      ("parentIsFull"                                  );
+                                     isEmpty = //L.bit      ("isEmpty"                                       );
+                                       isLow = //L.bit      ("isLow"                                         );
+                        hasLeavesForChildren = //L.bit      ("hasLeavesForChildren"                          );
+                              stolenOrMerged = //L.bit      ("stolenOrMerged"                                );
+                                pastMaxDepth = //L.bit      ("pastMaxDepth"                                  );
+                                  nodeMerged = //L.bit      ("nodeMerged"                                    );
+                                   mergeable = //L.bit      ("mergeable"                                     );
                                      deleted = L.bit      ("deleted"                                       );
 
                                     leafBase = L.variable ("leafBase"                                      , bitsPerAddress);
@@ -556,20 +557,21 @@ abstract class BtreePA extends Test                                             
       nr,
       l,
       r,
+
       splitParent,
 
-      IsLeaf,
-      isFull,
-      leafIsFull,
-      branchIsFull,
-      parentIsFull,
-      isEmpty,
-      isLow,
-      hasLeavesForChildren,
-      stolenOrMerged,
-      pastMaxDepth,
-      nodeMerged,
-      mergeable,
+      //IsLeaf,
+      //isFull,
+      //leafIsFull,
+      //branchIsFull,
+      //parentIsFull,
+      //isEmpty,
+      //isLow,
+      //hasLeavesForChildren,
+      //stolenOrMerged,
+      //pastMaxDepth,
+      //nodeMerged,
+      //mergeable,
       deleted,
 
       leafBase,     leafBase1,   leafBase2,   leafBase3,
@@ -3472,7 +3474,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 937, """
+    t.runVerilogDeleteTest(3, 6, 931, """
                     6           |
                     0           |
                     5           |
@@ -3484,7 +3486,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 806, """
+    t.runVerilogDeleteTest(4, 5, 802, """
              6           |
              0           |
              5           |
@@ -3496,7 +3498,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 777, """
+    t.runVerilogDeleteTest(2, 7, 771, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3504,7 +3506,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 657, """
+    t.runVerilogDeleteTest(1, 8, 653, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3512,7 +3514,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 382, """
+    t.runVerilogDeleteTest(5, 4, 381, """
       7      |
       0      |
       1      |
@@ -3520,7 +3522,7 @@ endmodule
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(6, 3, 383, """
+    t.runVerilogDeleteTest(6, 3, 381, """
     7      |
     0      |
     1      |
@@ -3528,7 +3530,7 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 456, """
+    t.runVerilogDeleteTest(7, 2, 453, """
 8,9=0 |
 """);
 
@@ -3576,7 +3578,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 562, """
+    t.runVerilogPutTest(4, 561, """
       2      |
       0      |
       1      |
@@ -3584,7 +3586,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 677, """
+    t.runVerilogPutTest(5, 674, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -3592,7 +3594,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 745, """
+    t.runVerilogPutTest(6, 742, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3600,7 +3602,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 860, """
+    t.runVerilogPutTest(7, 855, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -3608,7 +3610,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 1052, """
+    t.runVerilogPutTest(8, 1050, """
              4             |
              0             |
              5             |
@@ -3620,7 +3622,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 957, """
+    t.runVerilogPutTest(9, 953, """
              4                    |
              0                    |
              5                    |
