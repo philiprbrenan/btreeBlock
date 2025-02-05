@@ -382,10 +382,7 @@ class MemoryLayoutPA extends Test                                               
          {return target.verilogLoad()+" <= "+source.verilogLoad() + ";";
          }
         String n() {return field.name+"="+source.field.name;}
-        void   i()
-         {if (target.hasIndirection() || source.hasIndirection()) {}
-          else {out(target); in(source); mergeableInstruction = true;}
-         }
+        void   i()  {}
        };
      }
 
