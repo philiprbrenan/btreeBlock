@@ -1172,22 +1172,26 @@ abstract class BtreePA extends Test                                             
        }
      };
 
-    tt(node_leafSize,   node_splitLeaf); leafSize();
-    tt(node_leafIsFull, node_splitLeaf); leafIsFull();
+    if (Halt)
+     {tt(node_leafSize,   node_splitLeaf); leafSize();
+      tt(node_leafIsFull, node_splitLeaf); leafIsFull();
 
-    if (Halt) P.new If (T.at(leafIsFull))
-     {void Else()
-       {P.halt("Leaf is not full");
-       }
-     };
+      P.new If (T.at(leafIsFull))
+       {void Else()
+         {P.halt("Leaf is not full");
+         }
+       };
+     }
 
-    tt(node_branchIsFull, splitParent); branchIsFull();
+    if (Halt)
+     {tt(node_branchIsFull, splitParent); branchIsFull();
+      P.new If (T.at(branchIsFull))
+       {void Then()
+         {P.halt("Leaf split parent must not be full");
+         }
+       };
+     }
 
-    if (Halt) P.new If (T.at(branchIsFull))
-     {void Then()
-       {P.halt("Leaf split parent must not be full");
-       }
-     };
     allocLeaf(); tt(l, allocLeaf);                                              // New  split out leaf
 
     tt(node_leafBase1, l);              leafBase1(); lL.base(T.at(leafBase1));  // The leaf being split into
@@ -3639,7 +3643,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 561, """
+    t.runVerilogPutTest(4, 540, """
       2      |
       0      |
       1      |
@@ -3647,7 +3651,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 674, """
+    t.runVerilogPutTest(5, 653, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -3655,7 +3659,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 742, """
+    t.runVerilogPutTest(6, 721, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3663,7 +3667,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 855, """
+    t.runVerilogPutTest(7, 834, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -3671,7 +3675,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 1030, """
+    t.runVerilogPutTest(8, 1009, """
              4             |
              0             |
              5             |
@@ -3683,7 +3687,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 953, """
+    t.runVerilogPutTest(9, 932, """
              4                    |
              0                    |
              5                    |
