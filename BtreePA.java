@@ -3,7 +3,8 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-// splitBranch()) parallel
+// splitBranch() in parallel. leafSize() in parallel. Concatenate currently blocks parallel but can be improved by concatenating to a known point.
+// A parallel section is an opprtunity to create one instruction like moveAndDec
 import java.util.*;
 import java.nio.file.*;
 
@@ -1764,13 +1765,18 @@ abstract class BtreePA extends Test                                             
         bT.T.at(bT.index).move(T.at(index));
         bT.T.at(bT.index).dec();
         bT.elementAt();
-        T.at(l).move(bT.T.at(bT.tData));
 
-        bT.T.at(bT.index).move(T.at(index));
+        P.parallelStart();
+          T.at(l).move(bT.T.at(bT.tData));
+        P.parallelSection();
+          bT.T.at(bT.index).move(T.at(index));
+        P.parallelEnd();
+
         bT.elementAt();
-        T.at(r).move(bT.T.at(bT.tData));
 
+        T.at(r).move(bT.T.at(bT.tData));
         tt(node_hasLeavesForChildren, node_mergeLeftSibling);
+
         hasLeavesForChildren();
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
@@ -3616,7 +3622,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 905, """
+    t.runVerilogDeleteTest(3, 6, 904, """
                     6           |
                     0           |
                     5           |
@@ -3640,7 +3646,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 771, """
+    t.runVerilogDeleteTest(2, 7, 769, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3648,7 +3654,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 629, """
+    t.runVerilogDeleteTest(1, 8, 628, """
       6    7        |
       0    0.1      |
       1    7        |
