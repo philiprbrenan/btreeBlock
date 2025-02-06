@@ -1429,8 +1429,13 @@ abstract class BtreePA extends Test                                             
             bT.T.at(bT.index).dec();
 
             bT.elementAt();                                                     // Parent key
-            bR.T.at(bR.tKey).move(bT.T.at(bT.tKey));
-            bR.T.at(bR.index).zero();
+
+            P.parallelStart();
+              bR.T.at(bR.tKey).move(bT.T.at(bT.tKey));
+            P.parallelSection();
+              bR.T.at(bR.index).zero();
+            P.parallelEnd();
+
             bR.setElementAt();                                                  // Reduce key of parent of right
 
             bL.lastElement();                                                   // Last left key
@@ -1464,19 +1469,27 @@ abstract class BtreePA extends Test                                             
         bT.T.at(bT.index).move(T.at(index));
         bT.elementAt();
 
-        M.moveParallel
-         (T.at(lk), bT.T.at(bT.tKey),                                           /// Parallel possible
-          T.at(l) , bT.T.at(bT.tData));
-        bT.T.at(bT.index).move(T.at(index));
-        bT.T.at(bT.index).inc();
+        P.parallelStart();
+          M.moveParallel
+           (T.at(lk), bT.T.at(bT.tKey),                                         /// Parallel possible
+            T.at(l) , bT.T.at(bT.tData));
+        P.parallelSection();
+          bT.T.at(bT.index).move(T.at(index));
+          bT.T.at(bT.index).inc();
+        P.parallelEnd();
+
         bT.elementAt();
 
-        M.moveParallel
-         (T.at(rk), bT.T.at(bT.tKey),                                           /// Parallel possible
-          T.at(r) , bT.T.at(bT.tData));
+        P.parallelStart();
+          M.moveParallel
+           (T.at(rk), bT.T.at(bT.tKey),                                         /// Parallel possible
+            T.at(r) , bT.T.at(bT.tData));
+        P.parallelSection();
+          tt(node_hasLeavesForChildren, node_stealFromRight);
+        P.parallelEnd();
 
-        tt(node_hasLeavesForChildren, node_stealFromRight);
         hasLeavesForChildren();
+
         P.new If(T.at(hasLeavesForChildren))                                    // Children are leaves
          {void Then()
            {z();
@@ -3590,7 +3603,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 931, """
+    t.runVerilogDeleteTest(3, 6, 930, """
                     6           |
                     0           |
                     5           |
@@ -3622,7 +3635,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 653, """
+    t.runVerilogDeleteTest(1, 8, 652, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3646,7 +3659,7 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 453, """
+    t.runVerilogDeleteTest(7, 2, 452, """
 8,9=0 |
 """);
 
