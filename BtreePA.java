@@ -1493,29 +1493,35 @@ abstract class BtreePA extends Test                                             
         P.new If(T.at(hasLeavesForChildren))                                    // Children are leaves
          {void Then()
            {z();
-            tt(node_leafBase1, l); leafBase1(); lL.base(T.at(leafBase1));
-            tt(node_leafBase2, r); leafBase2(); lR.base(T.at(leafBase2));
-            tt(node_leafSize, l); leafSize(); tt(nl, leafSize);
-            tt(node_leafSize, r); leafSize(); tt(nr, leafSize);
+            P.parallelStart();
+              tt(node_leafBase1, l); leafBase1(); lL.base(T.at(leafBase1));
+              leafSize(lL, nl);
+            P.parallelSection();
+              tt(node_leafBase2, r); leafBase2(); lR.base(T.at(leafBase2));
+              leafSize(lR, nr);
+            P.parallelEnd();
 
             T.at(nl).greaterThanOrEqual(T.at(maxKeysPerLeaf), T.at(stolenOrMerged));
             stealNotPossible(end);
+
             T.at(nr).lessThan(T.at(two), T.at(stolenOrMerged));                 // Steal not allowed because it would leave the right sibling empty
             stealNotPossible(end);
 
             z();
-            lR.firstElement();                                                  // First element of right child
-            M.moveParallel
-             (lL.T.at(lL.tKey) , lR.T.at(lR.tKey),                              /// Parallel possible
-              lL.T.at(lL.tData), lR.T.at(lR.tData));
-            lL.push();                                                          // Increase left
+            lR.shift();                                                         // First element of right child
+            P.parallelStart();
+              M.moveParallel
+               (lL.T.at(lL.tKey) , lR.T.at(lR.tKey),                            /// Parallel possible
+                lL.T.at(lL.tData), lR.T.at(lR.tData));
+              lL.push();                                                        // Increase left
 
-            M.moveParallel
-             (bT.T.at(bT.tKey) , lR.T.at(lR.tKey),                              /// Parallel possible
-              bT.T.at(bT.tData), T.at(l),
-              bT.T.at(bT.index), T.at(index));
+            P.parallelSection();
+              M.moveParallel
+               (bT.T.at(bT.tKey) , lR.T.at(lR.tKey),                            /// Parallel possible
+                bT.T.at(bT.tData), T.at(l),
+                bT.T.at(bT.index), T.at(index));
+            P.parallelEnd();
             bT.setElementAt();                                                  // Swap key of parent
-            lR.shift();                                                         // Reduce right
            }
           void Else()                                                           // Children are branches
            {z();
@@ -3635,7 +3641,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 652, """
+    t.runVerilogDeleteTest(1, 8, 629, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3659,7 +3665,7 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 452, """
+    t.runVerilogDeleteTest(7, 2, 429, """
 8,9=0 |
 """);
 
