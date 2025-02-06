@@ -1089,10 +1089,14 @@ abstract class BtreePA extends Test                                             
     allocBranch(); tt(l, allocBranch);                                          // New left branch
     allocBranch(); tt(r, allocBranch);                                          // New right branch
 
-    T.setIntInstruction(node_branchBase1, root);
-                             branchBase1(); bT.base(T.at(branchBase1));         // Set address of the referenced branch stuck
-    tt(node_branchBase2, l); branchBase2(); bL.base(T.at(branchBase2));         // Set address of the referenced branch stuck
-    tt(node_branchBase3, r); branchBase3(); bR.base(T.at(branchBase3));         // Set address of the referenced branch stuck
+    P.parallelStart();
+      T.setIntInstruction(node_branchBase1, root);
+                               branchBase1(); bT.base(T.at(branchBase1));       // Set address of the referenced branch stuck
+    P.parallelSection();
+      tt(node_branchBase2, l); branchBase2(); bL.base(T.at(branchBase2));       // Set address of the referenced branch stuck
+    P.parallelSection();
+      tt(node_branchBase3, r); branchBase3(); bR.base(T.at(branchBase3));       // Set address of the referenced branch stuck
+    P.parallelEnd();
 
     bT.split(bL, bR);                                                           // Split the root as a branch
 
@@ -1104,12 +1108,23 @@ abstract class BtreePA extends Test                                             
 //     }
 //    bT.shift();                                                               // This key, next pair will be part of the root
 //    T.at(parentKey).move(bT.T.at(bT.tKey));
-    bL.T.setIntInstruction(bL.tKey, 0);
-    bT.T.setIntInstruction(bT.index, splitBranchSize);
+
+    P.parallelStart();
+      bL.T.setIntInstruction(bL.tKey, 0);
+    P.parallelSection();
+      bT.T.setIntInstruction(bT.index, splitBranchSize);
+    P.parallelEnd();
+
     bT.elementAt();
-    T.at(parentKey).move(bT.T.at(bT.tKey));
-    bL.T.at(bL.tData).move(bT.T.at(bT.tData));
-    bL.T.setIntInstruction(bL.index, splitBranchSize);
+
+    P.parallelStart();
+      T.at(parentKey)  .move(bT.T.at(bT.tKey));
+    P.parallelSection();
+      bL.T.at(bL.tData).move(bT.T.at(bT.tData));
+    P.parallelSection();
+      bL.T.setIntInstruction(bL.index, splitBranchSize);
+    P.parallelEnd();
+
     bL.setElementAt();
 //  bL.push();                                                                  // Becomes top and so ignored by search ... except last
 
@@ -1123,18 +1138,29 @@ abstract class BtreePA extends Test                                             
 //    bT.shift();
     bR.T.setIntInstruction(bR.tKey, 0);
     bT.lastElement();
-    bR.T.at(bR.tData).move(bT.T.at(bT.tData));
-    bR.T.setIntInstruction(bR.index, splitBranchSize);
+
+    P.parallelStart();
+      bR.T.at(bR.tData).move(bT.T.at(bT.tData));
+    P.parallelSection();
+      bR.T.setIntInstruction(bR.index, splitBranchSize);
+    P.parallelEnd();
     bR.setElementAt();
 //  bR.push();                                                                  // Becomes top and so ignored by search ... except last
 
-    bT.clear();                                                                 // Refer to new branches from root
-    M.moveParallel
-     (bT.T.at(bT.tKey) , T.at(parentKey),                                       /// Parallel possible
-      bT.T.at(bT.tData), T.at(l));
+    P.parallelStart();
+      bT.clear();                                                                 // Refer to new branches from root
+    P.parallelSection();
+      M.moveParallel
+       (bT.T.at(bT.tKey) , T.at(parentKey),                                       /// Parallel possible
+        bT.T.at(bT.tData), T.at(l));
+    P.parallelEnd();
     bT.push();
-    bT.T.at(bT.tKey ).zero();
-    bT.T.at(bT.tData).move(T.at(r));
+
+    P.parallelStart();
+      bT.T.at(bT.tKey ).zero();
+    P.parallelSection();
+      bT.T.at(bT.tData).move(T.at(r));
+    P.parallelEnd();
     bT.push();                                                                  // Becomes top and so ignored by search ... except last
    }
 
@@ -3645,7 +3671,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 1042, """
+    t.runVerilogPutTest(8, 1030, """
              4             |
              0             |
              5             |
