@@ -178,11 +178,11 @@ abstract class BtreePA extends Test                                             
 
   static BtreePA btreePA_small()                                                // Define a small test btree
    {return new BtreePA()
-     {int maxSize         () {return  8;}
+     {int maxSize         () {return 32;}
       int maxKeysPerLeaf  () {return  2;}
       int maxKeysPerBranch() {return  3;}
-      int bitsPerKey      () {return  4;}
-      int bitsPerData     () {return  4;}
+      int bitsPerKey      () {return  8;}
+      int bitsPerData     () {return  8;}
      };
    }
 
@@ -1271,9 +1271,14 @@ abstract class BtreePA extends Test                                             
 
     z();
     allocBranch(); tt(l, allocBranch);
-    tt(node_branchBase1, splitParent);      branchBase1(); bT.base(T.at(branchBase1)); // The parent branch
-    tt(node_branchBase2, l);                branchBase2(); bL.base(T.at(branchBase2)); // The branch being split into
-    tt(node_branchBase3, node_splitBranch); branchBase3(); bR.base(T.at(branchBase3)); // The branch being split
+
+    P.parallelStart();
+      tt(node_branchBase1, splitParent);      branchBase1(); bT.base(T.at(branchBase1)); // The parent branch
+    P.parallelSection();
+      tt(node_branchBase2, l);                branchBase2(); bL.base(T.at(branchBase2)); // The branch being split into
+    P.parallelSection();
+      tt(node_branchBase3, node_splitBranch); branchBase3(); bR.base(T.at(branchBase3)); // The branch being split
+    P.parallelEnd();
 
 //  for (int i = 0; i < splitBranchSize; i++)                                   // Build left branch from right
 //   {z(); bR.shift();
@@ -2556,7 +2561,7 @@ endmodule
       P.traceMemory = M.memory();                                               // Request memory tracing
       P.run(javaTraceFile);                                                     // Run the java version and trace it
       say(Project, Folder, Key());                                              // Identify the test
-      execTest();                                                               // Exeute the verilog test
+      execTest();                                                               // Execute the verilog test
      }
 
     void execTest()                                                             // Execute the verilog test and compare it with the results from execution under Java
@@ -3715,6 +3720,138 @@ endmodule
       3                  2        |
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
+
+    t.runVerilogPutTest(10, 986, """
+             4                       |
+             0                       |
+             5                       |
+             6                       |
+      2             6      8         |
+      5             6      6.1       |
+      1             4      7         |
+      3                    2         |
+1,2=1  3,4=3  5,6=4  7,8=7    9,10=2 |
+""");
+
+    t.runVerilogPutTest(11, 1099, """
+             4                               |
+             0                               |
+             5                               |
+             6                               |
+      2             6      8      9          |
+      5             6      6.1    6.2        |
+      1             4      7      8          |
+      3                           2          |
+1,2=1  3,4=3  5,6=4  7,8=7    9=8    10,11=2 |
+""");
+
+    t.runVerilogPutTest(12, 983, """
+                               8                 |
+                               0                 |
+                               5                 |
+                               6                 |
+      2      4        6                10        |
+      5      5.1      5.2              6         |
+      1      3        4                8         |
+                      7                2         |
+1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=2 |
+""");
+
+    t.runVerilogPutTest(13, 918, """
+                               8                          |
+                               0                          |
+                               5                          |
+                               6                          |
+      2      4        6                10      11         |
+      5      5.1      5.2              6       6.1        |
+      1      3        4                8       10         |
+                      7                        2          |
+1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11=10    12,13=2 |
+""");
+
+    t.runVerilogPutTest(14, 986, """
+                               8                             |
+                               0                             |
+                               5                             |
+                               6                             |
+      2      4        6                10         12         |
+      5      5.1      5.2              6          6.1        |
+      1      3        4                8          10         |
+                      7                           2          |
+1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=2 |
+""");
+
+    t.runVerilogPutTest(15, 1099, """
+                               8                                     |
+                               0                                     |
+                               5                                     |
+                               6                                     |
+      2      4        6                10         12      13         |
+      5      5.1      5.2              6          6.1     6.2        |
+      1      3        4                8          10      9          |
+                      7                                   2          |
+1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13=9    14,15=2 |
+""");
+
+    t.runVerilogPutTest(16, 1080, """
+                               8                  12                   |
+                               0                  0.1                  |
+                               5                  11                   |
+                                                  6                    |
+      2      4        6                10                    14        |
+      5      5.1      5.2              11                    6         |
+      1      3        4                8                     9         |
+                      7                10                    2         |
+1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=2 |
+""");
+
+    t.runVerilogPutTest(17, 1105, """
+                               8                  12                            |
+                               0                  0.1                           |
+                               5                  11                            |
+                                                  6                             |
+      2      4        6                10                    14      15         |
+      5      5.1      5.2              11                    6       6.1        |
+      1      3        4                8                     9       12         |
+                      7                10                            2          |
+1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15=12    16,17=2 |
+""");
+
+    t.runVerilogPutTest(18, 1173, """
+                               8                  12                               |
+                               0                  0.1                              |
+                               5                  11                               |
+                                                  6                                |
+      2      4        6                10                    14         16         |
+      5      5.1      5.2              11                    6          6.1        |
+      1      3        4                8                     9          12         |
+                      7                10                               2          |
+1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17,18=2 |
+""");
+
+    t.runVerilogPutTest(19, 1286, """
+                               8                  12                                        |
+                               0                  0.1                                       |
+                               5                  11                                        |
+                                                  6                                         |
+      2      4        6                10                    14         16       17         |
+      5      5.1      5.2              11                    6          6.1      6.2        |
+      1      3        4                8                     9          12       13         |
+                      7                10                                        2          |
+1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
+""");
+
+    t.runVerilogPutTest(20, 1174, """
+                               8                                           16                    |
+                               0                                           0.1                   |
+                               5                                           11                    |
+                                                                           6                     |
+      2      4        6                10         12          14                       18        |
+      5      5.1      5.2              11         11.1        11.2                     6         |
+      1      3        4                8          10          9                        13        |
+                      7                                       12                       2         |
+1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10     13,14=9     15,16=12    17,18=13   19,20=2 |
+""");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -3737,8 +3874,8 @@ endmodule
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
     //test_delete_small_random();
-    test_verilog_delete();
-    test_verilog_find();
+    //test_verilog_delete();
+    //test_verilog_find();
     test_verilog_put();
     //test_put_ascending();
     //test_delete_descending();
