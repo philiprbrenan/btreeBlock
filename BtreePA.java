@@ -3,7 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-// Isoptimize() moving code inside then clauses?
+// splitBranch()) parallel
 import java.util.*;
 import java.nio.file.*;
 
@@ -1211,48 +1211,63 @@ abstract class BtreePA extends Test                                             
 
     lR.splitLow(lL);                                                            // Split out the lower half
 
-    lR.firstElement();
-    lL. lastElement();
-    tt(node_branchBase, splitParent); branchBase(); bT.base(T.at(branchBase));  // The parent branch
-    P.new I()                                                                   // Splitting key
-     {void a()
-       {bT.T.at(bT.tKey).setInt((lR.T.at(lR.tKey).getInt() +
-                                 lL.T.at(lL.tKey).getInt()) / 2);
-       }
-      String v()
-       {return bT.T.at(bT.tKey).verilogLoad() + " <= "+
-           "("+lR.T.at(lR.tKey).verilogLoad() + " + " +
-               lL.T.at(lL.tKey).verilogLoad() + ") / 2;";
-       }
-     };
-    M.moveParallel
-     (bT.T.at(bT.tData), T.at(l),                                               /// Parallel possible
-      bT.T.at(bT.index), T.at(index));
+    P.parallelStart();
+      lR.firstElement();
+    P.parallelSection();
+      lL. lastElement();
+    P.parallelSection();
+      tt(node_branchBase, splitParent); branchBase(); bT.base(T.at(branchBase));// The parent branch
+    P.parallelEnd();
+
+
+    P.parallelStart();
+      P.new I()                                                                 // Splitting key
+       {void a()
+         {bT.T.at(bT.tKey).setInt((lR.T.at(lR.tKey).getInt() +
+                                   lL.T.at(lL.tKey).getInt()) / 2);
+         }
+        String v()
+         {return bT.T.at(bT.tKey).verilogLoad() + " <= "+
+             "("+lR.T.at(lR.tKey).verilogLoad() + " + " +
+                 lL.T.at(lL.tKey).verilogLoad() + ") / 2;";
+         }
+       };
+    P.parallelSection();
+      M.moveParallel
+       (bT.T.at(bT.tData), T.at(l),                                             /// Parallel possible
+        bT.T.at(bT.index), T.at(index));
+    P.parallelEnd();
     bT.insertElementAt();                                                       // Insert new key, next pair in parent
    }
 
   private void splitBranch()                                                    // Split a branch which is not the root by splitting right to left
    {if (Assert) {tt(node_assertBranch, node_splitBranch); assertBranch();}
-    tt(node_branchSize, node_splitBranch); branchSize();
-    if (Halt) P.new If (T.at(node_splitBranch))
-     {void Else()
-       {P.halt("Cannot split root with this method");
-       }
-     };
+    if (Halt)
+     {tt(node_branchSize, node_splitBranch); branchSize();
+      P.new If (T.at(node_splitBranch))
+       {void Else()
+         {P.halt("Cannot split root with this method");
+         }
+       };
+     }
 
-    tt(node_branchIsFull, node_splitBranch); branchIsFull();
-    if (Halt) P.new If (T.at(branchIsFull))
-     {void Else()
-       {P.halt("Branch is not full");
-       }
-     };
+    if (Halt)
+     {tt(node_branchIsFull, node_splitBranch); branchIsFull();
+      P.new If (T.at(branchIsFull))
+       {void Else()
+         {P.halt("Branch is not full");
+         }
+       };
+     }
 
-    tt(node_branchIsFull, splitParent); branchIsFull();
-    if (Halt) P.new If (T.at(branchIsFull))
-     {void Then()
-       {P.halt("Branch split parent must not be full");
-       }
-     };
+    if (Halt)
+     {tt(node_branchIsFull, splitParent); branchIsFull();
+      P.new If (T.at(branchIsFull))
+       {void Then()
+         {P.halt("Branch split parent must not be full");
+         }
+       };
+     }
 
     z();
     allocBranch(); tt(l, allocBranch);
@@ -1304,7 +1319,6 @@ abstract class BtreePA extends Test                                             
             P.Goto(end);
            }
          };
-
         tt(node_branchBase, node_stealFromLeft); branchBase(); bT.base(T.at(branchBase));
 
         bT.T.at(bT.index).move(T.at(index));
@@ -3646,7 +3660,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 537, """
+    t.runVerilogPutTest(4, 526, """
       2      |
       0      |
       1      |
@@ -3654,7 +3668,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 650, """
+    t.runVerilogPutTest(5, 639, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -3662,7 +3676,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 718, """
+    t.runVerilogPutTest(6, 707, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3670,7 +3684,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 831, """
+    t.runVerilogPutTest(7, 820, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -3678,7 +3692,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 1006, """
+    t.runVerilogPutTest(8, 995, """
              4             |
              0             |
              5             |
@@ -3690,7 +3704,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 929, """
+    t.runVerilogPutTest(9, 918, """
              4                    |
              0                    |
              5                    |
