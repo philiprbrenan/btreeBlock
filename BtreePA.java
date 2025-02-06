@@ -742,11 +742,22 @@ abstract class BtreePA extends Test                                             
     lSize.size(); T.at(leafSize).move(lSize.T.at(lSize.size));
    }
 
+  private void leafSize(StuckPA leafStuck, Layout.Variable Size)                // Number of children in body of leaf
+   {z();
+    leafStuck.size(); T.at(Size).move(leafStuck.T.at(leafStuck.size));
+   }
+
   private void branchSize()                                                     // Number of children in body of branch taking top for granted as it is always there
    {z();
     tt(node_branchBase, node_branchSize); branchBase(); bSize.base(T.at(branchBase));
     bSize.size(); T.at(branchSize).move(bSize.T.at(bSize.size));                // Changed order here to match leafSize more closely
     T.at(branchSize).dec();                                                     // Account for top which will always be present
+   }
+
+  private void branchSize(StuckPA branchStuck, Layout.Variable Size)            // Number of children in body of branch taking top for granted as it is always there
+   {z();
+    branchStuck.size(); T.at(Size).move(branchStuck.T.at(branchStuck.size));    // Changed order here to match leafSize more closely
+    T.at(Size).dec();                                                           // Account for top which will always be present
    }
 
   private void isEmpty()                                                        // The node is empty
@@ -1318,33 +1329,46 @@ abstract class BtreePA extends Test                                             
     P.new Block()
      {void code()
        {if (Assert) {tt(node_assertBranch, node_stealFromLeft); assertBranch();}
-        P.new If (T.at(index))
+        P.new If (T.at(index))                                                  // Nothing on the left to steal from
          {void Else()
            {T.at(stolenOrMerged).zero();
             P.Goto(end);
            }
          };
+
         tt(node_branchBase, node_stealFromLeft); branchBase(); bT.base(T.at(branchBase));
 
         bT.T.at(bT.index).move(T.at(index));
         bT.T.at(bT.index).dec();
         bT.elementAt();
 
-        T.at(l).move(bT.T.at(bT.tData));
-        bT.T.at(bT.index).move(T.at(index));
-        bT.elementAt();
-        T.at(r).move(bT.T.at(bT.tData));
+        P.parallelStart();
+          T.at(l).move(bT.T.at(bT.tData));
+        P.parallelSection();
+          bT.T.at(bT.index).move(T.at(index));
+        P.parallelEnd();
 
-        tt(node_hasLeavesForChildren, node_stealFromLeft);
+        bT.elementAt();
+
+        P.parallelStart();
+          T.at(r).move(bT.T.at(bT.tData));
+        P.parallelSection();
+          tt(node_hasLeavesForChildren, node_stealFromLeft);
+        P.parallelEnd();
+
         hasLeavesForChildren();
 
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
-           {tt(node_leafBase1, l); leafBase1(); lL.base(T.at(leafBase1));
-            tt(node_leafBase2, r); leafBase2(); lR.base(T.at(leafBase2));
-
-            tt(node_leafSize, l); leafSize(); tt(nl, leafSize);
-            tt(node_leafSize, r); leafSize(); tt(nr, leafSize);
+           {P.parallelStart();                                                  // Address leaves on each side and get their size
+              tt(node_leafBase1, l); leafBase1(); lL.base(T.at(leafBase1));
+              leafSize(lL, nl);
+            P.parallelSection();
+              tt(node_leafBase2, r); leafBase2(); lR.base(T.at(leafBase2));
+              leafSize(lR, nr);
+            P.parallelEnd();
+            //tt(node_leafSize, l); leafSize(); tt(nl, leafSize);
+            //tt(node_leafSize, r); leafSize(); tt(nr, leafSize);
 
             T.at(nr).greaterThanOrEqual(T.at(maxKeysPerLeaf), T.at(stolenOrMerged));
             stealNotPossible(end);
@@ -3873,12 +3897,9 @@ endmodule
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    //test_delete_small_random();
-    //test_verilog_delete();
+    test_verilog_delete();
     //test_verilog_find();
-    test_verilog_put();
-    //test_put_ascending();
-    //test_delete_descending();
+    //test_verilog_put();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
