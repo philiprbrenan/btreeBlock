@@ -1194,8 +1194,11 @@ abstract class BtreePA extends Test                                             
 
     allocLeaf(); tt(l, allocLeaf);                                              // New  split out leaf
 
-    tt(node_leafBase1, l);              leafBase1(); lL.base(T.at(leafBase1));  // The leaf being split into
-    tt(node_leafBase2, node_splitLeaf); leafBase2(); lR.base(T.at(leafBase2));  // The leaf being split on the right
+    P.parallelStart();
+      tt(node_leafBase1, l);              leafBase1(); lL.base(T.at(leafBase1));// The leaf being split into
+    P.parallelSection();
+      tt(node_leafBase2, node_splitLeaf); leafBase2(); lR.base(T.at(leafBase2));// The leaf being split on the right
+    P.parallelEnd();
 
 //  for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf
 //   {z(); lR.shift();
@@ -3643,7 +3646,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 540, """
+    t.runVerilogPutTest(4, 537, """
       2      |
       0      |
       1      |
@@ -3651,7 +3654,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 653, """
+    t.runVerilogPutTest(5, 650, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -3659,7 +3662,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 721, """
+    t.runVerilogPutTest(6, 718, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3667,7 +3670,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 834, """
+    t.runVerilogPutTest(7, 831, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -3675,7 +3678,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 1009, """
+    t.runVerilogPutTest(8, 1006, """
              4             |
              0             |
              5             |
@@ -3687,7 +3690,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 932, """
+    t.runVerilogPutTest(9, 929, """
              4                    |
              0                    |
              5                    |
