@@ -1376,14 +1376,15 @@ abstract class BtreePA extends Test                                             
             T.at(nl).lessThan(T.at(two), T.at(stolenOrMerged));
             stealNotPossible(end);
 
-            lL.lastElement();
+//          lL.lastElement();
+            lL.pop();                                                           // Steal from left
 
             M.moveParallel
              (lR.T.at(lR.tKey ), lL.T.at(lL.tKey ),                             /// Parallel possible
               lR.T.at(lR.tData), lL.T.at(lL.tData));
             lR.unshift();                                                       // Increase right
 
-            lL.pop();                                                           // Reduce left
+//          lL.pop();                                                           // Reduce left
 
             lL.T.at(lL.index).move(T.at(nl));
             lL.T.at(lL.index).dec(2);
@@ -3597,7 +3598,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 802, """
+    t.runVerilogDeleteTest(4, 5, 786, """
              6           |
              0           |
              5           |
