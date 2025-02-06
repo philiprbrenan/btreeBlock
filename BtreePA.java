@@ -1525,10 +1525,11 @@ abstract class BtreePA extends Test                                             
            }
           void Else()                                                           // Children are branches
            {z();
-            tt(node_branchBase1, l); branchBase1(); bL.base(T.at(branchBase1));
-            tt(node_branchBase2, r); branchBase2(); bR.base(T.at(branchBase2));
-            tt(node_branchSize, l); branchSize(); tt(nl, branchSize);
-            tt(node_branchSize, r); branchSize(); tt(nr, branchSize);
+            P.parallelStart();
+              tt(node_branchBase1, l); branchBase1(); bL.base(T.at(branchBase1)); branchSize(bL, nl);
+            P.parallelSection();
+              tt(node_branchBase2, r); branchBase2(); bR.base(T.at(branchBase2)); branchSize(bR, nr);
+            P.parallelEnd();
 
             T.at(nl).greaterThanOrEqual(T.at(maxKeysPerBranch), T.at(stolenOrMerged));
             stealNotPossible(end);
@@ -1541,18 +1542,24 @@ abstract class BtreePA extends Test                                             
               bL.T.at(bL.index), T.at(nl));
             bL.setElementAt();                                                  // Left top becomes real
 
-            bR.firstElement();                                                  // First element of  right child
+            bR.shift();                                                         // First element of  right child
 
-            bL.T.at(bL.tKey).zero();
-            bL.T.at(bL.tData).move(bR.T.at(bR.tData));
+            P.parallelStart();
+              bL.T.at(bL.tKey).zero();
+            P.parallelSection();
+              bL.T.at(bL.tData).move(bR.T.at(bR.tData));
+            P.parallelEnd();
             bL.push();                                                          // New top for left is ignored by search ,.. except last
 
-            M.moveParallel
-             (bT.T.at(bT.tKey ), bR.T.at(bR.tKey),                              /// Parallel possible
-              bT.T.at(bT.tData), T.at(l));
-            bT.T.at(bT.index).move(T.at(index));
+            P.parallelStart();
+              M.moveParallel
+               (bT.T.at(bT.tKey ), bR.T.at(bR.tKey),                              /// Parallel possible
+                bT.T.at(bT.tData), T.at(l));
+            P.parallelSection();
+              bT.T.at(bT.index).move(T.at(index));
+            P.parallelEnd();
             bT.setElementAt();                                                  // Swap key of parent
-            bR.shift();                                                         // Reduce right
+//          bR.shift();                                                         // Reduce right
            }
          };
         z(); T.at(stolenOrMerged).ones();
@@ -3609,7 +3616,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 930, """
+    t.runVerilogDeleteTest(3, 6, 905, """
                     6           |
                     0           |
                     5           |
