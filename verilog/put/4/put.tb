@@ -8,9 +8,9 @@ module put_tb;                                                             // Te
   reg                  stop;                                                    // Program has stopped when this goes high
   reg                  clock;                                                   // Program counter clock
   reg             [2:0]pfd;                                                     // Put, find delete
-  reg  [4 :0]Key  = 4;                                             // Input key
-  reg  [4:0]Data = 3;                                            // Input data
-  reg  [4:0]data;                                                    // Output data
+  reg  [8 :0]Key  = 4;                                             // Input key
+  reg  [8:0]Data = 3;                                            // Input data
+  reg  [8:0]data;                                                    // Output data
   reg                  found;                                                   // Whether the key was found on put, find delete
   integer testResults;                                                          // Test results file
 

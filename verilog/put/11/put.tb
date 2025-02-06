@@ -1,0 +1,39 @@
+//-----------------------------------------------------------------------------
+// Database on a chip test bench
+// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
+//------------------------------------------------------------------------------
+`timescale 10ps/1ps
+module put_tb;                                                             // Test bench for database on a chip
+  reg                  reset;                                                   // Restart the program run sequence when this goes high
+  reg                  stop;                                                    // Program has stopped when this goes high
+  reg                  clock;                                                   // Program counter clock
+  reg             [2:0]pfd;                                                     // Put, find delete
+  reg  [8 :0]Key  = 11;                                             // Input key
+  reg  [8:0]Data = 3;                                            // Input data
+  reg  [8:0]data;                                                    // Output data
+  reg                  found;                                                   // Whether the key was found on put, find delete
+  integer testResults;                                                          // Test results file
+
+  put a1(.reset(reset), .stop(stop), .clock(clock),                        // Connect to the module
+    .Key(Key), .Data(Data), .data(data), .found(found));
+
+  initial begin                                                                 // Test the module
+    reset = 0; #1; reset = 1; #1; reset = 0; #1;                                // Reset the module
+    execute();
+  end
+
+  task execute;                                                                 // Clock the module until it says it has stopped
+    integer step;
+    begin
+      for(step = 0; step < 2000 && !stop ; step = step + 1) begin
+        clock = 0; #1; clock = 1; #1;
+      end
+      if (stop) begin                                                           // Stopped
+        testResults = $fopen("tests.txt", "w");
+        $fdisplay(testResults, "Steps=%1d\nKey=%1d\ndata=%1d\n",
+          step, Key, data);
+        $fclose(testResults);
+      end
+    end
+  endtask
+endmodule
