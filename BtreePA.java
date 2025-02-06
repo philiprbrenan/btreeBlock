@@ -1399,17 +1399,21 @@ abstract class BtreePA extends Test                                             
            }
           void Else()                                                           // Children are branches
            {z();
-            tt(node_branchBase1, l); branchBase1(); bL.base(T.at(branchBase1));
-            tt(node_branchBase2, r); branchBase2(); bR.base(T.at(branchBase2));
-            tt(node_branchSize, l); branchSize(); tt(nl, branchSize);
-            tt(node_branchSize, r); branchSize(); tt(nr, branchSize);
+            P.parallelStart();
+              tt(node_branchBase1, l); branchBase1(); bL.base(T.at(branchBase1));
+              branchSize(bL, nl);
+            P.parallelSection();
+              tt(node_branchBase2, r); branchBase2(); bR.base(T.at(branchBase2));
+              branchSize(bR, nr);
+            P.parallelEnd();
 
             T.at(nr).greaterThanOrEqual(T.at(maxKeysPerBranch), T.at(stolenOrMerged));
             stealNotPossible(end);
+
             T.at(nl).lessThan(T.at(two), T.at(stolenOrMerged));
             stealNotPossible(end);
 
-            bL.lastElement();                                                   // Increase right with left top
+            bL.pop();                                                           // Increase right with left top
             bT.T.at(bT.index).move(T.at(index));
             bT.elementAt();                                                     // Top key
 
@@ -1417,7 +1421,7 @@ abstract class BtreePA extends Test                                             
              (bR.T.at(bR.tKey) , bT.T.at(bT.tKey),                              /// Parallel possible
               bR.T.at(bR.tData), bL.T.at(bL.tData));
             bR.unshift();                                                       // Increase right with left top
-            bL.pop();                                                           // Remove left top
+//          bL.pop();                                                           // Remove left top
 
             bR.firstElement();                                                  // Increase right with left top
 
@@ -3598,7 +3602,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 786, """
+    t.runVerilogDeleteTest(4, 5, 778, """
              6           |
              0           |
              5           |
