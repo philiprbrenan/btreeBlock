@@ -9,3 +9,5 @@
 !trace/**
 !verilog/
 !verilog/**
+!vivado/synthesis.pl
+!vivado/README.md
