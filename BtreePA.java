@@ -459,7 +459,7 @@ abstract class BtreePA extends Test                                             
                               stolenOrMerged = //L.bit      ("stolenOrMerged"                                );
                                 pastMaxDepth = //L.bit      ("pastMaxDepth"                                  );
                                   nodeMerged = //L.bit      ("nodeMerged"                                    );
-                                   mergeable = //L.bit      ("mergeable"                                     );
+                                   mergeable = L.bit      ("mergeable"                                     );
                                      deleted = //L.bit      ("deleted"                                       );
                                      success = L.bit      ("success"                                       );
                                     inserted = L.bit      ("inserted"                                      );
@@ -557,7 +557,7 @@ abstract class BtreePA extends Test                                             
       //stolenOrMerged,
       //pastMaxDepth,
       //nodeMerged,
-      //mergeable,
+      mergeable,
       //deleted,
       success,
       inserted,
