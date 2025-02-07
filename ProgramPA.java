@@ -115,8 +115,7 @@ class ProgramPA extends Test                                                    
    }
 
   void halt(final Object...O)                                                   // Halt execution with an explanatory message and traceback of current instruction
-   {z();
-    final String m = "/* "+saySb(O).toString()+" */";
+   {final String m = "/* "+saySb(O).toString()+" */";
     new I()
      {void   a() {say(O); say(currentInstruction.traceBack); running = false;}
       String v() {return "stopped <= 1; " + m;}
@@ -307,7 +306,7 @@ class ProgramPA extends Test                                                    
     m.at(n).inc();
     m.at(n).inc();
     m.at(n).inc();
-    p.run();
+    p.run(); p.clear();
 
     //stop(m);
     ok(m, """
@@ -385,7 +384,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
-  static void test_fizz_buzz()
+  static void test_fizz_buzz(int z)
    {final int N = 8;
     Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", N);
@@ -650,7 +649,7 @@ Line T       At      Wide       Size    Indices        Value   Name
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_inc();
     test_fibonacci();
-    test_fizz_buzz();
+    test_fizz_buzz(1);
     test_if();
     test_goOn();
     test_goOff();
