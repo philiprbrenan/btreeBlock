@@ -420,14 +420,11 @@ abstract class BtreePA extends Test                                             
    {final Layout L = new Layout();
                                     allocate = L.variable ("allocate"                                      , bitsPerNext);
                                     nextFree = L.variable ("nextFree"                                      , bitsPerNext);
-                                     success = L.bit      ("success"                                       );
-                                    inserted = L.bit      ("inserted"                                      );
 
                                        first = L.variable ("first"                                         , bitsPerSize);
                                         next = L.variable ("next"                                          , bitsPerNext);
 
                                       search = L.variable ("search"                                        , bitsPerKey());
-                                       found = L.bit      ("found"                                         );
                                          key = L.variable ("key"                                           , bitsPerKey());
                                         data = L.variable ("data"                                          , bitsPerData());
 
@@ -461,13 +458,15 @@ abstract class BtreePA extends Test                                             
                               stolenOrMerged = //L.bit      ("stolenOrMerged"                                );
                                 pastMaxDepth = //L.bit      ("pastMaxDepth"                                  );
                                   nodeMerged = //L.bit      ("nodeMerged"                                    );
-                                   mergeable = L.bit      ("mergeable"                                     );
-                                     deleted = L.bit      ("deleted"                                       );
+                                   mergeable = //L.bit      ("mergeable"                                     );
+                                     deleted = //L.bit      ("deleted"                                       );
+                                     success = //L.bit      ("success"                                       );
+                                    inserted = L.bit      ("inserted"                                      );
+                                       found = L.bit      ("found"                                         );
 
                                   branchBase = L.variable ("branchBase"                                    , bitsPerAddress);
                                     leafSize = //L.variable ("leafSize"                                      , bitsPerSize);
                                   branchSize = L.variable ("branchSize"                                    , bitsPerSize);
-                                         top = L.variable ("top"                                           , bitsPerNext);
 
                                          Key = L.variable ("Key"                                           , bitsPerKey());
                                         Data = L.variable ("Data"                                          , bitsPerData());
@@ -475,7 +474,8 @@ abstract class BtreePA extends Test                                             
                                findAndInsert = //L.variable ("findAndInsert"                                 , bitsPerNext);
                                       parent = L.variable ("parent"                                        , bitsPerNext);
                                        child = //L.variable ("child"                                         , bitsPerNext);
-                                   leafFound = L.variable ("leafFound"                                     , bitsPerNext);
+                                   leafFound = //L.variable ("leafFound"                                     , bitsPerNext);
+                                         top = L.variable ("top"                                           , bitsPerNext);
 
                               maxKeysPerLeaf = L.variable ("maxKeysPerLeaf"                                , bitsPerSize);
                             maxKeysPerBranch = L.variable ("maxKeysPerBranch"                              , bitsPerSize);
@@ -524,12 +524,9 @@ abstract class BtreePA extends Test                                             
     final Layout.Structure transaction = L.structure("transaction",
       allocate,
       nextFree,
-      success,
-      inserted,
       first,
       next,
       search,
-      found,
       key,
       data,
       //parentKey,
@@ -559,20 +556,23 @@ abstract class BtreePA extends Test                                             
       //stolenOrMerged,
       //pastMaxDepth,
       //nodeMerged,
-      mergeable,
-      deleted,
+      //mergeable,
+      //deleted,
+      //success,
+      inserted,
+      found,
 
       branchBase,
       //leafSize,
       branchSize,
-      top,
       Key,
       Data,
       //find,
       //findAndInsert,
       parent,
       //child,
-      leafFound,
+      //leafFound,
+      top,
       maxKeysPerLeaf,
       maxKeysPerBranch,
       two,
