@@ -307,12 +307,12 @@ public class Test                                                               
     stack.push(new LineCount(String.format("%s:%s:%s", s[0], s[2], s[1]), n));
    }
 
-  static void coverageAnalysis(String source, int top)                          // Coverage analysis: unexecuted lines and lines most frequently executed in a Geany clickable format
+  static void coverageAnalysis(String source, int top)                          // Coverage analysis: unexecuted lines and lines most frequently executed in the specified file in a Geany clickable format.
    {final Stack<String> sourceLines = readFile(source);                         // Lines of source from indicated file
     final Stack<String> notExecuted = new Stack<>();                            // Lines not executed
     final TreeSet<Integer> executed = new TreeSet<>();                          // Lines executed
 
-    for (String s : coverage.keySet())                                          // Find lines executed in this file
+    for (String s : coverage.keySet())                                          // Find lines that executed the line executed indicator function
      {final String[]fml = s.split("\\s+");
       if (fml[0].equals(source)) executed.add(Integer.parseInt(fml[2]));
      }
@@ -329,6 +329,67 @@ public class Test                                                               
      {say("Not executed");
       for (int i = 1; i <= notExecuted.size(); i++)                             // Not executed lines as a table
        {say(notExecuted.elementAt(i-1));
+       }
+     }
+    else say("All lines executed");                                             // All lines were executed
+
+    if (top > 0)                                                                // Most frequently executed
+     {final Stack<LineCount> lc = new Stack<>();                                // Lines executed most frequently
+      coverage.entrySet().stream()                                              // Find most frequently executed lines
+       .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))              // Sort by value in descending order
+       .limit(top)                                                              // Take the most frequent elements
+       .forEach(e -> printMostExecuted(lc, e.getKey(), e.getValue()));          // Print each entry
+
+      int w = 1; for (LineCount l: lc) w = max(w, l.line.length());             // Maximum width of line executed specification
+      final String f = "%-" + w + "s";
+      say(String.format(f+"  %12s  %4s", "Most Executed", "Count", "#"));
+
+      final int N = min(w, lc.size());
+      for (int i = 1; i <= N; i++)                                              // Print lines executed most frequently
+       {final LineCount l = lc.elementAt(i-1);
+        final String    c = NumberFormat.getInstance().format(l.count);
+        say(String.format(f+"  %12s  %4d", l.line, c, i));
+       }
+     }
+   }
+
+  static void coverageAnalysis(int top)                                         // Coverage analysis: unexecuted lines and top lines most frequently executed over all files encountered in a Geany clickable format.
+   {final TreeMap<String,TreeSet<Integer>> notExecuted      = new TreeMap<>();  // File, lines not executed
+    final TreeMap<String,TreeMap<Integer,Integer>> executed = new TreeMap<>();  // Lines executed
+
+    for (String s : coverage.keySet())                                          // Find lines that executed the line executed indicator function
+     {final String[]fml = s.split("\\s+");
+      final String f = fml[0];                                                  // The file containing the line executed
+say("AAAA", fml[0], fml[1], fml[2]);
+      final int    l = Integer.parseInt(fml[1]);                                // Line number
+      final int    c = Integer.parseInt(fml[2]);                                // The number of times this line was executed
+      if (!executed.containsKey(f)) executed.put(f, new TreeMap<Integer,Integer>());
+      final TreeMap<Integer,Integer> e = executed.get(f);
+      if (e.containsKey(l)) e.put(l, e.get(l)+1); else e.put(l, 1);             // Add or update the number of times this line was executed
+     }
+
+    for (String source: executed.keySet())                                      // The files encountered
+     {final Stack<String> sourceLines = readFile(source);                       // Lines of source code from a file encountered
+      for (int i = 1; i <= sourceLines.size(); i++)                             // Lines not executed in this file
+       {final String line = sourceLines.elementAt(i-1);
+        if (line.contains("z();"))                                              // Line has been marked as executable
+         {if (!notExecuted.containsKey(source))                                 // New source file with a line that has not been executed
+           {final TreeSet<Integer> c = new TreeSet<>();
+            c.add(i);
+            notExecuted.put(source, c);
+           }
+          else                                                                  // Line has not been executed in a file with other not executed lines
+           {final TreeSet<Integer> c = notExecuted.get(source);
+            c.add(i);
+            notExecuted.put(source, c);
+           }
+         }
+       }
+     }
+    if (notExecuted.size() > 0)                                                 // Lines not executed
+     {say("Not executed");
+      for (String f: notExecuted.keySet())                                      // The files containing lines that have not been executed
+       {for (Integer i : notExecuted.get(f)) say(f+":"+i+":");                  // Not executed lines
        }
      }
     else say("All lines executed");                                             // All lines were executed
