@@ -362,8 +362,7 @@ abstract class BtreePA extends Test                                             
   Layout.Bit              mergeable;                                            // The left and right children are mergable
   Layout.Bit                deleted;                                            // Whether the delete request actually deleted the specified key
 
-  Layout.Variable          leafBase,   leafBase1,   leafBase2,   leafBase3;     // The offset of a leaf in memory
-  Layout.Variable        branchBase, branchBase1, branchBase2, branchBase3;     // The offset of a branch in memory
+  Layout.Variable        branchBase;                                            // The offset of a branch in memory
   Layout.Variable          leafSize;                                            // Number of children in body of leaf
   Layout.Variable        branchSize;                                            // Number of children in body of branch taking top for granted as it is always there
   Layout.Variable               top;                                            // The top next element of a branch - only used in printing
@@ -393,8 +392,8 @@ abstract class BtreePA extends Test                                             
   Layout.Variable  node_free;
   Layout.Variable  node_clear;
   Layout.Variable  node_erase;
-  Layout.Variable  node_leafBase,     node_leafBase1,   node_leafBase2,   node_leafBase3;
-  Layout.Variable  node_branchBase, node_branchBase1, node_branchBase2, node_branchBase3;
+  Layout.Variable  node_leafBase;
+  Layout.Variable  node_branchBase;
   Layout.Variable  node_leafSize;
   Layout.Variable  node_branchSize;
   Layout.Variable  node_isFull;
@@ -465,14 +464,7 @@ abstract class BtreePA extends Test                                             
                                    mergeable = L.bit      ("mergeable"                                     );
                                      deleted = L.bit      ("deleted"                                       );
 
-                                    leafBase = L.variable ("leafBase"                                      , bitsPerAddress);
-                                   leafBase1 = L.variable ("leafBase1"                                     , bitsPerAddress);
-                                   leafBase2 = L.variable ("leafBase2"                                     , bitsPerAddress);
-                                   leafBase3 = L.variable ("leafBase3"                                     , bitsPerAddress);
                                   branchBase = L.variable ("branchBase"                                    , bitsPerAddress);
-                                 branchBase1 = L.variable ("branchBase1"                                   , bitsPerAddress);
-                                 branchBase2 = L.variable ("branchBase2"                                   , bitsPerAddress);
-                                 branchBase3 = L.variable ("branchBase3"                                   , bitsPerAddress);
                                     leafSize = L.variable ("leafSize"                                      , bitsPerSize);
                                   branchSize = L.variable ("branchSize"                                    , bitsPerSize);
                                          top = L.variable ("top"                                           , bitsPerNext);
@@ -505,14 +497,8 @@ abstract class BtreePA extends Test                                             
                                    node_free = //L.variable ("node_free"                                     , bitsPerNext);
                                   node_clear = //L.variable ("node_clear"                                    , bitsPerNext);
                                   node_erase = L.variable ("node_erase"                                    , bitsPerNext);
-                               node_leafBase = L.variable ("node_leafBase"                                 , bitsPerNext);
-                              node_leafBase1 = L.variable ("node_leafBase1"                                , bitsPerNext);
-                              node_leafBase2 = L.variable ("node_leafBase2"                                , bitsPerNext);
-                              node_leafBase3 = L.variable ("node_leafBase3"                                , bitsPerNext);
-                             node_branchBase = L.variable ("node_branchBase"                               , bitsPerNext);
-                            node_branchBase1 = L.variable ("node_branchBase1"                              , bitsPerNext);
-                            node_branchBase2 = L.variable ("node_branchBase2"                              , bitsPerNext);
-                            node_branchBase3 = L.variable ("node_branchBase3"                              , bitsPerNext);
+                               node_leafBase = //L.variable ("node_leafBase"                                 , bitsPerNext);
+                             node_branchBase = //L.variable ("node_branchBase"                               , bitsPerNext);
                                node_leafSize = //L.variable ("node_leafSize"                                 , bitsPerNext);
                              node_branchSize = //L.variable ("node_branchSize"                               , bitsPerNext);
                                  node_isFull = //L.variable ("node_isFull"                                   , bitsPerNext);
@@ -576,8 +562,7 @@ abstract class BtreePA extends Test                                             
       mergeable,
       deleted,
 
-      leafBase,     leafBase1,   leafBase2,   leafBase3,
-      branchBase, branchBase1, branchBase2, branchBase3,
+      branchBase,
       leafSize,
       branchSize,
       top,
@@ -607,14 +592,8 @@ abstract class BtreePA extends Test                                             
       //node_free,
       //node_clear,
       node_erase,
-      node_leafBase,
-      node_leafBase1,
-      node_leafBase2,
-      node_leafBase3,
-      node_branchBase,
-      node_branchBase1,
-      node_branchBase2,
-      node_branchBase3,
+      //node_leafBase,
+      //node_branchBase,
       //node_leafSize,
       //node_branchSize,
       //node_isFull,
@@ -3674,7 +3653,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 773, """
+    t.runVerilogDeleteTest(3, 6, 751, """
                     6           |
                     0           |
                     5           |
@@ -3686,7 +3665,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 693, """
+    t.runVerilogDeleteTest(4, 5, 676, """
              6           |
              0           |
              5           |
@@ -3698,7 +3677,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 617, """
+    t.runVerilogDeleteTest(2, 7, 600, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3706,7 +3685,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 526, """
+    t.runVerilogDeleteTest(1, 8, 514, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3714,7 +3693,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 332, """
+    t.runVerilogDeleteTest(5, 4, 325, """
       7      |
       0      |
       1      |
@@ -3722,7 +3701,7 @@ endmodule
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(6, 3, 336, """
+    t.runVerilogDeleteTest(6, 3, 329, """
     7      |
     0      |
     1      |
@@ -3730,7 +3709,7 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 385, """
+    t.runVerilogDeleteTest(7, 2, 381, """
 8,9=0 |
 """);
 
@@ -3778,7 +3757,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 462, """
+    t.runVerilogPutTest(4, 456, """
       2      |
       0      |
       1      |
@@ -3786,7 +3765,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 527, """
+    t.runVerilogPutTest(5, 517, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -3794,7 +3773,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 595, """
+    t.runVerilogPutTest(6, 585, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3802,7 +3781,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 660, """
+    t.runVerilogPutTest(7, 646, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -3810,7 +3789,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 894, """
+    t.runVerilogPutTest(8, 881, """
              4             |
              0             |
              5             |
@@ -3822,7 +3801,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 781, """
+    t.runVerilogPutTest(9, 764, """
              4                    |
              0                    |
              5                    |
@@ -3834,7 +3813,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
 
-    t.runVerilogPutTest(10, 849, """
+    t.runVerilogPutTest(10, 832, """
              4                       |
              0                       |
              5                       |
@@ -3846,7 +3825,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9,10=2 |
 """);
 
-    t.runVerilogPutTest(11, 914, """
+    t.runVerilogPutTest(11, 893, """
              4                               |
              0                               |
              5                               |
@@ -3858,7 +3837,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9=8    10,11=2 |
 """);
 
-    t.runVerilogPutTest(12, 869, """
+    t.runVerilogPutTest(12, 858, """
                                8                 |
                                0                 |
                                5                 |
@@ -3870,7 +3849,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=2 |
 """);
 
-    t.runVerilogPutTest(13, 781, """
+    t.runVerilogPutTest(13, 764, """
                                8                          |
                                0                          |
                                5                          |
@@ -3882,7 +3861,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest(14, 849, """
+    t.runVerilogPutTest(14, 832, """
                                8                             |
                                0                             |
                                5                             |
@@ -3894,7 +3873,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=2 |
 """);
 
-    t.runVerilogPutTest(15, 914, """
+    t.runVerilogPutTest(15, 893, """
                                8                                     |
                                0                                     |
                                5                                     |
@@ -3906,7 +3885,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest(16, 917, """
+    t.runVerilogPutTest(16, 902, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -3918,7 +3897,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=2 |
 """);
 
-    t.runVerilogPutTest(17, 900, """
+    t.runVerilogPutTest(17, 881, """
                                8                  12                            |
                                0                  0.1                           |
                                5                  11                            |
@@ -3930,7 +3909,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest(18, 968, """
+    t.runVerilogPutTest(18, 949, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -3942,7 +3921,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17,18=2 |
 """);
 
-    t.runVerilogPutTest(19, 1033, """
+    t.runVerilogPutTest(19, 1010, """
                                8                  12                                        |
                                0                  0.1                                       |
                                5                  11                                        |
@@ -3954,7 +3933,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 1010, """
+    t.runVerilogPutTest(20, 995, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
