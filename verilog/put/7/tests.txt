@@ -1,4 +1,4 @@
-Steps=660
+Steps=646
 Key=7
 data=0
 
