@@ -425,6 +425,7 @@ abstract class BtreePA extends Test                                             
                                         next = L.variable ("next"                                          , bitsPerNext);
 
                                       search = L.variable ("search"                                        , bitsPerKey());
+                                       found = L.bit      ("found"                                         );
                                          key = L.variable ("key"                                           , bitsPerKey());
                                         data = L.variable ("data"                                          , bitsPerData());
 
@@ -460,9 +461,8 @@ abstract class BtreePA extends Test                                             
                                   nodeMerged = //L.bit      ("nodeMerged"                                    );
                                    mergeable = //L.bit      ("mergeable"                                     );
                                      deleted = //L.bit      ("deleted"                                       );
-                                     success = //L.bit      ("success"                                       );
+                                     success = L.bit      ("success"                                       );
                                     inserted = L.bit      ("inserted"                                      );
-                                       found = L.bit      ("found"                                         );
 
                                   branchBase = L.variable ("branchBase"                                    , bitsPerAddress);
                                     leafSize = //L.variable ("leafSize"                                      , bitsPerSize);
@@ -527,6 +527,7 @@ abstract class BtreePA extends Test                                             
       first,
       next,
       search,
+      found,
       key,
       data,
       //parentKey,
@@ -558,9 +559,8 @@ abstract class BtreePA extends Test                                             
       //nodeMerged,
       //mergeable,
       //deleted,
-      //success,
+      success,
       inserted,
-      found,
 
       branchBase,
       //leafSize,
