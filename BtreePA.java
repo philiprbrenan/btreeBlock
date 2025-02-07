@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// BtreeSA in pseudo assembler.
+// BtreeSA in pseudo assembler
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024-2025
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
@@ -524,6 +524,8 @@ abstract class BtreePA extends Test                                             
     final Layout.Structure transaction = L.structure("transaction",
       allocate,
       nextFree,
+      success,
+      inserted,
       first,
       next,
       search,
@@ -559,8 +561,6 @@ abstract class BtreePA extends Test                                             
       //nodeMerged,
       mergeable,
       //deleted,
-      success,
-      inserted,
 
       branchBase,
       //leafSize,
