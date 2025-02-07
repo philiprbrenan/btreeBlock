@@ -3762,13 +3762,13 @@ endmodule
     test_put_ascending_wide();
     test_put_descending();
     test_put_small_random();
-    //test_put_large_random();
+    test_put_large_random();
     test_find();
     test_delete_ascending();
     test_delete_descending();
     //test_to_array();
     test_delete_small_random();
-    //test_delete_large_random();
+    test_delete_large_random();
     test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
