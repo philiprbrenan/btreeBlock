@@ -38,7 +38,7 @@ abstract class StuckSA extends Test                                             
 //D1 Construction                                                               // Create a stuck
 
   StuckSA()                                                                     // Create the stuck with a maximum number of the specified elements
-   {z();
+   {zz();
     M.layout(layout());
     C.layout(M.layout);
     C.memory(new Memory("StuckSA", C.layout.size()));

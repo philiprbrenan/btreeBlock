@@ -13,15 +13,16 @@ class Memory extends Test                                                       
 //D1 Construct                                                                  // Memory provided in bits
 
   Memory(String Name, int Size)                                                 // Create memory
-   {name = Name; bits = new boolean[Size];
+   {zz(); name = Name; bits = new boolean[Size];
    }
 
   static Memory memory(String Name, int Size)                                   // Create memory
-   {z(); return new Memory(Name, Size);
+   {zz(); return new Memory(Name, Size);
    }
 
   public String toString()                                                      // Print memory in hex
-   {final int N = 256;
+   {z();
+    final int N = 256;
     final String T = "4... 4... 4... 4... "+
                      "3... 3... 3... 3... "+
                      "2... 2... 2... 2... "+
@@ -54,8 +55,7 @@ class Memory extends Test                                                       
 //D2 Basic                                                                      // Basic memory access
 
   void check(int start, int width)                                              // Check a request is in the range of the memory
-   {z();
-    if (start < 0) stop("Too small:", start);
+   {if (start < 0) stop("Too small:", start);
     if (start + width  > size()) stop("Out of range. Addressing:", start+width,
      "in memory of size:", size());
     if  (width < 1) stop("Width must be one or more, not:", width);
@@ -64,14 +64,14 @@ class Memory extends Test                                                       
 //D3 Set                                                                        // Set a bit
 
   void set(int start, boolean value)                                            // Set a bit from a boolean
-   {z();
+   {zz();
     //check(start, 1);
     bits[start] = value;
    }
 
   void set(int start, int width, int value)                                     // Set some memory from an integer
    {//check(start, width);
-    z();
+    zz();
     final int w = min(Integer.SIZE-1, width);
     for(int i = 0; i < w; ++i)
      {z();
@@ -84,12 +84,12 @@ class Memory extends Test                                                       
 
   boolean getBit(int start)                                                     // Get a boolean from memory
    {//check(start, 1);
-    z(); return bits[start];
+    zz(); return bits[start];
    }
 
   int getInt(int start, int width)                                              // Get an int from memory
    {//check(start, width);
-    z();
+    zz();
     if (start < 0 || start + width  > size()) stop("Out of range in memory", name, "Start:", start, "width:", width, "size:", size());
     z();
     if  (width < 1) stop("width must be one or more, not:", width);
@@ -221,7 +221,8 @@ class Memory extends Test                                                       
 //D0                                                                            // Tests
 
   static void test_set_get()
-   {Memory m = memory(currentTestName(), 8);
+   {z();
+    Memory m = memory(currentTestName(), 8);
     m.set(2, 2, 3);
     m.set(5, 1, 1);
 
@@ -234,7 +235,8 @@ class Memory extends Test                                                       
    }
 
   static void test_zero_ones()
-   {Memory m = memory(currentTestName(), 8);
+   {z();
+    Memory m = memory(currentTestName(), 8);
     m.ones(2, 4);
     m.zero(4, 1);
 
@@ -242,7 +244,8 @@ class Memory extends Test                                                       
    }
 
   static void test_copy()
-   {Memory m = memory(currentTestName(), 8);
+   {z();
+    Memory m = memory(currentTestName(), 16);
 
     m.ones(1, 2);
     //stop(m);
@@ -261,10 +264,20 @@ Memory: test_copy
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0066
 """);
+
+    m.copy(8, 0, 8);
+    //stop(m);
+    ok(""+m, """
+Memory: test_copy
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 6666
+""");
    }
 
   static void test_invert()
-   {Memory m = memory(currentTestName(), 8);
+   {z();
+    Memory m = memory(currentTestName(), 8);
 
     m.ones(1, 2);
     //stop(m);
@@ -286,7 +299,8 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
    }
 
   static void test_boolean()
-   {for   (int i = 0; i <= 2; i++)
+   {z();
+    for   (int i = 0; i <= 2; i++)
      {for (int j = 0; j <= 2; j++)
        {Memory m = memory(currentTestName(), 8);
         m.set(0, 4, i);
@@ -302,7 +316,8 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
    }
 
   static void test_alternating()
-   {Memory m = memory(currentTestName(), 256);
+   {z();
+    Memory m = memory(currentTestName(), 256);
     m.alternating(4);
     //stop(m);
     ok(""+m, """
@@ -314,7 +329,8 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
    }
 
   static void test_all_zeros_and_ones()
-   {Memory m = memory(currentTestName(), 256);
+   {z();
+    Memory m = memory(currentTestName(), 256);
     m.alternating(4);
     m.ones();
     //stop(m);

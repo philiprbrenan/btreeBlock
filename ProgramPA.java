@@ -24,7 +24,8 @@ class ProgramPA extends Test                                                    
   ProgramPA() {}                                                                // Create a program that instructions can be added to and then executed
 
   ProgramPA(ProgramPA Program)                                                  // Copy a program
-   {for(Stack<I> i : Program.code)   code  .push(i);
+   {zz();
+    for(Stack<I> i : Program.code)   code  .push(i);
     for(Label    l : Program.labels) labels.push(l);
    }
 
@@ -32,8 +33,8 @@ class ProgramPA extends Test                                                    
 
   class Label                                                                   // Label definition
    {int instruction;                                                            // The instruction location to which this labels applies
-    Label() {set(); labels.push(this);}                                         // A label assigned to an instruction location
-    void set() {instruction = code.size();}                                     // Reassign the label to an instruction
+    Label()    {zz(); set(); labels.push(this);}                                // A label assigned to an instruction location
+    void set() {zz(); instruction = code.size();}                               // Reassign the label to an instruction
    }
 
   class I implements Comparable<I>                                              // Instruction definition
@@ -42,7 +43,8 @@ class ProgramPA extends Test                                                    
     boolean mightJump;                                                          // This instruction might change the flow of control
 
     I()                                                                         // Define an instruction
-     {traceBack = traceBack();                                                  // Location of code that defined this instruction
+     {zz();
+      traceBack = traceBack();                                                  // Location of code that defined this instruction
       if (running) stop("Cannot define instructions during program execution",
         traceBack);
       ++currentCode;
@@ -64,29 +66,33 @@ class ProgramPA extends Test                                                    
     String traceComment() {return " /* " + traceBack + " */";}                  // Traceback as a comment
 
     public int compareTo(I that)
-     {return Integer.compare(instructionNumber, that.instructionNumber);
+     {z(); return Integer.compare(instructionNumber, that.instructionNumber);
      }
    }
 
   void  parallelStart()                                                         // Start a parallel block.  Only one parallel block is allowed at a time.  Parallel blocks are much easoer to deal with than automated optimization as we can make local incremental changes.
-   {if (currentParallel >= 0) stop("Only one parallel block can be active at a time");
+   {zz();
+    if (currentParallel >= 0) stop("Only one parallel block can be active at a time");
     currentParallel = code.size()-1;
    }
 
   void  parallelSection()                                                       // Start a parallel block.  Only one parallel block is allowed at a time
-   {if (currentParallel < 0) stop("No active parallel section");
+   {zz();
+    if (currentParallel < 0) stop("No active parallel section");
     currentCode = currentParallel;                                              // Add the instructions in this section from the start of the block
    }
 
   void  parallelEnd()                                                           // End a parallel block
-   {currentParallel = -1;
+   {zz();
+    currentParallel = -1;
     currentCode = code.size();                                                  // Resume appending instructions at the end
    }
 
 //D1 Execute                                                                    // Execute the program
 
   void traceMemory()                                                            // Trace memory
-   {if (traceMemory != null)
+   {zz();
+    if (traceMemory != null)
      {final StringBuilder s = new StringBuilder();
       final boolean[]b = traceMemory.bits;
       for(int i = 0; i < b.length; i++) s.append(b[i] ? "1" : "0");             // Match iverilog
@@ -96,7 +102,7 @@ class ProgramPA extends Test                                                    
    }
 
   void run(String traceFile)                                                    // Run the program tracing to the named file
-   {z();
+   {zz();
     Trace.clear();
     running = true;
     final int N = code.size();
@@ -111,11 +117,12 @@ class ProgramPA extends Test                                                    
    }
 
   void run()                                                                    // Run the program tracing to a default file
-   {run("trace/"+currentTestName()+".txt");
+   {z(); run("trace/"+currentTestName()+".txt");
    }
 
   void halt(final Object...O)                                                   // Halt execution with an explanatory message and traceback of current instruction
-   {final String m = "/* "+saySb(O).toString()+" */";
+   {z();
+    final String m = "/* "+saySb(O).toString()+" */";
     new I()
      {void   a() {say(O); say(currentInstruction.traceBack); running = false;}
       String v() {return "stopped <= 1; " + m;}
@@ -128,7 +135,7 @@ class ProgramPA extends Test                                                    
 //D1 Blocks                                                                     // Blocks of code used to implement if statements and for loops
 
   void Goto(Label label)                                                        // Goto a label
-   {z();
+   {zz();
     new I()
      {void   a() {z(); step = label.instruction-1;}                             // The program execution for loop will increment
       String v() {return "step = "+(label.instruction-1)+";";}                  // The program execution for loop will increment
@@ -137,7 +144,7 @@ class ProgramPA extends Test                                                    
      };
    }
   void GoOn(Label label, MemoryLayoutPA.At condition)                           // Go to a specified label if a memory location is on, i.e. not zero
-   {z();
+   {zz();
     new I()
      {void a()
        {z(); if (condition.setOff().getInt() > 0) step = label.instruction-1;
@@ -148,7 +155,7 @@ class ProgramPA extends Test                                                    
      };
    }
   void GoOff(Label label, MemoryLayoutPA.At condition)                          // Go to a specified label if a memory location is off, i.e. zero
-   {z();
+   {zz();
     new I()
      {void a()
        {z(); if (condition.setOff().getInt() == 0) step = label.instruction-1;
@@ -164,7 +171,8 @@ class ProgramPA extends Test                                                    
     final Label Else = new Label(), End = new Label();                          // Components of an if statement
 
     If (MemoryLayoutPA.At Condition)                                            // If a condition
-     {condition = Condition;
+     {zz();
+      condition = Condition;
       final int t = code.size();
       GoOff(Else, condition);                                                   // Branch on the current value of if condition
       Then();
@@ -197,7 +205,8 @@ class ProgramPA extends Test                                                    
   abstract class Block                                                          // A block that can be continued or exited
    {final Label start = new Label(), end = new Label();                         // Labels at start and end of block to facilitate continuing or exiting
     Block()
-     {code();
+     {zz();
+      code();
       end.set();
      }
     abstract void code();
@@ -214,7 +223,8 @@ class ProgramPA extends Test                                                    
     final ProgramPA P = ProgramPA.this;
 
     Loop(int Limit, int Width)
-     {if (Limit < 1) stop("Loop limit must be 1 or more, not:", Limit);
+     {zz();
+      if (Limit < 1) stop("Loop limit must be 1 or more, not:", Limit);
       layout    = Layout.layout();
       index     = layout.variable ("index",   Width);
       limit     = layout.variable ("limit",   Width);
@@ -245,7 +255,8 @@ class ProgramPA extends Test                                                    
     final ProgramPA P = ProgramPA.this;
 
     Pool(int Limit, int Width)
-     {if (Limit < 1) stop("Pool start index must be 1 or more, not:", Limit);
+     {zz();
+      if (Limit < 1) stop("Pool start index must be 1 or more, not:", Limit);
       layout    = Layout.layout();
       index     = layout.variable ("index",   Width);
       compare   = layout.bit      ("compare");
@@ -297,7 +308,8 @@ class ProgramPA extends Test                                                    
 //D1 Tests                                                                      // Tests
 
   static void test_inc()
-   {Layout           l = Layout.layout();
+   {z();
+    Layout           l = Layout.layout();
     Layout.Variable  n = l.variable ("n", 8);
     ProgramPA        p = new ProgramPA();
     MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
@@ -318,7 +330,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_fibonacci()                                                  // The fibonacci numbers
-   {final int N = 8, time = 40;
+   {z();
+    final int N = 8, time = 40;
     Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", N);
     Layout.Variable  b = l.variable ("b", N);
@@ -385,7 +398,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_fizz_buzz(int z)
-   {final int N = 8;
+   {z();
+    final int N = 8;
     Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", N);
     Layout.Variable  b = l.variable ("b", N);
@@ -435,7 +449,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_if()
-   {Layout           l = Layout.layout();
+   {z();
+    Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
@@ -484,7 +499,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_goOn()
-   {Layout           l = Layout.layout();
+   {z();
+    Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
@@ -513,7 +529,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_goOff()
-   {Layout           l = Layout.layout();
+   {z();
+    Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
@@ -541,14 +558,16 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_stop()
-   {ProgramPA p = new ProgramPA();
+   {z();
+    ProgramPA p = new ProgramPA();
     sayThisOrStop("stopping");
     p.new I() {void a() {Test.stop("stopping");} String n() {return "stop";}};
     try {p.run();} catch(RuntimeException e) {};
    }
 
   static void test_loop()
-   {ProgramPA p = new ProgramPA();
+   {z();
+    ProgramPA p = new ProgramPA();
     final Stack<Integer> f = new Stack<>();
     p.new Loop(8, 4)
      {void code()
@@ -561,7 +580,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_pool()
-   {ProgramPA p = new ProgramPA();
+   {z();
+    ProgramPA p = new ProgramPA();
     final Stack<Integer> f = new Stack<>();
     p.new Pool(8, 4)
      {void code()
@@ -574,7 +594,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_debug()
-   {Layout           l = Layout.layout();
+   {z();
+    Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 8);
     Layout.Variable  b = l.variable ("b", 8);
     Layout.Structure s = l.structure("s", a, b);
@@ -590,7 +611,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_parallel()
-   {Layout           l = Layout.layout();
+   {z();
+    Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Variable  c = l.variable ("c", 4);

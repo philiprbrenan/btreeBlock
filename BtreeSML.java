@@ -55,7 +55,7 @@ abstract class BtreeSML extends Test                                            
 //D1 Construction                                                               // Create a BTree from nodes which can be branches or leaves.  The data associated with the BTree is stored only in the leaves opposite the keys
 
   BtreeSML()                                                                    // Define a BTree with user specified dimensions
-   {z();
+   {zz();
     memoryLayout.layout = layout();
     memoryLayout.memory(new Memory("BtreeSML", memoryLayout.layout.size()));
 

@@ -28,7 +28,7 @@ class BtreeStuckStatic extends Test                                             
 //D1 Construction                                                               // Create a BTree from nodes which can be branches or leaves.  The data associated with the BTree is stored only in the leaves opposite the keys
 
   BtreeStuckStatic(int MaxKeysPerLeaf, int MaxKeysPerBranch)                    // Define a BTree with the specified dimensions
-   {z();
+   {zz();
     maxKeysPerLeaf   = MaxKeysPerLeaf;
     maxKeysPerBranch = MaxKeysPerBranch;
     splitLeafSize    = maxKeysPerLeaf   >> 1;

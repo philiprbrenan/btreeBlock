@@ -296,6 +296,12 @@ public class Test                                                               
     coverage.put(s, c == null ? 1 : c+1);
    }
 
+  static void zz()                                                              // A subroutine that is being executed
+   {final String s = callerFileAndLine2();                                      // File method line
+    Integer c = coverage.get(s);
+    coverage.put(s, c == null ? 1 : c+1);
+   }
+
   static class LineCount                                                        // Line count
    {final String line;
     final int count;
@@ -307,6 +313,7 @@ public class Test                                                               
     stack.push(new LineCount(String.format("%s:%s:%s", s[0], s[2], s[1]), n));
    }
 
+  final static String coverageAnalysisBlock = "z();";                           // A string indicating the start of a block
   static void coverageAnalysis(String source, int top)                          // Coverage analysis: unexecuted lines and lines most frequently executed in the specified file in a Geany clickable format.
    {final Stack<String> sourceLines = readFile(source);                         // Lines of source from indicated file
     final Stack<String> notExecuted = new Stack<>();                            // Lines not executed
@@ -319,7 +326,7 @@ public class Test                                                               
 
     for (int i = 1; i <= sourceLines.size(); i++)                               // Lines not executed in this file
      {final String line = sourceLines.elementAt(i-1);
-      if (line.contains("z();"))                                                // Line has been marked as executable
+      if (line.contains(coverageAnalysisBlock))                                 // Line has been marked as executable
        {if (!executed.contains(i))                                              // Line has not been executed
          {notExecuted.push(""+source+":"+i+":");
          }
@@ -353,39 +360,46 @@ public class Test                                                               
      }
    }
 
-  static void coverageAnalysis(int top)                                         // Coverage analysis: unexecuted lines and top lines most frequently executed over all files encountered in a Geany clickable format.
+  static boolean coverageExecuted(String file, Integer line,                    // Coverage analysis: check thata line weas executed
+    TreeMap<String,TreeMap<Integer,Integer>> executed)
+   {if (!executed.containsKey(file)) return false;                               // Nothing in this file was ever executed
+    final TreeMap<Integer,Integer> e = executed.get(file);
+    return e.containsKey(line);                                                 // Whether this line in this file was executed
+   }
+
+  final static String coverageAnalysisSubStart = "zz();";                       // A string indicating the start of a subroutine
+
+  static void coverageAnalysis(int top, String...Ignore)                        // Coverage analysis: unexecuted lines and top lines most frequently executed over all files encountered in a Geany clickable format.
    {final TreeMap<String,TreeSet<Integer>> notExecuted      = new TreeMap<>();  // File, lines not executed
     final TreeMap<String,TreeMap<Integer,Integer>> executed = new TreeMap<>();  // Lines executed
+    final TreeSet<String> ignore                            = new TreeSet<>();
+    for (String s : Ignore) ignore.add(s);                                      // Files to be ignored
 
     for (String s : coverage.keySet())                                          // Find lines that executed the line executed indicator function
      {final String[]fml = s.split("\\s+");
       final String f = fml[0];                                                  // The file containing the line executed
-say("AAAA", fml[0], fml[1], fml[2]);
-      final int    l = Integer.parseInt(fml[1]);                                // Line number
-      final int    c = Integer.parseInt(fml[2]);                                // The number of times this line was executed
+      final String m = fml[1];                                                  // Method name
+      final int    l = Integer.parseInt(fml[2]);                                // Line number
       if (!executed.containsKey(f)) executed.put(f, new TreeMap<Integer,Integer>());
       final TreeMap<Integer,Integer> e = executed.get(f);
       if (e.containsKey(l)) e.put(l, e.get(l)+1); else e.put(l, 1);             // Add or update the number of times this line was executed
      }
 
     for (String source: executed.keySet())                                      // The files encountered
-     {final Stack<String> sourceLines = readFile(source);                       // Lines of source code from a file encountered
-      for (int i = 1; i <= sourceLines.size(); i++)                             // Lines not executed in this file
-       {final String line = sourceLines.elementAt(i-1);
-        if (line.contains("z();"))                                              // Line has been marked as executable
-         {if (!notExecuted.containsKey(source))                                 // New source file with a line that has not been executed
-           {final TreeSet<Integer> c = new TreeSet<>();
-            c.add(i);
-            notExecuted.put(source, c);
-           }
-          else                                                                  // Line has not been executed in a file with other not executed lines
-           {final TreeSet<Integer> c = notExecuted.get(source);
-            c.add(i);
-            notExecuted.put(source, c);
-           }
+     {if (ignore.contains(source)) continue;                                    // Ignore specified files
+      final Stack<String> sourceLines = readFile(source);                       // Lines of source code from a file encountered
+      for (int l = 1; l <= sourceLines.size(); l++)                             // Lines not executed in this file
+       {final String line = sourceLines.elementAt(l-1);
+        final String search = coverageAnalysisSubStart;
+        if (line.contains(search) && !coverageExecuted(source, l, executed))    // Line has been marked as executable but was not executed
+         {final TreeSet<Integer> c = notExecuted.containsKey(source) ?
+            notExecuted.get(source) : new TreeSet<>();
+          c.add(l);
+          notExecuted.put(source, c);
          }
        }
      }
+
     if (notExecuted.size() > 0)                                                 // Lines not executed
      {say("Not executed");
       for (String f: notExecuted.keySet())                                      // The files containing lines that have not been executed

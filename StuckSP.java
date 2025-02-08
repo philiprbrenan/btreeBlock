@@ -36,9 +36,9 @@ abstract class StuckSP extends Test                                             
 //D1 Construction                                                               // Create a stuck
 
   StuckSP()                                                                     // Create the stuck with a maximum number of the specified elements
-   {z();
+   {zz();
     M.layout(layout());
-    M.memory(new Memory("StuckSP", M.layout.size()));                                      // Can be set after construction to address a different memory. You will also need to call base if the stuck is located some where other than at location zero in memory.
+    M.memory(new Memory("StuckSP", M.layout.size()));                           // Can be set after construction to address a different memory. You will also need to call base if the stuck is located some where other than at location zero in memory.
     C.layout(M.layout);
     C.memory(new Memory("StuckSP", C.layout.size()));
    }

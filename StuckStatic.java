@@ -35,7 +35,7 @@ abstract class StuckStatic extends Test                                         
 //D1 Construction                                                               // Create a stuck
 
   StuckStatic()                                                                 // Create the stuck with a maximum number of the specified elements
-   {z();
+   {zz();
     currentSize = 0;
     Keys        = new int[maxSize()];
     Data        = new int[maxSize()];

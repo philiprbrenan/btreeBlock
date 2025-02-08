@@ -44,7 +44,7 @@ abstract class StuckSML extends Test                                            
 //D1 Construction                                                               // Create a stuck
 
   StuckSML()                                                                    // Create the layout for the stuck
-   {z();
+   {zz();
     M.layout(layout());
     M.memory(new Memory("StuckSML", M.layout.size()));                          // Can be set after construction to address a different memory. You will also need to call base if the stuck is located some where other than at location zero in memory.
    }

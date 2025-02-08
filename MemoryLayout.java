@@ -13,6 +13,8 @@ class MemoryLayout extends Test                                                 
   boolean debug;                                                                // Debug if true
   String   name;                                                                // Name of the memory layout if supplied
 
+  MemoryLayout() {zz();}                                                        // Constructor
+
 //D1 Control                                                                    // Testing, control and integrity
 
   void memory(Memory Memory) {memory = Memory;}                                 // Set the base of the layout in memory allowing such layouts to be relocated
@@ -67,7 +69,7 @@ class MemoryLayout extends Test                                                 
     int  result;                                                                // The contents of memory at this location
 
     At(int constant)                                                            // Constant value made to look like a memory reference
-     {z(); field = null; indices = null; width = delta = at = 0;
+     {zz(); field = null; indices = null; width = delta = at = 0;
       directs = null;
       type = Type.constant; result = constant;
      }
@@ -387,7 +389,7 @@ class MemoryLayout extends Test                                                 
     pp.s.append(String.format
        ("%4s %1s %8s  %8s   %8s   %8s     %8s   %s\n",
         "Line", "T", "At", "Wide", "Size", "Indices", "Value", "Name"));
-    print(layout.top, pp, 0);
+    print(layout.top(), pp, 0);
     return pp.s.toString();
    }
 

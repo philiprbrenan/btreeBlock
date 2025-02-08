@@ -14,6 +14,8 @@ class Program extends Test                                                      
   boolean     running = false;                                                  // Executing if true
   Stack<Label> labels = new Stack<>();                                          // Labels for some instructions
 
+  Program() {zz();}                                                             // Constructor
+
   class Label                                                                   // Label definition
    {int instruction;                                                            // The instruction to which this labels applies
     Label() {set(); labels.push(this);}                                         // A label assigned to an instruction
