@@ -6,10 +6,10 @@ package com.AppaApps.Silicon;                                                   
 
 import java.util.*;
 
-class ProgramPA extends Test                                                    // A progam that manipulates a memory layout via si instructions
+class ProgramPA extends Test                                                    // A program that manipulates a memory layout via instructions
  {final Stack<Stack<I>> code = new Stack<>();                                   // Code of the program
-  int            currentCode =  0;                                              // Point at which we are currently adding instsructions to the program. Instructions can run in parallel so the current point is not always at the end as it is with non parallel instruction execution
-  int        currentParallel = -1;                                              // Point at which the current parallel block started
+  int            currentCode =  0;                                              // Point at which we are currently adding instructions to the program. Instructions can run in parallel so the current point is not always at the end as it is with non parallel instruction execution
+  final Stack<Parallel> currentParallel = new Stack<>();                        // Start and end of current parallel range
   I       currentInstruction;                                                   // The currently executing instruction
   final int          maxTime = 100_000;                                         // Maximum number of steps permitted while running the program
   int                   step = 0;                                               // Execution step
@@ -52,6 +52,7 @@ class ProgramPA extends Test                                                    
        {final Stack<I> I = new Stack<>();
         I.push(this);
         code.push(I);
+        currentCode = code.size();                                              // Ensure we match code size as we are extending the program
        }
       else                                                                      // Append to an existing block of instructions
        {final Stack<I> I = code.elementAt(currentCode);
@@ -70,22 +71,32 @@ class ProgramPA extends Test                                                    
      }
    }
 
+//D1 Parallel                                                                   // Execute instructions in parallel
+
+  class Parallel                                                                // The start and end of the current parallel range
+   {int start;                                                                  // Start of the parallel range
+    int   end;                                                                  // End of the parallel range
+    Parallel() {start = end = currentCode-1; currentParallel.push(this);}       // Start at current code position
+   }
+
   void  parallelStart()                                                         // Start a parallel block.  Only one parallel block is allowed at a time.  Parallel blocks are much easoer to deal with than automated optimization as we can make local incremental changes.
    {zz();
-    if (currentParallel >= 0) stop("Only one parallel block can be active at a time");
-    currentParallel = code.size()-1;
+    new Parallel();
    }
 
   void  parallelSection()                                                       // Start a parallel block.  Only one parallel block is allowed at a time
    {zz();
-    if (currentParallel < 0) stop("No active parallel section");
-    currentCode = currentParallel;                                              // Add the instructions in this section from the start of the block
+    if (currentParallel.size() == 0) stop("No active parallel section");        // Check we are in apralle section
+    final Parallel p = currentParallel.lastElement();                           // Current parallel block
+    p.end            = max(currentCode, p.end);                                 // Furthest extent of parallel block
+    currentCode      = p.start;                                                 // Add the instructions in this section from the start of the block
    }
 
   void  parallelEnd()                                                           // End a parallel block
    {zz();
-    currentParallel = -1;
-    currentCode = code.size();                                                  // Resume appending instructions at the end
+    if (currentParallel.size() == 0) stop("No active parallel section");        // Check we are in apralle section
+    final Parallel p = currentParallel.pop();                                   // Current parallel block
+    currentCode      = max(currentCode, p.end);                                 // Furthest extent of parallel block
    }
 
 //D1 Execute                                                                    // Execute the program
@@ -617,54 +628,73 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Variable  c = l.variable ("c", 4);
     Layout.Variable  d = l.variable ("d", 4);
-    Layout.Structure s = l.structure("s", a, b, c, d);
+    Layout.Variable  e = l.variable ("e", 4);
+    Layout.Variable  f = l.variable ("f", 4);
+    Layout.Structure s = l.structure("s", a, b, c, d, e, f);
     Layout.Array     A = l.array    ("A", s, 2);
 
     MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
     ProgramPA        p = m.P;
 
-    p.new I() {void a() {m.at(a, 0).setInt(1);} String n() {return "a[0] = 1";}};
-    p.new I() {void a() {m.at(a, 1).setInt(2);} String n() {return "a[1] = 2";}};
-    p.parallelStart();
-    p.new I() {void a() {m.at(b, 0).setInt(3);} String n() {return "b[0] = 3";}};
-    p.new I() {void a() {m.at(b, 1).setInt(4);} String n() {return "b[1] = 4";}};
-    p.parallelSection();
-    p.new I() {void a() {m.at(c, 0).setInt(5);} String n() {return "c[0] = 5";}};
-    p.new I() {void a() {m.at(c, 1).setInt(6);} String n() {return "c[1] = 6";}};
+                          p.new I() {void a() {m.at(a, 0).setInt( 1);} String n() {return "a[0] =  1";}};
+                          p.new I() {void a() {m.at(a, 1).setInt( 2);} String n() {return "a[1] =  2";}};
+
+    p.parallelStart();    p.new I() {void a() {m.at(b, 0).setInt( 3);} String n() {return "b[0] =  3";}};
+                          p.new I() {void a() {m.at(b, 1).setInt( 4);} String n() {return "b[1] =  4";}};
+      p.parallelSection();
+        p.parallelStart();
+                          p.new I() {void a() {m.at(c, 0).setInt( 5);} String n() {return "c[0] =  5";}};
+                          p.new I() {void a() {m.at(c, 1).setInt( 6);} String n() {return "c[1] =  6";}};
+        p.parallelSection();
+                          p.new I() {void a() {m.at(d, 0).setInt( 7);} String n() {return "d[0] =  7";}};
+                          p.new I() {void a() {m.at(d, 1).setInt( 8);} String n() {return "d[1] =  8";}};
+      p.parallelEnd();
+      p.parallelSection();
+                          p.new I() {void a() {m.at(e, 0).setInt( 9);} String n() {return "e[0] =  9";}};
+                          p.new I() {void a() {m.at(e, 1).setInt(10);} String n() {return "e[1] = 10";}};
     p.parallelEnd();
-    p.new I() {void a() {m.at(d, 0).setInt(7);} String n() {return "d[0] = 7";}};
-    p.new I() {void a() {m.at(d, 1).setInt(8);} String n() {return "d[1] = 8";}};
+                          p.new I() {void a() {m.at(f, 0).setInt(11);} String n() {return "f[0] = 11";}};
+                          p.new I() {void a() {m.at(f, 1).setInt(12);} String n() {return "f[1] = 12";}};
 
     p.run();
     //stop(p);
     ok(p, """
-   1  a[0] = 1
-   2  a[1] = 2
+   1  a[0] =  1
+   2
+      a[1] =  2
+      d[0] =  7
    3
-      b[0] = 3
-      c[0] = 5
+      b[0] =  3
+      c[0] =  5
+      d[1] =  8
+      e[0] =  9
    4
-      b[1] = 4
-      c[1] = 6
-   5  d[0] = 7
-   6  d[1] = 8
+      b[1] =  4
+      c[1] =  6
+      e[1] = 10
+   5  f[0] = 11
+   6  f[1] = 12
 """);
     //stop(m);
     ok(m, """
 MemoryLayout: M
 Memory      : M
 Line T       At      Wide       Size    Indices        Value   Name
-   1 A        0        32          2                           A
-   2 S        0        16               0                        s
+   1 A        0        48          2                           A
+   2 S        0        24               0                        s
    3 V        0         4               0                  1       a
    4 V        4         4               0                  3       b
    5 V        8         4               0                  5       c
    6 V       12         4               0                  7       d
-   7 S       16        16               1                        s
-   8 V       16         4               1                  2       a
-   9 V       20         4               1                  4       b
-  10 V       24         4               1                  6       c
-  11 V       28         4               1                  8       d
+   7 V       16         4               0                  9       e
+   8 V       20         4               0                 11       f
+   9 S       24        24               1                        s
+  10 V       24         4               1                  2       a
+  11 V       28         4               1                  4       b
+  12 V       32         4               1                  6       c
+  13 V       36         4               1                  8       d
+  14 V       40         4               1                 10       e
+  15 V       44         4               1                 12       f
 """);
    }
 

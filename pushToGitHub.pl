@@ -3,6 +3,7 @@
 # Push Btree block code to GitHub
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2024
 #-------------------------------------------------------------------------------
+#die "Switched off for the moment to prevent accidental uploads";
 use warnings FATAL => qw(all);
 use strict;
 use Carp;

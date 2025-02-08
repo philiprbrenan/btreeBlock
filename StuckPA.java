@@ -261,162 +261,176 @@ abstract class StuckPA extends Test                                             
    {zz(); data().move(T.at(tData));
    }
 
-  void setKeyData()    {zz(); setKey(); setData();}                              // Set a key, data element in the stuck
+  void setKeyData()                                                             // Set a key, data element in the stuck
+   {zz();
+    P.parallelStart();
+      setKey();
+    P.parallelSection();
+      setData();
+    P.parallelEnd();
+   }
+
+  void moveKeyData()                                                            // Move key, data
+   {zz();
+    P.parallelStart();
+      moveKey();
+    P.parallelSection();
+      moveData();
+    P.parallelEnd();
+   }
+
   void sizeFullEmpty() {z(); size(); isFull(); isEmpty();}                      // Status
   void setFound()      {zz(); T.setIntInstruction(found, 1);}                    // Set found to true
 
   void push()                                                                   // Push an element onto the stuck
    {zz(); action = "push";
-    size();
-    isFull();
-    assertNotFull();
+    //size();
+    //isFull();
+    //assertNotFull();
     size();
     T.at(index).move(T.at(size));
     setKeyData();
     inc();
-    sizeFullEmpty();
+    //sizeFullEmpty();
    }
 
   void unshift()                                                                // Unshift an element onto the stuck
    {zz(); action = "unshift";
     size();
-    isFull();
-    assertNotFull();
-    setFound();
+    //isFull();
+    //assertNotFull();
+    //setFound();
     T.setIntInstruction(index, 0);
     M.at(Keys).moveUp(T.at(index), C.at(Keys));
     //T.setIntInstruction(index, 0);
     M.at(Data).moveUp(T.at(index), C.at(Data));
     inc();
     setKeyData();
-    sizeFullEmpty();
+    //sizeFullEmpty();
    }
 
   void pop()                                                                    // Pop an element from the stuck
    {zz(); action = "pop";
     size();
-    isEmpty();
-    assertNotEmpty();
+    //isEmpty();
+    //assertNotEmpty();
     dec();
-    setFound();
-    T.at(size).dec();
-    T.at(index).move(T.at(size));
-    moveKey(); moveData();
-    sizeFullEmpty();
+    //setFound();
+    //T.at(size).dec();
+    T.at(index).add(T.at(size), -1);
+    moveKeyData();
+    //sizeFullEmpty();
    }
 
   void shift()                                                                  // Shift an element from the stuck
    {zz(); action = "shift";
     size();
-    isEmpty();
-    assertNotEmpty();
-    setFound();
+    //isEmpty();
+    //assertNotEmpty();
+    //setFound();
     T.setIntInstruction(index, 0);
-    moveKey(); moveData();
+    moveKeyData();
     T.zero();
     M.at(Keys).moveDown(T.at(index), C.at(Keys));
     M.at(Data).moveDown(T.at(index), C.at(Data));
     dec();
-    sizeFullEmpty();
+    //sizeFullEmpty();
    }
 
   void elementAt()                                                              // Look up key and data associated with the index in the stuck at the specified base offset in memory
    {zz(); action = "elementAt";
-    size();
-    assertInNormal();
-    setFound();
-    moveKey();
-    moveData();
+    //size();
+    //assertInNormal();
+    //setFound();
+    moveKeyData();
    }
 
   void setElementAt()                                                           // Set an element either in range or one above the current range
    {zz(); action = "setElementAt";
-    size();
-    T.at(index).equal(T.at(size), T.at(equal));                                 // Extended range
-    P.new If(T.at(equal))
-     {void Then()
-       {setKeyData();
-        inc();
-        T.at(size).inc();
-       }
-      void Else()                                                               // In range
-       {assertInNormal(); setKeyData();
-       }
-     };
-    setFound();
+    //size();
+    //T.at(index).equal(T.at(size), T.at(equal));                                 // Extended range
+    //P.new If(T.at(equal))
+    // {void Then()
+    //   {setKeyData();
+    //    inc();
+    //    T.at(size).inc();
+    //   }
+    //  void Else()                                                               // In range
+    // {assertInNormal();
+        setKeyData();
+    //   }
+    // };
+    //setFound();
    }
 
   void insertElementAt()                                                        // Insert an element at the indicated location shifting all the remaining elements up one
    {zz(); action = "insertElementAt";
 
-    size();
-    isFull();
-    assertInExtended();
-    T.zero();
+    //size();
+    //isFull();
+    //assertInExtended();
+    //T.zero();
     M.at(Keys).moveUp(T.at(index), C.at(Keys));
     M.at(Data).moveUp(T.at(index), C.at(Data));
     M.at(currentSize).inc();
     setKeyData();
-    sizeFullEmpty();
+    //sizeFullEmpty();
    }
 
   void removeElementAt()                                                        // Remove an element at the indicated location from the stuck
    {zz(); action = "removeElementAt";
-    size();
-    assertInNormal();
-    setFound();
-    moveKey();
-    moveData();
-    T.zero();
+    //size();
+    //assertInNormal();
+    //setFound();
+    moveKeyData();
+    //T.zero();
     M.at(Keys).moveDown(T.at(index), C.at(Keys));
     M.at(Data).moveDown(T.at(index), C.at(Data));
     M.at(currentSize).dec();
-    sizeFullEmpty();
+    //sizeFullEmpty();
    }
 
   void firstElement()                                                           // First element
    {zz(); action = "firstElement";
-    size();
-    isEmpty();
-    assertNotEmpty();
-    setFound();
+    //size();
+    //isEmpty();
+    //assertNotEmpty();
+    //setFound();
     T.setIntInstruction(index, 0);
-    moveKey();
-    moveData();
+    moveKeyData();
    }
 
   void lastElement()                                                            // Last element
    {zz(); action = "lastElement";
-    size();
-    isEmpty();
-    assertNotEmpty();
-    setFound();
-    T.at(index).move(M.at(currentSize));
-    T.at(index).dec();
-    moveKey();
-    moveData();
+    //size();
+    //isEmpty();
+    //assertNotEmpty();
+    //setFound();
+    T.at(index).add(M.at(currentSize), -1);
+    //T.at(index).dec();
+    moveKeyData();
    }
 
   void zeroLastKey()                                                            // Save last key in the transaction buffer and zero it in the stuck
    {zz(); action = "zeroLastKey";
-    size();
-    isEmpty();
-    assertNotEmpty();
-    setFound();
-    T.at(index).move(M.at(currentSize));
-    T.at(index).dec();
+    //size();
+    //isEmpty();
+    //assertNotEmpty();
+    //setFound();
+    T.at(index).add(M.at(currentSize), -1);
+    //T.at(index).dec();
     moveKey();
     key().zero();
    }
 
   void setLastKey()                                                             // Set the last active key in the stuck from the one in the transaction buffer
    {zz(); action = "setLastKey";
-    size();
-    isEmpty();
-    assertNotEmpty();
-    setFound();
-    T.at(index).move(M.at(currentSize));
-    T.at(index).dec();
+    //size();
+    //isEmpty();
+    //assertNotEmpty();
+    //setFound();
+    T.at(index).add(M.at(currentSize), -1);
+    //T.at(index).dec();
     setKey();
    }
 
@@ -1934,9 +1948,7 @@ StuckSML(maxSize:4 size:4)
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    //test_zero_last_key();
-    test_set_last_key();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
