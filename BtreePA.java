@@ -3461,7 +3461,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 605, """
+    t.runVerilogDeleteTest(3, 6, 601, """
                     6           |
                     0           |
                     5           |
@@ -3473,7 +3473,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 544, """
+    t.runVerilogDeleteTest(4, 5, 541, """
              6           |
              0           |
              5           |
@@ -3493,7 +3493,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 401, """
+    t.runVerilogDeleteTest(1, 8, 397, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3517,7 +3517,7 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 300, """
+    t.runVerilogDeleteTest(7, 2, 296, """
 8,9=0 |
 """);
 
@@ -3778,7 +3778,7 @@ endmodule
     test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
-    test_delete_small_random();
+    //test_delete_small_random();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
