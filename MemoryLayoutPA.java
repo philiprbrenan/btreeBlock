@@ -263,7 +263,7 @@ class MemoryLayoutPA extends Test                                               
     void locateInDirectAddress()                                                // Locate an indirect address and its content
      {final int N = directs.length;
       for (int i = 0; i < N; i++)
-       {indices[i] = directs[i].setOff().getInt();  //////// Set off should not be needed here as the component variables of a locator expression should not have indices per the constructor.
+       {indices[i] = directs[i].setOff().getInt();                              // It is assumed by getInt() that setOff() will already have been called.
        }
       locateDirectAddress();                                                    // Locate the address directly now that its indices are known
      }
@@ -341,8 +341,8 @@ class MemoryLayoutPA extends Test                                               
     boolean getBit(int i)            {return memory.getBit(at+i);}              // Get a bit from memory assuming that setOff() has been called to fix the location of the field containing the bit
     void    setBit(int i, boolean b) {memory.set(at+i, b);}                     // Set a bit in memory  assuming that setOff() has been called to fix the location of the field containing the bit
 
-    int  getInt()          {zz(); return result;}                                // The value in memory, at the indicated location, treated as an integer or the value of the constant, assumming setOff has been called to update the variable description
-    void setInt(int value) {z(); memory.set(at, width, value);}                 // Set the value in memory at the indicated location, treated as an integer
+    int  getInt()          {zz(); return result;}                               // The value in memory, at the indicated location, treated as an integer or the value of the constant, assumming setOff has been called to update the variable description
+    void setInt(int value) {zz(); memory.set(at, width, value);}                // Set the value in memory at the indicated location, treated as an integer
 
     public String toString()                                                    // Print field name(indices)=value or name=value if there are no indices
      {final StringBuilder s = new StringBuilder();
@@ -812,6 +812,22 @@ class MemoryLayoutPA extends Test                                               
         String n()
          {return field.name + "-= " + n;
          }
+       };
+     }
+
+    void add(At source, int constant)                                           // Add to the source and store in the target
+     {zz(); sameSize(source);
+      final At target = this;
+      P.new I()
+       {void a()
+         {final int v = source.setOff().getInt();
+          target.setOff().setInt(v + constant);
+         }
+        String v()
+         {return target.verilogLoad()+" <= "+source.verilogLoad() + "+" + constant + ";";
+         }
+        String n() {return field.name+"="+source.field.name + "+ "+ constant;}
+        void   i() {}
        };
      }
    } // At

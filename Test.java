@@ -406,7 +406,7 @@ public class Test                                                               
        {for (Integer i : notExecuted.get(f)) say(f+":"+i+":");                  // Not executed lines
        }
      }
-    else say("All lines executed");                                             // All lines were executed
+    else say("All methods executed");                                           // All lines were executed
 
     if (top > 0)                                                                // Most frequently executed
      {final Stack<LineCount> lc = new Stack<>();                                // Lines executed most frequently
