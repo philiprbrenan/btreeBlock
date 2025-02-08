@@ -4,7 +4,7 @@
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
 // SplitBranch() in parallel. Concatenate currently blocks parallel but can be improved by concatenating to a known point.
-// A parallel section is an opportunity to create one instruction like moveAndDec/Inc
+// Branchbase and size as one instruction?
 import java.util.*;
 import java.nio.file.*;
 
@@ -816,10 +816,13 @@ abstract class BtreePA extends Test                                             
     lEqual.T.at(lEqual.search).move(T.at(search));
     lEqual.T.setIntInstruction(lEqual.limit, 0);
     lEqual.search();
-    M.moveParallel
-     (T.at(found), lEqual.T.at(lEqual.found),
-      T.at(index), lEqual.T.at(lEqual.index),
-      T.at(data ), lEqual.T.at(lEqual.tData));
+    P.parallelStart();
+      T.at(found).move(lEqual.T.at(lEqual.found));
+    P.parallelSection();
+      T.at(index).move(lEqual.T.at(lEqual.index));
+    P.parallelSection();
+      T.at(data ).move(lEqual.T.at(lEqual.tData));
+    P.parallelEnd();
    }
 
   public String findEqualInLeaf_toString()                                      // Print details of find equal in leaf node
@@ -845,9 +848,11 @@ abstract class BtreePA extends Test                                             
     lFirstLeaf.T.at(lFirstLeaf.search).move(T.at(search));
     lFirstLeaf.T.setIntInstruction(lFirstLeaf.limit, 0);
     lFirstLeaf.searchFirstGreaterThanOrEqual();
-    M.moveParallel
-     (T.at(found), lFirstLeaf.T.at(lFirstLeaf.found),
-      T.at(first), lFirstLeaf.T.at(lFirstLeaf.index));
+    P.parallelStart();
+      T.at(found).move(lFirstLeaf.T.at(lFirstLeaf.found));
+    P.parallelSection();
+      T.at(first).move(lFirstLeaf.T.at(lFirstLeaf.index));
+    P.parallelEnd();
    }
 
   private void findFirstGreaterThanOrEqualInBranch()                            // Find the first key in the branch that is equal to or greater than the search key
@@ -861,9 +866,11 @@ abstract class BtreePA extends Test                                             
     bFirstBranch.T.setIntInstruction(bFirstBranch.limit, 1);
 
     bFirstBranch.searchFirstGreaterThanOrEqual();
-    M.moveParallel
-     (T.at(found), bFirstBranch.T.at(bFirstBranch.found),
-      T.at(first), bFirstBranch.T.at(bFirstBranch.index));
+    P.parallelStart();
+      T.at(found).move(bFirstBranch.T.at(bFirstBranch.found));
+    P.parallelSection();
+      T.at(first).move(bFirstBranch.T.at(bFirstBranch.index));
+    P.parallelEnd();
 
     P.new If (T.at(found))                                                      // Next if key matches else top
      {void Then()
@@ -1033,9 +1040,11 @@ abstract class BtreePA extends Test                                             
        }
      };
 
-    M.moveParallel
-     (bT.T.at(bT.tKey ), T.at(flKey),
-      bT.T.at(bT.tData), T.at(l));
+    P.parallelStart();
+      bT.T.at(bT.tKey ).move(T.at(flKey));
+    P.parallelSection();
+      bT.T.at(bT.tData).move(T.at(l));
+    P.parallelEnd();
     bT.push();                                                                  // Insert left leaf into root
 
     P.parallelStart();
@@ -1103,9 +1112,9 @@ abstract class BtreePA extends Test                                             
     P.parallelStart();
       bT.clear();                                                               // Refer to new branches from root
     P.parallelSection();
-      M.moveParallel
-       (bT.T.at(bT.tKey) , T.at(parentKey),
-        bT.T.at(bT.tData), T.at(l));
+      bT.T.at(bT.tKey) .move(T.at(parentKey));
+    P.parallelSection();
+      bT.T.at(bT.tData).move(T.at(l));
     P.parallelEnd();
     bT.push();
 
@@ -1178,9 +1187,9 @@ abstract class BtreePA extends Test                                             
          }
        };
     P.parallelSection();
-      M.moveParallel
-       (bT.T.at(bT.tData), T.at(l),
-        bT.T.at(bT.index), T.at(index));
+      bT.T.at(bT.tData).move(T.at(l));
+    P.parallelSection();
+      bT.T.at(bT.index).move(T.at(index));
     P.parallelEnd();
     bT.insertElementAt();                                                       // Insert new key, next pair in parent
    }
@@ -1229,10 +1238,13 @@ abstract class BtreePA extends Test                                             
     bR.splitLow(bL);
     bL.zeroLastKey();
 
-    M.moveParallel
-     (bT.T.at(bT.tKey ), bL.T.at(bL.tKey),
-      bT.T.at(bT.tData), T.at(l),
-      bT.T.at(bT.index), T.at(index));
+    P.parallelStart();
+      bT.T.at(bT.tKey ).move(bL.T.at(bL.tKey));
+    P.parallelSection();
+      bT.T.at(bT.tData).move(T.at(l));
+    P.parallelSection();
+      bT.T.at(bT.index).move(T.at(index));
+    P.parallelEnd();
     bT.insertElementAt();
    }
 
@@ -1297,9 +1309,11 @@ abstract class BtreePA extends Test                                             
 
             lL.pop();                                                           // Steal from left
 
-            M.moveParallel
-             (lR.T.at(lR.tKey ), lL.T.at(lL.tKey ),
-              lR.T.at(lR.tData), lL.T.at(lL.tData));
+            P.parallelStart();
+              lR.T.at(lR.tKey ).move(lL.T.at(lL.tKey ));
+            P.parallelSection();
+              lR.T.at(lR.tData).move(lL.T.at(lL.tData));
+            P.parallelEnd();
             lR.unshift();                                                       // Increase right
 
             lL.T.at(lL.index).add(T.at(nl), -2);                                // Account for top and zero base
@@ -1334,9 +1348,11 @@ abstract class BtreePA extends Test                                             
             bT.T.at(bT.index).move(T.at(index));
             bT.elementAt();                                                     // Top key
 
-            M.moveParallel
-             (bR.T.at(bR.tKey) , bT.T.at(bT.tKey),
-              bR.T.at(bR.tData), bL.T.at(bL.tData));
+            P.parallelStart();
+              bR.T.at(bR.tKey) .move(bT.T.at(bT.tKey));
+            P.parallelSection();
+              bR.T.at(bR.tData).move(bL.T.at(bL.tData));
+            P.parallelEnd();
             bR.unshift();                                                       // Increase right with left top
 //          bL.pop();                                                           // Remove left top
 
@@ -1388,9 +1404,9 @@ abstract class BtreePA extends Test                                             
         bT.elementAt();
 
         P.parallelStart();
-          M.moveParallel
-           (T.at(lk), bT.T.at(bT.tKey),
-            T.at(l) , bT.T.at(bT.tData));
+          T.at(lk).move(bT.T.at(bT.tKey));
+        P.parallelSection();
+          T.at(l) .move(bT.T.at(bT.tData));
         P.parallelSection();
           bT.T.at(bT.index).add(T.at(index), +1);
         P.parallelEnd();
@@ -1398,9 +1414,9 @@ abstract class BtreePA extends Test                                             
         bT.elementAt();
 
         P.parallelStart();
-          M.moveParallel
-           (T.at(rk), bT.T.at(bT.tKey),
-            T.at(r) , bT.T.at(bT.tData));
+          T.at(rk).move(bT.T.at(bT.tKey));
+        P.parallelSection();
+          T.at(r) .move(bT.T.at(bT.tData));
         P.parallelSection();
           tt(node_hasLeavesForChildren, node_stealFromRight);
         P.parallelEnd();
@@ -1426,18 +1442,13 @@ abstract class BtreePA extends Test                                             
 
             z();
             lR.shift();                                                         // First element of right child
-            P.parallelStart();
-              M.moveParallel
-               (lL.T.at(lL.tKey) , lR.T.at(lR.tKey),
-                lL.T.at(lL.tData), lR.T.at(lR.tData));
-              lL.push();                                                        // Increase left
-
-            P.parallelSection();
-              M.moveParallel
-               (bT.T.at(bT.tKey) , lR.T.at(lR.tKey),
-                bT.T.at(bT.tData), T.at(l),
-                bT.T.at(bT.index), T.at(index));
+            P.parallelStart();   lL.T.at(lL.tKey) .move(lR.T.at(lR.tKey));
+            P.parallelSection(); lL.T.at(lL.tData).move(lR.T.at(lR.tData));
+            P.parallelSection(); bT.T.at(bT.tKey) .move(lR.T.at(lR.tKey));
+            P.parallelSection(); bT.T.at(bT.tData).move(T.at(l));
+            P.parallelSection(); bT.T.at(bT.index).move(T.at(index));
             P.parallelEnd();
+            lL.push();                                                          // Increase left
             bT.setElementAt();                                                  // Swap key of parent
            }
           void Else()                                                           // Children are branches
@@ -1456,9 +1467,11 @@ abstract class BtreePA extends Test                                             
             stealNotPossible(end);
 
             bL.lastElement();                                                   // Last element of left child
-            M.moveParallel
-             (bL.T.at(bL.tKey ), T.at(lk),
-              bL.T.at(bL.index), T.at(nl));
+            P.parallelStart();
+              bL.T.at(bL.tKey ).move(T.at(lk));
+            P.parallelSection();
+              bL.T.at(bL.index).move(T.at(nl));
+            P.parallelEnd();
             bL.setElementAt();                                                  // Left top becomes real
 
             bR.shift();                                                         // First element of  right child
@@ -1471,9 +1484,9 @@ abstract class BtreePA extends Test                                             
             bL.push();                                                          // New top for left is ignored by search ,.. except last
 
             P.parallelStart();
-              M.moveParallel
-               (bT.T.at(bT.tKey ), bR.T.at(bR.tKey),
-                bT.T.at(bT.tData), T.at(l));
+              bT.T.at(bT.tKey ).move(bR.T.at(bR.tKey));
+            P.parallelSection();
+              bT.T.at(bT.tData).move(T.at(l));
             P.parallelSection();
               bT.T.at(bT.index).move(T.at(index));
             P.parallelEnd();
@@ -1807,9 +1820,11 @@ abstract class BtreePA extends Test                                             
         bT.T.at(bT.index).add(T.at(index), +1);
         bT.elementAt();
 
-        M.moveParallel
-         (T.at(parentKey  ), bT.T.at(bT.tKey),                                  // One up from dividing point in parent
-          bT.T.at(bT.index), T.at(index));
+        P.parallelStart();
+          T.at(parentKey  ).move(bT.T.at(bT.tKey));                             // One up from dividing point in parent
+        P.parallelSection();
+          bT.T.at(bT.index).move(T.at(index));
+        P.parallelEnd();
         bT.elementAt();                                                         // Dividing point in parent
 
         bT.T.at(bT.tKey).move(T.at(parentKey));
@@ -2000,18 +2015,15 @@ abstract class BtreePA extends Test                                             
         P.new If (T.at(found))                                                  // Found the key in the leaf so update it with the new data
          {void Then()
            {z();
-            M.moveParallel
-             (lT.T.at(lT.tKey ), T.at(Key),
-              lT.T.at(lT.tData), T.at(Data),
-              lT.T.at(lT.index), T.at(index));
-            P.parallelStart();
-              lT.setElementAt();
-            P.parallelSection();
-              T.at(success).ones();
-            P.parallelSection();
-              T.at(inserted).zero();
-            P.parallelSection();
-              tt(findAndInsert, leafFound);
+            P.parallelStart();    lT.T.at(lT.tKey ).move(T.at(Key));
+            P.parallelSection();  lT.T.at(lT.tData).move(T.at(Data));
+            P.parallelSection();  lT.T.at(lT.index).move(T.at(index));
+            P.parallelEnd();
+
+            P.parallelStart();    lT.setElementAt();
+            P.parallelSection();  T.at(success).ones();
+            P.parallelSection();  T.at(inserted).zero();
+            P.parallelSection();  tt(findAndInsert, leafFound);
             P.parallelEnd();
             P.Goto(Return);
            }
@@ -2027,17 +2039,18 @@ abstract class BtreePA extends Test                                             
             P.new If(T.at(found))                                               // Overwrite existing key
              {void Then()
                {z();
-                M.moveParallel
-                 (lT.T.at(lT.tKey ), T.at(Key),
-                  lT.T.at(lT.tData), T.at(Data),
-                  lT.T.at(lT.index), T.at(first));
+                P.parallelStart();    lT.T.at(lT.tKey ).move(T.at(Key));
+                P.parallelSection();  lT.T.at(lT.tData).move(T.at(Data));
+                P.parallelSection();  lT.T.at(lT.index).move(T.at(first));
+                P.parallelEnd();
+
                 lT.insertElementAt();
                }
               void Else()                                                       // Insert into position
                {z();
-                M.moveParallel
-                 (lT.T.at(lT.tKey ), T.at(Key),
-                  lT.T.at(lT.tData), T.at(Data));
+                P.parallelStart();   lT.T.at(lT.tKey ).move(T.at(Key));
+                P.parallelSection(); lT.T.at(lT.tData).move(T.at(Data));
+                P.parallelEnd();
                 lT.push();
                }
              };
