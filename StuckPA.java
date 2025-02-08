@@ -323,8 +323,13 @@ abstract class StuckPA extends Test                                             
     P.parallelSection();
       inc();
     P.parallelEnd();
-    T.setIntInstruction(index, 0);
-    setKeyData();
+    //T.setIntInstruction(index, 0);
+    //setKeyData();
+
+    P.parallelStart();   M.at(sKey,  0).move(T.at(tKey  ));
+    P.parallelSection(); M.at(sData, 0).move(T.at(tData ));
+    P.parallelEnd();
+
     //sizeFullEmpty();
    }
 
