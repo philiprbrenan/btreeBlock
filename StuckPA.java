@@ -300,8 +300,9 @@ abstract class StuckPA extends Test                                             
     //assertNotFull();
     size();
     T.at(index).move(T.at(size));
-    setKeyData();
-    inc();
+    P.parallelStart();   setKeyData();
+    P.parallelSection(); inc();
+    P.parallelEnd();
     //sizeFullEmpty();
    }
 
@@ -357,14 +358,10 @@ abstract class StuckPA extends Test                                             
 
   void shift()                                                                  // Shift an element from the stuck
    {zz(); action = "shift";
-    T.setIntInstruction(index, 0);
-    moveKeyData();
-    P.parallelStart();
-      M.at(Keys).moveDown(null, C.at(Keys));
-    P.parallelSection();
-      M.at(Data).moveDown(null, C.at(Data));
-    P.parallelSection();
-      dec();
+    firstElement();
+    P.parallelStart();    M.at(Keys).moveDown(null, C.at(Keys));
+    P.parallelSection();  M.at(Data).moveDown(null, C.at(Data));
+    P.parallelSection();  dec();
     P.parallelEnd();
     //sizeFullEmpty();
    }
@@ -402,9 +399,10 @@ abstract class StuckPA extends Test                                             
     //isFull();
     //assertInExtended();
     //T.zero();
-    M.at(Keys).moveUp(T.at(index), C.at(Keys));
-    M.at(Data).moveUp(T.at(index), C.at(Data));
-    M.at(currentSize).inc();
+    P.parallelStart();   M.at(Keys).moveUp(T.at(index), C.at(Keys));
+    P.parallelSection(); M.at(Data).moveUp(T.at(index), C.at(Data));
+    P.parallelSection(); M.at(currentSize).inc();
+    P.parallelEnd();
     setKeyData();
     //sizeFullEmpty();
    }
@@ -416,9 +414,10 @@ abstract class StuckPA extends Test                                             
     //setFound();
     moveKeyData();
     //T.zero();
-    M.at(Keys).moveDown(T.at(index), C.at(Keys));
-    M.at(Data).moveDown(T.at(index), C.at(Data));
-    M.at(currentSize).dec();
+    P.parallelStart();    M.at(Keys).moveDown(T.at(index), C.at(Keys));
+    P.parallelSection();  M.at(Data).moveDown(T.at(index), C.at(Data));
+    P.parallelStart();    M.at(currentSize).dec();
+    P.parallelEnd();
     //sizeFullEmpty();
    }
 
@@ -428,8 +427,9 @@ abstract class StuckPA extends Test                                             
     //isEmpty();
     //assertNotEmpty();
     //setFound();
-    T.setIntInstruction(index, 0);
-    moveKeyData();
+    P.parallelStart();   T.at(tKey  ).move(M.at(sKey,  0));
+    P.parallelSection(); T.at(tData ).move(M.at(sData, 0));
+    P.parallelEnd();
    }
 
   void lastElement()                                                            // Last element
