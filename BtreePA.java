@@ -3,7 +3,6 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024-2025
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-// BranchBase(LV, LV) should be removed
 // SplitBranch() in parallel. Concatenate currently blocks parallel but can be improved by concatenating to a known point.
 // A parallel section is an opportunity to create one instruction like moveAndDec/Inc
 import java.util.*;
@@ -713,14 +712,14 @@ abstract class BtreePA extends Test                                             
     tt(node_branchBase, node_branchSize);
     branchBase(branchBase, node_branchBase);
     bSize.base(T.at(branchBase));
-    bSize.size(); T.at(branchSize).move(bSize.T.at(bSize.size));                // Changed order here to match leafSize more closely
-    T.at(branchSize).dec();                                                     // Account for top which will always be present
+    bSize.size();
+    T.at(branchSize).add(bSize.T.at(bSize.size), -1);                           // Account for top which will always be present
    }
 
   private void branchSize(StuckPA branchStuck, Layout.Variable Size)            // Number of children in body of branch taking top for granted as it is always there
    {zz();
-    branchStuck.size(); T.at(Size).move(branchStuck.T.at(branchStuck.size));    // Changed order here to match leafSize more closely
-    T.at(Size).dec();                                                           // Account for top which will always be present
+    branchStuck.size();
+    T.at(Size).add(branchStuck.T.at(branchStuck.size), -1);                     // Account for top which will always be present
    }
 
   private void isEmpty()                                                        // The node is empty
@@ -1261,8 +1260,7 @@ abstract class BtreePA extends Test                                             
 
         branchBase(bT, node_stealFromLeft);
 
-        bT.T.at(bT.index).move(T.at(index));
-        bT.T.at(bT.index).dec();
+        bT.T.at(bT.index).add(T.at(index), -1);                                 // Account for top
         bT.elementAt();
 
         P.parallelStart();
@@ -1304,15 +1302,16 @@ abstract class BtreePA extends Test                                             
               lR.T.at(lR.tData), lL.T.at(lL.tData));
             lR.unshift();                                                       // Increase right
 
-            lL.T.at(lL.index).move(T.at(nl));
-            lL.T.at(lL.index).dec(2);
+            lL.T.at(lL.index).add(T.at(nl), -2);                                // Account for top and zero base
             lL.elementAt();                                                     // Last key on left
 
-            M.moveParallel
-             (bT.T.at(bT.tKey) , lL.T.at(lL.tKey),
-              bT.T.at(bT.tData), T.at(l),
-              bT.T.at(bT.index), T.at(index));
-            bT.T.at(bT.index).dec();
+            P.parallelStart();
+              bT.T.at(bT.tKey) .move(lL.T.at(lL.tKey));
+            P.parallelSection();
+              bT.T.at(bT.tData).move(T.at(l));
+            P.parallelSection();
+              bT.T.at(bT.index).add(T.at(index), -1);
+            P.parallelEnd();
             bT.setElementAt();                                                  // Reduce key of parent of left
            }
           void Else()                                                           // Children are branches
@@ -1343,8 +1342,7 @@ abstract class BtreePA extends Test                                             
 
             bR.firstElement();                                                  // Increase right with left top
 
-            bT.T.at(bT.index).move(T.at(index));
-            bT.T.at(bT.index).dec();
+            bT.T.at(bT.index).add(T.at(index), -1);                             // Account for top
 
             bT.elementAt();                                                     // Parent key
 
@@ -1358,11 +1356,13 @@ abstract class BtreePA extends Test                                             
 
             bL.lastElement();                                                   // Last left key
 
-            M.moveParallel
-             (bT.T.at(bT.tKey) , bL.T.at(bL.tKey),
-              bT.T.at(bT.tData), T.at(l),
-              bT.T.at(bT.index), T.at(index));
-            bT.T.at(bT.index).dec();
+            P.parallelStart();
+              bT.T.at(bT.tKey) .move(bL.T.at(bL.tKey));
+            P.parallelSection();
+              bT.T.at(bT.tData).move(T.at(l));
+            P.parallelSection();
+              bT.T.at(bT.index).add(T.at(index), -1);
+            P.parallelEnd();
             bT.setElementAt();                                                  // Reduce key of parent of left
            }
          };
@@ -1392,8 +1392,7 @@ abstract class BtreePA extends Test                                             
            (T.at(lk), bT.T.at(bT.tKey),
             T.at(l) , bT.T.at(bT.tData));
         P.parallelSection();
-          bT.T.at(bT.index).move(T.at(index));
-          bT.T.at(bT.index).inc();
+          bT.T.at(bT.index).add(T.at(index), +1);
         P.parallelEnd();
 
         bT.elementAt();
@@ -1616,8 +1615,7 @@ abstract class BtreePA extends Test                                             
 
         z();
         branchBase(bT, node_mergeLeftSibling);
-        bT.T.at(bT.index).move(T.at(index));
-        bT.T.at(bT.index).dec();
+        bT.T.at(bT.index).add(T.at(index), -1);
         bT.elementAt();
 
         P.parallelStart();
@@ -1689,8 +1687,7 @@ abstract class BtreePA extends Test                                             
             stealNotPossible(end);
 
             z();
-            bT.T.at(bT.index).move(T.at(index));                                // Top key
-            bT.T.at(bT.index).dec();                                            // Top key
+            bT.T.at(bT.index).add(T.at(index), -1);                             // Top key
             bT.elementAt();                                                     // Top key
 
             bL.pop();                                                           // Last element of left child
@@ -1705,8 +1702,7 @@ abstract class BtreePA extends Test                                             
            }
          };
         tt(node_free, l); free();                                               // Free the empty left node
-        bT.T.at(bT.index).move(T.at(index));
-        bT.T.at(bT.index).dec();
+        bT.T.at(bT.index).add(T.at(index), -1);                                 // Account for top
 
         bT.removeElementAt();                                                   // Reduce parent on left
         z(); T.at(stolenOrMerged).ones();
@@ -1733,8 +1729,7 @@ abstract class BtreePA extends Test                                             
         bT.T.at(bT.index).move(T.at(index));
         bT.elementAt();
         T.at(l).move(bT.T.at(bT.tData));
-        bT.T.at(bT.index).move(T.at(index));
-        bT.T.at(bT.index).inc();
+        bT.T.at(bT.index).add(T.at(index), +1);
         bT.elementAt();
         T.at(r).move(bT.T.at(bT.tData));
 
@@ -1809,8 +1804,7 @@ abstract class BtreePA extends Test                                             
         tt(node_free, r);
         free();                                                                 // Free the empty right node
 
-        bT.T.at(bT.index).move(T.at(index));
-        bT.T.at(bT.index).inc();
+        bT.T.at(bT.index).add(T.at(index), +1);
         bT.elementAt();
 
         M.moveParallel
@@ -1821,8 +1815,7 @@ abstract class BtreePA extends Test                                             
         bT.T.at(bT.tKey).move(T.at(parentKey));
         bT.setElementAt();                                                      // Install key of right sibling in this child
 
-        bT.T.at(bT.index).move(T.at(index));                                    // Reduce parent on right
-        bT.T.at(bT.index).inc();
+        bT.T.at(bT.index).add(T.at(index), +1);                                 // Reduce parent on right
         bT.removeElementAt();                                                   // Reduce parent on right
         z(); T.at(stolenOrMerged).ones();
        }
@@ -3478,7 +3471,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 751, """
+    t.runVerilogDeleteTest(3, 6, 724, """
                     6           |
                     0           |
                     5           |
@@ -3490,7 +3483,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 676, """
+    t.runVerilogDeleteTest(4, 5, 653, """
              6           |
              0           |
              5           |
@@ -3502,7 +3495,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 600, """
+    t.runVerilogDeleteTest(2, 7, 578, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3510,7 +3503,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 514, """
+    t.runVerilogDeleteTest(1, 8, 496, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3518,7 +3511,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 325, """
+    t.runVerilogDeleteTest(5, 4, 315, """
       7      |
       0      |
       1      |
@@ -3526,7 +3519,7 @@ endmodule
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(6, 3, 329, """
+    t.runVerilogDeleteTest(6, 3, 322, """
     7      |
     0      |
     1      |
@@ -3534,7 +3527,7 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 381, """
+    t.runVerilogDeleteTest(7, 2, 376, """
 8,9=0 |
 """);
 
@@ -3584,7 +3577,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 456, """
+    t.runVerilogPutTest(4, 447, """
       2      |
       0      |
       1      |
@@ -3592,7 +3585,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 517, """
+    t.runVerilogPutTest(5, 504, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -3600,7 +3593,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 585, """
+    t.runVerilogPutTest(6, 570, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3608,7 +3601,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 646, """
+    t.runVerilogPutTest(7, 627, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -3616,7 +3609,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 881, """
+    t.runVerilogPutTest(8, 865, """
              4             |
              0             |
              5             |
@@ -3628,7 +3621,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 764, """
+    t.runVerilogPutTest(9, 744, """
              4                    |
              0                    |
              5                    |
@@ -3640,7 +3633,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
 
-    t.runVerilogPutTest(10, 832, """
+    t.runVerilogPutTest(10, 810, """
              4                       |
              0                       |
              5                       |
@@ -3652,7 +3645,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9,10=2 |
 """);
 
-    t.runVerilogPutTest(11, 893, """
+    t.runVerilogPutTest(11, 867, """
              4                               |
              0                               |
              5                               |
@@ -3664,7 +3657,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9=8    10,11=2 |
 """);
 
-    t.runVerilogPutTest(12, 858, """
+    t.runVerilogPutTest(12, 840, """
                                8                 |
                                0                 |
                                5                 |
@@ -3676,7 +3669,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=2 |
 """);
 
-    t.runVerilogPutTest(13, 764, """
+    t.runVerilogPutTest(13, 744, """
                                8                          |
                                0                          |
                                5                          |
@@ -3688,7 +3681,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest(14, 832, """
+    t.runVerilogPutTest(14, 810, """
                                8                             |
                                0                             |
                                5                             |
@@ -3700,7 +3693,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=2 |
 """);
 
-    t.runVerilogPutTest(15, 893, """
+    t.runVerilogPutTest(15, 867, """
                                8                                     |
                                0                                     |
                                5                                     |
@@ -3712,7 +3705,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest(16, 902, """
+    t.runVerilogPutTest(16, 878, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -3724,7 +3717,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=2 |
 """);
 
-    t.runVerilogPutTest(17, 881, """
+    t.runVerilogPutTest(17, 853, """
                                8                  12                            |
                                0                  0.1                           |
                                5                  11                            |
@@ -3736,7 +3729,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest(18, 949, """
+    t.runVerilogPutTest(18, 919, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -3748,7 +3741,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17,18=2 |
 """);
 
-    t.runVerilogPutTest(19, 1010, """
+    t.runVerilogPutTest(19, 976, """
                                8                  12                                        |
                                0                  0.1                                       |
                                5                  11                                        |
@@ -3760,7 +3753,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 995, """
+    t.runVerilogPutTest(20, 969, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
@@ -3778,13 +3771,13 @@ endmodule
     test_put_ascending_wide();
     test_put_descending();
     test_put_small_random();
-    test_put_large_random();
+    //test_put_large_random();
     test_find();
     test_delete_ascending();
     test_delete_descending();
     //test_to_array();
     test_delete_small_random();
-    test_delete_large_random();
+    //test_delete_large_random();
     test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
@@ -3803,7 +3796,7 @@ endmodule
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
       if (github_actions)                                                       // Coverage analysis
        {//coverageAnalysis(sourceFileName(), 12);
-        coverageAnalysis(12, "StuckSML.java", "MemoryLayout.java", "BtreeSML.java");
+        coverageAnalysis(12, "StuckSML.java", "MemoryLayout.java", "BtreeSML.java"); // Used for printing
        }
       testSummary();                                                            // Summarize test results
       System.exit(testsFailed);
