@@ -438,9 +438,9 @@ class MemoryLayoutPA extends Test                                               
       final int          w = a.width;                                           // Width of array element
       P.new I()
        {void a()                                                                // Emulation
-         {Index.setOff();
-          for   (int i = Index.result+1; i < A.size; i++)                       // Each element
-           {for (int j = 0;              j < w;      j++)                       // Each bit in each element
+         {final int S = Index == null ? 1 : (Index.setOff().result + 1);        // A null index means start at the very beginning
+          for   (int i = S; i < A.size; i++)                                    // Each element
+           {for (int j = 0; j < w;      j++)                                    // Each bit in each element
              {final boolean b = buffer.getBit((i-1)*w + j);
               target.setBit(i*w+j, b);
              }
@@ -448,7 +448,7 @@ class MemoryLayoutPA extends Test                                               
          }
         String v()                                                              // Verilog
          {final StringBuilder   s = new StringBuilder("/* Move Up */\n");
-          final String      start = Index.verilogLoad();                        // Load above this index
+          final String      start = Index == null ? "0" : Index.verilogLoad();  // Load above this index
           final MemoryLayoutPA tm = ml();                                       // Target memory
           final MemoryLayoutPA sm = buffer.ml();                                // Source memory
           for   (int i = 1; i < A.size; i++)                                    // Each element
@@ -460,7 +460,7 @@ class MemoryLayoutPA extends Test                                               
            }
           return s.toString();
          }
-        String n() {return field.name+" moveUp @ "+Index.field.name+" using "+buffer.field.name;}
+        String n() {return field.name+" moveUp @ "+(Index != null ? Index.field.name : "0")+" using "+buffer.field.name;}
        };
      }
 
@@ -476,8 +476,8 @@ class MemoryLayoutPA extends Test                                               
       final int          w = a.width;                                           // Width of array element
       P.new I()
        {void a()
-         {Index.setOff();
-          for   (int i = Index.result; i < A.size-1; i++)                       // Each element
+         {final int S = Index == null ? 0 : Index.setOff().result;
+          for   (int i = S; i < A.size-1; i++)                                  // Each element
            {//sa(target.at+i*w, buffer.at+i*w+w);
             for (int j = 0;            j < w;        j++)                       // Each bit in each element
              {final boolean b = buffer.getBit((i+1)*w + j);
@@ -487,7 +487,7 @@ class MemoryLayoutPA extends Test                                               
          }
         String v()                                                              // Verilog
          {final StringBuilder   s = new StringBuilder("/* Move Down */\n");
-          final String      start = Index.verilogLoad();                        // Load above this index
+          final String      start = Index == null ? "0" : Index.verilogLoad();  // Load above this index
           final MemoryLayoutPA tm = ml();                                       // Target memory
           final MemoryLayoutPA sm = buffer.ml();                                // Source memory
           for   (int i = 0; i < A.size-1; i++)                                  // Each element
@@ -505,7 +505,7 @@ class MemoryLayoutPA extends Test                                               
            }
           return s.toString();
          }
-        String n() {return field.name+" moveDown @ "+Index.field.name+" using "+buffer.field.name;}
+        String n() {return field.name+" moveDown @ "+(Index != null ? Index.field.name : "0")+" using "+buffer.field.name;}
        };
      }
 
