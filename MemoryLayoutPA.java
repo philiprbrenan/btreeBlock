@@ -20,17 +20,20 @@ class MemoryLayoutPA extends Test                                               
 //D1 Construction                                                               // Construct a memory layout
 
   MemoryLayoutPA(int size)                                                      // Memory useful for running tests.
-   {name   = null; based = null; layout = null;
+   {zz();
+    name   = null; based = null; layout = null;
     memory = new Memory("", size);
    }
 
   MemoryLayoutPA(Layout Layout, String Name)                                    // Memory with an associated layout and a name so we can generate verilog from it
-   {name   = Name; based = null; layout = Layout;
+   {zz();
+    name   = Name; based = null; layout = Layout;
     memory = new Memory(Name, size());                                          // Create the associated memory as this memory is not based on any other memory
    }
 
   MemoryLayoutPA(Layout Layout, String Name, MemoryLayoutPA Based)              // Like based storage in PL1.  If the based memory is null then we create a backing memory of the required size and base ourselves at zero in it to facilitate testing.
-   {layout = Layout;
+   {zz();
+    layout = Layout;
     if (Based == null)                                                          // Create the backing memory if necessary, usually for testing purposes
      {based = new MemoryLayoutPA(layout, Name+"_Backing");                      // Create new backing memory
       name  = Name+"_Based";
@@ -45,28 +48,29 @@ class MemoryLayoutPA extends Test                                               
 
 //D1 Control                                                                    // Testing, control and integrity
 
-  Memory memory() {return memory;}                                              // Real memory used by this layout
+  Memory memory() {zz(); return memory;}                                        // Real memory used by this layout
 
-  void program(ProgramPA program) {P = program;}                                // Program in which to generate instructions
+  void program(ProgramPA program) {zz(); P = program;}                          // Program in which to generate instructions
 
   void base(int Base)                                                           // Set the base of the layout in memory allowing such layouts to be relocated
    {if (based == null) stop("Memory layout is not based so cannot set a base");
     base = Base;
    }
 
-  String  name    () {return based() ? based.name() : name+"_"+number;}         // Name of this memory layout
-  Layout  layout  () {return layout;}                                           // Get the layout in use
-  String  baseName() {return name+"_"+number+"_base_offset";}                   // Name of the verilog field used to hold the base being used for this memory layout
+  String  name    () {z(); return based() ? based.name() : name+"_"+number;}    // Name of this memory layout
+  Layout  layout  () {z(); return layout;}                                      // Get the layout in use
+  String  baseName() {z(); return name+"_"+number+"_base_offset";}              // Name of the verilog field used to hold the base being used for this memory layout
 
-  String  initializeMemory() {return "initialize_memory_"+name();}              // Name of the verilog field used to hold the base being used for this memory layout
+  String  initializeMemory() {z(); return "initialize_memory_"+name();}         // Name of the verilog field used to hold the base being used for this memory layout
 
-  int     base () {return base;}                                                // Get the base offset into memory being used
-  boolean based() {return based  != null;}                                      // Whether the layout is based or not
-  int     size () {return layout != null ? layout.size() : memory.bits.length;} // Size of memory
-  int baseSize () {return based() ? based.size() : size();}                     // Size of underlying memory
+  int     base () {z(); return base;}                                           // Get the base offset into memory being used
+  boolean based() {z(); return based  != null;}                                 // Whether the layout is based or not
+  int     size () {z(); return layout != null ? layout.size() : memory.bits.length;} // Size of memory
+  int baseSize () {z(); return based() ? based.size() : size();}                // Size of underlying memory
 
   void clear()                                                                  // Clear underlying memory
-   {if (based == null) {memory.zero(); return;}                                 // Not based so we just clear the memory we have
+   {zz();
+    if (based == null) {memory.zero(); return;}                                 // Not based so we just clear the memory we have
     final int N = size();
     for (int i = 0; i < N; i++) memory.set(base + i, false);                    // Based so we clear the area occupied by the layout
    }
@@ -95,7 +99,8 @@ class MemoryLayoutPA extends Test                                               
   int      copySize() {return logTwo(baseSize());}                              // Size of bits for a length or index into this memory
 
   String copyVerilogDec()                                                       // Verilog declaration
-   {final StringBuilder s = new StringBuilder();                                // Text of declaration
+   {zz();
+    final StringBuilder s = new StringBuilder();                                // Text of declaration
     s.append("reg["+copySize()+": 0] "+copyIndex ()+";\n");
     s.append("reg["+copySize()+": 0] "+copyLength()+";\n");
     return ""+s;
@@ -104,27 +109,27 @@ class MemoryLayoutPA extends Test                                               
 //D1 Get and Set                                                                // Get and set values in memory but only during testing
 
   boolean getBit(int index)                                                     // Get a bit from the memory layout
-   {z();return memory.bits[base + index];
+   {zz();return memory.bits[base + index];
    }
 
   void setBit(int index, boolean value)                                         // Set a value in memory occupied by the layout
-   {z(); memory.bits[base + index] = value;
+   {zz(); memory.bits[base + index] = value;
    }
 
   int  getInt(Layout.Field field, int...indices)                                // Get a value from memory occupied by the layout
-   {z();
+   {zz();
     final int i = new At(field, indices).setOff().result;
     return i;
    }
 
   void setInt(Layout.Field field, int value, int...indices)                     // Set a value in memory occupied by the layout
-   {z();
+   {zz();
     final At a = new At(field, indices).setOff();
     memory.set(a.at, a.width, value);
    }
 
   void setIntInstruction(Layout.Field field, int value)                         // Set a value in memory occupied by the layout
-   {z();
+   {zz();
     P.new I()
      {void a()
        {final At a = new At(field).setOff();
@@ -139,7 +144,7 @@ class MemoryLayoutPA extends Test                                               
 
   void setIntInstruction(Layout.Field field1, int value1,                       // Set values in memory occupied by the layout
                          Layout.Field field2, int value2)                       // Set a value in memory occupied by the layout
-   {z();
+   {zz();
     P.new I()
      {void a()
        {final At a1 = new At(field1).setOff(), a2 = new At(field2).setOff();
@@ -154,12 +159,12 @@ class MemoryLayoutPA extends Test                                               
    }
 
   void zero()                                                                   // Clear the memory associated with the layout to zeros
-   {z();
+   {zz();
     memory.set(base, size(), 0);
    }
 
   void moveParallel(At...Fields)                                                // Move pairs of fields in parallel
-   {z();
+   {zz();
     final int N = Fields.length;
     if (N % 2 == 1) stop("Move in parallel requires an even number of fields");
     for(int i = 0; i < N; i += 2) Fields[i].sameSize(Fields[i+1]);
@@ -169,7 +174,7 @@ class MemoryLayoutPA extends Test                                               
          {final At target = Fields[i+0].setOff();
           final At source = Fields[i+1].setOff();
           for(int j = 0; j < target.width; ++j)
-           {z();
+           {zz();
             final boolean b = source.getBit(j);
             target.setBit(j, b);
            }
@@ -199,7 +204,7 @@ class MemoryLayoutPA extends Test                                               
    }
 
   void copy(MemoryLayoutPA source)                                              // Copy all the bits from the source into the target as long as the source and target are the same size
-   {z();
+   {zz();
     if (size() != source.size()) stop("Memory layouts have different sizes");
     final int N = size();
     P.new I()
@@ -284,7 +289,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     At(Layout.Field Field)                                                      // No indices or base
-     {z(); checkCompiled(Field);
+     {zz(); checkCompiled(Field);
       field = Field; indices = new int[0];
       width = field.width;
       if (width < 1) stop("Field", field.name, "does not have any bits");
@@ -293,14 +298,14 @@ class MemoryLayoutPA extends Test                                               
      }
 
     At(Layout.Field Field, int...Indices)                                       // Constant indices used for setting initial values
-     {z(); checkCompiled(Field);
+     {zz(); checkCompiled(Field);
       field = Field; indices = Indices; width = field.width;
       directs = null;
       locateDirectAddress();                                                    // The indices are constant so the address will not change over time
      }
 
     At(Layout.Field Field, At...Directs)                                        // Variable indices used for obtaining run time values
-     {z(); checkCompiled(Field);
+     {zz(); checkCompiled(Field);
       final int N = Directs.length;
       for (int i = 0; i < N; i++)
        {if (Directs[i].directs != null)
@@ -326,17 +331,17 @@ class MemoryLayoutPA extends Test                                               
     At setOff() {z(); return setOff(true);}                                     // Set the base address of the field from its indices confirming that we are inside an executing instruction
 
     At setOff(boolean checkSetOff)                                              // Set the base address of the field
-     {z();
+     {zz();
       if (checkSetOff && !P.running) P.halt("Set off must be inside an instruction");
       if (hasIndirection()) {z(); locateInDirectAddress();}                     // Evaluate indirect indices
-      else                  {z(); locateDirectAddress();}                       // Evaluate direct indices
+      else                  {zz(); locateDirectAddress();}                       // Evaluate direct indices
       return this;
      }
 
     boolean getBit(int i)            {return memory.getBit(at+i);}              // Get a bit from memory assuming that setOff() has been called to fix the location of the field containing the bit
     void    setBit(int i, boolean b) {memory.set(at+i, b);}                     // Set a bit in memory  assuming that setOff() has been called to fix the location of the field containing the bit
 
-    int  getInt()          {z(); return result;}                                // The value in memory, at the indicated location, treated as an integer or the value of the constant, assumming setOff has been called to update the variable description
+    int  getInt()          {zz(); return result;}                                // The value in memory, at the indicated location, treated as an integer or the value of the constant, assumming setOff has been called to update the variable description
     void setInt(int value) {z(); memory.set(at, width, value);}                 // Set the value in memory at the indicated location, treated as an integer
 
     public String toString()                                                    // Print field name(indices)=value or name=value if there are no indices
@@ -360,7 +365,7 @@ class MemoryLayoutPA extends Test                                               
 //D2 Move                                                                       // Copy data between memory locations
 
     void move(At source)                                                        // Copy the specified number of bits from source to target assuming no overlap. The source and target can be in the same or a different memory.
-     {z(); sameSize(source);
+     {zz(); sameSize(source);
       final At target = this;
       if (target.ml()  == source.ml()  &&
           target.field == source.field &&
@@ -373,7 +378,7 @@ class MemoryLayoutPA extends Test                                               
          {source.setOff();
           target.setOff();
           for(int i = 0; i < width; ++i)
-           {z();
+           {zz();
             final boolean b = source.getBit(i);
             target.setBit(i, b);
            }
@@ -387,7 +392,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void moveTo(At...Targets)                                                   // Move the data to the named fields
-     {z();
+     {zz();
       final int N = Targets.length;
       final At source = this;
       for(int i = 0; i < N; ++i) source.sameSize(Targets[i]);
@@ -398,7 +403,7 @@ class MemoryLayoutPA extends Test                                               
            {final At target = Targets[i];
             target.setOff();
             for(int j = 0; j < width; ++j)
-             {z();
+             {zz();
               final boolean b = source.getBit(j);
               target.setBit(j, b);
              }
@@ -416,13 +421,13 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void move(At source, At buffer)                                             // Copy the specified number of bits from source to target via a buffer to allow the operation to proceed in bit parallel assuming the buffer does not overlap either the source or target, each of which can be in different memories.
-     {z(); sameSize(source); sameSize(buffer);
+     {zz(); sameSize(source); sameSize(buffer);
       buffer.move(source);
       move(buffer);
      }
 
     void moveUp(At Index, At buffer)                                            // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.
-     {z(); sameSize(buffer);
+     {zz(); sameSize(buffer);
       if (!(field instanceof Layout.Array))  stop("Array required for moveUp");
       final At target = this;
       buffer.move(target);                                                      // Make a copy of the thing to be moved so we can move in parallel
@@ -460,7 +465,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void moveDown(At Index, At buffer)                                          // Move the elements of an array down one position deleting the indexed element.  A buffer of the same size is used to permit copy in parallel.
-     {z(); sameSize(buffer);
+     {zz(); sameSize(buffer);
       if (!(field instanceof Layout.Array)) stop("Array required for moveDown");
       final At target = this;
       buffer.move(target);                                                      // Make a copy of the thing to be moved so we can move in parallel
@@ -505,7 +510,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void copy(At Source, At Length)                                             // Copy the specified number of bits from the location addressed by the source to the location addressed by the target.
-     {z();
+     {zz();
       final At Target = this;
       P.new I()
        {void a()
@@ -547,7 +552,7 @@ class MemoryLayoutPA extends Test                                               
 //D2 Bits                                                                       // Bit operations in a memory.
 
     void zero()                                                                 // Zero some memory
-     {z();
+     {zz();
       P.new I()
        {void a() {setOff(); memory.zero(at, width);}
         String v()
@@ -560,7 +565,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void ones()                                                                 // Ones some memory
-     {z();
+     {zz();
       final String one = field.verilogOnes();
       P.new I()
        {void a()
@@ -576,7 +581,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void invert(At a)                                                           // Invert the specified bits
-     {z();
+     {zz();
       P.new I()
        {void a()
          {setOff(); memory.invert(a.result, a.width());
@@ -591,25 +596,25 @@ class MemoryLayoutPA extends Test                                               
      }
 
     boolean isAllZero()                                                         // Check that the specified memory is all zeros
-     {z(); setOff(); return memory.isAllZero(at, width);
+     {zz(); setOff(); return memory.isAllZero(at, width);
      }
 
     boolean isAllOnes()                                                         // Check that  the specified memory is all ones
-     {z(); setOff(); return memory.isAllOnes(at, width);
+     {zz(); setOff(); return memory.isAllOnes(at, width);
      }
 
 //D1 Boolean                                                                    // Boolean operations on fields held in memories.
 
     boolean isZero()                                                            // Whether the field is all zero
-     {z();
+     {zz();
       for(int i = 0; i < width; ++i)
-       {z(); if (getBit(i)) {z(); return false;}
+       {zz(); if (getBit(i)) {z(); return false;}
        }
       z(); return true;
      }
 
     void    isZero(At result)                                                   // Whether a field is all zeros
-     {z();
+     {zz();
       final At target = this;
       P.new I()
        {void a()
@@ -623,15 +628,15 @@ class MemoryLayoutPA extends Test                                               
      }
 
     boolean isOnes()                                                            // Whether the field is all ones
-     {z();
+     {zz();
       for(int i = 0; i < width; ++i)
-       {z(); if (!getBit(i)) {z(); return false;}
+       {zz(); if (!getBit(i)) {z(); return false;}
        }
       z(); return true;
      }
 
     void isOnes(At result)                                                      // Whether a field is all ones
-     {z();
+     {zz();
       final At target = this;
       P.new I()
        {void a()
@@ -646,16 +651,16 @@ class MemoryLayoutPA extends Test                                               
      }
 
     private boolean equal(At b)                                                 // Whether  a == b
-     {z(); sameSize(b);
+     {zz(); sameSize(b);
 
       for(int i = 0; i < width; ++i)
-       {z(); if (getBit(i) != b.getBit(i)) {z(); return false;}
+       {zz(); if (getBit(i) != b.getBit(i)) {z(); return false;}
        }
       z(); return true;
      }
 
     void equal(At b, At result)                                                // Whether  a == b
-     {z();
+     {zz();
       final At a = this;
       P.new I()
        {void a()
@@ -670,7 +675,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void    notEqual(At b, At result)                                           // Whether  a != b
-     {z();
+     {zz();
       final At a = this;
       P.new I()
        {void a()
@@ -685,9 +690,9 @@ class MemoryLayoutPA extends Test                                               
      }
 
     private boolean lessThan(At b)                                              // Whether a < b
-     {z(); sameSize(b);
+     {zz(); sameSize(b);
       for(int i = width; i > 0; --i)
-       {z();
+       {zz();
         if (!getBit(i-1) &&  b.getBit(i-1)) {z(); return true;}
         if ( getBit(i-1) && !b.getBit(i-1)) {z(); return false;}
        }
@@ -695,7 +700,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void lessThan(At b, At result)                                              // Whether  a < b
-     {z(); sameSize(b);
+     {zz(); sameSize(b);
       final At a = this;
       P.new I()
        {void a()
@@ -710,7 +715,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void lessThanOrEqual(At b, At result)                                       // Whether  a <= b
-     {z(); sameSize(b);
+     {zz(); sameSize(b);
       final At a = this;
       P.new I()
        {void a()
@@ -725,7 +730,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void    greaterThan(At b, At result)                                        // Whether  a > b
-     {z(); sameSize(b);
+     {zz(); sameSize(b);
       final At a = this;
       P.new I()
        {void a()
@@ -740,7 +745,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void    greaterThanOrEqual(At b, At result)                                 // Whether  a >= b
-     {z(); sameSize(b);
+     {zz(); sameSize(b);
       final At a = this;
       P.new I()
        {void a()
@@ -759,7 +764,7 @@ class MemoryLayoutPA extends Test                                               
 //D2 Binary                                                                     // Arithmetic on binary integers
 
     void inc()                                                                  // Increment a variable treated as an unsigned binary integer with wrap around on overflow.  Return the result after  the increment.
-     {z();
+     {zz();
       final At a = this;
       P.new I()
        {void a()
@@ -776,7 +781,7 @@ class MemoryLayoutPA extends Test                                               
        };
      }
     void dec()                                                                  // Decrement a variable treated as an unsigned binary integer with wrap around on overflow.  Return the result after  the increment.
-     {z();
+     {zz();
       final At a = this;
       P.new I()
        {void a()
@@ -793,7 +798,7 @@ class MemoryLayoutPA extends Test                                               
        };
      }
     void dec(int n)                                                             // Decrement a variable treated as an unsigned binary integer by a constant amount with wrap around on overflow.  Return the result after  the increment.
-     {z();
+     {zz();
       final At a = this;
       P.new I()
        {void a()
@@ -812,15 +817,15 @@ class MemoryLayoutPA extends Test                                               
    } // At
 
   At at(Layout.Field Field)                                                     // A field without indices or base addressing
-   {return new    At(Field);
+   {zz(); return new    At(Field);
    }
 
   At at(Layout.Field Field, int...Indices)                                      // A field with constant indices
-   {return new    At(Field,       Indices);
+   {zz(); return new    At(Field,       Indices);
    }
 
   At at(Layout.Field Field, At...Indices)                                       // A field with  variable indices. Each index being a field with no indices
-   {return new    At(Field,      Indices);
+   {zz(); return new    At(Field,      Indices);
    }
 
 //D1 Print                                                                      // Print a memory layout
@@ -839,7 +844,7 @@ class MemoryLayoutPA extends Test                                               
     pp.s.append(String.format
        ("%4s %1s %8s  %8s   %8s   %8s     %8s   %s\n",
         "Line", "T", "At", "Wide", "Size", "Indices", "Value", "Name"));
-    print(layout.top, pp, 0);
+    print(layout.top(), pp, 0);
     return pp.s.toString();
    }
 
@@ -920,7 +925,8 @@ class MemoryLayoutPA extends Test                                               
 //D1 Verilog                                                                    // Transfer memory to and from Verilog
 
   void dumpVerilog(String file)                                                 // Initialize memory in verilog with the contents of this memory
-   {final StringBuilder s = new StringBuilder();
+   {zz();
+    final StringBuilder s = new StringBuilder();
     final int N = memory.bits.length-1, B = logTwo(N)-1;
     final String m = name();
     s.append(declareVerilog());
@@ -936,7 +942,8 @@ class MemoryLayoutPA extends Test                                               
    }
 
   String declareVerilog()                                                       // Declare matching memory  but do not initialize it
-   {final int N = memory.bits.length-1, B = logTwo(N)-1;
+   {zz();
+    final int N = memory.bits.length-1, B = logTwo(N)-1;
     final StringBuilder s = new StringBuilder();
     if (based == null) s.append("reg ["+N+":0] "+name()    +"; ");              // Actual memory if it is not based
     else               s.append("reg ["+B+":0] "+baseName()+"; ");              // Base offset for this memory
@@ -960,13 +967,15 @@ class MemoryLayoutPA extends Test                                               
     Layout.Array     C = l.array    ("C", B, 3);
     MemoryLayoutPA   M;
     TestMemoryLayout()
-     {M = new MemoryLayoutPA(l.compile(), "test");
+     {z();
+      M = new MemoryLayoutPA(l.compile(), "test");
       M.memory.alternating(4);
      }
    }
 
   static void test_get_set()
-   {TestMemoryLayout   t = new TestMemoryLayout();
+   {z();
+    TestMemoryLayout   t = new TestMemoryLayout();
         MemoryLayoutPA m = t.M;
         ProgramPA      p = m.P;
               Layout l = m.layout;
@@ -992,7 +1001,8 @@ class MemoryLayoutPA extends Test                                               
    }
 
   static void test_boolean()
-   {TestMemoryLayout t = new TestMemoryLayout();
+   {z();
+    TestMemoryLayout t = new TestMemoryLayout();
         MemoryLayoutPA m = t.M;
         ProgramPA      p = m.P;
     p.new I()
@@ -1024,7 +1034,8 @@ class MemoryLayoutPA extends Test                                               
    }
 
   static void test_copy()
-   {TestMemoryLayout t = new TestMemoryLayout();
+   {z();
+    TestMemoryLayout t = new TestMemoryLayout();
         MemoryLayoutPA m = t.M;
         ProgramPA      p = m.P;
     p.new I()
@@ -1050,7 +1061,8 @@ class MemoryLayoutPA extends Test                                               
    }
 
   static void test_base()
-   {Layout           l = Layout.layout();
+   {z();
+    Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Variable  c = l.variable ("c", 4);
@@ -1112,7 +1124,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_move()
-   {Layout           l = Layout.layout();
+   {z();
+    Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Variable  c = l.variable ("c", 4);
@@ -1145,7 +1158,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_move_to()
-   {Layout           l = Layout.layout();
+   {z();
+    Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Variable  c = l.variable ("c", 4);
@@ -1191,7 +1205,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_move_parallel()
-   {Layout           l = Layout.layout();
+   {z();
+    Layout           l = Layout.layout();
     Layout.Variable  a = l.variable("a", 4);
     Layout.Variable  b = l.variable("b", 4);
     Layout.Variable  c = l.variable("c", 4);
@@ -1223,7 +1238,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_set_inc_dec_get()
-   {Layout           l = Layout.layout();
+   {z();
+    Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
@@ -1282,7 +1298,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_addressing()
-   {final int N = 8;
+   {z();
+    final int N = 8;
     Layout           l = Layout.layout();
     Layout.Variable  z = l.variable ("z", N);
     Layout.Variable  i = l.variable ("i", N);
@@ -1297,7 +1314,8 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     p.new I()
      {void a()
-       {Z.setOff().setInt(0);
+       {z();
+        Z.setOff().setInt(0);
         I.setOff().setInt(1);
         J.setOff().setInt(2);
        }
@@ -1310,7 +1328,8 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     p.new I()
      {void a()
-       {az.setOff().setInt(10);
+       {z();
+        az.setOff().setInt(10);
         ai.setOff().setInt(11);
         aj.setOff().setInt(12);
        }
@@ -1377,7 +1396,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_zero()
-   {Layout           l = Layout.layout();
+   {z();
+    Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Array     A = l.array    ("A", a, 6);
     l.compile();
@@ -1435,7 +1455,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_boolean_result()
-   {Layout           l = Layout.layout();
+   {z();
+    Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Bit       r = l.bit      ("r");
@@ -1455,7 +1476,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_is_ones_or_zeros()
-   {Layout           l = Layout.layout();
+   {z();
+    Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Variable  c = l.variable ("c", 4);
@@ -1503,7 +1525,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_union()
-   {Layout               l = Layout.layout();
+   {z();
+    Layout               l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 2);
     Layout.Variable  b = l.variable ("b", 2);
     Layout.Variable  c = l.variable ("c", 2);
@@ -1619,7 +1642,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_dump_verilog()
-   {final String v = "verilog/memoryLayoutPA/dump_verilog.txt";
+   {z();
+    final String v = "verilog/memoryLayoutPA/dump_verilog.txt";
 
     Layout               l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 2);
@@ -1651,7 +1675,8 @@ endtask
    }
 
   static void test_copy_bits()
-   {Layout               l = Layout.layout();
+   {z();
+    Layout               l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 2);
     Layout.Array     A = l.array    ("A", a, 4);
     Layout.Variable  b = l.variable ("b", 4);
@@ -1692,7 +1717,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_copy_memory()
-   {final int N = 8;
+   {z();
+    final int N = 8;
     Layout               l = Layout.layout();
     Layout.Variable  a = l.variable ("a", N);
     Layout.Variable  b = l.variable ("b", N);
@@ -1737,7 +1763,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_copyVerilogDec()
-   {Layout               l = Layout.layout();
+   {z();
+    Layout               l = Layout.layout();
     Layout.Variable  a = l.variable ("a", 8);
     Layout.Variable  b = l.variable ("b", 8);
     Layout.Structure s = l.structure("s", a, b);
@@ -1757,7 +1784,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_copy_variable()
-   {final int N = 4;
+   {z();
+    final int N = 4;
     Layout               l = Layout.layout();
     Layout.Variable  a = l.variable ("a", N);
     Layout.Array     A = l.array    ("A", a, N);

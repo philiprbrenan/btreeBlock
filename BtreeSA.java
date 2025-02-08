@@ -78,7 +78,7 @@ abstract class BtreeSA extends Test                                             
 //D1 Construction                                                               // Create a Btree from nodes which can be branches or leaves.  The data associated with the BTree is stored only in the leaves opposite the keys
 
   BtreeSA()                                                                     // Define a Btree with user specified dimensions
-   {z();
+   {zz();
     splitLeafSize   = maxKeysPerLeaf()   >> 1;                                  // The number of key, data pairs to split out of a leaf
     splitBranchSize = maxKeysPerBranch() >> 1;                                  // The number of key, next pairs to split out of a branch
 

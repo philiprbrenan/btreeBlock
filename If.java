@@ -12,7 +12,8 @@ abstract class If extends Test                                                  
 //D1 Construction                                                               // Create a modular if statement
 
   If (boolean condition)
-   {if (condition) Then(); else Else();
+   {zz();
+    if (condition) Then(); else Else();
    }
   void Then() {}
   void Else() {}

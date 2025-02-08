@@ -43,11 +43,11 @@ abstract class StuckPA extends Test                                             
 //D1 Construction                                                               // Create a stuck
 
   StuckPA(String Name)                                                          // Create the stuck with a maximum number of the specified elements
-   {this(Name, null);
+   {this(Name, null); zz();
    }
 
   StuckPA(String Name, MemoryLayoutPA Based)                                    // Create the stuck with a maximum number of the specified elements
-   {z(); name = Name;
+   {zz(); name = Name;
     final Layout layout = layout(), tl = transactionLayout();                   // Layout out the stuck
     if (Based != null && Based.based()) M = Based;                              // Some usable memory has been supplied
     else M = new MemoryLayoutPA(layout, Name+"_StuckSA_Memory", Based);         // No memory has been supplied, so create some memory and then base off it to assist in testing.
@@ -58,11 +58,11 @@ abstract class StuckPA extends Test                                             
    }
 
   void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
-   {z(); M.base(Base);
+   {zz(); M.base(Base);
    }
 
   void base(MemoryLayoutPA.At Base)                                             // Set the base address of the stuck in the memory layout containing the stuck
-   {z();
+   {zz();
     P.new I()
      {void   a() {M.base(Base.setOff().result);}
       String v() {return M.baseName() + " <= " + Base.verilogLoad()+";";}       // Set the base for this based data structure
@@ -70,14 +70,14 @@ abstract class StuckPA extends Test                                             
    }
 
   void program(ProgramPA program)                                               // Set the program in which the various components should generate code
-   {z();  P = program;
+   {zz();  P = program;
     M.program(P);
     C.program(P);
     T.program(P);
    }
 
   StuckPA copyDef()                                                             // Copy a stuck definition
-   {z();
+   {zz();
     final StuckPA parent = this;
     final StuckPA  child = new StuckPA(parent.name, parent.M.based)             // Address the underlying memory layout which is not based so wil force a new based memory to be created for this copy
      {int maxSize    () {return parent.maxSize    ();}
@@ -90,7 +90,7 @@ abstract class StuckPA extends Test                                             
    }
 
   Layout layout()                                                               // Layout describing stuck
-   {z();
+   {zz();
     final Layout  l = Layout.layout();
     sKey        = l.variable ("key"        ,         bitsPerKey());
     Keys        = l.array    ("Keys"       , sKey,   maxSize());
@@ -102,7 +102,7 @@ abstract class StuckPA extends Test                                             
    }
 
   Layout transactionLayout()                                                    // Layout of temporary memory used by a transaction
-   {z();
+   {zz();
     final Layout l = Layout.layout();
          search = l.variable (   "search", bitsPerKey());
           limit = l.variable (    "limit", bitsPerSize());
@@ -125,29 +125,29 @@ abstract class StuckPA extends Test                                             
 //D1 Transactions                                                               // Transactions on the stuck
 
   void size()                                                                   // The current number of elements in the stuck
-   {z();
+   {zz();
     T.at(size).move(M.at(currentSize));
    }
 
   void setSize()                                                                // Set the current number of elements in the stuck
-   {z();
+   {zz();
     M.at(currentSize).move(T.at(size));
    }
 
   void isFull()                                                                 // Check the stuck is full
-   {z();
+   {zz();
     T.setIntInstruction(full, maxSize());
     T.at(size).greaterThanOrEqual(T.at(full), T.at(isFull));
    }
 
   void isEmpty()                                                                // Check the stuck is empty
-   {z();
+   {zz();
     T.setIntInstruction(full, 0);
     T.at(size).equal(T.at(full), T.at(isEmpty));
    }
 
   void assertNotFull()                                                          // Assert the stuck is not full
-   {z();
+   {zz();
     if (Assert)
      {P.new If(T.at(isFull))
        {void Then() {P.halt("Stuck full");}
@@ -156,7 +156,7 @@ abstract class StuckPA extends Test                                             
    }
 
   void assertNotEmpty()                                                         // Assert the stuck is not empty
-   {z();
+   {zz();
     if (Assert)
      {P.new If(T.at(isEmpty))
        {void Then() {P.halt("Empty");}
@@ -165,7 +165,7 @@ abstract class StuckPA extends Test                                             
    }
 
   void assertInNormal()                                                         // Check that the index would yield a valid element
-   {z();
+   {zz();
     if (Assert)
      {P.new I()
        {void a()
@@ -206,7 +206,7 @@ if (debug)
    }
 
   void assertInExtended()                                                       // Check that the index would yield a valid element
-   {z();
+   {zz();
     if (Assert)                                                                 // Delete fails
      {P.new I()
        {void a()
@@ -222,54 +222,54 @@ if (debug)
    }
 
   void inc()                                                                    // Increment the current size
-   {z();
+   {zz();
     assertNotFull();
     M.at(currentSize).inc();
    }
 
   void dec()                                                                    // Decrement the current size
-   {z();
+   {zz();
     assertNotEmpty();
     M.at(currentSize).dec();
    }
 
   void clear()                                                                  // Zero the current size to clear the stuck
-   {z();
+   {zz();
     M.setIntInstruction(currentSize, 0);
     sizeFullEmpty();
    }
 
   MemoryLayoutPA.At key()                                                       // Refer to key
-   {z();
+   {zz();
     return M.at(sKey, T.at(index));
    }
 
   MemoryLayoutPA.At data()                                                      // Refer to data
-   {z(); return M.at(sData, T.at(index));
+   {zz(); return M.at(sData, T.at(index));
    }
 
   void moveKey()                                                                // Move a key from the stuck to this transaction
-   {z(); T.at(tKey ).move(key ());
+   {zz(); T.at(tKey ).move(key ());
    }
 
   void moveData()                                                               // Move a key from the stuck to this transaction
-   {z(); T.at(tData).move(data());
+   {zz(); T.at(tData).move(data());
    }
 
   void setKey  ()                                                               // Set the indexed key
-   {z(); key().move(T.at(tKey));
+   {zz(); key().move(T.at(tKey));
    }
 
   void setData ()                                                               // Set the indexed data
-   {z(); data().move(T.at(tData));
+   {zz(); data().move(T.at(tData));
    }
 
-  void setKeyData()    {z(); setKey(); setData();}                              // Set a key, data element in the stuck
+  void setKeyData()    {zz(); setKey(); setData();}                              // Set a key, data element in the stuck
   void sizeFullEmpty() {z(); size(); isFull(); isEmpty();}                      // Status
-  void setFound()      {z(); T.setIntInstruction(found, 1);}                    // Set found to true
+  void setFound()      {zz(); T.setIntInstruction(found, 1);}                    // Set found to true
 
   void push()                                                                   // Push an element onto the stuck
-   {z(); action = "push";
+   {zz(); action = "push";
     size();
     isFull();
     assertNotFull();
@@ -281,7 +281,7 @@ if (debug)
    }
 
   void unshift()                                                                // Unshift an element onto the stuck
-   {z(); action = "unshift";
+   {zz(); action = "unshift";
     size();
     isFull();
     assertNotFull();
@@ -296,7 +296,7 @@ if (debug)
    }
 
   void pop()                                                                    // Pop an element from the stuck
-   {z(); action = "pop";
+   {zz(); action = "pop";
     size();
     isEmpty();
     assertNotEmpty();
@@ -309,7 +309,7 @@ if (debug)
    }
 
   void shift()                                                                  // Shift an element from the stuck
-   {z(); action = "shift";
+   {zz(); action = "shift";
     size();
     isEmpty();
     assertNotEmpty();
@@ -324,7 +324,7 @@ if (debug)
    }
 
   void elementAt()                                                              // Look up key and data associated with the index in the stuck at the specified base offset in memory
-   {z(); action = "elementAt";
+   {zz(); action = "elementAt";
     size();
     assertInNormal();
     setFound();
@@ -333,7 +333,7 @@ if (debug)
    }
 
   void setElementAt()                                                           // Set an element either in range or one above the current range
-   {z(); action = "setElementAt";
+   {zz(); action = "setElementAt";
     size();
     T.at(index).equal(T.at(size), T.at(equal));                                 // Extended range
     P.new If(T.at(equal))
@@ -350,7 +350,7 @@ if (debug)
    }
 
   void insertElementAt()                                                        // Insert an element at the indicated location shifting all the remaining elements up one
-   {z(); action = "insertElementAt";
+   {zz(); action = "insertElementAt";
 
     size();
     isFull();
@@ -364,7 +364,7 @@ if (debug)
    }
 
   void removeElementAt()                                                        // Remove an element at the indicated location from the stuck
-   {z(); action = "removeElementAt";
+   {zz(); action = "removeElementAt";
     size();
     assertInNormal();
     setFound();
@@ -378,7 +378,7 @@ if (debug)
    }
 
   void firstElement()                                                           // First element
-   {z(); action = "firstElement";
+   {zz(); action = "firstElement";
     size();
     isEmpty();
     assertNotEmpty();
@@ -389,7 +389,7 @@ if (debug)
    }
 
   void lastElement()                                                            // Last element
-   {z(); action = "lastElement";
+   {zz(); action = "lastElement";
     size();
     isEmpty();
     assertNotEmpty();
@@ -401,7 +401,7 @@ if (debug)
    }
 
   void zeroLastKey()                                                            // Save last key in the transaction buffer and zero it in the stuck
-   {z(); action = "zeroLastKey";
+   {zz(); action = "zeroLastKey";
     size();
     isEmpty();
     assertNotEmpty();
@@ -413,7 +413,7 @@ if (debug)
    }
 
   void setLastKey()                                                             // Set the last active key in the stuck from the one in the transaction buffer
-   {z(); action = "setLastKey";
+   {zz(); action = "setLastKey";
     size();
     isEmpty();
     assertNotEmpty();
@@ -424,7 +424,7 @@ if (debug)
    }
 
   void search()                                                                 // Search for an element within all elements of the stuck
-   {z(); action = "search";
+   {zz(); action = "search";
     size();
 
     P.new If(T.at(limit))                                                       // Better if we had a separate routine for search a branch versus a leaf
@@ -458,7 +458,7 @@ if (debug)
    }
 
   void searchFirstGreaterThanOrEqual()                                          // Search for first greater than or equal
-   {z(); action = "searchFirstGreaterThanOrEqual";
+   {zz(); action = "searchFirstGreaterThanOrEqual";
     size();
 
     P.new If(T.at(limit))                                                       // Better if we had a separate routine for search a branch versus a leaf
@@ -505,14 +505,14 @@ if (debug)
    }
 
   void copy(StuckPA Source)                                                     // Copy the source stuck into the target replacing the target completely
-   {z(); action = "copy";
+   {zz(); action = "copy";
     checkSameProgram(Source);                                                   // Confirm that we are writing into the same program
     final StuckPA Target = this;
     Target.M.copy(Source.M);                                                    // Copy the source into the target
    }
 
   void concatenate(StuckPA Source)                                              // Concatenate two stucks placing the source at the end of the target while not modifying the source.
-   {z(); action = "concatenate";
+   {zz(); action = "concatenate";
     checkSameProgram(Source);                                                   // Confirm that we are writing into the same program
     final StuckPA Target = this;
     size(); Source.size();                                                      // Get the size of the stucks
@@ -538,7 +538,7 @@ if (debug)
    }
 
   void prepend(StuckPA Source)                                                  // Concatenate two stucks placing the source at the start of the target while (apparently) not modifying the target
-   {z(); action = "prepend";
+   {zz(); action = "prepend";
     checkSameProgram(Source);                                                   // Confirm that we are writing into the same program
     final StuckPA Target = this;
     size(); Source.size();                                                      // Get the size of the stucks
@@ -562,7 +562,7 @@ if (debug)
    }
 
   void split(StuckPA Low, StuckPA High)                                         // Split a full stuck into two halves
-   {z(); action = "split";
+   {zz(); action = "split";
     final int H = Low.maxSize()>>1;                                             // Should check theat Low, High, Source all have the same shape
     final StuckPA Source = this;
     checkSameProgram(Low); checkSameProgram(High);                              // Confirm that we are writing into the same program
@@ -586,7 +586,7 @@ if (debug)
    }
 
   void splitLow(StuckPA Low)                                                    // Split out the lower half of a full stuck
-   {z(); action = "splitLow";
+   {zz(); action = "splitLow";
     final int H = Low.maxSize()>>1;                                             // Should check theat Low, High, Source all have the same shape
     final StuckPA Source = this;
     checkSameProgram(Low);                                                      // Confirm that we are writing into the same program
@@ -607,7 +607,7 @@ if (debug)
    }
 
   void splitHigh(StuckPA High)                                                  // Split out the upper half of a full stuck
-   {z(); action = "splitHigh";
+   {zz(); action = "splitHigh";
     final int H = High.maxSize()>>1;                                            // Should check theat Low, High, Source all have the same shape
     final StuckPA Source = this;
     checkSameProgram(High);                                                     // Confirm that we are writing into the same program
@@ -660,7 +660,7 @@ if (debug)
 //D0 Testing                                                                    // Test the stuck
 
   static StuckPA stuckPA()                                                      // Create a sample stuck
-   {z();
+   {zz();
     return  new StuckPA("original")
      {int maxSize     () {return  8;}
       int bitsPerKey  () {return 16;}
@@ -1333,7 +1333,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
    }
 
   static void test_copy()                                                       // Copy one stuck into another
-   {z();
+   {zz();
 
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
@@ -1371,7 +1371,7 @@ StuckSML(maxSize:4 size:4)
    }
 
   static void test_copy_keys_and_data()                                         // Copy part of one stuck into another
-   {z();
+   {zz();
     final StuckPA    s = new StuckPA("source")
      {int maxSize     () {return  8;}
       int bitsPerKey  () {return 16;}
@@ -1440,7 +1440,7 @@ StuckSML(maxSize:8 size:5)
    }
 
   static void test_concatenate()
-   {z();
+   {zz();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
     final StuckPA s = new StuckPA("source", m)
      {int maxSize     () {return  8;}
@@ -1506,7 +1506,7 @@ StuckSML(maxSize:8 size:8)
    }
 
   static void test_prepend()
-   {z();
+   {zz();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
@@ -1574,7 +1574,7 @@ StuckSML(maxSize:8 size:8)
    }
 
   static void test_split()
-   {z();
+   {zz();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
@@ -1634,7 +1634,7 @@ StuckSML(maxSize:5 size:2)
    }
 
   static void test_split_low_2()
-   {z();
+   {zz();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
@@ -1675,7 +1675,7 @@ StuckSML(maxSize:2 size:1)
    }
 
   static void test_split_low_even()
-   {z();
+   {zz();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
@@ -1722,7 +1722,7 @@ StuckSML(maxSize:4 size:2)
    }
 
   static void test_split_low_odd()
-   {z();
+   {zz();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
@@ -1772,7 +1772,7 @@ StuckSML(maxSize:5 size:3)
    }
 
   static void test_split_high()
-   {z();
+   {zz();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
@@ -1822,7 +1822,7 @@ StuckSML(maxSize:5 size:2)
    }
 
   static void test_zero_last_key()
-   {z();
+   {zz();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
@@ -1865,7 +1865,7 @@ StuckSML(maxSize:4 size:4)
    }
 
   static void test_set_last_key()
-   {z();
+   {zz();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
