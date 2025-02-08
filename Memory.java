@@ -17,7 +17,7 @@ class Memory extends Test                                                       
    }
 
   static Memory memory(String Name, int Size)                                   // Create memory
-   {zz(); return new Memory(Name, Size);
+   {z(); return new Memory(Name, Size);
    }
 
   public String toString()                                                      // Print memory in hex

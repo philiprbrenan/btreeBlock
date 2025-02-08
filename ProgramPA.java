@@ -21,10 +21,10 @@ class ProgramPA extends Test                                                    
   static int         numbers = 0;                                               // Program numbers
   final  int          number = ++numbers;                                       // Program number
 
-  ProgramPA() {}                                                                // Create a program that instructions can be added to and then executed
+  ProgramPA() {z();}                                                            // Create a program that instructions can be added to and then executed
 
   ProgramPA(ProgramPA Program)                                                  // Copy a program
-   {zz();
+   {z();
     for(Stack<I> i : Program.code)   code  .push(i);
     for(Label    l : Program.labels) labels.push(l);
    }
@@ -223,7 +223,7 @@ class ProgramPA extends Test                                                    
     final ProgramPA P = ProgramPA.this;
 
     Loop(int Limit, int Width)
-     {zz();
+     {z();
       if (Limit < 1) stop("Loop limit must be 1 or more, not:", Limit);
       layout    = Layout.layout();
       index     = layout.variable ("index",   Width);
@@ -255,7 +255,7 @@ class ProgramPA extends Test                                                    
     final ProgramPA P = ProgramPA.this;
 
     Pool(int Limit, int Width)
-     {zz();
+     {z();
       if (Limit < 1) stop("Pool start index must be 1 or more, not:", Limit);
       layout    = Layout.layout();
       index     = layout.variable ("index",   Width);

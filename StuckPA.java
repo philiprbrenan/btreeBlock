@@ -43,7 +43,7 @@ abstract class StuckPA extends Test                                             
 //D1 Construction                                                               // Create a stuck
 
   StuckPA(String Name)                                                          // Create the stuck with a maximum number of the specified elements
-   {this(Name, null); zz();
+   {this(Name, null); z();
    }
 
   StuckPA(String Name, MemoryLayoutPA Based)                                    // Create the stuck with a maximum number of the specified elements
@@ -58,7 +58,7 @@ abstract class StuckPA extends Test                                             
    }
 
   void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
-   {zz(); M.base(Base);
+   {z(); M.base(Base);
    }
 
   void base(MemoryLayoutPA.At Base)                                             // Set the base address of the stuck in the memory layout containing the stuck
@@ -77,7 +77,7 @@ abstract class StuckPA extends Test                                             
    }
 
   StuckPA copyDef()                                                             // Copy a stuck definition
-   {zz();
+   {z();
     final StuckPA parent = this;
     final StuckPA  child = new StuckPA(parent.name, parent.M.based)             // Address the underlying memory layout which is not based so wil force a new based memory to be created for this copy
      {int maxSize    () {return parent.maxSize    ();}
@@ -181,22 +181,19 @@ abstract class StuckPA extends Test                                             
    }
 
   void copyKeys(StuckPA source)                                                 // Copy the specified number of elements from the source array of keys at the specified index into the target array of keys at the specified target index
-   {P.new I()
+   {zz();
+    P.new I()
      {void   a() {T.at(copyBits).setInt(T.at(copyCount).getInt()*bitsPerKey());}
       String v() {return T.at(copyBits).verilogLoad()+ " <= " + T.at(copyCount).verilogLoad() + "*" + bitsPerKey()+";" + traceComment();}
      };
     final MemoryLayoutPA.At ti = T.at(index);
     final MemoryLayoutPA.At si = source.T.at(source.index);
-if (debug)
- {source.M.debug = true;
-  P.new I() {void a() {say("DDDDD", si.getInt(), source.M.at(source.sKey, si).getInt(), source);}};
-  source.M.debug = false;
- }
     M.at(sKey, ti).copy(source.M.at(source.sKey, si), T.at(copyBits));
    }
 
   void copyData(StuckPA source)                                                 // Copy the specified number of elements from the source array of data at the specified index into the target array of data at the specified target index
-   {P.new I()
+   {zz();
+    P.new I()
      {void   a() {T.at(copyBits).setInt(T.at(copyCount).getInt()*bitsPerData());}
       String v() {return T.at(copyBits).verilogLoad()+ " <= " + T.at(copyCount).verilogLoad() + "*" + bitsPerData()+";";}
      };
@@ -607,7 +604,7 @@ if (debug)
    }
 
   void splitHigh(StuckPA High)                                                  // Split out the upper half of a full stuck
-   {zz(); action = "splitHigh";
+   {z(); action = "splitHigh";
     final int H = High.maxSize()>>1;                                            // Should check theat Low, High, Source all have the same shape
     final StuckPA Source = this;
     checkSameProgram(High);                                                     // Confirm that we are writing into the same program
@@ -660,7 +657,7 @@ if (debug)
 //D0 Testing                                                                    // Test the stuck
 
   static StuckPA stuckPA()                                                      // Create a sample stuck
-   {zz();
+   {z();
     return  new StuckPA("original")
      {int maxSize     () {return  8;}
       int bitsPerKey  () {return 16;}
@@ -1333,7 +1330,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
    }
 
   static void test_copy()                                                       // Copy one stuck into another
-   {zz();
+   {z();
 
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
@@ -1371,7 +1368,7 @@ StuckSML(maxSize:4 size:4)
    }
 
   static void test_copy_keys_and_data()                                         // Copy part of one stuck into another
-   {zz();
+   {z();
     final StuckPA    s = new StuckPA("source")
      {int maxSize     () {return  8;}
       int bitsPerKey  () {return 16;}
@@ -1440,7 +1437,7 @@ StuckSML(maxSize:8 size:5)
    }
 
   static void test_concatenate()
-   {zz();
+   {z();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
     final StuckPA s = new StuckPA("source", m)
      {int maxSize     () {return  8;}
@@ -1506,7 +1503,7 @@ StuckSML(maxSize:8 size:8)
    }
 
   static void test_prepend()
-   {zz();
+   {z();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
@@ -1574,7 +1571,7 @@ StuckSML(maxSize:8 size:8)
    }
 
   static void test_split()
-   {zz();
+   {z();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
@@ -1634,7 +1631,7 @@ StuckSML(maxSize:5 size:2)
    }
 
   static void test_split_low_2()
-   {zz();
+   {z();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
@@ -1675,7 +1672,7 @@ StuckSML(maxSize:2 size:1)
    }
 
   static void test_split_low_even()
-   {zz();
+   {z();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
@@ -1722,7 +1719,7 @@ StuckSML(maxSize:4 size:2)
    }
 
   static void test_split_low_odd()
-   {zz();
+   {z();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
@@ -1772,7 +1769,7 @@ StuckSML(maxSize:5 size:3)
    }
 
   static void test_split_high()
-   {zz();
+   {z();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
@@ -1822,7 +1819,7 @@ StuckSML(maxSize:5 size:2)
    }
 
   static void test_zero_last_key()
-   {zz();
+   {z();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
@@ -1865,7 +1862,7 @@ StuckSML(maxSize:4 size:4)
    }
 
   static void test_set_last_key()
-   {zz();
+   {z();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
 
     final StuckPA s = new StuckPA("source", m)
