@@ -91,20 +91,20 @@ reg[11: 0] copyLength_leaf_3_StuckSA_Memory_Based_32_base_offset;
               6 : begin T_10[ 245/*node_isLow  */ +: 5] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
               7 : begin T_10[ 139/*branchBase  */ +: 11] <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
               8 : begin branch_0_StuckSA_Memory_Based_11_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-              9 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             10 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+              9 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             10 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              11 : begin T_10[ 137/*mergeable   */ +: 1] <= T_10[ 154/*branchSize  */ +: 4] >= T_10[ 212/*two */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              12 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 14; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              13 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              14 : begin step = 158; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              15 : begin branch_1_StuckSA_Memory_Based_14_base_offset <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             16 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             16 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              17 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:1512:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1495:<init>
@@ -117,11 +117,11 @@ reg[11: 0] copyLength_leaf_3_StuckSA_Memory_Based_32_base_offset;
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:1512:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1495:<init>
@@ -135,14 +135,14 @@ reg[11: 0] copyLength_leaf_3_StuckSA_Memory_Based_32_base_offset;
   BtreePA.java:3786:main
  */
                 end
-             18 : begin T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             19 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             18 : begin T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             19 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              20 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:1513:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1495:<init>
@@ -155,11 +155,11 @@ reg[11: 0] copyLength_leaf_3_StuckSA_Memory_Based_32_base_offset;
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:1513:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1495:<init>
@@ -173,16 +173,16 @@ reg[11: 0] copyLength_leaf_3_StuckSA_Memory_Based_32_base_offset;
   BtreePA.java:3786:main
  */
                 end
-             21 : begin T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             21 : begin T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              22 : begin T_10[ 250/*node_balance*/ +: 5] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              23 : begin branch_0_StuckSA_Memory_Based_11_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             24 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             24 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              25 : begin
-                                  branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1516:code
   ProgramPA.java:0220:<init>
@@ -196,11 +196,11 @@ reg[11: 0] copyLength_leaf_3_StuckSA_Memory_Based_32_base_offset;
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1516:code
   ProgramPA.java:0220:<init>
@@ -215,39 +215,39 @@ reg[11: 0] copyLength_leaf_3_StuckSA_Memory_Based_32_base_offset;
   BtreePA.java:3786:main
  */
                 end
-             26 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             27 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             26 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             27 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              28 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 90; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              29 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              30 : begin leaf_0_StuckSA_Memory_Based_23_base_offset <=   11/*leaf*/ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             31 : begin leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             32 : begin T_10[ 150/*leafSize*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             31 : begin leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             32 : begin T_10[ 150/*leafSize*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              33 : begin T_10[ 114/*nl  */ +: 4] <= T_10[ 150/*leafSize*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              34 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 127/*r   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              35 : begin leaf_0_StuckSA_Memory_Based_23_base_offset <=   11/*leaf*/ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             36 : begin leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             37 : begin T_10[ 150/*leafSize*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             36 : begin leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             37 : begin T_10[ 150/*leafSize*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              38 : begin T_10[ 118/*nr  */ +: 4] <= T_10[ 150/*leafSize*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              39 : begin T_10[ 137/*mergeable   */ +: 1] <= (T_10[ 114/*nl  */ +: 4] + T_10[ 118/*nr  */ +: 4] <= 2) ? 'b1 : 'b0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              40 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 88; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              41 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             42 : begin branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             43 : begin branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4] <= 4; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             44 : begin branch_1_StuckSA_Transaction_16[  12/*isFull  */ +: 1] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] >= branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             45 : begin branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             46 : begin branch_1_StuckSA_Transaction_16[  13/*isEmpty */ +: 1] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] == branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             42 : begin branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             43 : begin branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4] <= 4; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             44 : begin branch_1_StuckSA_Transaction_16[   0/*isFull  */ +: 1] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] >= branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             45 : begin branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             46 : begin branch_1_StuckSA_Transaction_16[   1/*isEmpty */ +: 1] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] == branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              47 : begin T_10[ 245/*node_isLow  */ +: 5] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              48 : begin leaf_1_StuckSA_Memory_Based_26_base_offset <=   11/*leaf*/ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              49 : begin leaf_2_StuckSA_Memory_Based_29_base_offset <=   11/*leaf*/ + T_10[ 122/*l   */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              50 : begin leaf_3_StuckSA_Memory_Based_32_base_offset <=   11/*leaf*/ + T_10[ 127/*r   */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             51 : begin leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             52 : begin leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             53 : begin leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             54 : begin leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] <= leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             55 : begin leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             56 : begin leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12] <= leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0534:concatenate
+             51 : begin leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             52 : begin leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             53 : begin leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             54 : begin leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] <= leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             55 : begin leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             56 : begin leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12] <= leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0545:concatenate
   BtreePA.java:1543:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1537:<init>
@@ -267,8 +267,8 @@ reg[11: 0] copyLength_leaf_3_StuckSA_Memory_Based_32_base_offset;
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              57 : begin copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12];
-index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8;
-index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8;
+index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8;
+index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset >= 4096) begin
    M_9[index_leaf_1_StuckSA_Memory_Based_26_base_offset +: 4096] <= M_9[index_leaf_2_StuckSA_Memory_Based_29_base_offset +: 4096];
    copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset - 4096;
@@ -350,8 +350,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              58 : begin leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12] <= leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4]*8; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              59 : begin copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12];
-index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8;
-index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8;
+index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8;
+index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset >= 4096) begin
    M_9[index_leaf_1_StuckSA_Memory_Based_26_base_offset +: 4096] <= M_9[index_leaf_2_StuckSA_Memory_Based_29_base_offset +: 4096];
    copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset - 4096;
@@ -431,16 +431,16 @@ if (copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset >= 1) begin
    index_leaf_1_StuckSA_Memory_Based_26_base_offset = index_leaf_1_StuckSA_Memory_Based_26_base_offset + 1;
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             60 : begin leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4] <= leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4] +  leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             61 : begin M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4] <= leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             62 : begin leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             63 : begin leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             64 : begin leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             65 : begin leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] <= leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             66 : begin leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4] <= leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             67 : begin leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12] <= leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0534:concatenate
+             60 : begin leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4] <= leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4] +  leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             61 : begin M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4] <= leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             62 : begin leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             63 : begin leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             64 : begin leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             65 : begin leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] <= leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             66 : begin leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4] <= leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             67 : begin leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12] <= leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0545:concatenate
   BtreePA.java:1544:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1537:<init>
@@ -460,8 +460,8 @@ end
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              68 : begin copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12];
-index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8;
-index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8;
+index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8;
+index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset >= 4096) begin
    M_9[index_leaf_1_StuckSA_Memory_Based_26_base_offset +: 4096] <= M_9[index_leaf_3_StuckSA_Memory_Based_32_base_offset +: 4096];
    copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset - 4096;
@@ -543,8 +543,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              69 : begin leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12] <= leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4]*8; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              70 : begin copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12];
-index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8;
-index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8;
+index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8;
+index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset >= 4096) begin
    M_9[index_leaf_1_StuckSA_Memory_Based_26_base_offset +: 4096] <= M_9[index_leaf_3_StuckSA_Memory_Based_32_base_offset +: 4096];
    copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset - 4096;
@@ -624,8 +624,8 @@ if (copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset >= 1) begin
    index_leaf_1_StuckSA_Memory_Based_26_base_offset = index_leaf_1_StuckSA_Memory_Based_26_base_offset + 1;
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             71 : begin leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4] <= leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4] +  leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             72 : begin M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4] <= leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             71 : begin leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4] <= leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4] +  leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             72 : begin M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4] <= leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              73 : begin T_10[ 225/*node_setBranch  */ +: 5] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              74 : begin M_9[   5/*isLeaf  */ + T_10[ 225/*node_setBranch  */ +: 5] * 62 +: 1] <= 1'b1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              75 : begin T_10[ 240/*node_erase  */ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
@@ -647,26 +647,26 @@ end
              91 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              92 : begin T_10[ 139/*branchBase  */ +: 11] <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              93 : begin branch_0_StuckSA_Memory_Based_11_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             94 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-             95 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             94 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+             95 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              96 : begin T_10[ 114/*nl  */ +: 4] <= T_10[ 154/*branchSize  */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              97 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 127/*r   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              98 : begin T_10[ 139/*branchBase  */ +: 11] <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
              99 : begin branch_0_StuckSA_Memory_Based_11_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            100 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            101 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            100 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            101 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             102 : begin T_10[ 118/*nr  */ +: 4] <= T_10[ 154/*branchSize  */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             103 : begin T_10[ 137/*mergeable   */ +: 1] <= (T_10[ 114/*nl  */ +: 4]+ 1 +T_10[ 118/*nr  */ +: 4] <= 3) ? 'b1 : 'b0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             104 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 157; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             105 : begin branch_2_StuckSA_Memory_Based_17_base_offset <=   11/*branch  */ + T_10[ 122/*l   */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             106 : begin branch_3_StuckSA_Memory_Based_20_base_offset <=   11/*branch  */ + T_10[ 127/*r   */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            107 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            107 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             108 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:1576:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1573:<init>
@@ -685,11 +685,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:1576:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1573:<init>
@@ -709,21 +709,21 @@ end
   BtreePA.java:3786:main
  */
                 end
-            109 : begin T_10[  70/*parentKey   */ +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            109 : begin T_10[  70/*parentKey   */ +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             110 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            111 : begin branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            112 : begin branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4] <= 4; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            113 : begin branch_1_StuckSA_Transaction_16[  12/*isFull  */ +: 1] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] >= branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            114 : begin branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            115 : begin branch_1_StuckSA_Transaction_16[  13/*isEmpty */ +: 1] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] == branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            116 : begin branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            117 : begin branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            118 : begin branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            119 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            120 : begin branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            121 : begin branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12] <= branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0534:concatenate
+            111 : begin branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            112 : begin branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4] <= 4; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            113 : begin branch_1_StuckSA_Transaction_16[   0/*isFull  */ +: 1] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] >= branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            114 : begin branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            115 : begin branch_1_StuckSA_Transaction_16[   1/*isEmpty */ +: 1] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] == branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            116 : begin branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            117 : begin branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            118 : begin branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            119 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            120 : begin branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            121 : begin branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12] <= branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0545:concatenate
   BtreePA.java:1580:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1573:<init>
@@ -743,8 +743,8 @@ end
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             122 : begin copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12];
-index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8;
-index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8;
+index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8;
+index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8;
 if (copyLength_branch_1_StuckSA_Memory_Based_14_base_offset >= 4096) begin
    M_9[index_branch_1_StuckSA_Memory_Based_14_base_offset +: 4096] <= M_9[index_branch_2_StuckSA_Memory_Based_17_base_offset +: 4096];
    copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = copyLength_branch_1_StuckSA_Memory_Based_14_base_offset - 4096;
@@ -826,8 +826,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             123 : begin branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12] <= branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4]*5; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             124 : begin copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12];
-index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5;
-index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5;
+index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5;
+index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5;
 if (copyLength_branch_1_StuckSA_Memory_Based_14_base_offset >= 4096) begin
    M_9[index_branch_1_StuckSA_Memory_Based_14_base_offset +: 4096] <= M_9[index_branch_2_StuckSA_Memory_Based_17_base_offset +: 4096];
    copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = copyLength_branch_1_StuckSA_Memory_Based_14_base_offset - 4096;
@@ -907,19 +907,19 @@ if (copyLength_branch_1_StuckSA_Memory_Based_14_base_offset >= 1) begin
    index_branch_1_StuckSA_Memory_Based_14_base_offset = index_branch_1_StuckSA_Memory_Based_14_base_offset + 1;
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            125 : begin branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] +  branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            126 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            127 : begin branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= T_10[  70/*parentKey   */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            128 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            129 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            130 : begin branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            131 : begin branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            132 : begin branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            133 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            134 : begin branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4] <= branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            135 : begin branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12] <= branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0534:concatenate
+            125 : begin branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] +  branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            126 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            127 : begin branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= T_10[  70/*parentKey   */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            128 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            129 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            130 : begin branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            131 : begin branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            132 : begin branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            133 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            134 : begin branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4] <= branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            135 : begin branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12] <= branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0545:concatenate
   BtreePA.java:1584:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1573:<init>
@@ -939,8 +939,8 @@ end
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             136 : begin copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12];
-index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 8;
-index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8;
+index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 8;
+index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8;
 if (copyLength_branch_1_StuckSA_Memory_Based_14_base_offset >= 4096) begin
    M_9[index_branch_1_StuckSA_Memory_Based_14_base_offset +: 4096] <= M_9[index_branch_3_StuckSA_Memory_Based_20_base_offset +: 4096];
    copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = copyLength_branch_1_StuckSA_Memory_Based_14_base_offset - 4096;
@@ -1022,8 +1022,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             137 : begin branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12] <= branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4]*5; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             138 : begin copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12];
-index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 5;
-index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5;
+index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 5;
+index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5;
 if (copyLength_branch_1_StuckSA_Memory_Based_14_base_offset >= 4096) begin
    M_9[index_branch_1_StuckSA_Memory_Based_14_base_offset +: 4096] <= M_9[index_branch_3_StuckSA_Memory_Based_20_base_offset +: 4096];
    copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = copyLength_branch_1_StuckSA_Memory_Based_14_base_offset - 4096;
@@ -1103,11 +1103,11 @@ if (copyLength_branch_1_StuckSA_Memory_Based_14_base_offset >= 1) begin
    index_branch_1_StuckSA_Memory_Based_14_base_offset = index_branch_1_StuckSA_Memory_Based_14_base_offset + 1;
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            139 : begin branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] +  branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            140 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            141 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            142 : begin branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            143 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            139 : begin branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] +  branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            140 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            141 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            142 : begin branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            143 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             144 : begin T_10[ 240/*node_erase  */ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             145 : begin if (T_10[ 240/*node_erase  */ +: 5] > 0) step = 146; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             146 : begin stopped <= 1; /* Cannot free root */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
@@ -1132,31 +1132,31 @@ end
             165 : begin T_10[  21/*search  */ +: 8] <= T_10[ 163/*Key */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             166 : begin T_10[ 250/*node_balance*/ +: 5] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             167 : begin leaf_0_StuckSA_Memory_Based_23_base_offset <=   11/*leaf*/ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            168 : begin leaf_0_StuckSA_Transaction_25[   0/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            169 : begin leaf_0_StuckSA_Transaction_25[   8/*limit   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            170 : begin leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            171 : begin if (leaf_0_StuckSA_Transaction_25[   8/*limit   */ +: 4] == 0) step = 172; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            172 : begin leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            173 : begin leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1] <= 0;leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            174 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            175 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] > 0) step = 189; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            176 : begin leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            177 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            178 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] == 0) step = 181; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            179 : begin leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            180 : begin leaf_0_StuckSA_Transaction_25[  27/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            168 : begin leaf_0_StuckSA_Transaction_25[   4/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            169 : begin leaf_0_StuckSA_Transaction_25[  28/*limit   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            170 : begin leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            171 : begin if (leaf_0_StuckSA_Transaction_25[  28/*limit   */ +: 4] == 0) step = 172; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            172 : begin leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            173 : begin leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1] <= 0;leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            174 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            175 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] > 0) step = 189; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            176 : begin leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            177 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            178 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] == 0) step = 181; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            179 : begin leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            180 : begin leaf_0_StuckSA_Transaction_25[  20/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             181 : begin step = 189; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            182 : begin leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            183 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            184 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] > 0) step = 189; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            185 : begin leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            186 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            187 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] == 0) step = 189; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            188 : begin leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            189 : begin leaf_0_StuckSA_Transaction_25[  27/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            190 : begin T_10[  29/*found   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            182 : begin leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            183 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            184 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] > 0) step = 189; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            185 : begin leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            186 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            187 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] == 0) step = 189; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            188 : begin leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            189 : begin leaf_0_StuckSA_Transaction_25[  20/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            190 : begin T_10[  29/*found   */ +: 1] <= leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             191 : begin
-                                  T_10[ 110/*index   */ +: 4] <= leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[ 110/*index   */ +: 4] <= leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0822:findEqualInLeaf
   BtreePA.java:1946:Then
@@ -1181,7 +1181,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[  38/*data*/ +: 8] <= leaf_0_StuckSA_Transaction_25[  27/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                T_10[  38/*data*/ +: 8] <= leaf_0_StuckSA_Transaction_25[  20/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0824:findEqualInLeaf
   BtreePA.java:1946:Then
@@ -1217,62 +1217,62 @@ end
             199 : begin T_10[  21/*search  */ +: 8] <= T_10[ 163/*Key */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             200 : begin T_10[ 250/*node_balance*/ +: 5] <= T_10[ 189/*parent  */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             201 : begin branch_0_StuckSA_Memory_Based_11_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            202 : begin branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            203 : begin branch_0_StuckSA_Transaction_13[   8/*limit   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            204 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            205 : begin if (branch_0_StuckSA_Transaction_13[   8/*limit   */ +: 4] == 0) step = 206; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            206 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            207 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 0;branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            208 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            209 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 245; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            210 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            211 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            212 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 216; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            213 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            214 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            215 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            202 : begin branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            203 : begin branch_0_StuckSA_Transaction_13[  25/*limit   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            204 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            205 : begin if (branch_0_StuckSA_Transaction_13[  25/*limit   */ +: 4] == 0) step = 206; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            206 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            207 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 0;branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            208 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            209 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 245; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            210 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            211 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            212 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 216; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            213 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            214 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            215 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             216 : begin step = 245; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            217 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            218 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            219 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 245; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            220 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            221 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            222 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 226; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            223 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            224 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            225 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            217 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            218 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            219 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 245; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            220 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            221 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            222 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 226; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            223 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            224 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            225 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             226 : begin step = 245; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            227 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 2; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            228 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            229 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 245; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            230 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            231 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            232 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 236; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            233 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            234 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            235 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            227 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 2; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            228 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            229 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 245; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            230 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            231 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            232 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 236; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            233 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            234 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            235 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             236 : begin step = 245; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            237 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 3; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            238 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            239 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 245; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            240 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            241 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            242 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 245; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            243 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            244 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            245 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            246 : begin T_10[  29/*found   */ +: 1] <= branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            247 : begin T_10[  12/*first   */ +: 4] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            237 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 3; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            238 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            239 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 245; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            240 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            241 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            242 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 245; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            243 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            244 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            245 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            246 : begin T_10[  29/*found   */ +: 1] <= branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            247 : begin T_10[  12/*first   */ +: 4] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             248 : begin if (T_10[  29/*found   */ +: 1] == 0) step = 250; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            249 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            249 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             250 : begin step = 253; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            251 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            251 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             252 : begin
-                                  branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:0881:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:0876:<init>
@@ -1299,11 +1299,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:0881:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:0876:<init>
@@ -1331,7 +1331,7 @@ end
   BtreePA.java:3786:main
  */
                 end
-            253 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            253 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             254 : begin
                                   T_10[ 194/*child   */ +: 5] <= T_10[  16/*next*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
@@ -1445,31 +1445,31 @@ end
  */
                 end
             258 : begin leaf_0_StuckSA_Memory_Based_23_base_offset <=   11/*leaf*/ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            259 : begin leaf_0_StuckSA_Transaction_25[   0/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            260 : begin leaf_0_StuckSA_Transaction_25[   8/*limit   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            261 : begin leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            262 : begin if (leaf_0_StuckSA_Transaction_25[   8/*limit   */ +: 4] == 0) step = 263; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            263 : begin leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            264 : begin leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1] <= 0;leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            265 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            266 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] > 0) step = 280; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            267 : begin leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            268 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            269 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] == 0) step = 272; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            270 : begin leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            271 : begin leaf_0_StuckSA_Transaction_25[  27/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            259 : begin leaf_0_StuckSA_Transaction_25[   4/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            260 : begin leaf_0_StuckSA_Transaction_25[  28/*limit   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            261 : begin leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            262 : begin if (leaf_0_StuckSA_Transaction_25[  28/*limit   */ +: 4] == 0) step = 263; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            263 : begin leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            264 : begin leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1] <= 0;leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            265 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            266 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] > 0) step = 280; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            267 : begin leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            268 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            269 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] == 0) step = 272; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            270 : begin leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            271 : begin leaf_0_StuckSA_Transaction_25[  20/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             272 : begin step = 280; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            273 : begin leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            274 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            275 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] > 0) step = 280; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            276 : begin leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            277 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            278 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] == 0) step = 280; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            279 : begin leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            280 : begin leaf_0_StuckSA_Transaction_25[  27/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            281 : begin T_10[  29/*found   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            273 : begin leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            274 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            275 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] > 0) step = 280; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            276 : begin leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            277 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            278 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] == 0) step = 280; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            279 : begin leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            280 : begin leaf_0_StuckSA_Transaction_25[  20/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            281 : begin T_10[  29/*found   */ +: 1] <= leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             282 : begin
-                                  T_10[ 110/*index   */ +: 4] <= leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[ 110/*index   */ +: 4] <= leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0822:findEqualInLeaf
   BtreePA.java:1975:Then
@@ -1497,7 +1497,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[  38/*data*/ +: 8] <= leaf_0_StuckSA_Transaction_25[  27/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                T_10[  38/*data*/ +: 8] <= leaf_0_StuckSA_Transaction_25[  20/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0824:findEqualInLeaf
   BtreePA.java:1975:Then
@@ -1532,13 +1532,13 @@ end
             286 : begin step = 195; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             287 : begin if (T_10[  29/*found   */ +: 1] == 0) step = 297; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             288 : begin leaf_1_StuckSA_Memory_Based_26_base_offset <=   11/*leaf*/ + T_10[ 179/*find*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            289 : begin leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            289 : begin leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             290 : begin
-                                  leaf_1_StuckSA_Transaction_28[  19/*key */ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  leaf_1_StuckSA_Transaction_28[  12/*key */ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:2136:code
   ProgramPA.java:0220:<init>
   BtreePA.java:2132:<init>
@@ -1554,11 +1554,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                leaf_1_StuckSA_Transaction_28[  27/*data*/ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                leaf_1_StuckSA_Transaction_28[  20/*data*/ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:2136:code
   ProgramPA.java:0220:<init>
   BtreePA.java:2132:<init>
@@ -1575,13 +1575,13 @@ end
   BtreePA.java:3786:main
  */
                 end
-            291 : begin T_10[ 171/*Data*/ +: 8] <= leaf_1_StuckSA_Transaction_28[  27/*data*/ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            291 : begin T_10[ 171/*Data*/ +: 8] <= leaf_1_StuckSA_Transaction_28[  20/*data*/ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             292 : begin
-                                  leaf_1_StuckSA_Transaction_28[  19/*key */ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  leaf_1_StuckSA_Transaction_28[  12/*key */ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0385:removeElementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0396:removeElementAt
   BtreePA.java:2139:code
   ProgramPA.java:0220:<init>
   BtreePA.java:2132:<init>
@@ -1597,11 +1597,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                leaf_1_StuckSA_Transaction_28[  27/*data*/ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                leaf_1_StuckSA_Transaction_28[  20/*data*/ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0385:removeElementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0396:removeElementAt
   BtreePA.java:2139:code
   ProgramPA.java:0220:<init>
   BtreePA.java:2132:<init>
@@ -1621,14 +1621,14 @@ end
             293 : begin leaf_1_StuckSA_Copy_27[   4/*Keys*/ +: 16] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*Keys*/ +: 16]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             294 : begin /* Move Down */
 
-if (0 >= leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4]) begin
+if (0 >= leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4]) begin
   M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + 0 * 8 +: 8] <= leaf_1_StuckSA_Copy_27[   4/*key */ + 1 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             295 : begin leaf_1_StuckSA_Copy_27[  20/*Data*/ +: 16] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*Data*/ +: 16]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             296 : begin /* Move Down */
 
-if (0 >= leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4]) begin
+if (0 >= leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4]) begin
   M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + 0 * 8 +: 8] <= leaf_1_StuckSA_Copy_27[  20/*data*/ + 1 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
@@ -1643,62 +1643,62 @@ end
             305 : begin T_10[  21/*search  */ +: 8] <= T_10[ 163/*Key */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             306 : begin T_10[ 250/*node_balance*/ +: 5] <= T_10[ 189/*parent  */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             307 : begin branch_0_StuckSA_Memory_Based_11_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            308 : begin branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            309 : begin branch_0_StuckSA_Transaction_13[   8/*limit   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            310 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            311 : begin if (branch_0_StuckSA_Transaction_13[   8/*limit   */ +: 4] == 0) step = 312; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            312 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            313 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 0;branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            314 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            315 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 351; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            316 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            317 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            318 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 322; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            319 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            320 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            321 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            308 : begin branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            309 : begin branch_0_StuckSA_Transaction_13[  25/*limit   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            310 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            311 : begin if (branch_0_StuckSA_Transaction_13[  25/*limit   */ +: 4] == 0) step = 312; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            312 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            313 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 0;branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            314 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            315 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 351; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            316 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            317 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            318 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 322; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            319 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            320 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            321 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             322 : begin step = 351; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            323 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            324 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            325 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 351; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            326 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            327 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            328 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 332; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            329 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            330 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            331 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            323 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            324 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            325 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 351; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            326 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            327 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            328 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 332; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            329 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            330 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            331 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             332 : begin step = 351; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            333 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 2; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            334 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            335 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 351; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            336 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            337 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            338 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 342; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            339 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            340 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            341 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            333 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 2; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            334 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            335 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 351; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            336 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            337 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            338 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 342; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            339 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            340 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            341 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             342 : begin step = 351; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            343 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 3; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            344 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            345 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 351; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            346 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            347 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            348 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 351; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            349 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            350 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            351 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            352 : begin T_10[  29/*found   */ +: 1] <= branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            353 : begin T_10[  12/*first   */ +: 4] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            343 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 3; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            344 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            345 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 351; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            346 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            347 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            348 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 351; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            349 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            350 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            351 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            352 : begin T_10[  29/*found   */ +: 1] <= branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            353 : begin T_10[  12/*first   */ +: 4] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             354 : begin if (T_10[  29/*found   */ +: 1] == 0) step = 356; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            355 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            355 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             356 : begin step = 359; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            357 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            357 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             358 : begin
-                                  branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:0881:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:0876:<init>
@@ -1714,11 +1714,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:0881:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:0876:<init>
@@ -1735,23 +1735,23 @@ end
   BtreePA.java:3786:main
  */
                 end
-            359 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            359 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             360 : begin T_10[ 110/*index   */ +: 4] <= T_10[  12/*first   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             361 : begin T_10[ 250/*node_balance*/ +: 5] <= T_10[ 189/*parent  */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             362 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 250/*node_balance*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             363 : begin T_10[ 139/*branchBase  */ +: 11] <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             364 : begin branch_0_StuckSA_Memory_Based_11_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            365 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            366 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            365 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            366 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             367 : begin T_10[ 137/*mergeable   */ +: 1] <= T_10[ 110/*index   */ +: 4] > T_10[ 154/*branchSize  */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             368 : begin branch_1_StuckSA_Memory_Based_14_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            369 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            369 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             370 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1847:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1834:<init>
@@ -1767,11 +1767,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1847:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1834:<init>
@@ -1788,32 +1788,32 @@ end
   BtreePA.java:3786:main
  */
                 end
-            371 : begin T_10[ 245/*node_isLow  */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            371 : begin T_10[ 245/*node_isLow  */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             372 : begin T_10[ 225/*node_setBranch  */ +: 5] <= T_10[ 245/*node_isLow  */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             373 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + T_10[ 225/*node_setBranch  */ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             374 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 379; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             375 : begin leaf_0_StuckSA_Memory_Based_23_base_offset <=   11/*leaf*/ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            376 : begin leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            377 : begin T_10[ 150/*leafSize*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            376 : begin leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            377 : begin T_10[ 150/*leafSize*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             378 : begin T_10[ 137/*mergeable   */ +: 1] <= T_10[ 150/*leafSize*/ +: 4] < T_10[ 212/*two */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             379 : begin step = 384; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             380 : begin T_10[ 139/*branchBase  */ +: 11] <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             381 : begin branch_0_StuckSA_Memory_Based_11_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            382 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            383 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            382 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            383 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             384 : begin T_10[ 137/*mergeable   */ +: 1] <= T_10[ 154/*branchSize  */ +: 4] < T_10[ 212/*two */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             385 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 732; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             386 : begin if (T_10[ 110/*index   */ +: 4] > 0) step = 388; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             387 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             388 : begin step = 466; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             389 : begin branch_1_StuckSA_Memory_Based_14_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            390 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            390 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             391 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1276:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1264:<init>
@@ -1833,11 +1833,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1276:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1264:<init>
@@ -1859,7 +1859,7 @@ end
  */
                 end
             392 : begin
-                                  T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1279:code
   ProgramPA.java:0220:<init>
@@ -1880,7 +1880,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1281:code
   ProgramPA.java:0220:<init>
@@ -1903,11 +1903,11 @@ end
  */
                 end
             393 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1284:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1264:<init>
@@ -1927,11 +1927,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1284:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1264:<init>
@@ -1952,15 +1952,15 @@ end
   BtreePA.java:3786:main
  */
                 end
-            394 : begin T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            394 : begin T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             395 : begin branch_0_StuckSA_Memory_Based_11_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            396 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            396 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             397 : begin
-                                  branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1292:code
   ProgramPA.java:0220:<init>
@@ -1981,11 +1981,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1292:code
   ProgramPA.java:0220:<init>
@@ -2007,8 +2007,8 @@ end
   BtreePA.java:3786:main
  */
                 end
-            398 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            399 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            398 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            399 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             400 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 429; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             401 : begin
                                   leaf_2_StuckSA_Memory_Based_29_base_offset <=   11/*leaf*/ + T_10[ 122/*l   */ +: 5] * 62; /*   BtreePA.java:0664:<init>
@@ -2061,9 +2061,9 @@ end
  */
                 end
             402 : begin
-                                  leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0707:leafSize
   BtreePA.java:1298:Then
   ProgramPA.java:0189:<init>
@@ -2087,9 +2087,9 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0707:leafSize
   BtreePA.java:1301:Then
   ProgramPA.java:0189:<init>
@@ -2115,7 +2115,7 @@ end
  */
                 end
             403 : begin
-                                  T_10[ 114/*nl  */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[ 114/*nl  */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0707:leafSize
   BtreePA.java:1298:Then
@@ -2140,7 +2140,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[ 118/*nr  */ +: 4] <= leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                T_10[ 118/*nr  */ +: 4] <= leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0707:leafSize
   BtreePA.java:1301:Then
@@ -2174,15 +2174,15 @@ end
             409 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 411; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             410 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             411 : begin step = 466; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            412 : begin leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            412 : begin leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             413 : begin M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            414 : begin leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            414 : begin leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             415 : begin
-                                  leaf_2_StuckSA_Transaction_31[  19/*key */ +: 8] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  leaf_2_StuckSA_Transaction_31[  12/*key */ +: 8] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0321:pop
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0332:pop
   BtreePA.java:1310:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1295:<init>
@@ -2205,11 +2205,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                leaf_2_StuckSA_Transaction_31[  27/*data*/ +: 8] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                leaf_2_StuckSA_Transaction_31[  20/*data*/ +: 8] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0321:pop
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0332:pop
   BtreePA.java:1310:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1295:<init>
@@ -2234,7 +2234,7 @@ end
  */
                 end
             416 : begin
-                                  leaf_3_StuckSA_Transaction_34[  19/*key */ +: 8] <= leaf_2_StuckSA_Transaction_31[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  leaf_3_StuckSA_Transaction_34[  12/*key */ +: 8] <= leaf_2_StuckSA_Transaction_31[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1313:Then
   ProgramPA.java:0189:<init>
@@ -2258,7 +2258,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                leaf_3_StuckSA_Transaction_34[  27/*data*/ +: 8] <= leaf_2_StuckSA_Transaction_31[  27/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                leaf_3_StuckSA_Transaction_34[  20/*data*/ +: 8] <= leaf_2_StuckSA_Transaction_31[  20/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1315:Then
   ProgramPA.java:0189:<init>
@@ -2283,29 +2283,29 @@ end
   BtreePA.java:3786:main
  */
                 end
-            417 : begin leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            418 : begin leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            417 : begin leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            418 : begin leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             419 : begin leaf_3_StuckSA_Copy_33[   4/*Keys*/ +: 16] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*Keys*/ +: 16]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             420 : begin /* Move Up */
 
-if (1 > leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4]) begin
+if (1 > leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4]) begin
   M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + 1 * 8 +: 8] <= leaf_3_StuckSA_Copy_33[   4/*key */ + 0 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             421 : begin leaf_3_StuckSA_Copy_33[  20/*Data*/ +: 16] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*Data*/ +: 16]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             422 : begin /* Move Up */
 
-if (1 > leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4]) begin
+if (1 > leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4]) begin
   M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + 1 * 8 +: 8] <= leaf_3_StuckSA_Copy_33[  20/*data*/ + 0 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             423 : begin M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]+ 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             424 : begin
-                                  M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8 +: 8] <= leaf_3_StuckSA_Transaction_34[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8 +: 8] <= leaf_3_StuckSA_Transaction_34[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0308:unshift
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0319:unshift
   BtreePA.java:1317:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1295:<init>
@@ -2328,11 +2328,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8 +: 8] <= leaf_3_StuckSA_Transaction_34[  27/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8 +: 8] <= leaf_3_StuckSA_Transaction_34[  20/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0308:unshift
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0319:unshift
   BtreePA.java:1317:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1295:<init>
@@ -2356,13 +2356,13 @@ end
   BtreePA.java:3786:main
  */
                 end
-            425 : begin leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] <= T_10[ 114/*nl  */ +: 4]+-2; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            425 : begin leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] <= T_10[ 114/*nl  */ +: 4]+-2; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             426 : begin
-                                  leaf_2_StuckSA_Transaction_31[  19/*key */ +: 8] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  leaf_2_StuckSA_Transaction_31[  12/*key */ +: 8] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1320:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1295:<init>
@@ -2385,11 +2385,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                leaf_2_StuckSA_Transaction_31[  27/*data*/ +: 8] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                leaf_2_StuckSA_Transaction_31[  20/*data*/ +: 8] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1320:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1295:<init>
@@ -2414,7 +2414,7 @@ end
  */
                 end
             427 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= leaf_2_StuckSA_Transaction_31[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= leaf_2_StuckSA_Transaction_31[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1323:Then
   ProgramPA.java:0189:<init>
@@ -2438,7 +2438,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1325:Then
   ProgramPA.java:0189:<init>
@@ -2462,7 +2462,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
+                branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
   MemoryLayoutPA.java:0821:add
   BtreePA.java:1327:Then
   ProgramPA.java:0189:<init>
@@ -2488,11 +2488,11 @@ end
  */
                 end
             428 : begin
-                                  M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1329:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1295:<init>
@@ -2515,11 +2515,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1329:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1295:<init>
@@ -2595,9 +2595,9 @@ end
  */
                 end
             431 : begin
-                                  branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0721:branchSize
   BtreePA.java:1335:Else
   ProgramPA.java:0204:<init>
@@ -2621,9 +2621,9 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0721:branchSize
   BtreePA.java:1338:Else
   ProgramPA.java:0204:<init>
@@ -2649,7 +2649,7 @@ end
  */
                 end
             432 : begin
-                                  T_10[ 114/*nl  */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
+                                  T_10[ 114/*nl  */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
   MemoryLayoutPA.java:0821:add
   BtreePA.java:0722:branchSize
   BtreePA.java:1335:Else
@@ -2674,7 +2674,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[ 118/*nr  */ +: 4] <= branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
+                T_10[ 118/*nr  */ +: 4] <= branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
   MemoryLayoutPA.java:0821:add
   BtreePA.java:0722:branchSize
   BtreePA.java:1338:Else
@@ -2708,15 +2708,15 @@ end
             438 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 440; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             439 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             440 : begin step = 466; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            441 : begin branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            441 : begin branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             442 : begin M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            443 : begin branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            443 : begin branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             444 : begin
-                                  branch_2_StuckSA_Transaction_19[  19/*key */ +: 8] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  12/*key */ +: 8] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0321:pop
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0332:pop
   BtreePA.java:1347:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -2739,11 +2739,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_2_StuckSA_Transaction_19[  27/*data*/ +: 5] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_2_StuckSA_Transaction_19[  20/*data*/ +: 5] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0321:pop
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0332:pop
   BtreePA.java:1347:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -2767,13 +2767,13 @@ end
   BtreePA.java:3786:main
  */
                 end
-            445 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            445 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             446 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1349:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -2796,11 +2796,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1349:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -2825,7 +2825,7 @@ end
  */
                 end
             447 : begin
-                                  branch_3_StuckSA_Transaction_22[  19/*key */ +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_3_StuckSA_Transaction_22[  12/*key */ +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1352:Else
   ProgramPA.java:0204:<init>
@@ -2849,7 +2849,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_3_StuckSA_Transaction_22[  27/*data*/ +: 5] <= branch_2_StuckSA_Transaction_19[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_3_StuckSA_Transaction_22[  20/*data*/ +: 5] <= branch_2_StuckSA_Transaction_19[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1354:Else
   ProgramPA.java:0204:<init>
@@ -2874,45 +2874,45 @@ end
   BtreePA.java:3786:main
  */
                 end
-            448 : begin branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            449 : begin branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            448 : begin branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            449 : begin branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             450 : begin branch_3_StuckSA_Copy_21[   4/*Keys*/ +: 32] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*Keys*/ +: 32]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             451 : begin /* Move Up */
 
-if (1 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (1 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + 1 * 8 +: 8] <= branch_3_StuckSA_Copy_21[   4/*key */ + 0 * 8 +: 8];
 end
 
-if (2 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (2 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + 2 * 8 +: 8] <= branch_3_StuckSA_Copy_21[   4/*key */ + 1 * 8 +: 8];
 end
 
-if (3 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (3 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + 3 * 8 +: 8] <= branch_3_StuckSA_Copy_21[   4/*key */ + 2 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             452 : begin branch_3_StuckSA_Copy_21[  36/*Data*/ +: 20] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*Data*/ +: 20]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             453 : begin /* Move Up */
 
-if (1 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (1 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + 1 * 5 +: 5] <= branch_3_StuckSA_Copy_21[  36/*data*/ + 0 * 5 +: 5];
 end
 
-if (2 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (2 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + 2 * 5 +: 5] <= branch_3_StuckSA_Copy_21[  36/*data*/ + 1 * 5 +: 5];
 end
 
-if (3 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (3 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + 3 * 5 +: 5] <= branch_3_StuckSA_Copy_21[  36/*data*/ + 2 * 5 +: 5];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             454 : begin M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]+ 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             455 : begin
-                                  M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 8 +: 8] <= branch_3_StuckSA_Transaction_22[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 8 +: 8] <= branch_3_StuckSA_Transaction_22[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0308:unshift
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0319:unshift
   BtreePA.java:1356:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -2935,11 +2935,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 5 +: 5] <= branch_3_StuckSA_Transaction_22[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 5 +: 5] <= branch_3_StuckSA_Transaction_22[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0308:unshift
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0319:unshift
   BtreePA.java:1356:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -2963,13 +2963,13 @@ end
   BtreePA.java:3786:main
  */
                 end
-            456 : begin branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            456 : begin branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             457 : begin
-                                  branch_3_StuckSA_Transaction_22[  19/*key */ +: 8] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_3_StuckSA_Transaction_22[  12/*key */ +: 8] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:1359:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -2992,11 +2992,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_3_StuckSA_Transaction_22[  27/*data*/ +: 5] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_3_StuckSA_Transaction_22[  20/*data*/ +: 5] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:1359:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -3020,13 +3020,13 @@ end
   BtreePA.java:3786:main
  */
                 end
-            458 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            458 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             459 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1363:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -3049,11 +3049,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1363:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -3078,7 +3078,7 @@ end
  */
                 end
             460 : begin
-                                  branch_3_StuckSA_Transaction_22[  19/*key */ +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_3_StuckSA_Transaction_22[  12/*key */ +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1366:Else
   ProgramPA.java:0204:<init>
@@ -3102,7 +3102,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] <= 0; /*   MemoryLayoutPA.java:0557:<init>
+                branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] <= 0; /*   MemoryLayoutPA.java:0557:<init>
   MemoryLayoutPA.java:0556:zero
   BtreePA.java:1368:Else
   ProgramPA.java:0204:<init>
@@ -3128,11 +3128,11 @@ end
  */
                 end
             461 : begin
-                                  M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 8 +: 8] <= branch_3_StuckSA_Transaction_22[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 8 +: 8] <= branch_3_StuckSA_Transaction_22[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1371:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -3155,11 +3155,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 5 +: 5] <= branch_3_StuckSA_Transaction_22[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 5 +: 5] <= branch_3_StuckSA_Transaction_22[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1371:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -3183,13 +3183,13 @@ end
   BtreePA.java:3786:main
  */
                 end
-            462 : begin branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            462 : begin branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             463 : begin
-                                  branch_2_StuckSA_Transaction_19[  19/*key */ +: 8] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  12/*key */ +: 8] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:1373:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -3212,11 +3212,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_2_StuckSA_Transaction_19[  27/*data*/ +: 5] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_2_StuckSA_Transaction_19[  20/*data*/ +: 5] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:1373:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -3241,7 +3241,7 @@ end
  */
                 end
             464 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= branch_2_StuckSA_Transaction_19[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= branch_2_StuckSA_Transaction_19[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1376:Else
   ProgramPA.java:0204:<init>
@@ -3265,7 +3265,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1378:Else
   ProgramPA.java:0204:<init>
@@ -3289,7 +3289,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
+                branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
   MemoryLayoutPA.java:0821:add
   BtreePA.java:1380:Else
   ProgramPA.java:0204:<init>
@@ -3315,11 +3315,11 @@ end
  */
                 end
             465 : begin
-                                  M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1382:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -3342,11 +3342,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1382:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1295:<init>
@@ -3375,21 +3375,21 @@ end
             468 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 250/*node_balance*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             469 : begin T_10[ 139/*branchBase  */ +: 11] <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             470 : begin branch_0_StuckSA_Memory_Based_11_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            471 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            472 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            471 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            472 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             473 : begin T_10[ 137/*mergeable   */ +: 1] <= T_10[ 110/*index   */ +: 4] == T_10[ 154/*branchSize  */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             474 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 476; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             475 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             476 : begin step = 546; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             477 : begin branch_1_StuckSA_Memory_Based_14_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             478 : begin branch_1_StuckSA_Memory_Based_14_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            479 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            479 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             480 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1404:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1393:<init>
@@ -3409,11 +3409,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1404:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1393:<init>
@@ -3435,7 +3435,7 @@ end
  */
                 end
             481 : begin
-                                  T_10[  78/*lk  */ +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[  78/*lk  */ +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1407:code
   ProgramPA.java:0220:<init>
@@ -3456,7 +3456,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1409:code
   ProgramPA.java:0220:<init>
@@ -3477,7 +3477,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+1; /*   MemoryLayoutPA.java:0822:<init>
+                branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+1; /*   MemoryLayoutPA.java:0822:<init>
   MemoryLayoutPA.java:0821:add
   BtreePA.java:1411:code
   ProgramPA.java:0220:<init>
@@ -3500,11 +3500,11 @@ end
  */
                 end
             482 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1414:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1393:<init>
@@ -3524,11 +3524,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1414:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1393:<init>
@@ -3550,7 +3550,7 @@ end
  */
                 end
             483 : begin
-                                  T_10[  94/*rk  */ +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[  94/*rk  */ +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1417:code
   ProgramPA.java:0220:<init>
@@ -3571,7 +3571,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1419:code
   ProgramPA.java:0220:<init>
@@ -3594,13 +3594,13 @@ end
  */
                 end
             484 : begin branch_0_StuckSA_Memory_Based_11_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            485 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            485 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             486 : begin
-                                  branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1424:code
   ProgramPA.java:0220:<init>
@@ -3621,11 +3621,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1424:code
   ProgramPA.java:0220:<init>
@@ -3647,8 +3647,8 @@ end
   BtreePA.java:3786:main
  */
                 end
-            487 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            488 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            487 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            488 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             489 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 515; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             490 : begin
                                   leaf_2_StuckSA_Memory_Based_29_base_offset <=   11/*leaf*/ + T_10[ 122/*l   */ +: 5] * 62; /*   BtreePA.java:0664:<init>
@@ -3701,9 +3701,9 @@ end
  */
                 end
             491 : begin
-                                  leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0707:leafSize
   BtreePA.java:1431:Then
   ProgramPA.java:0189:<init>
@@ -3727,9 +3727,9 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0707:leafSize
   BtreePA.java:1434:Then
   ProgramPA.java:0189:<init>
@@ -3755,7 +3755,7 @@ end
  */
                 end
             492 : begin
-                                  T_10[ 114/*nl  */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[ 114/*nl  */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0707:leafSize
   BtreePA.java:1431:Then
@@ -3780,7 +3780,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[ 118/*nr  */ +: 4] <= leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                T_10[ 118/*nr  */ +: 4] <= leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0707:leafSize
   BtreePA.java:1434:Then
@@ -3814,14 +3814,14 @@ end
             498 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 500; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             499 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             500 : begin step = 546; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            501 : begin leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            502 : begin leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            501 : begin leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            502 : begin leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             503 : begin
-                                  leaf_3_StuckSA_Transaction_34[  19/*key */ +: 8] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  leaf_3_StuckSA_Transaction_34[  12/*key */ +: 8] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0332:shift
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0343:shift
   BtreePA.java:1444:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1427:<init>
@@ -3844,11 +3844,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                leaf_3_StuckSA_Transaction_34[  27/*data*/ +: 8] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                leaf_3_StuckSA_Transaction_34[  20/*data*/ +: 8] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0332:shift
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0343:shift
   BtreePA.java:1444:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1427:<init>
@@ -3875,20 +3875,20 @@ end
             504 : begin leaf_3_StuckSA_Copy_33[   4/*Keys*/ +: 16] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*Keys*/ +: 16]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             505 : begin /* Move Down */
 
-if (0 >= leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4]) begin
+if (0 >= leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4]) begin
   M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + 0 * 8 +: 8] <= leaf_3_StuckSA_Copy_33[   4/*key */ + 1 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             506 : begin leaf_3_StuckSA_Copy_33[  20/*Data*/ +: 16] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*Data*/ +: 16]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             507 : begin /* Move Down */
 
-if (0 >= leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4]) begin
+if (0 >= leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4]) begin
   M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + 0 * 8 +: 8] <= leaf_3_StuckSA_Copy_33[  20/*data*/ + 1 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             508 : begin M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             509 : begin
-                                  leaf_2_StuckSA_Transaction_31[  19/*key */ +: 8] <= leaf_3_StuckSA_Transaction_34[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  leaf_2_StuckSA_Transaction_31[  12/*key */ +: 8] <= leaf_3_StuckSA_Transaction_34[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1445:Then
   ProgramPA.java:0189:<init>
@@ -3912,7 +3912,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                leaf_2_StuckSA_Transaction_31[  27/*data*/ +: 8] <= leaf_3_StuckSA_Transaction_34[  27/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                leaf_2_StuckSA_Transaction_31[  20/*data*/ +: 8] <= leaf_3_StuckSA_Transaction_34[  20/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1446:Then
   ProgramPA.java:0189:<init>
@@ -3936,7 +3936,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= leaf_3_StuckSA_Transaction_34[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= leaf_3_StuckSA_Transaction_34[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1447:Then
   ProgramPA.java:0189:<init>
@@ -3960,7 +3960,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1448:Then
   ProgramPA.java:0189:<init>
@@ -3984,7 +3984,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1449:Then
   ProgramPA.java:0189:<init>
@@ -4009,14 +4009,14 @@ end
   BtreePA.java:3786:main
  */
                 end
-            510 : begin leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            511 : begin leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            510 : begin leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            511 : begin leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             512 : begin
-                                  M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8 +: 8] <= leaf_2_StuckSA_Transaction_31[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8 +: 8] <= leaf_2_StuckSA_Transaction_31[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0292:push
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0303:push
   BtreePA.java:1451:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1427:<init>
@@ -4039,11 +4039,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8 +: 8] <= leaf_2_StuckSA_Transaction_31[  27/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8 +: 8] <= leaf_2_StuckSA_Transaction_31[  20/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0292:push
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0303:push
   BtreePA.java:1451:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1427:<init>
@@ -4069,11 +4069,11 @@ end
                 end
             513 : begin M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]+ 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             514 : begin
-                                  M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1452:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1427:<init>
@@ -4096,11 +4096,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1452:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1427:<init>
@@ -4176,9 +4176,9 @@ end
  */
                 end
             517 : begin
-                                  branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0721:branchSize
   BtreePA.java:1456:Else
   ProgramPA.java:0204:<init>
@@ -4202,9 +4202,9 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0721:branchSize
   BtreePA.java:1457:Else
   ProgramPA.java:0204:<init>
@@ -4230,7 +4230,7 @@ end
  */
                 end
             518 : begin
-                                  T_10[ 114/*nl  */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
+                                  T_10[ 114/*nl  */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
   MemoryLayoutPA.java:0821:add
   BtreePA.java:0722:branchSize
   BtreePA.java:1456:Else
@@ -4255,7 +4255,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[ 118/*nr  */ +: 4] <= branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
+                T_10[ 118/*nr  */ +: 4] <= branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
   MemoryLayoutPA.java:0821:add
   BtreePA.java:0722:branchSize
   BtreePA.java:1457:Else
@@ -4289,13 +4289,13 @@ end
             524 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 526; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             525 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             526 : begin step = 546; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            527 : begin branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            527 : begin branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             528 : begin
-                                  branch_2_StuckSA_Transaction_19[  19/*key */ +: 8] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  12/*key */ +: 8] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:1465:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1427:<init>
@@ -4318,11 +4318,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_2_StuckSA_Transaction_19[  27/*data*/ +: 5] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_2_StuckSA_Transaction_19[  20/*data*/ +: 5] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:1465:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1427:<init>
@@ -4347,7 +4347,7 @@ end
  */
                 end
             529 : begin
-                                  branch_2_StuckSA_Transaction_19[  19/*key */ +: 8] <= T_10[  78/*lk  */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  12/*key */ +: 8] <= T_10[  78/*lk  */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1466:Else
   ProgramPA.java:0204:<init>
@@ -4371,7 +4371,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= T_10[ 114/*nl  */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= T_10[ 114/*nl  */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1467:Else
   ProgramPA.java:0204:<init>
@@ -4397,11 +4397,11 @@ end
  */
                 end
             530 : begin
-                                  M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8 +: 8] <= branch_2_StuckSA_Transaction_19[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8 +: 8] <= branch_2_StuckSA_Transaction_19[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1469:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1427:<init>
@@ -4424,11 +4424,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5 +: 5] <= branch_2_StuckSA_Transaction_19[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5 +: 5] <= branch_2_StuckSA_Transaction_19[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1469:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1427:<init>
@@ -4452,14 +4452,14 @@ end
   BtreePA.java:3786:main
  */
                 end
-            531 : begin branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            532 : begin branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            531 : begin branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            532 : begin branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             533 : begin
-                                  branch_3_StuckSA_Transaction_22[  19/*key */ +: 8] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_3_StuckSA_Transaction_22[  12/*key */ +: 8] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0332:shift
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0343:shift
   BtreePA.java:1471:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1427:<init>
@@ -4482,11 +4482,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_3_StuckSA_Transaction_22[  27/*data*/ +: 5] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_3_StuckSA_Transaction_22[  20/*data*/ +: 5] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0332:shift
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0343:shift
   BtreePA.java:1471:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1427:<init>
@@ -4513,36 +4513,36 @@ end
             534 : begin branch_3_StuckSA_Copy_21[   4/*Keys*/ +: 32] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*Keys*/ +: 32]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             535 : begin /* Move Down */
 
-if (0 >= branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (0 >= branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + 0 * 8 +: 8] <= branch_3_StuckSA_Copy_21[   4/*key */ + 1 * 8 +: 8];
 end
 
-if (1 >= branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (1 >= branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + 1 * 8 +: 8] <= branch_3_StuckSA_Copy_21[   4/*key */ + 2 * 8 +: 8];
 end
 
-if (2 >= branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (2 >= branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + 2 * 8 +: 8] <= branch_3_StuckSA_Copy_21[   4/*key */ + 3 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             536 : begin branch_3_StuckSA_Copy_21[  36/*Data*/ +: 20] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*Data*/ +: 20]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             537 : begin /* Move Down */
 
-if (0 >= branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (0 >= branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + 0 * 5 +: 5] <= branch_3_StuckSA_Copy_21[  36/*data*/ + 1 * 5 +: 5];
 end
 
-if (1 >= branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (1 >= branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + 1 * 5 +: 5] <= branch_3_StuckSA_Copy_21[  36/*data*/ + 2 * 5 +: 5];
 end
 
-if (2 >= branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (2 >= branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + 2 * 5 +: 5] <= branch_3_StuckSA_Copy_21[  36/*data*/ + 3 * 5 +: 5];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             538 : begin M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             539 : begin
-                                  branch_2_StuckSA_Transaction_19[  19/*key */ +: 8] <= 0; /*   MemoryLayoutPA.java:0557:<init>
+                                  branch_2_StuckSA_Transaction_19[  12/*key */ +: 8] <= 0; /*   MemoryLayoutPA.java:0557:<init>
   MemoryLayoutPA.java:0556:zero
   BtreePA.java:1473:Else
   ProgramPA.java:0204:<init>
@@ -4566,7 +4566,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_2_StuckSA_Transaction_19[  27/*data*/ +: 5] <= branch_3_StuckSA_Transaction_22[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_2_StuckSA_Transaction_19[  20/*data*/ +: 5] <= branch_3_StuckSA_Transaction_22[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1474:Else
   ProgramPA.java:0204:<init>
@@ -4591,14 +4591,14 @@ end
   BtreePA.java:3786:main
  */
                 end
-            540 : begin branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            541 : begin branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            540 : begin branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            541 : begin branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             542 : begin
-                                  M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8 +: 8] <= branch_2_StuckSA_Transaction_19[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8 +: 8] <= branch_2_StuckSA_Transaction_19[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0292:push
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0303:push
   BtreePA.java:1476:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1427:<init>
@@ -4621,11 +4621,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5 +: 5] <= branch_2_StuckSA_Transaction_19[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5 +: 5] <= branch_2_StuckSA_Transaction_19[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0292:push
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0303:push
   BtreePA.java:1476:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1427:<init>
@@ -4651,7 +4651,7 @@ end
                 end
             543 : begin M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]+ 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             544 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= branch_3_StuckSA_Transaction_22[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= branch_3_StuckSA_Transaction_22[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1478:Else
   ProgramPA.java:0204:<init>
@@ -4675,7 +4675,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1479:Else
   ProgramPA.java:0204:<init>
@@ -4699,7 +4699,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1480:Else
   ProgramPA.java:0204:<init>
@@ -4725,11 +4725,11 @@ end
  */
                 end
             545 : begin
-                                  M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1482:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1427:<init>
@@ -4752,11 +4752,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1482:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1427:<init>
@@ -4789,21 +4789,21 @@ end
             552 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 250/*node_balance*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             553 : begin T_10[ 139/*branchBase  */ +: 11] <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             554 : begin branch_0_StuckSA_Memory_Based_11_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            555 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            556 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            555 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            556 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             557 : begin T_10[ 137/*mergeable   */ +: 1] <= T_10[ 110/*index   */ +: 4] > T_10[ 154/*branchSize  */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             558 : begin T_10[ 137/*mergeable   */ +: 1] <= T_10[ 154/*branchSize  */ +: 4] < T_10[ 212/*two */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             559 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 561; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             560 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             561 : begin step = 641; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             562 : begin branch_1_StuckSA_Memory_Based_14_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            563 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            563 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             564 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1621:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1602:<init>
@@ -4823,11 +4823,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1621:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1602:<init>
@@ -4849,7 +4849,7 @@ end
  */
                 end
             565 : begin
-                                  T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1624:code
   ProgramPA.java:0220:<init>
@@ -4870,7 +4870,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1626:code
   ProgramPA.java:0220:<init>
@@ -4893,11 +4893,11 @@ end
  */
                 end
             566 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1629:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1602:<init>
@@ -4917,11 +4917,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1629:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1602:<init>
@@ -4942,15 +4942,15 @@ end
   BtreePA.java:3786:main
  */
                 end
-            567 : begin T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            567 : begin T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             568 : begin branch_0_StuckSA_Memory_Based_11_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            569 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            569 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             570 : begin
-                                  branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1637:code
   ProgramPA.java:0220:<init>
@@ -4971,11 +4971,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1637:code
   ProgramPA.java:0220:<init>
@@ -4997,8 +4997,8 @@ end
   BtreePA.java:3786:main
  */
                 end
-            571 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            572 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            571 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            572 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             573 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 593; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             574 : begin
                                   leaf_2_StuckSA_Memory_Based_29_base_offset <=   11/*leaf*/ + T_10[ 122/*l   */ +: 5] * 62; /*   BtreePA.java:0664:<init>
@@ -5051,9 +5051,9 @@ end
  */
                 end
             575 : begin
-                                  leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0707:leafSize
   BtreePA.java:1643:Then
   ProgramPA.java:0189:<init>
@@ -5077,9 +5077,9 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0707:leafSize
   BtreePA.java:1646:Then
   ProgramPA.java:0189:<init>
@@ -5105,7 +5105,7 @@ end
  */
                 end
             576 : begin
-                                  T_10[ 114/*nl  */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[ 114/*nl  */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0707:leafSize
   BtreePA.java:1643:Then
@@ -5130,7 +5130,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[ 118/*nr  */ +: 4] <= leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                T_10[ 118/*nr  */ +: 4] <= leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0707:leafSize
   BtreePA.java:1646:Then
@@ -5160,14 +5160,14 @@ end
             578 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 580; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             579 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             580 : begin step = 641; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            581 : begin leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            582 : begin leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            583 : begin leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            584 : begin leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            585 : begin leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4] <= leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            586 : begin leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12] <= leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0560:prepend
+            581 : begin leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            582 : begin leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            583 : begin leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            584 : begin leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            585 : begin leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4] <= leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            586 : begin leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12] <= leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0571:prepend
   BtreePA.java:1664:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1639:<init>
@@ -5191,8 +5191,8 @@ end
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             587 : begin copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12];
-index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8;
-index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8;
+index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8;
+index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset >= 4096) begin
    M_9[index_leaf_2_StuckSA_Memory_Based_29_base_offset +: 4096] <= M_9[index_leaf_3_StuckSA_Memory_Based_32_base_offset +: 4096];
    copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset - 4096;
@@ -5274,8 +5274,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             588 : begin leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12] <= leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4]*8; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             589 : begin copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12];
-index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8;
-index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8;
+index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8;
+index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset >= 4096) begin
    M_9[index_leaf_2_StuckSA_Memory_Based_29_base_offset +: 4096] <= M_9[index_leaf_3_StuckSA_Memory_Based_32_base_offset +: 4096];
    copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset - 4096;
@@ -5357,7 +5357,7 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             590 : begin M_9[leaf_3_StuckSA_Memory_Based_32_base_offset +: 36] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset +: 36]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             591 : begin  /* NOT SET */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            592 : begin M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4] <= leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            592 : begin M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4] <= leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             593 : begin step = 627; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             594 : begin
                                   branch_2_StuckSA_Memory_Based_17_base_offset <=   11/*branch  */ + T_10[ 122/*l   */ +: 5] * 62; /*   BtreePA.java:0689:<init>
@@ -5410,9 +5410,9 @@ end
  */
                 end
             595 : begin
-                                  branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0721:branchSize
   BtreePA.java:1670:Else
   ProgramPA.java:0204:<init>
@@ -5436,9 +5436,9 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0721:branchSize
   BtreePA.java:1673:Else
   ProgramPA.java:0204:<init>
@@ -5464,7 +5464,7 @@ end
  */
                 end
             596 : begin
-                                  T_10[ 114/*nl  */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
+                                  T_10[ 114/*nl  */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
   MemoryLayoutPA.java:0821:add
   BtreePA.java:0722:branchSize
   BtreePA.java:1670:Else
@@ -5489,7 +5489,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[ 118/*nr  */ +: 4] <= branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
+                T_10[ 118/*nr  */ +: 4] <= branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
   MemoryLayoutPA.java:0821:add
   BtreePA.java:0722:branchSize
   BtreePA.java:1673:Else
@@ -5519,13 +5519,13 @@ end
             598 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 600; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             599 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             600 : begin step = 641; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            601 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            601 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             602 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1693:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1639:<init>
@@ -5548,11 +5548,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1693:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1639:<init>
@@ -5576,15 +5576,15 @@ end
   BtreePA.java:3786:main
  */
                 end
-            603 : begin branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            603 : begin branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             604 : begin M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            605 : begin branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            605 : begin branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             606 : begin
-                                  branch_2_StuckSA_Transaction_19[  19/*key */ +: 8] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  12/*key */ +: 8] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0321:pop
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0332:pop
   BtreePA.java:1695:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1639:<init>
@@ -5607,11 +5607,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_2_StuckSA_Transaction_19[  27/*data*/ +: 5] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_2_StuckSA_Transaction_19[  20/*data*/ +: 5] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0321:pop
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0332:pop
   BtreePA.java:1695:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1639:<init>
@@ -5636,7 +5636,7 @@ end
  */
                 end
             607 : begin
-                                  branch_3_StuckSA_Transaction_22[  19/*key */ +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_3_StuckSA_Transaction_22[  12/*key */ +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1697:Else
   ProgramPA.java:0204:<init>
@@ -5660,7 +5660,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_3_StuckSA_Transaction_22[  27/*data*/ +: 5] <= branch_2_StuckSA_Transaction_19[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_3_StuckSA_Transaction_22[  20/*data*/ +: 5] <= branch_2_StuckSA_Transaction_19[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1699:Else
   ProgramPA.java:0204:<init>
@@ -5685,45 +5685,45 @@ end
   BtreePA.java:3786:main
  */
                 end
-            608 : begin branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            609 : begin branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            608 : begin branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            609 : begin branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             610 : begin branch_3_StuckSA_Copy_21[   4/*Keys*/ +: 32] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*Keys*/ +: 32]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             611 : begin /* Move Up */
 
-if (1 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (1 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + 1 * 8 +: 8] <= branch_3_StuckSA_Copy_21[   4/*key */ + 0 * 8 +: 8];
 end
 
-if (2 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (2 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + 2 * 8 +: 8] <= branch_3_StuckSA_Copy_21[   4/*key */ + 1 * 8 +: 8];
 end
 
-if (3 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (3 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + 3 * 8 +: 8] <= branch_3_StuckSA_Copy_21[   4/*key */ + 2 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             612 : begin branch_3_StuckSA_Copy_21[  36/*Data*/ +: 20] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*Data*/ +: 20]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             613 : begin /* Move Up */
 
-if (1 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (1 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + 1 * 5 +: 5] <= branch_3_StuckSA_Copy_21[  36/*data*/ + 0 * 5 +: 5];
 end
 
-if (2 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (2 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + 2 * 5 +: 5] <= branch_3_StuckSA_Copy_21[  36/*data*/ + 1 * 5 +: 5];
 end
 
-if (3 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (3 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + 3 * 5 +: 5] <= branch_3_StuckSA_Copy_21[  36/*data*/ + 2 * 5 +: 5];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             614 : begin M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]+ 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             615 : begin
-                                  M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 8 +: 8] <= branch_3_StuckSA_Transaction_22[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 8 +: 8] <= branch_3_StuckSA_Transaction_22[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0308:unshift
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0319:unshift
   BtreePA.java:1701:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1639:<init>
@@ -5746,11 +5746,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 5 +: 5] <= branch_3_StuckSA_Transaction_22[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 5 +: 5] <= branch_3_StuckSA_Transaction_22[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0308:unshift
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0319:unshift
   BtreePA.java:1701:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1639:<init>
@@ -5774,14 +5774,14 @@ end
   BtreePA.java:3786:main
  */
                 end
-            616 : begin branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            617 : begin branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            618 : begin branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            619 : begin branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            620 : begin branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4] <= branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            621 : begin branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12] <= branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0560:prepend
+            616 : begin branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            617 : begin branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            618 : begin branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            619 : begin branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            620 : begin branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4] <= branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            621 : begin branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12] <= branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0571:prepend
   BtreePA.java:1703:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1639:<init>
@@ -5805,8 +5805,8 @@ end
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             622 : begin copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12];
-index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 8;
-index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8;
+index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 8;
+index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8;
 if (copyLength_branch_2_StuckSA_Memory_Based_17_base_offset >= 4096) begin
    M_9[index_branch_2_StuckSA_Memory_Based_17_base_offset +: 4096] <= M_9[index_branch_3_StuckSA_Memory_Based_20_base_offset +: 4096];
    copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = copyLength_branch_2_StuckSA_Memory_Based_17_base_offset - 4096;
@@ -5888,8 +5888,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             623 : begin branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12] <= branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4]*5; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             624 : begin copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12];
-index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 5;
-index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5;
+index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 5;
+index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5;
 if (copyLength_branch_2_StuckSA_Memory_Based_17_base_offset >= 4096) begin
    M_9[index_branch_2_StuckSA_Memory_Based_17_base_offset +: 4096] <= M_9[index_branch_3_StuckSA_Memory_Based_20_base_offset +: 4096];
    copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = copyLength_branch_2_StuckSA_Memory_Based_17_base_offset - 4096;
@@ -5971,20 +5971,20 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             625 : begin M_9[branch_3_StuckSA_Memory_Based_20_base_offset +: 56] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset +: 56]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             626 : begin  /* NOT SET */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            627 : begin M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4] <= branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            627 : begin M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4] <= branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             628 : begin T_10[ 240/*node_erase  */ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             629 : begin if (T_10[ 240/*node_erase  */ +: 5] > 0) step = 630; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             630 : begin stopped <= 1; /* Cannot free root */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             631 : begin M_9[   5/*node*/ + T_10[ 240/*node_erase  */ +: 5] * 62 +: 62] <= 62'b11111111111111111111111111111111111111111111111111111111111111; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             632 : begin M_9[   6/*free*/ + T_10[ 240/*node_erase  */ +: 5] * 62 +: 5] <= M_9[   0/*freeList*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             633 : begin M_9[   0/*freeList*/ +: 5] <= T_10[ 240/*node_erase  */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            634 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            634 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             635 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0385:removeElementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0396:removeElementAt
   BtreePA.java:1709:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1602:<init>
@@ -6004,11 +6004,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0385:removeElementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0396:removeElementAt
   BtreePA.java:1709:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1602:<init>
@@ -6032,30 +6032,30 @@ end
             636 : begin branch_1_StuckSA_Copy_15[   4/*Keys*/ +: 32] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*Keys*/ +: 32]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             637 : begin /* Move Down */
 
-if (0 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (0 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + 0 * 8 +: 8] <= branch_1_StuckSA_Copy_15[   4/*key */ + 1 * 8 +: 8];
 end
 
-if (1 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (1 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + 1 * 8 +: 8] <= branch_1_StuckSA_Copy_15[   4/*key */ + 2 * 8 +: 8];
 end
 
-if (2 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (2 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + 2 * 8 +: 8] <= branch_1_StuckSA_Copy_15[   4/*key */ + 3 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             638 : begin branch_1_StuckSA_Copy_15[  36/*Data*/ +: 20] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*Data*/ +: 20]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             639 : begin /* Move Down */
 
-if (0 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (0 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + 0 * 5 +: 5] <= branch_1_StuckSA_Copy_15[  36/*data*/ + 1 * 5 +: 5];
 end
 
-if (1 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (1 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + 1 * 5 +: 5] <= branch_1_StuckSA_Copy_15[  36/*data*/ + 2 * 5 +: 5];
 end
 
-if (2 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (2 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + 2 * 5 +: 5] <= branch_1_StuckSA_Copy_15[  36/*data*/ + 3 * 5 +: 5];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
@@ -6065,8 +6065,8 @@ end
             643 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 250/*node_balance*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             644 : begin T_10[ 139/*branchBase  */ +: 11] <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             645 : begin branch_0_StuckSA_Memory_Based_11_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            646 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            647 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            646 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            647 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             648 : begin T_10[ 137/*mergeable   */ +: 1] <= T_10[ 110/*index   */ +: 4] >= T_10[ 154/*branchSize  */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             649 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 651; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             650 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
@@ -6076,13 +6076,13 @@ end
             654 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             655 : begin step = 731; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             656 : begin branch_1_StuckSA_Memory_Based_14_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            657 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            657 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             658 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1732:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -6102,11 +6102,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1732:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -6127,14 +6127,14 @@ end
   BtreePA.java:3786:main
  */
                 end
-            659 : begin T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            660 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            659 : begin T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            660 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             661 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1735:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -6154,11 +6154,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1735:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -6179,15 +6179,15 @@ end
   BtreePA.java:3786:main
  */
                 end
-            662 : begin T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            662 : begin T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             663 : begin branch_0_StuckSA_Memory_Based_11_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            664 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            664 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             665 : begin
-                                  branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1739:code
   ProgramPA.java:0220:<init>
@@ -6208,11 +6208,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1739:code
   ProgramPA.java:0220:<init>
@@ -6234,8 +6234,8 @@ end
   BtreePA.java:3786:main
  */
                 end
-            666 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            667 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            666 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            667 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             668 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 687; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             669 : begin
                                   leaf_2_StuckSA_Memory_Based_29_base_offset <=   11/*leaf*/ + T_10[ 122/*l   */ +: 5] * 62; /*   BtreePA.java:0664:<init>
@@ -6288,9 +6288,9 @@ end
  */
                 end
             670 : begin
-                                  leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0707:leafSize
   BtreePA.java:1744:Then
   ProgramPA.java:0189:<init>
@@ -6314,9 +6314,9 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0707:leafSize
   BtreePA.java:1747:Then
   ProgramPA.java:0189:<init>
@@ -6342,7 +6342,7 @@ end
  */
                 end
             671 : begin
-                                  T_10[ 114/*nl  */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[ 114/*nl  */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0707:leafSize
   BtreePA.java:1744:Then
@@ -6367,7 +6367,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[ 118/*nr  */ +: 4] <= leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                T_10[ 118/*nr  */ +: 4] <= leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0707:leafSize
   BtreePA.java:1747:Then
@@ -6397,14 +6397,14 @@ end
             673 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 675; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             674 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             675 : begin step = 731; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            676 : begin leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            677 : begin leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            678 : begin leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            679 : begin leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            680 : begin leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4] <= leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            681 : begin leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12] <= leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0534:concatenate
+            676 : begin leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            677 : begin leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            678 : begin leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            679 : begin leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            680 : begin leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4] <= leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            681 : begin leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12] <= leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0545:concatenate
   BtreePA.java:1765:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1741:<init>
@@ -6428,8 +6428,8 @@ end
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             682 : begin copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12];
-index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8;
-index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8;
+index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8;
+index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset >= 4096) begin
    M_9[index_leaf_2_StuckSA_Memory_Based_29_base_offset +: 4096] <= M_9[index_leaf_3_StuckSA_Memory_Based_32_base_offset +: 4096];
    copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset - 4096;
@@ -6511,8 +6511,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             683 : begin leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12] <= leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4]*8; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             684 : begin copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12];
-index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8;
-index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8;
+index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8;
+index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset >= 4096) begin
    M_9[index_leaf_2_StuckSA_Memory_Based_29_base_offset +: 4096] <= M_9[index_leaf_3_StuckSA_Memory_Based_32_base_offset +: 4096];
    copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset - 4096;
@@ -6592,8 +6592,8 @@ if (copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset >= 1) begin
    index_leaf_2_StuckSA_Memory_Based_29_base_offset = index_leaf_2_StuckSA_Memory_Based_29_base_offset + 1;
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            685 : begin leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] +  leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            686 : begin M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            685 : begin leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] +  leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            686 : begin M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             687 : begin step = 711; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             688 : begin
                                   branch_2_StuckSA_Memory_Based_17_base_offset <=   11/*branch  */ + T_10[ 122/*l   */ +: 5] * 62; /*   BtreePA.java:0689:<init>
@@ -6646,9 +6646,9 @@ end
  */
                 end
             689 : begin
-                                  branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0721:branchSize
   BtreePA.java:1770:Else
   ProgramPA.java:0204:<init>
@@ -6672,9 +6672,9 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0721:branchSize
   BtreePA.java:1773:Else
   ProgramPA.java:0204:<init>
@@ -6700,7 +6700,7 @@ end
  */
                 end
             690 : begin
-                                  T_10[ 114/*nl  */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
+                                  T_10[ 114/*nl  */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
   MemoryLayoutPA.java:0821:add
   BtreePA.java:0722:branchSize
   BtreePA.java:1770:Else
@@ -6725,7 +6725,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[ 118/*nr  */ +: 4] <= branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
+                T_10[ 118/*nr  */ +: 4] <= branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
   MemoryLayoutPA.java:0821:add
   BtreePA.java:0722:branchSize
   BtreePA.java:1773:Else
@@ -6755,13 +6755,13 @@ end
             692 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 694; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             693 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             694 : begin step = 731; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            695 : begin branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            695 : begin branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             696 : begin
-                                  branch_2_StuckSA_Transaction_19[  19/*key */ +: 8] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  12/*key */ +: 8] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:1791:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1741:<init>
@@ -6784,11 +6784,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_2_StuckSA_Transaction_19[  27/*data*/ +: 5] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_2_StuckSA_Transaction_19[  20/*data*/ +: 5] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:1791:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1741:<init>
@@ -6812,13 +6812,13 @@ end
   BtreePA.java:3786:main
  */
                 end
-            697 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            697 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             698 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1793:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1741:<init>
@@ -6841,11 +6841,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1793:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1741:<init>
@@ -6870,7 +6870,7 @@ end
  */
                 end
             699 : begin
-                                  branch_2_StuckSA_Transaction_19[  19/*key */ +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  12/*key */ +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1796:Else
   ProgramPA.java:0204:<init>
@@ -6894,7 +6894,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= T_10[ 114/*nl  */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= T_10[ 114/*nl  */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1798:Else
   ProgramPA.java:0204:<init>
@@ -6920,11 +6920,11 @@ end
  */
                 end
             700 : begin
-                                  M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8 +: 8] <= branch_2_StuckSA_Transaction_19[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8 +: 8] <= branch_2_StuckSA_Transaction_19[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1800:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1741:<init>
@@ -6947,11 +6947,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5 +: 5] <= branch_2_StuckSA_Transaction_19[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5 +: 5] <= branch_2_StuckSA_Transaction_19[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1800:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1741:<init>
@@ -6975,14 +6975,14 @@ end
   BtreePA.java:3786:main
  */
                 end
-            701 : begin branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            702 : begin branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            703 : begin branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            704 : begin branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            705 : begin branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4] <= branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            706 : begin branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12] <= branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0534:concatenate
+            701 : begin branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            702 : begin branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            703 : begin branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            704 : begin branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            705 : begin branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4] <= branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            706 : begin branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12] <= branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0545:concatenate
   BtreePA.java:1802:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1741:<init>
@@ -7006,8 +7006,8 @@ end
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             707 : begin copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12];
-index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 8;
-index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8;
+index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 8;
+index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8;
 if (copyLength_branch_2_StuckSA_Memory_Based_17_base_offset >= 4096) begin
    M_9[index_branch_2_StuckSA_Memory_Based_17_base_offset +: 4096] <= M_9[index_branch_3_StuckSA_Memory_Based_20_base_offset +: 4096];
    copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = copyLength_branch_2_StuckSA_Memory_Based_17_base_offset - 4096;
@@ -7089,8 +7089,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             708 : begin branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12] <= branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4]*5; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             709 : begin copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12];
-index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 5;
-index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5;
+index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 5;
+index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5;
 if (copyLength_branch_2_StuckSA_Memory_Based_17_base_offset >= 4096) begin
    M_9[index_branch_2_StuckSA_Memory_Based_17_base_offset +: 4096] <= M_9[index_branch_3_StuckSA_Memory_Based_20_base_offset +: 4096];
    copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = copyLength_branch_2_StuckSA_Memory_Based_17_base_offset - 4096;
@@ -7170,21 +7170,21 @@ if (copyLength_branch_2_StuckSA_Memory_Based_17_base_offset >= 1) begin
    index_branch_2_StuckSA_Memory_Based_17_base_offset = index_branch_2_StuckSA_Memory_Based_17_base_offset + 1;
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            710 : begin branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] +  branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            711 : begin M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            710 : begin branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] +  branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            711 : begin M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             712 : begin T_10[ 240/*node_erase  */ +: 5] <= T_10[ 127/*r   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             713 : begin if (T_10[ 240/*node_erase  */ +: 5] > 0) step = 714; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             714 : begin stopped <= 1; /* Cannot free root */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             715 : begin M_9[   5/*node*/ + T_10[ 240/*node_erase  */ +: 5] * 62 +: 62] <= 62'b11111111111111111111111111111111111111111111111111111111111111; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             716 : begin M_9[   6/*free*/ + T_10[ 240/*node_erase  */ +: 5] * 62 +: 5] <= M_9[   0/*freeList*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             717 : begin M_9[   0/*freeList*/ +: 5] <= T_10[ 240/*node_erase  */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            718 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            718 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             719 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1810:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -7204,11 +7204,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1810:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -7230,7 +7230,7 @@ end
  */
                 end
             720 : begin
-                                  T_10[  70/*parentKey   */ +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[  70/*parentKey   */ +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1813:code
   ProgramPA.java:0220:<init>
@@ -7251,7 +7251,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1815:code
   ProgramPA.java:0220:<init>
@@ -7274,11 +7274,11 @@ end
  */
                 end
             721 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1817:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -7298,11 +7298,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1817:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -7323,13 +7323,13 @@ end
   BtreePA.java:3786:main
  */
                 end
-            722 : begin branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= T_10[  70/*parentKey   */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            722 : begin branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= T_10[  70/*parentKey   */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             723 : begin
-                                  M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1820:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -7349,11 +7349,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1820:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -7374,13 +7374,13 @@ end
   BtreePA.java:3786:main
  */
                 end
-            724 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            724 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             725 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0385:removeElementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0396:removeElementAt
   BtreePA.java:1823:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -7400,11 +7400,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0385:removeElementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0396:removeElementAt
   BtreePA.java:1823:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -7428,30 +7428,30 @@ end
             726 : begin branch_1_StuckSA_Copy_15[   4/*Keys*/ +: 32] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*Keys*/ +: 32]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             727 : begin /* Move Down */
 
-if (0 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (0 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + 0 * 8 +: 8] <= branch_1_StuckSA_Copy_15[   4/*key */ + 1 * 8 +: 8];
 end
 
-if (1 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (1 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + 1 * 8 +: 8] <= branch_1_StuckSA_Copy_15[   4/*key */ + 2 * 8 +: 8];
 end
 
-if (2 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (2 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + 2 * 8 +: 8] <= branch_1_StuckSA_Copy_15[   4/*key */ + 3 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             728 : begin branch_1_StuckSA_Copy_15[  36/*Data*/ +: 20] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*Data*/ +: 20]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             729 : begin /* Move Down */
 
-if (0 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (0 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + 0 * 5 +: 5] <= branch_1_StuckSA_Copy_15[  36/*data*/ + 1 * 5 +: 5];
 end
 
-if (1 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (1 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + 1 * 5 +: 5] <= branch_1_StuckSA_Copy_15[  36/*data*/ + 2 * 5 +: 5];
 end
 
-if (2 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (2 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + 2 * 5 +: 5] <= branch_1_StuckSA_Copy_15[  36/*data*/ + 3 * 5 +: 5];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
@@ -7468,31 +7468,31 @@ end
             740 : begin T_10[  21/*search  */ +: 8] <= T_10[ 163/*Key */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             741 : begin T_10[ 250/*node_balance*/ +: 5] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             742 : begin leaf_0_StuckSA_Memory_Based_23_base_offset <=   11/*leaf*/ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            743 : begin leaf_0_StuckSA_Transaction_25[   0/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            744 : begin leaf_0_StuckSA_Transaction_25[   8/*limit   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            745 : begin leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            746 : begin if (leaf_0_StuckSA_Transaction_25[   8/*limit   */ +: 4] == 0) step = 747; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            747 : begin leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            748 : begin leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1] <= 0;leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            749 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            750 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] > 0) step = 764; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            751 : begin leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            752 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            753 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] == 0) step = 756; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            754 : begin leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            755 : begin leaf_0_StuckSA_Transaction_25[  27/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            743 : begin leaf_0_StuckSA_Transaction_25[   4/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            744 : begin leaf_0_StuckSA_Transaction_25[  28/*limit   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            745 : begin leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            746 : begin if (leaf_0_StuckSA_Transaction_25[  28/*limit   */ +: 4] == 0) step = 747; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            747 : begin leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            748 : begin leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1] <= 0;leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            749 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            750 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] > 0) step = 764; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            751 : begin leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            752 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            753 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] == 0) step = 756; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            754 : begin leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            755 : begin leaf_0_StuckSA_Transaction_25[  20/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             756 : begin step = 764; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            757 : begin leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            758 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            759 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] > 0) step = 764; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            760 : begin leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            761 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            762 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] == 0) step = 764; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            763 : begin leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            764 : begin leaf_0_StuckSA_Transaction_25[  27/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            765 : begin T_10[  29/*found   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            757 : begin leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            758 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            759 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] > 0) step = 764; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            760 : begin leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            761 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            762 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] == 0) step = 764; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            763 : begin leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            764 : begin leaf_0_StuckSA_Transaction_25[  20/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            765 : begin T_10[  29/*found   */ +: 1] <= leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             766 : begin
-                                  T_10[ 110/*index   */ +: 4] <= leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[ 110/*index   */ +: 4] <= leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0822:findEqualInLeaf
   BtreePA.java:1946:Then
@@ -7520,7 +7520,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[  38/*data*/ +: 8] <= leaf_0_StuckSA_Transaction_25[  27/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                T_10[  38/*data*/ +: 8] <= leaf_0_StuckSA_Transaction_25[  20/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0824:findEqualInLeaf
   BtreePA.java:1946:Then
@@ -7559,62 +7559,62 @@ end
             774 : begin T_10[  21/*search  */ +: 8] <= T_10[ 163/*Key */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             775 : begin T_10[ 250/*node_balance*/ +: 5] <= T_10[ 189/*parent  */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             776 : begin branch_0_StuckSA_Memory_Based_11_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            777 : begin branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            778 : begin branch_0_StuckSA_Transaction_13[   8/*limit   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            779 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            780 : begin if (branch_0_StuckSA_Transaction_13[   8/*limit   */ +: 4] == 0) step = 781; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            781 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            782 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 0;branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            783 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            784 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 820; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            785 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            786 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            787 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 791; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            788 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            789 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            790 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            777 : begin branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            778 : begin branch_0_StuckSA_Transaction_13[  25/*limit   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            779 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            780 : begin if (branch_0_StuckSA_Transaction_13[  25/*limit   */ +: 4] == 0) step = 781; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            781 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            782 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 0;branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            783 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            784 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 820; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            785 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            786 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            787 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 791; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            788 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            789 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            790 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             791 : begin step = 820; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            792 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            793 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            794 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 820; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            795 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            796 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            797 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 801; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            798 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            799 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            800 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            792 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            793 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            794 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 820; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            795 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            796 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            797 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 801; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            798 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            799 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            800 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             801 : begin step = 820; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            802 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 2; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            803 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            804 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 820; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            805 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            806 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            807 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 811; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            808 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            809 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            810 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            802 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 2; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            803 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            804 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 820; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            805 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            806 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            807 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 811; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            808 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            809 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            810 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             811 : begin step = 820; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            812 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 3; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            813 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            814 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 820; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            815 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            816 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            817 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 820; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            818 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            819 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            820 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            821 : begin T_10[  29/*found   */ +: 1] <= branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            822 : begin T_10[  12/*first   */ +: 4] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            812 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 3; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            813 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            814 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 820; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            815 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            816 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            817 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 820; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            818 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            819 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            820 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            821 : begin T_10[  29/*found   */ +: 1] <= branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            822 : begin T_10[  12/*first   */ +: 4] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             823 : begin if (T_10[  29/*found   */ +: 1] == 0) step = 825; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            824 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            824 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             825 : begin step = 828; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            826 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            826 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             827 : begin
-                                  branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:0881:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:0876:<init>
@@ -7644,11 +7644,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:0881:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:0876:<init>
@@ -7679,7 +7679,7 @@ end
   BtreePA.java:3786:main
  */
                 end
-            828 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            828 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             829 : begin
                                   T_10[ 194/*child   */ +: 5] <= T_10[  16/*next*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
@@ -7805,31 +7805,31 @@ end
  */
                 end
             833 : begin leaf_0_StuckSA_Memory_Based_23_base_offset <=   11/*leaf*/ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            834 : begin leaf_0_StuckSA_Transaction_25[   0/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            835 : begin leaf_0_StuckSA_Transaction_25[   8/*limit   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            836 : begin leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            837 : begin if (leaf_0_StuckSA_Transaction_25[   8/*limit   */ +: 4] == 0) step = 838; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            838 : begin leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            839 : begin leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1] <= 0;leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            840 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            841 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] > 0) step = 855; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            842 : begin leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            843 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            844 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] == 0) step = 847; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            845 : begin leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            846 : begin leaf_0_StuckSA_Transaction_25[  27/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            834 : begin leaf_0_StuckSA_Transaction_25[   4/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            835 : begin leaf_0_StuckSA_Transaction_25[  28/*limit   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            836 : begin leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            837 : begin if (leaf_0_StuckSA_Transaction_25[  28/*limit   */ +: 4] == 0) step = 838; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            838 : begin leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            839 : begin leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1] <= 0;leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            840 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            841 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] > 0) step = 855; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            842 : begin leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            843 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            844 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] == 0) step = 847; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            845 : begin leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            846 : begin leaf_0_StuckSA_Transaction_25[  20/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             847 : begin step = 855; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            848 : begin leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            849 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            850 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] > 0) step = 855; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            851 : begin leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            852 : begin leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  19/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            853 : begin if (leaf_0_StuckSA_Transaction_25[  43/*equal   */ +: 1] == 0) step = 855; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            854 : begin leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            855 : begin leaf_0_StuckSA_Transaction_25[  27/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            856 : begin T_10[  29/*found   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  14/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            848 : begin leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            849 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] == leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            850 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] > 0) step = 855; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            851 : begin leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    4/*key */ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            852 : begin leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] <= leaf_0_StuckSA_Transaction_25[  12/*key */ +: 8] == leaf_0_StuckSA_Transaction_25[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            853 : begin if (leaf_0_StuckSA_Transaction_25[   3/*equal   */ +: 1] == 0) step = 855; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            854 : begin leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            855 : begin leaf_0_StuckSA_Transaction_25[  20/*data*/ +: 8] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+   20/*data*/ + leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            856 : begin T_10[  29/*found   */ +: 1] <= leaf_0_StuckSA_Transaction_25[   2/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             857 : begin
-                                  T_10[ 110/*index   */ +: 4] <= leaf_0_StuckSA_Transaction_25[  15/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[ 110/*index   */ +: 4] <= leaf_0_StuckSA_Transaction_25[  32/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0822:findEqualInLeaf
   BtreePA.java:1975:Then
@@ -7860,7 +7860,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[  38/*data*/ +: 8] <= leaf_0_StuckSA_Transaction_25[  27/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                T_10[  38/*data*/ +: 8] <= leaf_0_StuckSA_Transaction_25[  20/*data*/ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0824:findEqualInLeaf
   BtreePA.java:1975:Then
@@ -7898,13 +7898,13 @@ end
             861 : begin step = 770; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             862 : begin if (T_10[  29/*found   */ +: 1] == 0) step = 872; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             863 : begin leaf_1_StuckSA_Memory_Based_26_base_offset <=   11/*leaf*/ + T_10[ 179/*find*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            864 : begin leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            864 : begin leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             865 : begin
-                                  leaf_1_StuckSA_Transaction_28[  19/*key */ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  leaf_1_StuckSA_Transaction_28[  12/*key */ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:2136:code
   ProgramPA.java:0220:<init>
   BtreePA.java:2132:<init>
@@ -7923,11 +7923,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                leaf_1_StuckSA_Transaction_28[  27/*data*/ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                leaf_1_StuckSA_Transaction_28[  20/*data*/ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:2136:code
   ProgramPA.java:0220:<init>
   BtreePA.java:2132:<init>
@@ -7947,13 +7947,13 @@ end
   BtreePA.java:3786:main
  */
                 end
-            866 : begin T_10[ 171/*Data*/ +: 8] <= leaf_1_StuckSA_Transaction_28[  27/*data*/ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            866 : begin T_10[ 171/*Data*/ +: 8] <= leaf_1_StuckSA_Transaction_28[  20/*data*/ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             867 : begin
-                                  leaf_1_StuckSA_Transaction_28[  19/*key */ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  leaf_1_StuckSA_Transaction_28[  12/*key */ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0385:removeElementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0396:removeElementAt
   BtreePA.java:2139:code
   ProgramPA.java:0220:<init>
   BtreePA.java:2132:<init>
@@ -7972,11 +7972,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                leaf_1_StuckSA_Transaction_28[  27/*data*/ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                leaf_1_StuckSA_Transaction_28[  20/*data*/ +: 8] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0385:removeElementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0396:removeElementAt
   BtreePA.java:2139:code
   ProgramPA.java:0220:<init>
   BtreePA.java:2132:<init>
@@ -7999,14 +7999,14 @@ end
             868 : begin leaf_1_StuckSA_Copy_27[   4/*Keys*/ +: 16] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*Keys*/ +: 16]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             869 : begin /* Move Down */
 
-if (0 >= leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4]) begin
+if (0 >= leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4]) begin
   M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + 0 * 8 +: 8] <= leaf_1_StuckSA_Copy_27[   4/*key */ + 1 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             870 : begin leaf_1_StuckSA_Copy_27[  20/*Data*/ +: 16] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*Data*/ +: 16]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             871 : begin /* Move Down */
 
-if (0 >= leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4]) begin
+if (0 >= leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4]) begin
   M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + 0 * 8 +: 8] <= leaf_1_StuckSA_Copy_27[  20/*data*/ + 1 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
@@ -8020,20 +8020,20 @@ end
             879 : begin T_10[ 245/*node_isLow  */ +: 5] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             880 : begin T_10[ 139/*branchBase  */ +: 11] <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             881 : begin branch_0_StuckSA_Memory_Based_11_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            882 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            883 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            882 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            883 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             884 : begin T_10[ 137/*mergeable   */ +: 1] <= T_10[ 154/*branchSize  */ +: 4] >= T_10[ 212/*two */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             885 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 887; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             886 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             887 : begin step = 1031; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             888 : begin branch_1_StuckSA_Memory_Based_14_base_offset <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            889 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            889 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             890 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:1512:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1495:<init>
@@ -8056,11 +8056,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:1512:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1495:<init>
@@ -8084,14 +8084,14 @@ end
   BtreePA.java:3786:main
  */
                 end
-            891 : begin T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            892 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            891 : begin T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            892 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             893 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:1513:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1495:<init>
@@ -8114,11 +8114,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:1513:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1495:<init>
@@ -8142,16 +8142,16 @@ end
   BtreePA.java:3786:main
  */
                 end
-            894 : begin T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            894 : begin T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             895 : begin T_10[ 250/*node_balance*/ +: 5] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             896 : begin branch_0_StuckSA_Memory_Based_11_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            897 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            897 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             898 : begin
-                                  branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1516:code
   ProgramPA.java:0220:<init>
@@ -8175,11 +8175,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1516:code
   ProgramPA.java:0220:<init>
@@ -8204,39 +8204,39 @@ end
   BtreePA.java:3786:main
  */
                 end
-            899 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            900 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            899 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            900 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             901 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 963; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             902 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             903 : begin leaf_0_StuckSA_Memory_Based_23_base_offset <=   11/*leaf*/ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            904 : begin leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            905 : begin T_10[ 150/*leafSize*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            904 : begin leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            905 : begin T_10[ 150/*leafSize*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             906 : begin T_10[ 114/*nl  */ +: 4] <= T_10[ 150/*leafSize*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             907 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 127/*r   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             908 : begin leaf_0_StuckSA_Memory_Based_23_base_offset <=   11/*leaf*/ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            909 : begin leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            910 : begin T_10[ 150/*leafSize*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            909 : begin leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4] <= M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            910 : begin T_10[ 150/*leafSize*/ +: 4] <= leaf_0_StuckSA_Transaction_25[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             911 : begin T_10[ 118/*nr  */ +: 4] <= T_10[ 150/*leafSize*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             912 : begin T_10[ 137/*mergeable   */ +: 1] <= (T_10[ 114/*nl  */ +: 4] + T_10[ 118/*nr  */ +: 4] <= 2) ? 'b1 : 'b0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             913 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 961; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             914 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            915 : begin branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            916 : begin branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4] <= 4; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            917 : begin branch_1_StuckSA_Transaction_16[  12/*isFull  */ +: 1] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] >= branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            918 : begin branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            919 : begin branch_1_StuckSA_Transaction_16[  13/*isEmpty */ +: 1] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] == branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            915 : begin branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            916 : begin branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4] <= 4; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            917 : begin branch_1_StuckSA_Transaction_16[   0/*isFull  */ +: 1] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] >= branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            918 : begin branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            919 : begin branch_1_StuckSA_Transaction_16[   1/*isEmpty */ +: 1] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] == branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             920 : begin T_10[ 245/*node_isLow  */ +: 5] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             921 : begin leaf_1_StuckSA_Memory_Based_26_base_offset <=   11/*leaf*/ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             922 : begin leaf_2_StuckSA_Memory_Based_29_base_offset <=   11/*leaf*/ + T_10[ 122/*l   */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             923 : begin leaf_3_StuckSA_Memory_Based_32_base_offset <=   11/*leaf*/ + T_10[ 127/*r   */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            924 : begin leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            925 : begin leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            926 : begin leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            927 : begin leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] <= leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            928 : begin leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            929 : begin leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12] <= leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0534:concatenate
+            924 : begin leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            925 : begin leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            926 : begin leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            927 : begin leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] <= leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            928 : begin leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            929 : begin leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12] <= leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0545:concatenate
   BtreePA.java:1543:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1537:<init>
@@ -8266,8 +8266,8 @@ end
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             930 : begin copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12];
-index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8;
-index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8;
+index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8;
+index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset >= 4096) begin
    M_9[index_leaf_1_StuckSA_Memory_Based_26_base_offset +: 4096] <= M_9[index_leaf_2_StuckSA_Memory_Based_29_base_offset +: 4096];
    copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset - 4096;
@@ -8349,8 +8349,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             931 : begin leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12] <= leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4]*8; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             932 : begin copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12];
-index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8;
-index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8;
+index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8;
+index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset >= 4096) begin
    M_9[index_leaf_1_StuckSA_Memory_Based_26_base_offset +: 4096] <= M_9[index_leaf_2_StuckSA_Memory_Based_29_base_offset +: 4096];
    copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset - 4096;
@@ -8430,16 +8430,16 @@ if (copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset >= 1) begin
    index_leaf_1_StuckSA_Memory_Based_26_base_offset = index_leaf_1_StuckSA_Memory_Based_26_base_offset + 1;
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            933 : begin leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4] <= leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4] +  leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            934 : begin M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4] <= leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            935 : begin leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            936 : begin leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            937 : begin leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            938 : begin leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] <= leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            939 : begin leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4] <= leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            940 : begin leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12] <= leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0534:concatenate
+            933 : begin leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4] <= leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4] +  leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            934 : begin M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4] <= leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            935 : begin leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4] <= M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            936 : begin leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            937 : begin leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            938 : begin leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] <= leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            939 : begin leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4] <= leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            940 : begin leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12] <= leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0545:concatenate
   BtreePA.java:1544:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1537:<init>
@@ -8469,8 +8469,8 @@ end
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             941 : begin copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12];
-index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8;
-index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8;
+index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8;
+index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+    4/*key */ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset >= 4096) begin
    M_9[index_leaf_1_StuckSA_Memory_Based_26_base_offset +: 4096] <= M_9[index_leaf_3_StuckSA_Memory_Based_32_base_offset +: 4096];
    copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset - 4096;
@@ -8552,8 +8552,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             942 : begin leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12] <= leaf_1_StuckSA_Transaction_28[  44/*copyCount   */ +: 4]*8; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             943 : begin copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Transaction_28[   0/*copyBits*/ +: 12];
-index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8;
-index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  15/*index   */ +: 4] * 8;
+index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8;
+index_leaf_1_StuckSA_Memory_Based_26_base_offset = leaf_1_StuckSA_Memory_Based_26_base_offset+   20/*data*/ + leaf_1_StuckSA_Transaction_28[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset >= 4096) begin
    M_9[index_leaf_1_StuckSA_Memory_Based_26_base_offset +: 4096] <= M_9[index_leaf_3_StuckSA_Memory_Based_32_base_offset +: 4096];
    copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset = copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset - 4096;
@@ -8633,8 +8633,8 @@ if (copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset >= 1) begin
    index_leaf_1_StuckSA_Memory_Based_26_base_offset = index_leaf_1_StuckSA_Memory_Based_26_base_offset + 1;
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            944 : begin leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4] <= leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4] +  leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            945 : begin M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4] <= leaf_1_StuckSA_Transaction_28[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            944 : begin leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4] <= leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4] +  leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            945 : begin M_9[leaf_1_StuckSA_Memory_Based_26_base_offset+    0/*currentSize */ +: 4] <= leaf_1_StuckSA_Transaction_28[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             946 : begin T_10[ 225/*node_setBranch  */ +: 5] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             947 : begin M_9[   5/*isLeaf  */ + T_10[ 225/*node_setBranch  */ +: 5] * 62 +: 1] <= 1'b1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             948 : begin T_10[ 240/*node_erase  */ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
@@ -8656,26 +8656,26 @@ end
             964 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             965 : begin T_10[ 139/*branchBase  */ +: 11] <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             966 : begin branch_0_StuckSA_Memory_Based_11_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            967 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            968 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            967 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            968 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             969 : begin T_10[ 114/*nl  */ +: 4] <= T_10[ 154/*branchSize  */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             970 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 127/*r   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             971 : begin T_10[ 139/*branchBase  */ +: 11] <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             972 : begin branch_0_StuckSA_Memory_Based_11_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            973 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            974 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            973 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            974 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             975 : begin T_10[ 118/*nr  */ +: 4] <= T_10[ 154/*branchSize  */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             976 : begin T_10[ 137/*mergeable   */ +: 1] <= (T_10[ 114/*nl  */ +: 4]+ 1 +T_10[ 118/*nr  */ +: 4] <= 3) ? 'b1 : 'b0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             977 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 1030; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             978 : begin branch_2_StuckSA_Memory_Based_17_base_offset <=   11/*branch  */ + T_10[ 122/*l   */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             979 : begin branch_3_StuckSA_Memory_Based_20_base_offset <=   11/*branch  */ + T_10[ 127/*r   */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            980 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            980 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             981 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:1576:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1573:<init>
@@ -8704,11 +8704,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:1576:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1573:<init>
@@ -8738,21 +8738,21 @@ end
   BtreePA.java:3786:main
  */
                 end
-            982 : begin T_10[  70/*parentKey   */ +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            982 : begin T_10[  70/*parentKey   */ +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             983 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            984 : begin branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            985 : begin branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4] <= 4; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            986 : begin branch_1_StuckSA_Transaction_16[  12/*isFull  */ +: 1] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] >= branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            987 : begin branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            988 : begin branch_1_StuckSA_Transaction_16[  13/*isEmpty */ +: 1] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] == branch_1_StuckSA_Transaction_16[  36/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            989 : begin branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            990 : begin branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            991 : begin branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            992 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            993 : begin branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            994 : begin branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12] <= branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0534:concatenate
+            984 : begin branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            985 : begin branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4] <= 4; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            986 : begin branch_1_StuckSA_Transaction_16[   0/*isFull  */ +: 1] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] >= branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            987 : begin branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            988 : begin branch_1_StuckSA_Transaction_16[   1/*isEmpty */ +: 1] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] == branch_1_StuckSA_Transaction_16[  37/*full*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            989 : begin branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            990 : begin branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            991 : begin branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            992 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            993 : begin branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            994 : begin branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12] <= branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0545:concatenate
   BtreePA.java:1580:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1573:<init>
@@ -8782,8 +8782,8 @@ end
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             995 : begin copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12];
-index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8;
-index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8;
+index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8;
+index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8;
 if (copyLength_branch_1_StuckSA_Memory_Based_14_base_offset >= 4096) begin
    M_9[index_branch_1_StuckSA_Memory_Based_14_base_offset +: 4096] <= M_9[index_branch_2_StuckSA_Memory_Based_17_base_offset +: 4096];
    copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = copyLength_branch_1_StuckSA_Memory_Based_14_base_offset - 4096;
@@ -8865,8 +8865,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             996 : begin branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12] <= branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4]*5; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
             997 : begin copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12];
-index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5;
-index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5;
+index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5;
+index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5;
 if (copyLength_branch_1_StuckSA_Memory_Based_14_base_offset >= 4096) begin
    M_9[index_branch_1_StuckSA_Memory_Based_14_base_offset +: 4096] <= M_9[index_branch_2_StuckSA_Memory_Based_17_base_offset +: 4096];
    copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = copyLength_branch_1_StuckSA_Memory_Based_14_base_offset - 4096;
@@ -8946,19 +8946,19 @@ if (copyLength_branch_1_StuckSA_Memory_Based_14_base_offset >= 1) begin
    index_branch_1_StuckSA_Memory_Based_14_base_offset = index_branch_1_StuckSA_Memory_Based_14_base_offset + 1;
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            998 : begin branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] +  branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-            999 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1000 : begin branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= T_10[  70/*parentKey   */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1001 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1002 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1003 : begin branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1004 : begin branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1005 : begin branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1006 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1007 : begin branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4] <= branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1008 : begin branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12] <= branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0534:concatenate
+            998 : begin branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] +  branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+            999 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1000 : begin branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= T_10[  70/*parentKey   */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1001 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1002 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1003 : begin branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1004 : begin branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1005 : begin branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1006 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1007 : begin branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4] <= branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1008 : begin branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12] <= branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0545:concatenate
   BtreePA.java:1584:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1573:<init>
@@ -8988,8 +8988,8 @@ end
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1009 : begin copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12];
-index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 8;
-index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8;
+index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 8;
+index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8;
 if (copyLength_branch_1_StuckSA_Memory_Based_14_base_offset >= 4096) begin
    M_9[index_branch_1_StuckSA_Memory_Based_14_base_offset +: 4096] <= M_9[index_branch_3_StuckSA_Memory_Based_20_base_offset +: 4096];
    copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = copyLength_branch_1_StuckSA_Memory_Based_14_base_offset - 4096;
@@ -9071,8 +9071,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1010 : begin branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12] <= branch_1_StuckSA_Transaction_16[  41/*copyCount   */ +: 4]*5; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1011 : begin copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Transaction_16[   0/*copyBits*/ +: 12];
-index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 5;
-index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5;
+index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 5;
+index_branch_1_StuckSA_Memory_Based_14_base_offset = branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5;
 if (copyLength_branch_1_StuckSA_Memory_Based_14_base_offset >= 4096) begin
    M_9[index_branch_1_StuckSA_Memory_Based_14_base_offset +: 4096] <= M_9[index_branch_3_StuckSA_Memory_Based_20_base_offset +: 4096];
    copyLength_branch_1_StuckSA_Memory_Based_14_base_offset = copyLength_branch_1_StuckSA_Memory_Based_14_base_offset - 4096;
@@ -9152,11 +9152,11 @@ if (copyLength_branch_1_StuckSA_Memory_Based_14_base_offset >= 1) begin
    index_branch_1_StuckSA_Memory_Based_14_base_offset = index_branch_1_StuckSA_Memory_Based_14_base_offset + 1;
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1012 : begin branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4] +  branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1013 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4] <= branch_1_StuckSA_Transaction_16[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1014 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1015 : begin branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1016 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1012 : begin branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4] +  branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1013 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4] <= branch_1_StuckSA_Transaction_16[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1014 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1015 : begin branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1016 : begin M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1017 : begin T_10[ 240/*node_erase  */ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1018 : begin if (T_10[ 240/*node_erase  */ +: 5] > 0) step = 1019; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1019 : begin stopped <= 1; /* Cannot free root */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
@@ -9184,8 +9184,8 @@ end
            1041 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 189/*parent  */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1042 : begin T_10[ 139/*branchBase  */ +: 11] <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1043 : begin branch_0_StuckSA_Memory_Based_11_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1044 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1045 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1044 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1045 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1046 : begin T_10[ 137/*mergeable   */ +: 1] <= T_10[ 221/*mergeIndex  */ +: 4] >= T_10[ 154/*branchSize  */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1047 : begin if (T_10[ 137/*mergeable   */ +: 1] > 0) step = 1243; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1048 : begin T_10[ 110/*index   */ +: 4] <= T_10[ 221/*mergeIndex  */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
@@ -9197,21 +9197,21 @@ end
            1054 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 250/*node_balance*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1055 : begin T_10[ 139/*branchBase  */ +: 11] <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1056 : begin branch_0_StuckSA_Memory_Based_11_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1057 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1058 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1057 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1058 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1059 : begin T_10[ 137/*mergeable   */ +: 1] <= T_10[ 110/*index   */ +: 4] > T_10[ 154/*branchSize  */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1060 : begin T_10[ 137/*mergeable   */ +: 1] <= T_10[ 154/*branchSize  */ +: 4] < T_10[ 212/*two */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1061 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 1063; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1062 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1063 : begin step = 1143; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1064 : begin branch_1_StuckSA_Memory_Based_14_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1065 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1065 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1066 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1621:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1602:<init>
@@ -9240,11 +9240,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1621:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1602:<init>
@@ -9275,7 +9275,7 @@ end
  */
                 end
            1067 : begin
-                                  T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1624:code
   ProgramPA.java:0220:<init>
@@ -9305,7 +9305,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1626:code
   ProgramPA.java:0220:<init>
@@ -9337,11 +9337,11 @@ end
  */
                 end
            1068 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1629:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1602:<init>
@@ -9370,11 +9370,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1629:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1602:<init>
@@ -9404,15 +9404,15 @@ end
   BtreePA.java:3786:main
  */
                 end
-           1069 : begin T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1069 : begin T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1070 : begin branch_0_StuckSA_Memory_Based_11_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1071 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1071 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1072 : begin
-                                  branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1637:code
   ProgramPA.java:0220:<init>
@@ -9442,11 +9442,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1637:code
   ProgramPA.java:0220:<init>
@@ -9477,8 +9477,8 @@ end
   BtreePA.java:3786:main
  */
                 end
-           1073 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1074 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1073 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1074 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1075 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 1095; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1076 : begin
                                   leaf_2_StuckSA_Memory_Based_29_base_offset <=   11/*leaf*/ + T_10[ 122/*l   */ +: 5] * 62; /*   BtreePA.java:0664:<init>
@@ -9549,9 +9549,9 @@ end
  */
                 end
            1077 : begin
-                                  leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0707:leafSize
   BtreePA.java:1643:Then
   ProgramPA.java:0189:<init>
@@ -9584,9 +9584,9 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0707:leafSize
   BtreePA.java:1646:Then
   ProgramPA.java:0189:<init>
@@ -9621,7 +9621,7 @@ end
  */
                 end
            1078 : begin
-                                  T_10[ 114/*nl  */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[ 114/*nl  */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0707:leafSize
   BtreePA.java:1643:Then
@@ -9655,7 +9655,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[ 118/*nr  */ +: 4] <= leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                T_10[ 118/*nr  */ +: 4] <= leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0707:leafSize
   BtreePA.java:1646:Then
@@ -9694,14 +9694,14 @@ end
            1080 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 1082; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1081 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1082 : begin step = 1143; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1083 : begin leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1084 : begin leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1085 : begin leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1086 : begin leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1087 : begin leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4] <= leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1088 : begin leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12] <= leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0560:prepend
+           1083 : begin leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1084 : begin leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1085 : begin leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1086 : begin leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1087 : begin leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4] <= leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1088 : begin leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12] <= leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0571:prepend
   BtreePA.java:1664:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1639:<init>
@@ -9734,8 +9734,8 @@ end
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1089 : begin copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12];
-index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8;
-index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8;
+index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8;
+index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset >= 4096) begin
    M_9[index_leaf_2_StuckSA_Memory_Based_29_base_offset +: 4096] <= M_9[index_leaf_3_StuckSA_Memory_Based_32_base_offset +: 4096];
    copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset - 4096;
@@ -9817,8 +9817,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1090 : begin leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12] <= leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4]*8; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1091 : begin copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12];
-index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8;
-index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8;
+index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8;
+index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset >= 4096) begin
    M_9[index_leaf_2_StuckSA_Memory_Based_29_base_offset +: 4096] <= M_9[index_leaf_3_StuckSA_Memory_Based_32_base_offset +: 4096];
    copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset - 4096;
@@ -9900,7 +9900,7 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1092 : begin M_9[leaf_3_StuckSA_Memory_Based_32_base_offset +: 36] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset +: 36]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1093 : begin  /* NOT SET */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1094 : begin M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4] <= leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1094 : begin M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4] <= leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1095 : begin step = 1129; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1096 : begin
                                   branch_2_StuckSA_Memory_Based_17_base_offset <=   11/*branch  */ + T_10[ 122/*l   */ +: 5] * 62; /*   BtreePA.java:0689:<init>
@@ -9971,9 +9971,9 @@ end
  */
                 end
            1097 : begin
-                                  branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0721:branchSize
   BtreePA.java:1670:Else
   ProgramPA.java:0204:<init>
@@ -10006,9 +10006,9 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0721:branchSize
   BtreePA.java:1673:Else
   ProgramPA.java:0204:<init>
@@ -10043,7 +10043,7 @@ end
  */
                 end
            1098 : begin
-                                  T_10[ 114/*nl  */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
+                                  T_10[ 114/*nl  */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
   MemoryLayoutPA.java:0821:add
   BtreePA.java:0722:branchSize
   BtreePA.java:1670:Else
@@ -10077,7 +10077,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[ 118/*nr  */ +: 4] <= branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
+                T_10[ 118/*nr  */ +: 4] <= branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
   MemoryLayoutPA.java:0821:add
   BtreePA.java:0722:branchSize
   BtreePA.java:1673:Else
@@ -10116,13 +10116,13 @@ end
            1100 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 1102; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1101 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1102 : begin step = 1143; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1103 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1103 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1104 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1693:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1639:<init>
@@ -10154,11 +10154,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1693:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1639:<init>
@@ -10191,15 +10191,15 @@ end
   BtreePA.java:3786:main
  */
                 end
-           1105 : begin branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1105 : begin branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1106 : begin M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1107 : begin branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1107 : begin branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1108 : begin
-                                  branch_2_StuckSA_Transaction_19[  19/*key */ +: 8] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  12/*key */ +: 8] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0321:pop
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0332:pop
   BtreePA.java:1695:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1639:<init>
@@ -10231,11 +10231,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_2_StuckSA_Transaction_19[  27/*data*/ +: 5] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_2_StuckSA_Transaction_19[  20/*data*/ +: 5] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0321:pop
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0332:pop
   BtreePA.java:1695:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1639:<init>
@@ -10269,7 +10269,7 @@ end
  */
                 end
            1109 : begin
-                                  branch_3_StuckSA_Transaction_22[  19/*key */ +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_3_StuckSA_Transaction_22[  12/*key */ +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1697:Else
   ProgramPA.java:0204:<init>
@@ -10302,7 +10302,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_3_StuckSA_Transaction_22[  27/*data*/ +: 5] <= branch_2_StuckSA_Transaction_19[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_3_StuckSA_Transaction_22[  20/*data*/ +: 5] <= branch_2_StuckSA_Transaction_19[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1699:Else
   ProgramPA.java:0204:<init>
@@ -10336,45 +10336,45 @@ end
   BtreePA.java:3786:main
  */
                 end
-           1110 : begin branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1111 : begin branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1110 : begin branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1111 : begin branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1112 : begin branch_3_StuckSA_Copy_21[   4/*Keys*/ +: 32] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*Keys*/ +: 32]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1113 : begin /* Move Up */
 
-if (1 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (1 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + 1 * 8 +: 8] <= branch_3_StuckSA_Copy_21[   4/*key */ + 0 * 8 +: 8];
 end
 
-if (2 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (2 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + 2 * 8 +: 8] <= branch_3_StuckSA_Copy_21[   4/*key */ + 1 * 8 +: 8];
 end
 
-if (3 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (3 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + 3 * 8 +: 8] <= branch_3_StuckSA_Copy_21[   4/*key */ + 2 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1114 : begin branch_3_StuckSA_Copy_21[  36/*Data*/ +: 20] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*Data*/ +: 20]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1115 : begin /* Move Up */
 
-if (1 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (1 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + 1 * 5 +: 5] <= branch_3_StuckSA_Copy_21[  36/*data*/ + 0 * 5 +: 5];
 end
 
-if (2 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (2 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + 2 * 5 +: 5] <= branch_3_StuckSA_Copy_21[  36/*data*/ + 1 * 5 +: 5];
 end
 
-if (3 > branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4]) begin
+if (3 > branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4]) begin
   M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + 3 * 5 +: 5] <= branch_3_StuckSA_Copy_21[  36/*data*/ + 2 * 5 +: 5];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1116 : begin M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]+ 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1117 : begin
-                                  M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 8 +: 8] <= branch_3_StuckSA_Transaction_22[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 8 +: 8] <= branch_3_StuckSA_Transaction_22[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0308:unshift
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0319:unshift
   BtreePA.java:1701:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1639:<init>
@@ -10406,11 +10406,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 5 +: 5] <= branch_3_StuckSA_Transaction_22[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 5 +: 5] <= branch_3_StuckSA_Transaction_22[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0308:unshift
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0319:unshift
   BtreePA.java:1701:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1639:<init>
@@ -10443,14 +10443,14 @@ end
   BtreePA.java:3786:main
  */
                 end
-           1118 : begin branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1119 : begin branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1120 : begin branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1121 : begin branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1122 : begin branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4] <= branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1123 : begin branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12] <= branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0560:prepend
+           1118 : begin branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1119 : begin branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1120 : begin branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1121 : begin branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1122 : begin branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4] <= branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1123 : begin branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12] <= branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0571:prepend
   BtreePA.java:1703:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1639:<init>
@@ -10483,8 +10483,8 @@ end
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1124 : begin copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12];
-index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 8;
-index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8;
+index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 8;
+index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8;
 if (copyLength_branch_2_StuckSA_Memory_Based_17_base_offset >= 4096) begin
    M_9[index_branch_2_StuckSA_Memory_Based_17_base_offset +: 4096] <= M_9[index_branch_3_StuckSA_Memory_Based_20_base_offset +: 4096];
    copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = copyLength_branch_2_StuckSA_Memory_Based_17_base_offset - 4096;
@@ -10566,8 +10566,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1125 : begin branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12] <= branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4]*5; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1126 : begin copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12];
-index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 5;
-index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5;
+index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 5;
+index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5;
 if (copyLength_branch_2_StuckSA_Memory_Based_17_base_offset >= 4096) begin
    M_9[index_branch_2_StuckSA_Memory_Based_17_base_offset +: 4096] <= M_9[index_branch_3_StuckSA_Memory_Based_20_base_offset +: 4096];
    copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = copyLength_branch_2_StuckSA_Memory_Based_17_base_offset - 4096;
@@ -10649,20 +10649,20 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1127 : begin M_9[branch_3_StuckSA_Memory_Based_20_base_offset +: 56] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset +: 56]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1128 : begin  /* NOT SET */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1129 : begin M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4] <= branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1129 : begin M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4] <= branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1130 : begin T_10[ 240/*node_erase  */ +: 5] <= T_10[ 122/*l   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1131 : begin if (T_10[ 240/*node_erase  */ +: 5] > 0) step = 1132; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1132 : begin stopped <= 1; /* Cannot free root */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1133 : begin M_9[   5/*node*/ + T_10[ 240/*node_erase  */ +: 5] * 62 +: 62] <= 62'b11111111111111111111111111111111111111111111111111111111111111; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1134 : begin M_9[   6/*free*/ + T_10[ 240/*node_erase  */ +: 5] * 62 +: 5] <= M_9[   0/*freeList*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1135 : begin M_9[   0/*freeList*/ +: 5] <= T_10[ 240/*node_erase  */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1136 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1136 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1137 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0385:removeElementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0396:removeElementAt
   BtreePA.java:1709:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1602:<init>
@@ -10691,11 +10691,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0385:removeElementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0396:removeElementAt
   BtreePA.java:1709:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1602:<init>
@@ -10728,30 +10728,30 @@ end
            1138 : begin branch_1_StuckSA_Copy_15[   4/*Keys*/ +: 32] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*Keys*/ +: 32]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1139 : begin /* Move Down */
 
-if (0 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (0 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + 0 * 8 +: 8] <= branch_1_StuckSA_Copy_15[   4/*key */ + 1 * 8 +: 8];
 end
 
-if (1 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (1 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + 1 * 8 +: 8] <= branch_1_StuckSA_Copy_15[   4/*key */ + 2 * 8 +: 8];
 end
 
-if (2 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (2 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + 2 * 8 +: 8] <= branch_1_StuckSA_Copy_15[   4/*key */ + 3 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1140 : begin branch_1_StuckSA_Copy_15[  36/*Data*/ +: 20] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*Data*/ +: 20]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1141 : begin /* Move Down */
 
-if (0 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (0 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + 0 * 5 +: 5] <= branch_1_StuckSA_Copy_15[  36/*data*/ + 1 * 5 +: 5];
 end
 
-if (1 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (1 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + 1 * 5 +: 5] <= branch_1_StuckSA_Copy_15[  36/*data*/ + 2 * 5 +: 5];
 end
 
-if (2 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (2 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + 2 * 5 +: 5] <= branch_1_StuckSA_Copy_15[  36/*data*/ + 3 * 5 +: 5];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
@@ -10764,8 +10764,8 @@ end
            1148 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 250/*node_balance*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1149 : begin T_10[ 139/*branchBase  */ +: 11] <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1150 : begin branch_0_StuckSA_Memory_Based_11_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1151 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1152 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1151 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1152 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1153 : begin T_10[ 137/*mergeable   */ +: 1] <= T_10[ 110/*index   */ +: 4] >= T_10[ 154/*branchSize  */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1154 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 1156; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1155 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
@@ -10775,13 +10775,13 @@ end
            1159 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1160 : begin step = 1236; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1161 : begin branch_1_StuckSA_Memory_Based_14_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1162 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1162 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1163 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1732:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -10810,11 +10810,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1732:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -10844,14 +10844,14 @@ end
   BtreePA.java:3786:main
  */
                 end
-           1164 : begin T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1165 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1164 : begin T_10[ 122/*l   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1165 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1166 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1735:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -10880,11 +10880,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1735:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -10914,15 +10914,15 @@ end
   BtreePA.java:3786:main
  */
                 end
-           1167 : begin T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1167 : begin T_10[ 127/*r   */ +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1168 : begin branch_0_StuckSA_Memory_Based_11_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1169 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1169 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1170 : begin
-                                  branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1739:code
   ProgramPA.java:0220:<init>
@@ -10952,11 +10952,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0400:firstElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0411:firstElement
   BtreePA.java:0795:hasLeavesForChildren
   BtreePA.java:1739:code
   ProgramPA.java:0220:<init>
@@ -10987,8 +10987,8 @@ end
   BtreePA.java:3786:main
  */
                 end
-           1171 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1172 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1171 : begin T_10[ 225/*node_setBranch  */ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1172 : begin T_10[ 137/*mergeable   */ +: 1] <= M_9[   5/*isLeaf  */ + branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] * 62 +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1173 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 1192; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1174 : begin
                                   leaf_2_StuckSA_Memory_Based_29_base_offset <=   11/*leaf*/ + T_10[ 122/*l   */ +: 5] * 62; /*   BtreePA.java:0664:<init>
@@ -11059,9 +11059,9 @@ end
  */
                 end
            1175 : begin
-                                  leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0707:leafSize
   BtreePA.java:1744:Then
   ProgramPA.java:0189:<init>
@@ -11094,9 +11094,9 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0707:leafSize
   BtreePA.java:1747:Then
   ProgramPA.java:0189:<init>
@@ -11131,7 +11131,7 @@ end
  */
                 end
            1176 : begin
-                                  T_10[ 114/*nl  */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[ 114/*nl  */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0707:leafSize
   BtreePA.java:1744:Then
@@ -11165,7 +11165,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[ 118/*nr  */ +: 4] <= leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                T_10[ 118/*nr  */ +: 4] <= leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:0707:leafSize
   BtreePA.java:1747:Then
@@ -11204,14 +11204,14 @@ end
            1178 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 1180; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1179 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1180 : begin step = 1236; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1181 : begin leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1182 : begin leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1183 : begin leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1184 : begin leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1185 : begin leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4] <= leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1186 : begin leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12] <= leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0534:concatenate
+           1181 : begin leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1182 : begin leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4] <= M_9[leaf_3_StuckSA_Memory_Based_32_base_offset+    0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1183 : begin leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1184 : begin leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1185 : begin leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4] <= leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1186 : begin leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12] <= leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0545:concatenate
   BtreePA.java:1765:Then
   ProgramPA.java:0189:<init>
   BtreePA.java:1741:<init>
@@ -11244,8 +11244,8 @@ end
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1187 : begin copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12];
-index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8;
-index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8;
+index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+    4/*key */ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8;
+index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+    4/*key */ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset >= 4096) begin
    M_9[index_leaf_2_StuckSA_Memory_Based_29_base_offset +: 4096] <= M_9[index_leaf_3_StuckSA_Memory_Based_32_base_offset +: 4096];
    copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset - 4096;
@@ -11327,8 +11327,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1188 : begin leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12] <= leaf_2_StuckSA_Transaction_31[  44/*copyCount   */ +: 4]*8; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1189 : begin copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Transaction_31[   0/*copyBits*/ +: 12];
-index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  15/*index   */ +: 4] * 8;
-index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  15/*index   */ +: 4] * 8;
+index_leaf_3_StuckSA_Memory_Based_32_base_offset = leaf_3_StuckSA_Memory_Based_32_base_offset+   20/*data*/ + leaf_3_StuckSA_Transaction_34[  32/*index   */ +: 4] * 8;
+index_leaf_2_StuckSA_Memory_Based_29_base_offset = leaf_2_StuckSA_Memory_Based_29_base_offset+   20/*data*/ + leaf_2_StuckSA_Transaction_31[  32/*index   */ +: 4] * 8;
 if (copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset >= 4096) begin
    M_9[index_leaf_2_StuckSA_Memory_Based_29_base_offset +: 4096] <= M_9[index_leaf_3_StuckSA_Memory_Based_32_base_offset +: 4096];
    copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset = copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset - 4096;
@@ -11408,8 +11408,8 @@ if (copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset >= 1) begin
    index_leaf_2_StuckSA_Memory_Based_29_base_offset = index_leaf_2_StuckSA_Memory_Based_29_base_offset + 1;
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1190 : begin leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4] +  leaf_3_StuckSA_Transaction_34[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1191 : begin M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4] <= leaf_2_StuckSA_Transaction_31[  35/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1190 : begin leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4] +  leaf_3_StuckSA_Transaction_34[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1191 : begin M_9[leaf_2_StuckSA_Memory_Based_29_base_offset+    0/*currentSize */ +: 4] <= leaf_2_StuckSA_Transaction_31[  36/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1192 : begin step = 1216; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1193 : begin
                                   branch_2_StuckSA_Memory_Based_17_base_offset <=   11/*branch  */ + T_10[ 122/*l   */ +: 5] * 62; /*   BtreePA.java:0689:<init>
@@ -11480,9 +11480,9 @@ end
  */
                 end
            1194 : begin
-                                  branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0721:branchSize
   BtreePA.java:1770:Else
   ProgramPA.java:0204:<init>
@@ -11515,9 +11515,9 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0129:size
+  StuckPA.java:0140:size
   BtreePA.java:0721:branchSize
   BtreePA.java:1773:Else
   ProgramPA.java:0204:<init>
@@ -11552,7 +11552,7 @@ end
  */
                 end
            1195 : begin
-                                  T_10[ 114/*nl  */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
+                                  T_10[ 114/*nl  */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
   MemoryLayoutPA.java:0821:add
   BtreePA.java:0722:branchSize
   BtreePA.java:1770:Else
@@ -11586,7 +11586,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                T_10[ 118/*nr  */ +: 4] <= branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
+                T_10[ 118/*nr  */ +: 4] <= branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]+-1; /*   MemoryLayoutPA.java:0822:<init>
   MemoryLayoutPA.java:0821:add
   BtreePA.java:0722:branchSize
   BtreePA.java:1773:Else
@@ -11625,13 +11625,13 @@ end
            1197 : begin if (T_10[ 137/*mergeable   */ +: 1] == 0) step = 1199; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1198 : begin T_10[ 137/*mergeable   */ +: 1] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1199 : begin step = 1236; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1200 : begin branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1200 : begin branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1201 : begin
-                                  branch_2_StuckSA_Transaction_19[  19/*key */ +: 8] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  12/*key */ +: 8] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:1791:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1741:<init>
@@ -11663,11 +11663,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_2_StuckSA_Transaction_19[  27/*data*/ +: 5] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_2_StuckSA_Transaction_19[  20/*data*/ +: 5] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:1791:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1741:<init>
@@ -11700,13 +11700,13 @@ end
   BtreePA.java:3786:main
  */
                 end
-           1202 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1202 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1203 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1793:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1741:<init>
@@ -11738,11 +11738,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1793:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1741:<init>
@@ -11776,7 +11776,7 @@ end
  */
                 end
            1204 : begin
-                                  branch_2_StuckSA_Transaction_19[  19/*key */ +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_2_StuckSA_Transaction_19[  12/*key */ +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1796:Else
   ProgramPA.java:0204:<init>
@@ -11809,7 +11809,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= T_10[ 114/*nl  */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= T_10[ 114/*nl  */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1798:Else
   ProgramPA.java:0204:<init>
@@ -11844,11 +11844,11 @@ end
  */
                 end
            1205 : begin
-                                  M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8 +: 8] <= branch_2_StuckSA_Transaction_19[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8 +: 8] <= branch_2_StuckSA_Transaction_19[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1800:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1741:<init>
@@ -11880,11 +11880,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5 +: 5] <= branch_2_StuckSA_Transaction_19[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5 +: 5] <= branch_2_StuckSA_Transaction_19[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1800:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1741:<init>
@@ -11917,14 +11917,14 @@ end
   BtreePA.java:3786:main
  */
                 end
-           1206 : begin branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1207 : begin branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1208 : begin branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1209 : begin branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1210 : begin branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4] <= branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1211 : begin branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12] <= branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0186:<init>
-  StuckPA.java:0185:copyKeys
-  StuckPA.java:0534:concatenate
+           1206 : begin branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1207 : begin branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4] <= M_9[branch_3_StuckSA_Memory_Based_20_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1208 : begin branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1209 : begin branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1210 : begin branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4] <= branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1211 : begin branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12] <= branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4]*8; /*   StuckPA.java:0197:<init>
+  StuckPA.java:0196:copyKeys
+  StuckPA.java:0545:concatenate
   BtreePA.java:1802:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:1741:<init>
@@ -11957,8 +11957,8 @@ end
   BtreePA.java:3786:main
  */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1212 : begin copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12];
-index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 8;
-index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 8;
+index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+      4/*key */ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 8;
+index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+      4/*key */ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 8;
 if (copyLength_branch_2_StuckSA_Memory_Based_17_base_offset >= 4096) begin
    M_9[index_branch_2_StuckSA_Memory_Based_17_base_offset +: 4096] <= M_9[index_branch_3_StuckSA_Memory_Based_20_base_offset +: 4096];
    copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = copyLength_branch_2_StuckSA_Memory_Based_17_base_offset - 4096;
@@ -12040,8 +12040,8 @@ end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1213 : begin branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12] <= branch_2_StuckSA_Transaction_19[  41/*copyCount   */ +: 4]*5; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1214 : begin copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Transaction_19[   0/*copyBits*/ +: 12];
-index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  15/*index   */ +: 4] * 5;
-index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  15/*index   */ +: 4] * 5;
+index_branch_3_StuckSA_Memory_Based_20_base_offset = branch_3_StuckSA_Memory_Based_20_base_offset+     36/*data*/ + branch_3_StuckSA_Transaction_22[  29/*index   */ +: 4] * 5;
+index_branch_2_StuckSA_Memory_Based_17_base_offset = branch_2_StuckSA_Memory_Based_17_base_offset+     36/*data*/ + branch_2_StuckSA_Transaction_19[  29/*index   */ +: 4] * 5;
 if (copyLength_branch_2_StuckSA_Memory_Based_17_base_offset >= 4096) begin
    M_9[index_branch_2_StuckSA_Memory_Based_17_base_offset +: 4096] <= M_9[index_branch_3_StuckSA_Memory_Based_20_base_offset +: 4096];
    copyLength_branch_2_StuckSA_Memory_Based_17_base_offset = copyLength_branch_2_StuckSA_Memory_Based_17_base_offset - 4096;
@@ -12121,21 +12121,21 @@ if (copyLength_branch_2_StuckSA_Memory_Based_17_base_offset >= 1) begin
    index_branch_2_StuckSA_Memory_Based_17_base_offset = index_branch_2_StuckSA_Memory_Based_17_base_offset + 1;
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1215 : begin branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4] +  branch_3_StuckSA_Transaction_22[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1216 : begin M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4] <= branch_2_StuckSA_Transaction_19[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1215 : begin branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4] +  branch_3_StuckSA_Transaction_22[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1216 : begin M_9[branch_2_StuckSA_Memory_Based_17_base_offset+      0/*currentSize */ +: 4] <= branch_2_StuckSA_Transaction_19[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1217 : begin T_10[ 240/*node_erase  */ +: 5] <= T_10[ 127/*r   */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1218 : begin if (T_10[ 240/*node_erase  */ +: 5] > 0) step = 1219; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1219 : begin stopped <= 1; /* Cannot free root */ /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1220 : begin M_9[   5/*node*/ + T_10[ 240/*node_erase  */ +: 5] * 62 +: 62] <= 62'b11111111111111111111111111111111111111111111111111111111111111; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1221 : begin M_9[   6/*free*/ + T_10[ 240/*node_erase  */ +: 5] * 62 +: 5] <= M_9[   0/*freeList*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1222 : begin M_9[   0/*freeList*/ +: 5] <= T_10[ 240/*node_erase  */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1223 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1223 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1224 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1810:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -12164,11 +12164,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1810:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -12199,7 +12199,7 @@ end
  */
                 end
            1225 : begin
-                                  T_10[  70/*parentKey   */ +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  T_10[  70/*parentKey   */ +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1813:code
   ProgramPA.java:0220:<init>
@@ -12229,7 +12229,7 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
   BtreePA.java:1815:code
   ProgramPA.java:0220:<init>
@@ -12261,11 +12261,11 @@ end
  */
                 end
            1226 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1817:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -12294,11 +12294,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0345:elementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0356:elementAt
   BtreePA.java:1817:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -12328,13 +12328,13 @@ end
   BtreePA.java:3786:main
  */
                 end
-           1227 : begin branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= T_10[  70/*parentKey   */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1227 : begin branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= T_10[  70/*parentKey   */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1228 : begin
-                                  M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  19/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8] <= branch_1_StuckSA_Transaction_16[  12/*key */ +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0257:setKey
-  StuckPA.java:0267:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0268:setKey
+  StuckPA.java:0278:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1820:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -12363,11 +12363,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5] <= branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5] <= branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0261:setData
-  StuckPA.java:0269:setKeyData
-  StuckPA.java:0360:setElementAt
+  StuckPA.java:0272:setData
+  StuckPA.java:0280:setKeyData
+  StuckPA.java:0371:setElementAt
   BtreePA.java:1820:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -12397,13 +12397,13 @@ end
   BtreePA.java:3786:main
  */
                 end
-           1229 : begin branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1229 : begin branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] <= T_10[ 110/*index   */ +: 4]+1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1230 : begin
-                                  branch_1_StuckSA_Transaction_16[  19/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_1_StuckSA_Transaction_16[  12/*key */ +: 8] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0385:removeElementAt
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0396:removeElementAt
   BtreePA.java:1823:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -12432,11 +12432,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_1_StuckSA_Transaction_16[  27/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_1_StuckSA_Transaction_16[  20/*data*/ +: 5] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0385:removeElementAt
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0396:removeElementAt
   BtreePA.java:1823:code
   ProgramPA.java:0220:<init>
   BtreePA.java:1718:<init>
@@ -12469,30 +12469,30 @@ end
            1231 : begin branch_1_StuckSA_Copy_15[   4/*Keys*/ +: 32] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*Keys*/ +: 32]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1232 : begin /* Move Down */
 
-if (0 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (0 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + 0 * 8 +: 8] <= branch_1_StuckSA_Copy_15[   4/*key */ + 1 * 8 +: 8];
 end
 
-if (1 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (1 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + 1 * 8 +: 8] <= branch_1_StuckSA_Copy_15[   4/*key */ + 2 * 8 +: 8];
 end
 
-if (2 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (2 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+      4/*key */ + 2 * 8 +: 8] <= branch_1_StuckSA_Copy_15[   4/*key */ + 3 * 8 +: 8];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1233 : begin branch_1_StuckSA_Copy_15[  36/*Data*/ +: 20] <= M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*Data*/ +: 20]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1234 : begin /* Move Down */
 
-if (0 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (0 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + 0 * 5 +: 5] <= branch_1_StuckSA_Copy_15[  36/*data*/ + 1 * 5 +: 5];
 end
 
-if (1 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (1 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + 1 * 5 +: 5] <= branch_1_StuckSA_Copy_15[  36/*data*/ + 2 * 5 +: 5];
 end
 
-if (2 >= branch_1_StuckSA_Transaction_16[  15/*index   */ +: 4]) begin
+if (2 >= branch_1_StuckSA_Transaction_16[  29/*index   */ +: 4]) begin
   M_9[branch_1_StuckSA_Memory_Based_14_base_offset+     36/*data*/ + 2 * 5 +: 5] <= branch_1_StuckSA_Copy_15[  36/*data*/ + 3 * 5 +: 5];
 end
  /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
@@ -12501,69 +12501,69 @@ end
            1237 : begin T_10[ 245/*node_isLow  */ +: 5] <= T_10[ 189/*parent  */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1238 : begin T_10[ 139/*branchBase  */ +: 11] <=   11/*branch  */ + T_10[ 245/*node_isLow  */ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1239 : begin branch_0_StuckSA_Memory_Based_11_base_offset <= T_10[ 139/*branchBase  */ +: 11]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1240 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1241 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1240 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1241 : begin T_10[ 154/*branchSize  */ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1242 : begin T_10[ 221/*mergeIndex  */ +: 4] <= T_10[ 221/*mergeIndex  */ +: 4]+ 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1243 : begin step = 1040; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1244 : begin T_10[  21/*search  */ +: 8] <= T_10[ 163/*Key */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1245 : begin T_10[ 250/*node_balance*/ +: 5] <= T_10[ 189/*parent  */ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1246 : begin branch_0_StuckSA_Memory_Based_11_base_offset <=   11/*branch  */ + T_10[ 250/*node_balance*/ +: 5] * 62; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1247 : begin branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1248 : begin branch_0_StuckSA_Transaction_13[   8/*limit   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1249 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1250 : begin if (branch_0_StuckSA_Transaction_13[   8/*limit   */ +: 4] == 0) step = 1251; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1251 : begin branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4] <= branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1252 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 0;branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1253 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1254 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 1290; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1255 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1256 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1257 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 1261; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1258 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1259 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1260 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1247 : begin branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8] <= T_10[  21/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1248 : begin branch_0_StuckSA_Transaction_13[  25/*limit   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1249 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1250 : begin if (branch_0_StuckSA_Transaction_13[  25/*limit   */ +: 4] == 0) step = 1251; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1251 : begin branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4] <= branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]- 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1252 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 0;branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 0; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1253 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1254 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 1290; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1255 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1256 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1257 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 1261; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1258 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1259 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1260 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1261 : begin step = 1290; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1262 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1263 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1264 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 1290; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1265 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1266 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1267 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 1271; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1268 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1269 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1270 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1262 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1263 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1264 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 1290; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1265 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1266 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1267 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 1271; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1268 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1269 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1270 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1271 : begin step = 1290; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1272 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 2; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1273 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1274 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 1290; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1275 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1276 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1277 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 1281; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1278 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1279 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1280 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1272 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 2; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1273 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1274 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 1290; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1275 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1276 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1277 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 1281; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1278 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1279 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1280 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1281 : begin step = 1290; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1282 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= 3; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1283 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  32/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1284 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] > 0) step = 1290; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1285 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1286 : begin branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   0/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1287 : begin if (branch_0_StuckSA_Transaction_13[  40/*equal   */ +: 1] == 0) step = 1290; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1288 : begin branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1289 : begin branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1290 : begin branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1291 : begin T_10[  29/*found   */ +: 1] <= branch_0_StuckSA_Transaction_13[  14/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1292 : begin T_10[  12/*first   */ +: 4] <= branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1282 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= 3; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1283 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] == branch_0_StuckSA_Transaction_13[  33/*size*/ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1284 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] > 0) step = 1290; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1285 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1286 : begin branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] <= branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] >= branch_0_StuckSA_Transaction_13[   4/*search  */ +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1287 : begin if (branch_0_StuckSA_Transaction_13[   3/*equal   */ +: 1] == 0) step = 1290; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1288 : begin branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1] <= 1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1289 : begin branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1290 : begin branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1291 : begin T_10[  29/*found   */ +: 1] <= branch_0_StuckSA_Transaction_13[   2/*found   */ +: 1]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1292 : begin T_10[  12/*first   */ +: 4] <= branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1293 : begin if (T_10[  29/*found   */ +: 1] == 0) step = 1295; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1294 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1294 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1295 : begin step = 1298; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
-           1296 : begin branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1296 : begin branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      0/*currentSize */ +: 4]+-1; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1297 : begin
-                                  branch_0_StuckSA_Transaction_13[  19/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
+                                  branch_0_StuckSA_Transaction_13[  12/*key */ +: 8] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+      4/*key */ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 8 +: 8]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0249:moveKey
-  StuckPA.java:0276:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0260:moveKey
+  StuckPA.java:0287:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:0881:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:0876:<init>
@@ -12589,11 +12589,11 @@ end
   BtreePA.java:3778:newTests
   BtreePA.java:3786:main
  */
-                branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  15/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
+                branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5] <= M_9[branch_0_StuckSA_Memory_Based_11_base_offset+     36/*data*/ + branch_0_StuckSA_Transaction_13[  29/*index   */ +: 4] * 5 +: 5]; /*   MemoryLayoutPA.java:0377:<init>
   MemoryLayoutPA.java:0376:move
-  StuckPA.java:0253:moveData
-  StuckPA.java:0278:moveKeyData
-  StuckPA.java:0411:lastElement
+  StuckPA.java:0264:moveData
+  StuckPA.java:0289:moveKeyData
+  StuckPA.java:0422:lastElement
   BtreePA.java:0881:Else
   ProgramPA.java:0204:<init>
   BtreePA.java:0876:<init>
@@ -12620,7 +12620,7 @@ end
   BtreePA.java:3786:main
  */
                 end
-           1298 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  27/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
+           1298 : begin T_10[  16/*next*/ +: 5] <= branch_0_StuckSA_Transaction_13[  20/*data*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1299 : begin T_10[ 189/*parent  */ +: 5] <= T_10[  16/*next*/ +: 5]; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1300 : begin step = 1033; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
            1301 : begin step = 1303; /*   BtreePA.java:2384:<init>   BtreePA.java:3423:<init>   BtreePA.java:3422:runVerilogDeleteTest   BtreePA.java:3524:test_verilog_delete   BtreePA.java:3778:newTests   BtreePA.java:3786:main  */ end
