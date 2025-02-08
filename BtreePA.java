@@ -3461,7 +3461,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 601, """
+    t.runVerilogDeleteTest(3, 6, 589, """
                     6           |
                     0           |
                     5           |
@@ -3473,7 +3473,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 541, """
+    t.runVerilogDeleteTest(4, 5, 531, """
              6           |
              0           |
              5           |
@@ -3485,7 +3485,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 483, """
+    t.runVerilogDeleteTest(2, 7, 473, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3493,7 +3493,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 397, """
+    t.runVerilogDeleteTest(1, 8, 388, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3501,7 +3501,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 276, """
+    t.runVerilogDeleteTest(5, 4, 271, """
       7      |
       0      |
       1      |
@@ -3509,7 +3509,7 @@ endmodule
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(6, 3, 281, """
+    t.runVerilogDeleteTest(6, 3, 275, """
     7      |
     0      |
     1      |
@@ -3517,15 +3517,15 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 296, """
+    t.runVerilogDeleteTest(7, 2, 288, """
 8,9=0 |
 """);
 
-    t.runVerilogDeleteTest(8, 1, 46, """
+    t.runVerilogDeleteTest(8, 1, 44, """
 9=0 |
 """);
 
-    t.runVerilogDeleteTest(9, 0, 46, """
+    t.runVerilogDeleteTest(9, 0, 44, """
 =0 |
 """);
    }
@@ -3551,15 +3551,15 @@ endmodule
     t.P.run(); t.P.clear();
     t.put();
 
-    t.runVerilogPutTest(1, 49, """
+    t.runVerilogPutTest(1, 48, """
 1=0 |
 """);
 
-    t.runVerilogPutTest(2, 61, """
+    t.runVerilogPutTest(2, 60, """
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest(3, 194, """
+    t.runVerilogPutTest(3, 191, """
     1      |
     0      |
     1      |
@@ -3567,7 +3567,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 378, """
+    t.runVerilogPutTest(4, 371, """
       2      |
       0      |
       1      |
@@ -3575,7 +3575,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 432, """
+    t.runVerilogPutTest(5, 425, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -3583,7 +3583,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 479, """
+    t.runVerilogPutTest(6, 470, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3591,7 +3591,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 533, """
+    t.runVerilogPutTest(7, 524, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -3599,7 +3599,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 720, """
+    t.runVerilogPutTest(8, 709, """
              4             |
              0             |
              5             |
@@ -3611,7 +3611,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 636, """
+    t.runVerilogPutTest(9, 627, """
              4                    |
              0                    |
              5                    |
@@ -3623,7 +3623,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
 
-    t.runVerilogPutTest(10, 683, """
+    t.runVerilogPutTest(10, 672, """
              4                       |
              0                       |
              5                       |
@@ -3635,7 +3635,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9,10=2 |
 """);
 
-    t.runVerilogPutTest(11, 737, """
+    t.runVerilogPutTest(11, 726, """
              4                               |
              0                               |
              5                               |
@@ -3647,7 +3647,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9=8    10,11=2 |
 """);
 
-    t.runVerilogPutTest(12, 688, """
+    t.runVerilogPutTest(12, 675, """
                                8                 |
                                0                 |
                                5                 |
@@ -3659,7 +3659,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=2 |
 """);
 
-    t.runVerilogPutTest(13, 636, """
+    t.runVerilogPutTest(13, 627, """
                                8                          |
                                0                          |
                                5                          |
@@ -3671,7 +3671,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest(14, 683, """
+    t.runVerilogPutTest(14, 672, """
                                8                             |
                                0                             |
                                5                             |
@@ -3683,7 +3683,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=2 |
 """);
 
-    t.runVerilogPutTest(15, 737, """
+    t.runVerilogPutTest(15, 726, """
                                8                                     |
                                0                                     |
                                5                                     |
@@ -3695,7 +3695,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest(16, 737, """
+    t.runVerilogPutTest(16, 724, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -3707,7 +3707,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=2 |
 """);
 
-    t.runVerilogPutTest(17, 728, """
+    t.runVerilogPutTest(17, 718, """
                                8                  12                            |
                                0                  0.1                           |
                                5                  11                            |
@@ -3719,7 +3719,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest(18, 775, """
+    t.runVerilogPutTest(18, 763, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -3731,7 +3731,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17,18=2 |
 """);
 
-    t.runVerilogPutTest(19, 829, """
+    t.runVerilogPutTest(19, 817, """
                                8                  12                                        |
                                0                  0.1                                       |
                                5                  11                                        |
@@ -3743,7 +3743,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 795, """
+    t.runVerilogPutTest(20, 780, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
