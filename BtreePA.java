@@ -3473,7 +3473,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 531, """
+    t.runVerilogDeleteTest(4, 5, 530, """
              6           |
              0           |
              5           |
