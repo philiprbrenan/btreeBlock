@@ -20,7 +20,7 @@ class MemoryLayoutPA extends Test                                               
 //D1 Construction                                                               // Construct a memory layout
 
   MemoryLayoutPA(int size)                                                      // Memory useful for running tests.
-   {zz();
+   {z();
     name   = null; based = null; layout = null;
     memory = new Memory("", size);
    }
@@ -69,7 +69,7 @@ class MemoryLayoutPA extends Test                                               
   int baseSize () {z(); return based() ? based.size() : size();}                // Size of underlying memory
 
   void clear()                                                                  // Clear underlying memory
-   {zz();
+   {z();
     if (based == null) {memory.zero(); return;}                                 // Not based so we just clear the memory we have
     final int N = size();
     for (int i = 0; i < N; i++) memory.set(base + i, false);                    // Based so we clear the area occupied by the layout
@@ -117,7 +117,7 @@ class MemoryLayoutPA extends Test                                               
    }
 
   int  getInt(Layout.Field field, int...indices)                                // Get a value from memory occupied by the layout
-   {zz();
+   {z();
     final int i = new At(field, indices).setOff().result;
     return i;
    }
@@ -392,7 +392,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void moveTo(At...Targets)                                                   // Move the data to the named fields
-     {zz();
+     {z();
       final int N = Targets.length;
       final At source = this;
       for(int i = 0; i < N; ++i) source.sameSize(Targets[i]);
@@ -403,7 +403,7 @@ class MemoryLayoutPA extends Test                                               
            {final At target = Targets[i];
             target.setOff();
             for(int j = 0; j < width; ++j)
-             {zz();
+             {z();
               final boolean b = source.getBit(j);
               target.setBit(j, b);
              }
@@ -421,7 +421,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void move(At source, At buffer)                                             // Copy the specified number of bits from source to target via a buffer to allow the operation to proceed in bit parallel assuming the buffer does not overlap either the source or target, each of which can be in different memories.
-     {zz(); sameSize(source); sameSize(buffer);
+     {z(); sameSize(source); sameSize(buffer);
       buffer.move(source);
       move(buffer);
      }
@@ -581,7 +581,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void invert(At a)                                                           // Invert the specified bits
-     {zz();
+     {z();
       P.new I()
        {void a()
          {setOff(); memory.invert(a.result, a.width());
@@ -596,11 +596,11 @@ class MemoryLayoutPA extends Test                                               
      }
 
     boolean isAllZero()                                                         // Check that the specified memory is all zeros
-     {zz(); setOff(); return memory.isAllZero(at, width);
+     {z(); setOff(); return memory.isAllZero(at, width);
      }
 
     boolean isAllOnes()                                                         // Check that  the specified memory is all ones
-     {zz(); setOff(); return memory.isAllOnes(at, width);
+     {z(); setOff(); return memory.isAllOnes(at, width);
      }
 
 //D1 Boolean                                                                    // Boolean operations on fields held in memories.
@@ -628,15 +628,15 @@ class MemoryLayoutPA extends Test                                               
      }
 
     boolean isOnes()                                                            // Whether the field is all ones
-     {zz();
+     {z();
       for(int i = 0; i < width; ++i)
-       {zz(); if (!getBit(i)) {z(); return false;}
+       {z(); if (!getBit(i)) {z(); return false;}
        }
       z(); return true;
      }
 
     void isOnes(At result)                                                      // Whether a field is all ones
-     {zz();
+     {z();
       final At target = this;
       P.new I()
        {void a()
@@ -675,7 +675,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void    notEqual(At b, At result)                                           // Whether  a != b
-     {zz();
+     {z();
       final At a = this;
       P.new I()
        {void a()
@@ -715,7 +715,7 @@ class MemoryLayoutPA extends Test                                               
      }
 
     void lessThanOrEqual(At b, At result)                                       // Whether  a <= b
-     {zz(); sameSize(b);
+     {z(); sameSize(b);
       final At a = this;
       P.new I()
        {void a()

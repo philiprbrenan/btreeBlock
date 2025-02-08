@@ -3801,9 +3801,9 @@ endmodule
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      //if (github_actions)                                                       // Coverage analysis
+      if (github_actions)                                                       // Coverage analysis
        {//coverageAnalysis(sourceFileName(), 12);
-        coverageAnalysis(12, "StuckSML.java", "MemoryLayout.java", "MemoryLayout.java", "BtreeSML.java");
+        coverageAnalysis(12, "StuckSML.java", "MemoryLayout.java", "BtreeSML.java");
        }
       testSummary();                                                            // Summarize test results
       System.exit(testsFailed);
