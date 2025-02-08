@@ -163,45 +163,45 @@ class MemoryLayoutPA extends Test                                               
     memory.set(base, size(), 0);
    }
 
-  void moveParallel(At...Fields)                                                // Move pairs of fields in parallel
-   {zz();
-    final int N = Fields.length;
-    if (N % 2 == 1) stop("Move in parallel requires an even number of fields");
-    for(int i = 0; i < N; i += 2) Fields[i].sameSize(Fields[i+1]);
-    P.new I()
-     {void a()
-       {for(int i = 0; i < N; i += 2)
-         {final At target = Fields[i+0].setOff();
-          final At source = Fields[i+1].setOff();
-          for(int j = 0; j < target.width; ++j)
-           {zz();
-            final boolean b = source.getBit(j);
-            target.setBit(j, b);
-           }
-         }
-       }
-      String v()
-       {final StringBuilder s = new StringBuilder();
-        for(int i = 0; i < N; i += 2)
-         {final At target = Fields[i+0];
-          final At source = Fields[i+1];
-          for(int j = 0; j < target.width; ++j)
-           {s.append(target.verilogLoad()+" <= "+source.verilogLoad() + ";");
-           }
-         }
-        return s.toString();
-       }
-      String n()
-       {final StringBuilder s = new StringBuilder();
-        for(int i = 0; i < N; i += 2)
-         {final At target = Fields[i+0];
-          final At source = Fields[i+1];
-          s.append(target.field.name+" = "+source.field.name);
-         }
-        return s.toString();
-       }
-     };
-   }
+//  void moveParallel(At...Fields)                                                // Move pairs of fields in parallel. Suceeded by parallel Section.
+//   {zz();
+//    final int N = Fields.length;
+//    if (N % 2 == 1) stop("Move in parallel requires an even number of fields");
+//    for(int i = 0; i < N; i += 2) Fields[i].sameSize(Fields[i+1]);
+//    P.new I()
+//     {void a()
+//       {for(int i = 0; i < N; i += 2)
+//         {final At target = Fields[i+0].setOff();
+//          final At source = Fields[i+1].setOff();
+//          for(int j = 0; j < target.width; ++j)
+//           {zz();
+//            final boolean b = source.getBit(j);
+//            target.setBit(j, b);
+//           }
+//         }
+//       }
+//      String v()
+//       {final StringBuilder s = new StringBuilder();
+//        for(int i = 0; i < N; i += 2)
+//         {final At target = Fields[i+0];
+//          final At source = Fields[i+1];
+//          for(int j = 0; j < target.width; ++j)
+//           {s.append(target.verilogLoad()+" <= "+source.verilogLoad() + ";");
+//           }
+//         }
+//        return s.toString();
+//       }
+//      String n()
+//       {final StringBuilder s = new StringBuilder();
+//        for(int i = 0; i < N; i += 2)
+//         {final At target = Fields[i+0];
+//          final At source = Fields[i+1];
+//          s.append(target.field.name+" = "+source.field.name);
+//         }
+//        return s.toString();
+//       }
+//     };
+//   }
 
   void copy(MemoryLayoutPA source)                                              // Copy all the bits from the source into the target as long as the source and target are the same size
    {zz();
@@ -1220,7 +1220,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
-  static void test_move_parallel()
+/* static void test_move_parallel()
    {z();
     Layout           l = Layout.layout();
     Layout.Variable  a = l.variable("a", 4);
@@ -1251,7 +1251,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    6 V       16         4                                 12     e
    7 V       20         4                                 12     f
 """);
-   }
+   } */
 
   static void test_set_inc_dec_get()
    {z();
@@ -1855,7 +1855,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_base();
     test_move();
     test_move_to();
-    test_move_parallel();
+//  test_move_parallel();
     test_set_inc_dec_get();
     test_addressing();
     test_zero();
