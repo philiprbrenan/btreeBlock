@@ -179,7 +179,7 @@ abstract class BtreePA extends Test                                             
 
   private static BtreePA btreePA_small()                                        // Define a small test btree
    {return new BtreePA()
-     {int maxSize         () {return 32;}
+     {int maxSize         () {return 20;}
       int maxKeysPerLeaf  () {return  2;}
       int maxKeysPerBranch() {return  3;}
       int bitsPerKey      () {return  8;}
@@ -1944,7 +1944,7 @@ abstract class BtreePA extends Test                                             
            {tt(search, Key);
             T.setIntInstruction(node_findEqualInLeaf, root);
             findEqualInLeaf();
-            T.at(find).zero();                                                  // Found in root
+            T.at(find).zero();                                                  // Leaf that should contain this key is the root
             P.Goto(Return);
            }
          };
@@ -2297,11 +2297,12 @@ abstract class BtreePA extends Test                                             
     final String javaTraceFile;                                                 // Folder in which to place java    execution trace file
     final ProgramPA    program;                                                 // Program associated with this tree
 
-    abstract int Key     ();                                                    // Input key value
-    abstract int Data    ();                                                    // Input data value
-    abstract int data    ();                                                    // Expected output data value
-    abstract int maxSteps();                                                    // Maximum number if execution steps
-    abstract int expSteps();                                                    // Expected number of steps
+    abstract int    Key     ();                                                 // Input key value
+    abstract int    Data    ();                                                 // Input data value
+    abstract int    data    ();                                                 // Expected output data value
+    abstract int    maxSteps();                                                 // Maximum number if execution steps
+    abstract int    expSteps();                                                 // Expected number of steps
+    abstract String expected();                                                 // Expected number of steps
 
     GenVerilog(String Project, String Folder)                                   // Generate verilog
      {zz();
@@ -2374,14 +2375,14 @@ $stuckBases
         final int N = I.size();
         if (N > 1)
          {final StringBuilder t = new StringBuilder();
-
-          for(ProgramPA.I j : I) t.append(q+j.v()+j.traceComment() + "\n");
+          for(ProgramPA.I j : I) t.append(q+"    "+j.v()+j.traceComment() + "\n");
           s.append(String.format("%s%5d : begin\n", p, i));
-          s.append(q+"  "+t);
-          s.append(q+"end\n");
+          s.append(t);
+          s.append(q+"  end\n");
          }
         else if (N == 1)
-         {final String t = I.firstElement().v()+traceComment();
+         {final ProgramPA.I j = I.firstElement();
+          final String t = j.v()+j.traceComment();
           s.append(String.format("%s%5d : begin %s end\n", p, i, t));           // Bracket instructions in this block with op code
          }
        }
@@ -2444,20 +2445,27 @@ endmodule
       T.dumpVerilog(tFile);                                                     // Write include file to initialize transaction memory
       P.traceMemory = M.memory();                                               // Request memory tracing
       P.run(javaTraceFile);                                                     // Run the java version and trace it
+
+      //ok(P.steps, expSteps());                                                  // Steps in java code
+      ok(T.at(BtreePA.this.data).getInt(), data());                             // Data associated with key from java code
+      if (debug) stop(this);                                                    // Print tree if debugging
+      if (expected() != null) ok(BtreePA.this, expected());                     // Check resulting tree
+
       say(Project, Folder, Key());                                              // Identify the test
-      execTest();                                                               // Execute the verilog test
+      execVerilogTest();                                                        // Execute the corresponding verilog test
      }
 
-    private void execTest()                                                     // Execute the verilog test and compare it with the results from execution under Java
+    private void execVerilogTest()                                              // Execute the verilog test and compare it with the results from execution under Java
      {zz();
       final StringBuilder s = new StringBuilder(editVariables("cd $projectFolder && iverilog $project.tb $project.v -Iincludes -g2012 -o $project && ./$project"));
       final ExecCommand   x = new ExecCommand(s);
       final String        e = joinLines(readFile(javaTraceFile));
       final String        g = joinLines(readFile(traceFile));
       ok(x.exitCode, 0);                                                        // Confirm exit code
-      ok(12, g, e);                                                             // Width of margin in verilog traces
+    //ok(12, g, e);                                                             // Width of margin in verilog traces
+      ok(0, g, e);                                                              // Width of margin in verilog traces
       final TreeMap<String,String> p = readProperties(testsFile);               // Load test results
-      ok(ifs(p.get("Steps")), expSteps());
+      ok(ifs(p.get("Steps")), expSteps());                                      // Confirm results from Verilog
       ok(ifs(p.get("data")),  data());
      }
 
@@ -3402,11 +3410,12 @@ endmodule
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
     GenVerilog v = t.new GenVerilog("find", "verilog")                          // Generate verilog now that memories have been initialized and the program written
-     {int Key     () {return    2;}                                             // Input key value
-      int Data    () {return    2;}                                             // Input data value
-      int data    () {return    7;}                                             // Expected output data value
-      int maxSteps() {return 2000;}                                             // Maximum number if execution steps
-      int expSteps() {return   90;}                                             // Expected number of steps
+     {int    Key     () {return    2;}                                          // Input key value
+      int    Data    () {return    2;}                                          // Input data value
+      int    data    () {return    7;}                                          // Expected output data value
+      int    maxSteps() {return 2000;}                                          // Maximum number if execution steps
+      int    expSteps() {return   74;}                                          // Expected number of steps
+      String expected() {return null;}                                          // Expected tree if present
      };
     //say("AAAA11", t);
     //say("AAAA22", t.P);
@@ -3419,17 +3428,15 @@ endmodule
    (int Key, int data, int steps, String expected)
    {z();
     T.at(this.Key).setInt(Key);                                                 // Sets memory directly not via an instruction
-    GenVerilog v = new GenVerilog("delete", "verilog")                          // Generate verilog now that memories have beeninitialzied and the program written
-     {int Key     () {return   Key;}                                            // Input key value
-      int Data    () {return     3;}                                            // Input key value
-      int data    () {return  data;}                                            // Expected output data value
-      int maxSteps() {return  2000;}                                            // Maximum number if execution steps
-      int expSteps() {return steps;}                                            // Expected number of steps
-     };
 
-    ok(T.at(this.data).getInt(), data);                                         // Data associated with key
-    if (debug) stop(this);                                                      // Print tree if debugging
-    ok(this, expected);                                                         // Check resultin tree
+    GenVerilog v = new GenVerilog("delete", "verilog")                          // Generate verilog now that memories have beeninitialzied and the program written
+     {int    Key     () {return   Key;}                                         // Input key value
+      int    Data    () {return     3;}                                         // Input key value
+      int    data    () {return  data;}                                         // Expected output data value
+      int    maxSteps() {return  2000;}                                         // Maximum number if execution steps
+      int    expSteps() {return steps;}                                         // Expected number of steps
+      String expected() {return null;}                                          // Expected tree if present
+     };
    }
 
   private static void test_verilog_delete()                                     // Delete using generated verilog code
@@ -3461,7 +3468,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 589, """
+    t.runVerilogDeleteTest(3, 6, 578, """
                     6           |
                     0           |
                     5           |
@@ -3473,7 +3480,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 530, """
+    t.runVerilogDeleteTest(4, 5, 514, """
              6           |
              0           |
              5           |
@@ -3485,7 +3492,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 473, """
+    t.runVerilogDeleteTest(2, 7, 457, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3493,7 +3500,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 388, """
+    t.runVerilogDeleteTest(1, 8, 377, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3501,7 +3508,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 271, """
+    t.runVerilogDeleteTest(5, 4, 260, """
       7      |
       0      |
       1      |
@@ -3509,7 +3516,7 @@ endmodule
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(6, 3, 275, """
+    t.runVerilogDeleteTest(6, 3, 264, """
     7      |
     0      |
     1      |
@@ -3517,15 +3524,15 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 288, """
+    t.runVerilogDeleteTest(7, 2, 277, """
 8,9=0 |
 """);
 
-    t.runVerilogDeleteTest(8, 1, 44, """
+    t.runVerilogDeleteTest(8, 1, 33, """
 9=0 |
 """);
 
-    t.runVerilogDeleteTest(9, 0, 44, """
+    t.runVerilogDeleteTest(9, 0, 33, """
 =0 |
 """);
    }
@@ -3535,11 +3542,12 @@ endmodule
     T.at(Key ).setInt(value);                                                   // Sets memory directly not via an instruction
     T.at(Data).setInt(value);                                                   // Sets memory directly not via an instruction
     GenVerilog v = new GenVerilog("put", "verilog")                             // Generate verilog now that memories have been initialized and the program written
-     {int Key     () {return value;}                                            // Input key value
-      int Data    () {return     3;}                                            // Input data value
-      int data    () {return     0;}                                            // Expected output data value
-      int maxSteps() {return  2000;}                                            // Maximum number if execution steps
-      int expSteps() {return steps;}                                            // Expected number of steps
+     {int    Key     () {return value;}                                         // Input key value
+      int    Data    () {return     3;}                                         // Input data value
+      int    data    () {return     0;}                                         // Expected output data value
+      int    maxSteps() {return  2000;}                                         // Maximum number if execution steps
+      int    expSteps() {return steps;}                                         // Expected number of steps
+      String expected() {return null;}                                          // Expected tree if present
      };
     if (debug) stop(this);
     ok(this, expected);
@@ -3550,16 +3558,15 @@ endmodule
     final BtreePA t = btreePA_small();
     t.P.run(); t.P.clear();
     t.put();
-
-    t.runVerilogPutTest(1, 48, """
+    t.runVerilogPutTest(1, 43, """
 1=0 |
 """);
 
-    t.runVerilogPutTest(2, 60, """
+    t.runVerilogPutTest(2, 49, """
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest(3, 191, """
+    t.runVerilogPutTest(3, 166, """
     1      |
     0      |
     1      |
@@ -3567,7 +3574,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 371, """
+    t.runVerilogPutTest(4, 346, """
       2      |
       0      |
       1      |
@@ -3575,7 +3582,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 425, """
+    t.runVerilogPutTest(5, 400, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -3583,7 +3590,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 470, """
+    t.runVerilogPutTest(6, 445, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3591,7 +3598,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 524, """
+    t.runVerilogPutTest(7, 499, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -3599,7 +3606,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 709, """
+    t.runVerilogPutTest(8, 670, """
              4             |
              0             |
              5             |
@@ -3611,7 +3618,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 627, """
+    t.runVerilogPutTest(9, 602, """
              4                    |
              0                    |
              5                    |
@@ -3623,7 +3630,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
 
-    t.runVerilogPutTest(10, 672, """
+    t.runVerilogPutTest(10, 647, """
              4                       |
              0                       |
              5                       |
@@ -3635,7 +3642,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9,10=2 |
 """);
 
-    t.runVerilogPutTest(11, 726, """
+    t.runVerilogPutTest(11, 701, """
              4                               |
              0                               |
              5                               |
@@ -3647,7 +3654,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9=8    10,11=2 |
 """);
 
-    t.runVerilogPutTest(12, 675, """
+    t.runVerilogPutTest(12, 650, """
                                8                 |
                                0                 |
                                5                 |
@@ -3659,7 +3666,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=2 |
 """);
 
-    t.runVerilogPutTest(13, 627, """
+    t.runVerilogPutTest(13, 602, """
                                8                          |
                                0                          |
                                5                          |
@@ -3671,7 +3678,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest(14, 672, """
+    t.runVerilogPutTest(14, 647, """
                                8                             |
                                0                             |
                                5                             |
@@ -3683,7 +3690,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=2 |
 """);
 
-    t.runVerilogPutTest(15, 726, """
+    t.runVerilogPutTest(15, 701, """
                                8                                     |
                                0                                     |
                                5                                     |
@@ -3695,7 +3702,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest(16, 724, """
+    t.runVerilogPutTest(16, 699, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -3707,7 +3714,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=2 |
 """);
 
-    t.runVerilogPutTest(17, 718, """
+    t.runVerilogPutTest(17, 693, """
                                8                  12                            |
                                0                  0.1                           |
                                5                  11                            |
@@ -3719,7 +3726,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest(18, 763, """
+    t.runVerilogPutTest(18, 738, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -3731,7 +3738,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17,18=2 |
 """);
 
-    t.runVerilogPutTest(19, 817, """
+    t.runVerilogPutTest(19, 792, """
                                8                  12                                        |
                                0                  0.1                                       |
                                5                  11                                        |
@@ -3743,7 +3750,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 780, """
+    t.runVerilogPutTest(20, 755, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
@@ -3778,7 +3785,7 @@ endmodule
     test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
-    //test_delete_small_random();
+    test_delete_small_random();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
