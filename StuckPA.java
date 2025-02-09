@@ -511,9 +511,9 @@ abstract class StuckPA extends Test                                             
     P.new I()
      {void a()
        {T.at(found).setOff().setInt(0);                                         // Assume we will not find the key
-        final int s = T.at(search).setOff().getInt();                           // Key to search for
-        final int N = M.at(currentSize).setOff().getInt();                      // Number of elements to search
-        for (int i = 0; i < N; i++)                                              // Search
+        final int s = T.at(search).getInt();                                    // Key to search for
+        final int N = M.at(currentSize).getInt();                               // Number of elements to search
+        for (int i = 0; i < N; i++)                                             // Search
          {z();
           final int k = M.at(sKey, i).setOff().getInt();
           if (s == k)                                                           // Current key equals search key with limits of a java integer
