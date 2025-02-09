@@ -14,6 +14,7 @@ class ProgramPA extends Test                                                    
   final int         maxSteps = 100_000;                                         // Maximum number of steps permitted while running the program
   int                   step = 0;                                               // Execution step
   int                  steps = 0;                                               // Execution steps
+  boolean              debug = false;                                           // Debug code if true
   boolean            running = false;                                           // Executing if true
   Stack<Label>        labels = new Stack<>();                                   // Labels for some instructions
   Memory         traceMemory;                                                   // Labels for some instructions
@@ -47,16 +48,16 @@ class ProgramPA extends Test                                                    
       traceBack = traceBack();                                                  // Location of code that defined this instruction
       if (running) stop("Cannot define instructions during program execution",
         traceBack);
-      ++currentCode;
-      if (currentCode >= code.size())                                           // Start a new  block of parallel instructions
+      if (currentCode >= code.size())                                           // Normally every new instruction starts a new block of parallel instructions
        {final Stack<I> I = new Stack<>();
         I.push(this);
         code.push(I);
         currentCode = code.size();                                              // Ensure we match code size as we are extending the program
        }
-      else                                                                      // Append to an existing block of instructions
+      else                                                                      // Append to an existing block of instructionsin parallel
        {final Stack<I> I = code.elementAt(currentCode);
         I.push(this);
+        ++currentCode;
        }
      }
     void   a() {}                                                               // Action performed by instruction
@@ -76,7 +77,16 @@ class ProgramPA extends Test                                                    
   class Parallel                                                                // The start and end of the current parallel range
    {int start;                                                                  // Start of the parallel range
     int   end;                                                                  // End of the parallel range
-    Parallel() {start = end = currentCode-1; currentParallel.push(this);}       // Start at current code position
+    final String traceBack = traceComment();
+    Parallel()                                                                  // Start at current code position
+     {if (currentParallel.size() == 0)
+       {start = end = code.size();
+       }
+      else
+       {start = end = currentCode;
+       }
+      currentParallel.push(this);
+     }
    }
 
   void  parallelStart()                                                         // Start a parallel block.  Only one parallel block is allowed at a time.  Parallel blocks are much easoer to deal with than automated optimization as we can make local incremental changes.
@@ -86,10 +96,10 @@ class ProgramPA extends Test                                                    
 
   void  parallelSection()                                                       // Start a parallel block.  Only one parallel block is allowed at a time
    {zz();
-    if (currentParallel.size() == 0) stop("No active parallel section");        // Check we are in apralle section
+    if (currentParallel.size() == 0) stop("No active parallel section");        // Check we are in a parallel section
     final Parallel p = currentParallel.lastElement();                           // Current parallel block
     p.end            = max(currentCode, p.end);                                 // Furthest extent of parallel block
-    currentCode      = p.start;                                                 // Add the instructions in this section from the start of the block
+    currentCode      = p.start;// + (currentParallel.size() > 1 ? 1 : 0);          // Add the instructions in this section from the start of the block
    }
 
   void  parallelEnd()                                                           // End a parallel block
@@ -97,6 +107,42 @@ class ProgramPA extends Test                                                    
     if (currentParallel.size() == 0) stop("No active parallel section");        // Check we are in apralle section
     final Parallel p = currentParallel.pop();                                   // Current parallel block
     currentCode      = max(currentCode, p.end);                                 // Furthest extent of parallel block
+   }
+
+//  class Parallel                                                                // The start and end of the current parallel range
+//   {int start;                                                                  // Start of the parallel range
+//    int   end;                                                                  // End of the parallel range
+//    final String traceBack = traceComment();
+//    Parallel() {start = end = currentCode-1; currentParallel.push(this);}       // Start at current code position
+//   }
+//
+//  void  parallelStart()                                                         // Start a parallel block.  Only one parallel block is allowed at a time.  Parallel blocks are much easoer to deal with than automated optimization as we can make local incremental changes.
+//   {zz();
+//    new Parallel();
+//   }
+//
+//  void  parallelSection()                                                       // Start a parallel block.  Only one parallel block is allowed at a time
+//   {zz();
+//    if (currentParallel.size() == 0) stop("No active parallel section");        // Check we are in a parallel section
+//    final Parallel p = currentParallel.lastElement();                           // Current parallel block
+//    p.end            = max(currentCode, p.end);                                 // Furthest extent of parallel block
+//    currentCode      = p.start + (currentParallel.size() > 1 ? 1 : 0);          // Add the instructions in this section from the start of the block
+//   }
+
+//  void  parallelEnd()                                                           // End a parallel block
+//   {zz();
+//    if (currentParallel.size() == 0) stop("No active parallel section");        // Check we are in apralle section
+//    final Parallel p = currentParallel.pop();                                   // Current parallel block
+//    currentCode      = max(currentCode, p.end);                                 // Furthest extent of parallel block
+//   }
+
+  void  parallelDump()                                                          // Dump the openeing locations for the current set of paalle blocks
+   {final int N = currentParallel.size();                                       // Open sections
+    say(N, "open parallel sections started at:");
+    for (int i = 1; i <= N; ++i)
+     {final Parallel p = currentParallel.elementAt(i-1);
+      say(i, p.traceBack);
+     }
    }
 
 //D1 Execute                                                                    // Execute the program
@@ -114,6 +160,10 @@ class ProgramPA extends Test                                                    
 
   void run(String traceFile)                                                    // Run the program tracing to the named file
    {zz();
+    if (currentParallel.size() > 0)                                             // Check all parallel sections have been closed
+     {parallelDump(); stop("Parallel sections still open");
+     }
+
     Trace.clear();
     running = true;
     final int N = code.size();
@@ -621,6 +671,300 @@ Line T       At      Wide       Size    Indices        Value   Name
     p.run();
    }
 
+  static void test_parallel_start_end()
+   {z();
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Variable  c = l.variable ("c", 4);
+    Layout.Variable  d = l.variable ("d", 4);
+    Layout.Variable  e = l.variable ("e", 4);
+    Layout.Variable  f = l.variable ("f", 4);
+    Layout.Structure s = l.structure("s", a, b, c, d, e, f);
+
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
+    ProgramPA        p = m.P;
+
+                          p.new I() {void a() {m.at(a).setInt( 1);} String n() {return "a =  1";}};
+                          p.new I() {void a() {m.at(b).setInt( 2);} String n() {return "b =  2";}};
+
+    p.parallelStart();    p.new I() {void a() {m.at(c).setInt( 3);} String n() {return "c =  3";}};
+                          p.new I() {void a() {m.at(d).setInt( 4);} String n() {return "d =  4";}};
+    p.parallelEnd();
+                          p.new I() {void a() {m.at(e).setInt( 5);} String n() {return "e =  5";}};
+                          p.new I() {void a() {m.at(f).setInt( 6);} String n() {return "f =  6";}};
+
+    p.run();
+    //stop(p);
+    ok(p, """
+   1  a =  1
+   2  b =  2
+   3  c =  3
+   4  d =  4
+   5  e =  5
+   6  f =  6
+""");
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        24                                      s
+   2 V        0         4                                  1     a
+   3 V        4         4                                  2     b
+   4 V        8         4                                  3     c
+   5 V       12         4                                  4     d
+   6 V       16         4                                  5     e
+   7 V       20         4                                  6     f
+""");
+   }
+
+  static void test_parallel_start_section_end()
+   {z();
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Variable  c = l.variable ("c", 4);
+    Layout.Variable  d = l.variable ("d", 4);
+    Layout.Variable  e = l.variable ("e", 4);
+    Layout.Variable  f = l.variable ("f", 4);
+    Layout.Structure s = l.structure("s", a, b, c, d, e, f);
+
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
+    ProgramPA        p = m.P;
+
+                          p.new I() {void a() {m.at(a).setInt( 1);} String n() {return "a =  1";}};
+                          p.new I() {void a() {m.at(b).setInt( 2);} String n() {return "b =  2";}};
+
+    p.parallelStart();    p.new I() {void a() {m.at(c).setInt( 3);} String n() {return "c =  3";}};
+    p.parallelSection();  p.new I() {void a() {m.at(d).setInt( 4);} String n() {return "d =  4";}};
+    p.parallelEnd();
+                          p.new I() {void a() {m.at(e).setInt( 5);} String n() {return "e =  5";}};
+                          p.new I() {void a() {m.at(f).setInt( 6);} String n() {return "f =  6";}};
+
+    p.run();
+    //stop(p);
+    ok(p, """
+   1  a =  1
+   2  b =  2
+   3
+      c =  3
+      d =  4
+   4  e =  5
+   5  f =  6
+""");
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        24                                      s
+   2 V        0         4                                  1     a
+   3 V        4         4                                  2     b
+   4 V        8         4                                  3     c
+   5 V       12         4                                  4     d
+   6 V       16         4                                  5     e
+   7 V       20         4                                  6     f
+""");
+   }
+
+  static void test_parallel_start_section_end_twice()
+   {z();
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Variable  c = l.variable ("c", 4);
+    Layout.Variable  d = l.variable ("d", 4);
+    Layout.Variable  e = l.variable ("e", 4);
+    Layout.Variable  f = l.variable ("f", 4);
+    Layout.Variable  g = l.variable ("g", 4);
+    Layout.Variable  h = l.variable ("h", 4);
+    Layout.Variable  i = l.variable ("i", 4);
+    Layout.Variable  j = l.variable ("j", 4);
+    Layout.Variable  k = l.variable ("k", 4);
+    Layout.Structure s = l.structure("s", a, b, c, d, e, f, g, h, i, j, k);
+
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
+    ProgramPA        p = m.P;
+
+                          p.new I() {void a() {m.at(a).setInt( 1);} String n() {return "a =  1";}};
+                          p.new I() {void a() {m.at(b).setInt( 2);} String n() {return "b =  2";}};
+
+    p.parallelStart();    p.new I() {void a() {m.at(c).setInt( 3);} String n() {return "c =  3";}};
+    p.parallelSection();  p.new I() {void a() {m.at(d).setInt( 4);} String n() {return "d =  4";}};
+    p.parallelEnd();
+                          p.new I() {void a() {m.at(e).setInt( 5);} String n() {return "e =  5";}};
+                          p.new I() {void a() {m.at(f).setInt( 6);} String n() {return "f =  6";}};
+
+    p.parallelStart();    p.new I() {void a() {m.at(g).setInt( 7);} String n() {return "g =  7";}};
+    p.parallelSection();  p.new I() {void a() {m.at(h).setInt( 8);} String n() {return "h =  8";}};
+    p.parallelEnd();
+                          p.new I() {void a() {m.at(i).setInt( 9);} String n() {return "i =  9";}};
+                          p.new I() {void a() {m.at(j).setInt(10);} String n() {return "j = 10";}};
+
+    p.run();
+    //stop(p);
+    ok(p, """
+   1  a =  1
+   2  b =  2
+   3
+      c =  3
+      d =  4
+   4  e =  5
+   5  f =  6
+   6
+      g =  7
+      h =  8
+   7  i =  9
+   8  j = 10
+""");
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        44                                      s
+   2 V        0         4                                  1     a
+   3 V        4         4                                  2     b
+   4 V        8         4                                  3     c
+   5 V       12         4                                  4     d
+   6 V       16         4                                  5     e
+   7 V       20         4                                  6     f
+   8 V       24         4                                  7     g
+   9 V       28         4                                  8     h
+  10 V       32         4                                  9     i
+  11 V       36         4                                 10     j
+  12 V       40         4                                  0     k
+""");
+   }
+
+  static void test_parallel_three()
+   {z();
+    Layout           L = Layout.layout();
+    Layout.Variable  a = L.variable ("a", 8);
+    Layout.Variable  b = L.variable ("b", 8);
+    Layout.Variable  c = L.variable ("c", 8);
+    Layout.Variable  d = L.variable ("d", 8);
+    Layout.Variable  e = L.variable ("e", 8);
+    Layout.Variable  f = L.variable ("f", 8);
+    Layout.Variable  g = L.variable ("g", 8);
+    Layout.Variable  h = L.variable ("h", 8);
+    Layout.Variable  i = L.variable ("i", 8);
+    Layout.Variable  j = L.variable ("j", 8);
+    Layout.Variable  k = L.variable ("k", 8);
+    Layout.Variable  l = L.variable ("l", 8);
+    Layout.Variable  m = L.variable ("m", 8);
+    Layout.Variable  n = L.variable ("n", 8);
+    Layout.Variable  o = L.variable ("o", 8);
+    Layout.Variable  p = L.variable ("p", 8);
+    Layout.Variable  q = L.variable ("q", 8);
+    Layout.Variable  r = L.variable ("r", 8);
+    Layout.Variable  s = L.variable ("s", 8);
+    Layout.Variable  t = L.variable ("t", 8);
+    Layout.Variable  u = L.variable ("u", 8);
+    Layout.Variable  v = L.variable ("v", 8);
+    Layout.Variable  w = L.variable ("w", 8);
+    Layout.Variable  x = L.variable ("x", 8);
+    Layout.Variable  y = L.variable ("y", 8);
+    Layout.Variable  z = L.variable ("z", 8);
+    Layout.Structure S = L.structure("S", a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z);
+
+    MemoryLayoutPA   M = new MemoryLayoutPA(L.compile(), "M");
+    ProgramPA        P = M.P;
+
+                              P.new I() {void a() {M.at(a).setInt( 1);} String n() {return "a =  1";}};
+
+    P.parallelStart();        P.new I() {void a() {M.at(b).setInt( 2);} String n() {return "b =  2";}};
+    P.parallelSection();      P.new I() {void a() {M.at(c).setInt( 3);} String n() {return "c =  3";}};
+      P.parallelStart();      P.new I() {void a() {M.at(d).setInt( 4);} String n() {return "d =  4";}};
+        P.parallelStart();    P.new I() {void a() {M.at(e).setInt( 5);} String n() {return "e =  5";}};
+        P.parallelSection();  P.new I() {void a() {M.at(f).setInt( 6);} String n() {return "f =  6";}};
+        P.parallelSection();  P.new I() {void a() {M.at(g).setInt( 7);} String n() {return "g =  7";}};
+        P.parallelEnd();
+      P.parallelSection();    P.new I() {void a() {M.at(h).setInt( 8);} String n() {return "h =  8";}};
+        P.parallelStart();    P.new I() {void a() {M.at(i).setInt( 9);} String n() {return "i =  9";}};
+        P.parallelSection();  P.new I() {void a() {M.at(j).setInt(10);} String n() {return "j = 10";}};
+        P.parallelSection();  P.new I() {void a() {M.at(k).setInt(11);} String n() {return "k = 11";}};
+        P.parallelEnd();
+      P.parallelEnd();
+    P.parallelSection();      P.new I() {void a() {M.at(l).setInt(12);} String n() {return "l = 12";}};
+      P.parallelStart();      P.new I() {void a() {M.at(m).setInt(13);} String n() {return "m = 13";}};
+        P.parallelStart();    P.new I() {void a() {M.at(n).setInt(14);} String n() {return "n = 14";}};
+        P.parallelSection();  P.new I() {void a() {M.at(o).setInt(15);} String n() {return "o = 15";}};
+        P.parallelSection();  P.new I() {void a() {M.at(p).setInt(16);} String n() {return "p = 16";}};
+        P.parallelEnd();
+      P.parallelSection();    P.new I() {void a() {M.at(q).setInt(17);} String n() {return "q = 17";}};
+        P.parallelStart();    P.new I() {void a() {M.at(r).setInt(18);} String n() {return "r = 18";}};
+        P.parallelSection();  P.new I() {void a() {M.at(s).setInt(19);} String n() {return "s = 19";}};
+        P.parallelSection();  P.new I() {void a() {M.at(t).setInt(20);} String n() {return "t = 20";}};
+        P.parallelEnd();
+      P.parallelEnd();
+    P.parallelEnd();
+                              P.new I() {void a() {M.at(u).setInt(21);} String n() {return "u = 21";}};
+
+    P.run();
+    //stop(P);
+    ok(P, """
+   1  a =  1
+   2
+      b =  2
+      c =  3
+      l = 12
+   3
+      d =  4
+      h =  8
+      m = 13
+      q = 17
+   4
+      e =  5
+      f =  6
+      g =  7
+      i =  9
+      j = 10
+      k = 11
+      n = 14
+      o = 15
+      p = 16
+      r = 18
+      s = 19
+      t = 20
+   5  u = 21
+""");
+    //stop(M);
+    ok(M, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0       208                                      S
+   2 V        0         8                                  1     a
+   3 V        8         8                                  2     b
+   4 V       16         8                                  3     c
+   5 V       24         8                                  4     d
+   6 V       32         8                                  5     e
+   7 V       40         8                                  6     f
+   8 V       48         8                                  7     g
+   9 V       56         8                                  8     h
+  10 V       64         8                                  9     i
+  11 V       72         8                                 10     j
+  12 V       80         8                                 11     k
+  13 V       88         8                                 12     l
+  14 V       96         8                                 13     m
+  15 V      104         8                                 14     n
+  16 V      112         8                                 15     o
+  17 V      120         8                                 16     p
+  18 V      128         8                                 17     q
+  19 V      136         8                                 18     r
+  20 V      144         8                                 19     s
+  21 V      152         8                                 20     t
+  22 V      160         8                                 21     u
+  23 V      168         8                                  0     v
+  24 V      176         8                                  0     w
+  25 V      184         8                                  0     x
+  26 V      192         8                                  0     y
+  27 V      200         8                                  0     z
+""");
+   }
+
   static void test_parallel()
    {z();
     Layout           l = Layout.layout();
@@ -660,17 +1004,16 @@ Line T       At      Wide       Size    Indices        Value   Name
     //stop(p);
     ok(p, """
    1  a[0] =  1
-   2
-      a[1] =  2
-      d[0] =  7
+   2  a[1] =  2
    3
       b[0] =  3
       c[0] =  5
-      d[1] =  8
+      d[0] =  7
       e[0] =  9
    4
       b[1] =  4
       c[1] =  6
+      d[1] =  8
       e[1] = 10
    5  f[0] = 11
    6  f[1] = 12
@@ -708,13 +1051,17 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_stop();
     test_loop();
     test_pool();
+    test_parallel_start_end();
+    test_parallel_start_section_end();
+    test_parallel_start_section_end_twice();
+    test_parallel_three();
     test_parallel();
     //test_debug();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_parallel();
+    test_parallel_three();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
