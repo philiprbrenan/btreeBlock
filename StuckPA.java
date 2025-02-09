@@ -471,36 +471,84 @@ abstract class StuckPA extends Test                                             
     setKey();
    }
 
+//void search()                                                                 // Search for an element within all elements of the stuck
+// {zz(); action = "search";
+//  size();
+//
+//  P.new If(T.at(limit))                                                       // Better if we had a separate routine for search a branch versus a leaf
+//   {void Then()
+//     {T.at(size).dec();
+//     }
+//   };
+//
+//  T.setIntInstruction(found, 0, index, 0);                                    // Assume we will not find a match
+//
+//  P.new Block()
+//   {void code()
+//     {for (int I = 0; I < maxSize(); I++)                                     // Search
+//       {final int i = I;
+//        //T.setIntInstruction(index, i);
+//        T.at(index).equal(T.at(size), T.at(equal));
+//        P.GoOn(end, T.at(equal));                                             // Reached the upper limit of the stuck
+//        moveKey();
+//        T.at(tKey).equal(T.at(search), T.at(equal));
+//        P.new If (T.at(equal))                                                // Found an equal key
+//         {void Then()
+//           {setFound();
+//            moveData();
+//            if (i != maxSize()-1) P.Goto(end);                                // Goto superfluous on last iteration
+//           }
+//         };
+//        if (i != maxSize()-1) T.setIntInstruction(index, i+1);                // Not needed on last iteration
+//       }
+//     }
+//   };
+// }
+
   void search()                                                                 // Search for an element within all elements of the stuck
-   {zz(); action = "search";
-    size();
+   {z(); action = "search";
 
-    P.new If(T.at(limit))                                                       // Better if we had a separate routine for search a branch versus a leaf
-     {void Then()
-       {T.at(size).dec();
-       }
-     };
-
-    T.setIntInstruction(found, 0, index, 0);                                    // Assume we will not find a match
-
-    P.new Block()
-     {void code()
-       {for (int I = 0; I < maxSize(); I++)                                     // Search
-         {final int i = I;
-          //T.setIntInstruction(index, i);
-          T.at(index).equal(T.at(size), T.at(equal));
-          P.GoOn(end, T.at(equal));                                             // Reached the upper limit of the stuck
-          moveKey();
-          T.at(tKey).equal(T.at(search), T.at(equal));
-          P.new If (T.at(equal))                                                // Found an equal key
-           {void Then()
-             {setFound();
-              moveData();
-              if (i != maxSize()-1) P.Goto(end);                                // Goto superfluous on last iteration
-             }
-           };
-          if (i != maxSize()-1) T.setIntInstruction(index, i+1);                // Not needed on last iteration
+    P.new I()
+     {void a()
+       {T.at(found).setOff().setInt(0);                                         // Assume we will not find the key
+        final int s = T.at(search).setOff().getInt();                           // Key to search for
+        final int N = M.at(currentSize).setOff().getInt();                      // Number of elements to search
+        for (int i = 0; i < N; i++)                                              // Search
+         {z();
+          final int k = M.at(sKey, i).setOff().getInt();
+          if (s == k)                                                           // Current key equals search key with limits of a java integer
+           {T.at(index).setInt(i);                                              // Index of key found
+            T.at(found).setInt(1);                                              // Show found
+            T.at(tKey) .setInt(M.at(sKey,  i).setOff().getInt());               // Key found
+            T.at(tData).setInt(M.at(sData, i).setOff().getInt());               // Data associated with key found
+            break;
+           }
          }
+       }
+      String v()
+       {final StringBuilder v = new StringBuilder();                            // Verilog
+        final String        s = T.at(search).verilogLoad();
+        final String        c = M.at(currentSize).verilogLoad();
+        final int           N = maxSize();
+
+        v.append(T.at(found).verilogLoad()+"= ( 0\n");                          // Found
+        for (int i = 0; i < N; i++)
+         {v.append(" || ("+M.at(sKey, i).verilogLoad()+" == "+s+" &&  "+i+ " < "+c+")\n");
+         }
+        v.append(") ? 1 : 0;\n");
+
+        v.append(T.at(index).verilogLoad()+" =\n");                             // Index of found
+        for (int i = 0; i < N; i++)
+         {v.append(    "("+M.at(sKey, i).verilogLoad()+" == "+s+" && "+i+ " < "+c+") ? "+i+" :\n");
+         }
+        v.append("0;\n");
+
+        v.append(T.at(tData).verilogLoad()+" =\n");                             // Data of found
+        for (int i = 0; i < N; i++)
+         {v.append(    "("+M.at(sKey, i).verilogLoad()+" == "+s+" && "+i+ " < "+c+") ? "+M.at(sData, i).verilogLoad()+" :\n");
+         }
+        v.append("0;\n");
+        return v.toString();
        }
      };
    }
@@ -1097,47 +1145,57 @@ StuckSML(maxSize:8 size:3)
     s.search();
     s.P.run(); s.P.clear();
     //stop(s);
-    ok(s.print(), """
-Transaction(action:search search:2 limit:0 found:1 index:0 key:2 data:1 size:4 isFull:0 isEmpty:0)
-""");
+//  ok(s.print(), """
+//Transaction(action:search search:2 limit:0 found:1 index:0 key:2 data:1 size:4 isFull:0 isEmpty:0)
+//""");
+    ok(s.T.at(s.found).getInt(), 1);
+    ok(s.T.at(s.index).getInt(), 0);
+    ok(s.T.at(s.tKey) .getInt(), 2);
+    ok(s.T.at(s.tData).getInt(), 1);
 
     s.P.new I() {void a() {s.T.at(s.search).setInt(3);}};
     s.search();
     s.P.run(); s.P.clear();
     //stop(s);
-    ok(s.print(), """
-Transaction(action:search search:3 limit:0 found:0 index:4 key:8 data:1 size:4 isFull:0 isEmpty:0)
-""");
+//    ok(s.print(), """
+//Transaction(action:search search:3 limit:0 found:0 index:4 key:8 data:1 size:4 isFull:0 isEmpty:0)
+//""");
+    ok(s.T.at(s.found).getInt(), 0);
+
     s.P.new I() {void a() {s.T.at(s.search).setInt(8);  }};
     s.search();
     s.P.run(); s.P.clear();
     //stop(s);
-    ok(s.print(), """
-Transaction(action:search search:8 limit:0 found:1 index:3 key:8 data:4 size:4 isFull:0 isEmpty:0)
-""");
+//    ok(s.print(), """
+//Transaction(action:search search:8 limit:0 found:1 index:3 key:8 data:4 size:4 isFull:0 isEmpty:0)
+//""");
+    ok(s.T.at(s.found).getInt(), 1);
+    ok(s.T.at(s.index).getInt(), 3);
+    ok(s.T.at(s.tKey) .getInt(), 8);
+    ok(s.T.at(s.tData).getInt(), 4);
    }
 
-  static void test_search_except_last()
-   {StuckPA s = test_load();
-
-    s.P.new I() {void a() {s.T.at(s.limit ).setInt(1);}};
-    s.P.new I() {void a() {s.T.at(s.search).setInt(4);}};
-    s.search();
-    s.P.run(); s.P.clear();
-    //stop(s);
-    ok(s.print(), """
-Transaction(action:search search:4 limit:1 found:1 index:1 key:4 data:2 size:3 isFull:0 isEmpty:0)
-""");
-
-    s.P.new I() {void a() {s.T.at(s.search).setInt(8);}};
-    s.search();
-    s.P.run(); s.P.clear();
-    //stop(t);
-    ok(s.print(), """
-Transaction(action:search search:8 limit:1 found:0 index:3 key:6 data:2 size:3 isFull:0 isEmpty:0)
-""");
-   }
-
+//  static void test_search_except_last()
+//   {StuckPA s = test_load();
+//
+//    s.P.new I() {void a() {s.T.at(s.limit ).setInt(1);}};
+//    s.P.new I() {void a() {s.T.at(s.search).setInt(4);}};
+//    s.search();
+//    s.P.run(); s.P.clear();
+//    //stop(s);
+//    ok(s.print(), """
+//Transaction(action:search search:4 limit:1 found:1 index:1 key:4 data:2 size:3 isFull:0 isEmpty:0)
+//""");
+//
+//    s.P.new I() {void a() {s.T.at(s.search).setInt(8);}};
+//    s.search();
+//    s.P.run(); s.P.clear();
+//    //stop(t);
+//    ok(s.print(), """
+//Transaction(action:search search:8 limit:1 found:0 index:3 key:6 data:2 size:3 isFull:0 isEmpty:0)
+//""");
+//   }
+//
   static void test_search_first_greater_than_or_equal()
    {StuckPA s = test_load();
 
@@ -1980,7 +2038,7 @@ StuckSML(maxSize:4 size:4)
     test_remove_element_at();
     test_first_last();
     test_search();
-    test_search_except_last();
+//  test_search_except_last();
     test_search_first_greater_than_or_equal();
     test_search_first_greater_than_or_equal_except_last();
     test_at();

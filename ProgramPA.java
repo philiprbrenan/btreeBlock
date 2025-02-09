@@ -11,9 +11,9 @@ class ProgramPA extends Test                                                    
   int            currentCode =  0;                                              // Point at which we are currently adding instructions to the program. Instructions can run in parallel so the current point is not always at the end as it is with non parallel instruction execution
   final Stack<Parallel> currentParallel = new Stack<>();                        // Start and end of current parallel range
   I       currentInstruction;                                                   // The currently executing instruction
-  final int          maxTime = 100_000;                                         // Maximum number of steps permitted while running the program
+  final int         maxSteps = 100_000;                                         // Maximum number of steps permitted while running the program
   int                   step = 0;                                               // Execution step
-  int                   time = 0;                                               // Execution time
+  int                  steps = 0;                                               // Execution steps
   boolean            running = false;                                           // Executing if true
   Stack<Label>        labels = new Stack<>();                                   // Labels for some instructions
   Memory         traceMemory;                                                   // Labels for some instructions
@@ -64,7 +64,7 @@ class ProgramPA extends Test                                                    
     String v() {return " /* NOT SET */";}                                       // Corresponding verilog
     void   i() {}                                                               // initialization for each instruction
 
-    String traceComment() {return " /* " + traceBack + " */";}                  // Traceback as a comment
+    String traceComment() {return " /* " + traceBack.replaceAll("\n", " ") + " */";}                  // Traceback as a comment
 
     public int compareTo(I that)
      {z(); return Integer.compare(instructionNumber, that.instructionNumber);
@@ -108,7 +108,7 @@ class ProgramPA extends Test                                                    
       final boolean[]b = traceMemory.bits;
       for(int i = 0; i < b.length; i++) s.append(b[i] ? "1" : "0");             // Match iverilog
       s.reverse();
-      Trace.push(String.format("%4d  %4d  %s", time, step, s));
+      Trace.push(String.format("%4d  %4d  %s", steps, step, s));
      }
    }
 
@@ -117,12 +117,12 @@ class ProgramPA extends Test                                                    
     Trace.clear();
     running = true;
     final int N = code.size();
-    for (step = 0, time = 0; step < N && time < maxTime && running; step++, time++)
+    for (step = 0, steps = 0; step < N && steps < maxSteps && running; step++, steps++)
      {traceMemory();
       for (I i : code.elementAt(step)) {currentInstruction =i; i.a();}          // Execute each instruction in the parallel block
      }
     traceMemory();
-    if (time >= maxTime) stop("Out of time: ", time);
+    if (steps >= maxSteps) stop("Out of steps: ", steps);
     running = false;
     if (traceMemory != null) writeFile(traceFile, joinLines(Trace));            // Write the trace
    }
