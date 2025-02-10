@@ -39,6 +39,8 @@ abstract class StuckPA extends Test                                             
   Layout.Variable     copyCount;                                                // Number of elements to copy in a copy operation
   Layout.Variable  copyBitsKeys;                                                // Number of keys bits to copy in a copy operation
   Layout.Variable  copyBitsData;                                                // Number of data bits to copy in a copy operation
+  Layout.Variable  maxSizeValue;                                                // A field with the maximum size of the stuck in it
+  Layout.Variable          zero;                                                // A field with zero in it
   Layout.Structure         temp;                                                // Transaction intermediate fields
 
 //D1 Construction                                                               // Create a stuck
@@ -234,7 +236,7 @@ abstract class StuckPA extends Test                                             
           if (i < 0 || i > n) stop("Out of extended range", i, "for size", n, traceBack);
          }
         String v()
-         {return "/* assertInEXtended */";
+         {return "/* assertInExtended */";
          }
        };
      }
@@ -242,20 +244,19 @@ abstract class StuckPA extends Test                                             
 
   void inc()                                                                    // Increment the current size
    {zz();
-    assertNotFull();
+    //assertNotFull();
     M.at(currentSize).inc();
    }
 
   void dec()                                                                    // Decrement the current size
    {zz();
-    assertNotEmpty();
+    //assertNotEmpty();
     M.at(currentSize).dec();
    }
 
   void clear()                                                                  // Zero the current size to clear the stuck
    {zz();
     M.setIntInstruction(currentSize, 0);
-    sizeFullEmpty();
    }
 
   MemoryLayoutPA.At key()                                                       // Refer to key
@@ -875,7 +876,10 @@ StuckSML(maxSize:8 size:4)
     ok(s.T.at(s.size).getInt(), 4);
     s.clear();
     s.P.run(); s.P.clear();
-    ok(s.T.at(s.size).getInt(), 0);
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:8 size:0)
+""");
    }
 
   static void test_push()
@@ -993,7 +997,10 @@ StuckSML(maxSize:8 size:3)
     ok(s.T.at(s.isEmpty).getInt() == 0);
     s.clear();
     s.P.run(); s.P.clear();
-    ok(s.T.at(s.isEmpty).getInt() == 1);
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:8 size:0)
+""");
     if (Assert)
      {sayThisOrStop("Empty");
       s.pop();

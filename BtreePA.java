@@ -3541,7 +3541,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 384, """
+    t.runVerilogDeleteTest(2, 7, 379, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3573,7 +3573,7 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 224, """
+    t.runVerilogDeleteTest(7, 2, 219, """
 8,9=0 |
 """);
 
@@ -3615,7 +3615,7 @@ endmodule
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest(3, 127, """
+    t.runVerilogPutTest(3, 122, """
     1      |
     0      |
     1      |
@@ -3655,7 +3655,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 467, """
+    t.runVerilogPutTest(8, 462, """
              4             |
              0             |
              5             |
