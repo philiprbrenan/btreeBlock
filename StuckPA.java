@@ -19,26 +19,27 @@ abstract class StuckPA extends Test                                             
   static boolean   debug;                                                       // Debug when true
   String          action;                                                       // Last action performed
 
-  Layout.Variable         sKey;                                                 // Key in a stuck
-  Layout.Array            Keys;                                                 // Array of keys
-  Layout.Variable        sData;                                                 // Data associated with a key
-  Layout.Array            Data;                                                 // Array of data associated with the array of keys
-  Layout.Variable  currentSize;                                                 // Current size of stuck
-  Layout.Structure       stuck;                                                 // The stuck itself
-  Layout.Variable       search;                                                 // Search key
-  Layout.Variable        limit;                                                 // Limit of search
-  Layout.Bit            isFull;                                                 // Whether the stuck is currently full
-  Layout.Bit           isEmpty;                                                 // Whether the stuck is currently empty
-  Layout.Bit             found;                                                 // Whether a matching element was found
-  Layout.Variable        index;                                                 // The index from which the key, data pair were retrieved
-  Layout.Variable         tKey;                                                 // The retrieved key
-  Layout.Variable        tData;                                                 // The retrieved data
-  Layout.Variable         size;                                                 // The current size of the stuck
-  Layout.Variable         full;                                                 // Used by isFull
-  Layout.Bit             equal;                                                 // The result of an equal operation
-  Layout.Variable    copyCount;                                                 // Number of elements to copy in a copy operation
-  Layout.Variable     copyBits;                                                 // Number of bits to copy in a copy operation
-  Layout.Structure        temp;                                                 // Transaction intermediate fields
+  Layout.Variable          sKey;                                                // Key in a stuck
+  Layout.Array             Keys;                                                // Array of keys
+  Layout.Variable         sData;                                                // Data associated with a key
+  Layout.Array             Data;                                                // Array of data associated with the array of keys
+  Layout.Variable   currentSize;                                                // Current size of stuck
+  Layout.Structure        stuck;                                                // The stuck itself
+  Layout.Variable        search;                                                // Search key
+  Layout.Variable         limit;                                                // Limit of search
+  Layout.Bit             isFull;                                                // Whether the stuck is currently full
+  Layout.Bit            isEmpty;                                                // Whether the stuck is currently empty
+  Layout.Bit              found;                                                // Whether a matching element was found
+  Layout.Variable         index;                                                // The index from which the key, data pair were retrieved
+  Layout.Variable          tKey;                                                // The retrieved key
+  Layout.Variable         tData;                                                // The retrieved data
+  Layout.Variable          size;                                                // The current size of the stuck
+  Layout.Variable          full;                                                // Used by isFull
+  Layout.Bit              equal;                                                // The result of an equal operation
+  Layout.Variable     copyCount;                                                // Number of elements to copy in a copy operation
+  Layout.Variable  copyBitsKeys;                                                // Number of keys bits to copy in a copy operation
+  Layout.Variable  copyBitsData;                                                // Number of data bits to copy in a copy operation
+  Layout.Structure         temp;                                                // Transaction intermediate fields
 
 //D1 Construction                                                               // Create a stuck
 
@@ -104,20 +105,21 @@ abstract class StuckPA extends Test                                             
   Layout transactionLayout()                                                    // Layout of temporary memory used by a transaction
    {zz();
     final Layout l = Layout.layout();
-         isFull = l.bit      (   "isFull");
-        isEmpty = l.bit      (  "isEmpty");
-          found = l.bit      (    "found");
-          equal = l.bit      (    "equal");
-         search = l.variable (   "search", bitsPerKey());
-           tKey = l.variable (      "key", bitsPerKey());
-          tData = l.variable (     "data", bitsPerData());
-          limit = l.variable (    "limit", bitsPerSize());
-          index = l.variable (    "index", bitsPerSize());
-           size = l.variable (     "size", bitsPerSize());
-           full = l.variable (     "full", bitsPerSize());
-      copyCount = l.variable ("copyCount", bitsPerSize());
-      copyBits  = l.variable ( "copyBits", bitsPerSize() + max(bitsPerKey(), bitsPerData()));
-           temp = l.structure("temp",
+             isFull = l.bit      (       "isFull");
+            isEmpty = l.bit      (      "isEmpty");
+              found = l.bit      (        "found");
+              equal = l.bit      (        "equal");
+             search = l.variable (       "search", bitsPerKey());
+               tKey = l.variable (          "key", bitsPerKey());
+              tData = l.variable (         "data", bitsPerData());
+              limit = l.variable (        "limit", bitsPerSize());
+              index = l.variable (        "index", bitsPerSize());
+               size = l.variable (         "size", bitsPerSize());
+               full = l.variable (         "full", bitsPerSize());
+          copyCount = l.variable (    "copyCount", bitsPerSize());
+       copyBitsKeys = l.variable ( "copyBitsKeys", bitsPerSize() + bitsPerKey());
+       copyBitsData = l.variable ( "copyBitsData", bitsPerSize() + bitsPerData());
+    temp = l.structure("temp",
            isFull,
            isEmpty,
            found,
@@ -129,7 +131,9 @@ abstract class StuckPA extends Test                                             
            index,
            size,
            full,
-           copyCount);
+           copyCount,
+           copyBitsKeys,
+           copyBitsData);
     return l.compile();
    }
 
@@ -194,23 +198,30 @@ abstract class StuckPA extends Test                                             
   void copyKeys(StuckPA source)                                                 // Copy the specified number of elements from the source array of keys at the specified index into the target array of keys at the specified target index
    {zz();
     P.new I()
-     {void   a() {T.at(copyBits).setInt(T.at(copyCount).getInt()*bitsPerKey());}
-      String v() {return T.at(copyBits).verilogLoad()+ " <= " + T.at(copyCount).verilogLoad() + "*" + bitsPerKey()+";" + traceComment();}
+     {void   a() {T.at(copyBitsKeys).setInt(T.at(copyCount).getInt()*bitsPerKey());}
+      String v() {return T.at(copyBitsKeys).verilogLoad()+ " <= " + T.at(copyCount).verilogLoad() + "*" + bitsPerKey()+";" + traceComment();}
      };
     final MemoryLayoutPA.At ti = T.at(index);
     final MemoryLayoutPA.At si = source.T.at(source.index);
-    M.at(sKey, ti).copy(source.M.at(source.sKey, si), T.at(copyBits));
+    M.at(sKey, ti).copy(source.M.at(source.sKey, si), T.at(copyBitsKeys));
    }
 
   void copyData(StuckPA source)                                                 // Copy the specified number of elements from the source array of data at the specified index into the target array of data at the specified target index
    {zz();
     P.new I()
-     {void   a() {T.at(copyBits).setInt(T.at(copyCount).getInt()*bitsPerData());}
-      String v() {return T.at(copyBits).verilogLoad()+ " <= " + T.at(copyCount).verilogLoad() + "*" + bitsPerData()+";";}
+     {void   a() {T.at(copyBitsData).setInt(T.at(copyCount).getInt()*bitsPerData());}
+      String v() {return T.at(copyBitsData).verilogLoad()+ " <= " + T.at(copyCount).verilogLoad() + "*" + bitsPerData()+";";}
      };
     final MemoryLayoutPA.At ti = T.at(index);
     final MemoryLayoutPA.At si = source.T.at(source.index);
-    M.at(sData, ti).copy(source.M.at(source.sData, si), T.at(copyBits));
+    M.at(sData, ti).copy(source.M.at(source.sData, si), T.at(copyBitsData));
+   }
+
+  void copyKeysData(StuckPA source)                                             // Copy the specified number of key, data pairs from the source array at the specified index into the target array at the specified target index
+   {zz();
+    P.parallelStart();   copyKeys(source);
+    P.parallelSection(); copyData(source);
+    P.parallelEnd();
    }
 
   void assertInExtended()                                                       // Check that the index would yield a valid element
@@ -589,9 +600,6 @@ abstract class StuckPA extends Test                                             
 //       }
 //     }
 //   };
-//  P.new I() {void a() {say("AAAA", T.at(search), T.at(limit));}};
-//  P.new I() {void a() {say("BBBB", T.at(index),  T.at(found));}};
-//  P.new I() {void a() {say("CCCC", T.at(tKey),   T.at(tData));}};
 // }
 
   void searchFirstGreaterThanOrEqual(boolean all)                               // Search for an element within all elements of the stuck or all but one
@@ -672,13 +680,17 @@ abstract class StuckPA extends Test                                             
    {zz(); action = "concatenate";
     checkSameProgram(Source);                                                   // Confirm that we are writing into the same program
     final StuckPA Target = this;
-    size(); Source.size();                                                      // Get the size of the stucks
 
-    Source.T.at(Source.index).zero();                                           // Start at start of source
-    Target.T.at(Target.index    ).move(Target.T.at(Target.size));               // Extend target
-    Target.T.at(Target.copyCount).move(Source.T.at(Source.size));               // Number of elements to copy into the target
-    Target.copyKeys(Source);                                                    // Copy keys
-    Target.copyData(Source);                                                    // Copy data
+    P.parallelStart();   size();                                                // Get the size of the stucks
+    P.parallelSection(); Source.size();
+    P.parallelEnd();
+
+    P.parallelStart();   Source.T.at(Source.index).zero();                      // Start at start of source
+    P.parallelSection(); Target.T.at(Target.index    ).move(Target.T.at(Target.size)); // Extend target
+    P.parallelSection(); Target.T.at(Target.copyCount).move(Source.T.at(Source.size)); // Number of elements to copy into the target
+    P.parallelEnd();
+
+    Target.copyKeysData(Source);                                                // Copy keys
     P.new I()                                                                   // Update size of target
      {void a()
        {Target.T.at(Target.size).setInt
@@ -698,14 +710,17 @@ abstract class StuckPA extends Test                                             
    {zz(); action = "prepend";
     checkSameProgram(Source);                                                   // Confirm that we are writing into the same program
     final StuckPA Target = this;
-    size(); Source.size();                                                      // Get the size of the stucks
 
-    Target.T.setIntInstruction(Target.index, 0);                                // Concatenate the target to the source
-    Source.T.at(Source.index    ).move(Source.T.at(Source.size));               // Extend source
-    Source.T.at(Source.copyCount).move(Target.T.at(Target.size));               // Number of elements to copy into the target
-    Source.copyKeys(Target);                                                    // Copy keys
-    Source.copyData(Target);                                                    // Copy data
+    P.parallelStart();   size();                                                // Get the size of the stucks
+    P.parallelSection(); Source.size();
+    P.parallelEnd();
 
+    P.parallelStart();   Target.T.setIntInstruction(Target.index, 0);                  // Concatenate the target to the source
+    P.parallelSection(); Source.T.at(Source.index    ).move(Source.T.at(Source.size)); // Extend source
+    P.parallelSection(); Source.T.at(Source.copyCount).move(Target.T.at(Target.size)); // Number of elements to copy into the target
+    P.parallelEnd();
+
+    Source.copyKeysData(Target);                                                // Copy keys
     Target.copy(Source);                                                        // Copy the source to the target leaving the length of the source unchanged so it looks as if it has not been changed
 
     P.new I()                                                                   // Update size of target
@@ -730,15 +745,16 @@ abstract class StuckPA extends Test                                             
      {void   a() {Low.T.at(Low.size).setInt(H);}                                // Size of half in elements
       String v() {return Low.T.at(Low.size).verilogLoad() + " <= "+H+";";}      // Size of half in elements
      };
-    Low.setSize();                                                              // Set size of lower half
 
-    High  .T.setIntInstruction(High.index    , 0);                              // High takes the upper half
-    High  .T.setIntInstruction(High.copyCount, H);                              // Number of elements to copy into the target
-    Source.T.setIntInstruction(Source.index, Source.maxSize() - H);             // Upper half
-    High  .copyKeys(Source);                                                    // Copy keys
-    High  .copyData(Source);                                                    // Copy data
+    P.parallelStart();   Low.setSize();                                         // Set size of lower half
+    P.parallelSection(); High  .T.setIntInstruction(High.index    , 0);         // High takes the upper half
+    P.parallelSection(); High  .T.setIntInstruction(High.copyCount, H);         // Number of elements to copy into the target
+    P.parallelSection(); Source.T.setIntInstruction(Source.index, Source.maxSize() - H); // Upper half
+    P.parallelEnd();
 
-    High.T.setIntInstruction(High.size, H);
+    P.parallelStart();   High  .copyKeysData(Source);                           // Copy keys
+    P.parallelSection(); High.T.setIntInstruction(High.size, H);
+    P.parallelEnd();
     High.setSize();
    }
 
@@ -753,11 +769,11 @@ abstract class StuckPA extends Test                                             
     Low.T.setIntInstruction(Low.size, Source.maxSize() - H);                    // Size of half in elements
     Low.setSize();                                                              // Set size of lower half
 
-    Source.T.setIntInstruction(Source.index,     0);                            // Source - high - takes the upper half moved down
-    Source.T.setIntInstruction(Source.copyCount, H);                            // Number of elements to copy into source
-    Low   .T.setIntInstruction(Low   .index,     Source.maxSize() - H);         // Upper half
-    Source.copyKeys(Low);                                                       // Copy keys back into source at the low position
-    Source.copyData(Low);                                                       // Copy data back into source at the low position
+    P.parallelStart();   Source.T.setIntInstruction(Source.index,     0);       // Source - high - takes the upper half moved down
+    P.parallelSection(); Source.T.setIntInstruction(Source.copyCount, H);       // Number of elements to copy into source
+    P.parallelSection(); Low   .T.setIntInstruction(Low   .index,     Source.maxSize() - H); // Upper half
+    P.parallelEnd();
+    Source.copyKeysData(Low);                                                   // Copy keys back into source at the low position
 
     Source.T.setIntInstruction(Source.size, H);
     Source.setSize();
@@ -772,11 +788,12 @@ abstract class StuckPA extends Test                                             
     Source.T.setIntInstruction(Source.size, Source.maxSize() - H);              // Size of half in elements
     Source.setSize();                                                           // Set size of lower half in source
 
-    Source.T.setIntInstruction(Source.index    , Source.maxSize() - H);         // High takes the upper half
-    High  .T.setIntInstruction(Source.copyCount, H);                            // Number of elements to copy into the target
-    High  .T.setIntInstruction(High  .index    , 0);                            // Upper half
-    High.copyKeys(Source);                                                      // Copy keys
-    High.copyData(Source);                                                      // Copy data
+    P.parallelStart();Source.T.setIntInstruction(Source.index      , Source.maxSize() - H); // High takes the upper half
+    P.parallelSection();High  .T.setIntInstruction(Source.copyCount, H);        // Number of elements to copy into the target
+    P.parallelSection();High  .T.setIntInstruction(High  .index    , 0);        // Upper half
+    P.parallelEnd();
+
+    High.copyKeysData(Source);                                                  // Copy keys
 
     High.T.setIntInstruction(High.size, H);                                     // New size of high
     High.setSize();
