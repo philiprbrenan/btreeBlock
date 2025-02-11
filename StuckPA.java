@@ -517,45 +517,49 @@ abstract class StuckPA extends Test                                             
 //   };
 // }
 
-  void search()                                                                 // Search for an element within all elements of the stuck
-   {z(); action = "search";
+  void search                                                                   // Search for an element within all elements of the stuck
+   (MemoryLayoutPA.At Search, MemoryLayoutPA.At Found,
+    MemoryLayoutPA.At Index,  MemoryLayoutPA.At Data)
+   {zz(); action = "search";
 
     P.new I()
      {void a()
-       {T.at(found).setOff().setInt(0);                                         // Assume we will not find the key
-        final int s = T.at(search).getInt();                                    // Key to search for
-        final int N = M.at(currentSize).getInt();                               // Number of elements to search
+       {Found.setOff().setInt(0);                                               // Assume we will not find the key
+        final int s = Search           .setOff().getInt();                      // Key to search for
+        final int N = M.at(currentSize).setOff().getInt();                      // Number of elements to search
+
         for (int i = 0; i < N; i++)                                             // Search
          {z();
-          final int k = M.at(sKey, i).setOff().getInt();
+          final int k = M.at(sKey, i)  .setOff().getInt();                      // Current key
           if (k == s)                                                           // Current key equals search key with limits of a java integer
-           {T.at(found).setInt(1);                                              // Show found
-            T.at(index).setInt(i);                                              // Index of key found
-            T.at(tKey) .setInt(M.at(sKey,  i).setOff().getInt());               // Key found
-            T.at(tData).setInt(M.at(sData, i).setOff().getInt());               // Data associated with key found
+           {Found.setInt(1);                                                    // Show found
+            Index.setInt(i);                                                    // Index of key found
+//          Key  .setInt(M.at(sKey,  i).setOff().getInt());                     // Key found
+final int v = M.at(sData, i).setOff().getInt();
+            Data .setInt(v);                                                    // Data associated with key found
             break;
            }
          }
        }
       String v()
        {final StringBuilder v = new StringBuilder();                            // Verilog
-        final String        s = T.at(search).verilogLoad();
+        final String        s = Search.verilogLoad();
         final String        c = M.at(currentSize).verilogLoad();
         final int           N = maxSize();
 
-        v.append(T.at(found).verilogLoad()+"= ( 0\n");                          // Found
+        v.append(Found.verilogLoad()+"= ( 0\n");                                // Found
         for (int i = 0; i < N; i++)
          {v.append(" || ("+M.at(sKey, i).verilogLoad()+" == "+s+" &&  "+i+ " < "+c+")\n");
          }
         v.append(") ? 1 : 0;\n");
 
-        v.append(T.at(index).verilogLoad()+" =\n");                             // Index of found
+        v.append(Index.verilogLoad()+" =\n");                                   // Index of found key if any
         for (int i = 0; i < N; i++)
          {v.append(    "("+M.at(sKey, i).verilogLoad()+" == "+s+" && "+i+ " < "+c+") ? "+i+" :\n");
          }
         v.append("0;\n");
 
-        v.append(T.at(tData).verilogLoad()+" =\n");                             // Data of found
+        v.append(Data.verilogLoad()+" =\n");                                    // Data of found key if any
         for (int i = 0; i < N; i++)
          {v.append(    "("+M.at(sKey, i).verilogLoad()+" == "+s+" && "+i+ " < "+c+") ? "+M.at(sData, i).verilogLoad()+" :\n");
          }
@@ -607,7 +611,7 @@ abstract class StuckPA extends Test                                             
     MemoryLayoutPA.At Search, MemoryLayoutPA.At Found,
     MemoryLayoutPA.At Index,
     MemoryLayoutPA.At Key,    MemoryLayoutPA.At Data)
-   {z(); action = "search";
+   {zz(); action = "search";
     if (Search == null) stop("Search must not be null");
     //if (Found  == null) err("Found");
     //if (Index  == null) err("Index");
@@ -1247,38 +1251,61 @@ StuckSML(maxSize:8 size:3)
   static void test_search()
    {StuckPA s = test_load();
 
-    s.P.new I() {void a() {s.T.at(s.search).setInt(2);}};
-    s.search();
+    Layout               l = Layout.layout();
+    Layout.Variable  k = l.variable ("k", s.bitsPerKey());
+    Layout.Variable  f = l.bit      ("f");
+    Layout.Variable  i = l.variable ("i", s.bitsPerSize());
+    Layout.Variable  d = l.variable ("d", s.bitsPerData());
+    Layout.Structure S = l.structure("S", k, f, i, d);
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "m");
+                     m.program(s.P);
+
+    m.setIntInstruction(k, 2);
+    s.search(m.at(k), m.at(f), m.at(i), m.at(d));
     s.P.run(); s.P.clear();
     //stop(s);
 //  ok(s.print(), """
 //Transaction(action:search search:2 limit:0 found:1 index:0 key:2 data:1 size:4 isFull:0 isEmpty:0)
 //""");
-    ok(s.T.at(s.found).getInt(), 1);
-    ok(s.T.at(s.index).getInt(), 0);
-    ok(s.T.at(s.tKey) .getInt(), 2);
-    ok(s.T.at(s.tData).getInt(), 1);
+    //stop(m);
+    ok(m, """
+MemoryLayout: m
+Memory      : m
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        49                                      S
+   2 V        0        16                                  2     k
+   3 B       16         1                                  1     f
+   4 V       17        16                                  0     i
+   5 V       33        16                                  1     d
+""");
 
-    s.P.new I() {void a() {s.T.at(s.search).setInt(3);}};
-    s.search();
+    m.setIntInstruction(k, 3);
+    s.search(m.at(k), m.at(f), m.at(i), m.at(d));
     s.P.run(); s.P.clear();
-    //stop(s);
+//  //stop(s);
 //    ok(s.print(), """
 //Transaction(action:search search:3 limit:0 found:0 index:4 key:8 data:1 size:4 isFull:0 isEmpty:0)
 //""");
-    ok(s.T.at(s.found).getInt(), 0);
+    ok(m.at(f).getInt(), 0);
 
-    s.P.new I() {void a() {s.T.at(s.search).setInt(8);  }};
-    s.search();
+    m.setIntInstruction(k, 8);
+    s.search(m.at(k), m.at(f), m.at(i), m.at(d));
     s.P.run(); s.P.clear();
-    //stop(s);
+//  //stop(s);
 //    ok(s.print(), """
 //Transaction(action:search search:8 limit:0 found:1 index:3 key:8 data:4 size:4 isFull:0 isEmpty:0)
 //""");
-    ok(s.T.at(s.found).getInt(), 1);
-    ok(s.T.at(s.index).getInt(), 3);
-    ok(s.T.at(s.tKey) .getInt(), 8);
-    ok(s.T.at(s.tData).getInt(), 4);
+    //stop(m);
+    ok(m, """
+MemoryLayout: m
+Memory      : m
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        49                                      S
+   2 V        0        16                                  8     k
+   3 B       16         1                                  1     f
+   4 V       17        16                                  3     i
+   5 V       33        16                                  4     d
+""");
    }
 
 //  static void test_search_except_last()
