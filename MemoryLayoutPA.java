@@ -1652,14 +1652,14 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     MemoryLayoutPA.At at = m.at(a, m.at(I));
     final String n = m.name();
-    ok(at.verilogLoad(), n+"[   0/*a   */ + "+n+"[  24/*I   */ +: 4] * 6 +: 2]");
-    ok(at.verilogAddr(),   "   0/*a   */ + "+n+"[  24/*I   */ +: 4] * 6");
-    ok(m.at(a, 0).verilogLoad(), n+"[   0/*a   */ + 0 * 6 +: 2]");
-    ok(m.at(a, 1).verilogLoad(), n+"[   0/*a   */ + 1 * 6 +: 2]");
-    ok(m.at(a, 2).verilogLoad(), n+"[   0/*a   */ + 2 * 6 +: 2]");
-    ok(m.at(b, 0).verilogLoad(), n+"[   2/*b   */ + 0 * 6 +: 2]");
-    ok(m.at(b, 1).verilogLoad(), n+"[   2/*b   */ + 1 * 6 +: 2]");
-    ok(m.at(b, 2).verilogLoad(), n+"[   2/*b   */ + 2 * 6 +: 2]");
+    ok(at.verilogLoad(), n+"[       0/*a       */ + "+n+"[      24/*I       */ +: 4] * 6 +: 2]");
+    ok(at.verilogAddr(),   "       0/*a       */ + "+n+"[      24/*I       */ +: 4] * 6");
+    ok(m.at(a, 0).verilogLoad(), n+"[       0/*a       */ + 0 * 6 +: 2]");
+    ok(m.at(a, 1).verilogLoad(), n+"[       0/*a       */ + 1 * 6 +: 2]");
+    ok(m.at(a, 2).verilogLoad(), n+"[       0/*a       */ + 2 * 6 +: 2]");
+    ok(m.at(b, 0).verilogLoad(), n+"[       2/*b       */ + 0 * 6 +: 2]");
+    ok(m.at(b, 1).verilogLoad(), n+"[       2/*b       */ + 1 * 6 +: 2]");
+    ok(m.at(b, 2).verilogLoad(), n+"[       2/*b       */ + 2 * 6 +: 2]");
    }
 
   static void test_dump_verilog()
