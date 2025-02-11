@@ -721,8 +721,8 @@ abstract class BtreePA extends Test                                             
 
   private void branchSize()                                                     // Number of children in body of branch taking top for granted as it is always there
    {zz();
-    tt(node_branchBase, node_branchSize);
-    branchBase(branchBase, node_branchBase);
+    //tt(node_branchBase, node_branchSize);
+    branchBase(branchBase, node_branchSize);
     bSize.base(T.at(branchBase));
     bSize.size();
     T.at(branchSize).add(bSize.T.at(bSize.size), -1);                           // Account for top which will always be present
@@ -734,22 +734,22 @@ abstract class BtreePA extends Test                                             
     T.at(Size).add(branchStuck.T.at(branchStuck.size), -1);                     // Account for top which will always be present
    }
 
-  private void isEmpty()                                                        // The node is empty
-   {z();
-    tt(node_isLeaf, node_isEmpty);
-    isLeaf();
-    P.new If (T.at(IsLeaf))
-     {void Then()
-       {tt(node_leafSize, node_isEmpty); leafSize();
-        T.at(leafSize).isZero(T.at(isEmpty));
-       }
-      void Else()
-       {z();
-        tt(node_branchSize, node_isEmpty); branchSize();
-        T.at(branchSize).isZero(T.at(isEmpty));                                 // Allow for top which must always be present
-       }
-     };
-   }
+//  private void isEmpty()                                                        // The node is empty
+//   {z();
+//    tt(node_isLeaf, node_isEmpty);
+//    isLeaf();
+//    P.new If (T.at(IsLeaf))
+//     {void Then()
+//       {tt(node_leafSize, node_isEmpty); leafSize();
+//        T.at(leafSize).isZero(T.at(isEmpty));
+//       }
+//      void Else()
+//       {z();
+//        tt(node_branchSize, node_isEmpty); branchSize();
+//        T.at(branchSize).isZero(T.at(isEmpty));                                 // Allow for top which must always be present
+//       }
+//     };
+//   }
 
   private void isFull()                                                         // The node is full
    {zz();
@@ -809,14 +809,14 @@ abstract class BtreePA extends Test                                             
     tt(hasLeavesForChildren, IsLeaf);
    }
 
-  private void top()                                                            // The top next element of a branch - only used in printing
-   {z();
-    if (Assert) {tt(node_assertBranch, node_top); assertBranch();}
-    branchBase(bTop, node_top);
-    tt(node_branchSize, node_top); branchSize(); bTop.T.at(bTop.index).move(T.at(branchSize));
-    bTop.elementAt();
-    T.at(top).move(bTop.T.at(bTop.tData));
-   }
+//private void top()                                                            // The top next element of a branch - only used in printing
+// {z();
+//  if (Assert) {tt(node_assertBranch, node_top); assertBranch();}
+//  branchBase(bTop, node_top);
+//  tt(node_branchSize, node_top); branchSize(); bTop.T.at(bTop.index).move(T.at(branchSize));
+//  bTop.elementAt();
+//  T.at(top).move(bTop.T.at(bTop.tData));
+// }
 
 //D2 Search                                                                     // Search within a node and update the node description with the results
 
@@ -1294,30 +1294,24 @@ abstract class BtreePA extends Test                                             
         bT.T.at(bT.index).add(T.at(index), -1);                                 // Account for top
         bT.elementAt();
 
-        P.parallelStart();
-          T.at(l).move(bT.T.at(bT.tData));
-        P.parallelSection();
-          bT.T.at(bT.index).move(T.at(index));
+        P.parallelStart();    T.at(l).move(bT.T.at(bT.tData));
+        P.parallelSection();  bT.T.at(bT.index).move(T.at(index));
         P.parallelEnd();
 
         bT.elementAt();
 
-        P.parallelStart();
-          T.at(r).move(bT.T.at(bT.tData));
-        P.parallelSection();
-          tt(node_hasLeavesForChildren, node_stealFromLeft);
+        P.parallelStart();    T.at(r).move(bT.T.at(bT.tData));
+        P.parallelSection();  tt(node_hasLeavesForChildren, node_stealFromLeft);
         P.parallelEnd();
 
         hasLeavesForChildren();
 
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
-           {P.parallelStart();                                                  // Address leaves on each side and get their size
-              leafBase(lL, l);
-              leafSize(lL, nl);
-            P.parallelSection();
-              leafBase(lR, r);
-              leafSize(lR, nr);
+           {P.parallelStart();    leafBase(lL, l);                              // Address leaves on each side and get their size
+                                  leafSize(lL, nl);
+            P.parallelSection();  leafBase(lR, r);
+                                  leafSize(lR, nr);
             P.parallelEnd();
 
             T.at(nr).greaterThanOrEqual(T.at(maxKeysPerLeaf), T.at(stolenOrMerged));
@@ -1328,33 +1322,26 @@ abstract class BtreePA extends Test                                             
 
             lL.pop();                                                           // Steal from left
 
-            P.parallelStart();
-              lR.T.at(lR.tKey ).move(lL.T.at(lL.tKey ));
-            P.parallelSection();
-              lR.T.at(lR.tData).move(lL.T.at(lL.tData));
+            P.parallelStart();    lR.T.at(lR.tKey ).move(lL.T.at(lL.tKey ));
+            P.parallelSection();  lR.T.at(lR.tData).move(lL.T.at(lL.tData));
             P.parallelEnd();
             lR.unshift();                                                       // Increase right
 
             lL.T.at(lL.index).add(T.at(nl), -2);                                // Account for top and zero base
             lL.elementAt();                                                     // Last key on left
 
-            P.parallelStart();
-              bT.T.at(bT.tKey) .move(lL.T.at(lL.tKey));
-            P.parallelSection();
-              bT.T.at(bT.tData).move(T.at(l));
-            P.parallelSection();
-              bT.T.at(bT.index).add(T.at(index), -1);
+            P.parallelStart();    bT.T.at(bT.tKey) .move(lL.T.at(lL.tKey));
+            P.parallelSection();  bT.T.at(bT.tData).move(T.at(l));
+            P.parallelSection();  bT.T.at(bT.index).add(T.at(index), -1);
             P.parallelEnd();
             bT.setElementAt();                                                  // Reduce key of parent of left
            }
           void Else()                                                           // Children are branches
            {z();
-            P.parallelStart();
-              branchBase(bL, l);
-              branchSize(bL, nl);
-            P.parallelSection();
-              branchBase(bR, r);
-              branchSize(bR, nr);
+            P.parallelStart();    branchBase(bL, l);
+                                  branchSize(bL, nl);
+            P.parallelSection();  branchBase(bR, r);
+                                  branchSize(bR, nr);
             P.parallelEnd();
 
             T.at(nr).greaterThanOrEqual(T.at(maxKeysPerBranch), T.at(stolenOrMerged));
@@ -1367,10 +1354,8 @@ abstract class BtreePA extends Test                                             
             bT.T.at(bT.index).move(T.at(index));
             bT.elementAt();                                                     // Top key
 
-            P.parallelStart();
-              bR.T.at(bR.tKey) .move(bT.T.at(bT.tKey));
-            P.parallelSection();
-              bR.T.at(bR.tData).move(bL.T.at(bL.tData));
+            P.parallelStart();   bR.T.at(bR.tKey) .move(bT.T.at(bT.tKey));
+            P.parallelSection(); bR.T.at(bR.tData).move(bL.T.at(bL.tData));
             P.parallelEnd();
             bR.unshift();                                                       // Increase right with left top
 //          bL.pop();                                                           // Remove left top
@@ -1381,22 +1366,17 @@ abstract class BtreePA extends Test                                             
 
             bT.elementAt();                                                     // Parent key
 
-            P.parallelStart();
-              bR.T.at(bR.tKey).move(bT.T.at(bT.tKey));
-            P.parallelSection();
-              bR.T.at(bR.index).zero();
+            P.parallelStart();   bR.T.at(bR.tKey).move(bT.T.at(bT.tKey));
+            P.parallelSection(); bR.T.at(bR.index).zero();
             P.parallelEnd();
 
             bR.setElementAt();                                                  // Reduce key of parent of right
 
             bL.lastElement();                                                   // Last left key
 
-            P.parallelStart();
-              bT.T.at(bT.tKey) .move(bL.T.at(bL.tKey));
-            P.parallelSection();
-              bT.T.at(bT.tData).move(T.at(l));
-            P.parallelSection();
-              bT.T.at(bT.index).add(T.at(index), -1);
+            P.parallelStart();   bT.T.at(bT.tKey) .move(bL.T.at(bL.tKey));
+            P.parallelSection(); bT.T.at(bT.tData).move(T.at(l));
+            P.parallelSection(); bT.T.at(bT.index).add(T.at(index), -1);
             P.parallelEnd();
             bT.setElementAt();                                                  // Reduce key of parent of left
            }
@@ -1422,22 +1402,16 @@ abstract class BtreePA extends Test                                             
         bT.T.at(bT.index).move(T.at(index));
         bT.elementAt();
 
-        P.parallelStart();
-          T.at(lk).move(bT.T.at(bT.tKey));
-        P.parallelSection();
-          T.at(l) .move(bT.T.at(bT.tData));
-        P.parallelSection();
-          bT.T.at(bT.index).add(T.at(index), +1);
+        P.parallelStart();    T.at(lk).move(bT.T.at(bT.tKey));
+        P.parallelSection();  T.at(l) .move(bT.T.at(bT.tData));
+        P.parallelSection();  bT.T.at(bT.index).add(T.at(index), +1);
         P.parallelEnd();
 
         bT.elementAt();
 
-        P.parallelStart();
-          T.at(rk).move(bT.T.at(bT.tKey));
-        P.parallelSection();
-          T.at(r) .move(bT.T.at(bT.tData));
-        P.parallelSection();
-          tt(node_hasLeavesForChildren, node_stealFromRight);
+        P.parallelStart();    T.at(rk).move(bT.T.at(bT.tKey));
+        P.parallelSection();  T.at(r) .move(bT.T.at(bT.tData));
+        P.parallelSection();  tt(node_hasLeavesForChildren, node_stealFromRight);
         P.parallelEnd();
 
         hasLeavesForChildren();
@@ -1445,12 +1419,10 @@ abstract class BtreePA extends Test                                             
         P.new If(T.at(hasLeavesForChildren))                                    // Children are leaves
          {void Then()
            {z();
-            P.parallelStart();
-              leafBase(lL, l);
-              leafSize(lL, nl);
-            P.parallelSection();
-              leafBase(lR, r);
-              leafSize(lR, nr);
+            P.parallelStart();   leafBase(lL, l);
+                                 leafSize(lL, nl);
+            P.parallelSection(); leafBase(lR, r);
+                                 leafSize(lR, nr);
             P.parallelEnd();
 
             T.at(nl).greaterThanOrEqual(T.at(maxKeysPerLeaf), T.at(stolenOrMerged));
