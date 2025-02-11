@@ -534,9 +534,7 @@ abstract class StuckPA extends Test                                             
           if (k == s)                                                           // Current key equals search key with limits of a java integer
            {Found.setInt(1);                                                    // Show found
             Index.setInt(i);                                                    // Index of key found
-//          Key  .setInt(M.at(sKey,  i).setOff().getInt());                     // Key found
-final int v = M.at(sData, i).setOff().getInt();
-            Data .setInt(v);                                                    // Data associated with key found
+            Data .setInt(M.at(sData, i).setOff().getInt());                     // Data associated with key found
             break;
            }
          }
