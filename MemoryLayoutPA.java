@@ -229,7 +229,7 @@ class MemoryLayoutPA extends Test                                               
     int  at;                                                                    // Location in memory
     int  result;                                                                // The contents of memory at this location
 
-    String verilogLoadAddr(boolean la)                                          // A verilog representation of an addressed location in memory
+    String verilogLoadAddr(boolean la, Integer delta)                           // A verilog representation of an addressed location in memory
      {final String base = based != null ? baseName()+"+" : "";                  // Base field name if a based memory layout
 
       final Stack<String>      v = new Stack<>();                               // Verilog expression, index variable names
@@ -243,12 +243,17 @@ class MemoryLayoutPA extends Test                                               
                                directs[i].verilogLoad();                        // Indirect index loaded from memory
         v.push(" + " + o + " * " + w);                                          // Access indexing field
        }
-      return (la ? c(base)+i(field.at)+"/*"+c(field.name)+"*/"+joinStrings(v, "") :                               // IBM S/360 Principles of Operation: LA
-        name()+"["+c(base)+i(field.at)+"/*"+c(field.name)+"*/"+joinStrings(v, "")+" +: "+w(field.width)+"]");     // IBM S/360 Principles of Operation: L
+
+      final int    W =  field.width;                                            // The width of the field
+      final String w = w(W);                                                    // The width of the field as a padded string
+      final String d = delta == null ? "" :                                     // Constant delta to modify address if needed in steps of field size as in the C programming language
+                       delta > 0 ? "+"+delta*W : ""+delta*W;
+      return (la ? c(base)+i(field.at)+"/*"+c(field.name)+"*/"+joinStrings(v, "")+d    :           // IBM S/360 Principles of Operation: LA
+        name()+"["+c(base)+i(field.at)+"/*"+c(field.name)+"*/"+joinStrings(v, "")+d+" +: "+w+"]"); // IBM S/360 Principles of Operation: L
      }
 
-    String verilogLoad() {return verilogLoadAddr(false);}                       // Content of a memory location as a verilog expression
-    String verilogAddr() {return verilogLoadAddr(true);}                        // Address of a memory location
+    String verilogLoad() {return verilogLoadAddr(false, null);}                 // Content of a memory location as a verilog expression
+    String verilogAddr() {return verilogLoadAddr(true,  null);}                 // Address of a memory location
     String i(int i)      {return String.format("%4d", i);}                      // Format an index
     String w(int w)      {return String.format("%1d", w);}                      // Format a width
     String c(String s)   {while(s.length() % 4 > 0) s = s+" "; return s;}       // Format a field name
