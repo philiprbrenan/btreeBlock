@@ -320,7 +320,7 @@ abstract class StuckPA extends Test                                             
 
   void unshift()                                                                // Unshift an element onto the stuck
    {zz(); action = "unshift";
-    size();
+    //size();
     //isFull();
     //assertNotFull();
     //setFound();
@@ -347,13 +347,13 @@ abstract class StuckPA extends Test                                             
 
   void pop()                                                                    // Pop an element from the stuck
    {zz(); action = "pop";
-    size();
+    //size();
     //isEmpty();
     //assertNotEmpty();
     dec();
     //setFound();
     //T.at(size).dec();
-    T.at(index).add(T.at(size), -1);
+    T.at(index).move(M.at(currentSize));
     moveKeyData();
     //sizeFullEmpty();
    }
@@ -603,23 +603,35 @@ abstract class StuckPA extends Test                                             
 //   };
 // }
 
-  void searchFirstGreaterThanOrEqual(boolean all)                               // Search for an element within all elements of the stuck or all but one
+  void searchFirstGreaterThanOrEqual(boolean all,                               // Search for an element within all elements of the stuck or all but one
+    MemoryLayoutPA.At Search, MemoryLayoutPA.At Found,
+    MemoryLayoutPA.At Index,
+    MemoryLayoutPA.At Key,    MemoryLayoutPA.At Data)
    {z(); action = "search";
+    if (Search == null) stop("Search must not be null");
+    //if (Found  == null) err("Found");
+    //if (Index  == null) err("Index");
+    //if (Key    == null) err("Key");
+    //if (Data   == null) err("Data");
 
     P.new I()
      {void a()
-       {T.at(found).setOff().setInt(0);                                         // Assume we will not find the key
-        final int s = T.at(search).getInt();                                    // Key to search for
-        final int N = M.at(currentSize).getInt() - (all ? 0 : 1);               // Number of elements to search
-        T.at(index).setInt(N);                                                  // Default index if no key matches
+       {if (Found != null) Found.setInt(0);                                     // Assume we will not find the key
+        final int s = Search.setOff().getInt();                                 // Key to search for
+
+        final int c = M.at(currentSize).setOff().getInt();                      // Number of elements in stuck
+        final int N = c - (all ? 0 : 1);                                        // Number of elements to search
+        if (Index != null) Index.setInt(N);                                     // Default index if no key matches
+        if (Data  != null) Data.setInt(M.at(sData, N).setOff().getInt());       // Default data  if no key matches
+
         for  (int i = 0; i < N; i++)                                            // Search
          {z();
           final int k = M.at(sKey, i).setOff().getInt();
-          T.at(tKey).setInt(k);                                                 // Key being considered
+          if (Key != null) Key.setInt(k);                                       // Key being considered
           if (k >= s)                                                           // Current key greater than or equal to search key with limits of a java integer
-           {T.at(found).setInt(1);                                              // Show found
-            T.at(index).setInt(i);                                              // Index of key found
-            T.at(tData).setInt(M.at(sData, i).setOff().getInt());               // Data associated with key found
+           {if (Found != null) Found.setInt(1);                                 // Show found
+            if (Index != null) Index.setInt(i);                                 // Index of key found
+            if (Data  != null) Data .setInt(M.at(sData, i).setOff().getInt());  // Data associated with key found
             break;
            }
          }
@@ -627,33 +639,42 @@ abstract class StuckPA extends Test                                             
 
       String v()
        {final StringBuilder v = new StringBuilder();                            // Verilog
-        final String        s = T.at(search).verilogLoad();
+        final String        s = Search == null ? T.at(search).verilogLoad() : Search.verilogLoad();
         final String        c = M.at(currentSize).verilogLoad() + (all ? "-0" : "-1");
         final int           N = maxSize();
 
-        v.append(T.at(found).verilogLoad()+"= ( 0\n");                          // Found
-        for (int i = 0; i < N; i++)
-         {v.append(" || ("+M.at(sKey, i).verilogLoad()+" >= "+s+" &&  "+i+ " < "+c+")\n");
+        if (Found != null)                                                      // Found
+         {v.append(Found.verilogLoad()+"= ( 0\n");
+          for (int i = 0; i < N; i++)
+           {v.append(" || ("+M.at(sKey, i).verilogLoad()+" >= "+s+" &&  "+i+ " < "+c+")\n");
+           }
+          v.append(") ? 1 : 0;\n");
          }
-        v.append(") ? 1 : 0;\n");
 
-        v.append(T.at(index).verilogLoad()+" =\n");                             // Index of found
-        for (int i = 0; i < N; i++)
-         {v.append(    "("+M.at(sKey, i).verilogLoad()+" >= "+s+" && "+i+ " < "+c+") ? "+i+" :\n");
+        if (Index != null)                                                      // Index of found
+         {v.append(Index.verilogLoad()+" =\n");
+          for (int i = 0; i < N; i++)
+           {v.append(    "("+M.at(sKey, i).verilogLoad()+" >= "+s+" && "+i+ " < "+c+") ? "+i+" :\n");
+           }
+          v.append(c+";\n");
          }
-        v.append(c+";\n");
 
-        v.append(T.at(tKey).verilogLoad()+" =\n");                              // Key of found
-        for (int i = 0; i < N; i++)
-         {v.append(    "("+M.at(sKey, i).verilogLoad()+" >= "+s+" && "+i+ " < "+c+") ? "+M.at(sKey, i).verilogLoad()+" :\n");
+        if (Key != null)                                                        // Greater than or equal key
+         {v.append(Key.verilogLoad()+" =\n");
+          for (int i = 0; i < N; i++)
+           {v.append(    "("+M.at(sKey, i).verilogLoad()+" >= "+s+" && "+i+ " < "+c+") ? "+M.at(sKey, i).verilogLoad()+" :\n");
+           }
+          v.append("0;\n");
          }
-        v.append("0;\n");
 
-        v.append(T.at(tData).verilogLoad()+" =\n");                              // Data of found
-        for (int i = 0; i < N; i++)
-         {v.append(    "("+M.at(sKey, i).verilogLoad()+" >= "+s+" && "+i+ " < "+c+") ? "+M.at(sData, i).verilogLoad()+" :\n");
+        if (Data != null)
+         {v.append(Data.verilogLoad()+" =\n");                                  // Data of found
+          for (int i = 0; i < N; i++)
+           {v.append(    "("+M.at(sKey, i).verilogLoad()+" >= "+s+" && "+i+ " < "+c+") ? "+M.at(sData, i).verilogLoad()+" :\n");
+           }
+          if (all) v.append(M.at(sData, M.at(currentSize)).verilogLoad() + ";\n");              // Normal address
+          else     v.append(M.at(sData, M.at(currentSize)).verilogLoadAddr(false, -1) + ";\n"); // Address one back
          }
-        v.append("0;\n");
         return v.toString();
        }
      };
@@ -1283,21 +1304,35 @@ StuckSML(maxSize:8 size:3)
 //
   static void test_search_first_greater_than_or_equal()
    {StuckPA s = test_load();
+    Layout               l = Layout.layout();
+    Layout.Variable  K = l.variable ("K", s.bitsPerKey());
+    Layout.Variable  f = l.bit      ("f");
+    Layout.Variable  i = l.variable ("i", s.bitsPerSize());
+    Layout.Variable  k = l.variable ("k", s.bitsPerKey());
+    Layout.Variable  d = l.variable ("d", s.bitsPerData());
+    Layout.Structure S = l.structure("S", k, f, i, K, d);
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "m");
+                     m.program(s.P);
 
-    s.P.new I() {void a() {s.T.at(s.search).setInt(5);}};
-    s.searchFirstGreaterThanOrEqual(true);
+    m.setIntInstruction(k, 5);
+    s.searchFirstGreaterThanOrEqual(true, m.at(k), m.at(f), m.at(i), m.at(K), m.at(d));
     s.P.run(); s.P.clear();
-    //stop(t);
-//    ok(s.print(), """
-//Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:0 found:1 index:2 key:6 data:3 size:4 isFull:0 isEmpty:0)
-//""");
-    ok(s.T.at(s.found).getInt(), 1);
-    ok(s.T.at(s.index).getInt(), 2);
-    ok(s.T.at(s.tKey) .getInt(), 6);
-    ok(s.T.at(s.tData).getInt(), 3);
+    //stop(m);
+    ok(m, """
+MemoryLayout: m
+Memory      : m
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        65                                      S
+   2 V        0        16                                  5     k
+   3 B       16         1                                  1     f
+   4 V       17        16                                  2     i
+   5 V       33        16                                  6     K
+   6 V       49        16                                  3     d
+""");
 
     s.P.new I() {void a() {s.T.at(s.search).setInt(7);}};
-    s.searchFirstGreaterThanOrEqual(true);
+    s.searchFirstGreaterThanOrEqual(true, s.T.at(s.search), s.T.at(s.found),
+      s.T.at(s.index), s.T.at(s.tKey), s.T.at(s.tData));
     s.P.run(); s.P.clear();
     //stop(t);
 //    ok(s.print(), """
@@ -1311,24 +1346,42 @@ StuckSML(maxSize:8 size:3)
 
   static void test_search_first_greater_than_or_equal_except_last()
    {StuckPA s = test_load();
+    Layout               l = Layout.layout();
+    Layout.Variable  K = l.variable ("K", s.bitsPerKey());
+    Layout.Variable  f = l.bit      ("f");
+    Layout.Variable  i = l.variable ("i", s.bitsPerSize());
+    Layout.Variable  k = l.variable ("k", s.bitsPerKey());
+    Layout.Variable  d = l.variable ("d", s.bitsPerData());
+    Layout.Structure S = l.structure("S", k, f, i, K, d);
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "m");
+                     m.program(s.P);
 
     //s.P.new I() {void a() {s.T.at(s.limit).setInt(1);}};
-    s.P.new I() {void a() {s.T.at(s.search).setInt(5);}};
-    s.searchFirstGreaterThanOrEqual(false);
+    m.setIntInstruction(k, 5);
+    s.searchFirstGreaterThanOrEqual(false, m.at(k), m.at(f), m.at(i), m.at(K), m.at(d));
     s.P.run(); s.P.clear();
-    //stop(t);
+//  //stop(t);
 //    ok(s.print(), """
 //Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:1 found:1 index:2 key:6 data:3 size:3 isFull:0 isEmpty:0)
 //""");
-    ok(s.T.at(s.found).getInt(), 1);
-    ok(s.T.at(s.index).getInt(), 2);
-    ok(s.T.at(s.tKey) .getInt(), 6);
-    ok(s.T.at(s.tData).getInt(), 3);
+    //stop(m);
+    ok(m, """
+MemoryLayout: m
+Memory      : m
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        65                                      S
+   2 V        0        16                                  5     k
+   3 B       16         1                                  1     f
+   4 V       17        16                                  2     i
+   5 V       33        16                                  6     K
+   6 V       49        16                                  3     d
+""");
 
     s.P.new I() {void a() {s.T.at(s.search).setInt(7);}};
-    s.searchFirstGreaterThanOrEqual(false);
+    s.searchFirstGreaterThanOrEqual(false, s.T.at(s.search),
+                                           s.T.at(s.found), null, null, null);
     s.P.run(); s.P.clear();
-    //stop(t);
+//  //stop(t);
 //    ok(s.print(), """
 //Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:3 key:6 data:3 size:3 isFull:0 isEmpty:0)
 //""");

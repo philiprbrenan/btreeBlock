@@ -1,4 +1,4 @@
-reg [254:0] T_44;  /*   MemoryLayoutPA.java:0966:declareVerilog   MemoryLayoutPA.java:0948:dumpVerilog   BtreePA.java:2494:<init>   BtreePA.java:3462:<init>   BtreePA.java:3461:test_verilog_find   BtreePA.java:3835:newTests   BtreePA.java:3842:main  */
+reg [254:0] T_44;  /*   MemoryLayoutPA.java:0971:declareVerilog   MemoryLayoutPA.java:0953:dumpVerilog   BtreePA.java:2507:<init>   BtreePA.java:3475:<init>   BtreePA.java:3474:test_verilog_find   BtreePA.java:3848:newTests   BtreePA.java:3855:main  */
 task initialize_memory_T_44;
     begin
         T_44[0] <= 1;
@@ -13,8 +13,8 @@ task initialize_memory_T_44;
         T_44[9] <= 0;
         T_44[10] <= 1;
         T_44[11] <= 0;
-        T_44[12] <= 0;
-        T_44[13] <= 1;
+        T_44[12] <= 1;
+        T_44[13] <= 0;
         T_44[14] <= 0;
         T_44[15] <= 0;
         T_44[16] <= 0;
