@@ -254,9 +254,9 @@ class MemoryLayoutPA extends Test                                               
 
     String verilogLoad() {return verilogLoadAddr(false, null);}                 // Content of a memory location as a verilog expression
     String verilogAddr() {return verilogLoadAddr(true,  null);}                 // Address of a memory location
-    String i(int i)      {return String.format("%4d", i);}                      // Format an index
+    String i(int i)      {return String.format("%8d", i);}                      // Format an index
     String w(int w)      {return String.format("%1d", w);}                      // Format a width
-    String c(String s)   {while(s.length() % 4 > 0) s = s+" "; return s;}       // Format a field name
+    String c(String s)   {while(s.length() % 8 > 0) s = s+" "; return s;}       // Format a field name
 
     void locateDirectAddress()                                                  // Locate a direct address and its content
      {final int N = indices.length;
