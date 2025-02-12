@@ -721,8 +721,8 @@ abstract class BtreePA extends Test                                             
 
   private void branchSize()                                                     // Number of children in body of branch taking top for granted as it is always there
    {zz();
-    //tt(node_branchBase, node_branchSize);
-    branchBase(branchBase, node_branchSize);
+    tt(node_branchBase, node_branchSize);
+    branchBase(branchBase, node_branchBase);
     bSize.base(T.at(branchBase));
     bSize.size();
     T.at(branchSize).add(bSize.T.at(bSize.size), -1);                           // Account for top which will always be present
@@ -809,14 +809,14 @@ abstract class BtreePA extends Test                                             
     tt(hasLeavesForChildren, IsLeaf);
    }
 
-//private void top()                                                            // The top next element of a branch - only used in printing
-// {z();
-//  if (Assert) {tt(node_assertBranch, node_top); assertBranch();}
-//  branchBase(bTop, node_top);
-//  tt(node_branchSize, node_top); branchSize(); bTop.T.at(bTop.index).move(T.at(branchSize));
-//  bTop.elementAt();
-//  T.at(top).move(bTop.T.at(bTop.tData));
-// }
+//  private void top()                                                            // The top next element of a branch - only used in printing
+//   {z();
+//    if (Assert) {tt(node_assertBranch, node_top); assertBranch();}
+//    branchBase(bTop, node_top);
+//    tt(node_branchSize, node_top); branchSize(); bTop.T.at(bTop.index).move(T.at(branchSize));
+//    bTop.elementAt();
+//    T.at(top).move(bTop.T.at(bTop.tData));
+//   }
 
 //D2 Search                                                                     // Search within a node and update the node description with the results
 
@@ -1988,7 +1988,7 @@ abstract class BtreePA extends Test                                             
      };
    }
 
-  private void findAndInsert()                                                  // Find the leaf that should contain this key and insert or update it is possible
+  private void findAndInsert(ProgramPA.Label Success)                           // Find the leaf that should contain this key and insert or update it is possible
    {zz();
     P.new Block()
      {void code()
@@ -2009,7 +2009,7 @@ abstract class BtreePA extends Test                                             
             P.parallelSection();  T.at(success).ones();
             P.parallelSection();  T.at(inserted).zero();
             P.parallelSection();  tt(findAndInsert, leafFound);
-            P.parallelSection();  P.Goto(Return);
+            P.parallelSection();  P.Goto(Success == null ? Return : Success);
             P.parallelEnd();
            }
          };
@@ -2044,7 +2044,7 @@ abstract class BtreePA extends Test                                             
              };
             P.parallelStart();   T.at(success).ones();
             P.parallelSection(); tt(findAndInsert, leafFound);
-            P.parallelSection(); P.Goto(Return);
+            P.parallelSection(); P.Goto(Success == null ? Return : Success);
             P.parallelEnd();
            }
          };
@@ -2060,8 +2060,8 @@ abstract class BtreePA extends Test                                             
     P.new Block()
      {void code()
        {final ProgramPA.Label Return = end;
-        findAndInsert();                                                        // Try direct insertion with no modifications to the shape of the tree
-        P.GoOn(Return, T.at(success));                                          // Inserted or updated successfully
+        findAndInsert(Return);                                                  // Try direct insertion with no modifications to the shape of the tree
+        //P.GoOn(Return, T.at(success));                                        // Inserted or updated successfully
         T.at(node_isFull).zero(); isFull();                                     // Start the insertion at the root(), after splitting it if necessary
         P.new If (T.at(isFull))                                                 // Start the insertion at the root(), after splitting it if necessary
          {void Then()
@@ -2072,8 +2072,8 @@ abstract class BtreePA extends Test                                             
               void Else() {splitBranchRoot();}
              };
             z();
-            findAndInsert();                                                    // Splitting the root() might have been enough
-            P.GoOn(Return, T.at(success));                                      // Inserted or updated successfully
+            findAndInsert(Return);                                              // Splitting the root() might have been enough
+            //P.GoOn(Return, T.at(success));                                      // Inserted or updated successfully
            }
          };
 
@@ -2087,9 +2087,9 @@ abstract class BtreePA extends Test                                             
             //T.at(putDepth).greaterThan(T.at(MaxDepth), T.at(pastMaxDepth));
             //P.GoOn(end, T.at(pastMaxDepth));                                    // Prevent runaway searches
 
-            P.parallelStart();   tt(search, Key);
-            P.parallelSection(); tt(node_findFirstGreaterThanOrEqualInBranch, parent);
-            P.parallelEnd();
+            //P.parallelStart();   tt(search, Key);
+            //P.parallelSection(); tt(node_findFirstGreaterThanOrEqualInBranch, parent);
+            //P.parallelEnd();
 
             findFirstGreaterThanOrEqualInBranch(parent, T.at(Key), null, T.at(first), T.at(child));
 
@@ -2107,7 +2107,7 @@ abstract class BtreePA extends Test                                             
                 P.parallelEnd();
 
                 splitLeaf();                                                    // Split the child leaf
-                findAndInsert();                                                // Now guaranteed to work
+                findAndInsert(null);                                            // Now guaranteed to work
                 merge();
                 P.Goto(Return);
                }
@@ -2123,15 +2123,16 @@ abstract class BtreePA extends Test                                             
 
                 splitBranch();                                                  // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
 
-                P.parallelStart();   tt(search, Key);
-                P.parallelSection(); tt(node_findFirstGreaterThanOrEqualInBranch, parent);
-                P.parallelEnd();
+                //P.parallelStart();   tt(search, Key);
+                //P.parallelSection(); //tt(node_findFirstGreaterThanOrEqualInBranch, parent);
+                //P.parallelEnd();
 
                 findFirstGreaterThanOrEqualInBranch(parent, T.at(Key), null, null, T.at(child));                          // Perform the step down again as the split will have altered the local layout
-                tt(parent, child);
+                //tt(parent, child);
                }
-              void Else() {z(); tt(parent, child);}                             // Step down directly as no split was required
+              //void Else() {z(); tt(parent, child);}                             // Step down directly as no split was required
              };
+            tt(parent, child);
             P.Goto(start);
            }
          };
@@ -3599,15 +3600,15 @@ endmodule
     final BtreePA t = btreePA_small();
     t.P.run(); t.P.clear();
     t.put();
-    t.runVerilogPutTest(1, 25, """
+    t.runVerilogPutTest(1, 24, """
 1=0 |
 """);
 
-    t.runVerilogPutTest(2, 25, """
+    t.runVerilogPutTest(2, 24, """
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest(3, 96, """
+    t.runVerilogPutTest(3, 94, """
     1      |
     0      |
     1      |
@@ -3615,7 +3616,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 194, """
+    t.runVerilogPutTest(4, 192, """
       2      |
       0      |
       1      |
@@ -3623,7 +3624,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 246, """
+    t.runVerilogPutTest(5, 244, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -3631,7 +3632,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 267, """
+    t.runVerilogPutTest(6, 265, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3639,7 +3640,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 319, """
+    t.runVerilogPutTest(7, 317, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -3647,7 +3648,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 357, """
+    t.runVerilogPutTest(8, 353, """
              4             |
              0             |
              5             |
@@ -3659,7 +3660,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 345, """
+    t.runVerilogPutTest(9, 342, """
              4                    |
              0                    |
              5                    |
@@ -3671,7 +3672,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
 
-    t.runVerilogPutTest(10, 366, """
+    t.runVerilogPutTest(10, 363, """
              4                       |
              0                       |
              5                       |
@@ -3683,7 +3684,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9,10=2 |
 """);
 
-    t.runVerilogPutTest(11, 418, """
+    t.runVerilogPutTest(11, 415, """
              4                               |
              0                               |
              5                               |
@@ -3695,7 +3696,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9=8    10,11=2 |
 """);
 
-    t.runVerilogPutTest(12, 341, """
+    t.runVerilogPutTest(12, 336, """
                                8                 |
                                0                 |
                                5                 |
@@ -3707,7 +3708,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=2 |
 """);
 
-    t.runVerilogPutTest(13, 345, """
+    t.runVerilogPutTest(13, 342, """
                                8                          |
                                0                          |
                                5                          |
@@ -3719,7 +3720,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest(14, 366, """
+    t.runVerilogPutTest(14, 363, """
                                8                             |
                                0                             |
                                5                             |
@@ -3731,7 +3732,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=2 |
 """);
 
-    t.runVerilogPutTest(15, 418, """
+    t.runVerilogPutTest(15, 415, """
                                8                                     |
                                0                                     |
                                5                                     |
@@ -3743,7 +3744,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest(16, 388, """
+    t.runVerilogPutTest(16, 383, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -3755,7 +3756,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=2 |
 """);
 
-    t.runVerilogPutTest(17, 410, """
+    t.runVerilogPutTest(17, 407, """
                                8                  12                            |
                                0                  0.1                           |
                                5                  11                            |
@@ -3767,7 +3768,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest(18, 431, """
+    t.runVerilogPutTest(18, 428, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -3779,7 +3780,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17,18=2 |
 """);
 
-    t.runVerilogPutTest(19, 483, """
+    t.runVerilogPutTest(19, 480, """
                                8                  12                                        |
                                0                  0.1                                       |
                                5                  11                                        |
@@ -3791,7 +3792,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 414, """
+    t.runVerilogPutTest(20, 409, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
