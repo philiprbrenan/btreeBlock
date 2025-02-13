@@ -2082,10 +2082,9 @@ abstract class BtreePA extends Test                                             
             //P.parallelSection(); tt(node_isLeaf, next);
             //P.parallelEnd();
 
-            isLeaf(T.at(child));
-            P.new If (T.at(IsLeaf))                                             // Reached a leaf
-             {void Then()
-               {z();
+            P.new Block()                                                       // Reached a leaf
+             {void code()
+               {P.GoOff(end, M.at(isLeaf, T.at(child)));
                 P.parallelStart();   tt(splitParent, parent);
                 P.parallelSection(); tt(index, first);
                 P.parallelSection(); tt(node_splitLeaf, child);
@@ -3601,7 +3600,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 190, """
+    t.runVerilogPutTest(4, 189, """
       2      |
       0      |
       1      |
@@ -3609,7 +3608,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 240, """
+    t.runVerilogPutTest(5, 239, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -3617,7 +3616,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 261, """
+    t.runVerilogPutTest(6, 260, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3625,7 +3624,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 311, """
+    t.runVerilogPutTest(7, 310, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -3633,7 +3632,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 346, """
+    t.runVerilogPutTest(8, 344, """
              4             |
              0             |
              5             |
@@ -3645,7 +3644,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 335, """
+    t.runVerilogPutTest(9, 333, """
              4                    |
              0                    |
              5                    |
@@ -3657,7 +3656,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
 
-    t.runVerilogPutTest(10, 356, """
+    t.runVerilogPutTest(10, 354, """
              4                       |
              0                       |
              5                       |
@@ -3669,7 +3668,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9,10=2 |
 """);
 
-    t.runVerilogPutTest(11, 406, """
+    t.runVerilogPutTest(11, 404, """
              4                               |
              0                               |
              5                               |
@@ -3681,7 +3680,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9=8    10,11=2 |
 """);
 
-    t.runVerilogPutTest(12, 330, """
+    t.runVerilogPutTest(12, 328, """
                                8                 |
                                0                 |
                                5                 |
@@ -3693,7 +3692,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=2 |
 """);
 
-    t.runVerilogPutTest(13, 335, """
+    t.runVerilogPutTest(13, 333, """
                                8                          |
                                0                          |
                                5                          |
@@ -3705,7 +3704,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest(14, 356, """
+    t.runVerilogPutTest(14, 354, """
                                8                             |
                                0                             |
                                5                             |
@@ -3717,7 +3716,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=2 |
 """);
 
-    t.runVerilogPutTest(15, 406, """
+    t.runVerilogPutTest(15, 404, """
                                8                                     |
                                0                                     |
                                5                                     |
@@ -3729,7 +3728,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest(16, 377, """
+    t.runVerilogPutTest(16, 375, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -3741,7 +3740,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=2 |
 """);
 
-    t.runVerilogPutTest(17, 400, """
+    t.runVerilogPutTest(17, 398, """
                                8                  12                            |
                                0                  0.1                           |
                                5                  11                            |
@@ -3753,7 +3752,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest(18, 421, """
+    t.runVerilogPutTest(18, 419, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -3765,7 +3764,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17,18=2 |
 """);
 
-    t.runVerilogPutTest(19, 471, """
+    t.runVerilogPutTest(19, 469, """
                                8                  12                                        |
                                0                  0.1                                       |
                                5                  11                                        |
@@ -3777,7 +3776,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 403, """
+    t.runVerilogPutTest(20, 401, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
