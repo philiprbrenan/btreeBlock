@@ -2098,7 +2098,7 @@ abstract class BtreePA extends Test                                             
              };
             z();
 
-            tt(node_isFull, child); branchIsFull();
+            tt(node_branchIsFull, child); branchIsFull();
             P.new If (T.at(branchIsFull))                                       // Step down, splitting full branches as we go
              {void Then()
                {P.parallelStart();   tt(splitParent, parent);
