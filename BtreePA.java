@@ -1097,13 +1097,10 @@ abstract class BtreePA extends Test                                             
     allocBranch(); tt(l, allocBranch);                                          // New left branch
     allocBranch(); tt(r, allocBranch);                                          // New right branch
 
-    P.parallelStart();
-      T.setIntInstruction(node_branchBase, root);
-      branchBase(bT, node_branchBase);                                          // Set address of the referenced branch stuck
-    P.parallelSection();
-      branchBase(bL, l);
-    P.parallelSection();
-      branchBase(bR, r);
+    P.parallelStart();   T.setIntInstruction(node_branchBase, root);            // Set address of the referenced branch stuck
+                         branchBase(bT, node_branchBase);
+    P.parallelSection(); branchBase(bL, l);
+    P.parallelSection(); branchBase(bR, r);
     P.parallelEnd();
 
     bT.split(bL, bR);                                                           // Split the root as a branch
@@ -1191,12 +1188,9 @@ abstract class BtreePA extends Test                                             
 
     lR.splitLow(lL);                                                            // Split out the lower half
 
-    P.parallelStart();
-      lR.firstElement();
-    P.parallelSection();
-      lL. lastElement();
-    P.parallelSection();
-      branchBase(bT, splitParent);                                              // The parent branch
+    P.parallelStart();   lR.firstElement();
+    P.parallelSection(); lL. lastElement();
+    P.parallelSection(); branchBase(bT, splitParent);                           // The parent branch
     P.parallelEnd();
 
 
@@ -1253,23 +1247,17 @@ abstract class BtreePA extends Test                                             
     z();
     allocBranch(); tt(l, allocBranch);
 
-    P.parallelStart();
-      branchBase(bT, splitParent);                                              // The parent branch
-    P.parallelSection();
-      branchBase(bL, l);
-    P.parallelSection();
-      branchBase(bR, node_splitBranch);
+    P.parallelStart();    branchBase(bT, splitParent);                          // The parent branch
+    P.parallelSection();  branchBase(bL, l);
+    P.parallelSection();  branchBase(bR, node_splitBranch);
     P.parallelEnd();
 
     bR.splitLow(bL);
     bL.zeroLastKey();
 
-    P.parallelStart();
-      bT.T.at(bT.tKey ).move(bL.T.at(bL.tKey));
-    P.parallelSection();
-      bT.T.at(bT.tData).move(T.at(l));
-    P.parallelSection();
-      bT.T.at(bT.index).move(T.at(index));
+    P.parallelStart();    bT.T.at(bT.tKey ).move(bL.T.at(bL.tKey));
+    P.parallelSection();  bT.T.at(bT.tData).move(T.at(l));
+    P.parallelSection();  bT.T.at(bT.index).move(T.at(index));
     P.parallelEnd();
     bT.insertElementAt();
    }
@@ -1659,12 +1647,10 @@ abstract class BtreePA extends Test                                             
            }
           void Else()                                                           // Children are branches
            {z();
-            P.parallelStart();
-              branchBase(bL, l);
-              branchSize(bL, nl);
-            P.parallelSection();
-              branchBase(bR, r);
-              branchSize(bR, nr);
+            P.parallelStart();   branchBase(bL, l);
+                                 branchSize(bL, nl);
+            P.parallelSection(); branchBase(bR, r);
+                                 branchSize(bR, nr);
             P.parallelEnd();
 
             P.new I()                                                           // Check that combined node would not be too big
@@ -1757,12 +1743,10 @@ abstract class BtreePA extends Test                                             
             lL.concatenate(lR);
            }
           void Else()                                                           // Children are branches
-           {P.parallelStart();
-              branchBase(bL, l);
-              branchSize(bL, nl);
-            P.parallelSection();
-              branchBase(bR, r);
-              branchSize(bR, nr);
+           {P.parallelStart();     branchBase(bL, l);
+                                   branchSize(bL, nl);
+            P.parallelSection();   branchBase(bR, r);
+                                   branchSize(bR, nr);
             P.parallelEnd();
 
             P.new I()                                                           // Check that combined node would not be too big
