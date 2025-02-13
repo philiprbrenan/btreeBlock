@@ -45,7 +45,7 @@ abstract class BtreePA extends Test                                             
             testMaxSize = github_actions ? 1000 : 50;                           // Maximum number of leaves plus branches during testing
 
   int          nodeUsed = 0;                                                    // Number of nodes currently in use
-  int       maxNodeUsed = 0;                                                    // Maximum number of branches plus leaves used
+//int       maxNodeUsed = 0;                                                    // Maximum number of branches plus leaves used
 
   final int        root = 0;                                                    // The root of the tree is always node zero
 
@@ -648,13 +648,13 @@ abstract class BtreePA extends Test                                             
     setBranch();
    }
 
-  private void free()                                                           // Free a new node to make it available for reuse
+  private void free(Layout.Variable node_free)                                  // Free a new node to make it available for reuse
    {zz();
-    P.new If (T.at(node_free)) {void Else() {P.halt("Cannot free root");}};     // The root is never freed
+//  P.new If (T.at(node_free)) {void Else() {P.halt("Cannot free root");}};     // The root is never freed
     z(); tt(node_erase, node_free); erase();                                    // Clear the node to encourage erroneous frees to do damage that shows up quickly.
     M.at(free, T.at(node_free)).move(M.at(freeList));                           // Chain this node in front of the last freed node
     M.at(freeList).move(T.at(node_free));                                       // Make this node the head of the free chain
-    maxNodeUsed = max(maxNodeUsed, --nodeUsed);                                 // Number of nodes in use
+//  maxNodeUsed = max(maxNodeUsed, --nodeUsed);                                 // Number of nodes in use
    }
 
   private void clear() {zz();  clear(T.at(node_clear));}                        // Clear a new node to zeros ready for use
@@ -1530,8 +1530,8 @@ abstract class BtreePA extends Test                                             
                 lT.concatenate(lR);                                             // Merge in right child leaf
 
                 T.setIntInstruction(node_setLeaf, root);  setLeaf();            // The root is now a leaf
-                tt(node_free, l); free();                                       // Free the children
-                tt(node_free, r); free();
+                /*tt(node_free, l);*/ free(l);                                  // Free the children
+                /*tt(node_free, r);*/ free(r);
                 z(); T.at(stolenOrMerged).ones(); P.Goto(Return);
                }
              };
@@ -1570,8 +1570,8 @@ abstract class BtreePA extends Test                                             
                 bT.concatenate(bR);
                 bT.zeroLastKey();
 
-                tt(node_free, l); free();                                       // Free the children
-                tt(node_free, r); free();
+                /*tt(node_free, l);*/ free(l);                                       // Free the children
+                /*tt(node_free, r);*/ free(r);
                 z(); T.at(stolenOrMerged).ones(); P.Goto(Return);
                }
              };
@@ -1683,7 +1683,7 @@ abstract class BtreePA extends Test                                             
             bR.prepend(bL);
            }
          };
-        tt(node_free, l); free();                                               // Free the empty left node
+        /* tt(node_free, l); */ free(l);                                        // Free the empty left node
         bT.T.at(bT.index).add(T.at(index), -1);                                 // Account for top
 
         bT.removeElementAt();                                                   // Reduce parent on left
@@ -1768,10 +1768,8 @@ abstract class BtreePA extends Test                                             
             z(); bT.T.at(bT.index).move(T.at(index));
             z(); bT.elementAt();                                                // Parent dividing element
 
-            P.parallelStart();
-              bL.T.at(bL.tKey) .move(bT.T.at(bT.tKey));
-            P.parallelSection();
-              bL.T.at(bL.index).move(T.at(nl));
+            P.parallelStart();   bL.T.at(bL.tKey) .move(bT.T.at(bT.tKey));
+            P.parallelSection(); bL.T.at(bL.index).move(T.at(nl));
             P.parallelEnd();
             bL.setElementAt();                                                  // Re-key left top
 
@@ -1779,16 +1777,13 @@ abstract class BtreePA extends Test                                             
            } // Else
          };
 
-        tt(node_free, r);
-        free();                                                                 // Free the empty right node
+        /*tt(node_free, r);*/ free(r);                                          // Free the empty right node
 
         bT.T.at(bT.index).add(T.at(index), +1);
         bT.elementAt();
 
-        P.parallelStart();
-          T.at(parentKey  ).move(bT.T.at(bT.tKey));                             // One up from dividing point in parent
-        P.parallelSection();
-          bT.T.at(bT.index).move(T.at(index));
+        P.parallelStart();   T.at(parentKey  ).move(bT.T.at(bT.tKey));          // One up from dividing point in parent
+        P.parallelSection(); bT.T.at(bT.index).move(T.at(index));
         P.parallelEnd();
         bT.elementAt();                                                         // Dividing point in parent
 
@@ -3507,7 +3502,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 321, """
+    t.runVerilogDeleteTest(4, 5, 320, """
              6           |
              0           |
              5           |
@@ -3519,7 +3514,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 341, """
+    t.runVerilogDeleteTest(2, 7, 339, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3527,7 +3522,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 272, """
+    t.runVerilogDeleteTest(1, 8, 271, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3535,7 +3530,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 161, """
+    t.runVerilogDeleteTest(5, 4, 160, """
       7      |
       0      |
       1      |
@@ -3551,7 +3546,7 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 192, """
+    t.runVerilogDeleteTest(7, 2, 190, """
 8,9=0 |
 """);
 
@@ -3601,7 +3596,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 189, """
+    t.runVerilogPutTest(4, 188, """
       2      |
       0      |
       1      |
@@ -3617,7 +3612,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 260, """
+    t.runVerilogPutTest(6, 259, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3633,7 +3628,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 344, """
+    t.runVerilogPutTest(8, 343, """
              4             |
              0             |
              5             |
@@ -3657,7 +3652,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
 
-    t.runVerilogPutTest(10, 354, """
+    t.runVerilogPutTest(10, 353, """
              4                       |
              0                       |
              5                       |
@@ -3681,7 +3676,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9=8    10,11=2 |
 """);
 
-    t.runVerilogPutTest(12, 328, """
+    t.runVerilogPutTest(12, 326, """
                                8                 |
                                0                 |
                                5                 |
@@ -3705,7 +3700,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest(14, 354, """
+    t.runVerilogPutTest(14, 353, """
                                8                             |
                                0                             |
                                5                             |
@@ -3729,7 +3724,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest(16, 375, """
+    t.runVerilogPutTest(16, 374, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -3753,7 +3748,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest(18, 419, """
+    t.runVerilogPutTest(18, 418, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -3777,7 +3772,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 401, """
+    t.runVerilogPutTest(20, 399, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
