@@ -7,7 +7,7 @@ use Data::Table::Text qw(:all);
 
 my $project      = q(find);                                                     # Folder within verilog delete/find/put
 my $key          =      2;                                                      # Key for operation
-my $part         = q(XC7A200T);                                                 # Part
+my $part         = q(XC7Z007S);                                                 # Part  $131 https://www.xilinx.com/products/boards-and-kits/1-1bkpiul.html
 
 my $home         =  $ENV{HOME};                                                 # Home folder
 my $project_dir  = "${home}/btreeBlock/verilog/${project}/${key}";              # Location of project files
@@ -29,6 +29,11 @@ add_files -norecurse ${includes_dir}/M.vh
 add_files -norecurse ${includes_dir}/T.vh
 
 set_property include_dirs [list ${includes_dir}] [current_fileset]
+set_param general.maxThreads 1
+set_param synth.elaborate.fsmAutoExtract 1
+set_param place.enableDFS 0
+set_param route.enableOverlapRemoval 0
+set_param route.enablePostGCR 0
 
 launch_runs synth_1
 wait_on_runs synth_1
