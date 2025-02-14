@@ -1,4 +1,4 @@
-reg [707:0] M_77;  /*   MemoryLayoutPA.java:0971:declareVerilog   MemoryLayoutPA.java:0953:dumpVerilog   BtreePA.java:2464:<init>   BtreePA.java:3566:<init>   BtreePA.java:3565:runVerilogPutTest   BtreePA.java:3598:test_verilog_put   BtreePA.java:3808:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg [707:0] M_77;  /*   MemoryLayoutPA.java:0971:declareVerilog   MemoryLayoutPA.java:0953:dumpVerilog   BtreePA.java:2464:<init>   BtreePA.java:3566:<init>   BtreePA.java:3565:runVerilogPutTest   BtreePA.java:3598:test_verilog_put   BtreePA.java:3808:newTests   BtreePA.java:3814:main  */
 task initialize_memory_M_77;
     begin
         M_77[0] <= 1;

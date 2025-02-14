@@ -2292,7 +2292,7 @@ abstract class BtreePA extends Test                                             
    }
 
   String stuckMemory(StuckPA s)                                                 // Base address variable for one stuck
-   {return"reg ["+bitsPerAddress+":0] "+s.M.baseName() + ";\n"+
+   {return "(* ram_style = \"block\" *)  reg ["+bitsPerAddress+":0] "+s.M.baseName() + ";\n"+
       s.C.declareVerilog()+
       s.T.declareVerilog()+
       s.M.copyVerilogDec();

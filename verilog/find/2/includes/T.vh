@@ -1,4 +1,4 @@
-reg [181:0] T_44;  /*   MemoryLayoutPA.java:0971:declareVerilog   MemoryLayoutPA.java:0953:dumpVerilog   BtreePA.java:2465:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg [181:0] T_44;  /*   MemoryLayoutPA.java:0971:declareVerilog   MemoryLayoutPA.java:0953:dumpVerilog   BtreePA.java:2465:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
 task initialize_memory_T_44;
     begin
         T_44[0] <= 1;

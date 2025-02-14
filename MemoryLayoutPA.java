@@ -101,8 +101,8 @@ class MemoryLayoutPA extends Test                                               
   String copyVerilogDec()                                                       // Verilog declaration
    {zz();
     final StringBuilder s = new StringBuilder();                                // Text of declaration
-    s.append("reg["+copySize()+": 0] "+copyIndex ()+";\n");
-    s.append("reg["+copySize()+": 0] "+copyLength()+";\n");
+    s.append("(* ram_style = \"block\" *) reg["+copySize()+": 0] "+copyIndex ()+";\n");
+    s.append("(* ram_style = \"block\" *) reg["+copySize()+": 0] "+copyLength()+";\n");
     return ""+s;
    }
 
@@ -966,8 +966,8 @@ class MemoryLayoutPA extends Test                                               
    {zz();
     final int N = memory.bits.length-1, B = logTwo(N)-1;
     final StringBuilder s = new StringBuilder();
-    if (based == null) s.append("reg ["+N+":0] "+name()    +"; ");              // Actual memory if it is not based
-    else               s.append("reg ["+B+":0] "+baseName()+"; ");              // Base offset for this memory
+    if (based == null) s.append("(* ram_style = \"block\" *) reg ["+N+":0] "+name()    +"; ");              // Actual memory if it is not based
+    else               s.append("(* ram_style = \"block\" *) reg ["+B+":0] "+baseName()+"; ");              // Base offset for this memory
     s.append(traceComment()); s.append("\n");
     return s.toString();
    }

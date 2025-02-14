@@ -24,46 +24,46 @@ module find(reset, stop, clock, pfd, Key, Data, data, found);               // D
   assign found = T_44[22];                                                 // Found the key
   assign data  = T_44[28+:4];                                     // Data associated with key found
 
-reg [10:0] branch_0_StuckSA_Memory_Based_45_base_offset;
-reg [38:0] branch_0_StuckSA_Copy_46;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg [47:0] branch_0_StuckSA_Transaction_47;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg[10: 0] index_branch_0_StuckSA_Memory_Based_45_base_offset;
-reg[10: 0] copyLength_branch_0_StuckSA_Memory_Based_45_base_offset;
-reg [10:0] branch_1_StuckSA_Memory_Based_48_base_offset;
-reg [38:0] branch_1_StuckSA_Copy_49;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg [47:0] branch_1_StuckSA_Transaction_50;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg[10: 0] index_branch_1_StuckSA_Memory_Based_48_base_offset;
-reg[10: 0] copyLength_branch_1_StuckSA_Memory_Based_48_base_offset;
-reg [10:0] branch_2_StuckSA_Memory_Based_51_base_offset;
-reg [38:0] branch_2_StuckSA_Copy_52;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg [47:0] branch_2_StuckSA_Transaction_53;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg[10: 0] index_branch_2_StuckSA_Memory_Based_51_base_offset;
-reg[10: 0] copyLength_branch_2_StuckSA_Memory_Based_51_base_offset;
-reg [10:0] branch_3_StuckSA_Memory_Based_54_base_offset;
-reg [38:0] branch_3_StuckSA_Copy_55;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg [47:0] branch_3_StuckSA_Transaction_56;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg[10: 0] index_branch_3_StuckSA_Memory_Based_54_base_offset;
-reg[10: 0] copyLength_branch_3_StuckSA_Memory_Based_54_base_offset;
-reg [10:0] leaf_0_StuckSA_Memory_Based_57_base_offset;
-reg [20:0] leaf_0_StuckSA_Copy_58;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg [47:0] leaf_0_StuckSA_Transaction_59;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg[10: 0] index_leaf_0_StuckSA_Memory_Based_57_base_offset;
-reg[10: 0] copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset;
-reg [10:0] leaf_1_StuckSA_Memory_Based_60_base_offset;
-reg [20:0] leaf_1_StuckSA_Copy_61;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg [47:0] leaf_1_StuckSA_Transaction_62;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg[10: 0] index_leaf_1_StuckSA_Memory_Based_60_base_offset;
-reg[10: 0] copyLength_leaf_1_StuckSA_Memory_Based_60_base_offset;
-reg [10:0] leaf_2_StuckSA_Memory_Based_63_base_offset;
-reg [20:0] leaf_2_StuckSA_Copy_64;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg [47:0] leaf_2_StuckSA_Transaction_65;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg[10: 0] index_leaf_2_StuckSA_Memory_Based_63_base_offset;
-reg[10: 0] copyLength_leaf_2_StuckSA_Memory_Based_63_base_offset;
-reg [10:0] leaf_3_StuckSA_Memory_Based_66_base_offset;
-reg [20:0] leaf_3_StuckSA_Copy_67;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg [47:0] leaf_3_StuckSA_Transaction_68;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
-reg[10: 0] index_leaf_3_StuckSA_Memory_Based_66_base_offset;
-reg[10: 0] copyLength_leaf_3_StuckSA_Memory_Based_66_base_offset;
+(* ram_style = "block" *)  reg [10:0] branch_0_StuckSA_Memory_Based_45_base_offset;
+(* ram_style = "block" *) reg [38:0] branch_0_StuckSA_Copy_46;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg [47:0] branch_0_StuckSA_Transaction_47;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg[10: 0] index_branch_0_StuckSA_Memory_Based_45_base_offset;
+(* ram_style = "block" *) reg[10: 0] copyLength_branch_0_StuckSA_Memory_Based_45_base_offset;
+(* ram_style = "block" *)  reg [10:0] branch_1_StuckSA_Memory_Based_48_base_offset;
+(* ram_style = "block" *) reg [38:0] branch_1_StuckSA_Copy_49;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg [47:0] branch_1_StuckSA_Transaction_50;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg[10: 0] index_branch_1_StuckSA_Memory_Based_48_base_offset;
+(* ram_style = "block" *) reg[10: 0] copyLength_branch_1_StuckSA_Memory_Based_48_base_offset;
+(* ram_style = "block" *)  reg [10:0] branch_2_StuckSA_Memory_Based_51_base_offset;
+(* ram_style = "block" *) reg [38:0] branch_2_StuckSA_Copy_52;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg [47:0] branch_2_StuckSA_Transaction_53;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg[10: 0] index_branch_2_StuckSA_Memory_Based_51_base_offset;
+(* ram_style = "block" *) reg[10: 0] copyLength_branch_2_StuckSA_Memory_Based_51_base_offset;
+(* ram_style = "block" *)  reg [10:0] branch_3_StuckSA_Memory_Based_54_base_offset;
+(* ram_style = "block" *) reg [38:0] branch_3_StuckSA_Copy_55;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg [47:0] branch_3_StuckSA_Transaction_56;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg[10: 0] index_branch_3_StuckSA_Memory_Based_54_base_offset;
+(* ram_style = "block" *) reg[10: 0] copyLength_branch_3_StuckSA_Memory_Based_54_base_offset;
+(* ram_style = "block" *)  reg [10:0] leaf_0_StuckSA_Memory_Based_57_base_offset;
+(* ram_style = "block" *) reg [20:0] leaf_0_StuckSA_Copy_58;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg [47:0] leaf_0_StuckSA_Transaction_59;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg[10: 0] index_leaf_0_StuckSA_Memory_Based_57_base_offset;
+(* ram_style = "block" *) reg[10: 0] copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset;
+(* ram_style = "block" *)  reg [10:0] leaf_1_StuckSA_Memory_Based_60_base_offset;
+(* ram_style = "block" *) reg [20:0] leaf_1_StuckSA_Copy_61;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg [47:0] leaf_1_StuckSA_Transaction_62;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg[10: 0] index_leaf_1_StuckSA_Memory_Based_60_base_offset;
+(* ram_style = "block" *) reg[10: 0] copyLength_leaf_1_StuckSA_Memory_Based_60_base_offset;
+(* ram_style = "block" *)  reg [10:0] leaf_2_StuckSA_Memory_Based_63_base_offset;
+(* ram_style = "block" *) reg [20:0] leaf_2_StuckSA_Copy_64;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg [47:0] leaf_2_StuckSA_Transaction_65;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg[10: 0] index_leaf_2_StuckSA_Memory_Based_63_base_offset;
+(* ram_style = "block" *) reg[10: 0] copyLength_leaf_2_StuckSA_Memory_Based_63_base_offset;
+(* ram_style = "block" *)  reg [10:0] leaf_3_StuckSA_Memory_Based_66_base_offset;
+(* ram_style = "block" *) reg [20:0] leaf_3_StuckSA_Copy_67;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg [47:0] leaf_3_StuckSA_Transaction_68;  /*   MemoryLayoutPA.java:0971:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2497:editVariables   BtreePA.java:2492:editVariables   BtreePA.java:2462:<init>   BtreePA.java:3434:<init>   BtreePA.java:3433:test_verilog_find   BtreePA.java:3807:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg[10: 0] index_leaf_3_StuckSA_Memory_Based_66_base_offset;
+(* ram_style = "block" *) reg[10: 0] copyLength_leaf_3_StuckSA_Memory_Based_66_base_offset;
 
 
   always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
