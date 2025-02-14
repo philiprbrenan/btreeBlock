@@ -30,13 +30,9 @@ add_files -norecurse ${includes_dir}/T.vh
 
 set_property include_dirs [list ${includes_dir}] [current_fileset]
 set_param general.maxThreads 1
-set_param synth.elaborate.fsmAutoExtract 1
-set_param place.enableDFS 0
-set_param route.enableOverlapRemoval 0
-set_param route.enablePostGCR 0
 
-launch_runs synth_1
-wait_on_runs synth_1
+launch_runs  ${project}_${key}
+wait_on_runs ${project}_${key}
 
 write_checkpoint -force $netList
 
