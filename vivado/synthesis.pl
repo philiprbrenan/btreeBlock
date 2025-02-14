@@ -20,8 +20,8 @@ my $synthesis = "$home/btreeBlock/vivado/synthesis.tcl";                        
 my $vivado    = "$home/Vivado/2024.2/";                                         # Location of vivaldo
 my $vivadoX   = "$home/Vivado/2024.2/bin/vivado";                               # Location of vivaldo executable
 
-makePath $reports_dir;                                                          # Ensure folder structure is present
-makePath $dcp_dir;                                                              # Ensure folder structure is present
+makePath fpd $reports_dir;                                                      # Ensure folder structure is present
+makePath fpd $dcp_dir;                                                          # Ensure folder structure is present
 
 die "No such path: $reports_dir" unless -d $reports_dir;
 die "No such path: $dcp_dir"     unless -d $dcp_dir;
