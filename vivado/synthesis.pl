@@ -24,20 +24,11 @@ die "No such path: $vivado"    unless -d $vivado;
 die "No such file: $vivadoX"   unless -f $vivadoX;
 
 owf($synthesis, <<"END");                                                       # Write tcl to run the synthesis
-create_project ${project} ${project_dir}/vivado -part $part -force
-
-add_files ${project_dir}/${project}.v
-add_files -norecurse ${includes_dir}/M.vh
-add_files -norecurse ${includes_dir}/T.vh
-
-set_property include_dirs [list ${includes_dir}] [current_fileset]
 set_param general.maxThreads 1
 
-set_param synth.keep_equivalent_registers true
+read_verilog ${project_dir}/${project}.v
 
-launch_runs  synth_1
-wait_on_runs synth_1
-
+synth_design -name $project -top $project -part $part -include_dirs $includes_dir -flatten_hierarchy none
 write_checkpoint -force post_synth.dcp
 
 opt_design
@@ -59,10 +50,7 @@ report_control_sets      -file $reports_dir/control.rpt
 report_bus_skew          -file $reports_dir/bus_skew.rpt
 report_high_fanout_nets  -file $reports_dir/fanout.rpt
 
-write_checkpoint -force final_routed.dcp
 write_bitstream  -force final.bit
-
-close_project
 END
 
 say STDERR qx($vivadoX -mode batch -source $synthesis);
