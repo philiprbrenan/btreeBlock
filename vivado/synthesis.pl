@@ -13,12 +13,17 @@ my $home         =  $ENV{HOME};                                                 
 my $project_dir  = "${home}/btreeBlock/verilog/${project}/${key}";              # Location of project files
 my $includes_dir = "${project_dir}/includes";                                   # Set the path to the includes directory
 my $reports_dir  = "${project_dir}/reports";                                    # Reports
+my $dcp_dir      = "${project_dir}/dcp";                                        # Reports
 
 my $synthesis = "$home/btreeBlock/vivado/synthesis.tcl";                        # Location of vivaldo
 my $vivado    = "$home/Vivado/2024.2/";                                         # Location of vivaldo
 my $vivadoX   = "$home/Vivado/2024.2/bin/vivado";                               # Location of vivaldo executable
 
 makePath $reports_dir;                                                          # Ensure folder structure is present
+makePath $dcp_dir;                                                              # Ensure folder structure is present
+
+die "No such path: $reports_dir" unless -d $reports_dir;
+die "No such path: $dcp_dir"     unless -d $dcp_dir;
 
 die "No such path: $vivado"    unless -d $vivado;
 die "No such file: $vivadoX"   unless -f $vivadoX;
@@ -29,16 +34,16 @@ set_param general.maxThreads 1
 read_verilog ${project_dir}/${project}.v
 
 synth_design -name $project -top $project -part $part -include_dirs $includes_dir -flatten_hierarchy none
-write_checkpoint -force post_synth.dcp
+write_checkpoint -force $dcp_dir/synth.dcp
 
 opt_design
-write_checkpoint -force post_opt.dcp
+write_checkpoint -force $dcp_dir/opt.dcp
 
 place_design
-write_checkpoint -force post_place.dcp
+write_checkpoint -force $dcp_dir/place.dcp
 
 route_design
-write_checkpoint -force post_route.dcp
+write_checkpoint -force $dcp_dir/route.dcp
 
 report_utilization       -file $reports_dir/utilization.rpt
 report_timing_summary    -file $reports_dir/timing.rpt
@@ -50,9 +55,10 @@ report_control_sets      -file $reports_dir/control.rpt
 report_bus_skew          -file $reports_dir/bus_skew.rpt
 report_high_fanout_nets  -file $reports_dir/fanout.rpt
 
-write_bitstream  -force final.bit
+# Need pin locations
+#write_bitstream  -force $project_dir/final.bit
 END
 
-say STDERR qx($vivadoX -mode batch -source $synthesis);
+say STDERR qx($vivadoX -mode batch -source $synthesis 1>zzz1.txt);
 
 unlink $synthesis;
