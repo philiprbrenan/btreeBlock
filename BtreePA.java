@@ -4,9 +4,7 @@
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
 // SplitBranch() in parallel. Concatenate currently blocks parallel but can be improved by concatenating to a known point.
-// Branchbase and size as one instruction?
-// isleaf() HasLeaves() and  other such queries like an If statemnt so we can evaluate the condition and jump in one instruction
-// Remove last else of put()
+// isleaf() HasLeaves() and  other such queries like an If statement so we can evaluate the condition and jump in one instruction
 // Clean up node is leaf at end of delete()
 import java.util.*;
 import java.nio.file.*;
@@ -182,11 +180,11 @@ abstract class BtreePA extends Test                                             
 
   private static BtreePA btreePA_small()                                        // Define a small test btree
    {return new BtreePA()
-     {int maxSize         () {return 20;}
+     {int maxSize         () {return 16;}
       int maxKeysPerLeaf  () {return  2;}
       int maxKeysPerBranch() {return  3;}
-      int bitsPerKey      () {return  8;}
-      int bitsPerData     () {return  8;}
+      int bitsPerKey      () {return  5;}
+      int bitsPerData     () {return  4;}
      };
    }
 
@@ -2176,6 +2174,7 @@ abstract class BtreePA extends Test                                             
             P.parallelStart();   tt(index, first);
             P.parallelSection(); tt(node_balance, parent);
             P.parallelEnd();
+
             balance();                                                          // Make sure there are enough entries in the parent to permit a deletion
 
             P.parallelStart();   tt(child,       next);

@@ -64,6 +64,13 @@ GIT_TRACE=1 GIT_CURL_VERBOSE=1  GIT_SSH_COMMAND="ssh -i .ssh/Azure.pem" git clon
 ​GIT_SSH_COMMAND="ssh -i ~/.ssh/Azure.pem" git pull
 ```
 
+Install the following if they are not present:
+
+```
+sudo cpan install -F Data::Table::text
+sudo apt install iverilog
+```
+
 # Synthesis
 
 Change to folder ```btreeBlock/vivado``` and edit ```synthesis.tcl``` to point
@@ -73,4 +80,17 @@ Synthesize the Vivado project:
 
 ```
 perl synthesis.pl
+```
+# Enable swap space
+
+```
+sudo dmesg | grep -i 'oom'
+sudo swapon --show
+df -h
+sudo fallocate -l 128G /swapfile
+sudo chmod 600         /swapfile
+sudo mkswap            /swapfile
+sudo swapon            /swapfile
+sudo swapon --show
+sudo sysctl vm.swappiness=99
 ```
