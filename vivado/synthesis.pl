@@ -33,7 +33,6 @@ add_files -norecurse ${includes_dir}/T.vh
 set_property include_dirs [list ${includes_dir}] [current_fileset]
 set_param general.maxThreads 1
 
-set_param synth.elaborate.keepHierarchy true
 set_param synth.keep_equivalent_registers true
 
 launch_runs  synth_1
