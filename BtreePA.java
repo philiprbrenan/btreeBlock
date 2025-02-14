@@ -2346,6 +2346,7 @@ abstract class BtreePA extends Test                                             
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
+(* keep_hierarchy = "yes" *)
 module $project(reset, stop, clock, pfd, Key, Data, data, found);               // Database on a chip
   input                 reset;                                                  // Restart the program run sequence when this goes high
   input                 clock;                                                  // Program counter clock

@@ -1,4 +1,4 @@
-(* ram_style = "block" *) reg [707:0] M_9;  /*   MemoryLayoutPA.java:0971:declareVerilog   MemoryLayoutPA.java:0953:dumpVerilog   BtreePA.java:2464:<init>   BtreePA.java:3454:<init>   BtreePA.java:3453:runVerilogDeleteTest   BtreePA.java:3504:test_verilog_delete   BtreePA.java:3806:newTests   BtreePA.java:3814:main  */
+(* ram_style = "block" *) reg [707:0] M_9;  /*   MemoryLayoutPA.java:0971:declareVerilog   MemoryLayoutPA.java:0953:dumpVerilog   BtreePA.java:2465:<init>   BtreePA.java:3455:<init>   BtreePA.java:3454:runVerilogDeleteTest   BtreePA.java:3505:test_verilog_delete   BtreePA.java:3807:newTests   BtreePA.java:3815:main  */
 task initialize_memory_M_9;
     begin
         M_9[0] <= 0;
