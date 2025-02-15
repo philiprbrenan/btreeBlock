@@ -2292,7 +2292,7 @@ abstract class BtreePA extends Test                                             
    }
 
   String stuckMemory(StuckPA s)                                                 // Base address variable for one stuck
-   {return "(* ram_style = \"block\" *)  reg ["+bitsPerAddress+":0] "+s.M.baseName() + ";\n"+
+   {return "reg ["+bitsPerAddress+":0] "+s.M.baseName() + ";\n"+
       s.C.declareVerilog()+
       s.T.declareVerilog()+
       s.M.copyVerilogDec();
@@ -2343,7 +2343,7 @@ abstract class BtreePA extends Test                                             
       s.append("""
 //-----------------------------------------------------------------------------
 // Database on a chip
-// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
+// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-01-07
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
 (* keep_hierarchy = "yes" *)
@@ -2391,22 +2391,53 @@ $stuckBases
       final String p = " ".repeat(10);                                          // Indentation for Verilog
       final String q = " ".repeat(16);
 
+      final StringToNumbers ops = new StringToNumbers();                        // Collapse identical instructions
+
       for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
        {final Stack<ProgramPA.I> I = program.code.elementAt(i);                 // The block of parallel instructions to write
-        final int N = I.size();
-        if (N > 1)
+        if (I.size() > 1)
          {final StringBuilder t = new StringBuilder();
-          for(ProgramPA.I j : I) t.append(q+"    "+j.v()+j.traceComment() + "\n");
-          s.append(String.format("%s%5d : begin\n", p, i));
-          s.append(t);
-          s.append(q+"  end\n");
+          for(ProgramPA.I j : I) t.append(q+"    "+j.v()+"\n");
+          ops.put(t.toString(), i);
          }
-        else if (N == 1)
+        else
          {final ProgramPA.I j = I.firstElement();
-          final String t = j.v()+j.traceComment();
-          s.append(String.format("%s%5d : begin %s end\n", p, i, t));           // Bracket instructions in this block with op code
+          ops.put(j.v(), i);
          }
        }
+
+      ops.order();                                                              // Order the instructions
+
+      for(StringToNumbers.Order o : ops.o)                                      // I shall say each instruction only once
+       {final String  k = o.joinKeys();                                         // Steps
+        final String  i = o.string;                                             // Instruction
+
+        if (i.contains("\n"))                                                   // Multi line instruction
+         {s.append(String.format("%s%s : begin\n%s\n%send\n", p, k, i, q));
+         }
+        else                                                                    // Single line instruction
+         {s.append(String.format("%s%s : begin %s end\n", p, k, i));
+         }
+       }
+
+//      for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
+//       {final Stack<ProgramPA.I> I = program.code.elementAt(i);                 // The block of parallel instructions to write
+//        final int N = I.size();
+//        if (N > 1)
+//         {final StringBuilder t = new StringBuilder();
+////        for(ProgramPA.I j : I) t.append(q+"    "+j.v()+j.traceComment() + "\n");
+//          for(ProgramPA.I j : I) t.append(q+"    "+j.v()+"\n");
+//          s.append(String.format("%s%5d : begin\n", p, i));
+//          s.append(t);
+//          s.append(q+"  end\n");
+//         }
+//        else if (N == 1)
+//         {final ProgramPA.I j = I.firstElement();
+////        final String t = j.v()+j.traceComment();
+//          final String t = j.v();
+//          s.append(String.format("%s%5d : begin %s end\n", p, i, t));           // Bracket instructions in this block with op code
+//         }
+//       }
       s.append("        default : begin stopped <= 1; /* end of execution */ end\n"); // Any invalid instruction address causes the program to halt
       s.append("""
       endcase
@@ -2421,7 +2452,7 @@ endmodule
       t.append("""
 //-----------------------------------------------------------------------------
 // Database on a chip test bench
-// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
+// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-01-07
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
 module $project_tb;                                                             // Test bench for database on a chip
@@ -2467,7 +2498,7 @@ endmodule
       P.traceMemory = M.memory();                                               // Request memory tracing
       P.run(javaTraceFile);                                                     // Run the java version and trace it
 
-      //ok(P.steps, expSteps());                                                  // Steps in java code
+      //ok(P.steps, expSteps());                                                // Steps in java code
       ok(T.at(BtreePA.this.data).getInt(), data());                             // Data associated with key from java code
       if (debug) stop(this);                                                    // Print tree if debugging
       if (expected() != null) ok(BtreePA.this, expected());                     // Check resulting tree

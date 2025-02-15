@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Database on a chip test bench
-// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
+// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-01-07
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
 module put_tb;                                                             // Test bench for database on a chip

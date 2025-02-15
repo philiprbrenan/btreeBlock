@@ -1,4 +1,4 @@
-(* ram_style = "block" *) reg [181:0] T_10;  /*   MemoryLayoutPA.java:0971:declareVerilog   MemoryLayoutPA.java:0953:dumpVerilog   BtreePA.java:2466:<init>   BtreePA.java:3455:<init>   BtreePA.java:3454:runVerilogDeleteTest   BtreePA.java:3517:test_verilog_delete   BtreePA.java:3807:newTests   BtreePA.java:3815:main  */
+reg [181:0] T_10;  /*   MemoryLayoutPA.java:0978:declareVerilog   MemoryLayoutPA.java:0960:dumpVerilog   BtreePA.java:2497:<init>   BtreePA.java:3486:<init>   BtreePA.java:3485:runVerilogDeleteTest   BtreePA.java:3548:test_verilog_delete   BtreePA.java:3838:newTests   BtreePA.java:3846:main  */
 task initialize_memory_T_10;
     begin
         T_10[0] <= 1;
