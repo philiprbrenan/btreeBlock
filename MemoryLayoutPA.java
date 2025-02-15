@@ -101,8 +101,8 @@ class MemoryLayoutPA extends Test                                               
   String copyVerilogDec()                                                       // Verilog declaration
    {zz();
     final StringBuilder s = new StringBuilder();                                // Text of declaration
-    s.append("(* ram_style = \"block\" *) reg["+copySize()+": 0] "+copyIndex ()+";\n");
-    s.append("(* ram_style = \"block\" *) reg["+copySize()+": 0] "+copyLength()+";\n");
+    s.append("reg["+copySize()+": 0] "+copyIndex ()+";\n");
+    s.append("reg["+copySize()+": 0] "+copyLength()+";\n");
     return ""+s;
    }
 
@@ -248,15 +248,22 @@ class MemoryLayoutPA extends Test                                               
       final String w = w(W);                                                    // The width of the field as a padded string
       final String d = delta == null ? "" :                                     // Constant delta to modify address if needed in steps of field size as in the C programming language
                        delta > 0 ? "+"+delta*W : ""+delta*W;
-      return (la ? c(base)+i(field.at)+"/*"+c(field.name)+"*/"+joinStrings(v, "")+d    :           // IBM S/360 Principles of Operation: LA
-        name()+"["+c(base)+i(field.at)+"/*"+c(field.name)+"*/"+joinStrings(v, "")+d+" +: "+w+"]"); // IBM S/360 Principles of Operation: L
+      return (la ? p(base)+i(field.at)+c()+joinStrings(v, "")+d    :            // IBM S/360 Principles of Operation: LA
+        name()+"["+p(base)+i(field.at)+c()+joinStrings(v, "")+d+" +: "+w+"]");  // IBM S/360 Principles of Operation: L
      }
 
     String verilogLoad() {return verilogLoadAddr(false, null);}                 // Content of a memory location as a verilog expression
     String verilogAddr() {return verilogLoadAddr(true,  null);}                 // Address of a memory location
     String i(int i)      {return String.format("%8d", i);}                      // Format an index
     String w(int w)      {return String.format("%1d", w);}                      // Format a width
-    String c(String s)   {while(s.length() % 8 > 0) s = s+" "; return s;}       // Format a field name
+
+    String c()                                                                  // Format a field name as a comment
+     {final StringBuilder s = new StringBuilder(field.name);
+      while(s.length() % 8 > 0) s.append(" ");
+      return "/*" + s +"*/";
+     }
+    String p(String s)   {while(s.length() % 8 > 0) s = s+" "; return s;}       // Pad a string
+
 
     void locateDirectAddress()                                                  // Locate a direct address and its content
      {final int N = indices.length;
@@ -966,8 +973,8 @@ class MemoryLayoutPA extends Test                                               
    {zz();
     final int N = memory.bits.length-1, B = logTwo(N)-1;
     final StringBuilder s = new StringBuilder();
-    if (based == null) s.append("(* ram_style = \"block\" *) reg ["+N+":0] "+name()    +"; ");              // Actual memory if it is not based
-    else               s.append("(* ram_style = \"block\" *) reg ["+B+":0] "+baseName()+"; ");              // Base offset for this memory
+    if (based == null) s.append("reg ["+N+":0] "+name()    +"; ");              // Actual memory if it is not based
+    else               s.append("reg ["+B+":0] "+baseName()+"; ");              // Base offset for this memory
     s.append(traceComment()); s.append("\n");
     return s.toString();
    }
