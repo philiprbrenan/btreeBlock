@@ -2312,6 +2312,8 @@ abstract class BtreePA extends Test                                             
     final String   testVerilog;                                                 // Verilog test bench file
     final String         mFile;                                                 // Folder in which to place include for btree memory
     final String         tFile;                                                 // Folder in which to place include for btree transaction memory
+    final String     opCodeMap = "opCodeMap";                                   // Name of op code map
+    final String opCodeMapFile;                                                 // File to contain op code map
     final String     testsFile;                                                 // File in which to place verilog test results sumamry
     final String     traceFile;                                                 // Folder in which to place verilog execution trace file
     final String javaTraceFile;                                                 // Folder in which to place java    execution trace file
@@ -2334,6 +2336,7 @@ abstract class BtreePA extends Test                                             
         testVerilog = ""+Paths.get(projectFolder, project+Verilog.testExt);
               mFile = ""+Paths.get(projectFolder, "includes", "M"+Verilog.header);
               tFile = ""+Paths.get(projectFolder, "includes", "T"+Verilog.header);
+      opCodeMapFile = ""+Paths.get(projectFolder, "includes", opCodeMap+Verilog.header);
           testsFile = ""+Paths.get(projectFolder, "tests.txt");
           traceFile = ""+Paths.get(projectFolder, "trace.txt");
       javaTraceFile = ""+Paths.get(projectFolder, "traceJava.txt");
@@ -2359,6 +2362,7 @@ module $project(reset, stop, clock, pfd, Key, Data, data, found);               
 
   `include "M.vh"                                                               // Memory holding a pre built tree from test_dump()
   `include "T.vh"                                                               // Transaction memory which is initialized to some values to reduce the complexity of Memory at by treating constants as variables
+  `include "opCodeMap.vh"                                                       // Op code map gives step to instruction
 
   integer  step;                                                                // Program counter
   integer steps;                                                                // Number of steps executed
@@ -2378,6 +2382,7 @@ $stuckBases
       stopped  <= 0;
       $initialize_memory_M();                                                   // Initialize btree memory
       $initialize_memory_T();                                                   // Initialize btree transaction
+      $initialize_opCodeMap();                                                  // Initialize op code map
       traceFile = $fopen("$traceFile", "w");                                    // Open trace file
       if (!traceFile) $fatal(1, "Cannot open trace file $traceFile");
       $stuckInitialization
@@ -2385,13 +2390,11 @@ $stuckBases
     else begin                                                                  // Run
       $display            ("%4d  %4d  %b", steps, step, $M);                    // Trace execution
       $fdisplay(traceFile, "%4d  %4d  %b", steps, step, $M);                    // Trace execution in a file
-      case(step)                                                                // Case statements to select the code for the current instruction
+      case(opCodeMap[step])                                                     // Case statements to select the code for the current instruction
 """);
 
-      final String p = " ".repeat(10);                                          // Indentation for Verilog
-      final String q = " ".repeat(16);
-
       final StringToNumbers ops = new StringToNumbers();                        // Collapse identical instructions
+      final String p = " ".repeat(10),  q = " ".repeat(16);                     // Indentation for Verilog
 
       for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
        {final Stack<ProgramPA.I> I = program.code.elementAt(i);                 // The block of parallel instructions to write
@@ -2407,9 +2410,10 @@ $stuckBases
        }
 
       ops.order();                                                              // Order the instructions
+      ops.genVerilog(opCodeMapFile, opCodeMap);                                 // Write op code map
 
-      for(StringToNumbers.Order o : ops.o)                                      // I shall say each instruction only once
-       {final String  k = o.joinKeys();                                         // Steps
+      for(StringToNumbers.Order o : ops.outputOrder)                            // I shall say each instruction only once
+       {final String  k = ""+o.ordinal; //o.joinKeys();                                         // Steps
         final String  i = o.string;                                             // Instruction
 
         if (i.contains("\n"))                                                   // Multi line instruction
@@ -2546,6 +2550,7 @@ endmodule
       s = s.replace("$T",                   ""+T.name());
       s = s.replace("$initialize_memory_M", ""+M.initializeMemory());           // Initialize btree memory
       s = s.replace("$initialize_memory_T", ""+T.initializeMemory());           // Initialize btree transaction
+      s = s.replace("$initialize_opCodeMap","initialize_"+opCodeMap);           // Initialize op code map
 
       return s;
      }
