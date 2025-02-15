@@ -61,7 +61,7 @@ report_high_fanout_nets  -file $reports_dir/fanout.rpt
 #write_bitstream  -force $project_dir/final.bit
 END
 
-  say STDERR dateTimeStamp;                                                     # Run tcl
+  say STDERR dateTimeStamp, " $project";                                        # Run tcl
   say STDERR qx($vivadoX -mode batch -source $synthesis 1>$reports_dir/1.txt);
 
   unlink $synthesis;
