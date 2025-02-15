@@ -130,9 +130,33 @@ public class Test                                                               
     return m;
    }
 
+  static Integer maxInt(Integer n, Integer...rest)                              // Maximum of some Integers with null acting as minus infinity
+   {Integer m = n;
+    for (int i = 0; i < rest.length; i++)                                       // Find a non null value to act as the initial maximum
+     {if (m == null && rest[i] != null) m = rest[i];
+     }
+    if (m == null) return null;                                                 // All the values are null
+    for (int i = 0; i < rest.length; i++)
+     {m = rest[i] == null ? m : max(m, rest[i]);
+     }
+    return m;
+   }
+
   static int min(int n, int...rest)                                             // Minimum of some numbers
    {int m = n;
     for (int i = 0; i < rest.length; i++) m = m > rest[i] ? rest[i] : m;
+    return m;
+   }
+
+  static Integer minInt(Integer n, Integer...rest)                              // Minimum of some Integers with null acting as plus infinity
+   {Integer m = n;
+    for (int i = 0; i < rest.length; i++)                                       // Find a non null value to act as the initial minimum
+     {if (m == null && rest[i] != null) m = rest[i];
+     }
+    if (m == null) return null;                                                 // All the values are null
+    for (int i = 0; i < rest.length; i++)
+     {m = rest[i] == null ? m : min(m, rest[i]);
+     }
     return m;
    }
 
@@ -439,6 +463,12 @@ public class Test                                                               
     catch (Exception e)
      {stop("Cannot read file", filePath, e);
      }
+    return null;
+   }
+
+  static String tempFile()                                                      // Create a temporary file
+   {try  {return ""+File.createTempFile("zzz", "111");}
+    catch(Exception e) {stop(e);}
     return null;
    }
 
@@ -897,6 +927,8 @@ public class Test                                                               
     ok(max(1,  2,  3),  3);
     ok(min(3d, 2d, 1d), 1d);
     ok(max(1d, 2d, 3d), 3d);
+    ok(maxInt(null, null, 1),    1);
+    ok(minInt(null, 2, null, 3), 2);
    }
 
   static void test_string()                                                     // Confirm an error message
@@ -1024,7 +1056,7 @@ BBBB
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
+   {oldTests();
     test_ifs();
    }
 

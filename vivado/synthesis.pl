@@ -15,9 +15,9 @@ sub gen                                                                         
   my $project_out  = "${home}/btreeBlock/verilog/${project}/vivado";            # Location of project output files
   my $includes_dir = "${project_dir}/includes";                                 # Set the path to the includes directory
   my $reports_dir  = "${project_out}/reports";                                  # Reports
-  my $dcp_dir      = "${project_out}/dcp";                                      # Reports
+  my $dcp_dir      = "${project_out}/dcp";                                      # Checkpoints
 
-  my $synthesis = "$home/btreeBlock/vivado/$project.tcl";                       # Vivado commands
+  my $synthesis = "$home/btreeBlock/vivado/$project.tcl";                       # Generated vivado commands
   my $vivado    = "$home/Vivado/2024.2/";                                       # Location of vivaldo
   my $vivadoX   = "$home/Vivado/2024.2/bin/vivado";                             # Location of vivaldo executable
 
