@@ -5,31 +5,32 @@ use strict;
 use Carp;
 use Data::Table::Text qw(:all);
 
-my $project      = q(find);                                                     # Folder within verilog delete/find/put
-my $key          =      2;                                                      # Key for operation
-my $part         = q(XC7Z007S);                                                 # Part  $131 https://www.xilinx.com/products/boards-and-kits/1-1bkpiul.html
+my $part = q(XC7Z007S);                                                         # Part $131 https://www.xilinx.com/products/boards-and-kits/1-1bkpiul.html
 
-my $home         =  $ENV{HOME};                                                 # Home folder
-my $project_dir  = "${home}/btreeBlock/verilog/${project}/$key";                # Location of project input files
-my $project_out  = "${home}/btreeBlock/verilog/${project}/vivado";              # Location of project output files
-my $includes_dir = "${project_dir}/includes";                                   # Set the path to the includes directory
-my $reports_dir  = "${project_out}/reports";                                    # Reports
-my $dcp_dir      = "${project_out}/dcp";                                        # Reports
+sub gen                                                                         # Generate tcl to synthesize design
+ {my ($project, $key, $part) = @_;                                              # Project, key
 
-my $synthesis = "$home/btreeBlock/vivado/synthesis.tcl";                        # Location of vivaldo
-my $vivado    = "$home/Vivado/2024.2/";                                         # Location of vivaldo
-my $vivadoX   = "$home/Vivado/2024.2/bin/vivado";                               # Location of vivaldo executable
+  my $home         =  $ENV{HOME};                                               # Home folder
+  my $project_dir  = "${home}/btreeBlock/verilog/${project}/$key";              # Location of project input files
+  my $project_out  = "${home}/btreeBlock/verilog/${project}/vivado";            # Location of project output files
+  my $includes_dir = "${project_dir}/includes";                                 # Set the path to the includes directory
+  my $reports_dir  = "${project_out}/reports";                                  # Reports
+  my $dcp_dir      = "${project_out}/dcp";                                      # Reports
 
-makePath fpd $reports_dir;                                                      # Ensure folder structure is present
-makePath fpd $dcp_dir;                                                          # Ensure folder structure is present
+  my $synthesis = "$home/btreeBlock/vivado/$project.tcl";                       # Vivado commands
+  my $vivado    = "$home/Vivado/2024.2/";                                       # Location of vivaldo
+  my $vivadoX   = "$home/Vivado/2024.2/bin/vivado";                             # Location of vivaldo executable
 
-die "No such path: $reports_dir" unless -d $reports_dir;
-die "No such path: $dcp_dir"     unless -d $dcp_dir;
+  makePath fpd $reports_dir;                                                    # Ensure folder structure is present
+  makePath fpd $dcp_dir;                                                        # Ensure folder structure is present
 
-die "No such path: $vivado"    unless -d $vivado;
-die "No such file: $vivadoX"   unless -f $vivadoX;
+  die "No such path: $reports_dir" unless -d $reports_dir;
+  die "No such path: $dcp_dir"     unless -d $dcp_dir;
 
-owf($synthesis, <<"END");                                                       # Write tcl to run the synthesis
+  die "No such path: $vivado"    unless -d $vivado;
+  die "No such file: $vivadoX"   unless -f $vivadoX;
+
+  owf($synthesis, <<"END");                                                     # Write tcl to run the synthesis
 set_param general.maxThreads 1
 
 read_verilog ${project_dir}/${project}.v
@@ -60,6 +61,12 @@ report_high_fanout_nets  -file $reports_dir/fanout.rpt
 #write_bitstream  -force $project_dir/final.bit
 END
 
-say STDERR qx($vivadoX -mode batch -source $synthesis 1>$reports_dir/1.txt);
+  say STDERR dateTimeStamp;                                                     # Run tcl
+  say STDERR qx($vivadoX -mode batch -source $synthesis 1>$reports_dir/1.txt);
 
-unlink $synthesis;
+  unlink $synthesis;
+ }
+
+gen(qw(find   2));
+gen(qw(delete 2));
+gen(qw(put    2));
