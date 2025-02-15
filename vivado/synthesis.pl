@@ -8,7 +8,7 @@ use Data::Table::Text qw(:all);
 my $part = q(XC7Z007S);                                                         # Part $131 https://www.xilinx.com/products/boards-and-kits/1-1bkpiul.html
 
 sub gen                                                                         # Generate tcl to synthesize design
- {my ($project, $key, $part) = @_;                                              # Project, key
+ {my ($project, $key) = @_;                                                     # Project, key
 
   my $home         =  $ENV{HOME};                                               # Home folder
   my $project_dir  = "${home}/btreeBlock/verilog/${project}/$key";              # Location of project input files
