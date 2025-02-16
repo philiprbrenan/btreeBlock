@@ -50,14 +50,14 @@ reg[10: 0] copyLength_leaf_0_StuckSA_Memory_Based_23_base_offset;
       initialize_memory_M_9();                                                   // Initialize btree memory
       initialize_memory_T_10();                                                   // Initialize btree transaction
       initialize_opCodeMap();                                                  // Initialize op code map
-      `ifdef SYNTHESIS
+      `ifndef SYNTHESIS
         traceFile = $fopen("trace.txt", "w");                                  // Open trace file
         if (!traceFile) $fatal(1, "Cannot open trace file trace.txt");
       `endif
       branch_0_StuckSA_Memory_Based_11_base_offset <= 0;branch_0_StuckSA_Copy_12 <= 0;branch_0_StuckSA_Transaction_13 <= 0; /*   BtreePA.java:2307:stuckMemoryInitialization   BtreePA.java:2292:stuckMemoryInitialization   BtreePA.java:2556:editVariables   BtreePA.java:2550:editVariables   BtreePA.java:2520:<init>   BtreePA.java:3497:<init>   BtreePA.java:3496:test_verilog_find   BtreePA.java:3870:newTests   BtreePA.java:3877:main  */leaf_0_StuckSA_Memory_Based_23_base_offset <= 0;leaf_0_StuckSA_Copy_24 <= 0;leaf_0_StuckSA_Transaction_25 <= 0; /*   BtreePA.java:2307:stuckMemoryInitialization   BtreePA.java:2293:stuckMemoryInitialization   BtreePA.java:2556:editVariables   BtreePA.java:2550:editVariables   BtreePA.java:2520:<init>   BtreePA.java:3497:<init>   BtreePA.java:3496:test_verilog_find   BtreePA.java:3870:newTests   BtreePA.java:3877:main  */
     end
     else begin                                                                  // Run
-      `ifndef SYNTHESIS
+      `ifdef SYNTHESIS
         T_10[113 +:5 ] <= Key;                                       // Load key
         T_10[118+:4] <= Data;                                      // Connect data
       `endif

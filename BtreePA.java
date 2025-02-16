@@ -2353,14 +2353,13 @@ abstract class BtreePA extends Test                                             
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
 (* keep_hierarchy = "yes" *)
-module $project(reset, stop, clock, pfd, Key, Data, data, found);               // Database on a chip
+module $project(reset, stop, clock, Key, Data, data, found);                    // Database on a chip
   input                 reset;                                                  // Restart the program run sequence when this goes high
   input                 clock;                                                  // Program counter clock
-  input            [2:0]pfd;                                                    // Put, find delete
-  input [$bitsPerKey :0]Key;                                                    // Input key
-  input [$bitsPerData:0]Data;                                                   // Input data
+  input [$bitsPerKey :0]  Key;                                                  // Input key
+  input [$bitsPerData:0] Data;                                                  // Input data
   output                 stop;                                                  // Program has stopped when this goes high
-  output[$bitsPerData:0]data;                                                   // Output data
+  output[$bitsPerData:0] data;                                                  // Output data
   output                found;                                                  // Whether the key was found on put, find delete
 
   `include "M.vh"                                                               // Memory holding a pre built tree from test_dump()
@@ -2369,8 +2368,8 @@ module $project(reset, stop, clock, pfd, Key, Data, data, found);               
 
   integer  step;                                                                // Program counter
   `ifndef SYNTHESIS
-    integer steps;                                                                // Number of steps executed
-    integer traceFile;                                                            // File to write trace to
+    integer steps;                                                              // Number of steps executed
+    integer traceFile;                                                          // File to write trace to
   `endif
   reg   stopped;                                                                // Set when we stop
   assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
@@ -2397,6 +2396,10 @@ $stuckBases
       $stuckInitialization
     end
     else begin                                                                  // Run
+      `ifdef SYNTHESIS
+        $T[$Key_at +:$Key_width ] <= Key;                                       // Load key
+        $T[$Data_at+:$Data_width] <= Data;                                      // Connect data
+      `endif
       `ifndef SYNTHESIS
         $display            ("%4d  %4d  %b", steps, step, $M);                  // Trace execution
         $fdisplay(traceFile, "%4d  %4d  %b", steps, step, $M);                  // Trace execution in a file
@@ -2481,7 +2484,6 @@ module $project_tb;                                                             
   reg                  reset;                                                   // Restart the program run sequence when this goes high
   reg                  stop;                                                    // Program has stopped when this goes high
   reg                  clock;                                                   // Program counter clock
-  reg             [2:0]pfd;                                                     // Put, find delete
   reg  [$bitsPerKey :0]Key  = $Key;                                             // Input key
   reg  [$bitsPerData:0]Data = $Data;                                            // Input data
   reg  [$bitsPerData:0]data;                                                    // Output data
@@ -2558,11 +2560,15 @@ endmodule
       s = s.replace("$traceFile",           fileName(traceFile));
       s = s.replace("$projectFolder",       projectFolder);
       s = s.replace("$project",             project);
-      s = s.replace("$Key",                 ""+Key());
-      s = s.replace("$Data",                ""+Data());
+      s = s.replace("$Key_at",              ""+Key.at);
+      s = s.replace("$Key_width",           ""+Key.width);
+      s = s.replace("$Data_at",             ""+Data.at);
+      s = s.replace("$Data_width",          ""+Data.width);
       s = s.replace("$data_at",             ""+data.at);
       s = s.replace("$data_width",          ""+data.width);
       s = s.replace("$data",                ""+data());
+      s = s.replace("$Key",                 ""+Key());
+      s = s.replace("$Data",                ""+Data());
       s = s.replace("$maxSteps",            ""+maxSteps());
       s = s.replace("$expSteps",            ""+expSteps());
       s = s.replace("$found_at",            ""+found.at);
