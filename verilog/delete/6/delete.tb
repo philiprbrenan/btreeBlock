@@ -7,7 +7,6 @@ module delete_tb;                                                             //
   reg                  reset;                                                   // Restart the program run sequence when this goes high
   reg                  stop;                                                    // Program has stopped when this goes high
   reg                  clock;                                                   // Program counter clock
-  reg             [2:0]pfd;                                                     // Put, find delete
   reg  [5 :0]Key  = 6;                                             // Input key
   reg  [4:0]Data = 3;                                            // Input data
   reg  [4:0]data;                                                    // Output data
@@ -29,12 +28,12 @@ module delete_tb;                                                             //
         clock = 0; #1; clock = 1; #1;
       end
       if (stop) begin                                                           // Stopped
-        `ifndef SYNTHESIS
+       `ifndef SYNTHESIS
           testResults = $fopen("tests.txt", "w");
           $fdisplay(testResults, "Steps=%1d\nKey=%1d\ndata=%1d\n",
             step, Key, data);
           $fclose(testResults);
-        `endif
+       `endif
       end
     end
   endtask

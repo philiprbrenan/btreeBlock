@@ -2279,8 +2279,8 @@ abstract class BtreePA extends Test                                             
     final StringBuilder s = new StringBuilder();
     final int B = find ? 1 : branchTransactions.length;
     final int L = find ? 1 :   leafTransactions.length;
-    for  (int b = 0; b < B; b++) s.append(stuckMemory(branchTransactions[b]));
-    for  (int l = 0; l < L; l++) s.append(stuckMemory(  leafTransactions[l]));
+    for  (int b = 0; b < B; b++) s.append(stuckMemory(branchTransactions[b], Project));
+    for  (int l = 0; l < L; l++) s.append(stuckMemory(  leafTransactions[l], Project));
     return s.toString();
    }
 
@@ -2289,20 +2289,27 @@ abstract class BtreePA extends Test                                             
     final StringBuilder s = new StringBuilder();
     final int B = find ? 1 : branchTransactions.length;
     final int L = find ? 1 :   leafTransactions.length;
-    for  (int b = 0; b < B; b++) s.append(stuckMemoryInitialization(branchTransactions[b]));
-    for  (int l = 0; l < L; l++) s.append(stuckMemoryInitialization(  leafTransactions[l]));
+    for  (int b = 0; b < B; b++) s.append(stuckMemoryInitialization(branchTransactions[b], Project));
+    for  (int l = 0; l < L; l++) s.append(stuckMemoryInitialization(  leafTransactions[l], Project));
     return s.toString();
    }
 
-  String stuckMemory(StuckPA s)                                                 // Base address variable for one stuck
-   {return "reg ["+bitsPerAddress+":0] "+s.M.baseName() + ";\n"+
-      s.C.declareVerilog()+
-      s.T.declareVerilog()+
-      s.M.copyVerilogDec();
+  String stuckMemory(StuckPA s, String Project)                                 // Base address variable for one stuck
+   {final boolean find = Project.equalsIgnoreCase("find");                      // Generating find
+    final StringBuilder t = new StringBuilder();
+    t.append("reg ["+bitsPerAddress+":0] "+s.M.baseName() + ";\n");
+    if (!find)
+     {t.append(s.C.declareVerilog());
+      t.append(s.T.declareVerilog());
+      t.append(s.M.copyVerilogDec());
+     }
+    return ""+t;
    }
 
-  String stuckMemoryInitialization(StuckPA s)                                   // Initialization for one stuck
-   {return s.M.baseName()+" <= 0;"+
+  String stuckMemoryInitialization(StuckPA s, String Project)                   // Initialization for one stuck
+   {final boolean find = Project.equalsIgnoreCase("find");                      // Generating find
+    if (find) return "";
+    return s.M.baseName()+" <= 0;"+
            s.C.name()    +" <= 0;"+
            s.T.name()    +" <= 0;"+traceComment();
    }
@@ -2518,9 +2525,9 @@ endmodule
 """);
 
       writeFile(sourceVerilog, editVariables(s));                               // Write verilog module
-      writeFile(testVerilog,   editVariables(t));                               // Write tverilog test bench
+      writeFile(testVerilog,   editVariables(t));                               // Write verilog test bench
       M.dumpVerilog(mFile);                                                     // Write include file to initialize main memory
-      T.dumpVerilog(tFile);                                                     // Write include file to initialize transaction memory
+      T.dumpVerilog(tFile, Key, Data);                                          // Write include file to initialize transaction memory excluding areas that will be loaded from the input ports
       P.traceMemory = M.memory();                                               // Request memory tracing
       P.run(javaTraceFile);                                                     // Run the java version and trace it
 
@@ -2553,7 +2560,7 @@ endmodule
      {s = s.replace("$bitsPerKey",    ""  + bitsPerKey());
       s = s.replace("$bitsPerData",   ""  + bitsPerData());
       s = s.replace("$stuckBases",          stuckMemories(project));
-      s = s.replace("$stuckInitialization", stuckMemoryInitialization(project));
+      s = s.replace("$stuckInitialization", stuckMemoryInitialization(project)); //, Key, Data));
       s = s.replace("$mFile",               mFile);
       s = s.replace("$tFile",               tFile);
       s = s.replace("$testsFile",           fileName(testsFile));
@@ -3489,7 +3496,7 @@ endmodule
       3                  2        |
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
-    t.P.clear();
+    t.P.clear(); t.T.clear();                                                   // Clear program and transaction memory
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
 
@@ -3866,9 +3873,9 @@ endmodule
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    //test_verilog_delete();
+      test_verilog_delete();
       test_verilog_find();
-    //test_verilog_put();
+      test_verilog_put();
     //test_delete_small_random();
    }
 
