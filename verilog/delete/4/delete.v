@@ -691,15 +691,15 @@ end
           80 : begin if (M_9[       4/*isLeaf  */ + 0 * 44 +: 1] == 0) step = 121; end
           81 : begin leaf_0_StuckSA_Memory_Based_23_base_offset <=        9/*leaf    */ + 0 * 44; end
           82 : begin
-T_10[      22/*found   */ +: 1]= ( 0
+/* StuckPA.search */T_10[      22/*found   */ +: 1] <= ( 0
  || (M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            3/*key     */ + 0 * 5 +: 5] == T_10[     113/*Key     */ +: 5] &&  0 < M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            0/*currentSize     */ +: 3])
  || (M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            3/*key     */ + 1 * 5 +: 5] == T_10[     113/*Key     */ +: 5] &&  1 < M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            0/*currentSize     */ +: 3])
 ) ? 1 : 0;
-T_10[      70/*index   */ +: 3] =
+T_10[      70/*index   */ +: 3] <=
 (M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            3/*key     */ + 0 * 5 +: 5] == T_10[     113/*Key     */ +: 5] && 0 < M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            0/*currentSize     */ +: 3]) ? 0 :
 (M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            3/*key     */ + 1 * 5 +: 5] == T_10[     113/*Key     */ +: 5] && 1 < M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            0/*currentSize     */ +: 3]) ? 1 :
 0;
-T_10[      28/*data    */ +: 4] =
+T_10[      28/*data    */ +: 4] <=
 (M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            3/*key     */ + 0 * 5 +: 5] == T_10[     113/*Key     */ +: 5] && 0 < M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            0/*currentSize     */ +: 3]) ? M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+           13/*data    */ + 0 * 4 +: 4] :
 (M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            3/*key     */ + 1 * 5 +: 5] == T_10[     113/*Key     */ +: 5] && 1 < M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            0/*currentSize     */ +: 3]) ? M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+           13/*data    */ + 1 * 4 +: 4] :
 0;
@@ -713,7 +713,7 @@ T_10[      28/*data    */ +: 4] =
           84 : begin T_10[     130/*parent  */ +: 4] <= 0; end
           85 : begin branch_0_StuckSA_Memory_Based_11_base_offset <=        9/*branch  */ + T_10[     130/*parent  */ +: 4] * 44; end
           86 : begin
-T_10[     134/*child   */ +: 4] =
+/* StuckPA.searchFirstGreaterThanOrEqual */T_10[     134/*child   */ +: 4] <=
 (M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 0 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 0 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? M_9[branch_0_StuckSA_Memory_Based_11_base_offset+         23/*data    */ + 0 * 4 +: 4] :
 (M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 1 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 1 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? M_9[branch_0_StuckSA_Memory_Based_11_base_offset+         23/*data    */ + 1 * 4 +: 4] :
 (M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 2 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 2 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? M_9[branch_0_StuckSA_Memory_Based_11_base_offset+         23/*data    */ + 2 * 4 +: 4] :
@@ -769,13 +769,13 @@ end
 
                 end
           99 : begin
-T_10[      10/*first   */ +: 3] =
+/* StuckPA.searchFirstGreaterThanOrEqual */T_10[      10/*first   */ +: 3] <=
 (M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 0 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 0 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? 0 :
 (M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 1 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 1 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? 1 :
 (M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 2 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 2 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? 2 :
 (M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 3 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 3 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? 3 :
 M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1;
-T_10[      13/*next    */ +: 4] =
+T_10[      13/*next    */ +: 4] <=
 (M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 0 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 0 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? M_9[branch_0_StuckSA_Memory_Based_11_base_offset+         23/*data    */ + 0 * 4 +: 4] :
 (M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 1 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 1 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? M_9[branch_0_StuckSA_Memory_Based_11_base_offset+         23/*data    */ + 1 * 4 +: 4] :
 (M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 2 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 2 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? M_9[branch_0_StuckSA_Memory_Based_11_base_offset+         23/*data    */ + 2 * 4 +: 4] :
@@ -1560,7 +1560,7 @@ end
           279 : begin T_10[     155/*mergeIndex      */ +: 3] <= T_10[     155/*mergeIndex      */ +: 3]+ 1; end
           280 : begin step = 591; end
           281 : begin
-T_10[      13/*next    */ +: 4] =
+/* StuckPA.searchFirstGreaterThanOrEqual */T_10[      13/*next    */ +: 4] <=
 (M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 0 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 0 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? M_9[branch_0_StuckSA_Memory_Based_11_base_offset+         23/*data    */ + 0 * 4 +: 4] :
 (M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 1 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 1 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? M_9[branch_0_StuckSA_Memory_Based_11_base_offset+         23/*data    */ + 1 * 4 +: 4] :
 (M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 2 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 2 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? M_9[branch_0_StuckSA_Memory_Based_11_base_offset+         23/*data    */ + 2 * 4 +: 4] :
