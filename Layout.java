@@ -6,9 +6,9 @@ package com.AppaApps.Silicon;                                                   
 
 import java.util.*;
 
-//D1 Construct                                                                  // Layout a description of the memory used by a chip
+//D1 Construct                                                                  // Describe the layout of the memory used by the chip.  All memory is laid out it in little endian format.
 
-public class Layout extends Test                                                // A Memory layout for a chip. There might be several such layouts representing parts of the chip.
+public class Layout extends Test                                                // A memory layout for a chip. There might be several such layouts representing parts of the chip.
  {private Field                 top;                                            // The top most field in a set of nested fields describing memory.
   private final Stack<Field> fields = new Stack<>();                            // Field creation sequence to enable efficient duplication of a layout
   String                 layoutName;                                            // Name this memory layout if helpful

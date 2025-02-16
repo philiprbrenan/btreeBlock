@@ -950,23 +950,37 @@ class MemoryLayoutPA extends Test                                               
      };
    }
 
-//D1 Verilog                                                                    // Transfer memory to and from Verilog
+//D1 Verilog                                                                    // Transfer memory to Verilog
 
-  void dumpVerilog(String file)                                                 // Initialize memory in verilog with the contents of this memory
+  void dumpVerilog(String file, Layout.Variable...ignores)                      // Initialize memory in Verilog with the contents of this memory ignoring some fields that will be loaded from input ports
    {zz();
+    final TreeSet<Integer> ignore = new TreeSet<>();                            // The bits to be ignored
+    for (Layout.Variable v : ignores)                                           // Load the bits to be ignored
+     {final int N = v.width;
+      for (int i = 0; i < N; i++) ignore.add(v.at+i);                           // Bit to be ignored
+     }
+
     final StringBuilder s = new StringBuilder();
-    final int N = memory.bits.length-1, B = logTwo(N)-1;
-    final String m = name();
+    final int N = memory.bits.length-1, B = logTwo(N)-1;                        // Dimensions of memory
+    final String m = name();                                                    // Name of memory
     s.append(declareVerilog());
     s.append("task "+initializeMemory()+";\n");
     s.append("    begin\n");
-    for(int i = 0; i<= N; ++i)
-     {final int b = memory.bits[i] ? 1 : 0;
-      s.append("        "+m+"["+i+"] <= "+b+";\n");
+    for(int i = 0; i <= N; ++i)                                                 // Load each bit
+     {final int b = memory.bits[i] ? 1 : 0;                                     // Bit to dump
+      final String l = "        "+m+"["+i+"] <= "+b+";\n";                      // Load bit into memory
+      if (ignore.contains(i))                                                   // Ignore bits loaded from other sources during synthesis
+       {s.append("     `ifndef SYNTHESIS\n");                                   // Load bit into memory
+        s.append(l);
+        s.append("     `endif\n");
+       }
+      else                                                                      // Load all bits as not in synthesis
+       {s.append("        "+m+"["+i+"] <= "+b+";\n");                           // Load bit into memory
+       }
      }
     s.append("    end\n");
     s.append("endtask\n");
-    writeFile(file, s);
+    writeFile(file, s);                                                         // Write the definition into an include file
    }
 
   String declareVerilog()                                                       // Declare matching memory  but do not initialize it
@@ -1702,6 +1716,63 @@ endtask
     deleteAllFiles(folderName(v), 1);
    }
 
+  static void test_dump_verilog_ignore()
+   {z();
+    final String v = "verilog/memoryLayoutPA/dump_verilog.txt";
+
+    Layout               l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 1);
+    Layout.Variable  b = l.variable ("b", 2);
+    Layout.Variable  c = l.variable ("c", 3);
+    Layout.Variable  d = l.variable ("d", 4);
+    Layout.Variable  e = l.variable ("e", 5);
+    Layout.Structure S = l.structure("S", a, b, c, d, e);
+
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "M");
+    final String     n = m.name();
+    final String     i = m.initializeMemory();
+    m.memory().alternating(4);
+    m.dumpVerilog(v, b, d);
+
+    final Stack<String> r = readFile(v);
+    r.removeElementAt(0);
+    //stop(joinLines(r));
+    ok(joinLines(r)+"\n", String.format("""
+task %s;
+    begin
+        %s[0] <= 0;
+     `ifndef SYNTHESIS
+        %s[1] <= 0;
+     `endif
+     `ifndef SYNTHESIS
+        %s[2] <= 0;
+     `endif
+        %s[3] <= 0;
+        %s[4] <= 1;
+        %s[5] <= 1;
+     `ifndef SYNTHESIS
+        %s[6] <= 1;
+     `endif
+     `ifndef SYNTHESIS
+        %s[7] <= 1;
+     `endif
+     `ifndef SYNTHESIS
+        %s[8] <= 0;
+     `endif
+     `ifndef SYNTHESIS
+        %s[9] <= 0;
+     `endif
+        %s[10] <= 0;
+        %s[11] <= 0;
+        %s[12] <= 1;
+        %s[13] <= 1;
+        %s[14] <= 1;
+    end
+endtask
+""", i, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n));
+    deleteAllFiles(folderName(v), 1);
+   }
+
   static void test_copy_bits()
    {z();
     Layout               l = Layout.layout();
@@ -1876,16 +1947,16 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_union();
     test_verilog_address();
     test_dump_verilog();
+    test_dump_verilog_ignore();
     test_copy_bits();
     test_copy_memory();
-    test_dump_verilog();
     test_copyVerilogDec();
     test_copy_variable();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
-    //test_copy_variable();
+   {//oldTests();
+    test_dump_verilog_ignore();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
