@@ -15,6 +15,7 @@ abstract class BtreePA extends Test                                             
   final ProgramPA      P = new ProgramPA();                                     // Program in which to generate instructions
   final boolean   Assert = false;                                               // Execute asserts if true
   final boolean     Halt = false;                                               // Execute tests that result in a halt
+  final boolean  OpCodes = true;                                                // Refactor op codes
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -2273,19 +2274,21 @@ abstract class BtreePA extends Test                                             
 
 //D1 Verilog                                                                    // Generate verilog code that implements the instructions used to manipulate a btree
 
-  String stuckMemories()                                                        // Declare variables holding the base addresses of all based memory elements
-   {final StringBuilder s = new StringBuilder();
-    final int B = branchTransactions.length;
-    final int L =   leafTransactions.length;
+  String stuckMemories(String Project)                                          // Declare variables holding the base addresses of all based memory elements
+   {final boolean find = Project.equalsIgnoreCase("find");                      // Generating find
+    final StringBuilder s = new StringBuilder();
+    final int B = find ? 1 : branchTransactions.length;
+    final int L = find ? 1 :   leafTransactions.length;
     for  (int b = 0; b < B; b++) s.append(stuckMemory(branchTransactions[b]));
     for  (int l = 0; l < L; l++) s.append(stuckMemory(  leafTransactions[l]));
     return s.toString();
    }
 
-  String stuckMemoryInitialization()                                            // Initialize based memory
-   {final StringBuilder s = new StringBuilder();
-    final int B = branchTransactions.length;
-    final int L =   leafTransactions.length;
+  String stuckMemoryInitialization(String Project)                              // Initialize based memory
+   {final boolean find = Project.equalsIgnoreCase("find");                      // Generating find
+    final StringBuilder s = new StringBuilder();
+    final int B = find ? 1 : branchTransactions.length;
+    final int L = find ? 1 :   leafTransactions.length;
     for  (int b = 0; b < B; b++) s.append(stuckMemoryInitialization(branchTransactions[b]));
     for  (int l = 0; l < L; l++) s.append(stuckMemoryInitialization(  leafTransactions[l]));
     return s.toString();
@@ -2365,8 +2368,10 @@ module $project(reset, stop, clock, pfd, Key, Data, data, found);               
   `include "opCodeMap.vh"                                                       // Op code map gives step to instruction
 
   integer  step;                                                                // Program counter
-  integer steps;                                                                // Number of steps executed
-  integer traceFile;                                                            // File to write trace to
+  `ifndef SYNTHESIS
+    integer steps;                                                                // Number of steps executed
+    integer traceFile;                                                            // File to write trace to
+  `endif
   reg   stopped;                                                                // Set when we stop
   assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
   assign found = $T[$found_at];                                                 // Found the key
@@ -2383,14 +2388,17 @@ $stuckBases
       $initialize_memory_M();                                                   // Initialize btree memory
       $initialize_memory_T();                                                   // Initialize btree transaction
       $initialize_opCodeMap();                                                  // Initialize op code map
-      traceFile = $fopen("$traceFile", "w");                                    // Open trace file
-      if (!traceFile) $fatal(1, "Cannot open trace file $traceFile");
+      `ifndef SYNTHESIS
+        traceFile = $fopen("$traceFile", "w");                                  // Open trace file
+        if (!traceFile) $fatal(1, "Cannot open trace file $traceFile");
+      `endif
       $stuckInitialization
     end
     else begin                                                                  // Run
-      $display            ("%4d  %4d  %b", steps, step, $M);                    // Trace execution
-      $fdisplay(traceFile, "%4d  %4d  %b", steps, step, $M);                    // Trace execution in a file
-      case(opCodeMap[step])                                                     // Case statements to select the code for the current instruction
+      `ifndef SYNTHESIS
+        $display            ("%4d  %4d  %b", steps, step, $M);                  // Trace execution
+        $fdisplay(traceFile, "%4d  %4d  %b", steps, step, $M);                  // Trace execution in a file
+      `endif
 """);
 
       final StringToNumbers ops = new StringToNumbers();                        // Collapse identical instructions
@@ -2412,41 +2420,49 @@ $stuckBases
       ops.order();                                                              // Order the instructions
       ops.genVerilog(opCodeMapFile, opCodeMap);                                 // Write op code map
 
-      for(StringToNumbers.Order o : ops.outputOrder)                            // I shall say each instruction only once
-       {final String  k = ""+o.ordinal; //o.joinKeys();                                         // Steps
-        final String  i = o.string;                                             // Instruction
+      if (OpCodes)                                                              // Reduce program size by refactoring op codes at the cost of one additional look up per instruction cycle. Also appears to reduce synthesis time by about 30% on Vivado and likewise reduces the number of FPGA cells.
+       {s.append("      case(opCodeMap[step])\n");                              // Case statements to select the code for the current instruction
 
-        if (i.contains("\n"))                                                   // Multi line instruction
-         {s.append(String.format("%s%s : begin\n%s\n%send\n", p, k, i, q));
-         }
-        else                                                                    // Single line instruction
-         {s.append(String.format("%s%s : begin %s end\n", p, k, i));
+        for(StringToNumbers.Order o : ops.outputOrder)                          // I shall say each instruction only once
+         {final String  k = ""+o.ordinal; //o.joinKeys();                       // Steps
+          final String  i = o.string;                                           // Instruction
+
+          if (i.contains("\n"))                                                 // Multi line instruction
+           {s.append(String.format("%s%s : begin\n%s\n%send\n", p, k, i, q));
+           }
+          else                                                                  // Single line instruction
+           {s.append(String.format("%s%s : begin %s end\n", p, k, i));
+           }
          }
        }
-
-//      for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
-//       {final Stack<ProgramPA.I> I = program.code.elementAt(i);                 // The block of parallel instructions to write
-//        final int N = I.size();
-//        if (N > 1)
-//         {final StringBuilder t = new StringBuilder();
-////        for(ProgramPA.I j : I) t.append(q+"    "+j.v()+j.traceComment() + "\n");
-//          for(ProgramPA.I j : I) t.append(q+"    "+j.v()+"\n");
-//          s.append(String.format("%s%5d : begin\n", p, i));
-//          s.append(t);
-//          s.append(q+"  end\n");
-//         }
-//        else if (N == 1)
-//         {final ProgramPA.I j = I.firstElement();
-////        final String t = j.v()+j.traceComment();
-//          final String t = j.v();
-//          s.append(String.format("%s%5d : begin %s end\n", p, i, t));           // Bracket instructions in this block with op code
-//         }
-//       }
+      else                                                                      // Write the code for each instruction at each step
+       {s.append("      case(step)");                                           // Case statements to select the code for the current instruction
+        for(int i = 0; i < program.code.size(); ++i)                            // Write each instruction
+         {final Stack<ProgramPA.I> I = program.code.elementAt(i);               // The block of parallel instructions to write
+          final int N = I.size();
+          if (N > 1)
+           {final StringBuilder t = new StringBuilder();
+//          for(ProgramPA.I j : I) t.append(q+"    "+j.v()+j.traceComment() + "\n");
+            for(ProgramPA.I j : I) t.append(q+"    "+j.v()+"\n");
+            s.append(String.format("%s%5d : begin\n", p, i));
+            s.append(t);
+            s.append(q+"  end\n");
+           }
+          else if (N == 1)
+           {final ProgramPA.I j = I.firstElement();
+//          final String t = j.v()+j.traceComment();
+            final String t = j.v();
+            s.append(String.format("%s%5d : begin %s end\n", p, i, t));         // Bracket instructions in this block with op code
+           }
+         }
+       }
       s.append("        default : begin stopped <= 1; /* end of execution */ end\n"); // Any invalid instruction address causes the program to halt
       s.append("""
       endcase
-      step   = step  + 1;
-      steps <= steps + 1;
+      step = step + 1;
+      `ifndef SYNTHESIS
+        steps <= steps + 1;
+      `endif
     end // Execute
   end // Always
 endmodule
@@ -2485,10 +2501,12 @@ module $project_tb;                                                             
         clock = 0; #1; clock = 1; #1;
       end
       if (stop) begin                                                           // Stopped
-        testResults = $fopen("$testsFile", "w");
-        $fdisplay(testResults, "Steps=%1d\\nKey=%1d\\ndata=%1d\\n",
-          step, Key, data);
-        $fclose(testResults);
+        `ifndef SYNTHESIS
+          testResults = $fopen("$testsFile", "w");
+          $fdisplay(testResults, "Steps=%1d\\nKey=%1d\\ndata=%1d\\n",
+            step, Key, data);
+          $fclose(testResults);
+        `endif
       end
     end
   endtask
@@ -2530,8 +2548,8 @@ endmodule
     private String editVariables(String s)                                      // Edit the variables in a string builder
      {s = s.replace("$bitsPerKey",    ""  + bitsPerKey());
       s = s.replace("$bitsPerData",   ""  + bitsPerData());
-      s = s.replace("$stuckBases",          stuckMemories());
-      s = s.replace("$stuckInitialization", stuckMemoryInitialization());
+      s = s.replace("$stuckBases",          stuckMemories(project));
+      s = s.replace("$stuckInitialization", stuckMemoryInitialization(project));
       s = s.replace("$mFile",               mFile);
       s = s.replace("$tFile",               tFile);
       s = s.replace("$testsFile",           fileName(testsFile));
@@ -3840,9 +3858,9 @@ endmodule
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-      test_verilog_delete();
+    //test_verilog_delete();
       test_verilog_find();
-      test_verilog_put();
+    //test_verilog_put();
     //test_delete_small_random();
    }
 

@@ -29,10 +29,12 @@ module find_tb;                                                             // T
         clock = 0; #1; clock = 1; #1;
       end
       if (stop) begin                                                           // Stopped
-        testResults = $fopen("tests.txt", "w");
-        $fdisplay(testResults, "Steps=%1d\nKey=%1d\ndata=%1d\n",
-          step, Key, data);
-        $fclose(testResults);
+        `ifndef SYNTHESIS
+          testResults = $fopen("tests.txt", "w");
+          $fdisplay(testResults, "Steps=%1d\nKey=%1d\ndata=%1d\n",
+            step, Key, data);
+          $fclose(testResults);
+        `endif
       end
     end
   endtask

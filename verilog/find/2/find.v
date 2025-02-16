@@ -19,53 +19,25 @@ module find(reset, stop, clock, pfd, Key, Data, data, found);               // D
   `include "opCodeMap.vh"                                                       // Op code map gives step to instruction
 
   integer  step;                                                                // Program counter
-  integer steps;                                                                // Number of steps executed
-  integer traceFile;                                                            // File to write trace to
+  `ifndef SYNTHESIS
+    integer steps;                                                                // Number of steps executed
+    integer traceFile;                                                            // File to write trace to
+  `endif
   reg   stopped;                                                                // Set when we stop
   assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
-  assign found = T_44[22];                                                 // Found the key
-  assign data  = T_44[28+:4];                                     // Data associated with key found
+  assign found = T_10[22];                                                 // Found the key
+  assign data  = T_10[28+:4];                                     // Data associated with key found
 
-reg [10:0] branch_0_StuckSA_Memory_Based_45_base_offset;
-reg [38:0] branch_0_StuckSA_Copy_46;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg [47:0] branch_0_StuckSA_Transaction_47;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg[10: 0] index_branch_0_StuckSA_Memory_Based_45_base_offset;
-reg[10: 0] copyLength_branch_0_StuckSA_Memory_Based_45_base_offset;
-reg [10:0] branch_1_StuckSA_Memory_Based_48_base_offset;
-reg [38:0] branch_1_StuckSA_Copy_49;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg [47:0] branch_1_StuckSA_Transaction_50;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg[10: 0] index_branch_1_StuckSA_Memory_Based_48_base_offset;
-reg[10: 0] copyLength_branch_1_StuckSA_Memory_Based_48_base_offset;
-reg [10:0] branch_2_StuckSA_Memory_Based_51_base_offset;
-reg [38:0] branch_2_StuckSA_Copy_52;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg [47:0] branch_2_StuckSA_Transaction_53;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg[10: 0] index_branch_2_StuckSA_Memory_Based_51_base_offset;
-reg[10: 0] copyLength_branch_2_StuckSA_Memory_Based_51_base_offset;
-reg [10:0] branch_3_StuckSA_Memory_Based_54_base_offset;
-reg [38:0] branch_3_StuckSA_Copy_55;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg [47:0] branch_3_StuckSA_Transaction_56;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2280:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg[10: 0] index_branch_3_StuckSA_Memory_Based_54_base_offset;
-reg[10: 0] copyLength_branch_3_StuckSA_Memory_Based_54_base_offset;
-reg [10:0] leaf_0_StuckSA_Memory_Based_57_base_offset;
-reg [20:0] leaf_0_StuckSA_Copy_58;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg [47:0] leaf_0_StuckSA_Transaction_59;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg[10: 0] index_leaf_0_StuckSA_Memory_Based_57_base_offset;
-reg[10: 0] copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset;
-reg [10:0] leaf_1_StuckSA_Memory_Based_60_base_offset;
-reg [20:0] leaf_1_StuckSA_Copy_61;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg [47:0] leaf_1_StuckSA_Transaction_62;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg[10: 0] index_leaf_1_StuckSA_Memory_Based_60_base_offset;
-reg[10: 0] copyLength_leaf_1_StuckSA_Memory_Based_60_base_offset;
-reg [10:0] leaf_2_StuckSA_Memory_Based_63_base_offset;
-reg [20:0] leaf_2_StuckSA_Copy_64;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg [47:0] leaf_2_StuckSA_Transaction_65;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg[10: 0] index_leaf_2_StuckSA_Memory_Based_63_base_offset;
-reg[10: 0] copyLength_leaf_2_StuckSA_Memory_Based_63_base_offset;
-reg [10:0] leaf_3_StuckSA_Memory_Based_66_base_offset;
-reg [20:0] leaf_3_StuckSA_Copy_67;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2296:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg [47:0] leaf_3_StuckSA_Transaction_68;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2297:stuckMemory   BtreePA.java:2281:stuckMemories   BtreePA.java:2533:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
-reg[10: 0] index_leaf_3_StuckSA_Memory_Based_66_base_offset;
-reg[10: 0] copyLength_leaf_3_StuckSA_Memory_Based_66_base_offset;
+reg [10:0] branch_0_StuckSA_Memory_Based_11_base_offset;
+reg [38:0] branch_0_StuckSA_Copy_12;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2299:stuckMemory   BtreePA.java:2282:stuckMemories   BtreePA.java:2551:editVariables   BtreePA.java:2546:editVariables   BtreePA.java:2516:<init>   BtreePA.java:3489:<init>   BtreePA.java:3488:test_verilog_find   BtreePA.java:3862:newTests   BtreePA.java:3869:main  */
+reg [47:0] branch_0_StuckSA_Transaction_13;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2300:stuckMemory   BtreePA.java:2282:stuckMemories   BtreePA.java:2551:editVariables   BtreePA.java:2546:editVariables   BtreePA.java:2516:<init>   BtreePA.java:3489:<init>   BtreePA.java:3488:test_verilog_find   BtreePA.java:3862:newTests   BtreePA.java:3869:main  */
+reg[10: 0] index_branch_0_StuckSA_Memory_Based_11_base_offset;
+reg[10: 0] copyLength_branch_0_StuckSA_Memory_Based_11_base_offset;
+reg [10:0] leaf_0_StuckSA_Memory_Based_23_base_offset;
+reg [20:0] leaf_0_StuckSA_Copy_24;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2299:stuckMemory   BtreePA.java:2283:stuckMemories   BtreePA.java:2551:editVariables   BtreePA.java:2546:editVariables   BtreePA.java:2516:<init>   BtreePA.java:3489:<init>   BtreePA.java:3488:test_verilog_find   BtreePA.java:3862:newTests   BtreePA.java:3869:main  */
+reg [47:0] leaf_0_StuckSA_Transaction_25;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2300:stuckMemory   BtreePA.java:2283:stuckMemories   BtreePA.java:2551:editVariables   BtreePA.java:2546:editVariables   BtreePA.java:2516:<init>   BtreePA.java:3489:<init>   BtreePA.java:3488:test_verilog_find   BtreePA.java:3862:newTests   BtreePA.java:3869:main  */
+reg[10: 0] index_leaf_0_StuckSA_Memory_Based_23_base_offset;
+reg[10: 0] copyLength_leaf_0_StuckSA_Memory_Based_23_base_offset;
 
 
   always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
@@ -74,66 +46,72 @@ reg[10: 0] copyLength_leaf_3_StuckSA_Memory_Based_66_base_offset;
       step      = 0;
       steps    <= 0;
       stopped  <= 0;
-      initialize_memory_M_43();                                                   // Initialize btree memory
-      initialize_memory_T_44();                                                   // Initialize btree transaction
+      initialize_memory_M_9();                                                   // Initialize btree memory
+      initialize_memory_T_10();                                                   // Initialize btree transaction
       initialize_opCodeMap();                                                  // Initialize op code map
-      traceFile = $fopen("trace.txt", "w");                                    // Open trace file
-      if (!traceFile) $fatal(1, "Cannot open trace file trace.txt");
-      branch_0_StuckSA_Memory_Based_45_base_offset <= 0;branch_0_StuckSA_Copy_46 <= 0;branch_0_StuckSA_Transaction_47 <= 0; /*   BtreePA.java:2304:stuckMemoryInitialization   BtreePA.java:2289:stuckMemoryInitialization   BtreePA.java:2534:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */branch_1_StuckSA_Memory_Based_48_base_offset <= 0;branch_1_StuckSA_Copy_49 <= 0;branch_1_StuckSA_Transaction_50 <= 0; /*   BtreePA.java:2304:stuckMemoryInitialization   BtreePA.java:2289:stuckMemoryInitialization   BtreePA.java:2534:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */branch_2_StuckSA_Memory_Based_51_base_offset <= 0;branch_2_StuckSA_Copy_52 <= 0;branch_2_StuckSA_Transaction_53 <= 0; /*   BtreePA.java:2304:stuckMemoryInitialization   BtreePA.java:2289:stuckMemoryInitialization   BtreePA.java:2534:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */branch_3_StuckSA_Memory_Based_54_base_offset <= 0;branch_3_StuckSA_Copy_55 <= 0;branch_3_StuckSA_Transaction_56 <= 0; /*   BtreePA.java:2304:stuckMemoryInitialization   BtreePA.java:2289:stuckMemoryInitialization   BtreePA.java:2534:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */leaf_0_StuckSA_Memory_Based_57_base_offset <= 0;leaf_0_StuckSA_Copy_58 <= 0;leaf_0_StuckSA_Transaction_59 <= 0; /*   BtreePA.java:2304:stuckMemoryInitialization   BtreePA.java:2290:stuckMemoryInitialization   BtreePA.java:2534:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */leaf_1_StuckSA_Memory_Based_60_base_offset <= 0;leaf_1_StuckSA_Copy_61 <= 0;leaf_1_StuckSA_Transaction_62 <= 0; /*   BtreePA.java:2304:stuckMemoryInitialization   BtreePA.java:2290:stuckMemoryInitialization   BtreePA.java:2534:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */leaf_2_StuckSA_Memory_Based_63_base_offset <= 0;leaf_2_StuckSA_Copy_64 <= 0;leaf_2_StuckSA_Transaction_65 <= 0; /*   BtreePA.java:2304:stuckMemoryInitialization   BtreePA.java:2290:stuckMemoryInitialization   BtreePA.java:2534:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */leaf_3_StuckSA_Memory_Based_66_base_offset <= 0;leaf_3_StuckSA_Copy_67 <= 0;leaf_3_StuckSA_Transaction_68 <= 0; /*   BtreePA.java:2304:stuckMemoryInitialization   BtreePA.java:2290:stuckMemoryInitialization   BtreePA.java:2534:editVariables   BtreePA.java:2528:editVariables   BtreePA.java:2498:<init>   BtreePA.java:3471:<init>   BtreePA.java:3470:test_verilog_find   BtreePA.java:3844:newTests   BtreePA.java:3851:main  */
+      `ifndef SYNTHESIS
+        traceFile = $fopen("trace.txt", "w");                                  // Open trace file
+        if (!traceFile) $fatal(1, "Cannot open trace file trace.txt");
+      `endif
+      branch_0_StuckSA_Memory_Based_11_base_offset <= 0;branch_0_StuckSA_Copy_12 <= 0;branch_0_StuckSA_Transaction_13 <= 0; /*   BtreePA.java:2307:stuckMemoryInitialization   BtreePA.java:2292:stuckMemoryInitialization   BtreePA.java:2552:editVariables   BtreePA.java:2546:editVariables   BtreePA.java:2516:<init>   BtreePA.java:3489:<init>   BtreePA.java:3488:test_verilog_find   BtreePA.java:3862:newTests   BtreePA.java:3869:main  */leaf_0_StuckSA_Memory_Based_23_base_offset <= 0;leaf_0_StuckSA_Copy_24 <= 0;leaf_0_StuckSA_Transaction_25 <= 0; /*   BtreePA.java:2307:stuckMemoryInitialization   BtreePA.java:2293:stuckMemoryInitialization   BtreePA.java:2552:editVariables   BtreePA.java:2546:editVariables   BtreePA.java:2516:<init>   BtreePA.java:3489:<init>   BtreePA.java:3488:test_verilog_find   BtreePA.java:3862:newTests   BtreePA.java:3869:main  */
     end
     else begin                                                                  // Run
-      $display            ("%4d  %4d  %b", steps, step, M_43);                    // Trace execution
-      $fdisplay(traceFile, "%4d  %4d  %b", steps, step, M_43);                    // Trace execution in a file
-      case(opCodeMap[step])                                                     // Case statements to select the code for the current instruction
-          0 : begin if (M_43[       4/*isLeaf  */ + 0 * 44 +: 1] == 0) step = 3; end
-          1 : begin leaf_0_StuckSA_Memory_Based_57_base_offset <=        9/*leaf    */ + 0 * 44; end
+      `ifndef SYNTHESIS
+        $display            ("%4d  %4d  %b", steps, step, M_9);                  // Trace execution
+        $fdisplay(traceFile, "%4d  %4d  %b", steps, step, M_9);                  // Trace execution in a file
+      `endif
+      case(opCodeMap[step])
+          0 : begin if (M_9[       4/*isLeaf  */ + 0 * 44 +: 1] == 0) step = 3; end
+          1 : begin leaf_0_StuckSA_Memory_Based_23_base_offset <=        9/*leaf    */ + 0 * 44; end
           2 : begin
-T_44[      22/*found   */ +: 1]= ( 0
- || (M_43[leaf_0_StuckSA_Memory_Based_57_base_offset+            3/*key     */ + 0 * 5 +: 5] == T_44[     113/*Key     */ +: 5] &&  0 < M_43[leaf_0_StuckSA_Memory_Based_57_base_offset+            0/*currentSize     */ +: 3])
- || (M_43[leaf_0_StuckSA_Memory_Based_57_base_offset+            3/*key     */ + 1 * 5 +: 5] == T_44[     113/*Key     */ +: 5] &&  1 < M_43[leaf_0_StuckSA_Memory_Based_57_base_offset+            0/*currentSize     */ +: 3])
+T_10[      22/*found   */ +: 1]= ( 0
+ || (M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            3/*key     */ + 0 * 5 +: 5] == T_10[     113/*Key     */ +: 5] &&  0 < M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            0/*currentSize     */ +: 3])
+ || (M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            3/*key     */ + 1 * 5 +: 5] == T_10[     113/*Key     */ +: 5] &&  1 < M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            0/*currentSize     */ +: 3])
 ) ? 1 : 0;
-T_44[      70/*index   */ +: 3] =
-(M_43[leaf_0_StuckSA_Memory_Based_57_base_offset+            3/*key     */ + 0 * 5 +: 5] == T_44[     113/*Key     */ +: 5] && 0 < M_43[leaf_0_StuckSA_Memory_Based_57_base_offset+            0/*currentSize     */ +: 3]) ? 0 :
-(M_43[leaf_0_StuckSA_Memory_Based_57_base_offset+            3/*key     */ + 1 * 5 +: 5] == T_44[     113/*Key     */ +: 5] && 1 < M_43[leaf_0_StuckSA_Memory_Based_57_base_offset+            0/*currentSize     */ +: 3]) ? 1 :
+T_10[      70/*index   */ +: 3] =
+(M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            3/*key     */ + 0 * 5 +: 5] == T_10[     113/*Key     */ +: 5] && 0 < M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            0/*currentSize     */ +: 3]) ? 0 :
+(M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            3/*key     */ + 1 * 5 +: 5] == T_10[     113/*Key     */ +: 5] && 1 < M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            0/*currentSize     */ +: 3]) ? 1 :
 0;
-T_44[      28/*data    */ +: 4] =
-(M_43[leaf_0_StuckSA_Memory_Based_57_base_offset+            3/*key     */ + 0 * 5 +: 5] == T_44[     113/*Key     */ +: 5] && 0 < M_43[leaf_0_StuckSA_Memory_Based_57_base_offset+            0/*currentSize     */ +: 3]) ? M_43[leaf_0_StuckSA_Memory_Based_57_base_offset+           13/*data    */ + 0 * 4 +: 4] :
-(M_43[leaf_0_StuckSA_Memory_Based_57_base_offset+            3/*key     */ + 1 * 5 +: 5] == T_44[     113/*Key     */ +: 5] && 1 < M_43[leaf_0_StuckSA_Memory_Based_57_base_offset+            0/*currentSize     */ +: 3]) ? M_43[leaf_0_StuckSA_Memory_Based_57_base_offset+           13/*data    */ + 1 * 4 +: 4] :
+T_10[      28/*data    */ +: 4] =
+(M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            3/*key     */ + 0 * 5 +: 5] == T_10[     113/*Key     */ +: 5] && 0 < M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            0/*currentSize     */ +: 3]) ? M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+           13/*data    */ + 0 * 4 +: 4] :
+(M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            3/*key     */ + 1 * 5 +: 5] == T_10[     113/*Key     */ +: 5] && 1 < M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+            0/*currentSize     */ +: 3]) ? M_9[leaf_0_StuckSA_Memory_Based_23_base_offset+           13/*data    */ + 1 * 4 +: 4] :
 0;
 
                 end
           3 : begin
-                    T_44[     122/*find    */ +: 4] <= 0;
+                    T_10[     122/*find    */ +: 4] <= 0;
                     step = 11;
 
                 end
-          4 : begin T_44[     130/*parent  */ +: 4] <= 0; end
-          5 : begin branch_0_StuckSA_Memory_Based_45_base_offset <=        9/*branch  */ + T_44[     130/*parent  */ +: 4] * 44; end
+          4 : begin T_10[     130/*parent  */ +: 4] <= 0; end
+          5 : begin branch_0_StuckSA_Memory_Based_11_base_offset <=        9/*branch  */ + T_10[     130/*parent  */ +: 4] * 44; end
           6 : begin
-T_44[     134/*child   */ +: 4] =
-(M_43[branch_0_StuckSA_Memory_Based_45_base_offset+          3/*key     */ + 0 * 5 +: 5] >= T_44[     113/*Key     */ +: 5] && 0 < M_43[branch_0_StuckSA_Memory_Based_45_base_offset+          0/*currentSize     */ +: 3]-1) ? M_43[branch_0_StuckSA_Memory_Based_45_base_offset+         23/*data    */ + 0 * 4 +: 4] :
-(M_43[branch_0_StuckSA_Memory_Based_45_base_offset+          3/*key     */ + 1 * 5 +: 5] >= T_44[     113/*Key     */ +: 5] && 1 < M_43[branch_0_StuckSA_Memory_Based_45_base_offset+          0/*currentSize     */ +: 3]-1) ? M_43[branch_0_StuckSA_Memory_Based_45_base_offset+         23/*data    */ + 1 * 4 +: 4] :
-(M_43[branch_0_StuckSA_Memory_Based_45_base_offset+          3/*key     */ + 2 * 5 +: 5] >= T_44[     113/*Key     */ +: 5] && 2 < M_43[branch_0_StuckSA_Memory_Based_45_base_offset+          0/*currentSize     */ +: 3]-1) ? M_43[branch_0_StuckSA_Memory_Based_45_base_offset+         23/*data    */ + 2 * 4 +: 4] :
-(M_43[branch_0_StuckSA_Memory_Based_45_base_offset+          3/*key     */ + 3 * 5 +: 5] >= T_44[     113/*Key     */ +: 5] && 3 < M_43[branch_0_StuckSA_Memory_Based_45_base_offset+          0/*currentSize     */ +: 3]-1) ? M_43[branch_0_StuckSA_Memory_Based_45_base_offset+         23/*data    */ + 3 * 4 +: 4] :
-M_43[branch_0_StuckSA_Memory_Based_45_base_offset+         23/*data    */ + M_43[branch_0_StuckSA_Memory_Based_45_base_offset+          0/*currentSize     */ +: 3] * 4-4 +: 4];
+T_10[     134/*child   */ +: 4] =
+(M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 0 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 0 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? M_9[branch_0_StuckSA_Memory_Based_11_base_offset+         23/*data    */ + 0 * 4 +: 4] :
+(M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 1 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 1 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? M_9[branch_0_StuckSA_Memory_Based_11_base_offset+         23/*data    */ + 1 * 4 +: 4] :
+(M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 2 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 2 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? M_9[branch_0_StuckSA_Memory_Based_11_base_offset+         23/*data    */ + 2 * 4 +: 4] :
+(M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          3/*key     */ + 3 * 5 +: 5] >= T_10[     113/*Key     */ +: 5] && 3 < M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3]-1) ? M_9[branch_0_StuckSA_Memory_Based_11_base_offset+         23/*data    */ + 3 * 4 +: 4] :
+M_9[branch_0_StuckSA_Memory_Based_11_base_offset+         23/*data    */ + M_9[branch_0_StuckSA_Memory_Based_11_base_offset+          0/*currentSize     */ +: 3] * 4-4 +: 4];
 
                 end
-          7 : begin if (M_43[       4/*isLeaf  */ + T_44[     134/*child   */ +: 4] * 44 +: 1] == 0) step = 10; end
-          8 : begin leaf_0_StuckSA_Memory_Based_57_base_offset <=        9/*leaf    */ + T_44[     134/*child   */ +: 4] * 44; end
+          7 : begin if (M_9[       4/*isLeaf  */ + T_10[     134/*child   */ +: 4] * 44 +: 1] == 0) step = 10; end
+          8 : begin leaf_0_StuckSA_Memory_Based_23_base_offset <=        9/*leaf    */ + T_10[     134/*child   */ +: 4] * 44; end
           9 : begin
-                    T_44[     122/*find    */ +: 4] <= T_44[     134/*child   */ +: 4];
+                    T_10[     122/*find    */ +: 4] <= T_10[     134/*child   */ +: 4];
                     step = 11;
 
                 end
           10 : begin
-                    T_44[     130/*parent  */ +: 4] <= T_44[     134/*child   */ +: 4];
+                    T_10[     130/*parent  */ +: 4] <= T_10[     134/*child   */ +: 4];
                     step = 4;
 
                 end
         default : begin stopped <= 1; /* end of execution */ end
       endcase
-      step   = step  + 1;
-      steps <= steps + 1;
+      step = step + 1;
+      `ifndef SYNTHESIS
+        steps <= steps + 1;
+      `endif
     end // Execute
   end // Always
 endmodule
