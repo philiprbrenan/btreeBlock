@@ -7,7 +7,6 @@ module find_tb;                                                             // T
   reg                  reset;                                                   // Restart the program run sequence when this goes high
   reg                  stop;                                                    // Program has stopped when this goes high
   reg                  clock;                                                   // Program counter clock
-  reg             [2:0]pfd;                                                     // Put, find delete
   reg  [5 :0]Key  = 2;                                             // Input key
   reg  [4:0]Data = 2;                                            // Input data
   reg  [4:0]data;                                                    // Output data

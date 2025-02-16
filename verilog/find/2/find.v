@@ -4,14 +4,13 @@
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
 (* keep_hierarchy = "yes" *)
-module find(reset, stop, clock, pfd, Key, Data, data, found);               // Database on a chip
+module find(reset, stop, clock, Key, Data, data, found);                    // Database on a chip
   input                 reset;                                                  // Restart the program run sequence when this goes high
   input                 clock;                                                  // Program counter clock
-  input            [2:0]pfd;                                                    // Put, find delete
-  input [5 :0]Key;                                                    // Input key
-  input [4:0]Data;                                                   // Input data
+  input [5 :0]  Key;                                                  // Input key
+  input [4:0] Data;                                                  // Input data
   output                 stop;                                                  // Program has stopped when this goes high
-  output[4:0]data;                                                   // Output data
+  output[4:0] data;                                                  // Output data
   output                found;                                                  // Whether the key was found on put, find delete
 
   `include "M.vh"                                                               // Memory holding a pre built tree from test_dump()
@@ -20,8 +19,8 @@ module find(reset, stop, clock, pfd, Key, Data, data, found);               // D
 
   integer  step;                                                                // Program counter
   `ifndef SYNTHESIS
-    integer steps;                                                                // Number of steps executed
-    integer traceFile;                                                            // File to write trace to
+    integer steps;                                                              // Number of steps executed
+    integer traceFile;                                                          // File to write trace to
   `endif
   reg   stopped;                                                                // Set when we stop
   assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
@@ -29,13 +28,13 @@ module find(reset, stop, clock, pfd, Key, Data, data, found);               // D
   assign data  = T_10[28+:4];                                     // Data associated with key found
 
 reg [10:0] branch_0_StuckSA_Memory_Based_11_base_offset;
-reg [38:0] branch_0_StuckSA_Copy_12;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2299:stuckMemory   BtreePA.java:2282:stuckMemories   BtreePA.java:2553:editVariables   BtreePA.java:2548:editVariables   BtreePA.java:2518:<init>   BtreePA.java:3491:<init>   BtreePA.java:3490:test_verilog_find   BtreePA.java:3864:newTests   BtreePA.java:3871:main  */
-reg [47:0] branch_0_StuckSA_Transaction_13;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2300:stuckMemory   BtreePA.java:2282:stuckMemories   BtreePA.java:2553:editVariables   BtreePA.java:2548:editVariables   BtreePA.java:2518:<init>   BtreePA.java:3491:<init>   BtreePA.java:3490:test_verilog_find   BtreePA.java:3864:newTests   BtreePA.java:3871:main  */
+reg [38:0] branch_0_StuckSA_Copy_12;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2299:stuckMemory   BtreePA.java:2282:stuckMemories   BtreePA.java:2555:editVariables   BtreePA.java:2550:editVariables   BtreePA.java:2520:<init>   BtreePA.java:3497:<init>   BtreePA.java:3496:test_verilog_find   BtreePA.java:3870:newTests   BtreePA.java:3877:main  */
+reg [47:0] branch_0_StuckSA_Transaction_13;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2300:stuckMemory   BtreePA.java:2282:stuckMemories   BtreePA.java:2555:editVariables   BtreePA.java:2550:editVariables   BtreePA.java:2520:<init>   BtreePA.java:3497:<init>   BtreePA.java:3496:test_verilog_find   BtreePA.java:3870:newTests   BtreePA.java:3877:main  */
 reg[10: 0] index_branch_0_StuckSA_Memory_Based_11_base_offset;
 reg[10: 0] copyLength_branch_0_StuckSA_Memory_Based_11_base_offset;
 reg [10:0] leaf_0_StuckSA_Memory_Based_23_base_offset;
-reg [20:0] leaf_0_StuckSA_Copy_24;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2299:stuckMemory   BtreePA.java:2283:stuckMemories   BtreePA.java:2553:editVariables   BtreePA.java:2548:editVariables   BtreePA.java:2518:<init>   BtreePA.java:3491:<init>   BtreePA.java:3490:test_verilog_find   BtreePA.java:3864:newTests   BtreePA.java:3871:main  */
-reg [47:0] leaf_0_StuckSA_Transaction_25;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2300:stuckMemory   BtreePA.java:2283:stuckMemories   BtreePA.java:2553:editVariables   BtreePA.java:2548:editVariables   BtreePA.java:2518:<init>   BtreePA.java:3491:<init>   BtreePA.java:3490:test_verilog_find   BtreePA.java:3864:newTests   BtreePA.java:3871:main  */
+reg [20:0] leaf_0_StuckSA_Copy_24;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2299:stuckMemory   BtreePA.java:2283:stuckMemories   BtreePA.java:2555:editVariables   BtreePA.java:2550:editVariables   BtreePA.java:2520:<init>   BtreePA.java:3497:<init>   BtreePA.java:3496:test_verilog_find   BtreePA.java:3870:newTests   BtreePA.java:3877:main  */
+reg [47:0] leaf_0_StuckSA_Transaction_25;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2300:stuckMemory   BtreePA.java:2283:stuckMemories   BtreePA.java:2555:editVariables   BtreePA.java:2550:editVariables   BtreePA.java:2520:<init>   BtreePA.java:3497:<init>   BtreePA.java:3496:test_verilog_find   BtreePA.java:3870:newTests   BtreePA.java:3877:main  */
 reg[10: 0] index_leaf_0_StuckSA_Memory_Based_23_base_offset;
 reg[10: 0] copyLength_leaf_0_StuckSA_Memory_Based_23_base_offset;
 
@@ -51,13 +50,17 @@ reg[10: 0] copyLength_leaf_0_StuckSA_Memory_Based_23_base_offset;
       initialize_memory_M_9();                                                   // Initialize btree memory
       initialize_memory_T_10();                                                   // Initialize btree transaction
       initialize_opCodeMap();                                                  // Initialize op code map
-      `ifndef SYNTHESIS
+      `ifdef SYNTHESIS
         traceFile = $fopen("trace.txt", "w");                                  // Open trace file
         if (!traceFile) $fatal(1, "Cannot open trace file trace.txt");
       `endif
-      branch_0_StuckSA_Memory_Based_11_base_offset <= 0;branch_0_StuckSA_Copy_12 <= 0;branch_0_StuckSA_Transaction_13 <= 0; /*   BtreePA.java:2307:stuckMemoryInitialization   BtreePA.java:2292:stuckMemoryInitialization   BtreePA.java:2554:editVariables   BtreePA.java:2548:editVariables   BtreePA.java:2518:<init>   BtreePA.java:3491:<init>   BtreePA.java:3490:test_verilog_find   BtreePA.java:3864:newTests   BtreePA.java:3871:main  */leaf_0_StuckSA_Memory_Based_23_base_offset <= 0;leaf_0_StuckSA_Copy_24 <= 0;leaf_0_StuckSA_Transaction_25 <= 0; /*   BtreePA.java:2307:stuckMemoryInitialization   BtreePA.java:2293:stuckMemoryInitialization   BtreePA.java:2554:editVariables   BtreePA.java:2548:editVariables   BtreePA.java:2518:<init>   BtreePA.java:3491:<init>   BtreePA.java:3490:test_verilog_find   BtreePA.java:3864:newTests   BtreePA.java:3871:main  */
+      branch_0_StuckSA_Memory_Based_11_base_offset <= 0;branch_0_StuckSA_Copy_12 <= 0;branch_0_StuckSA_Transaction_13 <= 0; /*   BtreePA.java:2307:stuckMemoryInitialization   BtreePA.java:2292:stuckMemoryInitialization   BtreePA.java:2556:editVariables   BtreePA.java:2550:editVariables   BtreePA.java:2520:<init>   BtreePA.java:3497:<init>   BtreePA.java:3496:test_verilog_find   BtreePA.java:3870:newTests   BtreePA.java:3877:main  */leaf_0_StuckSA_Memory_Based_23_base_offset <= 0;leaf_0_StuckSA_Copy_24 <= 0;leaf_0_StuckSA_Transaction_25 <= 0; /*   BtreePA.java:2307:stuckMemoryInitialization   BtreePA.java:2293:stuckMemoryInitialization   BtreePA.java:2556:editVariables   BtreePA.java:2550:editVariables   BtreePA.java:2520:<init>   BtreePA.java:3497:<init>   BtreePA.java:3496:test_verilog_find   BtreePA.java:3870:newTests   BtreePA.java:3877:main  */
     end
     else begin                                                                  // Run
+      `ifndef SYNTHESIS
+        T_10[113 +:5 ] <= Key;                                       // Load key
+        T_10[118+:4] <= Data;                                      // Connect data
+      `endif
       `ifndef SYNTHESIS
         $display            ("%4d  %4d  %b", steps, step, M_9);                  // Trace execution
         $fdisplay(traceFile, "%4d  %4d  %b", steps, step, M_9);                  // Trace execution in a file
