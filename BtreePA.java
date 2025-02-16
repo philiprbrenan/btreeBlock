@@ -2382,28 +2382,28 @@ $stuckBases
 
     if (reset) begin                                                            // Reset
       step      = 0;
-      `ifndef SYNTHESIS
-        steps    <= 0;
-      `endif
+     `ifndef SYNTHESIS
+        steps  <= 0;
+     `endif
       stopped  <= 0;
       $initialize_memory_M();                                                   // Initialize btree memory
       $initialize_memory_T();                                                   // Initialize btree transaction
       $initialize_opCodeMap();                                                  // Initialize op code map
-      `ifndef SYNTHESIS
+     `ifndef SYNTHESIS
         traceFile = $fopen("$traceFile", "w");                                  // Open trace file
         if (!traceFile) $fatal(1, "Cannot open trace file $traceFile");
-      `endif
+     `endif
       $stuckInitialization
-    end
-    else begin                                                                  // Run
-      `ifdef SYNTHESIS
+     `ifdef SYNTHESIS
         $T[$Key_at +:$Key_width ] <= Key;                                       // Load key
         $T[$Data_at+:$Data_width] <= Data;                                      // Connect data
-      `endif
-      `ifndef SYNTHESIS
+     `endif
+    end
+    else begin                                                                  // Run
+     `ifndef SYNTHESIS
         $display            ("%4d  %4d  %b", steps, step, $M);                  // Trace execution
         $fdisplay(traceFile, "%4d  %4d  %b", steps, step, $M);                  // Trace execution in a file
-      `endif
+     `endif
 """);
 
       final StringToNumbers ops = new StringToNumbers();                        // Collapse identical instructions
@@ -2465,9 +2465,9 @@ $stuckBases
       s.append("""
       endcase
       step = step + 1;
-      `ifndef SYNTHESIS
+     `ifndef SYNTHESIS
         steps <= steps + 1;
-      `endif
+     `endif
     end // Execute
   end // Always
 endmodule
@@ -2505,12 +2505,12 @@ module $project_tb;                                                             
         clock = 0; #1; clock = 1; #1;
       end
       if (stop) begin                                                           // Stopped
-        `ifndef SYNTHESIS
+       `ifndef SYNTHESIS
           testResults = $fopen("$testsFile", "w");
           $fdisplay(testResults, "Steps=%1d\\nKey=%1d\\ndata=%1d\\n",
             step, Key, data);
           $fclose(testResults);
-        `endif
+       `endif
       end
     end
   endtask
