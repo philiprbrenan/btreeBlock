@@ -67,6 +67,7 @@ END
   unlink $synthesis;
  }
 
+say STDERR "Synthesis of btreeBlock";
 gen(qw(find   2));
 gen(qw(delete 2));
 gen(qw(put    2));

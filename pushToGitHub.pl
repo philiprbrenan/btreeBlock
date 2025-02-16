@@ -43,6 +43,23 @@ writeFileUsingSavedToken($user, $repo, q(.config/geany/snippets.conf),          
                    readFile(q(/home/phil/.config/geany/snippets.conf)));
 writeFileUsingSavedToken($user, $repo, q(.config/geany/keybindings.conf),       # Save the keybindings file for the same reason
                   readFile(q(//home/phil/.config/geany/keybindings.conf)));
+writeFileUsingSavedToken($user, $repo, q(.config/bashrc),                       # Save bash commands that are useful for running synthesis on a server
+                         <<'END');
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias b='cd   ~/btreeBlock/'
+alias bv='cd  ~/btreeBlock/vivado'
+alias g='git status; git add *; git commit -m aaa; git push --force'
+alias gg='sudo rm -r ~/btreeBlock/; git clone git@github.com:philiprbrenan/btreeBlock.git; cd ~/btreeBlock'
+alias m='micro'
+alias dv='cd  ~/btreeBlock/verilog/delete/vivado/reports'
+alias fv='cd  ~/btreeBlock/verilog/find/vivado/reports'
+alias pv='cd  ~/btreeBlock/verilog/put/vivado/reports'
+alias s='perl ~/btreeBlock/vivado/synthesis.pl'
+alias t='top -u azureuser -E g'
+alias x='bash ~/btreeBlock/j.sh
+END
 
 if (1)                                                                          # Write workflow
  {my $d = dateTimeStamp;
