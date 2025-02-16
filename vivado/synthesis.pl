@@ -35,6 +35,27 @@ set_param general.maxThreads 1
 
 read_verilog ${project_dir}/${project}.v
 
+set_property PACKAGE_PIN A1  [get_ports {reset}]                                # Pin assignments
+#set_property PACKAGE_PIN A2  [get_ports {clock}]
+set_property PACKAGE_PIN A3  [get_ports {Key[0]}]
+set_property PACKAGE_PIN A4  [get_ports {Key[1]}]
+set_property PACKAGE_PIN A5  [get_ports {Key[2]}]
+set_property PACKAGE_PIN A6  [get_ports {Key[3]}]
+set_property PACKAGE_PIN A7  [get_ports {Key[4]}]
+set_property PACKAGE_PIN A8  [get_ports {Key[5]}]
+set_property PACKAGE_PIN A9  [get_ports {Data[0]}]
+set_property PACKAGE_PIN A10 [get_ports {Data[1]}]
+set_property PACKAGE_PIN A11 [get_ports {Data[2]}]
+set_property PACKAGE_PIN A12 [get_ports {Data[3]}]
+set_property PACKAGE_PIN A13 [get_ports {Data[4]}]
+set_property PACKAGE_PIN A14 [get_ports {stop}]
+set_property PACKAGE_PIN A15 [get_ports {found}]
+set_property PACKAGE_PIN B1  [get_ports {data[0]}]
+set_property PACKAGE_PIN B2  [get_ports {data[1]}]
+set_property PACKAGE_PIN B3  [get_ports {data[2]}]
+set_property PACKAGE_PIN B4  [get_ports {data[3]}]
+set_property PACKAGE_PIN B5  [get_ports {data[4]}]
+
 synth_design -name $project -top $project -part $part -include_dirs $includes_dir -flatten_hierarchy none
 write_checkpoint -force $dcp_dir/synth.dcp
 
