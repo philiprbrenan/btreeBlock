@@ -2383,7 +2383,9 @@ $stuckBases
 
     if (reset) begin                                                            // Reset
       step      = 0;
-      steps    <= 0;
+      `ifndef SYNTHESIS
+        steps    <= 0;
+      `endif
       stopped  <= 0;
       $initialize_memory_M();                                                   // Initialize btree memory
       $initialize_memory_T();                                                   // Initialize btree transaction
