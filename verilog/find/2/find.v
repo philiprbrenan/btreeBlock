@@ -29,13 +29,13 @@ module find(reset, stop, clock, pfd, Key, Data, data, found);               // D
   assign data  = T_10[28+:4];                                     // Data associated with key found
 
 reg [10:0] branch_0_StuckSA_Memory_Based_11_base_offset;
-reg [38:0] branch_0_StuckSA_Copy_12;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2299:stuckMemory   BtreePA.java:2282:stuckMemories   BtreePA.java:2551:editVariables   BtreePA.java:2546:editVariables   BtreePA.java:2516:<init>   BtreePA.java:3489:<init>   BtreePA.java:3488:test_verilog_find   BtreePA.java:3862:newTests   BtreePA.java:3869:main  */
-reg [47:0] branch_0_StuckSA_Transaction_13;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2300:stuckMemory   BtreePA.java:2282:stuckMemories   BtreePA.java:2551:editVariables   BtreePA.java:2546:editVariables   BtreePA.java:2516:<init>   BtreePA.java:3489:<init>   BtreePA.java:3488:test_verilog_find   BtreePA.java:3862:newTests   BtreePA.java:3869:main  */
+reg [38:0] branch_0_StuckSA_Copy_12;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2299:stuckMemory   BtreePA.java:2282:stuckMemories   BtreePA.java:2553:editVariables   BtreePA.java:2548:editVariables   BtreePA.java:2518:<init>   BtreePA.java:3491:<init>   BtreePA.java:3490:test_verilog_find   BtreePA.java:3864:newTests   BtreePA.java:3871:main  */
+reg [47:0] branch_0_StuckSA_Transaction_13;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2300:stuckMemory   BtreePA.java:2282:stuckMemories   BtreePA.java:2553:editVariables   BtreePA.java:2548:editVariables   BtreePA.java:2518:<init>   BtreePA.java:3491:<init>   BtreePA.java:3490:test_verilog_find   BtreePA.java:3864:newTests   BtreePA.java:3871:main  */
 reg[10: 0] index_branch_0_StuckSA_Memory_Based_11_base_offset;
 reg[10: 0] copyLength_branch_0_StuckSA_Memory_Based_11_base_offset;
 reg [10:0] leaf_0_StuckSA_Memory_Based_23_base_offset;
-reg [20:0] leaf_0_StuckSA_Copy_24;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2299:stuckMemory   BtreePA.java:2283:stuckMemories   BtreePA.java:2551:editVariables   BtreePA.java:2546:editVariables   BtreePA.java:2516:<init>   BtreePA.java:3489:<init>   BtreePA.java:3488:test_verilog_find   BtreePA.java:3862:newTests   BtreePA.java:3869:main  */
-reg [47:0] leaf_0_StuckSA_Transaction_25;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2300:stuckMemory   BtreePA.java:2283:stuckMemories   BtreePA.java:2551:editVariables   BtreePA.java:2546:editVariables   BtreePA.java:2516:<init>   BtreePA.java:3489:<init>   BtreePA.java:3488:test_verilog_find   BtreePA.java:3862:newTests   BtreePA.java:3869:main  */
+reg [20:0] leaf_0_StuckSA_Copy_24;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2299:stuckMemory   BtreePA.java:2283:stuckMemories   BtreePA.java:2553:editVariables   BtreePA.java:2548:editVariables   BtreePA.java:2518:<init>   BtreePA.java:3491:<init>   BtreePA.java:3490:test_verilog_find   BtreePA.java:3864:newTests   BtreePA.java:3871:main  */
+reg [47:0] leaf_0_StuckSA_Transaction_25;  /*   MemoryLayoutPA.java:0978:declareVerilog   BtreePA.java:2300:stuckMemory   BtreePA.java:2283:stuckMemories   BtreePA.java:2553:editVariables   BtreePA.java:2548:editVariables   BtreePA.java:2518:<init>   BtreePA.java:3491:<init>   BtreePA.java:3490:test_verilog_find   BtreePA.java:3864:newTests   BtreePA.java:3871:main  */
 reg[10: 0] index_leaf_0_StuckSA_Memory_Based_23_base_offset;
 reg[10: 0] copyLength_leaf_0_StuckSA_Memory_Based_23_base_offset;
 
@@ -44,7 +44,9 @@ reg[10: 0] copyLength_leaf_0_StuckSA_Memory_Based_23_base_offset;
 
     if (reset) begin                                                            // Reset
       step      = 0;
-      steps    <= 0;
+      `ifndef SYNTHESIS
+        steps    <= 0;
+      `endif
       stopped  <= 0;
       initialize_memory_M_9();                                                   // Initialize btree memory
       initialize_memory_T_10();                                                   // Initialize btree transaction
@@ -53,7 +55,7 @@ reg[10: 0] copyLength_leaf_0_StuckSA_Memory_Based_23_base_offset;
         traceFile = $fopen("trace.txt", "w");                                  // Open trace file
         if (!traceFile) $fatal(1, "Cannot open trace file trace.txt");
       `endif
-      branch_0_StuckSA_Memory_Based_11_base_offset <= 0;branch_0_StuckSA_Copy_12 <= 0;branch_0_StuckSA_Transaction_13 <= 0; /*   BtreePA.java:2307:stuckMemoryInitialization   BtreePA.java:2292:stuckMemoryInitialization   BtreePA.java:2552:editVariables   BtreePA.java:2546:editVariables   BtreePA.java:2516:<init>   BtreePA.java:3489:<init>   BtreePA.java:3488:test_verilog_find   BtreePA.java:3862:newTests   BtreePA.java:3869:main  */leaf_0_StuckSA_Memory_Based_23_base_offset <= 0;leaf_0_StuckSA_Copy_24 <= 0;leaf_0_StuckSA_Transaction_25 <= 0; /*   BtreePA.java:2307:stuckMemoryInitialization   BtreePA.java:2293:stuckMemoryInitialization   BtreePA.java:2552:editVariables   BtreePA.java:2546:editVariables   BtreePA.java:2516:<init>   BtreePA.java:3489:<init>   BtreePA.java:3488:test_verilog_find   BtreePA.java:3862:newTests   BtreePA.java:3869:main  */
+      branch_0_StuckSA_Memory_Based_11_base_offset <= 0;branch_0_StuckSA_Copy_12 <= 0;branch_0_StuckSA_Transaction_13 <= 0; /*   BtreePA.java:2307:stuckMemoryInitialization   BtreePA.java:2292:stuckMemoryInitialization   BtreePA.java:2554:editVariables   BtreePA.java:2548:editVariables   BtreePA.java:2518:<init>   BtreePA.java:3491:<init>   BtreePA.java:3490:test_verilog_find   BtreePA.java:3864:newTests   BtreePA.java:3871:main  */leaf_0_StuckSA_Memory_Based_23_base_offset <= 0;leaf_0_StuckSA_Copy_24 <= 0;leaf_0_StuckSA_Transaction_25 <= 0; /*   BtreePA.java:2307:stuckMemoryInitialization   BtreePA.java:2293:stuckMemoryInitialization   BtreePA.java:2554:editVariables   BtreePA.java:2548:editVariables   BtreePA.java:2518:<init>   BtreePA.java:3491:<init>   BtreePA.java:3490:test_verilog_find   BtreePA.java:3864:newTests   BtreePA.java:3871:main  */
     end
     else begin                                                                  // Run
       `ifndef SYNTHESIS
