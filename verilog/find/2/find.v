@@ -5,13 +5,13 @@
 `timescale 10ps/1ps
 (* keep_hierarchy = "yes" *)
 module find(reset, stop, clock, Key, Data, data, found);                    // Database on a chip
-  input                 reset;                                                  // Restart the program run sequence when this goes high
-  input                 clock;                                                  // Program counter clock
-  input [5 :0]  Key;                                                  // Input key
-  input [4:0] Data;                                                  // Input data
-  output                 stop;                                                  // Program has stopped when this goes high
-  output[4:0] data;                                                  // Output data
-  output                found;                                                  // Whether the key was found on put, find delete
+  input                   reset;                                                // Restart the program run sequence when this goes high
+  input                   clock;                                                // Program counter clock
+  input [5-1 :0]  Key;                                                // Input key
+  input [4-1:0] Data;                                                // Input data
+  output                   stop;                                                // Program has stopped when this goes high
+  output[4-1:0] data;                                                // Output data
+  output                  found;                                                // Whether the key was found on put, find delete
 
   `include "M.vh"                                                               // Memory holding a pre built tree from test_dump()
   `include "T.vh"                                                               // Transaction memory which is initialized to some values to reduce the complexity of Memory at by treating constants as variables

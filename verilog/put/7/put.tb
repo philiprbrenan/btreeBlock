@@ -4,13 +4,13 @@
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
 module put_tb;                                                             // Test bench for database on a chip
-  reg                  reset;                                                   // Restart the program run sequence when this goes high
-  reg                  stop;                                                    // Program has stopped when this goes high
-  reg                  clock;                                                   // Program counter clock
-  reg  [5 :0]Key  = 7;                                             // Input key
-  reg  [4:0]Data = 3;                                            // Input data
-  reg  [4:0]data;                                                    // Output data
-  reg                  found;                                                   // Whether the key was found on put, find delete
+  reg                   reset;                                                  // Restart the program run sequence when this goes high
+  reg                   stop;                                                   // Program has stopped when this goes high
+  reg                   clock;                                                  // Program counter clock
+  reg  [5 -1:0] Key  = 7;                                          // Input key
+  reg  [4-1:0]Data = 3;                                          // Input data
+  reg  [4-1:0]data;                                                  // Output data
+  reg                   found;                                                  // Whether the key was found on put, find delete
   integer testResults;                                                          // Test results file
 
   put a1(.reset(reset), .stop(stop), .clock(clock),                        // Connect to the module

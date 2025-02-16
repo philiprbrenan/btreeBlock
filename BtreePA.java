@@ -2364,13 +2364,13 @@ abstract class BtreePA extends Test                                             
 `timescale 10ps/1ps
 (* keep_hierarchy = "yes" *)
 module $project(reset, stop, clock, Key, Data, data, found);                    // Database on a chip
-  input                 reset;                                                  // Restart the program run sequence when this goes high
-  input                 clock;                                                  // Program counter clock
-  input [$bitsPerKey :0]  Key;                                                  // Input key
-  input [$bitsPerData:0] Data;                                                  // Input data
-  output                 stop;                                                  // Program has stopped when this goes high
-  output[$bitsPerData:0] data;                                                  // Output data
-  output                found;                                                  // Whether the key was found on put, find delete
+  input                   reset;                                                // Restart the program run sequence when this goes high
+  input                   clock;                                                // Program counter clock
+  input [$bitsPerKey-1 :0]  Key;                                                // Input key
+  input [$bitsPerData-1:0] Data;                                                // Input data
+  output                   stop;                                                // Program has stopped when this goes high
+  output[$bitsPerData-1:0] data;                                                // Output data
+  output                  found;                                                // Whether the key was found on put, find delete
 
   `include "M.vh"                                                               // Memory holding a pre built tree from test_dump()
   `include "T.vh"                                                               // Transaction memory which is initialized to some values to reduce the complexity of Memory at by treating constants as variables
@@ -2491,13 +2491,13 @@ endmodule
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
 module $project_tb;                                                             // Test bench for database on a chip
-  reg                  reset;                                                   // Restart the program run sequence when this goes high
-  reg                  stop;                                                    // Program has stopped when this goes high
-  reg                  clock;                                                   // Program counter clock
-  reg  [$bitsPerKey :0]Key  = $Key;                                             // Input key
-  reg  [$bitsPerData:0]Data = $Data;                                            // Input data
-  reg  [$bitsPerData:0]data;                                                    // Output data
-  reg                  found;                                                   // Whether the key was found on put, find delete
+  reg                   reset;                                                  // Restart the program run sequence when this goes high
+  reg                   stop;                                                   // Program has stopped when this goes high
+  reg                   clock;                                                  // Program counter clock
+  reg  [$bitsPerKey -1:0] Key  = $Key;                                          // Input key
+  reg  [$bitsPerData-1:0]Data = $Data;                                          // Input data
+  reg  [$bitsPerData-1:0]data;                                                  // Output data
+  reg                   found;                                                  // Whether the key was found on put, find delete
   integer testResults;                                                          // Test results file
 
   $project a1(.reset(reset), .stop(stop), .clock(clock),                        // Connect to the module
