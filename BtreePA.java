@@ -2409,7 +2409,7 @@ $stuckBases
         $T[$Data_at+:$Data_width] <= Data;                                      // Connect data
      `endif
     end
-    else begin                                                                  // Run
+    else if (clock) begin                                                                  // Run
      `ifndef SYNTHESIS
         $display            ("%4d  %4d  %b", steps, step, $M);                  // Trace execution
         $fdisplay(traceFile, "%4d  %4d  %b", steps, step, $M);                  // Trace execution in a file
