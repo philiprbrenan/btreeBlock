@@ -52,7 +52,7 @@ reg [10:0] leaf_0_StuckSA_Memory_Based_57_base_offset;
         T_44[118+:4] <= Data;                                      // Connect data
      `endif
     end
-    else begin                                                                  // Run
+    else if (clock) begin                                                                  // Run
      `ifndef SYNTHESIS
         $display            ("%4d  %4d  %b", steps, step, M_43);                  // Trace execution
         $fdisplay(traceFile, "%4d  %4d  %b", steps, step, M_43);                  // Trace execution in a file

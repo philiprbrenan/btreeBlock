@@ -545,7 +545,7 @@ abstract class StuckPA extends Test                                             
         final String        c = M.at(currentSize).verilogLoad();
         final int           N = maxSize();
 
-        v.append("/* StuckPA.search */");
+        v.append("/* StuckPA.search */\n");
         v.append(Found.verilogLoad()+" <= ( 0\n");                                // Found
         for (int i = 0; i < N; i++)
          {v.append(" || ("+M.at(sKey, i).verilogLoad()+" == "+s+" &&  "+i+ " < "+c+")\n");
@@ -646,7 +646,7 @@ abstract class StuckPA extends Test                                             
         final String        c = M.at(currentSize).verilogLoad() + (all ? "-0" : "-1");
         final int           N = maxSize();
 
-        v.append("/* StuckPA.searchFirstGreaterThanOrEqual */");
+        v.append("/* StuckPA.searchFirstGreaterThanOrEqual */\n");
         if (Found != null)                                                      // Found
          {v.append(Found.verilogLoad()+" <= ( 0\n");
           for (int i = 0; i < N; i++)

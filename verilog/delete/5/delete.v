@@ -90,7 +90,7 @@ reg[10: 0] copyLength_leaf_3_StuckSA_Memory_Based_32_base_offset;
         T_10[118+:4] <= Data;                                      // Connect data
      `endif
     end
-    else begin                                                                  // Run
+    else if (clock) begin                                                                  // Run
      `ifndef SYNTHESIS
         $display            ("%4d  %4d  %b", steps, step, M_9);                  // Trace execution
         $fdisplay(traceFile, "%4d  %4d  %b", steps, step, M_9);                  // Trace execution in a file
