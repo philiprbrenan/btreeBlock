@@ -6,6 +6,7 @@ package com.AppaApps.Silicon;                                                   
 // SplitBranch() in parallel. Concatenate currently blocks parallel but can be improved by concatenating to a known point.
 // isleaf() HasLeaves() and  other such queries like an If statement so we can evaluate the condition and jump in one instruction
 // Clean up node is leaf at end of delete()
+// Clock in the key/data to be used rather than using a large number of input pins
 import java.util.*;
 import java.nio.file.*;
 
@@ -2320,6 +2321,7 @@ abstract class BtreePA extends Test                                             
     final String projectFolder;                                                 // Folder in which to place verilog
     final String sourceVerilog;                                                 // Source verilog file
     final String   testVerilog;                                                 // Verilog test bench file
+    final String   constraints;                                                 // Verilog constraints file
     final String         mFile;                                                 // Folder in which to place include for btree memory
     final String         tFile;                                                 // Folder in which to place include for btree transaction memory
     final String     opCodeMap = "opCodeMap";                                   // Name of op code map
@@ -2344,6 +2346,7 @@ abstract class BtreePA extends Test                                             
       projectFolder = ""+Paths.get(folder, project, ""+Key());
       sourceVerilog = ""+Paths.get(projectFolder, project+Verilog.ext);
         testVerilog = ""+Paths.get(projectFolder, project+Verilog.testExt);
+        constraints = ""+Paths.get(projectFolder, project+Verilog.constraintsExt);
               mFile = ""+Paths.get(projectFolder, "includes", "M"+Verilog.header);
               tFile = ""+Paths.get(projectFolder, "includes", "T"+Verilog.header);
       opCodeMapFile = ""+Paths.get(projectFolder, "includes", opCodeMap+Verilog.header);
@@ -2524,8 +2527,33 @@ module $project_tb;                                                             
 endmodule
 """);
 
+      final StringBuilder x = new StringBuilder(                                // Constraints file
+"""
+set_property PACKAGE_PIN A1  [get_ports {reset}]
+set_property PACKAGE_PIN A2  [get_ports {clock}]
+set_property PACKAGE_PIN A3  [get_ports {Key[0]}]
+set_property PACKAGE_PIN A4  [get_ports {Key[1]}]
+set_property PACKAGE_PIN A5  [get_ports {Key[2]}]
+set_property PACKAGE_PIN A6  [get_ports {Key[3]}]
+set_property PACKAGE_PIN A7  [get_ports {Key[4]}]
+set_property PACKAGE_PIN A8  [get_ports {Key[5]}]
+set_property PACKAGE_PIN A9  [get_ports {Data[0]}]
+set_property PACKAGE_PIN A10 [get_ports {Data[1]}]
+set_property PACKAGE_PIN A11 [get_ports {Data[2]}]
+set_property PACKAGE_PIN A12 [get_ports {Data[3]}]
+set_property PACKAGE_PIN A13 [get_ports {Data[4]}]
+set_property PACKAGE_PIN A14 [get_ports {stop}]
+set_property PACKAGE_PIN A15 [get_ports {found}]
+set_property PACKAGE_PIN B1  [get_ports {data[0]}]
+set_property PACKAGE_PIN B2  [get_ports {data[1]}]
+set_property PACKAGE_PIN B3  [get_ports {data[2]}]
+set_property PACKAGE_PIN B4  [get_ports {data[3]}]
+set_property PACKAGE_PIN B5  [get_ports {data[4]}]
+""");
+
       writeFile(sourceVerilog, editVariables(s));                               // Write verilog module
       writeFile(testVerilog,   editVariables(t));                               // Write verilog test bench
+      writeFile(constraints,   editVariables(x));                               // Write verilog constraints file
       M.dumpVerilog(mFile);                                                     // Write include file to initialize main memory
       T.dumpVerilog(tFile, Key, Data);                                          // Write include file to initialize transaction memory excluding areas that will be loaded from the input ports
       P.traceMemory = M.memory();                                               // Request memory tracing

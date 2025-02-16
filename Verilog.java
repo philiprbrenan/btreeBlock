@@ -8,6 +8,7 @@ class Verilog extends Test                                                      
  {static final String ext     = ".v";                                           // File extension recognized by Vivado
   static final String header  = ".vh";                                          // Header file extension name recognized by Vivado
   static final String testExt = ".tb";                                          // Extension for test bench
+  static final String constraintsExt = ".xdc";                                  // Extension for constraionts file
 
 //D0 Tests                                                                      // Testing
 
@@ -15,6 +16,7 @@ class Verilog extends Test                                                      
    {ok(Verilog.ext    .equals(".v"));
     ok(Verilog.header .equals(".vh"));
     ok(Verilog.testExt.equals(".tb"));
+    ok(Verilog.constraintsExt.equals(".xdc"));
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
