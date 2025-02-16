@@ -545,19 +545,20 @@ abstract class StuckPA extends Test                                             
         final String        c = M.at(currentSize).verilogLoad();
         final int           N = maxSize();
 
-        v.append(Found.verilogLoad()+"= ( 0\n");                                // Found
+        v.append("/* StuckPA.search */");
+        v.append(Found.verilogLoad()+" <= ( 0\n");                                // Found
         for (int i = 0; i < N; i++)
          {v.append(" || ("+M.at(sKey, i).verilogLoad()+" == "+s+" &&  "+i+ " < "+c+")\n");
          }
         v.append(") ? 1 : 0;\n");
 
-        v.append(Index.verilogLoad()+" =\n");                                   // Index of found key if any
+        v.append(Index.verilogLoad()+" <=\n");                                   // Index of found key if any
         for (int i = 0; i < N; i++)
          {v.append(    "("+M.at(sKey, i).verilogLoad()+" == "+s+" && "+i+ " < "+c+") ? "+i+" :\n");
          }
         v.append("0;\n");
 
-        v.append(Data.verilogLoad()+" =\n");                                    // Data of found key if any
+        v.append(Data.verilogLoad()+" <=\n");                                    // Data of found key if any
         for (int i = 0; i < N; i++)
          {v.append(    "("+M.at(sKey, i).verilogLoad()+" == "+s+" && "+i+ " < "+c+") ? "+M.at(sData, i).verilogLoad()+" :\n");
          }
@@ -645,8 +646,9 @@ abstract class StuckPA extends Test                                             
         final String        c = M.at(currentSize).verilogLoad() + (all ? "-0" : "-1");
         final int           N = maxSize();
 
+        v.append("/* StuckPA.searchFirstGreaterThanOrEqual */");
         if (Found != null)                                                      // Found
-         {v.append(Found.verilogLoad()+"= ( 0\n");
+         {v.append(Found.verilogLoad()+" <= ( 0\n");
           for (int i = 0; i < N; i++)
            {v.append(" || ("+M.at(sKey, i).verilogLoad()+" >= "+s+" &&  "+i+ " < "+c+")\n");
            }
@@ -654,7 +656,7 @@ abstract class StuckPA extends Test                                             
          }
 
         if (Index != null)                                                      // Index of found
-         {v.append(Index.verilogLoad()+" =\n");
+         {v.append(Index.verilogLoad()+" <=\n");
           for (int i = 0; i < N; i++)
            {v.append(    "("+M.at(sKey, i).verilogLoad()+" >= "+s+" && "+i+ " < "+c+") ? "+i+" :\n");
            }
@@ -662,7 +664,7 @@ abstract class StuckPA extends Test                                             
          }
 
         if (Key != null)                                                        // Greater than or equal key
-         {v.append(Key.verilogLoad()+" =\n");
+         {v.append(Key.verilogLoad()+" <=\n");
           for (int i = 0; i < N; i++)
            {v.append(    "("+M.at(sKey, i).verilogLoad()+" >= "+s+" && "+i+ " < "+c+") ? "+M.at(sKey, i).verilogLoad()+" :\n");
            }
@@ -670,7 +672,7 @@ abstract class StuckPA extends Test                                             
          }
 
         if (Data != null)
-         {v.append(Data.verilogLoad()+" =\n");                                  // Data of found
+         {v.append(Data.verilogLoad()+" <=\n");                                 // Data of found
           for (int i = 0; i < N; i++)
            {v.append(    "("+M.at(sKey, i).verilogLoad()+" >= "+s+" && "+i+ " < "+c+") ? "+M.at(sData, i).verilogLoad()+" :\n");
            }
