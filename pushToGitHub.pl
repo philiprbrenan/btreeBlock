@@ -25,6 +25,8 @@ sub writeGitIgnore(@)                                                           
   owf(fpe($home, qw(.gitignore)), join "\n", @g);
  }
 
+say STDERR timeStamp,  " push to github $repo";
+
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
         @files = grep {!m(/\.|backups/|Classes/|verilog|vivado/runs/)} @files;  # Remove files that do not need to be saved
 my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
