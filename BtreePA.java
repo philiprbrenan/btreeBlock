@@ -2296,6 +2296,18 @@ abstract class BtreePA extends Test                                             
     for  (int l = 0; l < L; l++) s.append(stuckMemoryInitialization(l,   leafTransactions[l], Project));
     return s.toString();
    }
+/*
+WARNING: [Synth 8-6014] Unused sequential element copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:192]
+WARNING: [Synth 8-6014] Unused sequential element index_leaf_2_StuckSA_Memory_Based_29_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:193]
+WARNING: [Synth 8-6014] Unused sequential element index_leaf_1_StuckSA_Memory_Based_26_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:194]
+WARNING: [Synth 8-6014] Unused sequential element index_leaf_3_StuckSA_Memory_Based_32_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:324]
+WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_1_StuckSA_Memory_Based_14_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:470]
+WARNING: [Synth 8-6014] Unused sequential element index_branch_2_StuckSA_Memory_Based_17_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:471]
+WARNING: [Synth 8-6014] Unused sequential element index_branch_1_StuckSA_Memory_Based_14_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:472]
+WARNING: [Synth 8-6014] Unused sequential element index_branch_3_StuckSA_Memory_Based_20_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:604]
+WARNING: [Synth 8-6014] Unused sequential element copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:1159]
+WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_2_StuckSA_Memory_Based_17_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:1294]
+*/
 
   String stuckMemory(int n, StuckPA s, String Project)                          // Base address variable for one stuck
    {final boolean  delete = Project.equalsIgnoreCase("delete");                 // Generating delete

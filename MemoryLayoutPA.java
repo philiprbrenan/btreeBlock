@@ -101,8 +101,8 @@ class MemoryLayoutPA extends Test                                               
   String copyVerilogDec()                                                       // Verilog declaration
    {zz();
     final StringBuilder s = new StringBuilder();                                // Text of declaration
-    s.append("reg["+copySize()+": 0] "+copyIndex ()+"; "+traceComment()+"\n");
-    s.append("reg["+copySize()+": 0] "+copyLength()+"; "+traceComment()+"\n");
+    s.append("(* keep = \"true\" *)reg["+copySize()+": 0] "+copyIndex ()+"; "+traceComment()+"\n");
+    s.append("(* keep = \"true\" *)reg["+copySize()+": 0] "+copyLength()+"; "+traceComment()+"\n");
     return ""+s;
    }
 
@@ -396,7 +396,7 @@ class MemoryLayoutPA extends Test                                               
            }
          }
         String v()
-         {return target.verilogLoad()+" <= "+source.verilogLoad() + ";";
+         {return target.verilogLoad()+" <= "+source.verilogLoad() + "/* MemoryLayoutPA.move */\n;";
          }
         String n() {return field.name+"="+source.field.name;}
         void   i()  {}
@@ -424,7 +424,7 @@ class MemoryLayoutPA extends Test                                               
         String v()
          {final StringBuilder s = new StringBuilder();
           for(int i = 0; i < N; ++i)
-           {return Targets[i].verilogLoad()+" <= "+source.verilogLoad() + ";";
+           {return Targets[i].verilogLoad()+" <= "+source.verilogLoad() + "/* MemoryLayoutPA.moveTo */\n;";
            }
           return s.toString();
          }
@@ -459,7 +459,7 @@ class MemoryLayoutPA extends Test                                               
            }
          }
         String v()                                                              // Verilog
-         {final StringBuilder   s = new StringBuilder("/* Move Up */\n");
+         {final StringBuilder   s = new StringBuilder("/* MemoryLayoutPA.moveUp */\n");
           final String      start = Index == null ? "0" : Index.verilogLoad();  // Load above this index
           final MemoryLayoutPA tm = ml();                                       // Target memory
           final MemoryLayoutPA sm = buffer.ml();                                // Source memory
@@ -498,7 +498,7 @@ class MemoryLayoutPA extends Test                                               
            }
          }
         String v()                                                              // Verilog
-         {final StringBuilder   s = new StringBuilder("/* Move Down */\n");
+         {final StringBuilder   s = new StringBuilder("/* MemoryLayoutPA.moveDown */\n");
           final String      start = Index == null ? "0" : Index.verilogLoad();  // Load above this index
           final MemoryLayoutPA tm = ml();                                       // Target memory
           final MemoryLayoutPA sm = buffer.ml();                                // Source memory
@@ -536,7 +536,7 @@ class MemoryLayoutPA extends Test                                               
            }
          }
         String v()                                                              // Logarithmic move
-         {final StringBuilder v = new StringBuilder();
+         {final StringBuilder v = new StringBuilder("/* MemoryLayoutPA.copy */\n");
           final int    N = Length.width;                                        // Log2 of the largest possible copy
           final String l = Target.ml().copyLength(),                            // Length of move in bits
                        s = Source.ml().copyIndex(),                             // Source of move in backing memory
