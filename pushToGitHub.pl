@@ -11,7 +11,6 @@ use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
 use GitHub::Crud qw(:all);
 use feature qw(say current_sub);
-sub writeGitIgnore(@);                                                           # Write ignore to select just the files we want
 
 my $home = q(/home/phil/btreeBlock/);                                           # Home folder
 my $user = q(philiprbrenan);                                                    # User
@@ -19,6 +18,12 @@ my $repo = q(btreeBlock);                                                       
 my $wf   = q(.github/workflows/main.yml);                                       # Work flow on Ubuntu
 my @ext  = qw(.java .md .pl .txt .png .py .sv .tb .v .xdc);                     # Extensions of files to upload to github
 #  @ext  = qw(.java .md .pl .txt);                                              # Reduced set of files to upload to github
+
+sub writeGitIgnore(@)                                                           # Write ignore to select just the files we want
+ {my (@files) = @_;
+  my @g = ("*", map {"!$_"} @files);
+  owf(fpe($home, qw(.gitignore)), join "\\n", @files);
+ }
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
         @files = grep {!m(\A\.|backups/|Classes/|verilog|vivado/runs/)} @files; # Remove files that do not need to be saved
@@ -137,10 +142,4 @@ END
 
   my $f = writeFileUsingSavedToken $user, $repo, $wf, $y;                       # Upload workflow
   lll "$f  Ubuntu work flow for $repo";
- }
-
-sub writeGitIgnore(@)                                                           # Write ignore to select just the files we want
- {my (@files) = @_;
-  my @g = ("*", map {"!$_"} @files);
-  owf(fpe($home, qw(.gitignore)), @g);
  }
