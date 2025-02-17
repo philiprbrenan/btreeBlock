@@ -11,19 +11,21 @@ sub gen                                                                         
  {my ($project, $key) = @_;                                                     # Project, key
 
   my $home         =  $ENV{HOME};                                               # Home folder
-  my $project_dir  = "${home}/btreeBlock/verilog/${project}/$key";              # Location of project input files
-  my $project_out  = "${home}/btreeBlock/verilog/${project}/vivado";            # Location of project output files
-  my $includes_dir = "${project_dir}/includes";                                 # Set the path to the includes directory
-  my $reports_dir  = "${project_out}/reports";                                  # Reports
-  my $dcp_dir      = "${project_out}/dcp";                                      # Checkpoints
+  my $project_dir  = "$home/btreeBlock/verilog/$project/$key";                  # Location of project input files
+  my $project_out  = "$home/btreeBlock/verilog/$project/vivado";                # Location of project output files
+  my $includes_dir = "$project_dir/includes";                                   # Set the path to the includes directory
+  my $constraints  = "$home/btreeBlock/vivado/constraints.xdc";                 # Constraints file
+  my $reports_dir  = "$project_out/reports";                                    # Reports
+  my $dcp_dir      = "$project_out/dcp";                                        # Checkpoints
 
-  my $synthesis = "$home/btreeBlock/vivado/$project.tcl";                       # Generated vivado commands
-  my $vivado    = "$home/Vivado/2024.2/";                                       # Location of vivaldo
-  my $vivadoX   = "$home/Vivado/2024.2/bin/vivado";                             # Location of vivaldo executable
+  my $synthesis    = "$home/btreeBlock/vivado/$project.tcl";                    # Generated vivado commands
+  my $vivado       = "$home/Vivado/2024.2/";                                    # Location of vivaldo
+  my $vivadoX      = "$home/Vivado/2024.2/bin/vivado";                          # Location of vivaldo executable
 
   makePath fpd $reports_dir;                                                    # Ensure folder structure is present
   makePath fpd $dcp_dir;                                                        # Ensure folder structure is present
 
+  die "No such file: $constraints" unless -f $constraints;
   die "No such path: $reports_dir" unless -d $reports_dir;
   die "No such path: $dcp_dir"     unless -d $dcp_dir;
 
@@ -33,8 +35,8 @@ sub gen                                                                         
   owf($synthesis, <<"END");                                                     # Write tcl to run the synthesis
 set_param general.maxThreads 1
 
-read_verilog ${project_dir}/${project}.v
-read_xdc     ${project_dir}/${project}.xdc
+read_verilog $project_dir/$project.v
+read_xdc     $constraints
 
 synth_design -name $project -top $project -part $part -include_dirs $includes_dir -flatten_hierarchy none
 write_checkpoint -force $dcp_dir/synth.dcp
