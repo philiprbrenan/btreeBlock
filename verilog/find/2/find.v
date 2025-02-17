@@ -46,8 +46,8 @@ reg [10:0] leaf_0_StuckSA_Memory_Based_57_base_offset;
         traceFile = $fopen("trace.txt", "w");                                  // Open trace file
         if (!traceFile) $fatal(1, "Cannot open trace file trace.txt");
      `endif
-              branch_0_StuckSA_Memory_Based_45_base_offset <= 0; /*   BtreePA.java:2313:stuckMemoryInitialization   BtreePA.java:2293:stuckMemoryInitialization   BtreePA.java:2590:editVariables   BtreePA.java:2584:editVariables   BtreePA.java:2553:<init>   BtreePA.java:3531:<init>   BtreePA.java:3530:test_verilog_find   BtreePA.java:3904:newTests   BtreePA.java:3911:main  */
-        leaf_0_StuckSA_Memory_Based_57_base_offset <= 0; /*   BtreePA.java:2313:stuckMemoryInitialization   BtreePA.java:2294:stuckMemoryInitialization   BtreePA.java:2590:editVariables   BtreePA.java:2584:editVariables   BtreePA.java:2553:<init>   BtreePA.java:3531:<init>   BtreePA.java:3530:test_verilog_find   BtreePA.java:3904:newTests   BtreePA.java:3911:main  */
+              branch_0_StuckSA_Memory_Based_45_base_offset <= 0; /*   BtreePA.java:2313:stuckMemoryInitialization   BtreePA.java:2293:stuckMemoryInitialization   BtreePA.java:2635:editVariables   BtreePA.java:2629:editVariables   BtreePA.java:2598:<init>   BtreePA.java:3576:<init>   BtreePA.java:3575:test_verilog_find   BtreePA.java:3949:newTests   BtreePA.java:3956:main  */
+        leaf_0_StuckSA_Memory_Based_57_base_offset <= 0; /*   BtreePA.java:2313:stuckMemoryInitialization   BtreePA.java:2294:stuckMemoryInitialization   BtreePA.java:2635:editVariables   BtreePA.java:2629:editVariables   BtreePA.java:2598:<init>   BtreePA.java:3576:<init>   BtreePA.java:3575:test_verilog_find   BtreePA.java:3949:newTests   BtreePA.java:3956:main  */
 
      `ifdef SYNTHESIS
         T_44[113 +:5 ] <= Key;                                       // Load key
