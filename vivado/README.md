@@ -98,10 +98,38 @@ sudo swapon --show
 sudo sysctl vm.swappiness=99
 ```
 
+# Bash set up
+
+Placing the following commands in your ```.bashrc`` file speeds up development on the command line of a remote host:
+
+```
+alias b='cd   ~/btreeBlock/'
+alias bv='cd  ~/btreeBlock/vivado'
+alias g='git status; git add *; git commit -m aaa; git push --force'
+alias gg='cd; sudo rm -r ~/btreeBlock/; git clone git@github.com:philiprbrenan/btreeBlock.git; cd ~/btreeBlock'
+alias m='micro'
+alias dv='cd  ~/btreeBlock/verilog/delete/vivado/reports'
+alias fv='cd  ~/btreeBlock/verilog/find/vivado/reports'
+alias pv='cd  ~/btreeBlock/verilog/put/vivado/reports'
+alias s='perl ~/btreeBlock/vivado/synthesis.pl'
+alias t='top -u azureuser -E g'
+alias v='/home/azureuser/Vivado/2024.2/bin/vivado'
+alias x='bash ~/btreeBlock/j.sh
+```
+
 # Using Vivado
+
+Enter ```v``` on the command line of the remote host to run Vivado as a gui .
 
 ## Setting font size
 
 Tools->settings->display
+
+Set scaling to user defined at 250%
+
+## IO Pins
+
+Tools->IO Planning-> AutoPlace IO Ports
+Then File->Exports->Constraints as xdc file
 
 Set scaling to user defined at 250%
