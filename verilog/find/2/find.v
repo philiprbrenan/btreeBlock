@@ -31,7 +31,7 @@ reg [10:0] branch_0_StuckSA_Memory_Based_45_base_offset;
 reg [10:0] leaf_0_StuckSA_Memory_Based_57_base_offset;
 
 
-  always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
+  always @ (posedge clock) begin                                                // Execute next step in program
 
     if (reset) begin                                                            // Reset
       step      = 0;
@@ -54,7 +54,7 @@ reg [10:0] leaf_0_StuckSA_Memory_Based_57_base_offset;
         T_44[118+:4] <= Data;                                      // Connect data
      `endif
     end
-    else if (clock) begin                                                       // Run
+    else begin                                                                  // Run
      `ifndef SYNTHESIS
         $display            ("%4d  %4d  %b", steps, step, M_43);                  // Trace execution
         $fdisplay(traceFile, "%4d  %4d  %b", steps, step, M_43);                  // Trace execution in a file

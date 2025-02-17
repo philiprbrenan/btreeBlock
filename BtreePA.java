@@ -2300,19 +2300,21 @@ abstract class BtreePA extends Test                                             
     final StringBuilder t = new StringBuilder();
     t.append("reg ["+bitsPerAddress+":0] "+s.M.baseName() + ";\n");
     if (!find)
-     {t.append(s.C.declareVerilog());
-      t.append(s.T.declareVerilog());
-      t.append(s.M.copyVerilogDec());
+     {t.append(s.C.declareVerilog());                                           // Stuck copy area declaration for paralle moves
+      t.append(s.T.declareVerilog());                                           // Transaction memory which is ephemeral versus permanent main memory
+      t.append(s.M.copyVerilogDec());                                           // Copy veriables used when copying stucks
      }
     return ""+t;
    }
 
   String stuckMemoryInitialization(StuckPA s, String Project)                   // Initialization for one stuck
    {final boolean find = Project.equalsIgnoreCase("find");                      // Generating find
-    if (find) return "";
-    return s.M.baseName()+" <= 0;"+
-           s.C.name()    +" <= 0;"+
-           s.T.name()    +" <= 0;"+traceComment();
+    final StringBuilder t = new StringBuilder();
+    t.append("        " + s.M.baseName()+" <= 0;"+traceComment()+"\n");
+    if (find) return "" + t;
+    t.append("        " + s.C.name() +" <= 0;\n");
+    t.append("        " + s.T.name() +" <= 0;\n");
+    return ""+t;
    }
 
   abstract class GenVerilog                                                     // Generate verilog
@@ -2388,7 +2390,7 @@ module $project(reset, stop, clock, Key, Data, data, found);                    
 
 $stuckBases
 
-  always @ (posedge reset, posedge clock) begin                                 // Execute next step in program
+  always @ (posedge clock) begin                                                // Execute next step in program
 
     if (reset) begin                                                            // Reset
       step      = 0;
@@ -2409,7 +2411,7 @@ $stuckBases
         $T[$Data_at+:$Data_width] <= Data;                                      // Connect data
      `endif
     end
-    else if (clock) begin                                                                  // Run
+    else begin                                                                  // Run
      `ifndef SYNTHESIS
         $display            ("%4d  %4d  %b", steps, step, $M);                  // Trace execution
         $fdisplay(traceFile, "%4d  %4d  %b", steps, step, $M);                  // Trace execution in a file
