@@ -2280,40 +2280,43 @@ abstract class BtreePA extends Test                                             
     final StringBuilder s = new StringBuilder();
     final int B = find ? 1 : branchTransactions.length;
     final int L = find ? 1 :   leafTransactions.length;
-    for  (int b = 0; b < B; b++) s.append(stuckMemory(branchTransactions[b], Project));
-    for  (int l = 0; l < L; l++) s.append(stuckMemory(  leafTransactions[l], Project));
+    for  (int b = 0; b < B; b++) s.append(stuckMemory(b, branchTransactions[b], Project));
+    for  (int l = 0; l < L; l++) s.append(stuckMemory(l,   leafTransactions[l], Project));
     return s.toString();
    }
 
   String stuckMemoryInitialization(String Project)                              // Initialize based memory
-   {final boolean find = Project.equalsIgnoreCase("find");                      // Generating find
+   {final boolean  delete = Project.equalsIgnoreCase("delete");                 // Generating delete
+    final boolean    find = Project.equalsIgnoreCase("find");                   // Generating find
+    final boolean     put = Project.equalsIgnoreCase("put");                    // Generating put
     final StringBuilder s = new StringBuilder();
     final int B = find ? 1 : branchTransactions.length;
     final int L = find ? 1 :   leafTransactions.length;
-    for  (int b = 0; b < B; b++) s.append(stuckMemoryInitialization(branchTransactions[b], Project));
-    for  (int l = 0; l < L; l++) s.append(stuckMemoryInitialization(  leafTransactions[l], Project));
+    for  (int b = 0; b < B; b++) s.append(stuckMemoryInitialization(b, branchTransactions[b], Project));
+    for  (int l = 0; l < L; l++) s.append(stuckMemoryInitialization(l,   leafTransactions[l], Project));
     return s.toString();
    }
 
-  String stuckMemory(StuckPA s, String Project)                                 // Base address variable for one stuck
-   {final boolean find = Project.equalsIgnoreCase("find");                      // Generating find
+  String stuckMemory(int n, StuckPA s, String Project)                          // Base address variable for one stuck
+   {final boolean  delete = Project.equalsIgnoreCase("delete");                 // Generating delete
+    final boolean    find = Project.equalsIgnoreCase("find");                   // Generating find
+    final boolean     put = Project.equalsIgnoreCase("put");                    // Generating put
     final StringBuilder t = new StringBuilder();
-    t.append("reg ["+bitsPerAddress+":0] "+s.M.baseName() + ";\n");
-    if (!find)
-     {t.append(s.C.declareVerilog());                                           // Stuck copy area declaration for paralle moves
-      t.append(s.T.declareVerilog());                                           // Transaction memory which is ephemeral versus permanent main memory
-      t.append(s.M.copyVerilogDec());                                           // Copy veriables used when copying stucks
-     }
+    t.append("reg ["+bitsPerAddress+":0] "+s.M.baseName() + "; "+traceComment()+"\n");
+    if ((delete && (        n==1 || n==2 || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append(s.C.declareVerilog()+traceComment()+"\n");                  // Stuck copy area declaration for paralle moves
+    if ((delete && (n==0 || n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (n==0 || n==1 || n==2 || n==3))) t.append(s.T.declareVerilog()+traceComment()+"\n");                  // Transaction memory which is ephemeral versus permanent main memory
+    if ((delete && (        n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (        n==1 || n==2 || n==3))) t.append(s.M.copyVerilogDec()+traceComment()+"\n");                  // Copy veriables used when copying stucks
     return ""+t;
    }
 
-  String stuckMemoryInitialization(StuckPA s, String Project)                   // Initialization for one stuck
-   {final boolean find = Project.equalsIgnoreCase("find");                      // Generating find
+  String stuckMemoryInitialization(int n, StuckPA s, String Project)            // Initialization for one stuck
+   {final boolean  delete = Project.equalsIgnoreCase("delete");                 // Generating delete
+    final boolean    find = Project.equalsIgnoreCase("find");                   // Generating find
+    final boolean     put = Project.equalsIgnoreCase("put");                    // Generating put
     final StringBuilder t = new StringBuilder();
-    t.append("        " + s.M.baseName()+" <= 0;"+traceComment()+"\n");
-    if (find) return "" + t;
-    t.append("        " + s.C.name() +" <= 0;\n");
-    t.append("        " + s.T.name() +" <= 0;\n");
+    if ((delete && (        n==1 || n==2 || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append("        " + s.C.name()    +" <= 0;"+traceComment()+"\n");
+    if ((delete && (n==0 || n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (n==0 || n==1 || n==2 || n==3))) t.append("        " + s.M.baseName()+" <= 0;"+traceComment()+"\n");
+    if ((delete && (        n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (        n==1 || n==2 || n==3))) t.append("        " + s.T.name()    +" <= 0;"+traceComment()+"\n");
     return ""+t;
    }
 
@@ -3945,9 +3948,9 @@ set_property SLEW SLOW [get_ports stop]""");
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-      test_verilog_delete();
-      test_verilog_find();
-      test_verilog_put();
+    test_verilog_delete();
+    test_verilog_find();
+    test_verilog_put();
     //test_delete_small_random();
    }
 

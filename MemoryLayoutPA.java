@@ -101,8 +101,8 @@ class MemoryLayoutPA extends Test                                               
   String copyVerilogDec()                                                       // Verilog declaration
    {zz();
     final StringBuilder s = new StringBuilder();                                // Text of declaration
-    s.append("reg["+copySize()+": 0] "+copyIndex ()+";\n");
-    s.append("reg["+copySize()+": 0] "+copyLength()+";\n");
+    s.append("reg["+copySize()+": 0] "+copyIndex ()+"; "+traceComment()+"\n");
+    s.append("reg["+copySize()+": 0] "+copyLength()+"; "+traceComment()+"\n");
     return ""+s;
    }
 
