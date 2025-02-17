@@ -5,22 +5,26 @@ use strict;
 use Carp;
 use Data::Table::Text qw(:all);
 
-my $part = q(XC7Z007S);                                                         # Part $131 https://www.xilinx.com/products/boards-and-kits/1-1bkpiul.html
+my $part         = q(XC7Z007S);                                                 # Part $131 https://www.xilinx.com/products/boards-and-kits/1-1bkpiul.html
+
+my $home         =  "~/btreeBlock/";                                            # Home folder
+
+my $vivado       = "~/Vivado/2024.2/";                                          # Location of vivaldo
+my $vivadoX      = "~/Vivado/2024.2/bin/vivado";                                # Location of vivaldo executable
+
+die "No such path: $vivado"    unless -d $vivado  or -e "/home/phil";           # Check vivado files exist
+die "No such file: $vivadoX"   unless -f $vivadoX or -e "/home/phil";
 
 sub gen                                                                         # Generate tcl to synthesize design
  {my ($project, $key) = @_;                                                     # Project, key
 
-  my $home         =  $ENV{HOME};                                               # Home folder
-  my $project_dir  = "$home/btreeBlock/verilog/$project/$key";                  # Location of project input files
-  my $project_out  = "$home/btreeBlock/verilog/$project/vivado";                # Location of project output files
+  my $project_dir  = "$home/verilog/$project/$key";                             # Location of project input files
+  my $project_out  = "$home/verilog/$project/vivado";                           # Location of project output files
   my $includes_dir = "$project_dir/includes";                                   # Set the path to the includes directory
-  my $constraints  = "$home/btreeBlock/vivado/constraints.xdc";                 # Constraints file
+  my $synthesis    = "$home/vivado/$project.tcl";                               # Generated vivado commands
+  my $constraints  = "$home/vivado/constraints.xdc";                            # Constraints file
   my $reports_dir  = "$project_out/reports";                                    # Reports
   my $dcp_dir      = "$project_out/dcp";                                        # Checkpoints
-
-  my $synthesis    = "$home/btreeBlock/vivado/$project.tcl";                    # Generated vivado commands
-  my $vivado       = "$home/Vivado/2024.2/";                                    # Location of vivaldo
-  my $vivadoX      = "$home/Vivado/2024.2/bin/vivado";                          # Location of vivaldo executable
 
   makePath fpd $reports_dir;                                                    # Ensure folder structure is present
   makePath fpd $dcp_dir;                                                        # Ensure folder structure is present
@@ -28,9 +32,6 @@ sub gen                                                                         
   die "No such file: $constraints" unless -f $constraints;
   die "No such path: $reports_dir" unless -d $reports_dir;
   die "No such path: $dcp_dir"     unless -d $dcp_dir;
-
-  die "No such path: $vivado"    unless -d $vivado;
-  die "No such file: $vivadoX"   unless -f $vivadoX;
 
   owf($synthesis, <<"END");                                                     # Write tcl to run the synthesis
 set_param general.maxThreads 1
@@ -71,7 +72,10 @@ END
   unlink $synthesis;
  }
 
-say STDERR dateTimeStamp, " Synthesis of btreeBlock";
+say STDERR dateTimeStamp, " Generate   btreeBlock";                             # Create the verilog files
+say STDERR qx(cd $home; bash j.sh BtreePA);
+
+say STDERR dateTimeStamp, " Synthesize btreeBlock";                             # Synthesize the verilog description
 gen(qw(find   2));
 gen(qw(delete 2));
 gen(qw(put    2));

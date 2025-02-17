@@ -11,17 +11,17 @@ use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
 use GitHub::Crud qw(:all);
 use feature qw(say current_sub);
+sub writeGitIgnore(@);                                                           # Write ignore to select just the files we want
 
 my $home = q(/home/phil/btreeBlock/);                                           # Home folder
 my $user = q(philiprbrenan);                                                    # User
 my $repo = q(btreeBlock);                                                       # Repo
 my $wf   = q(.github/workflows/main.yml);                                       # Work flow on Ubuntu
-my @ext  = qw(.java .md .pl .txt .png .py .sv .tb .v);                          # All files to upload to github
+my @ext  = qw(.java .md .pl .txt .png .py .sv .tb .v .xdc);                     # Extensions of files to upload to github
 #  @ext  = qw(.java .md .pl .txt);                                              # Reduced set of files to upload to github
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
-        @files = grep {!m(z/|machine|perl|vivado/)} @files;                     # Remove files that do not need to be saved
-        @files = grep {!m(verilog/|git/objects/)}   @files;                     # Remove files that do not need to be saved
+        @files = grep {!m(\A\.|backups/|Classes/|verilog|vivado/runs/)} @files; # Remove files that do not need to be saved
 my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
 
 if (0)                                                                          # Upload via github crud
@@ -36,7 +36,8 @@ if (0)                                                                          
    }
  }
 else                                                                            # Upload files via git
- {qx(git add *; git commit -m aaa; git push --force);                           # Force used to overcome changes to workflow file which is used as a surrogate for any change
+ {writeGitIgnore(@files);
+  qx(git add *; git commit -m aaa; git push --force);                           # Force used to overcome changes to workflow file which is used as a surrogate for any change
  }
 
 writeFileUsingSavedToken($user, $repo, q(.config/geany/snippets.conf),          # Save the snippets file as this was the thing I missed most after a rebuild
@@ -136,4 +137,10 @@ END
 
   my $f = writeFileUsingSavedToken $user, $repo, $wf, $y;                       # Upload workflow
   lll "$f  Ubuntu work flow for $repo";
+ }
+
+sub writeGitIgnore(@)                                                           # Write ignore to select just the files we want
+ {my (@files) = @_;
+  my @g = ("*", map {"!$_"} @files);
+  owf(fpe($home, qw(.gitignore)), @g);
  }
