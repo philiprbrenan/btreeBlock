@@ -83,6 +83,9 @@ perl synthesis.pl
 ```
 # Enable swap space
 
+This might help simulate more memory if Vovado runs out of memory.
+Normally it seems to take aboit 15GB.
+
 ```
 sudo dmesg | grep -i 'oom'
 sudo swapon --show
@@ -94,3 +97,11 @@ sudo swapon            /swapfile
 sudo swapon --show
 sudo sysctl vm.swappiness=99
 ```
+
+# Using Vivado
+
+## Setting font size
+
+Tools->settings->display
+
+Set scaling to user defined at 250%
