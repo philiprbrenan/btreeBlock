@@ -43,6 +43,7 @@ opt_design
 write_checkpoint -force $dcp_dir/opt.dcp
 
 report_utilization       -file $reports_dir/utilization.rpt
+report_methodology       -file $reports_dir/methodology.rpt
 report_timing_summary    -file $reports_dir/timing.rpt
 report_power             -file $reports_dir/power.rpt
 report_drc               -file $reports_dir/drc.rpt
