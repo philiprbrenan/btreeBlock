@@ -5,12 +5,18 @@ use strict;
 use Carp;
 use Data::Table::Text qw(:all);
 
-my $part         = q(XC7Z007S);                                                 # Part $131 https://www.xilinx.com/products/boards-and-kits/1-1bkpiul.html
+my $project       = q(btreeBlock);                                              # The name of the project
+my $part          = q(XC7Z007S);                                                # Part $131 https://www.xilinx.com/products/boards-and-kits/1-1bkpiul.html
 
-my $home         =  "~/btreeBlock/";                                            # Home folder
+my $localHome     = "/home/phil/";                                              # Home on local machine
+my $local         = -e $localHome;                                              # On local machine
+my $home          = fpd(($local ? $localHome : "/home/azureuser/"));            # Working folder
+my $projectDir    = fpd $home, $project;                                        # Folder containing generated verilog files
+my $verilogDir    = fpd $projectDir, q(verilog);                                # Folder containing generated verilog files
+my $vivadoDir     = fpd $projectDir, q(vivado);                                 # Folder containing vivado specific files
 
-my $vivado       = "~/Vivado/2024.2/";                                          # Location of vivaldo
-my $vivadoX      = "~/Vivado/2024.2/bin/vivado";                                # Location of vivaldo executable
+my $vivado        = fpd $home,   qw(Vivado 2024.2);                             # Location of vivaldo installation
+my $vivadoX       = fpf $vivado, qw(bin vivado);                                # Location of vivaldo executable
 
 die "No such path: $vivado"    unless -d $vivado  or -e "/home/phil";           # Check vivado files exist
 die "No such file: $vivadoX"   unless -f $vivadoX or -e "/home/phil";
@@ -18,64 +24,64 @@ die "No such file: $vivadoX"   unless -f $vivadoX or -e "/home/phil";
 sub gen                                                                         # Generate tcl to synthesize design
  {my ($project, $key) = @_;                                                     # Project, key
 
-  my $project_dir  = "$home/verilog/$project/$key";                             # Location of project input files
-  my $project_out  = "$home/verilog/$project/vivado";                           # Location of project output files
-  my $includes_dir = "$project_dir/includes";                                   # Set the path to the includes directory
-  my $synthesis    = "$home/vivado/$project.tcl";                               # Generated vivado commands
-  my $constraints  = "$home/vivado/constraints.xdc";                            # Constraints file
-  my $reports_dir  = "$project_out/reports";                                    # Reports
-  my $dcp_dir      = "$project_out/dcp";                                        # Checkpoints
+  my $projectDir  = fpd $verilogDir, $project, $key;                            # Location of project input files
+  my $projectOut  = fpd $verilogDir, $project, qw(vivado);                      # Location of project output files
+  my $includesDir = fpd $projectDir, qw(includes);                              # Set the path to the includes directory
+  my $reportsDir  = fpd $projectOut, qw(reports);                               # Reports
+  my $dcpDir      = fpd $projectOut, qw(dcp);                                   # Checkpoints
+  my $synthesis   = fpe $vivadoDir, $project, qw(tcl);                          # Generated vivado commands
+  my $constraints = fpe $vivadoDir, qw(constraints xdc);                        # Constraints file
 
-  makePath fpd $reports_dir;                                                    # Ensure folder structure is present
-  makePath fpd $dcp_dir;                                                        # Ensure folder structure is present
+  makePath fpd $reportsDir;                                                     # Ensure folder structure is present
+  makePath fpd $dcpDir;                                                         # Ensure folder structure is present
 
   die "No such file: $constraints" unless -f $constraints;
-  die "No such path: $reports_dir" unless -d $reports_dir;
-  die "No such path: $dcp_dir"     unless -d $dcp_dir;
+  die "No such path: $reportsDir"  unless -d $reportsDir;
+  die "No such path: $dcpDir"      unless -d $dcpDir;
 
   owf($synthesis, <<"END");                                                     # Write tcl to run the synthesis
 set_param general.maxThreads 1
 
-read_verilog $project_dir/$project.v
+read_verilog $projectDir/$project.v
 read_xdc     $constraints
 
-synth_design -name $project -top $project -part $part -include_dirs $includes_dir -flatten_hierarchy none
-write_checkpoint -force $dcp_dir/synth.dcp
+synth_design -name $project -top $project -part $part -include_dirs $includesDir -flatten_hierarchy none
+write_checkpoint -force $dcpDir/synth.dcp
 
 opt_design
-write_checkpoint -force $dcp_dir/opt.dcp
+write_checkpoint -force $dcpDir/opt.dcp
 
-report_utilization       -file $reports_dir/utilization.rpt
-report_methodology       -file $reports_dir/methodology.rpt
-report_timing_summary    -file $reports_dir/timing.rpt
-report_power             -file $reports_dir/power.rpt
-report_drc               -file $reports_dir/drc.rpt
-report_clock_interaction -file $reports_dir/clock_interaction.rpt
-report_cdc               -file $reports_dir/cdc.rpt
-report_control_sets      -file $reports_dir/control.rpt
-report_bus_skew          -file $reports_dir/bus_skew.rpt
-report_high_fanout_nets  -file $reports_dir/fanout.rpt
+report_utilization       -file $reportsDir/utilization.rpt
+report_methodology       -file $reportsDir/methodology.rpt
+report_timing_summary    -file $reportsDir/timing.rpt
+report_power             -file $reportsDir/power.rpt
+report_drc               -file $reportsDir/drc.rpt
+report_clock_interaction -file $reportsDir/clock_interaction.rpt
+report_cdc               -file $reportsDir/cdc.rpt
+report_control_sets      -file $reportsDir/control.rpt
+report_bus_skew          -file $reportsDir/bus_skew.rpt
+report_high_fanout_nets  -file $reportsDir/fanout.rpt
 
 #place_design
-#write_checkpoint -force $dcp_dir/place.dcp
+#write_checkpoint -force $dcpDir/place.dcp
 
 #route_design
-#write_checkpoint -force $dcp_dir/route.dcp
+#write_checkpoint -force $dcpDir/route.dcp
 
 # Need pin locations
-#write_bitstream  -force $project_dir/final.bit
+#write_bitstream  -force $projectDir/final.bit
 END
 
   say STDERR dateTimeStamp, " $project";                                        # Run tcl
-  say STDERR qx($vivadoX -mode batch -source $synthesis 1>$reports_dir/1.txt);
+  say STDERR qx($vivadoX -mode batch -source $synthesis 1>$reportsDir/1.txt);
 
-  unlink $synthesis;
+  #unlink $synthesis;
  }
 
 say STDERR dateTimeStamp, " Generate   btreeBlock";                             # Create the verilog files
-say STDERR qx(cd $home; bash j.sh BtreePA);
+say STDERR qx(cd $projectDir; bash j.sh BtreePA);
 
 say STDERR dateTimeStamp, " Synthesize btreeBlock";                             # Synthesize the verilog description
 gen(qw(find   2));
-gen(qw(delete 2));
-gen(qw(put    2));
+#gen(qw(delete 2));
+#gen(qw(put    2));
