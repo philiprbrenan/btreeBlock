@@ -2278,8 +2278,8 @@ abstract class BtreePA extends Test                                             
   String stuckMemories(String Project)                                          // Declare variables holding the base addresses of all based memory elements
    {final boolean find = Project.equalsIgnoreCase("find");                      // Generating find
     final StringBuilder s = new StringBuilder();
-    final int B = find ? 1 : branchTransactions.length;
-    final int L = find ? 1 :   leafTransactions.length;
+    final int B = branchTransactions.length;
+    final int L =   leafTransactions.length;
     for  (int b = 0; b < B; b++) s.append(stuckMemory(b, branchTransactions[b], Project));
     for  (int l = 0; l < L; l++) s.append(stuckMemory(l,   leafTransactions[l], Project));
     return s.toString();
@@ -2290,8 +2290,8 @@ abstract class BtreePA extends Test                                             
     final boolean    find = Project.equalsIgnoreCase("find");                   // Generating find
     final boolean     put = Project.equalsIgnoreCase("put");                    // Generating put
     final StringBuilder s = new StringBuilder();
-    final int B = find ? 1 : branchTransactions.length;
-    final int L = find ? 1 :   leafTransactions.length;
+    final int B = branchTransactions.length;
+    final int L =   leafTransactions.length;
     for  (int b = 0; b < B; b++) s.append(stuckMemoryInitialization(b, branchTransactions[b], Project));
     for  (int l = 0; l < L; l++) s.append(stuckMemoryInitialization(l,   leafTransactions[l], Project));
     return s.toString();
@@ -2303,8 +2303,8 @@ abstract class BtreePA extends Test                                             
     final boolean     put = Project.equalsIgnoreCase("put");                    // Generating put
     final StringBuilder t = new StringBuilder();
     t.append("reg ["+bitsPerAddress+":0] "+s.M.baseName() + "; "+traceComment()+"\n");
-    if ((delete && (        n==1 || n==2 || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append(s.C.declareVerilog()+traceComment()+"\n");                  // Stuck copy area declaration for paralle moves
-    if ((delete && (n==0 || n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (n==0 || n==1 || n==2 || n==3))) t.append(s.T.declareVerilog()+traceComment()+"\n");                  // Transaction memory which is ephemeral versus permanent main memory
+    if ((delete && (        n==1         || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append(s.C.declareVerilog()+traceComment()+"\n");                  // Stuck copy area declaration for paralle moves
+    if ((delete && (n==0 || n==1 || n==2 || n==3))                     || (put && (n==0 || n==1 || n==2 || n==3))) t.append(s.T.declareVerilog()+traceComment()+"\n");                  // Transaction memory which is ephemeral versus permanent main memory
     if ((delete && (        n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (        n==1 || n==2 || n==3))) t.append(s.M.copyVerilogDec()+traceComment()+"\n");                  // Copy veriables used when copying stucks
     return ""+t;
    }
@@ -2314,9 +2314,9 @@ abstract class BtreePA extends Test                                             
     final boolean    find = Project.equalsIgnoreCase("find");                   // Generating find
     final boolean     put = Project.equalsIgnoreCase("put");                    // Generating put
     final StringBuilder t = new StringBuilder();
-    if ((delete && (        n==1 || n==2 || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append("        " + s.C.name()    +" <= 0;"+traceComment()+"\n");
+    if ((delete && (        n==1         || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append("        " + s.C.name()    +" <= 0;"+traceComment()+"\n");
+    if ((delete && (        n==1 || n==2 || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append("        " + s.T.name()    +" <= 0;"+traceComment()+"\n");
     if ((delete && (n==0 || n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (n==0 || n==1 || n==2 || n==3))) t.append("        " + s.M.baseName()+" <= 0;"+traceComment()+"\n");
-    if ((delete && (        n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (        n==1 || n==2 || n==3))) t.append("        " + s.T.name()    +" <= 0;"+traceComment()+"\n");
     return ""+t;
    }
 
