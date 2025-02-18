@@ -7,7 +7,6 @@ use Data::Table::Text qw(:all);
 # https://docs.amd.com/v/u/en-US/zynq-7000-product-selection-guide
 my $project       = q(btreeBlock);                                              # The name of the project
 my $part          = q(XC7Z007S);
-   $part          = q(XC7Z100);
 
 my $localHome     = "/home/phil/";                                              # Home on local machine
 my $local         = -e $localHome;                                              # On local machine
