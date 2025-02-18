@@ -2297,6 +2297,7 @@ abstract class BtreePA extends Test                                             
     return s.toString();
    }
 /*
+Delete
 WARNING: [Synth 8-6014] Unused sequential element copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:192]
 WARNING: [Synth 8-6014] Unused sequential element index_leaf_2_StuckSA_Memory_Based_29_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:193]
 WARNING: [Synth 8-6014] Unused sequential element index_leaf_1_StuckSA_Memory_Based_26_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:194]
@@ -2307,6 +2308,23 @@ WARNING: [Synth 8-6014] Unused sequential element index_branch_1_StuckSA_Memory_
 WARNING: [Synth 8-6014] Unused sequential element index_branch_3_StuckSA_Memory_Based_20_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:604]
 WARNING: [Synth 8-6014] Unused sequential element copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:1159]
 WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_2_StuckSA_Memory_Based_17_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:1294]
+
+Put
+WARNING: [Synth 8-6014] Unused sequential element branch_2_StuckSA_Copy_86_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:105]
+WARNING: [Synth 8-6014] Unused sequential element leaf_2_StuckSA_Copy_98_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:115]
+WARNING: [Synth 8-6014] Unused sequential element leaf_3_StuckSA_Copy_101_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:118]
+WARNING: [Synth 8-6014] Unused sequential element copyLength_leaf_3_StuckSA_Memory_Based_100_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:314]
+WARNING: [Synth 8-6014] Unused sequential element index_leaf_1_StuckSA_Memory_Based_94_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:315]
+WARNING: [Synth 8-6014] Unused sequential element index_leaf_3_StuckSA_Memory_Based_100_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:316]
+WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_3_StuckSA_Memory_Based_88_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:494]
+WARNING: [Synth 8-6014] Unused sequential element index_branch_1_StuckSA_Memory_Based_82_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:495]
+WARNING: [Synth 8-6014] Unused sequential element index_branch_3_StuckSA_Memory_Based_88_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:496]
+WARNING: [Synth 8-6014] Unused sequential element index_leaf_2_StuckSA_Memory_Based_97_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:711]
+WARNING: [Synth 8-6014] Unused sequential element copyLength_leaf_1_StuckSA_Memory_Based_94_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:966]
+WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_1_StuckSA_Memory_Based_82_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:1243]
+WARNING: [Synth 8-6014] Unused sequential element index_branch_2_StuckSA_Memory_Based_85_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:1244]
+WARNING: [Synth 8-6014] Unused sequential element copyLength_leaf_2_StuckSA_Memory_Based_97_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:1554]
+WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_2_StuckSA_Memory_Based_85_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:1757]
 */
 
   String stuckMemory(int n, StuckPA s, String Project)                          // Base address variable for one stuck
@@ -2314,7 +2332,7 @@ WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_2_StuckSA_Me
     final boolean    find = Project.equalsIgnoreCase("find");                   // Generating find
     final boolean     put = Project.equalsIgnoreCase("put");                    // Generating put
     final StringBuilder t = new StringBuilder();
-    t.append("reg ["+bitsPerAddress+":0] "+s.M.baseName() + "; "+traceComment()+"\n");
+    t.append("reg ["+bitsPerAddress+"-1:0] "+s.M.baseName() + "; "+traceComment()+"\n");
     if ((delete && (        n==1         || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append(s.C.declareVerilog()+traceComment()+"\n");                  // Stuck copy area declaration for paralle moves
     if ((delete && (n==0 || n==1 || n==2 || n==3))                     || (put && (n==0 || n==1 || n==2 || n==3))) t.append(s.T.declareVerilog()+traceComment()+"\n");                  // Transaction memory which is ephemeral versus permanent main memory
     if ((delete && (        n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (        n==1 || n==2 || n==3))) t.append(s.M.copyVerilogDec()+traceComment()+"\n");                  // Copy veriables used when copying stucks

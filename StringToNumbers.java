@@ -61,7 +61,7 @@ class StringToNumbers extends Test                                              
   void genVerilog(String file, String name)                                     // Verilog to map sets of numbers to the ordinal of the element in the order and then writethe verilog to a file
    {final StringBuilder s = new StringBuilder();
     final int N = outputOrder.size(), L = logTwo(N);
-    s.append("reg ["+L+" : 0] "+name+"["+max+" : 0];\n");
+    s.append("reg ["+L+"-1: 0] "+name+"["+max+" : 0];\n");
     s.append("task initialize_"+name+";\n");
     s.append("  begin\n");
     for (int i = 0; i < N; i++)
@@ -104,8 +104,9 @@ d [6]
     if (true)
      {final String t = tempFile();
       s.genVerilog(t, "caseMap");
+      //stop(joinLines(readFile(t))+"\n");
       ok(joinLines(readFile(t))+"\n", """
-reg [2 : 0] caseMap[6 : 0];
+reg [2-1: 0] caseMap[6 : 0];
 task initialize_caseMap;
   begin
         caseMap[1] <= 0;

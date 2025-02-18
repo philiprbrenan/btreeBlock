@@ -117,15 +117,35 @@ alias v='/home/azureuser/Vivado/2024.2/bin/vivado'
 alias x='bash ~/btreeBlock/j.sh
 ```
 
+# Install lxde
+
+On the server install the lightweight desktop lxde
+
+```
+sudo apt-get install lxde x2goserver x2goserver-xsession
+```
+
+And add a password for ```azureuser``` using:
+
+```
+sud
+```
+
+On the client:
+
+```
+sudo apt-get install x2goclient
+```
+
+Then run the client to connect to the graphics desktop provided by the server.
+
 # Using Vivado
 
 Enter ```v``` on the command line of the remote host to run Vivado as a gui .
 
 ## Setting font size
 
-Tools->settings->display
-
-Set scaling to user defined at 250%
+```lxappearance``` set font size to 20 and everything should be visible
 
 ## IO Pins
 

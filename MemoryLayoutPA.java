@@ -101,8 +101,8 @@ class MemoryLayoutPA extends Test                                               
   String copyVerilogDec()                                                       // Verilog declaration
    {zz();
     final StringBuilder s = new StringBuilder();                                // Text of declaration
-    s.append("(* keep = \"true\" *)reg["+copySize()+": 0] "+copyIndex ()+"; "+traceComment()+"\n");
-    s.append("(* keep = \"true\" *)reg["+copySize()+": 0] "+copyLength()+"; "+traceComment()+"\n");
+    s.append("(* keep = \"true\" *)reg["+copySize()+"-1: 0] "+copyIndex ()+"; "+traceComment()+"\n");
+    s.append("(* keep = \"true\" *)reg["+copySize()+"-1: 0] "+copyLength()+"; "+traceComment()+"\n");
     return ""+s;
    }
 
@@ -987,8 +987,8 @@ class MemoryLayoutPA extends Test                                               
    {zz();
     final int N = memory.bits.length-1, B = logTwo(N)-1;
     final StringBuilder s = new StringBuilder();
-    if (based == null) s.append("reg ["+N+":0] "+name()    +"; ");              // Actual memory if it is not based
-    else               s.append("reg ["+B+":0] "+baseName()+"; ");              // Base offset for this memory
+    if (based == null) s.append("reg ["+N+"-1:0] "+name()    +"; ");            // Actual memory if it is not based
+    else               s.append("reg ["+B+"-1:0] "+baseName()+"; ");            // Base offset for this memory
     s.append(traceComment()); s.append("\n");
     return s.toString();
    }
@@ -1875,11 +1875,11 @@ Line T       At      Wide       Size    Indices        Value   Name
     final String M = m.copyVerilogDec();
     final String N = n.copyVerilogDec();
 
-    ok(M.contains("reg[4: 0] index_M"));
-    ok(M.contains("reg[4: 0] copyLength_M"));
+    ok(M.contains("reg[4-1: 0] index_M"));
+    ok(M.contains("reg[4-1: 0] copyLength_M"));
 
-    ok(N.contains("reg[4: 0] index_N"));
-    ok(N.contains("reg[4: 0] copyLength_N"));
+    ok(N.contains("reg[4-1: 0] index_N"));
+    ok(N.contains("reg[4-1: 0] copyLength_N"));
    }
 
   static void test_copy_variable()
@@ -1955,8 +1955,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_dump_verilog_ignore();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
