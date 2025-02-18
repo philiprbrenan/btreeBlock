@@ -7,6 +7,7 @@ use Data::Table::Text qw(:all);
 
 my $project       = q(btreeBlock);                                              # The name of the project
 my $part          = q(XC7Z007S);                                                # Part $131 https://www.xilinx.com/products/boards-and-kits/1-1bkpiul.html
+   $part          = q(XC7Z100);                                                # Part $131 https://www.xilinx.com/products/boards-and-kits/1-1bkpiul.html
 
 my $localHome     = "/home/phil/";                                              # Home on local machine
 my $local         = -e $localHome;                                              # On local machine
@@ -62,14 +63,13 @@ report_control_sets      -file $reportsDir/control.rpt
 report_bus_skew          -file $reportsDir/bus_skew.rpt
 report_high_fanout_nets  -file $reportsDir/fanout.rpt
 
-#place_design
-#write_checkpoint -force $dcpDir/place.dcp
+place_design
+write_checkpoint -force $dcpDir/place.dcp
 
-#route_design
-#write_checkpoint -force $dcpDir/route.dcp
+route_design
+write_checkpoint -force $dcpDir/route.dcp
 
-# Need pin locations
-#write_bitstream  -force $projectDir/final.bit
+write_bitstream  -force $projectDir/final.bit
 END
 
   say STDERR dateTimeStamp, " $project";                                        # Run tcl
