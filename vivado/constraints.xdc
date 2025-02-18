@@ -11,7 +11,7 @@ set_property PACKAGE_PIN G18 [get_ports {Key[3]}]
 set_property PACKAGE_PIN H18 [get_ports {Key[2]}]
 set_property PACKAGE_PIN J18 [get_ports {Key[1]}]
 set_property PACKAGE_PIN K18 [get_ports {Key[0]}]
-set_property PACKAGE_PIN K14 [get_ports clock]
+set_property PACKAGE_PIN K11 [get_ports clock]                                  # Clock capable pin because it has SRCC or MRCC in its name.
 set_property PACKAGE_PIN K16 [get_ports found]
 set_property PACKAGE_PIN K17 [get_ports reset]
 set_property PACKAGE_PIN K19 [get_ports stop]
