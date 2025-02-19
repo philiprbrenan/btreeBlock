@@ -21,7 +21,7 @@ my @ext  = qw(.java .md .pl .txt .png .py .sv .tb .v .xdc);                     
 
 sub writeGitIgnore(@)                                                           # Write ignore to select just the files we want
  {my (@files) = @_;
-  my @g = ("*", map {"!$_"} @files);
+  my @g = ("*", map {"!$_"} map {swapFilePrefix $_, $home} @files);
   owf(fpe($home, qw(gitignore)), join "\n", @g);
  }
 
