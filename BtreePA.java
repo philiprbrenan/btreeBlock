@@ -2356,7 +2356,6 @@ WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_2_StuckSA_Me
     final String projectFolder;                                                 // Folder in which to place verilog
     final String sourceVerilog;                                                 // Source verilog file
     final String   testVerilog;                                                 // Verilog test bench file
-    final String   constraints;                                                 // Verilog constraints file
     final String         mFile;                                                 // Folder in which to place include for btree memory
     final String         tFile;                                                 // Folder in which to place include for btree transaction memory
     final String     opCodeMap = "opCodeMap";                                   // Name of op code map
@@ -2381,7 +2380,6 @@ WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_2_StuckSA_Me
       projectFolder = ""+Paths.get(folder, project, ""+Key());
       sourceVerilog = ""+Paths.get(projectFolder, project+Verilog.ext);
         testVerilog = ""+Paths.get(projectFolder, project+Verilog.testExt);
-        constraints = ""+Paths.get(projectFolder, project+Verilog.constraintsExt);
               mFile = ""+Paths.get(projectFolder, "includes", "M"+Verilog.header);
               tFile = ""+Paths.get(projectFolder, "includes", "T"+Verilog.header);
       opCodeMapFile = ""+Paths.get(projectFolder, "includes", opCodeMap+Verilog.header);
@@ -2539,14 +2537,18 @@ module $project_tb;                                                             
     .Key(Key), .Data(Data), .data(data), .found(found));
 
   initial begin                                                                 // Test the module
-    reset = 0; #1; reset = 1; #1; reset = 0; #1;                                // Reset the module
+    clock = 0; reset = 0; #1;                                                   // Reset the module
+    clock = 1; reset = 1; #1;
+    clock = 0; reset = 0; #1;
     execute();
   end
 
   task execute;                                                                 // Clock the module until it says it has stopped
     integer step;
     begin
-      for(step = 0; step < $maxSteps && !stop ; step = step + 1) begin
+       $display("AAAA %d", stop);
+      for(step = 0; step < $maxSteps && !stop; step = step + 1) begin
+        $display("AAAA %d %d", step, stop);
         clock = 0; #1; clock = 1; #1;
       end
       if (stop) begin                                                           // Stopped
@@ -2562,77 +2564,11 @@ module $project_tb;                                                             
 endmodule
 """);
 
-      final StringBuilder x = new StringBuilder(                                // Constraints file
-"""
-set_property PACKAGE_PIN A20 [get_ports {Data[3]}]
-set_property PACKAGE_PIN B20 [get_ports {Data[2]}]
-set_property PACKAGE_PIN C20 [get_ports {Data[1]}]
-set_property PACKAGE_PIN D20 [get_ports {Data[0]}]
-set_property PACKAGE_PIN B19 [get_ports {data[3]}]
-set_property PACKAGE_PIN D19 [get_ports {data[2]}]
-set_property PACKAGE_PIN E19 [get_ports {data[1]}]
-set_property PACKAGE_PIN F19 [get_ports {data[0]}]
-set_property PACKAGE_PIN E18 [get_ports {Key[4]}]
-set_property PACKAGE_PIN G18 [get_ports {Key[3]}]
-set_property PACKAGE_PIN H18 [get_ports {Key[2]}]
-set_property PACKAGE_PIN J18 [get_ports {Key[1]}]
-set_property PACKAGE_PIN K18 [get_ports {Key[0]}]
-set_property PACKAGE_PIN K14 [get_ports clock]
-set_property PACKAGE_PIN K16 [get_ports found]
-set_property PACKAGE_PIN K17 [get_ports reset]
-set_property PACKAGE_PIN K19 [get_ports stop]
-set_property DIRECTION IN [get_ports {Key[4]}]
-set_property IOSTANDARD LVCMOS18 [get_ports {Key[4]}]
-set_property DIRECTION IN [get_ports {Key[3]}]
-set_property IOSTANDARD LVCMOS18 [get_ports {Key[3]}]
-set_property DIRECTION IN [get_ports {Key[2]}]
-set_property IOSTANDARD LVCMOS18 [get_ports {Key[2]}]
-set_property DIRECTION IN [get_ports {Key[1]}]
-set_property IOSTANDARD LVCMOS18 [get_ports {Key[1]}]
-set_property DIRECTION IN [get_ports {Key[0]}]
-set_property IOSTANDARD LVCMOS18 [get_ports {Key[0]}]
-set_property DIRECTION IN [get_ports {Data[3]}]
-set_property IOSTANDARD LVCMOS18 [get_ports {Data[3]}]
-set_property DIRECTION IN [get_ports {Data[2]}]
-set_property IOSTANDARD LVCMOS18 [get_ports {Data[2]}]
-set_property DIRECTION IN [get_ports {Data[1]}]
-set_property IOSTANDARD LVCMOS18 [get_ports {Data[1]}]
-set_property DIRECTION IN [get_ports {Data[0]}]
-set_property IOSTANDARD LVCMOS18 [get_ports {Data[0]}]
-set_property DIRECTION OUT [get_ports {data[3]}]
-set_property IOSTANDARD LVCMOS18 [get_ports {data[3]}]
-set_property DRIVE 12 [get_ports {data[3]}]
-set_property SLEW SLOW [get_ports {data[3]}]
-set_property DIRECTION OUT [get_ports {data[2]}]
-set_property IOSTANDARD LVCMOS18 [get_ports {data[2]}]
-set_property DRIVE 12 [get_ports {data[2]}]
-set_property SLEW SLOW [get_ports {data[2]}]
-set_property DIRECTION OUT [get_ports {data[1]}]
-set_property IOSTANDARD LVCMOS18 [get_ports {data[1]}]
-set_property DRIVE 12 [get_ports {data[1]}]
-set_property SLEW SLOW [get_ports {data[1]}]
-set_property DIRECTION OUT [get_ports {data[0]}]
-set_property IOSTANDARD LVCMOS18 [get_ports {data[0]}]
-set_property DRIVE 12 [get_ports {data[0]}]
-set_property SLEW SLOW [get_ports {data[0]}]
-set_property DIRECTION IN [get_ports clock]
-set_property IOSTANDARD LVCMOS18 [get_ports clock]
-set_property DIRECTION OUT [get_ports found]
-set_property IOSTANDARD LVCMOS18 [get_ports found]
-set_property DRIVE 12 [get_ports found]
-set_property SLEW SLOW [get_ports found]
-set_property DIRECTION IN [get_ports reset]
-set_property IOSTANDARD LVCMOS18 [get_ports reset]
-set_property DIRECTION OUT [get_ports stop]
-set_property IOSTANDARD LVCMOS18 [get_ports stop]
-set_property DRIVE 12 [get_ports stop]
-set_property SLEW SLOW [get_ports stop]""");
-
       writeFile(sourceVerilog, editVariables(s));                               // Write verilog module
       writeFile(testVerilog,   editVariables(t));                               // Write verilog test bench
-      writeFile(constraints,   editVariables(x));                               // Write verilog constraints file
       M.dumpVerilog(mFile);                                                     // Write include file to initialize main memory
       T.dumpVerilog(tFile, Key, Data);                                          // Write include file to initialize transaction memory excluding areas that will be loaded from the input ports
+
       P.traceMemory = M.memory();                                               // Request memory tracing
       P.run(javaTraceFile);                                                     // Run the java version and trace it
 
@@ -2649,8 +2585,8 @@ set_property SLEW SLOW [get_ports stop]""");
      {zz();
       final StringBuilder s = new StringBuilder(editVariables("cd $projectFolder && iverilog $project.tb $project.v -Iincludes -g2012 -o $project && ./$project"));
       final ExecCommand   x = new ExecCommand(s);
-      final String        e = joinLines(readFile(javaTraceFile));
-      final String        g = joinLines(readFile(traceFile));
+      final String        e = joinLines(readFile(javaTraceFile));               // Read java output
+      final String        g = joinLines(readFile(traceFile));                   // Execute verilog
       ok(x.exitCode, 0);                                                        // Confirm exit code
       ok(12, g, e);                                                             // Width of margin in verilog traces
       //ok(0, g, e);                                                              // Width of margin in verilog traces
