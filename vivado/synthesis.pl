@@ -82,5 +82,5 @@ say STDERR qx(cd $projectDir; bash j.sh BtreePA);
 
 say STDERR dateTimeStamp, " Synthesize btreeBlock";                             # Synthesize the verilog description
 gen(qw(find   2));
-gen(qw(delete 2));
-gen(qw(put    2));
+#gen(qw(delete 2));
+#gen(qw(put    2));
