@@ -14,7 +14,7 @@ use feature qw(say current_sub);
 
 my $home = q(/home/phil/btreeBlock/);                                           # Home folder
 my $user = q(philiprbrenan);                                                    # User
-my $repo = q(btreeBlock);                                                       # Repo
+my $repo = q(btreeBlock2);                                                      # Repo
 my $wf   = q(.github/workflows/main.yml);                                       # Work flow on Ubuntu
 my @ext  = qw(.java .md .pl .txt .png .py .sv .tb .v .xdc);                     # Extensions of files to upload to github
 #  @ext  = qw(.java .md .pl .txt);                                              # Reduced set of files to upload to github
