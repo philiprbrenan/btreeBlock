@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// BtreeSA in pseudo assembler
+// BtreeSA in pseudo assembler.
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024-2025
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
@@ -2171,7 +2171,7 @@ abstract class BtreePA extends Test                                             
             //P.parallelSection(); tt(node_findFirstGreaterThanOrEqualInBranch, parent);
             //P.parallelEnd();
 
-            findFirstGreaterThanOrEqualInBranch(parent, T.at(Key), null, T.at(first), T.at(next));
+            findFirstGreaterThanOrEqualInBranch(parent, T.at(Key), null, T.at(first), T.at(child));
 
             P.parallelStart();   tt(index, first);
             P.parallelSection(); tt(node_balance, parent);
@@ -2179,10 +2179,11 @@ abstract class BtreePA extends Test                                             
 
             balance();                                                          // Make sure there are enough entries in the parent to permit a deletion
 
-            P.parallelStart();   tt(child,       next);
-            P.parallelSection(); tt(node_isLeaf, next);
-            P.parallelSection(); isLeaf(T.at(next));
-            P.parallelEnd();
+            //P.parallelStart();   tt(child,       next);
+            //P.parallelSection(); tt(node_isLeaf, next);
+            //P.parallelSection(); isLeaf(T.at(next));
+            //P.parallelEnd();
+            isLeaf(T.at(child));
 
             P.new If (T.at(IsLeaf))                                             // Reached a leaf
              {void Then()
@@ -2570,6 +2571,7 @@ endmodule
       T.dumpVerilog(tFile, Key, Data);                                          // Write include file to initialize transaction memory excluding areas that will be loaded from the input ports
 
       P.traceMemory = M.memory();                                               // Request memory tracing
+      deleteFile(javaTraceFile);
       P.run(javaTraceFile);                                                     // Run the java version and trace it
 
       //ok(P.steps, expSteps());                                                // Steps in java code
@@ -2584,6 +2586,7 @@ endmodule
     private void execVerilogTest()                                              // Execute the verilog test and compare it with the results from execution under Java
      {zz();
       final StringBuilder s = new StringBuilder(editVariables("cd $projectFolder && iverilog $project.tb $project.v -Iincludes -g2012 -o $project && ./$project"));
+      deleteFile(traceFile);
       final ExecCommand   x = new ExecCommand(s);
       final String        e = joinLines(readFile(javaTraceFile));               // Read java output
       final String        g = joinLines(readFile(traceFile));                   // Execute verilog
