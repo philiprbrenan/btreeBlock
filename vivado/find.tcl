@@ -3,7 +3,7 @@ set_param general.maxThreads 1
 read_verilog /home/phil/btreeBlock/verilog/find/2//find.v
 read_xdc     /home/phil/btreeBlock/vivado/constraints.xdc
 
-synth_design -name find -top find -part XC7Z100 -include_dirs /home/phil/btreeBlock/verilog/find/2/includes/ -flatten_hierarchy none
+synth_design -name find -top find -part XC7Z007S -include_dirs /home/phil/btreeBlock/verilog/find/2/includes/ -flatten_hierarchy none
 write_checkpoint -force /home/phil/btreeBlock/verilog/find/vivado/dcp//synth.dcp
 
 opt_design
@@ -26,4 +26,4 @@ write_checkpoint -force /home/phil/btreeBlock/verilog/find/vivado/dcp//place.dcp
 route_design
 write_checkpoint -force /home/phil/btreeBlock/verilog/find/vivado/dcp//route.dcp
 
-write_bitstream  -force /home/phil/btreeBlock/verilog/find/2//final.bit
+#write_bitstream  -force /home/phil/btreeBlock/verilog/find/2//final.bit

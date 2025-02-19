@@ -69,7 +69,7 @@ write_checkpoint -force $dcpDir/place.dcp
 route_design
 write_checkpoint -force $dcpDir/route.dcp
 
-write_bitstream  -force $projectDir/final.bit
+#write_bitstream  -force $projectDir/final.bit
 END
 
   say STDERR dateTimeStamp, " $project";                                        # Run tcl
