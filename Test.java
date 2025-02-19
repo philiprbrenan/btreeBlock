@@ -486,21 +486,22 @@ public class Test                                                               
    {writeFile(filePath, new StringBuilder(string));
    }
 
-  static void deleteFile(String filePath)                                       // Delete a file
+  static void deleteFile(String filePath, boolean required)                     // Delete a file
    {try
      {Files.delete(Paths.get(filePath));
      }
     catch (Exception e)
-     {stop("Cannot delete file", filePath, e);
+     {if (required) stop("Cannot delete file", filePath, e);
      }
    }
+  static void deleteFile(String filePath) {deleteFile(filePath, false);}
 
   static void makePath(String folder)                                           // Make a path
    {try
      {Files.createDirectories(Paths.get(folder));
      }
     catch (Exception e)
-     {stop("Cannot mzkd path", folder, e);
+     {stop("Cannot make path", folder, e);
      }
    }
 
