@@ -985,7 +985,7 @@ class MemoryLayoutPA extends Test                                               
 
   String declareVerilog()                                                       // Declare matching memory  but do not initialize it
    {zz();
-    final int N = memory.bits.length, B = logTwo(N);
+    final int N = memory.bits.length-1, B = logTwo(N);
     final StringBuilder s = new StringBuilder();
     if (based == null) s.append("reg ["+N+":0] "+name()    +"; ");              // Actual memory if it is not based
     else               s.append("reg ["+B+":0] "+baseName()+"; ");              // Base offset for this memory

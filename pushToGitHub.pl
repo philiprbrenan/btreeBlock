@@ -47,7 +47,7 @@ else                                                                            
  {writeGitIgnore(@files);
   qx(git add *; git commit -m aaa; git push --force);                           # Force used to overcome changes to workflow file which is used as a surrogate for any change
  }
-exit;
+
 writeFileUsingSavedToken($user, $repo, q(.config/geany/snippets.conf),          # Save the snippets file as this was the thing I missed most after a rebuild
                    readFile(q(/home/phil/.config/geany/snippets.conf)));
 writeFileUsingSavedToken($user, $repo, q(.config/geany/keybindings.conf),       # Save the keybindings file for the same reason
