@@ -5,6 +5,7 @@ use strict;
 use Carp;
 use Data::Table::Text qw(:all);
 # https://docs.amd.com/v/u/en-US/zynq-7000-product-selection-guide
+# Clock was k11 now C7
 my $project       = q(btreeBlock);                                              # The name of the project
 my $part          = q(XC7Z007S);
 
