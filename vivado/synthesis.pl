@@ -8,6 +8,7 @@ use Data::Table::Text qw(:all);
 # Clock was k11 now C7
 my $project       = q(btreeBlock);                                              # The name of the project
 my $part          = q(XC7Z007S);
+   $part          = q(XC7V585T);
 
 my $localHome     = "/home/phil/";                                              # Home on local machine
 my $local         = -e $localHome;                                              # On local machine
