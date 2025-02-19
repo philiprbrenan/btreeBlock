@@ -40,7 +40,7 @@ sub gen                                                                         
   die "No such path: $reportsDir"  unless -d $reportsDir;
   die "No such path: $dcpDir"      unless -d $dcpDir;
 
-  owf($synthesis, <<"END");                                                     # Write tcl to run the synthesis
+  my @s = <<"END";                                                              # Write tcl to run the synthesis
 set_param general.maxThreads 1
 
 read_verilog $projectDir/$project.v
@@ -69,8 +69,15 @@ write_checkpoint -force $dcpDir/place.dcp
 route_design
 write_checkpoint -force $dcpDir/route.dcp
 
-#write_bitstream  -force $projectDir/final.bit
 END
+
+  if ($project =~ m(find)is)                                                    # Write bit stream
+   {push @s, <<END;
+write_bitstream  -force $projectDir/final.bit
+END
+   }
+
+  owf($synthesis, join "\n", @s);                                               # Write tcl to run the synthesis
 
   say STDERR dateTimeStamp, " $project";                                        # Run tcl
   say STDERR qx($vivadoX -mode batch -source $synthesis 1>$reportsDir/1.txt);
