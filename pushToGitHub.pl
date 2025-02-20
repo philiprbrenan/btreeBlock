@@ -34,7 +34,7 @@ if (1)                                                                          
    }
  }
 
-if (0)                                                                          # Upload via github crud
+if  (0)                                                                          # Upload via github crud
  {for my $s(@files)                                                             # Upload each selected file
    {my $c = readBinaryFile $s;                                                  # Load file
 
