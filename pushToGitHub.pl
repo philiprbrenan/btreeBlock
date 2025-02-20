@@ -16,7 +16,7 @@ my $home = q(/home/phil/btreeBlock/);                                           
 my $user = q(philiprbrenan);                                                    # User
 my $repo = q(btreeBlock);                                                       # Repo
 my $wf   = q(.github/workflows/main.yml);                                       # Work flow on Ubuntu
-my @ext  = qw(.java .md .pl .txt .png .py .sv .tb .v .xdc);                     # Extensions of files to upload to github
+my @ext  = qw(.java .md .pl .txt .png .py .rpt .sv .tb .xdc);                   # Extensions of files to upload to github
 #  @ext  = qw(.java .md .pl .txt);                                              # Reduced set of files to upload to github
 
 sub writeGitIgnore(@)                                                           # Write ignore to select just the files we want
@@ -28,7 +28,7 @@ sub writeGitIgnore(@)                                                           
 say STDERR timeStamp,  " push to github $repo";
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
-        @files = grep {!m(/\.|backups/|Classes/|verilog|vivado/runs/)} @files;  # Remove files that do not need to be saved
+        @files = grep {!m(/\.|backups/|Classes/|vivado/runs/)} @files;          # Remove files that do not need to be saved
         @files = grep {!m(7zSeriesALL/)} @files;
 my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
 
