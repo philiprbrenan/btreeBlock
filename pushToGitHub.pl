@@ -26,7 +26,7 @@ push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              
         @files = grep {!m(7zSeriesALL/)} @files;
 my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
 
-if (1)                                                                          # Remove most of the verilofg as it is very bulky and slows up commits a lot
+if (1)                                                                          # Remove most of the verilog as it is very bulky and slows up commits a lot
  {my @f = @files; @files = ();
   for my $f(@f)
    {next if $f =~ m(verilog) and $f !~ m(/vivado/reports/);
