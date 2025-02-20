@@ -72,13 +72,8 @@ write_checkpoint -force $dcpDir/place.dcp
 route_design
 write_checkpoint -force $dcpDir/route.dcp
 
-END
-
-  if ($project =~ m(find)is)                                                    # Write bit stream
-   {push @s, <<END;
 write_bitstream  -force $projectDir/final.bit
 END
-   }
 
   owf($synthesis, join "\n", @s);                                               # Write tcl to run the synthesis
 
@@ -88,10 +83,12 @@ END
   #unlink $synthesis;
  }
 
-say STDERR dateTimeStamp, " Generate   btreeBlock";                             # Create the verilog files
-#say STDERR qx(cd $projectDir; bash j.sh BtreePA);
+if (!-e q(/home/phil/))                                                         # Create the verilog files
+ {say STDERR dateTimeStamp, " Generate   btreeBlock";
+  say STDERR qx(cd $projectDir; bash j.sh BtreePA);
+ }
 
 say STDERR dateTimeStamp, " Synthesize btreeBlock";                             # Synthesize the verilog description
 gen(qw(find   2));
-#gen(qw(delete 2));
-#gen(qw(put    2));
+gen(qw(delete 2));
+gen(qw(put    2));

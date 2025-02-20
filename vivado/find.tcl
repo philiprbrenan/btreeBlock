@@ -26,5 +26,4 @@ write_checkpoint -force /home/phil/btreeBlock/verilog/find/vivado/dcp//place.dcp
 route_design
 write_checkpoint -force /home/phil/btreeBlock/verilog/find/vivado/dcp//route.dcp
 
-
 write_bitstream  -force /home/phil/btreeBlock/verilog/find/2//final.bit

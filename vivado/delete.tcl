@@ -1,9 +1,9 @@
 set_param general.maxThreads 1
 
 read_verilog /home/phil/btreeBlock/verilog/delete/2//delete.v
-read_xdc     /home/phil/btreeBlock/vivado/constraints.xdc
+read_xdc     /home/phil/btreeBlock/vivado/constraints/xc7a200tffv1156-2.xdc
 
-synth_design -name delete -top delete -part XC7Z100 -include_dirs /home/phil/btreeBlock/verilog/delete/2/includes/ -flatten_hierarchy none
+synth_design -name delete -top delete -part xc7a200tffv1156-2 -include_dirs /home/phil/btreeBlock/verilog/delete/2/includes/ -flatten_hierarchy none
 write_checkpoint -force /home/phil/btreeBlock/verilog/delete/vivado/dcp//synth.dcp
 
 opt_design
