@@ -16,12 +16,12 @@ my $home = q(/home/phil/btreeBlock/);                                           
 my $user = q(philiprbrenan);                                                    # User
 my $repo = q(btreeBlock);                                                       # Repo
 my $wf   = q(.github/workflows/main.yml);                                       # Work flow on Ubuntu
-my @ext  = qw(.java .md .pl .txt .png .py .rpt .sv .tb .xdc);                   # Extensions of files to upload to github
+my @ext  = qw(.java .md .pl .txt .png .py .rpt .xdc);                           # Extensions of files to upload to github
 #  @ext  = qw(.java .md .pl .txt);                                              # Reduced set of files to upload to github
 
 sub writeGitIgnore(@)                                                           # Write ignore to select just the files we want
  {my (@files) = @_;
-  my @g = ("*", map {"!$_"} map {swapFilePrefix $_, $home} @files);
+  my @g = ("*", "**", map {"!$_"} map {swapFilePrefix $_, $home} @files);
   owf(fpe($home, qw(gitignore)), join "\n", @g);
  }
 
