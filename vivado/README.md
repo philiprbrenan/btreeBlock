@@ -105,6 +105,7 @@ Placing the following commands in your ```.bashrc`` file speeds up development o
 ```
 alias b='cd   ~/btreeBlock/'
 alias bv='cd  ~/btreeBlock/vivado'
+alias G= "grep -Iinr -P"
 alias g='git status; git add *; git commit -m aaa; git push --force'
 alias gg='cd; sudo rm -r ~/btreeBlock/; git clone git@github.com:philiprbrenan/btreeBlock.git; cd ~/btreeBlock'
 alias m='micro'
