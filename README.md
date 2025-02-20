@@ -10,12 +10,20 @@ http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html
 
 # Roadmap
 
-I implemented the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [Java](https://en.wikipedia.org/wiki/Java_(programming_language)), then successively reduced the [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) [code](https://en.wikipedia.org/wiki/Computer_program) until it looked just like [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program), at which point it was easy to
-generate a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) in [Verilog](https://en.wikipedia.org/wiki/Verilog) to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program):
+I implemented the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in
+[Java](https://en.wikipedia.org/wiki/Java_(programming_language)),
+then successively reduced the [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) [code](https://en.wikipedia.org/wiki/Computer_program)
+until it looked just like [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program),
+at which point it was easy to generate a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit)
+in [Verilog](https://en.wikipedia.org/wiki/Verilog)
+to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program):
 ![Roadmap](flowChart/DevelopmentFlowChart.png)
 
-The [Verilog](https://en.wikipedia.org/wiki/Verilog) [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) will now be implemented on an [fpga](https://en.wikipedia.org/wiki/Field-programmable_gate_array) and then as an [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) to
+The [Verilog](https://en.wikipedia.org/wiki/Verilog) [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) has now been synthesized on an
+[fpga](https://en.wikipedia.org/wiki/Field-programmable_gate_array) as a prelude to implementing it
+as an [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) to
 implement the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [hardware](https://en.wikipedia.org/wiki/Digital_electronics) rather than [software](https://en.wikipedia.org/wiki/Software).
+
 ```
 -----------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
