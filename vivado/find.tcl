@@ -1,9 +1,9 @@
 set_param general.maxThreads 1
 
 read_verilog /home/phil/btreeBlock/verilog/find/2//find.v
-read_xdc     /home/phil/btreeBlock/vivado/constraints.xdc
+read_xdc     /home/phil/btreeBlock/vivado/constraints/xc7a200tffv1156-2.xdc
 
-synth_design -name find -top find -part XC7V585T -include_dirs /home/phil/btreeBlock/verilog/find/2/includes/ -flatten_hierarchy none
+synth_design -name find -top find -part xc7a200tffv1156-2 -include_dirs /home/phil/btreeBlock/verilog/find/2/includes/ -flatten_hierarchy none
 write_checkpoint -force /home/phil/btreeBlock/verilog/find/vivado/dcp//synth.dcp
 
 opt_design

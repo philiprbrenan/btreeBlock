@@ -8,7 +8,8 @@ use Data::Table::Text qw(:all);
 # Clock was k11 now C7
 my $project       = q(btreeBlock);                                              # The name of the project
 my $part          = q(XC7Z007S);
-   $part          = q(XC7V585T-2FFG1157I);
+   $part          = q(XC7V2000T);
+   $part          = q(xc7a200tffv1156-2);
 
 my $localHome     = "/home/phil/";                                              # Home on local machine
 my $local         = -e $localHome;                                              # On local machine
@@ -16,6 +17,7 @@ my $home          = fpd(($local ? $localHome : "/home/azureuser/"));            
 my $projectDir    = fpd $home, $project;                                        # Folder containing generated verilog files
 my $verilogDir    = fpd $projectDir, q(verilog);                                # Folder containing generated verilog files
 my $vivadoDir     = fpd $projectDir, q(vivado);                                 # Folder containing vivado specific files
+my $constraintsDir= fpd $vivadoDir,  q(constraints);                            # Folder containing constraints
 
 my $vivado        = fpd $home,   qw(Vivado 2024.2);                             # Location of vivaldo installation
 my $vivadoX       = fpf $vivado, qw(bin vivado);                                # Location of vivaldo executable
@@ -31,8 +33,8 @@ sub gen                                                                         
   my $includesDir = fpd $projectDir, qw(includes);                              # Set the path to the includes directory
   my $reportsDir  = fpd $projectOut, qw(reports);                               # Reports
   my $dcpDir      = fpd $projectOut, qw(dcp);                                   # Checkpoints
-  my $synthesis   = fpe $vivadoDir, $project, qw(tcl);                          # Generated vivado commands
-  my $constraints = fpe $vivadoDir, qw(constraints xdc);                        # Constraints file
+  my $synthesis   = fpe $vivadoDir,      $project, qw(tcl);                     # Generated vivado commands
+  my $constraints = fpe $constraintsDir, $part,    qw(xdc);                     # Constraints file
 
   makePath fpd $reportsDir;                                                     # Ensure folder structure is present
   makePath fpd $dcpDir;                                                         # Ensure folder structure is present
@@ -87,7 +89,7 @@ END
  }
 
 say STDERR dateTimeStamp, " Generate   btreeBlock";                             # Create the verilog files
-say STDERR qx(cd $projectDir; bash j.sh BtreePA);
+#say STDERR qx(cd $projectDir; bash j.sh BtreePA);
 
 say STDERR dateTimeStamp, " Synthesize btreeBlock";                             # Synthesize the verilog description
 gen(qw(find   2));
