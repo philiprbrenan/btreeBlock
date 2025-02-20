@@ -24,7 +24,7 @@ implement the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [hardw
 -----------------------------------------------------------------------------------
 ```
 
-[The log of the successful synthesis can be seen here](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/find/vivado/reports/)
+[The log of the successful synthesis can be seen here](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/find/vivado/reports)
 
 # Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database)
 For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)):
