@@ -19,12 +19,6 @@ my $wf   = q(.github/workflows/main.yml);                                       
 my @ext  = qw(.java .md .pl .txt .png .py .rpt .xdc);                           # Extensions of files to upload to github
 #  @ext  = qw(.java .md .pl .txt);                                              # Reduced set of files to upload to github
 
-sub writeGitIgnore(@)                                                           # Write ignore to select just the files we want
- {my (@files) = @_;
-  my @g = ("*", "**", map {"!$_"} map {swapFilePrefix $_, $home} @files);
-  owf(fpe($home, qw(gitignore)), join "\n", @g);
- }
-
 say STDERR timeStamp,  " push to github $repo";
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
@@ -52,8 +46,8 @@ if (0)                                                                          
    }
  }
 else                                                                            # Upload files via git
- {writeGitIgnore(@files);
-  qx(git add *; git commit -m aaa; git push --force);                           # Force used to overcome changes to workflow file which is used as a surrogate for any change
+ {my $g = join " ", @files;
+  qx(git add $g; git commit -m aaa; git push --force);                           # Force used to overcome changes to workflow file which is used as a surrogate for any change
  }
 
 writeFileUsingSavedToken($user, $repo, q(.config/geany/snippets.conf),          # Save the snippets file as this was the thing I missed most after a rebuild
