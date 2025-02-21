@@ -1925,7 +1925,7 @@ abstract class BtreePA extends Test                                             
            }
          };
         P.parallelStart();   T.at(parent).zero();                               // Parent starts at root which is now known to be a branch
-        P.parallelSection(); //T.at(findDepth).zero();                            // Limit number of levels searched
+        P.parallelSection(); //T.at(findDepth).zero();                          // Limit number of levels searched
         P.parallelEnd();
 
         P.new Block()
@@ -2053,7 +2053,7 @@ abstract class BtreePA extends Test                                             
              };
             z();
             findAndInsert(Return);                                              // Splitting the root() might have been enough
-            //P.GoOn(Return, T.at(success));                                      // Inserted or updated successfully
+            //P.GoOn(Return, T.at(success));                                    // Inserted or updated successfully
            }
          };
 
@@ -2065,7 +2065,7 @@ abstract class BtreePA extends Test                                             
          {void code()
            {//T.at(putDepth).inc();
             //T.at(putDepth).greaterThan(T.at(MaxDepth), T.at(pastMaxDepth));
-            //P.GoOn(end, T.at(pastMaxDepth));                                    // Prevent runaway searches
+            //P.GoOn(end, T.at(pastMaxDepth));                                  // Prevent runaway searches
 
             //P.parallelStart();   tt(search, Key);
             //P.parallelSection(); tt(node_findFirstGreaterThanOrEqualInBranch, parent);
@@ -2087,7 +2087,7 @@ abstract class BtreePA extends Test                                             
 
                 splitLeaf();                                                    // Split the child leaf
                 findAndInsert(null);                                            // Now guaranteed to work
-                merge();
+                //merge();
                 P.Goto(Return);
                }
              };
