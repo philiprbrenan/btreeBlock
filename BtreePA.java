@@ -2190,7 +2190,7 @@ abstract class BtreePA extends Test                                             
                {z();
                 findAndDelete();
                 tt(deleted, found);
-                merge();
+                //merge();
                 P.Goto(Return);
                }
              };
