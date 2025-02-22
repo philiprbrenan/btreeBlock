@@ -13,12 +13,13 @@ use Data::Table::Text qw(:all);
 use GitHub::Crud qw(:all);
 use feature qw(say current_sub);
 
-my $home = q(/home/phil/btreeBlock/);                                           # Home folder
-my $user = q(philiprbrenan);                                                    # User
-my $repo = q(btreeBlock);                                                       # Repo
-my $wf   = q(.github/workflows/main.yml);                                       # Work flow on Ubuntu
-my @ext  = qw(.htm .html .java .md .pl .txt .png .py .rpt .xdc);                # Extensions of files to upload to github
-#  @ext  = qw(.java .md .pl .txt);                                              # Reduced set of files to upload to github
+my $home    = q(/home/phil/btreeBlock/);                                        # Home folder
+my $md5File = q(/home/phil/btreeBlock/.md5Sums);                                # Md5 file sums for each known file to detect changes
+my $user    = q(philiprbrenan);                                                 # User
+my $repo    = q(btreeBlock);                                                    # Repo
+my $wf      = q(.github/workflows/main.yml);                                    # Work flow on Ubuntu
+my @ext     = qw(.htm .html .java .md .pl .txt .png .py .rpt .xdc);             # Extensions of files to upload to github
+#  @ext     = qw(.java .md .pl .txt);                                           # Reduced set of files to upload to github
 
 say STDERR timeStamp,  " push to github $repo";
 
@@ -33,6 +34,33 @@ if (1)                                                                          
   for my $f(@f)
    {next if $f =~ m(verilog) and $f !~ m(/vivado/reports/);
     push @files, $f;
+   }
+ }
+
+if (1)                                                                          # Remove files that have not changed as shown  by their md5 sum
+ {if (-e $md5File)                                                              # Sums exist
+   {my $md5Files = eval readFile($md5File);
+    die $@ if $@;
+    my @f = @files; @files = ();
+    for my $f(@f)
+     {my $s = fileMd5Sum $f;
+      my $m = $$md5Files{$f};
+      if (!$m or $m ne $s)
+       {push @files, $f;
+        $$md5Files{$f} = $s;
+        writeFile($md5File, dump($md5Files));
+       }
+     }
+   }
+  else                                                                          # Sums do not exist
+   {my $md5Files;
+    my @f = @files; @files = ();
+    for my $f(@f)
+     {my $s = fileMd5Sum $f;
+      push @files, $f;
+      $$md5Files{$f} = fileMd5Sum $f;
+     }
+    writeFile($md5File, dump($md5Files));
    }
  }
 
