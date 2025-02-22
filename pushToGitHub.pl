@@ -22,8 +22,10 @@ my @ext  = qw(.java .md .pl .txt .png .py .rpt .xdc);                           
 say STDERR timeStamp,  " push to github $repo";
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
-        @files = grep {!m(/\.|backups/|Classes/|vivado/runs/)} @files;          # Remove files that do not need to be saved
+        @files = grep {!m(/\.|backups/|Classes/)} @files;                       # Remove files that do not need to be saved
         @files = grep {!m(7zSeriesALL/)} @files;
+        @files = grep {!m(vivado/reports/)} @files;
+        @files = grep {!m(vivado/runs/)} @files;
 my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
 
 if (1)                                                                          # Remove most of the verilog as it is very bulky and slows up commits a lot
