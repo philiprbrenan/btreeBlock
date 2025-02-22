@@ -4,6 +4,7 @@
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2024
 #-------------------------------------------------------------------------------
 #die "Switched off to prevent accidental uploads";
+# Save last modified date and upload a file only if the file has been changed
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -16,20 +17,18 @@ my $home = q(/home/phil/btreeBlock/);                                           
 my $user = q(philiprbrenan);                                                    # User
 my $repo = q(btreeBlock);                                                       # Repo
 my $wf   = q(.github/workflows/main.yml);                                       # Work flow on Ubuntu
-my @ext  = qw(.java .md .pl .txt .png .py .rpt .xdc);                           # Extensions of files to upload to github
+my @ext  = qw(.htm .html .java .md .pl .txt .png .py .rpt .xdc);                # Extensions of files to upload to github
 #  @ext  = qw(.java .md .pl .txt);                                              # Reduced set of files to upload to github
 
 say STDERR timeStamp,  " push to github $repo";
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
         @files = grep {!m(/\.|backups/|Classes/)} @files;                       # Remove files that do not need to be saved
-        @files = grep {!m(7zSeriesALL/)} @files;
-        @files = grep {!m(vivado/reports/)} @files;
         @files = grep {!m(vivado/runs/)} @files;
         @files = grep {!m(vivado/pins/)} @files;
 my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
 
-if (1)                                                                          # Remove most of the verilog as it is very bulky and slows up commits a lot
+if (1)                                                                          # Remove most of the verilog except the reports
  {my @f = @files; @files = ();
   for my $f(@f)
    {next if $f =~ m(verilog) and $f !~ m(/vivado/reports/);
