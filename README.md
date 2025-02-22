@@ -32,7 +32,13 @@ implement the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [hardw
 -----------------------------------------------------------------------------------
 ```
 
-[The [log](https://en.wikipedia.org/wiki/Log_file) of the successful synthesis of "find" can be seen here](https://github.com/philiprbrenan/btreeBlock/tree/main/verilog/find/vivado/reports)
+
+[The [log](https://en.wikipedia.org/wiki/Log_file) of the successful synthesis of "find"   can be seen here](https://github.com/philiprbrenan/btreeBlock/tree/main/verilog/find/vivado/reports)
+
+[The [log](https://en.wikipedia.org/wiki/Log_file) of the successful synthesis of "put"    can be seen here](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/put/vivado/reports)
+
+[The [log](https://en.wikipedia.org/wiki/Log_file) of the successful synthesis of "delete" can be seen here](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/delete/vivado/reports)
+
 
 # Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database)
 For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)):
@@ -78,8 +84,6 @@ Finished Writing Synthesis Report : Time (s): cpu = 00:24:57 ; elapsed = 00:25:4
 Synthesis finished with 0 errors, 0 critical warnings and 80 warnings.
 ```
 
-[The [log](https://en.wikipedia.org/wiki/Log_file) of the successful synthesis of "put" can be seen here](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/put/vivado/reports
-
 [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) Synthesis uses the following resources to implement the **delete**
 operation.
 
@@ -119,9 +123,6 @@ produces:
 ```
 Stopped after:  117 steps key    2  data    7
 ```
-
-[The [log](https://en.wikipedia.org/wiki/Log_file) of the successful synthesis of "delete" can be seen here](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/delete/vivado/reports
-
 
 # Deleting in ascending order
 
