@@ -48,7 +48,7 @@ if (1)                                                                          
       if (!$m or $m ne $s)
        {push @files, $f;
         $$md5Files{$f} = $s;
-        writeFile($md5File, dump($md5Files));
+        owf($md5File, dump($md5Files));
        }
      }
    }
@@ -62,6 +62,11 @@ if (1)                                                                          
      }
     writeFile($md5File, dump($md5Files));
    }
+ }
+
+if (!@files)                                                                    # No new files
+ {say "Everything up to date";
+  exit;
  }
 
 if  (1)                                                                         # Upload via github crud
