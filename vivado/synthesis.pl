@@ -79,8 +79,8 @@ END
 
   owf($synthesis, join "\n", @s);                                               # Write tcl to run the synthesis
 
-  say STDERR dateTimeStamp, " Synthesize btreeBlock $project on $part";         # Run tcl
-  say STDERR qx($vivadoX -mode batch -source $synthesis 1>$reportsDir/1.txt);
+  say   STDERR dateTimeStamp, " $part for $project";                            # Run tcl
+  print STDERR qx($vivadoX -mode batch -source $synthesis 1>$reportsDir/1.txt);
 
   #unlink $synthesis;
  }
