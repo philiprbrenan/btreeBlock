@@ -1,11 +1,11 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date             : Thu Feb 20 18:32:22 2025
+| Date             : Sat Feb 22 06:18:49 2025
 | Host             : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command          : report_power -file /home/azureuser/btreeBlock/verilog/find/vivado/reports//power.rpt
 | Design           : find
-| Device           : xc7a200tffv1156-2
+| Device           : xc7v2000tflg1925-1
 | Design State     : synthesized
 | Grade            : commercial
 | Process          : typical
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 3.088        |
+| Total On-Chip Power (W)  | 3.629        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 2.950        |
-| Device Static (W)        | 0.137        |
-| Effective TJA (C/W)      | 1.5          |
-| Max Ambient (C)          | 80.5         |
-| Junction Temperature (C) | 29.5         |
+| Dynamic (W)              | 2.954        |
+| Device Static (W)        | 0.675        |
+| Effective TJA (C/W)      | 0.8          |
+| Max Ambient (C)          | 82.0         |
+| Junction Temperature (C) | 28.0         |
 | Confidence Level         | Low          |
 | Setting File             | ---          |
 | Simulation Activity File | ---          |
@@ -52,17 +52,17 @@ Table of Contents
 +----------------+-----------+----------+-----------+-----------------+
 | On-Chip        | Power (W) | Used     | Available | Utilization (%) |
 +----------------+-----------+----------+-----------+-----------------+
-| Slice Logic    |     1.185 |      815 |       --- |             --- |
-|   LUT as Logic |     1.142 |      663 |    134600 |            0.49 |
-|   CARRY4       |     0.029 |        8 |     33650 |            0.02 |
-|   BUFG         |     0.006 |        1 |        32 |            3.13 |
-|   Register     |     0.005 |       41 |    269200 |            0.02 |
-|   F7/F8 Muxes  |     0.003 |       15 |    134600 |            0.01 |
+| Slice Logic    |     1.174 |      815 |       --- |             --- |
+|   LUT as Logic |     1.131 |      663 |   1221600 |            0.05 |
+|   CARRY4       |     0.029 |        8 |    305400 |           <0.01 |
+|   BUFG         |     0.006 |        1 |       128 |            0.78 |
+|   Register     |     0.005 |       41 |   2443200 |           <0.01 |
+|   F7/F8 Muxes  |     0.003 |       15 |   1221600 |           <0.01 |
 |   Others       |     0.000 |        2 |       --- |             --- |
-| Signals        |     1.221 |      783 |       --- |             --- |
-| I/O            |     0.544 |       13 |       500 |            2.60 |
-| Static Power   |     0.137 |          |           |                 |
-| Total          |     3.088 |          |           |                 |
+| Signals        |     1.218 |      783 |       --- |             --- |
+| I/O            |     0.562 |       13 |      1200 |            1.08 |
+| Static Power   |     0.675 |          |           |                 |
+| Total          |     3.629 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
 
 
@@ -72,19 +72,23 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     2.466 |       2.430 |      0.036 |       NA    | Unspecified | NA         |
-| Vccaux    |       1.800 |     0.074 |       0.043 |      0.031 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     2.761 |       2.416 |      0.345 |       NA    | Unspecified | NA         |
+| Vccaux    |       1.800 |     0.143 |       0.043 |      0.100 |       NA    | Unspecified | NA         |
 | Vcco33    |       3.300 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
-| Vcco18    |       1.800 |     0.251 |       0.246 |      0.005 |       NA    | Unspecified | NA         |
+| Vcco18    |       1.800 |     0.257 |       0.256 |      0.001 |       NA    | Unspecified | NA         |
 | Vcco15    |       1.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco135   |       1.350 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco12    |       1.200 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vccaux_io |       1.800 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
-| Vccbram   |       1.000 |     0.001 |       0.000 |      0.001 |       NA    | Unspecified | NA         |
+| Vccbram   |       1.000 |     0.004 |       0.000 |      0.004 |       NA    | Unspecified | NA         |
 | MGTAVcc   |       1.000 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | MGTAVtt   |       1.200 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
-| Vccadc    |       1.800 |     0.020 |       0.000 |      0.020 |       NA    | Unspecified | NA         |
+| MGTVccaux |       1.800 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| MGTZVccl  |       1.075 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| MGTZAVcc  |       1.075 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| MGTZVcch  |       1.800 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| Vccadc    |       1.800 |     0.080 |       0.000 |      0.080 |       NA    | Unspecified | NA         |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 
 
@@ -112,10 +116,10 @@ Table of Contents
 
 +-----------------------+--------------------------+
 | Ambient Temp (C)      | 25.0                     |
-| ThetaJA (C/W)         | 1.5                      |
+| ThetaJA (C/W)         | 0.8                      |
 | Airflow (LFM)         | 250                      |
 | Heat Sink             | medium (Medium Profile)  |
-| ThetaSA (C/W)         | 2.4                      |
+| ThetaSA (C/W)         | 1.2                      |
 | Board Selection       | medium (10"x10")         |
 | # of Board Layers     | 12to15 (12 to 15 Layers) |
 | Board Temperature (C) | 25.0                     |
@@ -139,7 +143,7 @@ Table of Contents
 +------+-----------+
 | Name | Power (W) |
 +------+-----------+
-| find |     2.950 |
+| find |     2.954 |
 +------+-----------+
 
 
