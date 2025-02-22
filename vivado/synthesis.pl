@@ -79,13 +79,14 @@ END
 
   owf($synthesis, join "\n", @s);                                               # Write tcl to run the synthesis
 
-  say STDERR dateTimeStamp, " Synthesize $project on $part";                    # Run tcl
+  say STDERR dateTimeStamp, " Synthesize btreeBlock $project on $part";         # Run tcl
   say STDERR qx($vivadoX -mode batch -source $synthesis 1>$reportsDir/1.txt);
 
   #unlink $synthesis;
  }
 
-if (!-e q(/home/phil/))                                                         # Create the verilog files
+if    (-e q(/home/phil/) {}                                                     # Create the verilog files if on azure
+elsif (-e q(/home/azureuser/btreeblock/vivado/find/1/) {}                       # Create the verilog files if they have not already been created
  {say STDERR dateTimeStamp, " Generate   btreeBlock";
   say STDERR qx(cd $projectDir; bash j.sh BtreePA);
  }
