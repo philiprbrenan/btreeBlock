@@ -1,4 +1,4 @@
-set_property PACKAGE_PIN AJ29 [get_ports clock]
+set_property PACKAGE_PIN AU28 [get_ports clock]
 set_property PACKAGE_PIN Y1   [get_ports reset]
 set_property PACKAGE_PIN Y2   [get_ports found]
 set_property PACKAGE_PIN Y3   [get_ports stop]
