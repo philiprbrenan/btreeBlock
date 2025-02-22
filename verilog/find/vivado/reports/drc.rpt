@@ -1,12 +1,12 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Thu Feb 20 18:32:23 2025
+| Date         : Sat Feb 22 06:18:54 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_drc -file /home/azureuser/btreeBlock/verilog/find/vivado/reports//drc.rpt
 | Design       : find
-| Device       : xc7a200tffv1156-2
-| Speed File   : -2
+| Device       : xc7v2000tflg1925-1
+| Speed File   : -1
 | Design State : Synthesized
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -24,12 +24,11 @@ Table of Contents
       Design limits: <entire design considered>
            Ruledeck: default
              Max checks: <unlimited>
-             Checks found: 2
+             Checks found: 1
 +----------+----------+-----------------------------------------------------+--------+
 | Rule     | Severity | Description                                         | Checks |
 +----------+----------+-----------------------------------------------------+--------+
 | CFGBVS-1 | Warning  | Missing CFGBVS and CONFIG_VOLTAGE Design Properties | 1      |
-| PLIO-3   | Warning  | Placement Constraints Check for IO constraints      | 1      |
 +----------+----------+-----------------------------------------------------+--------+
 
 2. REPORT DETAILS
@@ -45,11 +44,6 @@ Neither the CFGBVS nor CONFIG_VOLTAGE voltage property is set in the current_des
  #where value2 is the voltage provided to configuration bank 0
 
 Refer to the device configuration user guide for more information.
-Related violations: <none>
-
-PLIO-3#1 Warning
-Placement Constraints Check for IO constraints  
-Partially locked IO Bus is found. Following components of the IO Bus Data[3:0] are not locked:  Data[0]
 Related violations: <none>
 
 
