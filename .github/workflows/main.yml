@@ -1,4 +1,4 @@
-# Test 2025-02-06 at 20:19:12
+# Test 2025-02-22 at 03:20:18
 
 name: Test
 run-name: btreeBlock
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        task: [Btree, BtreePA, BtreeSA, BtreeSML, BtreeSP, BtreeStuck, BtreeStuckStatic, If, Layout, Memory, MemoryLayout, MemoryLayoutPA, Program, ProgramPA, Stuck, StuckPA, StuckSA, StuckSML, StuckSP, StuckStatic, Test, Verilog]
+        task: [Btree, BtreePA, BtreeSA, BtreeSML, BtreeSP, BtreeStuck, BtreeStuckStatic, If, Layout, Memory, MemoryLayout, MemoryLayoutPA, Program, ProgramPA, StringToNumbers, Stuck, StuckPA, StuckSA, StuckSML, StuckSP, StuckStatic, Test, Verilog]
 
     steps:
     - uses: actions/checkout@v4
@@ -136,6 +136,12 @@ jobs:
       if: matrix.task == 'ProgramPA'
       run: |
         java -cp Classes com/AppaApps/Silicon/ProgramPA
+
+
+    - name: Test StringToNumbers
+      if: matrix.task == 'StringToNumbers'
+      run: |
+        java -cp Classes com/AppaApps/Silicon/StringToNumbers
 
 
     - name: Test Stuck
