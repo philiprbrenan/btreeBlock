@@ -9,7 +9,9 @@ use Data::Table::Text qw(:all);
 my $project       = q(btreeBlock);                                              # The name of the project
 my $part          = q(XC7Z007S);
    $part          = q(XC7V2000T);
-   $part          = q(xc7a200tffv1156-2);
+   $part          = q(xc7a200tffv1156-2);                                       # 150K
+   $part          = q(xc7v2000tflg1925-1);                                      # 1 million
+   $part          = q(xcvu440-flga2892-1-c);                                    # 5 million
 
 my $localHome     = "/home/phil/";                                              # Home on local machine
 my $local         = -e $localHome;                                              # On local machine
@@ -89,6 +91,6 @@ if (!-e q(/home/phil/))                                                         
  }
 
 say STDERR dateTimeStamp, " Synthesize btreeBlock";                             # Synthesize the verilog description
-#gen(qw(find   2));
+gen(qw(find   2));
 gen(qw(delete 2));
-#gen(qw(put    2));
+gen(qw(put    2));
