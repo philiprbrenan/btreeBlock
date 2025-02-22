@@ -11,7 +11,7 @@ my $part          = q(XC7Z007S);
    $part          = q(XC7V2000T);
    $part          = q(xc7a200tffv1156-2);                                       # 150K
    $part          = q(xc7v2000tflg1925-1);                                      # 1 million
-   $part          = q(xcvu440-flga2892-1-c);                                    # 5 million
+#  $part          = q(xcvu440-flga2892-1-c);                                    # 5 million
 
 my $localHome     = "/home/phil/";                                              # Home on local machine
 my $local         = -e $localHome;                                              # On local machine
