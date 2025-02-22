@@ -79,7 +79,7 @@ END
 
   owf($synthesis, join "\n", @s);                                               # Write tcl to run the synthesis
 
-  say STDERR dateTimeStamp, " $project";                                        # Run tcl
+  say STDERR dateTimeStamp, " Synthesize $project on $part";                    # Run tcl
   say STDERR qx($vivadoX -mode batch -source $synthesis 1>$reportsDir/1.txt);
 
   #unlink $synthesis;
