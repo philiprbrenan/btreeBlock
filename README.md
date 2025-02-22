@@ -32,12 +32,11 @@ implement the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [hardw
 -----------------------------------------------------------------------------------
 ```
 
+The logs of the successful synthesis of the individual components of [Database on a Chip](http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html) on [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado): [find  ](https://github.com/philiprbrenan/btreeBlock/tree/main/verilog/find/vivado/reports)
 
-[The [log](https://en.wikipedia.org/wiki/Log_file) of the successful synthesis of **find**   can be seen here](https://github.com/philiprbrenan/btreeBlock/tree/main/verilog/find/vivado/reports)
+[put   ](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/put/vivado/reports)
 
-[The [log](https://en.wikipedia.org/wiki/Log_file) of the successful synthesis of **put**    can be seen here](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/put/vivado/reports)
-
-[The [log](https://en.wikipedia.org/wiki/Log_file) of the successful synthesis of **delete** can be seen here](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/delete/vivado/reports)
+[delete](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/delete/vivado/reports)
 
 
 # Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database)
