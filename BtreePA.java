@@ -2217,7 +2217,7 @@ abstract class BtreePA extends Test                                             
         P.parallelSection(); T.at(mergeDepth).zero();
         P.parallelEnd();
 
-        P.new Block()                                                           // Step down through the tree, splitting as we go
+        P.new Block()                                                           // Step down through the tree, merging as we go
          {void code()
            {T.at(mergeDepth).inc();
             T.at(mergeDepth).greaterThan(T.at(MaxDepth), T.at(pastMaxDepth));
