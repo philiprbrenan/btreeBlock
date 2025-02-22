@@ -1,11 +1,10 @@
 # How to run Vivado synthesis on Azure
 
-## Create an Azure spot instance
+## Create an Azure [spot](https://aws.amazon.com/ec2/spot/) instance
 
-Create an Azure spot instance with at least 128GB hard drive and 16GB memory.
-
-Update .ssh/config creating a host (perhaps ```aaa```) with the ip address on
-Azure with a convenient name to make access easier. Configure ssh to allow x
+Create an Azure [spot](https://aws.amazon.com/ec2/spot/) instance with at least 128GB hard drive and 16GB [memory](https://en.wikipedia.org/wiki/Computer_memory). 
+Update .ssh/config creating a host (perhaps ```aaa```) with the [IP address](https://en.wikipedia.org/wiki/IP_address) address on
+Azure with a convenient name to make access easier. Configure [Secure Shell](https://www.ssh.com/ssh) to allow x
 forwarding.
 
 Update the Ubunbtu instance:
@@ -15,7 +14,7 @@ sudo apt update
 
 sudo apt install build-essential tcsh libssl-dev libx11-dev libboost-all-dev \
   libncurses5-dev x11-apps  libxext-dev libxrender-dev \
-  libxtst-dev openjdk-21-jdk-headless​ micro
+  libxtst-dev openjdk-21-jdk-headlessâ micro
 ```
 
 ## AMD installer
@@ -33,21 +32,20 @@ Start the installer on the instance:
 XINSTALLER_SCALE=2 bash FPGAs_AdaptiveSoCs_Unified_2024.2_1113_1001_Lin64.bin
 ```
 
-Supply login details for: (https://login.amd.com)
+Supply [login](https://en.wikipedia.org/wiki/Login) details for: (https://login.amd.com)
 
 
 ## Clone GitHub
 
-### Update GitHub ssh key
-
+### Update GitHub [Secure Shell](https://www.ssh.com/ssh) [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) 
 Copy ```Azure.pem``` on the local machine to the instance:
 
 ```
 scp .ssh/Azure.pem aaa:.ssh/
 ```
 
-On the remote instance extract the public key and load it into to GitHub oif
-convert the ```pem``` file to r```rsa``` format and load it into GutHub if it
+On the remote instance extract the public [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) and load it into to GitHub oif
+convert the ```pem``` [file](https://en.wikipedia.org/wiki/Computer_file) to r```rsa``` format and load it into GutHub if it
 is not already there:
 
 ```
@@ -57,11 +55,11 @@ ssh-keygen -y -f Azure.pem > Azure.pub
 
 ### Clone the GitHub repo
 
-Clone the github repo: (https://github.com/philiprbrenan/btreeBlock)
+Clone the [GitHub](https://github.com/philiprbrenan) repo: (https://github.com/philiprbrenan/btreeBlock)
 
 ```
 GIT_TRACE=1 GIT_CURL_VERBOSE=1  GIT_SSH_COMMAND="ssh -i .ssh/Azure.pem" git clone git@github.com:philiprbrenan/btreeBlock.git
-​GIT_SSH_COMMAND="ssh -i ~/.ssh/Azure.pem" git pull
+âGIT_SSH_COMMAND="ssh -i ~/.ssh/Azure.pem" git pull
 ```
 
 Install the following if they are not present:
@@ -73,8 +71,8 @@ sudo apt install iverilog
 
 # Synthesis
 
-Change to folder ```btreeBlock/vivado``` and edit ```synthesis.tcl``` to point
-to the verilog folder containing the project to be synthesized.
+Change to [folder](https://en.wikipedia.org/wiki/File_folder) ```btreeBlock/vivado``` and edit ```synthesis.tcl``` to point
+to the [Verilog](https://en.wikipedia.org/wiki/Verilog) [folder](https://en.wikipedia.org/wiki/File_folder) containing the project to be synthesized.
 
 Synthesize the Vivado project:
 
@@ -83,8 +81,7 @@ perl synthesis.pl
 ```
 # Enable swap space
 
-This might help simulate more memory if Vovado runs out of memory.
-Normally it seems to take aboit 15GB.
+This might [help](https://en.wikipedia.org/wiki/Online_help) simulate more [memory](https://en.wikipedia.org/wiki/Computer_memory) if Vovado runs out of [memory](https://en.wikipedia.org/wiki/Computer_memory). Normally it seems to take aboit 15GB.
 
 ```
 sudo dmesg | grep -i 'oom'
@@ -106,8 +103,8 @@ Placing the following commands in your ```.bashrc`` file speeds up development o
 alias b='cd   ~/btreeBlock/'
 alias bv='cd  ~/btreeBlock/vivado'
 alias G= "grep -Iinr -P"
-alias g='git status; git add *; git commit -m aaa; git push --force'
-alias gg='cd; sudo rm -r ~/btreeBlock/; git clone git@github.com:philiprbrenan/btreeBlock.git; cd ~/btreeBlock'
+alias g='git status; [Git](https://en.wikipedia.org/wiki/Git) add *; [Git](https://en.wikipedia.org/wiki/Git) commit -m aaa; [Git](https://en.wikipedia.org/wiki/Git) push --force'
+alias gg='cd; sudo rm -r ~/btreeBlock/; [Git](https://en.wikipedia.org/wiki/Git) clone git@github.com:philiprbrenan/btreeBlock.git; cd ~/btreeBlock'
 alias m='micro'
 alias dv='cd  ~/btreeBlock/verilog/delete/vivado/reports'
 alias fv='cd  ~/btreeBlock/verilog/find/vivado/reports'
@@ -123,7 +120,7 @@ alias x='bash ~/btreeBlock/j.sh
 On the server install the lightweight desktop lxde
 
 ```
-sudo apt-get install lxde x2goserver x2goserver-xsession
+sudo apt-get [install](https://en.wikipedia.org/wiki/Installation_(computer_programs)) lxde x2goserver x2goserver-xsession
 ```
 
 And add a password for ```azureuser``` using:
@@ -135,7 +132,7 @@ sud
 On the client:
 
 ```
-sudo apt-get install x2goclient
+sudo apt-get [install](https://en.wikipedia.org/wiki/Installation_(computer_programs)) x2goclient
 ```
 
 Then run the client to connect to the graphics desktop provided by the server.
@@ -161,44 +158,44 @@ Set scaling to user defined at 250%
 ##Find
 
 ```
-WARNING: [Synth 8-3295] tying undriven pin index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[9] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[8] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[7] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[6] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[5] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[4] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[3] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[2] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[1] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[0] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[9] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[8] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[7] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[6] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[5] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[4] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[3] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[2] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[1] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[0] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[9] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[8] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[7] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[6] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[5] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[4] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[3] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[2] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[1] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[0] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[9] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[8] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[7] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[6] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[5] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[4] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[3] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[2] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[1] to constant 0
-WARNING: [Synth 8-3295] tying undriven pin copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[0] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[9] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[8] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[7] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[6] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[5] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[4] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[3] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[2] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[1] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[0] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[9] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[8] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[7] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[6] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[5] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[4] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[3] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[2] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[1] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_branch_0_StuckSA_Memory_Based_45_base_offset_inferred:in0[0] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[9] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[8] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[7] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[6] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[5] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[4] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[3] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[2] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[1] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) index_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[0] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[9] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[8] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[7] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[6] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[5] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[4] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[3] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[2] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[1] to constant 0
+WARNING: [Synth 8-3295] tying undriven [pin](https://en.wikipedia.org/wiki/555_timer_IC) copyLength_leaf_0_StuckSA_Memory_Based_57_base_offset_inferred:in0[0] to constant 0
 ```
