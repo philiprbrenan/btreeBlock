@@ -1,0 +1,31 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
+| Date         : Sat Feb 22 15:37:05 2025
+| Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
+| Command      : report_high_fanout_nets -file /home/azureuser/btreeBlock/verilog/put/vivado/reports//fanout.rpt
+| Design       : put
+| Device       : xc7v2000t
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+High Fan-out Nets Information
+
+1. Summary
+----------
+
++-------------------------------------------------------------------+--------+-------------+
+| Net Name                                                          | Fanout | Driver Type |
++-------------------------------------------------------------------+--------+-------------+
+| leaf_3_StuckSA_Transaction_102_reg_n_0_[43]                       |   6594 | FDRE        |
+| opCodeMap[6]                                                      |   4406 | MUXF7       |
+| M_77_reg[529]_i_98_n_4                                            |   4260 | CARRY4      |
+| M_77_reg[707]_i_330_n_4                                           |   3821 | CARRY4      |
+| M_77_reg[529]_i_98_n_5                                            |   3811 | CARRY4      |
+| M_77_reg[705]_i_188_n_6                                           |   3322 | CARRY4      |
+| M_77_reg[707]_i_330_n_5                                           |   3022 | CARRY4      |
+| M_77_reg[705]_i_188_n_7                                           |   2780 | CARRY4      |
+| index_branch_3_StuckSA_Memory_Based_88_base_offset_reg[5]_i_3_n_4 |   2490 | CARRY4      |
+| M_77_reg[529]_i_98_n_6                                            |   2366 | CARRY4      |
++-------------------------------------------------------------------+--------+-------------+
+
+
