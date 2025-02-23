@@ -3,8 +3,9 @@
 # Push Btree block code to GitHub
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2024
 #-------------------------------------------------------------------------------
-#die "Switched off to prevent accidental uploads";
+# die "Switched off to prevent accidental uploads";
 # Save last modified date and upload a file only if the file has been changed
+# http://prb.appaapps.com/zesal/presentation/index.htm
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
