@@ -37,6 +37,7 @@ if (1)                                                                          
    }
  }
 
+
 if (1)                                                                          # Remove files that have not changed as shown  by their md5 sum
  {if (-e $md5File)                                                              # Sums exist
    {my $md5Files = eval readFile($md5File);
