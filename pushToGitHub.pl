@@ -5,7 +5,6 @@
 #-------------------------------------------------------------------------------
 # die "Switched off to prevent accidental uploads";
 # Save last modified date and upload a file only if the file has been changed
-# http://prb.appaapps.com/zesal/presentation/index.htm
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -19,7 +18,7 @@ my $md5File = q(/home/phil/btreeBlock/.md5Sums);                                
 my $user    = q(philiprbrenan);                                                 # User
 my $repo    = q(btreeBlock);                                                    # Repo
 my $wf      = q(.github/workflows/main.yml);                                    # Work flow on Ubuntu
-my @ext     = qw(.htm .html .java .jpg .md .pl .txt .pdf .png .py .rpt .xdc);   # Extensions of files to upload to github
+my @ext     = qw(.html .java .jpg .md .pl .txt .pdf .png .py .rpt .xdc);        # Extensions of files to upload to github
 #  @ext     = qw(.java .md .pl .txt);                                           # Reduced set of files to upload to github
 
 say STDERR timeStamp,  " push to github $repo";
