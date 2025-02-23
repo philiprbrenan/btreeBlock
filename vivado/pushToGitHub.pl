@@ -24,8 +24,8 @@ if (0)
   exit;
  }
 
-for my $s(&files()->@*)                                                         # Target each source file4
- {say $s;
+for my $s(&files()->@*)                                                         # Target each source file
+ {say STDERR $s;
   my $t = swapFilePrefix $s, $source,  $target;
   copyFile($s, $t);
  }
