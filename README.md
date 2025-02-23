@@ -8,8 +8,11 @@ The reasons why you might want to get involved in this implementation of the
 [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in
 [Silicon](https://en.wikipedia.org/wiki/Silicon) rather than [software](https://en.wikipedia.org/wiki/Software) are:
 
-<!-- http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html -->
 https://s3.eu-west-1.amazonaws.com/philiprbrenan.appaapps.com/DatabaseOnAChip/index.html
+
+A more detailed presentation:
+
+http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html
 
 # Roadmap
 
