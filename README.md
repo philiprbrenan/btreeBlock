@@ -25,6 +25,8 @@ in [Verilog](https://en.wikipedia.org/wiki/Verilog)
 to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program):
 ![Roadmap](flowChart/DevelopmentFlowChart.png)
 
+# Synthesis
+
 The [Verilog](https://en.wikipedia.org/wiki/Verilog) [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) has now been synthesized on an
 [fpga](https://en.wikipedia.org/wiki/Field-programmable_gate_array) as a prelude to implementing it
 as an [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) to
