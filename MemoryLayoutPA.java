@@ -101,8 +101,8 @@ class MemoryLayoutPA extends Test                                               
   String copyVerilogDec()                                                       // Verilog declaration
    {zz();
     final StringBuilder s = new StringBuilder();                                // Text of declaration
-    s.append("(* keep = \"true\" *)reg["+copySize()+"-1: 0] "+copyIndex ()+"; "+traceComment()+"\n");
-    s.append("(* keep = \"true\" *)reg["+copySize()+"-1: 0] "+copyLength()+"; "+traceComment()+"\n");
+    s.append("/*DDD111*/reg["+copySize()+"-1: 0] "+copyIndex ()+"; "+traceComment()+"\n");
+    //s.append("/*DDD222*/reg["+copySize()+"-1: 0] "+copyLength()+"; "+traceComment()+"\n");
     return ""+s;
    }
 
@@ -203,7 +203,7 @@ class MemoryLayoutPA extends Test                                               
 //     };
 //   }
 
-  void copy(MemoryLayoutPA source)                                              // Copy all the bits from the source into the target as long as the source and target are the same size
+  void copy(MemoryLayoutPA source)                                              // Copy all the bits from the source into the target as long as the source and target are the same size.
    {zz();
     if (size() != source.size()) stop("Memory layouts have different sizes");
     final int N = size();
@@ -396,7 +396,7 @@ class MemoryLayoutPA extends Test                                               
            }
          }
         String v()
-         {return target.verilogLoad()+" <= "+source.verilogLoad() + "/* MemoryLayoutPA.move */\n;";
+         {return target.verilogLoad()+" <= "+source.verilogLoad() + "/* MemoryLayoutPA.move */;\n";
          }
         String n() {return field.name+"="+source.field.name;}
         void   i()  {}
@@ -424,7 +424,7 @@ class MemoryLayoutPA extends Test                                               
         String v()
          {final StringBuilder s = new StringBuilder();
           for(int i = 0; i < N; ++i)
-           {return Targets[i].verilogLoad()+" <= "+source.verilogLoad() + "/* MemoryLayoutPA.moveTo */\n;";
+           {return Targets[i].verilogLoad()+" <= "+source.verilogLoad() + "/* MemoryLayoutPA.moveTo */;\n";
            }
           return s.toString();
          }
@@ -537,25 +537,35 @@ class MemoryLayoutPA extends Test                                               
          }
         String v()                                                              // Logarithmic move
          {final StringBuilder v = new StringBuilder("/* MemoryLayoutPA.copy */\n");
-          final int    N = Length.width;                                        // Log2 of the largest possible copy
-          final String l = Target.ml().copyLength(),                            // Length of move in bits
-                       s = Source.ml().copyIndex(),                             // Source of move in backing memory
-                       t = Target.ml().copyIndex(),                             // Target of move in backing memory
+          final int    N = Length.width, C = copySize();                        // Log2 of the largest possible copy
+          final String l = "l", //Target.ml().copyLength(),                            // Length of move in bits
+                       s = "s", //Source.ml().copyIndex(),                             // Source of move in backing memory - the offset in memory
+                       t = "t", //Target.ml().copyIndex(),                             // Target of move in backing memory - the offset in memory
                        m = Target.ml().name();                                  // Name of backing memory
+//        final String l = Target.ml().copyLength(),                            // Length of move in bits
+//                     s = Source.ml().copyIndex(),                             // Source of move in backing memory - the offset in memory
+//                     t = Target.ml().copyIndex(),                             // Target of move in backing memory - the offset in memory
+//                     m = Target.ml().name();                                  // Name of backing memory
 
-          v.append(l + " = " + Length.verilogLoad() + ";\n");
-          v.append(s + " = " + Source.verilogAddr() + ";\n");
-          v.append(t + " = " + Target.verilogAddr() + ";\n");
+          v.append("begin\n");
+          v.append("  reg["+C+":0] "+l+";\n");
+          v.append("  reg["+C+":0] "+s+";\n");
+          v.append("  reg["+C+":0] "+t+";\n");
+
+          v.append("  "+l + " = " + Length.verilogLoad() + ";\n");
+          v.append("  "+s + " = " + Source.verilogAddr() + ";\n");
+          v.append("  "+t + " = " + Target.verilogAddr() + ";\n");
 
           for (int i = N+1; i > 0; --i)
            {final int u = 1<<(i-1);
-            v.append("if (" +l+" >= "+u+") begin\n");
-            v.append("   "+m+"["+t+" +: "+u+"] <= "+m+"["+s+" +: "+u+"];\n");
-            v.append("   "  +l+" = "+l+" - "+u+";\n");                          // These assigns have to be made immediately else each block has to be executed one after another to drive the length and pointers sequentially.
-            v.append("   "  +s+" = "+s+" + "+u+";\n");
-            v.append("   "  +t+" = "+t+" + "+u+";\n");
-            v.append("end\n");
+            v.append("  if (" +l+" >= "+u+") begin\n");
+            v.append("     "+m+"["+t+" +: "+u+"] <= "+m+"["+s+" +: "+u+"];\n");
+            v.append("     "  +l+" = "+l+" - "+u+";\n");                          // These assigns have to be made immediately else each block has to be executed one after another to drive the length and pointers sequentially.
+            v.append("     "  +s+" = "+s+" + "+u+";\n");
+            v.append("     "  +t+" = "+t+" + "+u+";\n");
+            v.append("  end\n");
            }
+          v.append("end\n");
           return v.toString();
          }
        };
@@ -1877,10 +1887,10 @@ Line T       At      Wide       Size    Indices        Value   Name
     final String N = n.copyVerilogDec();
 
     ok(M.contains("reg[4-1: 0] index_M"));
-    ok(M.contains("reg[4-1: 0] copyLength_M"));
+//  ok(M.contains("reg[4-1: 0] copyLength_M"));
 
     ok(N.contains("reg[4-1: 0] index_N"));
-    ok(N.contains("reg[4-1: 0] copyLength_N"));
+//  ok(N.contains("reg[4-1: 0] copyLength_N"));
    }
 
   static void test_copy_variable()
