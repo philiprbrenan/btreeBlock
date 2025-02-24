@@ -7,11 +7,12 @@ package com.AppaApps.Silicon;                                                   
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
-import java.util.stream.*;
+import java.security.*;
 import java.text.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.*;
 
 //D1 Utility routines                                                           // Utility routines
 
@@ -114,6 +115,16 @@ public class Test                                                               
      {e.printStackTrace();
      }
     return treeMap;                                                             // Return treemap
+   }
+
+  static String md5Sum(String text)                                             // Md5 sum of a string
+   {try
+     {final MessageDigest m = MessageDigest.getInstance("MD5");
+      final byte[]        b = m.digest(text.getBytes("UTF-8"));
+      return HexFormat.of().formatHex(b);
+     }
+    catch(Exception e) {say("CCCC", e);}
+    return null;
    }
 
 //D2 Numeric routines                                                           // Numeric routines
@@ -1042,6 +1053,10 @@ BBBB
    {ok(ifs("22"), 22);
    }
 
+  static void test_md5()
+   {ok(md5Sum("Hello World"), "b10a8db164e0754105b7a99be72e3fe5");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_log_two();
     test_max_min();
@@ -1054,11 +1069,12 @@ BBBB
     test_string();
     test_properties();
     test_ifs();
+    test_md5();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
-    test_ifs();
+   {//oldTests();
+    test_md5();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
