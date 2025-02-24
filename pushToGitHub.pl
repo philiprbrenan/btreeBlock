@@ -37,36 +37,7 @@ if (1)                                                                          
    }
  }
 
-
-if (1)                                                                          # Remove files that have not changed as shown by their md5 sum
- {if (-e $md5File)                                                              # Sums exist
-  #{my $md5Files = eval readFile($md5File);
-   {my $md5Files = retrieveFile($md5File);
-    die $@ if $@;
-    my @f = @files; @files = ();
-    for my $f(@f)
-     {my $s = fileMd5Sum $f;
-      my $m = $$md5Files{$f};
-      if (!$m or $m ne $s)
-       {push @files, $f;
-        $$md5Files{$f} = $s;
-#       owf($md5File, dump($md5Files));
-        storeFile($md5File, $md5Files);
-       }
-     }
-   }
-  else                                                                          # Sums do not exist
-   {my $md5Files;
-    my @f = @files; @files = ();
-    for my $f(@f)
-     {my $s = fileMd5Sum $f;
-      push @files, $f;
-      $$md5Files{$f} = fileMd5Sum $f;
-     }
-#   writeFile($md5File, dump($md5Files));
-    storeFile($md5File, $md5Files);
-   }
- }
+@files = changedFiles $md5File, @files;                                         # Filter out files that have not changed
 
 if (!@files)                                                                    # No new files
  {say "Everything up to date";
