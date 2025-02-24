@@ -21,6 +21,8 @@
 #set_property DRIVE 12 [get_ports {data[3]}]
 #set_property DRIVE 12 [get_ports found]
 #set_property DRIVE 12 [get_ports stop]
+
+create_clock -period 100         [get_ports clock]
 set_property IOSTANDARD LVCMOS18 [get_ports clock]
 set_property IOSTANDARD LVCMOS18 [get_ports {data[0]}]
 set_property IOSTANDARD LVCMOS18 [get_ports {Data[0]}]
