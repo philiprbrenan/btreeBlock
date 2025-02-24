@@ -27,7 +27,6 @@ push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              
         @files = grep {!m(/\.|backups/|Classes/)} @files;                       # Remove files that do not need to be saved
         @files = grep {!m(vivado/runs/)} @files;
         @files = grep {!m(vivado/pins/)} @files;
-my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
 
 if (1)                                                                          # Remove most of the verilog except the reports
  {my @f = @files; @files = ();
@@ -81,6 +80,8 @@ alias s='perl ~/btreeBlock/vivado/synthesis.pl'
 alias t='top -u azureuser -E g'
 alias x='bash ~/btreeBlock/j.sh
 END
+
+my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
 
 if (1)                                                                          # Write workflow
  {my $d = dateTimeStamp;
