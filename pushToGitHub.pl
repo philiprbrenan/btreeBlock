@@ -38,9 +38,10 @@ if (1)                                                                          
  }
 
 
-if (1)                                                                          # Remove files that have not changed as shown  by their md5 sum
+if (1)                                                                          # Remove files that have not changed as shown by their md5 sum
  {if (-e $md5File)                                                              # Sums exist
-   {my $md5Files = eval readFile($md5File);
+  #{my $md5Files = eval readFile($md5File);
+   {my $md5Files = retrieveFile($md5File);
     die $@ if $@;
     my @f = @files; @files = ();
     for my $f(@f)
@@ -49,7 +50,8 @@ if (1)                                                                          
       if (!$m or $m ne $s)
        {push @files, $f;
         $$md5Files{$f} = $s;
-        owf($md5File, dump($md5Files));
+#       owf($md5File, dump($md5Files));
+        storeFile($md5File, $md5Files);
        }
      }
    }
@@ -61,7 +63,8 @@ if (1)                                                                          
       push @files, $f;
       $$md5Files{$f} = fileMd5Sum $f;
      }
-    writeFile($md5File, dump($md5Files));
+#   writeFile($md5File, dump($md5Files));
+    storeFile($md5File, $md5Files);
    }
  }
 
