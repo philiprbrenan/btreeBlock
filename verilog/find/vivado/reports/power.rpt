@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date             : Sat Feb 22 06:18:49 2025
+| Date             : Mon Feb 24 20:20:02 2025
 | Host             : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command          : report_power -file /home/azureuser/btreeBlock/verilog/find/vivado/reports//power.rpt
 | Design           : find
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 3.629        |
+| Total On-Chip Power (W)  | 3.355        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 2.954        |
-| Device Static (W)        | 0.675        |
+| Dynamic (W)              | 2.683        |
+| Device Static (W)        | 0.671        |
 | Effective TJA (C/W)      | 0.8          |
-| Max Ambient (C)          | 82.0         |
-| Junction Temperature (C) | 28.0         |
+| Max Ambient (C)          | 82.2         |
+| Junction Temperature (C) | 27.8         |
 | Confidence Level         | Low          |
 | Setting File             | ---          |
 | Simulation Activity File | ---          |
@@ -52,17 +52,17 @@ Table of Contents
 +----------------+-----------+----------+-----------+-----------------+
 | On-Chip        | Power (W) | Used     | Available | Utilization (%) |
 +----------------+-----------+----------+-----------+-----------------+
-| Slice Logic    |     1.174 |      815 |       --- |             --- |
-|   LUT as Logic |     1.131 |      663 |   1221600 |            0.05 |
+| Slice Logic    |     1.050 |      788 |       --- |             --- |
+|   LUT as Logic |     1.004 |      646 |   1221600 |            0.05 |
 |   CARRY4       |     0.029 |        8 |    305400 |           <0.01 |
+|   F7/F8 Muxes  |     0.006 |       19 |   1221600 |           <0.01 |
 |   BUFG         |     0.006 |        1 |       128 |            0.78 |
-|   Register     |     0.005 |       41 |   2443200 |           <0.01 |
-|   F7/F8 Muxes  |     0.003 |       15 |   1221600 |           <0.01 |
+|   Register     |     0.005 |       40 |   2443200 |           <0.01 |
 |   Others       |     0.000 |        2 |       --- |             --- |
-| Signals        |     1.218 |      783 |       --- |             --- |
-| I/O            |     0.562 |       13 |      1200 |            1.08 |
-| Static Power   |     0.675 |          |           |                 |
-| Total          |     3.629 |          |           |                 |
+| Signals        |     1.075 |      748 |       --- |             --- |
+| I/O            |     0.559 |       13 |      1200 |            1.08 |
+| Static Power   |     0.671 |          |           |                 |
+| Total          |     3.355 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
 
 
@@ -72,11 +72,11 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     2.761 |       2.416 |      0.345 |       NA    | Unspecified | NA         |
-| Vccaux    |       1.800 |     0.143 |       0.043 |      0.100 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     2.490 |       2.149 |      0.341 |       NA    | Unspecified | NA         |
+| Vccaux    |       1.800 |     0.142 |       0.042 |      0.100 |       NA    | Unspecified | NA         |
 | Vcco33    |       3.300 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
-| Vcco18    |       1.800 |     0.257 |       0.256 |      0.001 |       NA    | Unspecified | NA         |
+| Vcco18    |       1.800 |     0.256 |       0.255 |      0.001 |       NA    | Unspecified | NA         |
 | Vcco15    |       1.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco135   |       1.350 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco12    |       1.200 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -143,7 +143,7 @@ Table of Contents
 +------+-----------+
 | Name | Power (W) |
 +------+-----------+
-| find |     2.954 |
+| find |     2.683 |
 +------+-----------+
 
 
