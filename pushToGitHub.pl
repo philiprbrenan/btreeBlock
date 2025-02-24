@@ -83,7 +83,7 @@ END
 
 my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
 
-if (1)                                                                          # Write workflow
+if (@java)                                                                      # Write workflow
  {my $d = dateTimeStamp;
   my $c = q(com/AppaApps/Silicon);                                              # Package to classes folder
   my $j = join ', ', @java;                                                     # Java files
@@ -158,4 +158,7 @@ END
 
   my $f = writeFileUsingSavedToken $user, $repo, $wf, $y;                       # Upload workflow
   lll "$f  Ubuntu work flow for $repo";
+ }
+else
+ {say STDERR "No Java files changed";
  }
