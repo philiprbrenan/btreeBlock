@@ -2333,10 +2333,10 @@ WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_2_StuckSA_Me
     final boolean    find = Project.equalsIgnoreCase("find");                   // Generating find
     final boolean     put = Project.equalsIgnoreCase("put");                    // Generating put
     final StringBuilder t = new StringBuilder();
-    t.append("reg ["+bitsPerAddress+"-1:0] "+s.M.baseName() + "; "+traceComment()+"\n");
-    if ((delete && (        n==1         || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append(s.C.declareVerilog()+traceComment()+"\n");                  // Stuck copy area declaration for paralle moves
-    if ((delete && (n==0 || n==1 || n==2 || n==3))                     || (put && (n==0 || n==1 || n==2 || n==3))) t.append(s.T.declareVerilog()+traceComment()+"\n");                  // Transaction memory which is ephemeral versus permanent main memory
-    if ((delete && (        n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (        n==1 || n==2 || n==3))) t.append(s.M.copyVerilogDec()+traceComment()+"\n");                  // Copy veriables used when copying stucks
+    t.append("/*AAA11*/reg ["+bitsPerAddress+"-1:0] "+s.M.baseName() + "; "+traceComment()+"\n");
+    if ((delete && (        n==1         || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append("/*BBB11*/"+s.C.declareVerilog()+traceComment()+"\n");                  // Stuck copy area declaration for paralle moves
+    if ((delete && (n==0 || n==1 || n==2 || n==3))                     || (put && (n==0 || n==1 || n==2 || n==3))) t.append("/*BBB22*/"+s.T.declareVerilog()+traceComment()+"\n");                  // Transaction memory which is ephemeral versus permanent main memory
+    if ((delete && (        n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (        n==1 || n==2 || n==3))) t.append("/*BBB33*/"+s.M.copyVerilogDec()+traceComment()+"\n");                  // Copy variables used when copying stucks
     return ""+t;
    }
 
@@ -2345,9 +2345,9 @@ WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_2_StuckSA_Me
     final boolean    find = Project.equalsIgnoreCase("find");                   // Generating find
     final boolean     put = Project.equalsIgnoreCase("put");                    // Generating put
     final StringBuilder t = new StringBuilder();
-    if ((delete && (        n==1         || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append("        " + s.C.name()    +" <= 0;"+traceComment()+"\n");
-    if ((delete && (        n==1 || n==2 || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append("        " + s.T.name()    +" <= 0;"+traceComment()+"\n");
-    if ((delete && (n==0 || n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (n==0 || n==1 || n==2 || n==3))) t.append("        " + s.M.baseName()+" <= 0;"+traceComment()+"\n");
+    if ((delete && (        n==1         || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append("/*CCC11*/        " + s.C.name()    +" <= 0;"+traceComment()+"\n");
+    if ((delete && (        n==1 || n==2 || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append("/*CCC22*/        " + s.T.name()    +" <= 0;"+traceComment()+"\n");
+    if ((delete && (n==0 || n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (n==0 || n==1 || n==2 || n==3))) t.append("/*CCC33*/        " + s.M.baseName()+" <= 0;"+traceComment()+"\n");
     return ""+t;
    }
 
@@ -2420,7 +2420,7 @@ module $project(reset, stop, clock, Key, Data, data, found);                    
   assign found = $T[$found_at];                                                 // Found the key
   assign data  = $T[$data_at+:$data_width];                                     // Data associated with key found
 
-$stuckBases
+  $stuckBases
 
   always @ (posedge clock) begin                                                // Execute next step in program
 
