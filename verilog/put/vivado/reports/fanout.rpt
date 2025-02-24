@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sun Feb 23 14:24:07 2025
+| Date         : Sun Feb 23 19:44:31 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_high_fanout_nets -file /home/azureuser/btreeBlock/verilog/put/vivado/reports//fanout.rpt
 | Design       : put
@@ -13,19 +13,19 @@ High Fan-out Nets Information
 1. Summary
 ----------
 
-+-------------------------------------------------------------------+--------+-------------+
-| Net Name                                                          | Fanout | Driver Type |
-+-------------------------------------------------------------------+--------+-------------+
-| leaf_3_StuckSA_Transaction_102_reg_n_0_[43]                       |   6594 | FDRE        |
-| opCodeMap[6]                                                      |   4406 | MUXF7       |
-| M_77_reg[529]_i_98_n_4                                            |   4260 | CARRY4      |
-| M_77_reg[707]_i_330_n_4                                           |   3821 | CARRY4      |
-| M_77_reg[529]_i_98_n_5                                            |   3811 | CARRY4      |
-| M_77_reg[705]_i_188_n_6                                           |   3322 | CARRY4      |
-| M_77_reg[707]_i_330_n_5                                           |   3022 | CARRY4      |
-| M_77_reg[705]_i_188_n_7                                           |   2780 | CARRY4      |
-| index_branch_3_StuckSA_Memory_Based_88_base_offset_reg[5]_i_3_n_4 |   2490 | CARRY4      |
-| M_77_reg[529]_i_98_n_6                                            |   2366 | CARRY4      |
-+-------------------------------------------------------------------+--------+-------------+
++----------------------------------------------------------+--------+-------------+
+| Net Name                                                 | Fanout | Driver Type |
++----------------------------------------------------------+--------+-------------+
+| opCodeMap[4]                                             |  13269 | MUXF7       |
+| opCodeMap[5]                                             |  12363 | MUXF7       |
+| opCodeMap[1]                                             |  10407 | MUXF7       |
+| opCodeMap[7]                                             |   9304 | MUXF7       |
+| opCodeMap[2]                                             |   9268 | MUXF7       |
+| branch_1_StuckSA_Transaction_84_reg_n_0_[44]             |   7722 | FDRE        |
+| M_77_reg[706]_i_16_n_0                                   |   7469 | MUXF7       |
+| branch_1_StuckSA_Transaction_84_reg_n_0_[43]             |   6917 | FDRE        |
+| opCodeMap[3]                                             |   6614 | MUXF7       |
+| branch_2_StuckSA_Memory_Based_85_base_offset_reg_n_0_[9] |   5014 | FDRE        |
++----------------------------------------------------------+--------+-------------+
 
 
