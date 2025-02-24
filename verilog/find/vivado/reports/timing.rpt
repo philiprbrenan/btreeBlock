@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sat Feb 22 06:18:45 2025
+| Date         : Mon Feb 24 20:19:58 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_timing_summary -file /home/azureuser/btreeBlock/verilog/find/vivado/reports//timing.rpt
 | Design       : find
@@ -43,7 +43,7 @@ Timing Summary Report
 
 Rule       Severity          Description                  Violations  
 ---------  ----------------  ---------------------------  ----------  
-TIMING-17  Critical Warning  Non-clocked sequential cell  41          
+TIMING-17  Critical Warning  Non-clocked sequential cell  40          
 
 Note: This report is based on the most recent report_methodology run and may not be up-to-date. Run report_methodology on the current design for the latest report.
 
@@ -53,10 +53,10 @@ check_timing report
 
 Table of Contents
 -----------------
-1. checking no_clock (41)
+1. checking no_clock (40)
 2. checking constant_clock (0)
 3. checking pulse_width_clock (0)
-4. checking unconstrained_internal_endpoints (106)
+4. checking unconstrained_internal_endpoints (104)
 5. checking no_input_delay (6)
 6. checking no_output_delay (5)
 7. checking multiple_clock (0)
@@ -66,9 +66,9 @@ Table of Contents
 11. checking partial_output_delay (0)
 12. checking latch_loops (0)
 
-1. checking no_clock (41)
+1. checking no_clock (40)
 -------------------------
- There are 41 register/latch pins with no clock driven by root clock pin: clock (HIGH)
+ There are 40 register/latch pins with no clock driven by root clock pin: clock (HIGH)
 
 
 2. checking constant_clock (0)
@@ -81,9 +81,9 @@ Table of Contents
  There are 0 register/latch pins which need pulse_width check
 
 
-4. checking unconstrained_internal_endpoints (106)
+4. checking unconstrained_internal_endpoints (104)
 --------------------------------------------------
- There are 106 pins that are not constrained for maximum delay. (HIGH)
+ There are 104 pins that are not constrained for maximum delay. (HIGH)
 
  There are 0 pins that are not constrained for maximum delay due to constant clock.
 
