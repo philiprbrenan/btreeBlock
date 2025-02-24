@@ -1,8 +1,8 @@
 <style>
 body {
     font-family: Verdana, sans-serif;
-    margin-left: 9vw;
-    margin-right: 9vw;
+    margin-left: 5vw;
+    margin-right: 5vw;
     max-width: 60ch;
     word-wrap: break-word;
     font-size: 2em;
@@ -31,8 +31,8 @@ li {
 <h1 id="xxx">Database on a Chip</h1>
 <h2 id="xxx">The problem</h2>
 
-<p>Data centers use one hundred times as much power as other businesses do,
-according to the Wall Street Journal.
+<p><q>Data centers use one hundred times as much power as most other businesses
+do</q>, according to the <a href="https://www.wsj.com/">The Wall Street Journal</a>.
 
 <p><img src="images/DataCentersUseALotOfElectricity.jpg">
 
@@ -93,40 +93,40 @@ major global cities:</p>
 </table>
 
 
-<p>As a consequence, <a href="https://en.wikipedia.org/wiki/Data">data</a> center operators like to locate their <a href="https://en.wikipedia.org/wiki/Data">data</a> centers
-close to reliable supplies of cheap electricity. For example, Gmail is located
+<p>As a consequence, <a href="https://en.wikipedia.org/wiki/Data">data</a> center operators like to locate themselves close to
+reliable supplies of cheap electricity. For example, <i>Gmail</i> is located
 near the Bonneville Dam in The Cascades, on the River Columbia, in Oregon.</p>
 
 <p><img src="images/BonnevilleDam.jpg"/>
 
 <p>Global electricity production currently amounts to $2 trillion annually -
-equivalent to the GDP of Italy.</p>
+equivalent to the gdp of Italy.</p>
 
 <p><img src="images/Italy.jpg"/>
 
-<p>Data centers do a lot of <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups. Every company has a <a href="https://en.wikipedia.org/wiki/Database">database</a> and
-every company spends lots of time and money looking stuff up in their <a href="https://en.wikipedia.org/wiki/Database">database</a>,
-quickly, because their customers demand it.</p>
+<h2 id="xxx">The Solution</h2>
+
+<p>Data centers do do a lot of <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups. Every company has a <a href="https://en.wikipedia.org/wiki/Database">database</a>
+and every company spends lots of time and money looking stuff up in their
+<a href="https://en.wikipedia.org/wiki/Database">database</a>, quickly, because their customers demand it.</p>
 
 <p><img src="images/EveryCompanyHasADatabase.jpg">
 
-<h2 id="xxx">The Solution</h2>
+<p>If we could make <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups just a <a href="https://en.wikipedia.org/wiki/Bit">bit</a> more efficient, <a href="https://en.wikipedia.org/wiki/Data">data</a> centers
+would save a quite lot of money on their huge electricity bills - perhaps
+<b>$100 million</b> per year.</p>
 
-<p>If we could make <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups more efficient, <a href="https://en.wikipedia.org/wiki/Data">data</a> centers would save a
-<a href="https://en.wikipedia.org/wiki/Bit">bit</a> of money on their huge electricity bills - perhaps $100 million per year.</p>
-
-<p>Appa Apps Inc. is prototyping a specialized <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a> to perform
-<a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups 10 times faster while using 10 times less electricity
+<p>Appa Apps Inc. is prototyping a specialized <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a> to perform <a href="https://en.wikipedia.org/wiki/Database">database</a>
+look-ups <b>10</b> times faster while using <b>10</b> times less electricity
 than generic <a href="https://en.wikipedia.org/wiki/Computer">computer</a>s do.</p>
 
 <p><img src="images/AppaAppsIsPrototypingASiliconChip.jpg">
 
 <h2>This is not a new idea...</h2>
 
-<p>Today, everyone has a mobile phone with a graphics processing unit (GPU)
-implemented in <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> rather than <a href="https://en.wikipedia.org/wiki/Software">software</a> because the original, software-only
-<a href="https://en.wikipedia.org/wiki/Software_versioning">version</a>s were too slow. And every personal <a href="https://en.wikipedia.org/wiki/Computer">computer</a> has a GPU for much the same
-reason.</p>
+<p>Today, everyone has a mobile phone with a <a href="https://en.wikipedia.org/wiki/Graphics_processing_unit">Graphics Processing Unit</a> implemented in <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> rather
+than <a href="https://en.wikipedia.org/wiki/Software">software</a> because the original, software-only <a href="https://en.wikipedia.org/wiki/Software_versioning">version</a>s were far too slow.
+And every personal <a href="https://en.wikipedia.org/wiki/Computer">computer</a> has a <a href="https://en.wikipedia.org/wiki/Graphics_processing_unit">Graphics Processing Unit</a> for much the same reason.</p>
 
 <p><img src="images/EvolutionOfMobilePhone.png">
 
@@ -141,50 +141,53 @@ processing in <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> rather
 operators be more competitive by reducing the cost and time spent doing
 <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups.</p>
 
+<h2 id="xxx">Roadmap</h2>
+
 <p>Appa Apps Inc. has recently succeeded in synthesizing a Verilog <a href="https://en.wikipedia.org/wiki/Software_versioning">version</a> of
 the well known <a href="https://en.wikipedia.org/wiki/Database">database</a> algorithm normally written in <b>C</b> ready for
 programming into an <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> (FPGA).</p>
 
 <p><img src="images/fpga.jpg">
 
-<h2 id="xxx">Roadmap</h2>
-
-<p>We are going to use a <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> mounted on a card to compare the performance of
-our specialized implementation of the <a href="https://en.wikipedia.org/wiki/Database">database</a> algorithm with the performance
-of a generic <a href="https://en.wikipedia.org/wiki/Computer">computer</a>, implemented on the same <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a>, running the same algorithm.</p>
+<p>We are going to a <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> to compare the performance of our specialized
+implementation of the <a href="https://en.wikipedia.org/wiki/Database">database</a> algorithm with the performance of a generic
+<a href="https://en.wikipedia.org/wiki/Computer">computer</a>, likewise implemented on the same <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a>, running the <b>C</b> <a href="https://en.wikipedia.org/wiki/Software_versioning">version</a>
+of the algorithm.</p>
 
 <p><img id="tugOfWar" src="images/SpecializedVersusGeneric.jpg">
 
-<p>Assuming our specialized <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> implementation can do <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups
-significantly faster using less power than the comparable generic
-implementation: we are going to send the major operators copies of the
-programmed <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> mounted on a card so that they can plug it in and see for
-themselves that they are currently wasting money, needlessly, on their
-electricity bills because they are not using using our technology.</p>
+<p>Hopefully our specialized <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> implementation will be able to do <a href="https://en.wikipedia.org/wiki/Database">database</a>
+look-ups significantly faster while using less power than the comparable
+implementation on a generic computer.</p>
+
+<p>If it can, we want to send the major operators copies of the programmed <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a>
+mounted on a board so that they can plug it in and see for themselves that they
+are currently wasting money, needlessly, on their huge electricity bills
+because they are not using using our technology.</p>
 
 <p><img src="images/DatabaseOnAnFPGA.png">
 
-<p>We aim to raise $1M to:
+<p>We aim to raise <b>$1 million</b> for a seed round to:</p>
 
 <ol>
 
-<li>Buy <a href="https://en.wikipedia.org/wiki/Digital_electronics">hardware</a> to demonstrate our technology,
+<li>Buy the <a href="https://en.wikipedia.org/wiki/Digital_electronics">hardware</a> necessary to demonstrate our technology,</li>
 
-<li>Hire <a href="https://en.wikipedia.org/wiki/Digital_electronics">hardware</a> engineers to implement our technology on that <a href="https://en.wikipedia.org/wiki/Digital_electronics">hardware</a> as an
-actual programmed <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> connected to the real world via <a href="https://en.wikipedia.org/wiki/Ethernet">Ethernet</a>,
+<li>Hire <a href="https://en.wikipedia.org/wiki/Digital_electronics">hardware</a> engineers to implement our technology as an actual programmed
+<a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> connected to the real world via <a href="https://en.wikipedia.org/wiki/Ethernet">Ethernet</a> and usb,</li>
 
 <li>Hire sales and marketing personnel to present our findings to the major
 operators with the goal of getting letters of intent from them to buy <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s
-based on our design.
+based on our design.</li>
 
 </ol>
 
 <p><img src="images/LetterOfIntent.jpg">
 
-<p>If they do provide letters of intent to buy such <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s, we will use those
-letters to drive a large Series <b>A</b> funding round and get into the
-business of saving our planet by reducing the electricity consumed doing
-<a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups while making a lot of money.</p>
+<p>If they provide letters of intent to buy such <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s, we will use them to
+drive a large Series <b>A</b> funding round to convert the <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> into an <a href="https://en.wikipedia.org/wiki/Application-specific_integrated_circuit">application specific integrated circuit</a>
+implemented on <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s to reduce the time and electricity consumed doing
+<a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups even more effectively.</p>
 
 <h2 id="xxx">Frequently asked questions</h2>
 
@@ -194,8 +197,8 @@ business of saving our planet by reducing the electricity consumed doing
 
 <p><img src="images/JustMeAndChatGpt.jpg">
 
-<p><a href="https://platform.openai.com/docs/guides/text-generation">Chat GPT</a> is very useful as it does all the  boring low-level coding, letting
-me concentrate on the problem of what, exactly, to <a href="https://en.wikipedia.org/wiki/Computer_program">code</a>.
+<p><a href="https://platform.openai.com/docs/guides/text-generation">Chat GPT</a> is very useful as it does all the boring low-level coding, letting
+me concentrate on the problem of what, exactly, should be coded.
 
 <p>Appa Apps Inc. is a class <b>C</b> corporation registered in Austin,
 Texas.</p>
@@ -210,13 +213,13 @@ last two years with no time off for anything else.
 <ul>
 
 <li>Moore's law has come to an end so generic <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s are starting to give way to
-specialist <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s.
+specialist chips.</li>
 
 <li>The <a href="https://en.wikipedia.org/wiki/Artificial_intelligence">artificial intelligence</a> boom is creating lots of spare fabrication capacity at the
-semiconductor foundries that produce <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s.
+semiconductor foundries that produce chips.</li>
 
 <li><a href="https://en.wikipedia.org/wiki/Artificial_intelligence">artificial intelligence</a> makes it possible to explore the myriad <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a> design possibilities much
-more easily than ever before.
+more easily than ever before.</li>
 
 </ul>
 
