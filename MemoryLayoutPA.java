@@ -536,7 +536,7 @@ class MemoryLayoutPA extends Test                                               
            }
          }
         String v()                                                              // Logarithmic move
-         {final StringBuilder v = new StringBuilder("/* MemoryLayoutPA.copy */\n");
+         {final StringBuilder w = new StringBuilder();
           final int    N = Length.width, C = copySize();                        // Log2 of the largest possible copy
           final String l = "l", //Target.ml().copyLength(),                            // Length of move in bits
                        s = "s", //Source.ml().copyIndex(),                             // Source of move in backing memory - the offset in memory
@@ -547,26 +547,27 @@ class MemoryLayoutPA extends Test                                               
 //                     t = Target.ml().copyIndex(),                             // Target of move in backing memory - the offset in memory
 //                     m = Target.ml().name();                                  // Name of backing memory
 
-          v.append("begin\n");
-          v.append("  reg["+C+":0] "+l+";\n");
-          v.append("  reg["+C+":0] "+s+";\n");
-          v.append("  reg["+C+":0] "+t+";\n");
+          w.append("  reg["+C+":0] "+l+";\n");
+          w.append("  reg["+C+":0] "+s+";\n");
+          w.append("  reg["+C+":0] "+t+";\n");
 
-          v.append("  "+l + " = " + Length.verilogLoad() + ";\n");
-          v.append("  "+s + " = " + Source.verilogAddr() + ";\n");
-          v.append("  "+t + " = " + Target.verilogAddr() + ";\n");
+          w.append("  "+l + " = " + Length.verilogLoad() + ";\n");
+          w.append("  "+s + " = " + Source.verilogAddr() + ";\n");
+          w.append("  "+t + " = " + Target.verilogAddr() + ";\n");
 
           for (int i = N+1; i > 0; --i)
            {final int u = 1<<(i-1);
-            v.append("  if (" +l+" >= "+u+") begin\n");
-            v.append("     "+m+"["+t+" +: "+u+"] <= "+m+"["+s+" +: "+u+"];\n");
-            v.append("     "  +l+" = "+l+" - "+u+";\n");                          // These assigns have to be made immediately else each block has to be executed one after another to drive the length and pointers sequentially.
-            v.append("     "  +s+" = "+s+" + "+u+";\n");
-            v.append("     "  +t+" = "+t+" + "+u+";\n");
-            v.append("  end\n");
+            w.append("  if (" +l+" >= "+u+") begin\n");
+            w.append("     "+m+"["+t+" +: "+u+"] <= "+m+"["+s+" +: "+u+"];\n");
+            w.append("     "  +l+" = "+l+" - "+u+";\n");                          // These assigns have to be made immediately else each block has to be executed one after another to drive the length and pointers sequentially.
+            w.append("     "  +s+" = "+s+" + "+u+";\n");
+            w.append("     "  +t+" = "+t+" + "+u+";\n");
+            w.append("  end\n");
            }
-          v.append("end\n");
-          return v.toString();
+
+          final String code = ""+w, md5 = md5Sum(code);
+
+          return "/*MemoryLayoutPA.copy*/\n"+"begin : L"+md5+"\n"+code+"end\n";
          }
        };
      }
