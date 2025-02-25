@@ -11,6 +11,7 @@ abstract class StuckPA extends Test                                             
   abstract int bitsPerSize();                                                   // The number of bits needed to define the size field
 
   final String      name;                                                       // Name of the stuck
+  final int bitsPerAddress;                                                     // Number of bits needed to address a bit in the memory containign the stuck
   final MemoryLayoutPA M;                                                       // Memory for stuck
   final MemoryLayoutPA C;                                                       // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
   final MemoryLayoutPA T;                                                       // Memory for transaction intermediates
@@ -43,6 +44,10 @@ abstract class StuckPA extends Test                                             
   Layout.Variable          zero;                                                // A field with zero in it
   Layout.Structure         temp;                                                // Transaction intermediate fields
 
+  Layout.Variable  copy_source_keys, copy_source_data;                          // Index/pointer, length variables to copy a variable number of bits from one stuck to another
+  Layout.Variable  copy_target_keys, copy_target_data;
+  Layout.Variable  copy_length_keys, copy_length_data;
+
 //D1 Construction                                                               // Create a stuck
 
   StuckPA(String Name)                                                          // Create the stuck with a maximum number of the specified elements
@@ -51,12 +56,14 @@ abstract class StuckPA extends Test                                             
 
   StuckPA(String Name, MemoryLayoutPA Based)                                    // Create the stuck with a maximum number of the specified elements
    {zz(); name = Name;
-    final Layout layout = layout(), tl = transactionLayout();                   // Layout out the stuck
+    final Layout layout = layout();                                             // Layout out the stuck
     if (Based != null && Based.based()) M = Based;                              // Some usable memory has been supplied
     else M = new MemoryLayoutPA(layout, Name+"_StuckSA_Memory", Based);         // No memory has been supplied, so create some memory and then base off it to assist in testing.
     C = new MemoryLayoutPA(layout, name+"_StuckSA_Copy");                       // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
-    T = new MemoryLayoutPA(tl,     name+"_StuckSA_Transaction");                // Memory for transaction intermediates
 
+    bitsPerAddress = logTwo(M.baseSize());                                      // The stuck might be located any where in this memory
+    final Layout tl = transactionLayout();                                      // Layout out of transacions performed on stuck
+    T = new MemoryLayoutPA(tl,     name+"_StuckSA_Transaction");                // Memory for transaction intermediates
     program(M.P);
    }
 
@@ -106,21 +113,30 @@ abstract class StuckPA extends Test                                             
 
   Layout transactionLayout()                                                    // Layout of temporary memory used by a transaction
    {zz();
-    final Layout l = Layout.layout();
-             isFull = l.bit      (       "isFull");
-            isEmpty = l.bit      (      "isEmpty");
-              found = l.bit      (        "found");
-              equal = l.bit      (        "equal");
-             search = l.variable (       "search", bitsPerKey());
-               tKey = l.variable (          "key", bitsPerKey());
-              tData = l.variable (         "data", bitsPerData());
-              limit = l.variable (        "limit", bitsPerSize());
-              index = l.variable (        "index", bitsPerSize());
-               size = l.variable (         "size", bitsPerSize());
-               full = l.variable (         "full", bitsPerSize());
-          copyCount = l.variable (    "copyCount", bitsPerSize());
-       copyBitsKeys = l.variable ( "copyBitsKeys", bitsPerSize() + bitsPerKey());
-       copyBitsData = l.variable ( "copyBitsData", bitsPerSize() + bitsPerData());
+    final Layout       l = Layout.layout();
+             isFull  = l.bit      (       "isFull");
+            isEmpty  = l.bit      (      "isEmpty");
+              found  = l.bit      (        "found");
+              equal  = l.bit      (        "equal");
+             search  = l.variable (       "search", bitsPerKey());
+               tKey  = l.variable (          "key", bitsPerKey());
+              tData  = l.variable (         "data", bitsPerData());
+              limit  = l.variable (        "limit", bitsPerSize());
+              index  = l.variable (        "index", bitsPerSize());
+               size  = l.variable (         "size", bitsPerSize());
+               full  = l.variable (         "full", bitsPerSize());
+          copyCount  = l.variable (    "copyCount", bitsPerSize());
+       copyBitsKeys  = l.variable ( "copyBitsKeys", bitsPerSize() + bitsPerKey());
+       copyBitsData  = l.variable ( "copyBitsData", bitsPerSize() + bitsPerData());
+
+    copy_source_keys = l.variable ("copy_source_keys", bitsPerAddress);
+    copy_target_keys = l.variable ("copy_target_keys", bitsPerAddress);
+    copy_length_keys = l.variable ("copy_length_keys", bitsPerAddress);
+
+    copy_source_data = l.variable ("copy_source_data", bitsPerAddress);
+    copy_target_data = l.variable ("copy_target_data", bitsPerAddress);
+    copy_length_data = l.variable ("copy_length_data", bitsPerAddress);
+
     temp = l.structure("temp",
            isFull,
            isEmpty,
@@ -135,7 +151,13 @@ abstract class StuckPA extends Test                                             
            full,
            copyCount,
            copyBitsKeys,
-           copyBitsData);
+           copyBitsData,
+           copy_source_keys,
+           copy_target_keys,
+           copy_length_keys,
+           copy_source_data,
+           copy_target_data,
+           copy_length_data);
     return l.compile();
    }
 
@@ -205,7 +227,9 @@ abstract class StuckPA extends Test                                             
      };
     final MemoryLayoutPA.At ti = T.at(index);
     final MemoryLayoutPA.At si = source.T.at(source.index);
-    M.at(sKey, ti).copy(source.M.at(source.sKey, si), T.at(copyBitsKeys));
+//  M.at(sKey, ti).copy(source.M.at(source.sKey, si), T.at(copyBitsKeys));
+    M.at(sKey, ti).copy(source.M.at(source.sKey, si), T.at(copyBitsKeys),
+    T.at(copy_target_keys), T.at(copy_source_keys), T.at(copy_length_keys));
    }
 
   void copyData(StuckPA source)                                                 // Copy the specified number of elements from the source array of data at the specified index into the target array of data at the specified target index
@@ -216,7 +240,9 @@ abstract class StuckPA extends Test                                             
      };
     final MemoryLayoutPA.At ti = T.at(index);
     final MemoryLayoutPA.At si = source.T.at(source.index);
-    M.at(sData, ti).copy(source.M.at(source.sData, si), T.at(copyBitsData));
+//  M.at(sData, ti).copy(source.M.at(source.sData, si), T.at(copyBitsData));
+    M.at(sData, ti).copy(source.M.at(source.sData, si), T.at(copyBitsData),
+      T.at(copy_target_data), T.at(copy_source_data), T.at(copy_length_data));
    }
 
   void copyKeysData(StuckPA source)                                             // Copy the specified number of key, data pairs from the source array at the specified index into the target array at the specified target index
