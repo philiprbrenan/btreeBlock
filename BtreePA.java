@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// BtreeSA in pseudo assembler.
+// BtreeSA in pseudo assembler .
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024-2025
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
