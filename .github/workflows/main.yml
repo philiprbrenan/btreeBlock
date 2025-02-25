@@ -1,4 +1,4 @@
-# Test 2025-02-25 at 18:58:41
+# Test 2025-02-25 at 23:32:27
 
 name: Test
 run-name: btreeBlock
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        task: [StuckPA]
+        task: [BtreePA]
 
     steps:
     - uses: actions/checkout@v4
@@ -54,8 +54,8 @@ jobs:
       run: |
         javac -g -d Classes -cp Classes `find com/AppaApps/Silicon -name "*.java"`
 
-    - name: Test StuckPA
-      if: matrix.task == 'StuckPA'
+    - name: Test BtreePA
+      if: matrix.task == 'BtreePA'
       run: |
-        java -cp Classes com/AppaApps/Silicon/StuckPA
+        java -cp Classes com/AppaApps/Silicon/BtreePA
 
