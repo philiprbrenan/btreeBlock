@@ -122,10 +122,10 @@ abstract class StuckPA extends Test                                             
                tKey  = l.variable (          "key", bitsPerKey());
               tData  = l.variable (         "data", bitsPerData());
               limit  = //l.variable (        "limit", bitsPerSize());
-              index  = l.variable (        "index", bitsPerSize());
-               size  = l.variable (         "size", bitsPerSize());
-               full  = l.variable (         "full", bitsPerSize());
           copyCount  = l.variable (    "copyCount", bitsPerSize());
+              index  = l.variable (        "index", bitsPerSize());
+               size  = //l.variable (         "size", bitsPerSize());
+               full  = l.variable (         "full", bitsPerSize());
        copyBitsKeys  = l.variable ( "copyBitsKeys", bitsPerSize() + bitsPerKey());
        copyBitsData  = l.variable ( "copyBitsData", bitsPerSize() + bitsPerData());
 
@@ -147,7 +147,7 @@ abstract class StuckPA extends Test                                             
            tData,
 //         limit,
            index,
-           size,
+//         size,
            full,
            copyCount,
            copyBitsKeys,
