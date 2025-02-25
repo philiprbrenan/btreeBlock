@@ -28,15 +28,15 @@ die "No such path: $vivado"    unless -d $vivado  or -e "/home/phil";           
 die "No such file: $vivadoX"   unless -f $vivadoX or -e "/home/phil";
 
 sub gen                                                                         # Generate tcl to synthesize design
- {my ($project, $key) = @_;                                                     # Project, key
+ {my ($design, $key) = @_;                                                      # Project, key
 
-  my $projectDir  = fpd $verilogDir, $project, $key;                            # Location of project input files
-  my $projectOut  = fpd $verilogDir, $project, qw(vivado);                      # Location of project output files
-  my $includesDir = fpd $projectDir, qw(includes);                              # Set the path to the includes directory
-  my $reportsDir  = fpd $projectOut, qw(reports);                               # Reports
-  my $dcpDir      = fpd $projectOut, qw(dcp);                                   # Checkpoints
-  my $synthesis   = fpe $vivadoDir,      $project, qw(tcl);                     # Generated vivado commands
-  my $constraints = fpe $constraintsDir, $part,    qw(xdc);                     # Constraints file
+  my $designDir  = fpd $verilogDir, $design, $key;                              # Location of project input files
+  my $designOut  = fpd $verilogDir, $design, qw(vivado);                        # Location of project output files
+  my $includesDir = fpd $designDir, qw(includes);                               # Set the path to the includes directory
+  my $reportsDir  = fpd $designOut, qw(reports);                                # Reports
+  my $dcpDir      = fpd $designOut, qw(dcp);                                    # Checkpoints
+  my $synthesis   = fpe $vivadoDir,      $design, qw(tcl);                      # Generated vivado commands
+  my $constraints = fpe $constraintsDir, $part,   qw(xdc);                      # Constraints file
 
   makePath fpd $reportsDir;                                                     # Ensure folder structure is present
   makePath fpd $dcpDir;                                                         # Ensure folder structure is present
@@ -48,10 +48,10 @@ sub gen                                                                         
   my @s = <<"END";                                                              # Write tcl to run the synthesis
 set_param general.maxThreads 1
 
-read_verilog $projectDir/$project.v
+read_verilog $designDir/$design.v
 read_xdc     $constraints
 
-synth_design -name $project -top $project -part $part -include_dirs $includesDir -flatten_hierarchy none
+synth_design -name $design -top $design -part $part -include_dirs $includesDir -flatten_hierarchy none
 write_checkpoint -force $dcpDir/synth.dcp
 
 opt_design
@@ -74,12 +74,12 @@ write_checkpoint -force $dcpDir/place.dcp
 route_design
 write_checkpoint -force $dcpDir/route.dcp
 
-write_bitstream  -force $projectDir/final.bit
+write_bitstream  -force $vivadoDir/$design/final.bit
 END
 
   owf($synthesis, join "\n", @s);                                               # Write tcl to run the synthesis
 
-  say   STDERR dateTimeStamp, " $part for $project";                            # Run tcl
+  say   STDERR dateTimeStamp, " $part for $design";                             # Run tcl
   print STDERR qx($vivadoX -mode batch -source $synthesis 1>$reportsDir/1.txt);
 
   #unlink $synthesis;
