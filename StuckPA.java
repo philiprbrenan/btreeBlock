@@ -114,14 +114,14 @@ abstract class StuckPA extends Test                                             
   Layout transactionLayout()                                                    // Layout of temporary memory used by a transaction
    {zz();
     final Layout       l = Layout.layout();
-             isFull  = l.bit      (       "isFull");
-            isEmpty  = l.bit      (      "isEmpty");
-              found  = l.bit      (        "found");
+             isFull  = //l.bit      (       "isFull");
+            isEmpty  = //l.bit      (      "isEmpty");
+              found  = //l.bit      (        "found");
               equal  = l.bit      (        "equal");
-             search  = l.variable (       "search", bitsPerKey());
+             search  = //l.variable (       "search", bitsPerKey());
                tKey  = l.variable (          "key", bitsPerKey());
               tData  = l.variable (         "data", bitsPerData());
-              limit  = l.variable (        "limit", bitsPerSize());
+              limit  = //l.variable (        "limit", bitsPerSize());
               index  = l.variable (        "index", bitsPerSize());
                size  = l.variable (         "size", bitsPerSize());
                full  = l.variable (         "full", bitsPerSize());
@@ -138,14 +138,14 @@ abstract class StuckPA extends Test                                             
     copy_length_data = l.variable ("copy_length_data", bitsPerAddress);
 
     temp = l.structure("temp",
-           isFull,
-           isEmpty,
-           found,
+//         isFull,
+//         isEmpty,
+//         found,
            equal,
-           search,
+//         search,
            tKey,
            tData,
-           limit,
+//         limit,
            index,
            size,
            full,
