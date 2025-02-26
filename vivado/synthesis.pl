@@ -79,6 +79,7 @@ write_checkpoint -force $place
 
 route_design
 write_checkpoint -force $route
+report_timing_summary    -file ${reportsDir}timing_route.rpt
 
 write_bitstream  -force $final
 END
