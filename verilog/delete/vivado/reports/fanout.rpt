@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sat Feb 22 07:35:05 2025
+| Date         : Tue Feb 25 16:25:44 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_high_fanout_nets -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports//fanout.rpt
 | Design       : delete
@@ -13,19 +13,19 @@ High Fan-out Nets Information
 1. Summary
 ----------
 
-+-------------------------+--------+-------------+
-| Net Name                | Fanout | Driver Type |
-+-------------------------+--------+-------------+
-| M_9_reg[707]_i_488_n_4  |   4806 | CARRY4      |
-| M_9_reg[707]_i_488_n_5  |   4376 | CARRY4      |
-| M_9_reg[706]_i_902_n_6  |   4219 | CARRY4      |
-| M_9_reg[706]_i_902_n_7  |   3981 | CARRY4      |
-| M_9_reg[686]_i_278_n_7  |   2943 | CARRY4      |
-| M_9_reg[707]_i_488_n_6  |   2934 | CARRY4      |
-| M_9[701]_i_15_n_0       |   2918 | LUT3        |
-| M_9_reg[706]_i_1180_n_7 |   2862 | CARRY4      |
-| M_9_reg[686]_i_278_n_4  |   2818 | CARRY4      |
-| M_9_reg[703]_i_580_n_7  |   2582 | CARRY4      |
-+-------------------------+--------+-------------+
++----------------------------------------------+--------+-------------+
+| Net Name                                     | Fanout | Driver Type |
++----------------------------------------------+--------+-------------+
+| branch_1_StuckSA_Transaction_16_reg_n_0_[95] |  10297 | FDRE        |
+| branch_1_StuckSA_Transaction_16_reg_n_0_[94] |   8950 | FDRE        |
+| opCodeMap[7]                                 |   8602 | MUXF7       |
+| branch_2_StuckSA_Transaction_19_reg_n_0_[95] |   6844 | FDRE        |
+| branch_1_StuckSA_Transaction_16_reg_n_0_[93] |   6577 | FDRE        |
+| branch_2_StuckSA_Transaction_19_reg_n_0_[94] |   5922 | FDRE        |
+| branch_2_StuckSA_Transaction_19_reg_n_0_[93] |   5391 | FDRE        |
+| branch_2_StuckSA_Transaction_19_reg_n_0_[92] |   5309 | FDRE        |
+| branch_1_StuckSA_Transaction_16_reg_n_0_[92] |   5243 | FDRE        |
+| leaf_2_StuckSA_Transaction_31_reg_n_0_[95]   |   5161 | FDRE        |
++----------------------------------------------+--------+-------------+
 
 
