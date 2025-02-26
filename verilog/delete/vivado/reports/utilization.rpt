@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sat Feb 22 07:29:31 2025
+| Date         : Tue Feb 25 16:21:01 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_utilization -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports//utilization.rpt
 | Design       : delete
@@ -34,14 +34,14 @@ Table of Contents
 +-------------------------+--------+-------+------------+-----------+-------+
 |        Site Type        |  Used  | Fixed | Prohibited | Available | Util% |
 +-------------------------+--------+-------+------------+-----------+-------+
-| Slice LUTs*             | 246331 |     0 |          0 |   1221600 | 20.16 |
-|   LUT as Logic          | 246331 |     0 |          0 |   1221600 | 20.16 |
+| Slice LUTs*             | 213548 |     0 |          0 |   1221600 | 17.48 |
+|   LUT as Logic          | 213548 |     0 |          0 |   1221600 | 17.48 |
 |   LUT as Memory         |      0 |     0 |          0 |    344800 |  0.00 |
-| Slice Registers         |   1966 |     0 |          0 |   2443200 |  0.08 |
-|   Register as Flip Flop |   1966 |     0 |          0 |   2443200 |  0.08 |
+| Slice Registers         |   3110 |     0 |          0 |   2443200 |  0.13 |
+|   Register as Flip Flop |   3110 |     0 |          0 |   2443200 |  0.13 |
 |   Register as Latch     |      0 |     0 |          0 |   2443200 |  0.00 |
-| F7 Muxes                |  10708 |     0 |          0 |    610800 |  1.75 |
-| F8 Muxes                |   1715 |     0 |          0 |    305400 |  0.56 |
+| F7 Muxes                |   9641 |     0 |          0 |    610800 |  1.58 |
+| F8 Muxes                |   3341 |     0 |          0 |    305400 |  1.09 |
 +-------------------------+--------+-------+------------+-----------+-------+
 * Warning! The Final LUT count, after physical optimizations and full implementation, is typically lower. Run opt_design after synthesis, if not already completed, for a more realistic count.
 Warning! LUT value is adjusted to account for LUT combining.
@@ -62,8 +62,8 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 | 0     |          Yes |           - |            - |
 | 0     |          Yes |           - |          Set |
 | 0     |          Yes |           - |        Reset |
-| 126   |          Yes |         Set |            - |
-| 1840  |          Yes |       Reset |            - |
+| 124   |          Yes |         Set |            - |
+| 2986  |          Yes |       Reset |            - |
 +-------+--------------+-------------+--------------+
 
 
@@ -160,16 +160,16 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 +----------+--------+---------------------+
 | Ref Name |  Used  | Functional Category |
 +----------+--------+---------------------+
-| LUT6     | 161691 |                 LUT |
-| LUT5     |  57618 |                 LUT |
-| LUT4     |  29305 |                 LUT |
-| LUT3     |  23391 |                 LUT |
-| LUT2     |  11801 |                 LUT |
-| MUXF7    |  10708 |               MuxFx |
-| FDRE     |   1840 |        Flop & Latch |
-| MUXF8    |   1715 |               MuxFx |
-| FDSE     |    126 |        Flop & Latch |
-| CARRY4   |     86 |          CarryLogic |
+| LUT6     | 136060 |                 LUT |
+| LUT5     |  54105 |                 LUT |
+| LUT4     |  27380 |                 LUT |
+| LUT3     |  14517 |                 LUT |
+| MUXF7    |   9641 |               MuxFx |
+| LUT2     |   7400 |                 LUT |
+| MUXF8    |   3341 |               MuxFx |
+| FDRE     |   2986 |        Flop & Latch |
+| FDSE     |    124 |        Flop & Latch |
+| CARRY4   |     85 |          CarryLogic |
 | LUT1     |     55 |                 LUT |
 | RAMB36E1 |     40 |        Block Memory |
 | IBUF     |      7 |                  IO |
