@@ -64,4 +64,5 @@ set_property PACKAGE_PIN Y8   [get_ports {Key[3]}]
 #set_property SLEW SLOW [get_ports found]
 #set_property SLEW SLOW [get_ports stop]
 
-set_max_fanout 16 [get_nets -filter {NAME !~ clock}]
+# Set max fan-out for all non-clock signals
+set_property MAX_FANOUT 16 [get_pins -hierarchical * -filter {is_clock==0}]
