@@ -63,3 +63,6 @@ set_property PACKAGE_PIN Y8   [get_ports {Key[3]}]
 #set_property SLEW SLOW [get_ports {data[3]}]
 #set_property SLEW SLOW [get_ports found]
 #set_property SLEW SLOW [get_ports stop]
+
+
+set_max_fanout 16 [get_nets -filter {NAME !~ clock}]
