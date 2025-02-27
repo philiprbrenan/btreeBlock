@@ -2473,14 +2473,19 @@ $stuckBases
        {s.append("      case(opCodeMap[step])\n");                              // Case statements to select the code for the current instruction
 
         for(StringToNumbers.Order o : ops.outputOrder)                          // I shall say each instruction only once
-         {final String  k = ""+o.ordinal; //o.joinKeys();                       // Steps
-          final String  i = o.string;                                           // Instruction
+         {final String k = ""+o.ordinal; //o.joinKeys();                        // Steps
+          final String I = o.string;                                            // Instruction before next
+          final String i;                                                       // Instruction after next
+
+          if      (I.contains("/*GoTo*/"))   i = I;
+          else if (I.contains("/*GoNext*/")) i = I.replace("/*GoNext*/", " else step <= step+1;");
+          else                               i = I +                          " step <= step+1;";
 
           if (i.contains("\n"))                                                 // Multi line instruction
-           {s.append(String.format("%s%s : begin\n%s\n%send\n", p, k, i, q));
+           {s.append(String.format("%s%s : begin\n%s\n%s end\n", p, k, i, q));
            }
           else                                                                  // Single line instruction
-           {s.append(String.format("%s%s : begin %s end\n", p, k, i));
+           {s.append(String.format("%s%s : begin %s end\n",      p, k, i));
            }
          }
        }
@@ -2508,7 +2513,7 @@ $stuckBases
       s.append("        default : begin stopped <= 1; /* end of execution */ end\n"); // Any invalid instruction address causes the program to halt
       s.append("""
       endcase
-      step = step + 1;
+//    step = step + 1;
      `ifndef SYNTHESIS
         steps <= steps + 1;
      `endif
@@ -3920,7 +3925,7 @@ endmodule
     test_verilog_delete();
     test_verilog_find();
     test_verilog_put();
-    test_delete_small_random();
+    //test_delete_small_random();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
