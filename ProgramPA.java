@@ -59,13 +59,14 @@ class ProgramPA extends Test                                                    
         I.push(this);
         ++currentCode;
        }
+      i();                                                                      // Additional initialization
      }
     void   a() {}                                                               // Action performed by instruction
     String n() {return "instruction";}                                          // Instruction name
     String v() {return " /* NOT SET */";}                                       // Corresponding verilog
     void   i() {}                                                               // initialization for each instruction
 
-    String traceComment() {return " /* " + traceBack.replaceAll("\n", " ") + " */";}                  // Traceback as a comment
+    String traceComment() {return " /* " + traceBack.replaceAll("\n", " ") + " */";} // Traceback as a comment
 
     public int compareTo(I that)
      {z(); return Integer.compare(instructionNumber, that.instructionNumber);
@@ -199,7 +200,8 @@ class ProgramPA extends Test                                                    
    {zz();
     new I()
      {void   a() {z(); step = label.instruction-1;}                             // The program execution for loop will increment
-      String v() {return "step = "+(label.instruction-1)+";";}                  // The program execution for loop will increment
+//    String v() {return "step = "+(label.instruction-1)+";";}                  // The program execution for loop will increment
+      String v() {return "step <= "+(label.instruction)+"; /*GoTo*/";}          // The program execution for loop will increment
       String n() {return "Go to "+(label.instruction+1);}                       // One based with no auto increment from run
       void   i() {mightJump = true;}                                            // Will certainly jump
      };
@@ -210,7 +212,8 @@ class ProgramPA extends Test                                                    
      {void a()
        {z(); if (condition.setOff().getInt() > 0) step = label.instruction-1;
        }
-      String v() {return "if ("+condition.verilogLoad()+" > 0) step = "+(label.instruction-1)+";";} // The program execution for loop will increment
+//    String v() {return "if ("+condition.verilogLoad()+" > 0) step = "+(label.instruction-1)+";";} // The program execution for loop will increment
+      String v() {return "if ("+condition.verilogLoad()+" > 0) step <= "+(label.instruction)+"; /*GoNext*/";} // The program execution for loop will increment
       String n() {return "GoOn "+condition.field.name+" to "+(label.instruction+1);}
       void   i() {mightJump = true;}                                            // Might jump
      };
@@ -221,7 +224,8 @@ class ProgramPA extends Test                                                    
      {void a()
        {z(); if (condition.setOff().getInt() == 0) step = label.instruction-1;
        }
-      String v() {return "if ("+condition.verilogLoad()+" == 0) step = "+(label.instruction-1)+";";} // The program execution for loop will increment
+//    String v() {return "if ("+condition.verilogLoad()+" == 0) step = "+(label.instruction-1)+";";} // The program execution for loop will increment
+      String v() {return "if ("+condition.verilogLoad()+" == 0) step <= "+(label.instruction)+"; /*GoNext*/";} // The program execution for loop will increment
       String n() {return "GoOff "+condition.field.name+" to "+(label.instruction+1);}
       void   i() {mightJump = true;}                                            // Might jump
      };
