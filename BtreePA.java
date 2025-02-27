@@ -2425,7 +2425,7 @@ $stuckBases
   always @ (posedge clock) begin                                                // Execute next step in program
 
     if (reset) begin                                                            // Reset
-      step      = 0;
+      step     <= 0;
      `ifndef SYNTHESIS
         steps  <= 0;
      `endif
