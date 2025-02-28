@@ -674,7 +674,7 @@ abstract class StuckPA extends Test                                             
         for (int i = 0; i < N; i++)                                             // Search
          {z();
           final boolean f = T.at(equalLeafKey, i).setOff().getInt() > 0;        // Whether this key is in range and is equal
-          Found.setInt((f || Found.setOff().getInt() > 0) ? 1 : 0);                      // Any key matched ?
+          Found.setInt((f || Found.setOff().getInt() > 0) ? 1 : 0);             // Any key matched ?
           if (f) Index.setInt(i);                                               // Save index if this key matched
           if (f) Data .setInt(M.at(sData, i).setOff().getInt());                // Save data if this key matched
          }
