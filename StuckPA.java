@@ -738,7 +738,7 @@ abstract class StuckPA extends Test                                             
 //   };
 // }
 
-  void searchFirstGreaterThanOrEqual(boolean all,                               // Search for an element within all elements of the stuck or all but one
+  void searchFirstGreaterThanOrEqual2(boolean all,                              // Search for an element within all elements of the stuck or all but one
     MemoryLayoutPA.At Search, MemoryLayoutPA.At Found,
     MemoryLayoutPA.At Index,
     MemoryLayoutPA.At Key,    MemoryLayoutPA.At Data)
@@ -812,6 +812,113 @@ abstract class StuckPA extends Test                                             
           else     v.append(M.at(sData, M.at(currentSize)).verilogLoadAddr(false, -1) + ";\n"); // Address one back
          }
         return v.toString();
+       }
+     };
+   }
+
+  void searchFirstGreaterThanOrEqual(boolean all,                               // Search for the first matching element in the stuck greater than or equal to the search element using multiple instructions with shorter paths than the original one instruction solution.
+    MemoryLayoutPA.At Search, MemoryLayoutPA.At Found,
+    MemoryLayoutPA.At Index,
+    MemoryLayoutPA.At Key,    MemoryLayoutPA.At Data)
+   {zz(); action = "search";
+
+    P.new I()                                                                   // Matching key, in valid part of  stuck
+     {void a()
+       {Found.setOff().setInt(0);                                               // Assume we will not find the key
+        final int s = Search           .setOff().getInt();                      // Key to search for
+        final int X = M.at(currentSize).setOff().getInt();                      // Number of elements to search
+        final int N = maxSize();                                                // Maximum number of elements to search
+        for (int i = 0; i < N; i++)                                             // Search
+         {z();
+          final int k = M.at(sKey, i)  .setOff().getInt();                      // Current key
+          T.at(equalLeafKey,     i).setInt(k >= s ? 1 : 0);
+          T.at(lessThanLeafSize, i).setInt(i <  X ? 1 : 0);
+         }
+       }
+      String v()
+       {final StringBuilder v = new StringBuilder();                            // Verilog
+        final String        s = Search.verilogLoad();                           // Search key
+        final String        X = M.at(currentSize).verilogLoad();                // Number of elements to search
+        final int           N = maxSize();
+
+        v.append("/* StuckPA.search2.1 */\n");
+        for (int i = 0; i < N; i++)
+         {v.append(T.at(equalLeafKey,     i).verilogLoad()+" <= "+M.at(sKey, i).verilogLoad()+" >= "+s+";\n");
+          v.append(T.at(lessThanLeafSize, i).verilogLoad()+" <= "+i+                          " < " +X+";\n");
+         }
+        return ""+v;
+       }
+     };
+
+    P.new I()                                                                   // Matching key and in valid part of stuck
+     {void a()
+       {Found.setOff().setInt(0);                                               // Assume we will not find the key
+        final int N = maxSize();                                                // Maximum number of elements to search
+        for (int i = 0; i < N; i++)                                             // Search
+         {z();
+          final boolean e = T.at(equalLeafKey,     i).setOff().getInt() > 0;
+          final boolean E = i > 0 ? T.at(equalLeafKey,   -1+i).setOff().getInt() ==  0 : true;
+          final boolean v = T.at(lessThanLeafSize, i).setOff().getInt() > 0;
+          T.at(equalLeafKey, i).setInt(v && e && E ? 1 : 0);
+         }
+       }
+      String v()
+       {final StringBuilder v = new StringBuilder();                            // Verilog
+        final int           N = maxSize();
+
+        v.append("/* StuckPA.search2.2 */\n");
+        for (int i = 0; i < N; i++)
+         {v.append(T.at(equalLeafKey,     i).verilogLoad()+" <= ");
+          v.append(T.at(equalLeafKey,     i).verilogLoad()+" >  0 && ");
+          if (i > 0)
+           {v.append(T.at(equalLeafKey,-1+i).verilogLoad()+" == 0 && ");
+           }
+          v.append(T.at(lessThanLeafSize, i).verilogLoad()+";\n");
+         }
+        return ""+v;
+       }
+     };
+
+    P.new I()                                                                   // Found or not
+     {void a()
+       {Found.setOff().setInt(0);                                               // Assume we will not find the key
+        final int N = maxSize();                                                // Maximum number of elements to search
+        boolean found = false;
+        Found.setOff();
+        Index.setOff();
+        Data .setOff();
+        for (int i = 0; i < N; i++)                                             // Search
+         {z();
+          final boolean f = T.at(equalLeafKey, i).setOff().getInt() > 0;        // Whether this key is in range and is equal
+          Found.setInt((f || Found.setOff().getInt() > 0) ? 1 : 0);             // Any key matched ?
+          if (f) Index.setInt(i);                                               // Save index if this key matched
+          if (f) Key .setInt(M.at(sKey,  i).setOff().getInt());                 // Save matching key
+          if (f) Data.setInt(M.at(sData, i).setOff().getInt());                 // Save data if this key matched
+         }
+       }
+      String v()
+       {final StringBuilder v = new StringBuilder();                            // Verilog
+        final int           N = maxSize();
+
+        v.append("/* StuckPA.search2.3 */\n");
+        v.append(Found.verilogLoad()+" <= 0");                                  // Found
+        for (int i = 0; i < N; i++) v.append(" || "+T.at(equalLeafKey, i).verilogLoad() + " > 0");
+        v.append(";\n");
+
+        v.append(Index.verilogLoad()+" <= ");                                   // Index
+        for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+i+" : ");
+        v.append("0;\n");                                                       // Not found so it can be anything
+
+        v.append(Key.verilogLoad()+" <= ");                                     // Key
+        for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+M.at(sKey, i).verilogLoad()+" : ");
+        v.append("0;\n");                                                       // Not found so it can be anything
+
+        if (Data != null)
+         {v.append(Data.verilogLoad()+" <= ");                                  // Data
+          for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+M.at(sData, i).verilogLoad()+" : ");
+          v.append("0;\n");                                                     // Not found so it can be anything
+         }
+        return ""+v;
        }
      };
    }
@@ -1529,6 +1636,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.setIntInstruction(k, 5);
     s.searchFirstGreaterThanOrEqual(true, m.at(k), m.at(f), m.at(i), m.at(K), m.at(d));
     s.P.run(); s.P.clear();
+    //stop(s.T);
     //stop(m);
     ok(m, """
 MemoryLayout: m
@@ -1544,7 +1652,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     s.P.new I() {void a() {s.T.at(s.search).setInt(7);}};
     s.searchFirstGreaterThanOrEqual(true, s.T.at(s.search), s.T.at(s.found),
-      s.T.at(s.index), s.T.at(s.tKey), s.T.at(s.tData));
+    s.T.at(s.index), s.T.at(s.tKey), s.T.at(s.tData));
     s.P.run(); s.P.clear();
     //stop(t);
 //    ok(s.print(), """
@@ -2421,7 +2529,7 @@ StuckSML(maxSize:4 size:4)
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_search2();
+    test_search_first_greater_than_or_equal();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
