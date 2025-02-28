@@ -824,8 +824,7 @@ abstract class StuckPA extends Test                                             
 
     P.new I()                                                                   // Matching key, in valid part of  stuck
      {void a()
-       {Found.setOff().setInt(0);                                               // Assume we will not find the key
-        final int s = Search           .setOff().getInt();                      // Key to search for
+       {final int s = Search           .setOff().getInt();                      // Key to search for
         final int X = M.at(currentSize).setOff().getInt();                      // Number of elements to search
         final int N = maxSize();                                                // Maximum number of elements to search
         for (int i = 0; i < N; i++)                                             // Search
@@ -852,12 +851,11 @@ abstract class StuckPA extends Test                                             
 
     P.new I()                                                                   // Matching key and in valid part of stuck
      {void a()
-       {Found.setOff().setInt(0);                                               // Assume we will not find the key
-        final int N = maxSize();                                                // Maximum number of elements to search
+       {final int N = maxSize();                                                // Maximum number of elements to search
         for (int i = 0; i < N; i++)                                             // Search
          {z();
-          final boolean e = T.at(equalLeafKey,     i).setOff().getInt() > 0;
-          final boolean E = i > 0 ? T.at(equalLeafKey,   -1+i).setOff().getInt() ==  0 : true;
+          final boolean e =         T.at(equalLeafKey,      i).setOff().getInt() >  0;
+          final boolean E = i > 0 ? T.at(equalLeafKey,   -1+i).setOff().getInt() == 0 : true;
           final boolean v = T.at(lessThanLeafSize, i).setOff().getInt() > 0;
           T.at(equalLeafKey, i).setInt(v && e && E ? 1 : 0);
          }
@@ -881,42 +879,56 @@ abstract class StuckPA extends Test                                             
 
     P.new I()                                                                   // Found or not
      {void a()
-       {Found.setOff().setInt(0);                                               // Assume we will not find the key
+       {if (Found != null) Found.setOff().setInt(0);                            // Assume we will not find the key
         final int N = maxSize();                                                // Maximum number of elements to search
-        boolean found = false;
-        Found.setOff();
-        Index.setOff();
-        Data .setOff();
+        final int c = M.at(currentSize).setOff().getInt();                      // Number of elements in stuck
+        final int C = c - (all ? 0 : 1);                                        // Number of elements to search
+        if (Index != null) Index.setInt(C);                                     // Default index if no key matches
+        if (Data  != null) Data.setInt(M.at(sData, C).setOff().getInt());       // Default data  if no key matches
+
         for (int i = 0; i < N; i++)                                             // Search
          {z();
           final boolean f = T.at(equalLeafKey, i).setOff().getInt() > 0;        // Whether this key is in range and is equal
-          Found.setInt((f || Found.setOff().getInt() > 0) ? 1 : 0);             // Any key matched ?
-          if (f) Index.setInt(i);                                               // Save index if this key matched
-          if (f) Key .setInt(M.at(sKey,  i).setOff().getInt());                 // Save matching key
-          if (f) Data.setInt(M.at(sData, i).setOff().getInt());                 // Save data if this key matched
+          if (Found != null) Found.setInt((f || Found.setOff().getInt() > 0) ? 1 : 0); // Any key matched ?
+          if (f && Index != null) Index.setInt(i);                              // Save index if this key matched
+          if (f && Key   != null) Key .setInt(M.at(sKey,  i).setOff().getInt());// Save matching key
+          if (f && Data  != null) Data.setInt(M.at(sData, i).setOff().getInt());// Save data if this key matched
          }
+        if (Found != null) say("Found", Found);
+        if (Index != null) say("Index", Index);
+        if (Data  != null) say("Data",  Data);
        }
       String v()
        {final StringBuilder v = new StringBuilder();                            // Verilog
         final int           N = maxSize();
 
         v.append("/* StuckPA.search2.3 */\n");
-        v.append(Found.verilogLoad()+" <= 0");                                  // Found
-        for (int i = 0; i < N; i++) v.append(" || "+T.at(equalLeafKey, i).verilogLoad() + " > 0");
-        v.append(";\n");
+        if (Found != null)                                                      // Found
+         {v.append(Found.verilogLoad()+" <= 0");
+          for (int i = 0; i < N; i++) v.append(" || "+T.at(equalLeafKey, i).verilogLoad() + " > 0");
+          v.append(";\n");
+v.append("$display(\"Found %d\", "+Found.verilogLoad()+");");
+         }
 
-        v.append(Index.verilogLoad()+" <= ");                                   // Index
-        for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+i+" : ");
-        v.append("0;\n");                                                       // Not found so it can be anything
+        if (Index != null)                                                      // Index
+         {v.append(Index.verilogLoad()+" <= ");
+          for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+i+" : ");
+          v.append("0;\n");                                                     // Not found so it can be anything
+v.append("$display(\"Index %d\", "+Index.verilogLoad()+");");
+         }
 
-        v.append(Key.verilogLoad()+" <= ");                                     // Key
-        for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+M.at(sKey, i).verilogLoad()+" : ");
-        v.append("0;\n");                                                       // Not found so it can be anything
+        if (Key != null)                                                        // Key
+         {v.append(Key.verilogLoad()+" <= ");
+          for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+M.at(sKey, i).verilogLoad()+" : ");
+          v.append("0;\n");                                                     // Not found so it can be anything
+         }
 
         if (Data != null)
          {v.append(Data.verilogLoad()+" <= ");                                  // Data
           for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+M.at(sData, i).verilogLoad()+" : ");
-          v.append("0;\n");                                                     // Not found so it can be anything
+          if (all) v.append(M.at(sData, M.at(currentSize)).verilogLoad() + ";\n");              // Normal address
+          else     v.append(M.at(sData, M.at(currentSize)).verilogLoadAddr(false, -1) + ";\n"); // Address one back
+v.append("$display(\"Data %d\", "+Data.verilogLoad()+");");
          }
         return ""+v;
        }
@@ -1652,7 +1664,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     s.P.new I() {void a() {s.T.at(s.search).setInt(7);}};
     s.searchFirstGreaterThanOrEqual(true, s.T.at(s.search), s.T.at(s.found),
-    s.T.at(s.index), s.T.at(s.tKey), s.T.at(s.tData));
+      s.T.at(s.index), s.T.at(s.tKey), s.T.at(s.tData));
     s.P.run(); s.P.clear();
     //stop(t);
 //    ok(s.print(), """
