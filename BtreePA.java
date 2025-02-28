@@ -593,7 +593,6 @@ abstract class BtreePA extends Test                                             
       //node_mergeLeftSibling,
       //node_mergeRightSibling,
       node_balance);
-
     return L.compile();
    }
 
@@ -2297,36 +2296,6 @@ abstract class BtreePA extends Test                                             
     for  (int l = 0; l < L; l++) s.append(stuckMemoryInitialization(l,   leafTransactions[l], Project));
     return s.toString();
    }
-/*
-Delete
-WARNING: [Synth 8-6014] Unused sequential element copyLength_leaf_1_StuckSA_Memory_Based_26_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:192]
-WARNING: [Synth 8-6014] Unused sequential element index_leaf_2_StuckSA_Memory_Based_29_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:193]
-WARNING: [Synth 8-6014] Unused sequential element index_leaf_1_StuckSA_Memory_Based_26_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:194]
-WARNING: [Synth 8-6014] Unused sequential element index_leaf_3_StuckSA_Memory_Based_32_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:324]
-WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_1_StuckSA_Memory_Based_14_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:470]
-WARNING: [Synth 8-6014] Unused sequential element index_branch_2_StuckSA_Memory_Based_17_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:471]
-WARNING: [Synth 8-6014] Unused sequential element index_branch_1_StuckSA_Memory_Based_14_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:472]
-WARNING: [Synth 8-6014] Unused sequential element index_branch_3_StuckSA_Memory_Based_20_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:604]
-WARNING: [Synth 8-6014] Unused sequential element copyLength_leaf_2_StuckSA_Memory_Based_29_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:1159]
-WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_2_StuckSA_Memory_Based_17_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:1294]
-
-Put
-WARNING: [Synth 8-6014] Unused sequential element branch_2_StuckSA_Copy_86_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:105]
-WARNING: [Synth 8-6014] Unused sequential element leaf_2_StuckSA_Copy_98_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:115]
-WARNING: [Synth 8-6014] Unused sequential element leaf_3_StuckSA_Copy_101_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:118]
-WARNING: [Synth 8-6014] Unused sequential element copyLength_leaf_3_StuckSA_Memory_Based_100_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:314]
-WARNING: [Synth 8-6014] Unused sequential element index_leaf_1_StuckSA_Memory_Based_94_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:315]
-WARNING: [Synth 8-6014] Unused sequential element index_leaf_3_StuckSA_Memory_Based_100_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:316]
-WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_3_StuckSA_Memory_Based_88_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:494]
-WARNING: [Synth 8-6014] Unused sequential element index_branch_1_StuckSA_Memory_Based_82_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:495]
-WARNING: [Synth 8-6014] Unused sequential element index_branch_3_StuckSA_Memory_Based_88_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:496]
-WARNING: [Synth 8-6014] Unused sequential element index_leaf_2_StuckSA_Memory_Based_97_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:711]
-WARNING: [Synth 8-6014] Unused sequential element copyLength_leaf_1_StuckSA_Memory_Based_94_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:966]
-WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_1_StuckSA_Memory_Based_82_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:1243]
-WARNING: [Synth 8-6014] Unused sequential element index_branch_2_StuckSA_Memory_Based_85_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:1244]
-WARNING: [Synth 8-6014] Unused sequential element copyLength_leaf_2_StuckSA_Memory_Based_97_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:1554]
-WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_2_StuckSA_Memory_Based_85_base_offset_reg was removed.  [/home/azureuser/btreeBlock/verilog/put/2/put.v:1757]
-*/
 
   String stuckMemory(int n, StuckPA s, String Project)                          // Base address variable for one stuck
    {final boolean  delete = Project.equalsIgnoreCase("delete");                 // Generating delete
@@ -2335,8 +2304,8 @@ WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_2_StuckSA_Me
     final StringBuilder t = new StringBuilder();
     t.append("reg ["+bitsPerAddress+"-1:0] "+s.M.baseName() + "; "+traceComment()+"\n");
     if ((delete && (        n==1         || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append(s.C.declareVerilog()+traceComment()+"\n");                  // Stuck copy area declaration for paralle moves
-    if ((delete && (n==0 || n==1 || n==2 || n==3))                     || (put && (n==0 || n==1 || n==2 || n==3))) t.append(s.T.declareVerilog()+traceComment()+"\n");                  // Transaction memory which is ephemeral versus permanent main memory
     if ((delete && (        n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (        n==1 || n==2 || n==3))) t.append(s.M.copyVerilogDec()+traceComment()+"\n");                  // Copy veriables used when copying stucks
+    if ((delete && (n==0 || n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (n==0 || n==1 || n==2 || n==3))) t.append(s.T.declareVerilog()+traceComment()+"\n");                  // Transaction memory which is ephemeral versus permanent main memory
     return ""+t;
    }
 
@@ -2346,8 +2315,8 @@ WARNING: [Synth 8-6014] Unused sequential element copyLength_branch_2_StuckSA_Me
     final boolean     put = Project.equalsIgnoreCase("put");                    // Generating put
     final StringBuilder t = new StringBuilder();
     if ((delete && (        n==1         || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append("        " + s.C.name()    +" <= 0;"+traceComment()+"\n");
-    if ((delete && (        n==1 || n==2 || n==3))                     || (put && (        n==1 || n==2 || n==3))) t.append("        " + s.T.name()    +" <= 0;"+traceComment()+"\n");
     if ((delete && (n==0 || n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (n==0 || n==1 || n==2 || n==3))) t.append("        " + s.M.baseName()+" <= 0;"+traceComment()+"\n");
+    if ((delete && (        n==1 || n==2 || n==3)) || (find && (n==0)) || (put && (        n==1 || n==2 || n==3))) t.append("        " + s.T.name()    +" <= 0;"+traceComment()+"\n");
     return ""+t;
    }
 
@@ -2797,7 +2766,7 @@ endmodule
   private static void test_find()
    {z();
     final int N = 64;
-     final BtreePA t = btreePA(8, 3);
+    final BtreePA t = btreePA(8, 3);
     t.P.run(); t.P.clear();
     t.put();
     for(int i = 2; i <= N; i += 2)
@@ -3554,7 +3523,7 @@ endmodule
       int    Data    () {return    2;}                                          // Input data value
       int    data    () {return    7;}                                          // Expected output data value
       int    maxSteps() {return 2000;}                                          // Maximum number if execution steps
-      int    expSteps() {return   13;}                                          // Expected number of steps
+      int    expSteps() {return   15;}                                          // Expected number of steps
       String expected() {return null;}                                          // Expected tree if present
      };
     //say("AAAA11", t);
@@ -3608,7 +3577,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 384, """
+    t.runVerilogDeleteTest(3, 6, 386, """
                     6           |
                     0           |
                     5           |
@@ -3620,7 +3589,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 326, """
+    t.runVerilogDeleteTest(4, 5, 328, """
              6           |
              0           |
              5           |
@@ -3632,7 +3601,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 353, """
+    t.runVerilogDeleteTest(2, 7, 355, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3640,7 +3609,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 277, """
+    t.runVerilogDeleteTest(1, 8, 279, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3648,7 +3617,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 166, """
+    t.runVerilogDeleteTest(5, 4, 168, """
       7      |
       0      |
       1      |
@@ -3656,7 +3625,7 @@ endmodule
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(6, 3, 172, """
+    t.runVerilogDeleteTest(6, 3, 174, """
     7      |
     0      |
     1      |
@@ -3664,15 +3633,15 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 202, """
+    t.runVerilogDeleteTest(7, 2, 204, """
 8,9=0 |
 """);
 
-    t.runVerilogDeleteTest(8, 1, 20, """
+    t.runVerilogDeleteTest(8, 1, 22, """
 9=0 |
 """);
 
-    t.runVerilogDeleteTest(9, 0, 20, """
+    t.runVerilogDeleteTest(9, 0, 22, """
 =0 |
 """);
    }
@@ -3698,15 +3667,15 @@ endmodule
     final BtreePA t = btreePA_small();
     t.P.run(); t.P.clear();
     t.put();
-    t.runVerilogPutTest(1, 24, """
+    t.runVerilogPutTest(1, 26, """
 1=0 |
 """);
 
-    t.runVerilogPutTest(2, 24, """
+    t.runVerilogPutTest(2, 26, """
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest(3, 98, """
+    t.runVerilogPutTest(3, 102, """
     1      |
     0      |
     1      |
@@ -3714,7 +3683,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 200, """
+    t.runVerilogPutTest(4, 204, """
       2      |
       0      |
       1      |
@@ -3722,7 +3691,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 245, """
+    t.runVerilogPutTest(5, 249, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -3730,7 +3699,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 271, """
+    t.runVerilogPutTest(6, 275, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3738,7 +3707,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 316, """
+    t.runVerilogPutTest(7, 320, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -3746,7 +3715,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 362, """
+    t.runVerilogPutTest(8, 368, """
              4             |
              0             |
              5             |
@@ -3758,7 +3727,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 339, """
+    t.runVerilogPutTest(9, 343, """
              4                    |
              0                    |
              5                    |
@@ -3770,7 +3739,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
 
-    t.runVerilogPutTest(10, 365, """
+    t.runVerilogPutTest(10, 369, """
              4                       |
              0                       |
              5                       |
@@ -3782,7 +3751,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9,10=2 |
 """);
 
-    t.runVerilogPutTest(11, 410, """
+    t.runVerilogPutTest(11, 414, """
              4                               |
              0                               |
              5                               |
@@ -3794,7 +3763,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9=8    10,11=2 |
 """);
 
-    t.runVerilogPutTest(12, 352, """
+    t.runVerilogPutTest(12, 356, """
                                8                 |
                                0                 |
                                5                 |
@@ -3806,7 +3775,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=2 |
 """);
 
-    t.runVerilogPutTest(13, 339, """
+    t.runVerilogPutTest(13, 343, """
                                8                          |
                                0                          |
                                5                          |
@@ -3818,7 +3787,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest(14, 365, """
+    t.runVerilogPutTest(14, 369, """
                                8                             |
                                0                             |
                                5                             |
@@ -3830,7 +3799,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=2 |
 """);
 
-    t.runVerilogPutTest(15, 410, """
+    t.runVerilogPutTest(15, 414, """
                                8                                     |
                                0                                     |
                                5                                     |
@@ -3842,7 +3811,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest(16, 393, """
+    t.runVerilogPutTest(16, 397, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -3854,7 +3823,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=2 |
 """);
 
-    t.runVerilogPutTest(17, 404, """
+    t.runVerilogPutTest(17, 408, """
                                8                  12                            |
                                0                  0.1                           |
                                5                  11                            |
@@ -3866,7 +3835,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest(18, 430, """
+    t.runVerilogPutTest(18, 434, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -3878,7 +3847,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17,18=2 |
 """);
 
-    t.runVerilogPutTest(19, 475, """
+    t.runVerilogPutTest(19, 479, """
                                8                  12                                        |
                                0                  0.1                                       |
                                5                  11                                        |
@@ -3890,7 +3859,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 425, """
+    t.runVerilogPutTest(20, 429, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
