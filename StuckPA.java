@@ -20,29 +20,33 @@ abstract class StuckPA extends Test                                             
   static boolean   debug;                                                       // Debug when true
   String          action;                                                       // Last action performed
 
-  Layout.Variable          sKey;                                                // Key in a stuck
-  Layout.Array             Keys;                                                // Array of keys
-  Layout.Variable         sData;                                                // Data associated with a key
-  Layout.Array             Data;                                                // Array of data associated with the array of keys
-  Layout.Variable   currentSize;                                                // Current size of stuck
-  Layout.Structure        stuck;                                                // The stuck itself
-  Layout.Variable        search;                                                // Search key
-  Layout.Variable         limit;                                                // Limit of search
-  Layout.Bit             isFull;                                                // Whether the stuck is currently full
-  Layout.Bit            isEmpty;                                                // Whether the stuck is currently empty
-  Layout.Bit              found;                                                // Whether a matching element was found
-  Layout.Variable         index;                                                // The index from which the key, data pair were retrieved
-  Layout.Variable          tKey;                                                // The retrieved key
-  Layout.Variable         tData;                                                // The retrieved data
-  Layout.Variable          size;                                                // The current size of the stuck
-  Layout.Variable          full;                                                // Used by isFull
-  Layout.Bit              equal;                                                // The result of an equal operation
-  Layout.Variable     copyCount;                                                // Number of elements to copy in a copy operation
-  Layout.Variable  copyBitsKeys;                                                // Number of keys bits to copy in a copy operation
-  Layout.Variable  copyBitsData;                                                // Number of data bits to copy in a copy operation
-  Layout.Variable  maxSizeValue;                                                // A field with the maximum size of the stuck in it
-  Layout.Variable          zero;                                                // A field with zero in it
-  Layout.Structure         temp;                                                // Transaction intermediate fields
+  Layout.Variable               sKey;                                           // Key in a stuck
+  Layout.Array                  Keys;                                           // Array of keys
+  Layout.Variable              sData;                                           // Data associated with a key
+  Layout.Array                  Data;                                           // Array of data associated with the array of keys
+  Layout.Variable        currentSize;                                           // Current size of stuck
+  Layout.Structure             stuck;                                           // The stuck itself
+  Layout.Variable             search;                                           // Search key
+  Layout.Variable              limit;                                           // Limit of search
+  Layout.Bit                  isFull;                                           // Whether the stuck is currently full
+  Layout.Bit                 isEmpty;                                           // Whether the stuck is currently empty
+  Layout.Bit                   found;                                           // Whether a matching element was found
+  Layout.Variable              index;                                           // The index from which the key, data pair were retrieved
+  Layout.Variable               tKey;                                           // The retrieved key
+  Layout.Variable              tData;                                           // The retrieved data
+  Layout.Variable               size;                                           // The current size of the stuck
+  Layout.Variable               full;                                           // Used by isFull
+  Layout.Bit                   equal;                                           // The result of an equal operation
+  Layout.Variable          copyCount;                                           // Number of elements to copy in a copy operation
+  Layout.Variable       copyBitsKeys;                                           // Number of keys bits to copy in a copy operation
+  Layout.Variable       copyBitsData;                                           // Number of data bits to copy in a copy operation
+  Layout.Variable       maxSizeValue;                                           // A field with the maximum size of the stuck in it
+  Layout.Variable               zero;                                           // A field with zero in it
+  Layout.Bit            equalLeafKey;                                           // Whether the indexed key is equal to the search key
+  Layout.Array     arrayEqualLeafKey;                                           // Whether each indexed key is equal to the search key
+  Layout.Bit        lessThanLeafSize;                                           // Whether the index is less than the leaf size
+  Layout.Array arrayLessThanLeafSize;                                           // Whether the index is less than the leaf size
+  Layout.Structure              temp;                                           // Transaction intermediate fields
 
   Layout.Variable  copy_source_keys, copy_source_data;                          // Index/pointer, length variables to copy a variable number of bits from one stuck to another
   Layout.Variable  copy_target_keys, copy_target_data;
@@ -62,7 +66,7 @@ abstract class StuckPA extends Test                                             
     C = new MemoryLayoutPA(layout, name+"_StuckSA_Copy");                       // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
 
     bitsPerAddress = logTwo(M.baseSize());                                      // The stuck might be located any where in this memory
-    final Layout tl = transactionLayout();                                      // Layout out of transacions performed on stuck
+    final Layout tl = transactionLayout();                                      // Layout out of transations performed on stuck
     T = new MemoryLayoutPA(tl,     name+"_StuckSA_Transaction");                // Memory for transaction intermediates
     program(M.P);
    }
@@ -113,29 +117,34 @@ abstract class StuckPA extends Test                                             
 
   Layout transactionLayout()                                                    // Layout of temporary memory used by a transaction
    {zz();
-    final Layout       l = Layout.layout();
-             isFull  = //l.bit      (       "isFull");
-            isEmpty  = //l.bit      (      "isEmpty");
-              found  = //l.bit      (        "found");
-              equal  = l.bit      (        "equal");
-             search  = //l.variable (       "search", bitsPerKey());
-               tKey  = l.variable (          "key", bitsPerKey());
-              tData  = l.variable (         "data", bitsPerData());
-              limit  = //l.variable (        "limit", bitsPerSize());
-          copyCount  = l.variable (    "copyCount", bitsPerSize());
-              index  = l.variable (        "index", bitsPerSize());
-               size  = //l.variable (         "size", bitsPerSize());
-               full  = l.variable (         "full", bitsPerSize());
-       copyBitsKeys  = l.variable ( "copyBitsKeys", bitsPerSize() + bitsPerKey());
-       copyBitsData  = l.variable ( "copyBitsData", bitsPerSize() + bitsPerData());
+    final Layout        l = Layout.layout();
+                  isFull  = //l.bit      (       "isFull");
+                 isEmpty  = //l.bit      (      "isEmpty");
+                   found  = //l.bit      (        "found");
+                   equal  = l.bit      (        "equal");
+                  search  = //l.variable (       "search", bitsPerKey());
+                    tKey  = l.variable (          "key", bitsPerKey());
+                   tData  = l.variable (         "data", bitsPerData());
+                   limit  = //l.variable (        "limit", bitsPerSize());
+               copyCount  = l.variable (    "copyCount", bitsPerSize());
+                   index  = l.variable (        "index", bitsPerSize());
+                    size  = //l.variable (         "size", bitsPerSize());
+                    full  = l.variable (         "full", bitsPerSize());
+            copyBitsKeys  = l.variable ( "copyBitsKeys", bitsPerSize() + bitsPerKey());
+            copyBitsData  = l.variable ( "copyBitsData", bitsPerSize() + bitsPerData());
 
-    copy_source_keys = l.variable ("copy_source_keys", bitsPerAddress);
-    copy_target_keys = l.variable ("copy_target_keys", bitsPerAddress);
-    copy_length_keys = l.variable ("copy_length_keys", bitsPerAddress);
+         copy_source_keys = l.variable ("copy_source_keys", bitsPerAddress);
+         copy_target_keys = l.variable ("copy_target_keys", bitsPerAddress);
+         copy_length_keys = l.variable ("copy_length_keys", bitsPerAddress);
 
-    copy_source_data = l.variable ("copy_source_data", bitsPerAddress);
-    copy_target_data = l.variable ("copy_target_data", bitsPerAddress);
-    copy_length_data = l.variable ("copy_length_data", bitsPerAddress);
+         copy_source_data = l.variable ("copy_source_data", bitsPerAddress);
+         copy_target_data = l.variable ("copy_target_data", bitsPerAddress);
+         copy_length_data = l.variable ("copy_length_data", bitsPerAddress);
+
+             equalLeafKey = l.bit  (     "equalLeafKey");
+        arrayEqualLeafKey = l.array("arrayEqualLeafKey",     equalLeafKey,     maxSize());
+         lessThanLeafSize = l.bit  (     "lessThanLeafSize");
+    arrayLessThanLeafSize = l.array("arrayLessThanLeafSize", lessThanLeafSize, maxSize());
 
     temp = l.structure("temp",
 //         isFull,
@@ -157,7 +166,9 @@ abstract class StuckPA extends Test                                             
            copy_length_keys,
            copy_source_data,
            copy_target_data,
-           copy_length_data);
+           copy_length_data,
+           arrayEqualLeafKey,
+           arrayLessThanLeafSize);
     return l.compile();
    }
 
@@ -543,7 +554,7 @@ abstract class StuckPA extends Test                                             
 //   };
 // }
 
-  void search                                                                   // Search for an element within all elements of the stuck
+  void search2                                                                  // Search for an element within all elements of the stuck
    (MemoryLayoutPA.At Search, MemoryLayoutPA.At Found,
     MemoryLayoutPA.At Index,  MemoryLayoutPA.At Data)
    {zz(); action = "search";
@@ -572,24 +583,119 @@ abstract class StuckPA extends Test                                             
         final int           N = maxSize();
 
         v.append("/* StuckPA.search */\n");
-        v.append(Found.verilogLoad()+" <= ( 0\n");                                // Found
+        v.append(Found.verilogLoad()+" <= ( 0\n");                              // Found
         for (int i = 0; i < N; i++)
          {v.append(" || ("+M.at(sKey, i).verilogLoad()+" == "+s+" &&  "+i+ " < "+c+")\n");
          }
         v.append(") ? 1 : 0;\n");
 
-        v.append(Index.verilogLoad()+" <=\n");                                   // Index of found key if any
+        v.append(Index.verilogLoad()+" <=\n");                                  // Index of found key if any
         for (int i = 0; i < N; i++)
          {v.append(    "("+M.at(sKey, i).verilogLoad()+" == "+s+" && "+i+ " < "+c+") ? "+i+" :\n");
          }
         v.append("0;\n");
 
-        v.append(Data.verilogLoad()+" <=\n");                                    // Data of found key if any
+        v.append(Data.verilogLoad()+" <=\n");                                   // Data of found key if any
         for (int i = 0; i < N; i++)
          {v.append(    "("+M.at(sKey, i).verilogLoad()+" == "+s+" && "+i+ " < "+c+") ? "+M.at(sData, i).verilogLoad()+" :\n");
          }
         v.append("0;\n");
         return v.toString();
+       }
+     };
+   }
+
+  void search                                                                   // Search for an element within all elements of the stuck using multiple instructions with shorter paths than the original one instruction solution.
+   (MemoryLayoutPA.At Search, MemoryLayoutPA.At Found,
+    MemoryLayoutPA.At Index,  MemoryLayoutPA.At Data)
+   {zz(); action = "search";
+
+    P.new I()                                                                   // Equals search key, in valid part of  stuck
+     {void a()
+       {Found.setOff().setInt(0);                                               // Assume we will not find the key
+        final int s = Search           .setOff().getInt();                      // Key to search for
+        final int X = M.at(currentSize).setOff().getInt();                      // Number of elements to search
+        final int N = maxSize();                                                // Maximum number of elements to search
+        for (int i = 0; i < N; i++)                                             // Search
+         {z();
+          final int k = M.at(sKey, i)  .setOff().getInt();                      // Current key
+          T.at(equalLeafKey,     i).setInt(k == s ? 1 : 0);
+          T.at(lessThanLeafSize, i).setInt(i <  X ? 1 : 0);
+         }
+       }
+      String v()
+       {final StringBuilder v = new StringBuilder();                            // Verilog
+        final String        s = Search.verilogLoad();                           // Search key
+        final String        X = M.at(currentSize).verilogLoad();                // Number of elements to search
+        final int           N = maxSize();
+
+        v.append("/* StuckPA.search2.1 */\n");
+        for (int i = 0; i < N; i++)
+         {v.append(T.at(equalLeafKey,     i).verilogLoad()+" <= "+M.at(sKey, i).verilogLoad()+" == "+s+";\n");
+          v.append(T.at(lessThanLeafSize, i).verilogLoad()+" <= "+i+                          " < " +X+";\n");
+         }
+        return ""+v;
+       }
+     };
+
+    P.new I()                                                                   // Equals search key and in valid part of stuck
+     {void a()
+       {Found.setOff().setInt(0);                                               // Assume we will not find the key
+        final int N = maxSize();                                                // Maximum number of elements to search
+        for (int i = 0; i < N; i++)                                             // Search
+         {z();
+          final boolean e = T.at(equalLeafKey,     i).setOff().getInt() > 0;
+          final boolean v = T.at(lessThanLeafSize, i).setOff().getInt() > 0;
+          T.at(equalLeafKey,     i).setInt(v && e ? 1 : 0);
+         }
+       }
+      String v()
+       {final StringBuilder v = new StringBuilder();                            // Verilog
+        final int           N = maxSize();
+
+        v.append("/* StuckPA.search2.2 */\n");
+        for (int i = 0; i < N; i++)
+         {v.append(T.at(equalLeafKey,     i).verilogLoad()+" <= ");
+          v.append(T.at(equalLeafKey,     i).verilogLoad()+" && ");
+          v.append(T.at(lessThanLeafSize, i).verilogLoad()+";\n");
+         }
+        return ""+v;
+       }
+     };
+
+    P.new I()                                                                   // Found or not
+     {void a()
+       {Found.setOff().setInt(0);                                               // Assume we will not find the key
+        final int N = maxSize();                                                // Maximum number of elements to search
+        boolean found = false;
+        Found.setOff();
+        Index.setOff();
+        Data .setOff();
+        for (int i = 0; i < N; i++)                                             // Search
+         {z();
+          final boolean f = T.at(equalLeafKey, i).setOff().getInt() > 0;        // Whether this key is in range and is equal
+          Found.setInt((f || Found.setOff().getInt() > 0) ? 1 : 0);                      // Any key matched ?
+          if (f) Index.setInt(i);                                               // Save index if this key matched
+          if (f) Data .setInt(M.at(sData, i).setOff().getInt());                // Save data if this key matched
+         }
+       }
+      String v()
+       {final StringBuilder v = new StringBuilder();                            // Verilog
+        final int           N = maxSize();
+
+        v.append("/* StuckPA.search2.3 */\n");
+        v.append(Found.verilogLoad()+" <= 0");                                  // Found
+        for (int i = 0; i < N; i++) v.append(" || "+T.at(equalLeafKey, i).verilogLoad() + " > 0");
+        v.append(";\n");
+
+        v.append(Index.verilogLoad()+" <= ");                                   // Index
+        for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+i+" : ");
+        v.append("0;\n");                                                       // Not found so it can be anything
+
+        v.append(Data.verilogLoad()+" <= ");                                    // Data
+        for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+M.at(sData, i).verilogLoad()+" : ");
+        v.append("0;\n");                                                       // Not found so it can be anything
+        return ""+v;
        }
      };
    }
@@ -1321,6 +1427,59 @@ Line T       At      Wide       Size    Indices        Value   Name
 //    ok(s.print(), """
 //Transaction(action:search search:8 limit:0 found:1 index:3 key:8 data:4 size:4 isFull:0 isEmpty:0)
 //""");
+    //stop(m);
+    ok(m, """
+MemoryLayout: m
+Memory      : m
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        49                                      S
+   2 V        0        16                                  8     k
+   3 B       16         1                                  1     f
+   4 V       17        16                                  3     i
+   5 V       33        16                                  4     d
+""");
+   }
+
+  static void test_search2()
+   {StuckPA s = test_load();
+
+    Layout               l = Layout.layout();
+    Layout.Variable  k = l.variable ("k", s.bitsPerKey());
+    Layout.Variable  f = l.bit      ("f");
+    Layout.Variable  i = l.variable ("i", s.bitsPerSize());
+    Layout.Variable  d = l.variable ("d", s.bitsPerData());
+    Layout.Structure S = l.structure("S", k, f, i, d);
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "m");
+                     m.program(s.P);
+
+    m.setIntInstruction(k, 6);
+    s.search2(m.at(k), m.at(f), m.at(i), m.at(d));
+    s.P.run(); s.P.clear();
+
+    //stop(s/print());
+//  ok(s.print(), """
+//Transaction(action:search search:2 limit:0 found:1 index:0 key:2 data:1 size:4 isFull:0 isEmpty:0)
+//""");
+    //stop(m);
+    ok(m, """
+MemoryLayout: m
+Memory      : m
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        49                                      S
+   2 V        0        16                                  6     k
+   3 B       16         1                                  1     f
+   4 V       17        16                                  2     i
+   5 V       33        16                                  3     d
+""");
+
+    m.setIntInstruction(k, 3);
+    s.search(m.at(k), m.at(f), m.at(i), m.at(d));
+    s.P.run(); s.P.clear();
+    ok(m.at(f).getInt(), 0);
+
+    m.setIntInstruction(k, 8);
+    s.search(m.at(k), m.at(f), m.at(i), m.at(d));
+    s.P.run(); s.P.clear();
     //stop(m);
     ok(m, """
 MemoryLayout: m
@@ -2242,6 +2401,7 @@ StuckSML(maxSize:4 size:4)
     test_remove_element_at();
     test_first_last();
     test_search();
+    test_search2();
 //  test_search_except_last();
     test_search_first_greater_than_or_equal();
     test_search_first_greater_than_or_equal_except_last();
@@ -2260,7 +2420,8 @@ StuckSML(maxSize:4 size:4)
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_search2();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
