@@ -1,4 +1,4 @@
-# Test 2025-02-27 at 04:06:31
+# Test 2025-02-28 at 00:46:59
 
 name: Test
 run-name: btreeBlock
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        task: [BtreePA]
+        task: [BtreePA, StuckPA]
 
     steps:
     - uses: actions/checkout@v4
@@ -58,4 +58,10 @@ jobs:
       if: matrix.task == 'BtreePA'
       run: |
         java -cp Classes com/AppaApps/Silicon/BtreePA
+
+
+    - name: Test StuckPA
+      if: matrix.task == 'StuckPA'
+      run: |
+        java -cp Classes com/AppaApps/Silicon/StuckPA
 
