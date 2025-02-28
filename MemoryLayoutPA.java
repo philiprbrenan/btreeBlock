@@ -396,7 +396,7 @@ class MemoryLayoutPA extends Test                                               
            }
          }
         String v()
-         {return target.verilogLoad()+" <= "+source.verilogLoad() + "/* MemoryLayoutPA.move */\n;";
+         {return target.verilogLoad()+" <= "+source.verilogLoad() + "/* MemoryLayoutPA.move */;";
          }
         String n() {return field.name+"="+source.field.name;}
         void   i()  {}
@@ -424,7 +424,7 @@ class MemoryLayoutPA extends Test                                               
         String v()
          {final StringBuilder s = new StringBuilder();
           for(int i = 0; i < N; ++i)
-           {return Targets[i].verilogLoad()+" <= "+source.verilogLoad() + "/* MemoryLayoutPA.moveTo */\n;";
+           {return Targets[i].verilogLoad()+" <= "+source.verilogLoad() + "/* MemoryLayoutPA.moveTo */;";
            }
           return s.toString();
          }
