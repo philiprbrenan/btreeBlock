@@ -36,3 +36,7 @@ set_property PACKAGE_PIN Y38  [get_ports {Data[3]}]
 
 # Set max fan-out for all non-clock signals
 set_property MAX_FANOUT 16 [get_nets]
+
+# Voltage
+set_property CFGBVS GND [current_design]
+set_property CONFIG_VOLTAGE 1.8 [current_design]
