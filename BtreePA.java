@@ -7,6 +7,7 @@ package com.AppaApps.Silicon;                                                   
 // isleaf() HasLeaves() and  other such queries like an If statement so we can evaluate the condition and jump in one instruction
 // Clean up node is leaf at end of delete()
 // Clock in the key/data to be used rather than using a large number of input pins
+// Run report_design_analysis -congestion and -complexity to find potential sources of congestion in the areas where nets are not fully routed and review UG906 for design closure techniques.
 import java.util.*;
 import java.nio.file.*;
 
