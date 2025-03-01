@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sat Mar  1 22:59:55 2025
+| Date         : Sat Mar  1 23:06:31 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_timing_summary -file /home/azureuser/btreeBlock/verilog/find/vivado/reports/timing_route.rpt
 | Design       : find
@@ -142,7 +142,7 @@ Table of Contents
 
     WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
     -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
-     97.664        0.000                      0                   11        0.126        0.000                      0                   11       49.600        0.000                       0                    15  
+     97.689        0.000                      0                   11        0.126        0.000                      0                   11       49.600        0.000                       0                    15  
 
 
 All user specified timing constraints are met.
@@ -165,7 +165,7 @@ clock  {0.000 50.000}       100.000         10.000
 
 Clock             WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
 -----             -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
-clock              97.664        0.000                      0                   11        0.126        0.000                      0                   11       49.600        0.000                       0                    15  
+clock              97.689        0.000                      0                   11        0.126        0.000                      0                   11       49.600        0.000                       0                    15  
 
 
 ------------------------------------------------------------------------------------------------
@@ -196,7 +196,7 @@ Path Group    From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing 
 From Clock:  clock
   To Clock:  clock
 
-Setup :            0  Failing Endpoints,  Worst Slack       97.664ns,  Total Violation        0.000ns
+Setup :            0  Failing Endpoints,  Worst Slack       97.689ns,  Total Violation        0.000ns
 Hold  :            0  Failing Endpoints,  Worst Slack        0.126ns,  Total Violation        0.000ns
 PW    :            0  Failing Endpoints,  Worst Slack       49.600ns,  Total Violation        0.000ns
 ---------------------------------------------------------------------------------------------------
@@ -204,15 +204,15 @@ PW    :            0  Failing Endpoints,  Worst Slack       49.600ns,  Total Vio
 
 Max Delay Paths
 --------------------------------------------------------------------------------------
-Slack (MET) :             97.664ns  (required time - arrival time)
-  Source:                 opCodeMap_reg[16][0]/C
+Slack (MET) :             97.689ns  (required time - arrival time)
+  Source:                 opCodeMap_reg[7][0]/C
                             (rising edge-triggered cell FDSE clocked by clock  {rise@0.000ns fall@50.000ns period=100.000ns})
   Destination:            stopped_reg/CE
                             (rising edge-triggered cell FDRE clocked by clock  {rise@0.000ns fall@50.000ns period=100.000ns})
   Path Group:             clock
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            100.000ns  (clock rise@100.000ns - clock rise@0.000ns)
-  Data Path Delay:        2.039ns  (logic 0.492ns (24.135%)  route 1.547ns (75.865%))
+  Data Path Delay:        2.014ns  (logic 0.620ns (30.787%)  route 1.394ns (69.213%))
   Logic Levels:           2  (LUT3=1 LUT4=1)
   Clock Path Skew:        -0.018ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    5.012ns = ( 105.012 - 100.000 ) 
@@ -234,14 +234,14 @@ Slack (MET) :             97.664ns  (required time - arrival time)
     BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.120     3.160 r  clock__0_BUFG_inst/O
                          net (fo=14, routed)          2.372     5.532    clock__0_BUFG
     SLR Crossing[0->2]   
-    SLICE_X396Y310       FDSE                                         r  opCodeMap_reg[16][0]/C
+    SLICE_X396Y310       FDSE                                         r  opCodeMap_reg[7][0]/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X396Y310       FDSE (Prop_fdse_C_Q)         0.282     5.814 f  opCodeMap_reg[16][0]/Q
-                         net (fo=2, routed)           0.601     6.415    p_16_in[0]
-    SLICE_X397Y310       LUT3 (Prop_lut3_I0_O)        0.157     6.572 f  stopped_i_3/O
-                         net (fo=2, routed)           0.467     7.038    p_0_in__0[0]
-    SLICE_X397Y310       LUT4 (Prop_lut4_I1_O)        0.053     7.091 r  stopped_i_1/O
-                         net (fo=2, routed)           0.479     7.570    stopped__0
+    SLICE_X396Y310       FDSE (Prop_fdse_C_Q)         0.282     5.814 r  opCodeMap_reg[7][0]/Q
+                         net (fo=2, routed)           0.601     6.415    p_7_in[0]
+    SLICE_X397Y310       LUT3 (Prop_lut3_I0_O)        0.168     6.583 r  stopped_i_2/O
+                         net (fo=2, routed)           0.314     6.896    p_0_in__0[0]
+    SLICE_X397Y310       LUT4 (Prop_lut4_I0_O)        0.170     7.066 r  stopped_i_1/O
+                         net (fo=2, routed)           0.479     7.546    stopped__0
     SLICE_X397Y310       FDRE                                         r  stopped_reg/CE
   -------------------------------------------------------------------    -------------------
 
@@ -259,9 +259,9 @@ Slack (MET) :             97.664ns  (required time - arrival time)
     SLICE_X397Y310       FDRE (Setup_fdre_C_CE)      -0.244   105.234    stopped_reg
   -------------------------------------------------------------------
                          required time                        105.234    
-                         arrival time                          -7.570    
+                         arrival time                          -7.546    
   -------------------------------------------------------------------
-                         slack                                 97.664    
+                         slack                                 97.689    
 
 
 
@@ -270,10 +270,10 @@ Slack (MET) :             97.664ns  (required time - arrival time)
 Min Delay Paths
 --------------------------------------------------------------------------------------
 Slack (MET) :             0.126ns  (arrival time - required time)
-  Source:                 opCodeMap_reg[16][3]/C
-                            (rising edge-triggered cell FDSE clocked by clock  {rise@0.000ns fall@50.000ns period=100.000ns})
-  Destination:            opCodeMap_reg[16][3]/D
-                            (rising edge-triggered cell FDSE clocked by clock  {rise@0.000ns fall@50.000ns period=100.000ns})
+  Source:                 opCodeMap_reg[7][3]/C
+                            (rising edge-triggered cell FDRE clocked by clock  {rise@0.000ns fall@50.000ns period=100.000ns})
+  Destination:            opCodeMap_reg[7][3]/D
+                            (rising edge-triggered cell FDRE clocked by clock  {rise@0.000ns fall@50.000ns period=100.000ns})
   Path Group:             clock
   Path Type:              Hold (Min at Fast Process Corner)
   Requirement:            0.000ns  (clock rise@0.000ns - clock rise@0.000ns)
@@ -294,11 +294,11 @@ Slack (MET) :             0.126ns  (arrival time - required time)
     BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026     1.115 r  clock__0_BUFG_inst/O
                          net (fo=14, routed)          1.016     2.131    clock__0_BUFG
     SLR Crossing[0->2]   
-    SLICE_X397Y309       FDSE                                         r  opCodeMap_reg[16][3]/C
+    SLICE_X397Y309       FDRE                                         r  opCodeMap_reg[7][3]/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X397Y309       FDSE (Prop_fdse_C_Q)         0.100     2.231 r  opCodeMap_reg[16][3]/Q
-                         net (fo=2, routed)           0.066     2.298    p_16_in[3]
-    SLICE_X397Y309       FDSE                                         r  opCodeMap_reg[16][3]/D
+    SLICE_X397Y309       FDRE (Prop_fdre_C_Q)         0.100     2.231 r  opCodeMap_reg[7][3]/Q
+                         net (fo=2, routed)           0.066     2.298    p_7_in[3]
+    SLICE_X397Y309       FDRE                                         r  opCodeMap_reg[7][3]/D
   -------------------------------------------------------------------    -------------------
 
                          (clock clock rise edge)      0.000     0.000 r  
@@ -309,9 +309,9 @@ Slack (MET) :             0.126ns  (arrival time - required time)
     BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.030     1.359 r  clock__0_BUFG_inst/O
                          net (fo=14, routed)          1.302     2.661    clock__0_BUFG
     SLR Crossing[0->2]   
-    SLICE_X397Y309       FDSE                                         r  opCodeMap_reg[16][3]/C
+    SLICE_X397Y309       FDRE                                         r  opCodeMap_reg[7][3]/C
                          clock pessimism             -0.529     2.131    
-    SLICE_X397Y309       FDSE (Hold_fdse_C_D)         0.040     2.171    opCodeMap_reg[16][3]
+    SLICE_X397Y309       FDRE (Hold_fdre_C_D)         0.040     2.171    opCodeMap_reg[7][3]
   -------------------------------------------------------------------
                          required time                         -2.171    
                          arrival time                           2.298    
