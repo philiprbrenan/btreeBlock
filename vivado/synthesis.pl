@@ -57,7 +57,6 @@ sub gen                                                                         
      {if (defined($statement) and $r =~ m(timing)is)
        {my $f = fpe $reportsDir, q(statement), $statement, $r,  q(rpt);
         makePath $f;
-        say STDERR "AAAA $f";
         push @r, qq(report_$r -file $f);
        }
       else
