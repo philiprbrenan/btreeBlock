@@ -1,9 +1,9 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Tue Feb 25 14:58:36 2025
+| Date         : Sat Mar  1 03:16:30 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
-| Command      : report_clock_interaction -file /home/azureuser/btreeBlock/verilog/find/vivado/reports//clock_interaction.rpt
+| Command      : report_clock_interaction -file /home/azureuser/btreeBlock/verilog/find/vivado/reports/clock_interaction.rpt
 | Design       : find
 | Device       : 7v2000t-flg1925
 | Speed File   : -1  PRODUCTION 1.10 2014-09-11
@@ -18,6 +18,6 @@ Clock Interaction Table
                             WNS                            TNS Failing  TNS Total    WNS Path         Clock-Pair           Inter-Clock  
 From Clock    To Clock      Clock Edges  WNS(ns)  TNS(ns)    Endpoints    Endpoints  Requirement(ns)  Classification       Constraints  
 ------------  ------------  -----------  -------  -------  -----------  -----------  ---------------  -------------------  -----------  
-clock         clock         rise - rise    93.26     0.00            0           72           100.00  Clean                Timed        
+clock         clock         rise - rise    89.92     0.00            0         1928           100.00  Clean                Timed        
 
 
