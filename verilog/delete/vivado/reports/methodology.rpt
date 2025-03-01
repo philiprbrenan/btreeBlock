@@ -1,9 +1,9 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Tue Feb 25 16:22:06 2025
+| Date         : Sat Mar  1 04:17:59 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
-| Command      : report_methodology -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports//methodology.rpt
+| Command      : report_methodology -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/methodology.rpt
 | Design       : delete
 | Device       : xc7v2000tflg1925-1
 | Speed File   : -1
@@ -23,214 +23,24 @@ Table of Contents
           Floorplan: delete
       Design limits: <entire design considered>
              Max checks: <unlimited>
-             Checks found: 52
-+-----------+----------+--------------------------------------------+--------+
-| Rule      | Severity | Description                                | Checks |
-+-----------+----------+--------------------------------------------+--------+
-| SYNTH-6   | Warning  | Timing of a RAM block might be sub-optimal | 40     |
-| TIMING-18 | Warning  | Missing input or output delay              | 12     |
-+-----------+----------+--------------------------------------------+--------+
+             Checks found: 14
++-----------+----------+-------------------------------+--------+
+| Rule      | Severity | Description                   | Checks |
++-----------+----------+-------------------------------+--------+
+| SYNTH-9   | Warning  | Small multiplier              | 2      |
+| TIMING-18 | Warning  | Missing input or output delay | 12     |
++-----------+----------+-------------------------------+--------+
 
 2. REPORT DETAILS
 -----------------
-SYNTH-6#1 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+SYNTH-9#1 Warning
+Small multiplier  
+Detected multiplier at leaf_1_StuckSA_Memory_Based_26_base_offset_reg[7]_i_3 of size 6x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
 Related violations: <none>
 
-SYNTH-6#2 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_0__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#3 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_1, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#4 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_10, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#5 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_10__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#6 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_11, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#7 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_11__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#8 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_12, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#9 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_12__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#10 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_13, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#11 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_13__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#12 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_14, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#13 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_14__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#14 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_15, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#15 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_15__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#16 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_16, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#17 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_16__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#18 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_17, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#19 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_17__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#20 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_18, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#21 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_18__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#22 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_19, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#23 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_19__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#24 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_1__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#25 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_2, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#26 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_2__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#27 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_3, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#28 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_3__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#29 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_4, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#30 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_4__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#31 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_5, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#32 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_5__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#33 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_6, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#34 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_6__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#35 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_7, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#36 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_7__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#37 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_8, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#38 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_8__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#39 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_9, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
-Related violations: <none>
-
-SYNTH-6#40 Warning
-Timing of a RAM block might be sub-optimal  
-The timing for the instance branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_9__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+SYNTH-9#2 Warning
+Small multiplier  
+Detected multiplier at leaf_1_StuckSA_Memory_Based_26_base_offset_reg[9]_i_7 of size 6x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
 Related violations: <none>
 
 TIMING-18#1 Warning
