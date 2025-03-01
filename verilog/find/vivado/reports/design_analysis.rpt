@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sat Mar  1 22:56:15 2025
+| Date         : Sat Mar  1 23:02:50 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_design_analysis -file /home/azureuser/btreeBlock/verilog/find/vivado/reports/design_analysis.rpt
 | Design       : find
@@ -49,7 +49,7 @@ Table of Contents
 | Mark Debug                | 0                                    |
 | Start Point Pin Primitive | FDSE/C                               |
 | End Point Pin Primitive   | FDRE/CE                              |
-| Start Point Pin           | opCodeMap_reg[16][0]/C               |
+| Start Point Pin           | opCodeMap_reg[7][1]/C                |
 | End Point Pin             | stopped_reg/CE                       |
 +---------------------------+--------------------------------------+
 * Bounding box calculated as % of dimensions for the target device (1156, 1200)
