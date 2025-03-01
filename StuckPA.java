@@ -753,7 +753,6 @@ abstract class StuckPA extends Test                                             
      {void a()
        {if (Found != null) Found.setInt(0);                                     // Assume we will not find the key
         final int s = Search.setOff().getInt();                                 // Key to search for
-        say("AAAA Search", s);
 
         final int c = M.at(currentSize).setOff().getInt();                      // Number of elements in stuck
         final int N = c - (all ? 0 : 1);                                        // Number of elements to search
@@ -771,9 +770,6 @@ abstract class StuckPA extends Test                                             
             break;
            }
          }
-        if (Found != null) say("BBBB Found", Found.setOff().getInt());
-        if (Index != null) say("BBBB Index", Index.setOff().getInt());
-        if (Data  != null) say("BBBB Data",  Data.setOff() .getInt());
        }
 
       String v()
@@ -829,7 +825,7 @@ abstract class StuckPA extends Test                                             
     P.new I()                                                                   // Matching key, in valid part of  stuck
      {void a()
        {final int s = Search           .setOff().getInt();                      // Key to search for
-        final int X = M.at(currentSize).setOff().getInt();                      // Number of elements to search
+        final int X = M.at(currentSize).setOff().getInt() - (all ? 0 : 1);      // Number of elements to search
         final int N = maxSize();                                                // Maximum number of elements to search
         for (int i = 0; i < N; i++)                                             // Search
          {z();
@@ -840,9 +836,9 @@ abstract class StuckPA extends Test                                             
        }
       String v()
        {final StringBuilder v = new StringBuilder();                            // Verilog
-        final String        s = Search.verilogLoad();                           // Search key
-        final String        X = M.at(currentSize).verilogLoad();                // Number of elements to search
-        final int           N = maxSize();
+        final String s = Search.verilogLoad();                                  // Search key
+        final String X = M.at(currentSize).verilogLoad()+ (all ? "" : "-1");    // Number of elements to search
+        final int    N = maxSize();
 
         v.append("/* StuckPA.search2.1 */\n");
         for (int i = 0; i < N; i++)
@@ -2541,7 +2537,7 @@ StuckSML(maxSize:4 size:4)
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_search_first_greater_than_or_equal();
+    test_search_first_greater_than_or_equal_except_last();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
