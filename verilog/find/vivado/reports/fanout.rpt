@@ -1,9 +1,9 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Tue Feb 25 14:58:36 2025
+| Date         : Sat Mar  1 03:16:32 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
-| Command      : report_high_fanout_nets -file /home/azureuser/btreeBlock/verilog/find/vivado/reports//fanout.rpt
+| Command      : report_high_fanout_nets -file /home/azureuser/btreeBlock/verilog/find/vivado/reports/fanout.rpt
 | Design       : find
 | Device       : xc7v2000t
 ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -13,19 +13,19 @@ High Fan-out Nets Information
 1. Summary
 ----------
 
-+----------------------------------------------------------+--------+-------------+
-| Net Name                                                 | Fanout | Driver Type |
-+----------------------------------------------------------+--------+-------------+
-| branch_0_StuckSA_Memory_Based_45_base_offset_reg_n_0_[3] |    201 | FDRE        |
-| branch_0_StuckSA_Memory_Based_45_base_offset_reg_n_0_[0] |    189 | FDRE        |
-| branch_0_StuckSA_Memory_Based_45_base_offset_reg_n_0_[4] |    186 | FDRE        |
-| branch_0_StuckSA_Memory_Based_45_base_offset_reg_n_0_[5] |    186 | FDRE        |
-| branch_0_StuckSA_Memory_Based_45_base_offset_reg_n_0_[6] |    174 | FDRE        |
-| branch_0_StuckSA_Memory_Based_45_base_offset_reg_n_0_[7] |    169 | FDRE        |
-| branch_0_StuckSA_Memory_Based_45_base_offset_reg_n_0_[2] |    146 | FDRE        |
-| leaf_0_StuckSA_Memory_Based_57_base_offset[3]            |    110 | FDRE        |
-| leaf_0_StuckSA_Memory_Based_57_base_offset[6]            |    105 | FDRE        |
-| leaf_0_StuckSA_Memory_Based_57_base_offset[2]            |    101 | FDRE        |
-+----------------------------------------------------------+--------+-------------+
++---------------------------------------------+--------+-------------+
+| Net Name                                    | Fanout | Driver Type |
++---------------------------------------------+--------+-------------+
+| reset__0                                    |   1710 | IBUF        |
+| leaf_0_StuckSA_Transaction_59[94]_i_89_n_0  |    207 | LUT5        |
+| T_44[137]_i_16_n_0                          |    203 | LUT4        |
+| T_44[31]_i_40_n_0                           |    189 | LUT3        |
+| T_44[31]_i_37_n_0                           |    188 | LUT5        |
+| p_5_in__0_inst_i_174_n_0                    |    178 | LUT6        |
+| p_5_in__0_inst_i_173_n_0                    |    177 | LUT5        |
+| p_7_in__0_inst_i_163_n_0                    |    169 | LUT5        |
+| p_7_in__0_inst_i_12__2_n_0                  |    137 | LUT6        |
+| leaf_0_StuckSA_Transaction_59[94]_i_257_n_0 |    136 | LUT5        |
++---------------------------------------------+--------+-------------+
 
 
