@@ -21,16 +21,18 @@ my $verilogDir    = fpd $projectDir, q(verilog);                                
 my $vivadoDir     = fpd $projectDir, q(vivado);                                 # Folder containing vivado specific files
 my $constraintsDir= fpd $vivadoDir,  q(constraints);                            # Folder containing constraints
 
-my $vivado        = fpd $home,   qw(Vivado 2024.2);                             # Location of vivaldo installation
-my $vivadoX       = fpf $vivado, qw(bin vivado);                                # Location of vivaldo executable
+my $vivado        = fpd $home,   qw(Vivado 2024.2);                             # Location of vivado installation
+my $vivadoX       = fpf $vivado, qw(bin vivado);                                # Location of vivado executable
 
 die "No such path: $vivado"    unless -d $vivado  or -e "/home/phil";           # Check vivado files exist
 die "No such file: $vivadoX"   unless -f $vivadoX or -e "/home/phil";
 
 sub gen                                                                         # Generate tcl to synthesize design
- {my ($design, $key) = @_;                                                      # Project, key
+ {my ($design, $key, $statement) = @_;                                          # Project, key, optional statement
 
-  my $designDir   = fpd $verilogDir, $design, $key;                             # Location of project input files
+  my @statement = defined($statement) ? (q(statement), $statement) : ();        # Address statement files
+
+  my $designDir   = fpd $verilogDir, $design, $key, @statement;                 # Location of project input files
   my $designOut   = fpd $verilogDir, $design, qw(vivado);                       # Location of project output files
   my $includesDir = fpd $designDir, qw(includes);                               # Set the path to the includes directory
   my $reportsDir  = fpd $designOut, qw(reports);                                # Reports
@@ -43,6 +45,27 @@ sub gen                                                                         
   my $place       = fpe $dcpDir, qw(place dcp);                                 # After place checkpoint
   my $opt         = fpe $dcpDir, qw(opt   dcp);                                 # After optimization checkpoint
   my $synth       = fpe $dcpDir, qw(synth dcp);                                 # After synthesis checkpoint
+
+
+  my @reports     =                                                             # Reports
+   qw(bus_skew clock_interaction control_sets cdc drc high_fanout_nets
+      methodology power timing_summary utilization);
+
+  my $reports = sub
+   {my @r;
+    for my $r(@reports)
+     {if (defined($statement) and $r =~ m(timing)is)
+       {my $f = fpe $reportsDir, q(statement), $statement, $r,  q(rpt);
+        makePath $f;
+        say STDERR "AAAA $f";
+        push @r, qq(report_$r -file $f);
+       }
+      else
+       {push @r, qq(report_$r -file ${reportsDir}$r.rpt);
+       }
+     }
+    join "\n", @r;
+   }->();
 
   makePath fpd $reportsDir;                                                     # Ensure folder structure is present
   makePath fpd $dcpDir;                                                         # Ensure folder structure is present
@@ -63,16 +86,7 @@ write_checkpoint -force $synth
 opt_design
 write_checkpoint -force $opt
 
-report_utilization       -file ${reportsDir}utilization.rpt
-report_methodology       -file ${reportsDir}methodology.rpt
-report_timing_summary    -file ${reportsDir}timing.rpt
-report_power             -file ${reportsDir}power.rpt
-report_drc               -file ${reportsDir}drc.rpt
-report_clock_interaction -file ${reportsDir}clock_interaction.rpt
-report_cdc               -file ${reportsDir}cdc.rpt
-report_control_sets      -file ${reportsDir}control.rpt
-report_bus_skew          -file ${reportsDir}bus_skew.rpt
-report_high_fanout_nets  -file ${reportsDir}fanout.rpt
+$reports
 
 place_design -directive AltSpreadLogic_high
 write_checkpoint -force $place
@@ -86,9 +100,8 @@ END
 
   owf($synthesis, join "\n", @s);                                               # Write tcl to run the synthesis
 
-  say   STDERR dateTimeStamp, " $part for $design";                             # Run tcl
+  say   STDERR dateTimeStamp, " $part for $design ".join " ", @statement;       # Run tcl
   print STDERR qx($vivadoX -mode batch -source $synthesis 1>$reportsDir/1.txt);
-
   #unlink $synthesis;
  }
 
@@ -100,6 +113,6 @@ else
  }
 
 say STDERR dateTimeStamp, " Synthesize btreeBlock";                             # Synthesize the verilog description
-gen(qw(find   2));
+gen(qw(find   2), $_) for 0..14;
 gen(qw(delete 2));
 gen(qw(put    2));
