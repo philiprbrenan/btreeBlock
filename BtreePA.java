@@ -2349,7 +2349,7 @@ abstract class BtreePA extends Test                                             
       project = Project; folder = Folder; program = P;
       //program.optimize();                                                     // Optimize not reliable enough yet and does not make a big enough differnce versus algorithmic improvements
 
-      projectFolder = ""+Paths.get(folder, project, ""+Key());
+      projectFolder = ""+Paths.get(folder, project, ""+Key());                  // Use the  key to identify the sub project
       sourceVerilog = ""+Paths.get(projectFolder, project+Verilog.ext);
         testVerilog = ""+Paths.get(projectFolder, project+Verilog.testExt);
               mFile = ""+Paths.get(projectFolder, "includes", "M"+Verilog.header);
@@ -2360,7 +2360,26 @@ abstract class BtreePA extends Test                                             
       javaTraceFile = ""+Paths.get(projectFolder, "traceJava.txt");
       makePath(projectFolder);
 
-      final StringBuilder s = new StringBuilder();
+      final StringToNumbers ops = new StringToNumbers();                        // Collapse identical instructions
+      final String p = " ".repeat(10),  q = " ".repeat(16);                     // Indentation for Verilog
+
+      for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
+       {final Stack<ProgramPA.I> I = program.code.elementAt(i);                 // The block of parallel instructions to write
+        if (I.size() > 1)
+         {final StringBuilder t = new StringBuilder();
+          for(ProgramPA.I j : I) t.append(q+"    "+j.v()+"\n");
+          ops.put(t.toString(), i);
+         }
+        else
+         {final ProgramPA.I j = I.firstElement();
+          ops.put(j.v(), i);
+         }
+       }
+
+      ops.order();                                                              // Order the instructions
+      ops.genVerilog(opCodeMapFile, opCodeMap);                                 // Write op code map
+
+      final StringBuilder s = new StringBuilder();                              // Generate code
       s.append("""
 //-----------------------------------------------------------------------------
 // Database on a chip
@@ -2420,25 +2439,6 @@ $stuckBases
         $fdisplay(traceFile, "%4d  %4d  %b", steps, step, $M);                  // Trace execution in a file
      `endif
 """);
-
-      final StringToNumbers ops = new StringToNumbers();                        // Collapse identical instructions
-      final String p = " ".repeat(10),  q = " ".repeat(16);                     // Indentation for Verilog
-
-      for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
-       {final Stack<ProgramPA.I> I = program.code.elementAt(i);                 // The block of parallel instructions to write
-        if (I.size() > 1)
-         {final StringBuilder t = new StringBuilder();
-          for(ProgramPA.I j : I) t.append(q+"    "+j.v()+"\n");
-          ops.put(t.toString(), i);
-         }
-        else
-         {final ProgramPA.I j = I.firstElement();
-          ops.put(j.v(), i);
-         }
-       }
-
-      ops.order();                                                              // Order the instructions
-      ops.genVerilog(opCodeMapFile, opCodeMap);                                 // Write op code map
 
       if (OpCodes)                                                              // Reduce program size by refactoring op codes at the cost of one additional look up per instruction cycle. Also appears to reduce synthesis time by about 30% on Vivado and likewise reduces the number of FPGA cells.
        {s.append("      case(opCodeMap[step])\n");                              // Case statements to select the code for the current instruction
