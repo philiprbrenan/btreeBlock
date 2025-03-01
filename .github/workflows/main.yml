@@ -1,4 +1,4 @@
-# Test 2025-02-28 at 16:38:48
+# Test 2025-03-01 at 02:24:51
 
 name: Test
 run-name: btreeBlock
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        task: [MemoryLayoutPA, StuckPA]
+        task: [BtreePA, StuckPA]
 
     steps:
     - uses: actions/checkout@v4
@@ -54,10 +54,10 @@ jobs:
       run: |
         javac -g -d Classes -cp Classes `find com/AppaApps/Silicon -name "*.java"`
 
-    - name: Test MemoryLayoutPA
-      if: matrix.task == 'MemoryLayoutPA'
+    - name: Test BtreePA
+      if: matrix.task == 'BtreePA'
       run: |
-        java -cp Classes com/AppaApps/Silicon/MemoryLayoutPA
+        java -cp Classes com/AppaApps/Silicon/BtreePA
 
 
     - name: Test StuckPA
