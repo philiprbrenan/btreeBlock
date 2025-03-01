@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date             : Sat Mar  1 22:29:37 2025
+| Date             : Sat Mar  1 22:36:30 2025
 | Host             : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command          : report_power -file /home/azureuser/btreeBlock/verilog/find/vivado/reports/power.rpt
 | Design           : find
@@ -54,12 +54,12 @@ Table of Contents
 +----------------+-----------+----------+-----------+-----------------+
 | Clocks         |    <0.001 |        3 |       --- |             --- |
 | Slice Logic    |    <0.001 |      125 |       --- |             --- |
-|   LUT as Logic |    <0.001 |       25 |   1221600 |           <0.01 |
+|   LUT as Logic |    <0.001 |       22 |   1221600 |           <0.01 |
 |   Register     |    <0.001 |       86 |   2443200 |           <0.01 |
 |   CARRY4       |    <0.001 |        1 |    305400 |           <0.01 |
-|   F7/F8 Muxes  |    <0.001 |        8 |   1221600 |           <0.01 |
+|   F7/F8 Muxes  |    <0.001 |       12 |   1221600 |           <0.01 |
 |   Others       |     0.000 |        3 |       --- |             --- |
-| Signals        |    <0.001 |      106 |       --- |             --- |
+| Signals        |    <0.001 |       98 |       --- |             --- |
 | I/O            |    <0.001 |        8 |      1200 |            0.67 |
 | Static Power   |     0.636 |          |           |                 |
 | Total          |     0.636 |          |           |                 |
