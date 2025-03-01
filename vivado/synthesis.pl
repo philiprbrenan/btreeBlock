@@ -74,10 +74,10 @@ report_control_sets      -file ${reportsDir}control.rpt
 report_bus_skew          -file ${reportsDir}bus_skew.rpt
 report_high_fanout_nets  -file ${reportsDir}fanout.rpt
 
-place_design
+place_design -directive AltSpreadLogic_high
 write_checkpoint -force $place
 
-route_design
+route_design -directive Quick
 write_checkpoint -force $route
 report_timing_summary    -file ${reportsDir}timing_route.rpt
 
