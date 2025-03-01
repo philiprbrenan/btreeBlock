@@ -52,12 +52,10 @@ sub gen                                                                         
   die "No such path: $dcpDir"      unless -d $dcpDir;
 
   my @s = <<"END";                                                              # Write tcl to run the synthesis
-set_param general.maxThreads 1
+set_param general.maxThreads 4
 
 read_verilog $verilog
 read_xdc     $constraints
-
-set_property SYNTH_HIERARCHY true [current_project]
 
 synth_design -name $design -top $design -part $part -include_dirs $includesDir -flatten_hierarchy none
 write_checkpoint -force $synth
