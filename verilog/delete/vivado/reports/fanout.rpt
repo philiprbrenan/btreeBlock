@@ -1,9 +1,9 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Tue Feb 25 16:25:44 2025
+| Date         : Sat Mar  1 04:21:24 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
-| Command      : report_high_fanout_nets -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports//fanout.rpt
+| Command      : report_high_fanout_nets -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/fanout.rpt
 | Design       : delete
 | Device       : xc7v2000t
 ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -13,19 +13,19 @@ High Fan-out Nets Information
 1. Summary
 ----------
 
-+----------------------------------------------+--------+-------------+
-| Net Name                                     | Fanout | Driver Type |
-+----------------------------------------------+--------+-------------+
-| branch_1_StuckSA_Transaction_16_reg_n_0_[95] |  10297 | FDRE        |
-| branch_1_StuckSA_Transaction_16_reg_n_0_[94] |   8950 | FDRE        |
-| opCodeMap[7]                                 |   8602 | MUXF7       |
-| branch_2_StuckSA_Transaction_19_reg_n_0_[95] |   6844 | FDRE        |
-| branch_1_StuckSA_Transaction_16_reg_n_0_[93] |   6577 | FDRE        |
-| branch_2_StuckSA_Transaction_19_reg_n_0_[94] |   5922 | FDRE        |
-| branch_2_StuckSA_Transaction_19_reg_n_0_[93] |   5391 | FDRE        |
-| branch_2_StuckSA_Transaction_19_reg_n_0_[92] |   5309 | FDRE        |
-| branch_1_StuckSA_Transaction_16_reg_n_0_[92] |   5243 | FDRE        |
-| leaf_2_StuckSA_Transaction_31_reg_n_0_[95]   |   5161 | FDRE        |
-+----------------------------------------------+--------+-------------+
++----------------------------------------+--------+-------------+
+| Net Name                               | Fanout | Driver Type |
++----------------------------------------+--------+-------------+
+| T_10__0_BUFG                           |  33198 | BUFG        |
+| M_9[705]_i_99_n_0                      |   2832 | LUT3        |
+| leaf_2_StuckSA_Transaction_31__1[93]   |   2616 | LUT6        |
+| branch_3_StuckSA_Copy_21[38]_i_1_n_0   |   2281 | LUT4        |
+| M_9_reg[705]_i_42_n_0                  |   2278 | MUXF7       |
+| branch_2_StuckSA_Transaction_19__1[93] |   2182 | LUT5        |
+| M_9[705]_i_96_n_0                      |   2161 | LUT2        |
+| M_9[705]_i_267_n_0                     |   2126 | LUT3        |
+| leaf_2_StuckSA_Transaction_31__1[63]   |   2048 | LUT6        |
+| M_9[705]_i_57_n_0                      |   1727 | LUT3        |
++----------------------------------------+--------+-------------+
 
 
