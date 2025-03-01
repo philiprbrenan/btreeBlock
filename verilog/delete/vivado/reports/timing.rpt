@@ -1,9 +1,9 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Tue Feb 25 16:22:19 2025
+| Date         : Sat Mar  1 04:18:14 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
-| Command      : report_timing_summary -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports//timing.rpt
+| Command      : report_timing_summary -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/timing.rpt
 | Design       : delete
 | Device       : 7v2000t-flg1925
 | Speed File   : -1  PRODUCTION 1.10 2014-09-11
@@ -41,10 +41,10 @@ Timing Summary Report
 | ------------------
 ------------------------------------------------------------------------------------------------
 
-Rule       Severity  Description                                 Violations  
----------  --------  ------------------------------------------  ----------  
-SYNTH-6    Warning   Timing of a RAM block might be sub-optimal  40          
-TIMING-18  Warning   Missing input or output delay               12          
+Rule       Severity  Description                    Violations  
+---------  --------  -----------------------------  ----------  
+SYNTH-9    Warning   Small multiplier               2           
+TIMING-18  Warning   Missing input or output delay  12          
 
 Note: This report is based on the most recent report_methodology run and may not be up-to-date. Run report_methodology on the current design for the latest report.
 
@@ -143,7 +143,7 @@ Table of Contents
 
     WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
     -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
-     90.395        0.000                      0                 5688        0.069        0.000                      0                 5688       49.600        0.000                       0                  3151  
+     89.385        0.000                      0                54676        0.064        0.000                      0                54676       49.600        0.000                       0                 33331  
 
 
 All user specified timing constraints are met.
@@ -166,7 +166,7 @@ clock  {0.000 50.000}       100.000         10.000
 
 Clock             WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
 -----             -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
-clock              90.395        0.000                      0                 5688        0.069        0.000                      0                 5688       49.600        0.000                       0                  3151  
+clock              89.385        0.000                      0                54676        0.064        0.000                      0                54676       49.600        0.000                       0                 33331  
 
 
 ------------------------------------------------------------------------------------------------
@@ -197,24 +197,24 @@ Path Group    From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing 
 From Clock:  clock
   To Clock:  clock
 
-Setup :            0  Failing Endpoints,  Worst Slack       90.395ns,  Total Violation        0.000ns
-Hold  :            0  Failing Endpoints,  Worst Slack        0.069ns,  Total Violation        0.000ns
+Setup :            0  Failing Endpoints,  Worst Slack       89.385ns,  Total Violation        0.000ns
+Hold  :            0  Failing Endpoints,  Worst Slack        0.064ns,  Total Violation        0.000ns
 PW    :            0  Failing Endpoints,  Worst Slack       49.600ns,  Total Violation        0.000ns
 ---------------------------------------------------------------------------------------------------
 
 
 Max Delay Paths
 --------------------------------------------------------------------------------------
-Slack (MET) :             90.395ns  (required time - arrival time)
-  Source:                 M_9_reg[502]/C
+Slack (MET) :             89.385ns  (required time - arrival time)
+  Source:                 M_9_reg[477]_rep__1/C
                             (rising edge-triggered cell FDRE clocked by clock  {rise@0.000ns fall@50.000ns period=100.000ns})
-  Destination:            T_10_reg[137]/D
+  Destination:            T_10_reg[135]/D
                             (rising edge-triggered cell FDRE clocked by clock  {rise@0.000ns fall@50.000ns period=100.000ns})
   Path Group:             clock
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            100.000ns  (clock rise@100.000ns - clock rise@0.000ns)
-  Data Path Delay:        9.462ns  (logic 2.447ns (25.861%)  route 7.015ns (74.139%))
-  Logic Levels:           21  (CARRY4=2 LUT2=1 LUT3=2 LUT4=1 LUT5=6 LUT6=6 MUXF7=3)
+  Data Path Delay:        10.472ns  (logic 2.110ns (20.149%)  route 8.362ns (79.851%))
+  Logic Levels:           21  (CARRY4=2 LUT3=1 LUT4=2 LUT5=6 LUT6=9 MUXF7=1)
   Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    1.722ns = ( 101.722 - 100.000 ) 
     Source Clock Delay      (SCD):    2.028ns
@@ -231,76 +231,76 @@ Slack (MET) :             90.395ns  (required time - arrival time)
     BB39                                              0.000     0.000 r  clock (IN)
                          net (fo=0)                   0.000     0.000    clock
     BB39                 IBUF (Prop_ibuf_I_O)         0.741     0.741 r  clock_IBUF_inst/O
-                         net (fo=1, unplaced)         0.584     1.324    clock_IBUF
-                         BUFG (Prop_bufg_I_O)         0.120     1.444 r  clock_IBUF_BUFG_inst/O
-                         net (fo=3150, unplaced)      0.584     2.028    clock_IBUF_BUFG
-                         FDRE                                         r  M_9_reg[502]/C
+                         net (fo=1, unplaced)         0.584     1.324    clock__0
+                         BUFG (Prop_bufg_I_O)         0.120     1.444 r  clock__0_BUFG_inst/O
+                         net (fo=33330, unplaced)     0.584     2.028    clock__0_BUFG
+                         FDRE                                         r  M_9_reg[477]_rep__1/C
   -------------------------------------------------------------------    -------------------
-                         FDRE (Prop_fdre_C_Q)         0.269     2.297 r  M_9_reg[502]/Q
-                         net (fo=58, unplaced)        0.744     3.041    M_9_reg_n_0_[502]
-                         LUT6 (Prop_lut6_I0_O)        0.153     3.194 r  branch_0_StuckSA_Transaction_13[26]_i_172/O
-                         net (fo=1, unplaced)         0.000     3.194    branch_0_StuckSA_Transaction_13[26]_i_172_n_0
-                         MUXF7 (Prop_muxf7_I1_O)      0.140     3.334 r  branch_0_StuckSA_Transaction_13_reg[26]_i_158/O
-                         net (fo=2, unplaced)         0.350     3.684    branch_0_StuckSA_Transaction_13_reg[26]_i_158_n_0
-                         LUT5 (Prop_lut5_I0_O)        0.150     3.834 r  branch_0_StuckSA_Transaction_13[26]_i_138/O
-                         net (fo=1, unplaced)         0.340     4.174    branch_0_StuckSA_Transaction_13[26]_i_138_n_0
-                         LUT3 (Prop_lut3_I2_O)        0.056     4.230 r  branch_0_StuckSA_Transaction_13[26]_i_93/O
-                         net (fo=3, unplaced)         0.358     4.588    branch_0_StuckSA_Transaction_13[26]_i_93_n_0
-                         LUT5 (Prop_lut5_I0_O)        0.053     4.641 r  branch_0_StuckSA_Transaction_13[26]_i_41/O
-                         net (fo=2, unplaced)         0.351     4.992    branch_0_StuckSA_Transaction_13[26]_i_41_n_0
-                         LUT3 (Prop_lut3_I2_O)        0.056     5.048 r  branch_0_StuckSA_Transaction_13[26]_i_15/O
-                         net (fo=1, unplaced)         0.340     5.388    branch_0_StuckSA_Transaction_13[26]_i_15_n_0
-                         LUT6 (Prop_lut6_I5_O)        0.053     5.441 r  branch_0_StuckSA_Transaction_13[26]_i_6/O
-                         net (fo=1, unplaced)         0.340     5.781    branch_0_StuckSA_Transaction_13[26]_i_6_n_0
-                         LUT6 (Prop_lut6_I5_O)        0.053     5.834 r  branch_0_StuckSA_Transaction_13[26]_i_2/O
-                         net (fo=12, unplaced)        0.388     6.222    p_2_in[26]
-                         LUT2 (Prop_lut2_I1_O)        0.053     6.275 r  T_10[137]_i_330/O
-                         net (fo=1, unplaced)         0.564     6.839    T_10[137]_i_330_n_0
-                         CARRY4 (Prop_carry4_S[2]_CO[3])
-                                                      0.272     7.111 r  T_10_reg[137]_i_159/CO[3]
-                         net (fo=1, unplaced)         0.000     7.111    T_10_reg[137]_i_159_n_0
-                         CARRY4 (Prop_carry4_CI_O[0])
-                                                      0.142     7.253 r  T_10_reg[137]_i_73/O[0]
-                         net (fo=204, unplaced)       0.467     7.720    T_10_reg[137]_i_73_n_7
-                         LUT5 (Prop_lut5_I1_O)        0.153     7.873 r  T_10[14]_i_226/O
-                         net (fo=1, unplaced)         0.000     7.873    T_10[14]_i_226_n_0
-                         MUXF7 (Prop_muxf7_I1_O)      0.140     8.013 r  T_10_reg[14]_i_143/O
-                         net (fo=1, unplaced)         0.520     8.533    T_10_reg[14]_i_143_n_0
-                         LUT6 (Prop_lut6_I1_O)        0.150     8.683 r  T_10[14]_i_77/O
-                         net (fo=2, unplaced)         0.532     9.215    T_10[14]_i_77_n_0
-                         LUT5 (Prop_lut5_I3_O)        0.053     9.268 r  T_10[137]_i_162/O
-                         net (fo=2, unplaced)         0.351     9.619    T_10[137]_i_162_n_0
-                         LUT5 (Prop_lut5_I4_O)        0.053     9.672 r  T_10[137]_i_74/O
-                         net (fo=1, unplaced)         0.340    10.012    T_10[137]_i_74_n_0
-                         LUT6 (Prop_lut6_I5_O)        0.053    10.065 r  T_10[137]_i_28/O
-                         net (fo=1, unplaced)         0.340    10.405    T_10[137]_i_28_n_0
-                         LUT6 (Prop_lut6_I5_O)        0.053    10.458 r  T_10[137]_i_14/O
-                         net (fo=1, unplaced)         0.000    10.458    T_10[137]_i_14_n_0
-                         MUXF7 (Prop_muxf7_I0_O)      0.136    10.594 r  T_10_reg[137]_i_5/O
-                         net (fo=1, unplaced)         0.339    10.933    T_10_reg[137]_i_5_n_0
-                         LUT5 (Prop_lut5_I4_O)        0.153    11.086 r  T_10[137]_i_2/O
-                         net (fo=2, unplaced)         0.351    11.437    p_47_in[137]
-                         LUT4 (Prop_lut4_I1_O)        0.053    11.490 r  T_10[137]_i_1/O
-                         net (fo=1, unplaced)         0.000    11.490    T_10[137]_i_1_n_0
-                         FDRE                                         r  T_10_reg[137]/D
+                         FDRE (Prop_fdre_C_Q)         0.269     2.297 r  M_9_reg[477]_rep__1/Q
+                         net (fo=14, unplaced)        0.709     3.006    M_9_reg[477]_rep__1_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.153     3.159 r  p_2_out_inst__15_i_95/O
+                         net (fo=1, unplaced)         0.340     3.499    p_2_out_inst__15_i_95_n_0
+                         LUT5 (Prop_lut5_I4_O)        0.053     3.552 r  p_2_out_inst__15_i_57/O
+                         net (fo=1, unplaced)         0.461     4.013    p_2_out_inst__15_i_57_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.053     4.066 f  p_2_out_inst__15_i_30/O
+                         net (fo=2, unplaced)         0.532     4.598    p_2_out_inst__15_i_30_n_0
+                         LUT5 (Prop_lut5_I0_O)        0.053     4.651 r  p_2_out_inst__17_i_28/O
+                         net (fo=1, unplaced)         0.340     4.991    p_2_out_inst__17_i_28_n_0
+                         LUT3 (Prop_lut3_I2_O)        0.056     5.047 r  p_2_out_inst__17_i_10/O
+                         net (fo=2, unplaced)         0.532     5.579    p_2_out_inst__17_i_10_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.053     5.632 r  p_2_out_inst__16_i_4/O
+                         net (fo=1, unplaced)         0.340     5.972    p_2_out_inst__16_i_4_n_0
+                         LUT6 (Prop_lut6_I5_O)        0.053     6.025 r  p_2_out_inst__16_i_1/O
+                         net (fo=5, unplaced)         0.368     6.393    branch_0_StuckSA_Transaction_13__0[14]
+                         LUT4 (Prop_lut4_I1_O)        0.053     6.446 r  T_107_inst__0__0/O
+                         net (fo=1, unplaced)         0.569     7.015    T_107_inst__0__0_n_0
+                         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.269     7.284 r  p_2_out_inst_i_25/CO[3]
+                         net (fo=1, unplaced)         0.000     7.284    p_2_out_inst_i_25_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.189     7.473 r  p_2_out_inst_i_19/O[3]
+                         net (fo=9, unplaced)         0.616     8.089    T_106[7]
+                         LUT6 (Prop_lut6_I0_O)        0.142     8.231 r  p_2_out_inst_i_362/O
+                         net (fo=79, unplaced)        0.434     8.665    p_2_out_inst_i_362_n_0
+                         LUT5 (Prop_lut5_I3_O)        0.053     8.718 r  p_2_out_inst_i_592/O
+                         net (fo=1, unplaced)         0.000     8.718    p_2_out_inst_i_592_n_0
+                         MUXF7 (Prop_muxf7_I1_O)      0.140     8.858 r  p_2_out_inst_i_348/O
+                         net (fo=1, unplaced)         0.520     9.378    p_2_out_inst_i_348_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.150     9.528 r  p_2_out_inst_i_162/O
+                         net (fo=2, unplaced)         0.351     9.879    p_2_out_inst_i_162_n_0
+                         LUT5 (Prop_lut5_I4_O)        0.053     9.932 r  p_2_out_inst_i_61/O
+                         net (fo=3, unplaced)         0.539    10.471    p_2_out_inst_i_61_n_0
+                         LUT5 (Prop_lut5_I0_O)        0.053    10.524 r  p_2_out_inst__1_i_33/O
+                         net (fo=1, unplaced)         0.340    10.864    p_2_out_inst__1_i_33_n_0
+                         LUT6 (Prop_lut6_I5_O)        0.053    10.917 r  p_2_out_inst__1_i_20/O
+                         net (fo=1, unplaced)         0.340    11.257    p_2_out_inst__1_i_20_n_0
+                         LUT6 (Prop_lut6_I5_O)        0.053    11.310 r  p_2_out_inst__1_i_9/O
+                         net (fo=1, unplaced)         0.340    11.650    p_2_out_inst__1_i_9_n_0
+                         LUT5 (Prop_lut5_I4_O)        0.053    11.703 r  p_2_out_inst__1_i_3/O
+                         net (fo=2, unplaced)         0.351    12.054    p_2_out_inst__1_i_3_n_0
+                         LUT6 (Prop_lut6_I5_O)        0.053    12.107 r  p_2_out_inst__1/O
+                         net (fo=1, unplaced)         0.340    12.447    p_2_out[135]
+                         LUT4 (Prop_lut4_I1_O)        0.053    12.500 r  p_2_out_inst__9/O
+                         net (fo=1, unplaced)         0.000    12.500    p_2_out_inst__9_n_0
+                         FDRE                                         r  T_10_reg[135]/D
   -------------------------------------------------------------------    -------------------
 
                          (clock clock rise edge)    100.000   100.000 r  
     BB39                                              0.000   100.000 r  clock (IN)
                          net (fo=0)                   0.000   100.000    clock
     BB39                 IBUF (Prop_ibuf_I_O)         0.615   100.615 r  clock_IBUF_inst/O
-                         net (fo=1, unplaced)         0.554   101.170    clock_IBUF
-                         BUFG (Prop_bufg_I_O)         0.113   101.283 r  clock_IBUF_BUFG_inst/O
-                         net (fo=3150, unplaced)      0.439   101.722    clock_IBUF_BUFG
-                         FDRE                                         r  T_10_reg[137]/C
+                         net (fo=1, unplaced)         0.554   101.170    clock__0
+                         BUFG (Prop_bufg_I_O)         0.113   101.283 r  clock__0_BUFG_inst/O
+                         net (fo=33330, unplaced)     0.439   101.722    clock__0_BUFG
+                         FDRE                                         r  T_10_reg[135]/C
                          clock pessimism              0.162   101.883    
                          clock uncertainty           -0.035   101.848    
-                         FDRE (Setup_fdre_C_D)        0.037   101.885    T_10_reg[137]
+                         FDRE (Setup_fdre_C_D)        0.037   101.885    T_10_reg[135]
   -------------------------------------------------------------------
                          required time                        101.885    
-                         arrival time                         -11.490    
+                         arrival time                         -12.500    
   -------------------------------------------------------------------
-                         slack                                 90.395    
+                         slack                                 89.385    
 
 
 
@@ -308,15 +308,15 @@ Slack (MET) :             90.395ns  (required time - arrival time)
 
 Min Delay Paths
 --------------------------------------------------------------------------------------
-Slack (MET) :             0.069ns  (arrival time - required time)
-  Source:                 branch_1_StuckSA_Transaction_16_reg[30]/C
+Slack (MET) :             0.064ns  (arrival time - required time)
+  Source:                 T_10_reg[143]/C
                             (rising edge-triggered cell FDRE clocked by clock  {rise@0.000ns fall@50.000ns period=100.000ns})
-  Destination:            branch_1_StuckSA_Transaction_16_reg[35]/D
+  Destination:            T_10_reg[143]/D
                             (rising edge-triggered cell FDRE clocked by clock  {rise@0.000ns fall@50.000ns period=100.000ns})
   Path Group:             clock
   Path Type:              Hold (Min at Fast Process Corner)
   Requirement:            0.000ns  (clock rise@0.000ns - clock rise@0.000ns)
-  Data Path Delay:        0.279ns  (logic 0.164ns (58.677%)  route 0.115ns (41.323%))
+  Data Path Delay:        0.274ns  (logic 0.164ns (59.943%)  route 0.110ns (40.057%))
   Logic Levels:           1  (LUT2=1)
   Clock Path Skew:        0.145ns (DCD - SCD - CPR)
     Destination Clock Delay (DCD):    0.856ns
@@ -329,33 +329,33 @@ Slack (MET) :             0.069ns  (arrival time - required time)
     BB39                                              0.000     0.000 r  clock (IN)
                          net (fo=0)                   0.000     0.000    clock
     BB39                 IBUF (Prop_ibuf_I_O)         0.141     0.141 r  clock_IBUF_inst/O
-                         net (fo=1, unplaced)         0.246     0.387    clock_IBUF
-                         BUFG (Prop_bufg_I_O)         0.026     0.413 r  clock_IBUF_BUFG_inst/O
-                         net (fo=3150, unplaced)      0.114     0.527    clock_IBUF_BUFG
-                         FDRE                                         r  branch_1_StuckSA_Transaction_16_reg[30]/C
+                         net (fo=1, unplaced)         0.246     0.387    clock__0
+                         BUFG (Prop_bufg_I_O)         0.026     0.413 r  clock__0_BUFG_inst/O
+                         net (fo=33330, unplaced)     0.114     0.527    clock__0_BUFG
+                         FDRE                                         r  T_10_reg[143]/C
   -------------------------------------------------------------------    -------------------
-                         FDRE (Prop_fdre_C_Q)         0.100     0.627 r  branch_1_StuckSA_Transaction_16_reg[30]/Q
-                         net (fo=6, unplaced)         0.115     0.743    branch_1_StuckSA_Transaction_160[0]
-                         LUT2 (Prop_lut2_I1_O)        0.064     0.807 r  branch_1_StuckSA_Transaction_16[35]_i_1/O
-                         net (fo=1, unplaced)         0.000     0.807    branch_1_StuckSA_Transaction_16[35]_i_1_n_0
-                         FDRE                                         r  branch_1_StuckSA_Transaction_16_reg[35]/D
+                         FDRE (Prop_fdre_C_Q)         0.100     0.627 r  T_10_reg[143]/Q
+                         net (fo=3, unplaced)         0.110     0.737    T_10_reg_n_0_[143]
+                         LUT2 (Prop_lut2_I1_O)        0.064     0.801 r  T_10_inst__31/O
+                         net (fo=1, unplaced)         0.000     0.801    T_10_inst__31_n_0
+                         FDRE                                         r  T_10_reg[143]/D
   -------------------------------------------------------------------    -------------------
 
                          (clock clock rise edge)      0.000     0.000 r  
     BB39                                              0.000     0.000 r  clock (IN)
                          net (fo=0)                   0.000     0.000    clock
     BB39                 IBUF (Prop_ibuf_I_O)         0.308     0.308 r  clock_IBUF_inst/O
-                         net (fo=1, unplaced)         0.259     0.567    clock_IBUF
-                         BUFG (Prop_bufg_I_O)         0.030     0.597 r  clock_IBUF_BUFG_inst/O
-                         net (fo=3150, unplaced)      0.259     0.856    clock_IBUF_BUFG
-                         FDRE                                         r  branch_1_StuckSA_Transaction_16_reg[35]/C
+                         net (fo=1, unplaced)         0.259     0.567    clock__0
+                         BUFG (Prop_bufg_I_O)         0.030     0.597 r  clock__0_BUFG_inst/O
+                         net (fo=33330, unplaced)     0.259     0.856    clock__0_BUFG
+                         FDRE                                         r  T_10_reg[143]/C
                          clock pessimism             -0.183     0.672    
-                         FDRE (Hold_fdre_C_D)         0.065     0.737    branch_1_StuckSA_Transaction_16_reg[35]
+                         FDRE (Hold_fdre_C_D)         0.065     0.737    T_10_reg[143]
   -------------------------------------------------------------------
                          required time                         -0.737    
-                         arrival time                           0.807    
+                         arrival time                           0.801    
   -------------------------------------------------------------------
-                         slack                                  0.069    
+                         slack                                  0.064    
 
 
 
@@ -368,10 +368,10 @@ Waveform(ns):       { 0.000 50.000 }
 Period(ns):         100.000
 Sources:            { clock }
 
-Check Type        Corner  Lib Pin             Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location  Pin
-Min Period        n/a     RAMB36E1/CLKARDCLK  n/a            2.183         100.000     97.817               branch_3_StuckSA_Memory_Based_20_base_offset_reg_rep_0/CLKARDCLK
-Low Pulse Width   Slow    FDSE/C              n/a            0.400         50.000      49.600               T_10_reg[95]/C
-High Pulse Width  Slow    FDSE/C              n/a            0.350         50.000      49.650               M_9_reg[0]/C
+Check Type        Corner  Lib Pin  Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location  Pin
+Min Period        n/a     BUFG/I   n/a            1.600         100.000     98.400               clock__0_BUFG_inst/I
+Low Pulse Width   Slow    FDRE/C   n/a            0.400         50.000      49.600               branch_2_StuckSA_Memory_Based_17_base_offset_reg[2]/C
+High Pulse Width  Slow    FDSE/C   n/a            0.350         50.000      49.650               M_9_reg[0]/C
 
 
 
