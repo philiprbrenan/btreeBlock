@@ -753,6 +753,7 @@ abstract class StuckPA extends Test                                             
      {void a()
        {if (Found != null) Found.setInt(0);                                     // Assume we will not find the key
         final int s = Search.setOff().getInt();                                 // Key to search for
+        say("AAAA Search", s);
 
         final int c = M.at(currentSize).setOff().getInt();                      // Number of elements in stuck
         final int N = c - (all ? 0 : 1);                                        // Number of elements to search
@@ -770,6 +771,9 @@ abstract class StuckPA extends Test                                             
             break;
            }
          }
+        if (Found != null) say("BBBB Found", Found.setOff().getInt());
+        if (Index != null) say("BBBB Index", Index.setOff().getInt());
+        if (Data  != null) say("BBBB Data",  Data.setOff() .getInt());
        }
 
       String v()
@@ -854,10 +858,11 @@ abstract class StuckPA extends Test                                             
        {final int N = maxSize();                                                // Maximum number of elements to search
         for (int i = 0; i < N; i++)                                             // Search
          {z();
-          final boolean e =         T.at(equalLeafKey,      i).setOff().getInt() >  0;
-          final boolean E = i > 0 ? T.at(equalLeafKey,   -1+i).setOff().getInt() == 0 : true;
-          final boolean v = T.at(lessThanLeafSize, i).setOff().getInt() > 0;
-          T.at(equalLeafKey, i).setInt(v && e && E ? 1 : 0);
+          final boolean e = i > 0 ? T.at(equalLeafKey,     i-1).setOff().getInt() > 0 : false; // Next    value
+          final boolean E =         T.at(equalLeafKey,     i  ).setOff().getInt() > 0;         // Current value
+          final boolean v =         T.at(lessThanLeafSize, i  ).setOff().getInt() > 0;         // In range
+          final int     r = !e && E && v ? 1 : 0;
+          T.at(lessThanLeafSize, i).setInt(r);                                  // Need to preserve equalLeafKey unchanged to allow previous element to be referenced
          }
        }
       String v()
@@ -866,9 +871,9 @@ abstract class StuckPA extends Test                                             
 
         v.append("/* StuckPA.search2.2 */\n");
         for (int i = 0; i < N; i++)
-         {v.append(T.at(equalLeafKey,     i).verilogLoad()+" <= ");
+         {v.append(T.at(lessThanLeafSize, i).verilogLoad()+" <= ");
           v.append(T.at(equalLeafKey,     i).verilogLoad()+" >  0 && ");
-          if (i > 0)
+          if (i > 0)                                                            // The previous element must be zero unless it is the first one
            {v.append(T.at(equalLeafKey,-1+i).verilogLoad()+" == 0 && ");
            }
           v.append(T.at(lessThanLeafSize, i).verilogLoad()+";\n");
@@ -888,15 +893,12 @@ abstract class StuckPA extends Test                                             
 
         for (int i = 0; i < N; i++)                                             // Search
          {z();
-          final boolean f = T.at(equalLeafKey, i).setOff().getInt() > 0;        // Whether this key is in range and is equal
+          final boolean f = T.at(lessThanLeafSize, i).setOff().getInt() > 0;    // Whether this key is in range and is greater than or equal to the search key
           if (Found != null) Found.setInt((f || Found.setOff().getInt() > 0) ? 1 : 0); // Any key matched ?
           if (f && Index != null) Index.setInt(i);                              // Save index if this key matched
           if (f && Key   != null) Key .setInt(M.at(sKey,  i).setOff().getInt());// Save matching key
           if (f && Data  != null) Data.setInt(M.at(sData, i).setOff().getInt());// Save data if this key matched
          }
-        if (Found != null) say("Found", Found);
-        if (Index != null) say("Index", Index);
-        if (Data  != null) say("Data",  Data);
        }
       String v()
        {final StringBuilder v = new StringBuilder();                            // Verilog
@@ -904,31 +906,29 @@ abstract class StuckPA extends Test                                             
 
         v.append("/* StuckPA.search2.3 */\n");
         if (Found != null)                                                      // Found
-         {v.append(Found.verilogLoad()+" <= 0");
+         {v.append(Found.verilogLoad()+" = 0");
           for (int i = 0; i < N; i++) v.append(" || "+T.at(equalLeafKey, i).verilogLoad() + " > 0");
           v.append(";\n");
-v.append("$display(\"Found %d\", "+Found.verilogLoad()+");");
          }
 
         if (Index != null)                                                      // Index
-         {v.append(Index.verilogLoad()+" <= ");
+         {v.append(Index.verilogLoad()+" = ");
           for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+i+" : ");
-          v.append("0;\n");                                                     // Not found so it can be anything
-v.append("$display(\"Index %d\", "+Index.verilogLoad()+");");
+          if (all) v.append(M.at(currentSize).verilogLoad() + ";\n");           // Normal index
+          else     v.append(M.at(currentSize).verilogLoad() + " -1;\n");        // Index one back
          }
 
         if (Key != null)                                                        // Key
-         {v.append(Key.verilogLoad()+" <= ");
+         {v.append(Key.verilogLoad()+" = ");
           for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+M.at(sKey, i).verilogLoad()+" : ");
           v.append("0;\n");                                                     // Not found so it can be anything
          }
 
         if (Data != null)
-         {v.append(Data.verilogLoad()+" <= ");                                  // Data
+         {v.append(Data.verilogLoad()+" = ");                                  // Data
           for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+M.at(sData, i).verilogLoad()+" : ");
           if (all) v.append(M.at(sData, M.at(currentSize)).verilogLoad() + ";\n");              // Normal address
           else     v.append(M.at(sData, M.at(currentSize)).verilogLoadAddr(false, -1) + ";\n"); // Address one back
-v.append("$display(\"Data %d\", "+Data.verilogLoad()+");");
          }
         return ""+v;
        }
