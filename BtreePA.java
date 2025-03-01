@@ -727,8 +727,10 @@ abstract class BtreePA extends Test                                             
 
   private void branchSize()                                                     // Number of children in body of branch taking top for granted as it is always there
    {zz();
-    tt(node_branchBase, node_branchSize);
-    branchBase(branchBase, node_branchBase);
+    P.parallelStart();   tt(node_branchBase, node_branchSize);
+    P.parallelSection(); branchBase(branchBase, node_branchBase);
+    P.parallelEnd();
+
     bSize.base(T.at(branchBase));
     bSize.size();
     T.at(branchSize).add(bSize.T.at(bSize.size), -1);                           // Account for top which will always be present
