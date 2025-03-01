@@ -1,9 +1,9 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date             : Tue Feb 25 14:58:29 2025
+| Date             : Sat Mar  1 03:16:24 2025
 | Host             : vivado running 64-bit Ubuntu 24.04.1 LTS
-| Command          : report_power -file /home/azureuser/btreeBlock/verilog/find/vivado/reports//power.rpt
+| Command          : report_power -file /home/azureuser/btreeBlock/verilog/find/vivado/reports/power.rpt
 | Design           : find
 | Device           : xc7v2000tflg1925-1
 | Design State     : synthesized
@@ -30,10 +30,10 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.637        |
+| Total On-Chip Power (W)  | 0.641        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 0.000        |
+| Dynamic (W)              | 0.005        |
 | Device Static (W)        | 0.636        |
 | Effective TJA (C/W)      | 0.8          |
 | Max Ambient (C)          | 84.5         |
@@ -52,17 +52,17 @@ Table of Contents
 +----------------+-----------+----------+-----------+-----------------+
 | On-Chip        | Power (W) | Used     | Available | Utilization (%) |
 +----------------+-----------+----------+-----------+-----------------+
-| Clocks         |    <0.001 |        3 |       --- |             --- |
-| Slice Logic    |    <0.001 |      787 |       --- |             --- |
-|   LUT as Logic |    <0.001 |      647 |   1221600 |            0.05 |
-|   CARRY4       |    <0.001 |        8 |    305400 |           <0.01 |
-|   F7/F8 Muxes  |    <0.001 |       19 |   1221600 |           <0.01 |
-|   Register     |    <0.001 |       40 |   2443200 |           <0.01 |
-|   Others       |     0.000 |        2 |       --- |             --- |
-| Signals        |    <0.001 |      746 |       --- |             --- |
+| Clocks         |     0.002 |        3 |       --- |             --- |
+| Slice Logic    |     0.001 |     8050 |       --- |             --- |
+|   LUT as Logic |     0.001 |     4642 |   1221600 |            0.38 |
+|   F7/F8 Muxes  |    <0.001 |     1563 |   1221600 |            0.13 |
+|   Register     |    <0.001 |     1707 |   2443200 |            0.07 |
+|   CARRY4       |    <0.001 |       10 |    305400 |           <0.01 |
+|   Others       |     0.000 |       22 |       --- |             --- |
+| Signals        |     0.001 |     5084 |       --- |             --- |
 | I/O            |    <0.001 |       13 |      1200 |            1.08 |
 | Static Power   |     0.636 |          |           |                 |
-| Total          |     0.637 |          |           |                 |
+| Total          |     0.641 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
 
 
@@ -72,7 +72,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     0.309 |       0.000 |      0.309 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     0.314 |       0.005 |      0.309 |       NA    | Unspecified | NA         |
 | Vccaux    |       1.800 |     0.099 |       0.000 |      0.099 |       NA    | Unspecified | NA         |
 | Vcco33    |       3.300 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -144,6 +144,8 @@ Table of Contents
 
 +------+-----------+
 | Name | Power (W) |
++------+-----------+
+| find |     0.005 |
 +------+-----------+
 
 
