@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sat Mar  1 22:36:25 2025
+| Date         : Sat Mar  1 22:56:21 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_high_fanout_nets -file /home/azureuser/btreeBlock/verilog/find/vivado/reports/high_fanout_nets.rpt
 | Design       : find
@@ -13,19 +13,19 @@ High Fan-out Nets Information
 1. Summary
 ----------
 
-+------------------------+--------+-------------+
-| Net Name               | Fanout | Driver Type |
-+------------------------+--------+-------------+
-| reset__0               |     86 | IBUF        |
-| step_reg[0]_rep_n_0    |     11 | FDRE        |
-| step_reg[0]_rep__0_n_0 |     10 | FDRE        |
-| step[2]                |      9 | FDRE        |
-| step__0                |      9 | LUT4        |
-| step_reg[1]_rep__0_n_0 |      8 | FDRE        |
-| step_reg[1]_rep_n_0    |      8 | FDRE        |
-| step[3]                |      5 | FDRE        |
-| step[4]                |      5 | FDRE        |
-| step0[1]               |      3 | CARRY4      |
-+------------------------+--------+-------------+
++------------+--------+-------------+
+| Net Name   | Fanout | Driver Type |
++------------+--------+-------------+
+| reset__0   |     14 | IBUF        |
+| step__0[4] |      5 | FDRE        |
+| p_0_in[3]  |      2 | FDRE        |
+| p_0_in[0]  |      2 | FDRE        |
+| p_0_in[1]  |      2 | FDRE        |
+| p_0_in[2]  |      2 | FDRE        |
+| p_16_in[0] |      2 | FDSE        |
+| p_16_in[1] |      2 | FDRE        |
+| p_16_in[2] |      2 | FDSE        |
+| p_16_in[3] |      2 | FDSE        |
++------------+--------+-------------+
 
 
