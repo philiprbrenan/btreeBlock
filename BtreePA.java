@@ -2322,20 +2322,24 @@ abstract class BtreePA extends Test                                             
     return ""+t;
    }
 
-  abstract class GenVerilog                                                     // Generate verilog
+  abstract class VerilogCode                                                    // Generate verilog code
    {final String       project;                                                 // Project name - used to generate file names
     final String        folder;                                                 // Folder in which to place project
-    final String projectFolder;                                                 // Folder in which to place verilog
-    final String sourceVerilog;                                                 // Source verilog file
-    final String   testVerilog;                                                 // Verilog test bench file
-    final String         mFile;                                                 // Folder in which to place include for btree memory
-    final String         tFile;                                                 // Folder in which to place include for btree transaction memory
-    final String     opCodeMap = "opCodeMap";                                   // Name of op code map
-    final String opCodeMapFile;                                                 // File to contain op code map
-    final String     testsFile;                                                 // File in which to place verilog test results sumamry
-    final String     traceFile;                                                 // Folder in which to place verilog execution trace file
-    final String javaTraceFile;                                                 // Folder in which to place java    execution trace file
+          String projectFolder;                                                 // Folder in which to place verilog
+          String sourceVerilog;                                                 // Source verilog file
+          String   testVerilog;                                                 // Verilog test bench file
+          String         mFile;                                                 // Folder in which to place include for btree memory
+          String         tFile;                                                 // Folder in which to place include for btree transaction memory
+          String     opCodeMap = "opCodeMap";                                   // Name of op code map
+          String opCodeMapFile;                                                 // File to contain op code map
+          String     testsFile;                                                 // File in which to place verilog test results sumamry
+          String     traceFile;                                                 // Folder in which to place verilog execution trace file
+          String javaTraceFile;                                                 // Folder in which to place java    execution trace file
     final ProgramPA    program;                                                 // Program associated with this tree
+    final StringToNumbers  ops = new StringToNumbers();                         // Collapse identical instructions
+    final String blockIndent = " ".repeat(10), statementIndent = " ".repeat(16);// Indentation for Verilog
+
+    Integer         statements = null;                                          // Set if only one statement is to be generated
 
     abstract int    Key     ();                                                 // Input key value
     abstract int    Data    ();                                                 // Input data value
@@ -2344,12 +2348,38 @@ abstract class BtreePA extends Test                                             
     abstract int    expSteps();                                                 // Expected number of steps
     abstract String expected();                                                 // Expected number of steps
 
-    GenVerilog(String Project, String Folder)                                   // Generate verilog
+    VerilogCode(String Project, String Folder)                                  // Generate verilog code
      {zz();
       project = Project; folder = Folder; program = P;
-      //program.optimize();                                                     // Optimize not reliable enough yet and does not make a big enough differnce versus algorithmic improvements
 
-      projectFolder = ""+Paths.get(folder, project, ""+Key());                  // Use the  key to identify the sub project
+      for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
+       {final Stack<ProgramPA.I> I = program.code.elementAt(i);                 // The block of parallel instructions to write
+        if (I.size() > 1)
+         {final StringBuilder t = new StringBuilder();
+          for(ProgramPA.I j : I) t.append(statementIndent+"    "+j.v()+"\n");
+          ops.put(t.toString(), i);
+         }
+        else
+         {final ProgramPA.I j = I.firstElement();
+          ops.put(j.v(), i);
+         }
+       }
+
+      ops.order();                                                              // Order the instructions
+     }
+
+    void eachStatement()                                                        // Generate verilog with each statement appearing once
+     {final int N = ops.outputOrder.size();
+      for (int i = 0; i < N; i++) {statements = i; generate();}
+     }
+
+    VerilogCode generate()                                                      // Generate verilog
+     {zz();
+
+      final String subProject = ""+Key() +
+       (statements == null ? "" : "/statement/"+statements);                    // Some times we only want the specified statement to be generated (a block in always) so that we can use timing analysis to estimate the timing for that block
+
+      projectFolder = ""+Paths.get(folder, project, subProject);                // Use the  key to identify the sub project
       sourceVerilog = ""+Paths.get(projectFolder, project+Verilog.ext);
         testVerilog = ""+Paths.get(projectFolder, project+Verilog.testExt);
               mFile = ""+Paths.get(projectFolder, "includes", "M"+Verilog.header);
@@ -2360,23 +2390,6 @@ abstract class BtreePA extends Test                                             
       javaTraceFile = ""+Paths.get(projectFolder, "traceJava.txt");
       makePath(projectFolder);
 
-      final StringToNumbers ops = new StringToNumbers();                        // Collapse identical instructions
-      final String p = " ".repeat(10),  q = " ".repeat(16);                     // Indentation for Verilog
-
-      for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
-       {final Stack<ProgramPA.I> I = program.code.elementAt(i);                 // The block of parallel instructions to write
-        if (I.size() > 1)
-         {final StringBuilder t = new StringBuilder();
-          for(ProgramPA.I j : I) t.append(q+"    "+j.v()+"\n");
-          ops.put(t.toString(), i);
-         }
-        else
-         {final ProgramPA.I j = I.firstElement();
-          ops.put(j.v(), i);
-         }
-       }
-
-      ops.order();                                                              // Order the instructions
       ops.genVerilog(opCodeMapFile, opCodeMap);                                 // Write op code map
 
       final StringBuilder s = new StringBuilder();                              // Generate code
@@ -2413,7 +2426,6 @@ module $project(reset, stop, clock, Key, Data, data, found);                    
 $stuckBases
 
   always @ (posedge clock) begin                                                // Execute next step in program
-
     if (reset) begin                                                            // Reset
       step     <= 0;
      `ifndef SYNTHESIS
@@ -2444,24 +2456,27 @@ $stuckBases
        {s.append("      case(opCodeMap[step])\n");                              // Case statements to select the code for the current instruction
 
         for(StringToNumbers.Order o : ops.outputOrder)                          // I shall say each instruction only once
-         {final String k = ""+o.ordinal; //o.joinKeys();                        // Steps
-          final String I = o.string;                                            // Instruction before next
-          final String i;                                                       // Instruction after next
+         {final int    n = o.ordinal;                                           // Step
+          if (statements != null && statements != n) continue;                  // Generating just one statement so we can check timing for this statement
+          final String I = o.string;                                            // Instruction before next added
+          final String i;                                                       // Instruction after next added
+          final String p = blockIndent, q = statementIndent;
 
           if      (I.contains("/*GoTo*/"))   i = I;
           else if (I.contains("/*GoNext*/")) i = I.replace("/*GoNext*/", " else step <= step+1;");
           else                               i = I +                          " step <= step+1;";
 
           if (i.contains("\n"))                                                 // Multi line instruction
-           {s.append(String.format("%s%s : begin\n%s\n%s end\n", p, k, i, q));
+           {s.append(String.format("%s%4d : begin\n%s\n%s end\n", p, n, i, q));
            }
           else                                                                  // Single line instruction
-           {s.append(String.format("%s%s : begin %s end\n",      p, k, i));
+           {s.append(String.format("%s%4d : begin %s end\n",      p, n, i));
            }
          }
        }
       else                                                                      // Write the code for each instruction at each step
        {s.append("      case(step)");                                           // Case statements to select the code for the current instruction
+        final String p = blockIndent, q = statementIndent;
         for(int i = 0; i < program.code.size(); ++i)                            // Write each instruction
          {final Stack<ProgramPA.I> I = program.code.elementAt(i);               // The block of parallel instructions to write
           final int N = I.size();
@@ -2548,7 +2563,7 @@ endmodule
 
       P.traceMemory = M.memory();                                               // Request memory tracing
       deleteFile(javaTraceFile);
-      say(Project, Folder, Key());                                              // Identify the test
+      say(project, folder, Key());                                              // Identify the test
       P.run(javaTraceFile);                                                     // Run the java version and trace it
 
       //ok(P.steps, expSteps());                                                // Steps in java code
@@ -2556,10 +2571,26 @@ endmodule
       if (debug) stop(this);                                                    // Print tree if debugging
       if (expected() != null) ok(BtreePA.this, expected());                     // Check resulting tree
 
-      execVerilogTest();                                                        // Execute the corresponding verilog test
+      if (statements == null)                                                   // All statements are in play so it is possible to execute the programs and compare their outputs to see if they are the same.
+       {execJavaTest();                                                         // Execute the corresponding Java test
+        execVerilogTest();                                                      // Execute the corresponding Verilog test
+       }
+      return this;
      }
 
-    private void execVerilogTest()                                              // Execute the verilog test and compare it with the results from execution under Java
+    private void execJavaTest()                                                 // Execute the Java test
+     {P.traceMemory = M.memory();                                               // Request memory tracing
+      deleteFile(javaTraceFile);
+      say(project, folder, Key());                                              // Identify the test
+      P.run(javaTraceFile);                                                     // Run the Java version and trace it
+
+      //ok(P.steps, expSteps());                                                // Steps in Java code
+      ok(T.at(BtreePA.this.data).getInt(), data());                             // Data associated with key from java code
+      if (debug) stop(this);                                                    // Print tree if debugging
+      if (expected() != null) ok(BtreePA.this, expected());                     // Check resulting tree
+     }
+
+    private void execVerilogTest()                                              // Execute the Verilog test and compare it with the results from execution under Java
      {zz();
       final StringBuilder s = new StringBuilder(editVariables("cd $projectFolder && iverilog $project.tb $project.v -Iincludes -g2012 -o $project && ./$project"));
       deleteFile(traceFile);
@@ -3520,19 +3551,20 @@ endmodule
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
 
-    GenVerilog v = t.new GenVerilog("find", "verilog")                          // Generate verilog now that memories have been initialized and the program written
+    VerilogCode v = t.new VerilogCode("find", "verilog")                        // Generate verilog now that memories have been initialized and the program written
      {int    Key     () {return    2;}                                          // Input key value
       int    Data    () {return    2;}                                          // Input data value
       int    data    () {return    7;}                                          // Expected output data value
       int    maxSteps() {return 2000;}                                          // Maximum number if execution steps
       int    expSteps() {return   19;}                                          // Expected number of steps
       String expected() {return null;}                                          // Expected tree if present
-     };
+     }.generate();
     //say("AAAA11", t);
     //say("AAAA22", t.P);
     //say("AAAA22", t.T);
     //say("AAAA22", t.M);
     ok(t.T.at(t.data).getInt(), 7);                                             // Data associated with key
+    v.eachStatement();                                                          // Generate each statement
    }
 
   private void runVerilogDeleteTest                                             // Run the java and verilog versions and compare the resulting memory traces
@@ -3540,14 +3572,14 @@ endmodule
    {z();
     T.at(this.Key).setInt(Key);                                                 // Sets memory directly not via an instruction
 
-    GenVerilog v = new GenVerilog("delete", "verilog")                          // Generate verilog now that memories have beeninitialzied and the program written
+    VerilogCode v = new VerilogCode("delete", "verilog")                        // Generate verilog now that memories have beeninitialzied and the program written
      {int    Key     () {return   Key;}                                         // Input key value
       int    Data    () {return     3;}                                         // Input key value
       int    data    () {return  data;}                                         // Expected output data value
       int    maxSteps() {return  2000;}                                         // Maximum number if execution steps
       int    expSteps() {return steps;}                                         // Expected number of steps
       String expected() {return null;}                                          // Expected tree if present
-     };
+     }.generate();
    }
 
   private static void test_verilog_delete()                                     // Delete using generated verilog code
@@ -3652,14 +3684,14 @@ endmodule
    {z();
     T.at(Key ).setInt(value);                                                   // Sets memory directly not via an instruction
     T.at(Data).setInt(value);                                                   // Sets memory directly not via an instruction
-    GenVerilog v = new GenVerilog("put", "verilog")                             // Generate verilog now that memories have been initialized and the program written
+    VerilogCode v = new VerilogCode("put", "verilog")                           // Generate verilog now that memories have been initialized and the program written
      {int    Key     () {return value;}                                         // Input key value
       int    Data    () {return     3;}                                         // Input data value
       int    data    () {return     0;}                                         // Expected output data value
       int    maxSteps() {return  2000;}                                         // Maximum number if execution steps
       int    expSteps() {return steps;}                                         // Expected number of steps
       String expected() {return null;}                                          // Expected tree if present
-     };
+     }.generate();
     if (debug) stop(this);
     ok(this, expected);
    }
@@ -3893,9 +3925,9 @@ endmodule
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_verilog_delete();
+    //test_verilog_delete();
     test_verilog_find();
-    test_verilog_put();
+    //test_verilog_put();
     //test_delete_small_random();
    }
 
