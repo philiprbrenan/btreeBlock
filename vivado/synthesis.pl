@@ -57,6 +57,8 @@ set_param general.maxThreads 1
 read_verilog $verilog
 read_xdc     $constraints
 
+set_property SYNTH_HIERARCHY true [current_project]
+
 synth_design -name $design -top $design -part $part -include_dirs $includesDir -flatten_hierarchy none
 write_checkpoint -force $synth
 
