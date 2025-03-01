@@ -48,8 +48,8 @@ sub gen                                                                         
 
 
   my @reports     =                                                             # Reports
-   qw(bus_skew clock_interaction control_sets cdc drc high_fanout_nets
-      methodology power timing_summary utilization);
+   qw(bus_skew clock_interaction control_sets cdc design_analysis
+      drc high_fanout_nets methodology power timing_summary utilization);
 
   my $reports = sub
    {my @r;
