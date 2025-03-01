@@ -1,9 +1,9 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Tue Feb 25 14:58:36 2025
+| Date         : Sat Mar  1 03:16:30 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
-| Command      : report_control_sets -file /home/azureuser/btreeBlock/verilog/find/vivado/reports//control.rpt
+| Command      : report_control_sets -file /home/azureuser/btreeBlock/verilog/find/vivado/reports/control.rpt
 | Design       : find
 | Device       : xc7v2000t
 ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -22,8 +22,8 @@ Table of Contents
 +---------------------------------------------------+-------+
 |                       Status                      | Count |
 +---------------------------------------------------+-------+
-| Total control sets                                |     8 |
-|    Minimum number of control sets                 |     8 |
+| Total control sets                                |    19 |
+|    Minimum number of control sets                 |    19 |
 |    Addition due to synthesis replication          |     0 |
 |    Addition due to physical synthesis replication |     0 |
 +---------------------------------------------------+-------+
@@ -37,15 +37,15 @@ Table of Contents
 +--------------------+-------+
 |       Fanout       | Count |
 +--------------------+-------+
-| Total control sets |     8 |
-| >= 0 to < 4        |     1 |
-| >= 4 to < 6        |     5 |
-| >= 6 to < 8        |     0 |
-| >= 8 to < 10       |     2 |
+| Total control sets |    19 |
+| >= 0 to < 4        |     2 |
+| >= 4 to < 6        |     4 |
+| >= 6 to < 8        |     1 |
+| >= 8 to < 10       |     1 |
 | >= 10 to < 12      |     0 |
-| >= 12 to < 14      |     0 |
-| >= 14 to < 16      |     0 |
-| >= 16              |     0 |
+| >= 12 to < 14      |     2 |
+| >= 14 to < 16      |     1 |
+| >= 16              |     8 |
 +--------------------+-------+
 * Control sets can be remapped at either synth_design or opt_design
 
@@ -58,10 +58,10 @@ Table of Contents
 +--------------+-----------------------+------------------------+-----------------+--------------+
 | No           | No                    | No                     |               0 |            0 |
 | No           | No                    | Yes                    |               0 |            0 |
-| No           | Yes                   | No                     |               4 |            0 |
-| Yes          | No                    | No                     |              10 |            0 |
+| No           | Yes                   | No                     |            1447 |            0 |
+| Yes          | No                    | No                     |              20 |            0 |
 | Yes          | No                    | Yes                    |               0 |            0 |
-| Yes          | Yes                   | No                     |              26 |            0 |
+| Yes          | Yes                   | No                     |             240 |            0 |
 +--------------+-----------------------+------------------------+-----------------+--------------+
 
 
