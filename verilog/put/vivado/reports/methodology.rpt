@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sat Mar  1 21:30:04 2025
+| Date         : Sun Mar  2 18:30:56 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_methodology -file /home/azureuser/btreeBlock/verilog/put/vivado/reports/methodology.rpt
 | Design       : put
@@ -23,46 +23,15 @@ Table of Contents
           Floorplan: put
       Design limits: <entire design considered>
              Max checks: <unlimited>
-             Checks found: 22
+             Checks found: 13
 +-----------+----------+-------------------------------+--------+
 | Rule      | Severity | Description                   | Checks |
 +-----------+----------+-------------------------------+--------+
-| SYNTH-9   | Warning  | Small multiplier              | 6      |
-| TIMING-18 | Warning  | Missing input or output delay | 16     |
+| TIMING-18 | Warning  | Missing input or output delay | 13     |
 +-----------+----------+-------------------------------+--------+
 
 2. REPORT DETAILS
 -----------------
-SYNTH-9#1 Warning
-Small multiplier  
-Detected multiplier at branch_1_StuckSA_Memory_Based_82_base_offset_reg[7]_i_3 of size 6x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
-Related violations: <none>
-
-SYNTH-9#2 Warning
-Small multiplier  
-Detected multiplier at branch_1_StuckSA_Memory_Based_82_base_offset_reg[9]_i_8 of size 6x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
-Related violations: <none>
-
-SYNTH-9#3 Warning
-Small multiplier  
-Detected multiplier at branch_3_StuckSA_Memory_Based_88_base_offset_reg[6]_i_2 of size 6x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
-Related violations: <none>
-
-SYNTH-9#4 Warning
-Small multiplier  
-Detected multiplier at branch_3_StuckSA_Memory_Based_88_base_offset_reg[6]_i_4 of size 6x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
-Related violations: <none>
-
-SYNTH-9#5 Warning
-Small multiplier  
-Detected multiplier at leaf_1_StuckSA_Memory_Based_94_base_offset_reg[7]_i_2 of size 6x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
-Related violations: <none>
-
-SYNTH-9#6 Warning
-Small multiplier  
-Detected multiplier at leaf_1_StuckSA_Memory_Based_94_base_offset_reg[8]_i_2 of size 6x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
-Related violations: <none>
-
 TIMING-18#1 Warning
 Missing input or output delay  
 An input delay is missing on Data[0] relative to the rising and/or falling clock edge(s) of clock.
@@ -80,65 +49,50 @@ Related violations: <none>
 
 TIMING-18#4 Warning
 Missing input or output delay  
-An input delay is missing on Data[3] relative to the rising and/or falling clock edge(s) of clock.
+An input delay is missing on Key[0] relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#5 Warning
 Missing input or output delay  
-An input delay is missing on Key[0] relative to the rising and/or falling clock edge(s) of clock.
+An input delay is missing on Key[1] relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#6 Warning
 Missing input or output delay  
-An input delay is missing on Key[1] relative to the rising and/or falling clock edge(s) of clock.
+An input delay is missing on Key[2] relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#7 Warning
 Missing input or output delay  
-An input delay is missing on Key[2] relative to the rising and/or falling clock edge(s) of clock.
+An input delay is missing on Key[3] relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#8 Warning
 Missing input or output delay  
-An input delay is missing on Key[3] relative to the rising and/or falling clock edge(s) of clock.
+An input delay is missing on reset relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#9 Warning
 Missing input or output delay  
-An input delay is missing on Key[4] relative to the rising and/or falling clock edge(s) of clock.
+An output delay is missing on data[0] relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#10 Warning
 Missing input or output delay  
-An input delay is missing on reset relative to the rising and/or falling clock edge(s) of clock.
+An output delay is missing on data[1] relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#11 Warning
 Missing input or output delay  
-An output delay is missing on data[0] relative to the rising and/or falling clock edge(s) of clock.
+An output delay is missing on data[2] relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#12 Warning
 Missing input or output delay  
-An output delay is missing on data[1] relative to the rising and/or falling clock edge(s) of clock.
-Related violations: <none>
-
-TIMING-18#13 Warning
-Missing input or output delay  
-An output delay is missing on data[2] relative to the rising and/or falling clock edge(s) of clock.
-Related violations: <none>
-
-TIMING-18#14 Warning
-Missing input or output delay  
-An output delay is missing on data[3] relative to the rising and/or falling clock edge(s) of clock.
-Related violations: <none>
-
-TIMING-18#15 Warning
-Missing input or output delay  
 An output delay is missing on found relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
-TIMING-18#16 Warning
+TIMING-18#13 Warning
 Missing input or output delay  
 An output delay is missing on stop relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
