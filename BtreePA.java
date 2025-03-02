@@ -181,7 +181,17 @@ abstract class BtreePA extends Test                                             
      };
    }
 
-  private static BtreePA btreePA_small()                                        // Define a small test btree
+  private static BtreePA superSmall()                                           // Define a super small tree
+   {return new BtreePA()
+     {int maxSize         () {return 8;}
+      int maxKeysPerLeaf  () {return 2;}
+      int maxKeysPerBranch() {return 3;}
+      int bitsPerKey      () {return 4;}
+      int bitsPerData     () {return 3;}
+     };
+   }
+
+  private static BtreePA allTreeOps()                                           // Define a tree capable of performing all operations
    {return new BtreePA()
      {int maxSize         () {return 16;}
       int maxKeysPerLeaf  () {return  2;}
@@ -2577,7 +2587,7 @@ endmodule
 
       //ok(P.steps, expSteps());                                                // Steps in Java code
       ok(T.at(BtreePA.this.data).getInt(), data());                             // Data associated with key from java code
-      if (debug) stop(this);                                                    // Print tree if debugging
+      if (debug) stop(print());                                                 // Print tree if debugging
       if (expected() != null) ok(BtreePA.this, expected());                     // Check resulting tree
      }
 
@@ -2590,7 +2600,7 @@ endmodule
       final String        g = joinLines(readFile(traceFile));                   // Execute verilog
       ok(x.exitCode, 0);                                                        // Confirm exit code
       ok(12, g, e);                                                             // Width of margin in verilog traces
-      //ok(0, g, e);                                                              // Width of margin in verilog traces
+      //ok(0, g, e);                                                            // Width of margin in verilog traces
       final TreeMap<String,String> p = readProperties(testsFile);               // Load test results
       ok(ifs(p.get("Steps")), expSteps());                                      // Confirm results from Verilog
       ok(ifs(p.get("data")),  data());
@@ -3513,9 +3523,9 @@ endmodule
     test_delete_random(random_large);
    }
 
-  private static void test_verilog_find()                                       // Find using generated verilog code
+  private static void test_verilogFind_allTreeOps()                                       // Find using generated verilog code
    {z();
-    final BtreePA t = btreePA_small();
+    final BtreePA t = allTreeOps();
     t.P.run(); t.P.clear();
     t.put();
     final int N = 9;
@@ -3559,7 +3569,7 @@ endmodule
 //  if (!github_actions) v.eachStatement();                                     // Generate each statement in isolation so it can be timed
    }
 
-  private void runVerilogDeleteTest                                             // Run the java and verilog versions and compare the resulting memory traces
+  private void runVerilogDeleteTest_allTreeOps                                  // Run the java and verilog versions and compare the resulting memory traces
    (int Key, int data, int steps, String expected)
    {z();
     T.at(this.Key).setInt(Key);                                                 // Sets memory directly not via an instruction
@@ -3574,9 +3584,9 @@ endmodule
      }.generate();
    }
 
-  private static void test_verilog_delete()                                     // Delete using generated verilog code
+  private static void test_verilogDelete_allTreeOps()                           // Delete using generated verilog code
    {z();
-    final BtreePA t = btreePA_small();
+    final BtreePA t = allTreeOps();
     t.P.run(); t.P.clear();
     t.put();
     final int N = 9;
@@ -3603,7 +3613,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 398, """
+    t.runVerilogDeleteTest_allTreeOps(3, 6, 398, """
                     6           |
                     0           |
                     5           |
@@ -3615,7 +3625,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 340, """
+    t.runVerilogDeleteTest_allTreeOps(4, 5, 340, """
              6           |
              0           |
              5           |
@@ -3627,7 +3637,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 361, """
+    t.runVerilogDeleteTest_allTreeOps(2, 7, 361, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3635,7 +3645,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 285, """
+    t.runVerilogDeleteTest_allTreeOps(1, 8, 285, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3643,7 +3653,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 174, """
+    t.runVerilogDeleteTest_allTreeOps(5, 4, 174, """
       7      |
       0      |
       1      |
@@ -3651,7 +3661,7 @@ endmodule
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(6, 3, 180, """
+    t.runVerilogDeleteTest_allTreeOps(6, 3, 180, """
     7      |
     0      |
     1      |
@@ -3659,20 +3669,132 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 208, """
+    t.runVerilogDeleteTest_allTreeOps(7, 2, 208, """
 8,9=0 |
 """);
 
-    t.runVerilogDeleteTest(8, 1, 22, """
+    t.runVerilogDeleteTest_allTreeOps(8, 1, 22, """
 9=0 |
 """);
 
-    t.runVerilogDeleteTest(9, 0, 22, """
+    t.runVerilogDeleteTest_allTreeOps(9, 0, 22, """
 =0 |
 """);
    }
 
-  private void runVerilogPutTest(int value, int steps, String expected)         // Run the java and verilog versions and compare the resulting memory traces
+  private void runVerilogDeleteTest_superSmall                                  // Run the java and verilog versions and compare the resulting memory traces
+   (int Key, int data, int steps, String expected)
+   {z();
+    T.at(this.Key).setInt(Key);                                                 // Sets memory directly not via an instruction
+
+    VerilogCode v = new VerilogCode("delete", "verilog")                        // Generate verilog now that memories have beeninitialzied and the program written
+     {int    Key     () {return   Key;}                                         // Input key value
+      int    Data    () {return     3;}                                         // Input key value
+      int    data    () {return  data;}                                         // Expected output data value
+      int    maxSteps() {return  1000;}                                         // Maximum number if execution steps
+      int    expSteps() {return steps;}                                         // Expected number of steps
+      String expected() {return null;}                                          // Expected tree if present
+     }.generate();
+   }
+
+  private static void test_verilogDelete_superSmall()                           // Delete using generated verilog code
+   {z();
+    final BtreePA t = superSmall();
+    t.P.run(); t.P.clear();
+    t.put();
+    final int N = 9;
+    for (int i = 0; i < N; ++i)
+     {t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(i>>1);
+      t.P.run();
+     }
+    //stop(t.M);
+    //stop(t);
+    ok(t, """
+             3                    |
+             0                    |
+             5                    |
+             6                    |
+      1             5    6        |
+      5             6    6.1      |
+      1             4    7        |
+      3                  2        |
+0,1=1  2,3=3  4,5=4  6=7    7,8=2 |
+""");
+
+    t.P.clear();                                                                // Replace program with delete
+    t.delete();                                                                 // Delete code
+
+    t.runVerilogDeleteTest_superSmall(3, 1, 398, """
+                    6           |
+                    0           |
+                    5           |
+                    6           |
+      2    4             7      |
+      5    5.1           6      |
+      1    3             7      |
+           4             2      |
+1,2=1  4=3    5,6=4  7=7  8,9=2 |
+""");
+
+    t.runVerilogDeleteTest_superSmall(4, 2, 379, """
+             5           |
+             0           |
+             5           |
+             6           |
+      1           6      |
+      5           6      |
+      1           7      |
+      3           2      |
+""");
+
+    t.runVerilogDeleteTest_superSmall(2, 1, 314, """
+      1      6        |
+      0      0.1      |
+      1      3        |
+             2        |
+0,1=1  5,6=3    7,8=2 |
+""");
+
+    t.runVerilogDeleteTest_superSmall(1, 0, 219, """
+    1      6        |
+    0      0.1      |
+    1      3        |
+           2        |
+0=1  5,6=3    7,8=2 |
+""");
+
+    t.runVerilogDeleteTest_superSmall(5, 2, 174, """
+    6      |
+    0      |
+    1      |
+    2      |
+0=1  7,8=2 |
+""");
+
+    t.runVerilogDeleteTest_superSmall(6, 3, 180, """
+    7      |
+    0      |
+    1      |
+    2      |
+7=1  8,9=2 |
+""");
+
+    t.runVerilogDeleteTest_superSmall(7, 3, 168, """
+0,8=0 |
+""");
+
+    t.runVerilogDeleteTest_superSmall(8, 4, 22, """
+0=0 |
+""");
+
+    t.runVerilogDeleteTest_superSmall(0, 0, 22, """
+=0 |
+""");
+   }
+
+  private void runVerilogPutTest_allTreeOps                                     // Run the java and verilog versions and compare the resulting memory traces
+   (int value, int steps, String expected)
    {z();
     T.at(Key ).setInt(value);                                                   // Sets memory directly not via an instruction
     T.at(Data).setInt(value);                                                   // Sets memory directly not via an instruction
@@ -3688,20 +3810,20 @@ endmodule
     ok(this, expected);
    }
 
-  private static void test_verilog_put()                                        // Delete using generated verilog code
+  private static void test_verilogPut_allTreeOps()                              // Delete using generated verilog code
    {z();
-    final BtreePA t = btreePA_small();
+    final BtreePA t = allTreeOps();
     t.P.run(); t.P.clear();
     t.put();
-    t.runVerilogPutTest(1, 28, """
+    t.runVerilogPutTest_allTreeOps(1, 28, """
 1=0 |
 """);
 
-    t.runVerilogPutTest(2, 28, """
+    t.runVerilogPutTest_allTreeOps(2, 28, """
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest(3, 106, """
+    t.runVerilogPutTest_allTreeOps(3, 106, """
     1      |
     0      |
     1      |
@@ -3709,7 +3831,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 214, """
+    t.runVerilogPutTest_allTreeOps(4, 214, """
       2      |
       0      |
       1      |
@@ -3717,7 +3839,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 259, """
+    t.runVerilogPutTest_allTreeOps(5, 259, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -3725,7 +3847,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 285, """
+    t.runVerilogPutTest_allTreeOps(6, 285, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3733,7 +3855,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 330, """
+    t.runVerilogPutTest_allTreeOps(7, 330, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -3741,7 +3863,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 388, """
+    t.runVerilogPutTest_allTreeOps(8, 388, """
              4             |
              0             |
              5             |
@@ -3753,7 +3875,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 361, """
+    t.runVerilogPutTest_allTreeOps(9, 361, """
              4                    |
              0                    |
              5                    |
@@ -3765,7 +3887,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
 
-    t.runVerilogPutTest(10, 387, """
+    t.runVerilogPutTest_allTreeOps(10, 387, """
              4                       |
              0                       |
              5                       |
@@ -3777,7 +3899,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9,10=2 |
 """);
 
-    t.runVerilogPutTest(11, 432, """
+    t.runVerilogPutTest_allTreeOps(11, 432, """
              4                               |
              0                               |
              5                               |
@@ -3789,7 +3911,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9=8    10,11=2 |
 """);
 
-    t.runVerilogPutTest(12, 376, """
+    t.runVerilogPutTest_allTreeOps(12, 376, """
                                8                 |
                                0                 |
                                5                 |
@@ -3801,7 +3923,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=2 |
 """);
 
-    t.runVerilogPutTest(13, 361, """
+    t.runVerilogPutTest_allTreeOps(13, 361, """
                                8                          |
                                0                          |
                                5                          |
@@ -3813,7 +3935,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest(14, 387, """
+    t.runVerilogPutTest_allTreeOps(14, 387, """
                                8                             |
                                0                             |
                                5                             |
@@ -3825,7 +3947,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=2 |
 """);
 
-    t.runVerilogPutTest(15, 432, """
+    t.runVerilogPutTest_allTreeOps(15, 432, """
                                8                                     |
                                0                                     |
                                5                                     |
@@ -3837,7 +3959,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest(16, 417, """
+    t.runVerilogPutTest_allTreeOps(16, 417, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -3849,7 +3971,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=2 |
 """);
 
-    t.runVerilogPutTest(17, 426, """
+    t.runVerilogPutTest_allTreeOps(17, 426, """
                                8                  12                            |
                                0                  0.1                           |
                                5                  11                            |
@@ -3861,7 +3983,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest(18, 452, """
+    t.runVerilogPutTest_allTreeOps(18, 452, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -3873,7 +3995,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17,18=2 |
 """);
 
-    t.runVerilogPutTest(19, 497, """
+    t.runVerilogPutTest_allTreeOps(19, 497, """
                                8                  12                                        |
                                0                  0.1                                       |
                                5                  11                                        |
@@ -3885,7 +4007,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 449, """
+    t.runVerilogPutTest_allTreeOps(20, 449, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
@@ -3910,17 +4032,19 @@ endmodule
     //test_to_array();
     test_delete_small_random();
     //test_delete_large_random();
-    test_verilog_delete();
-    test_verilog_find();
-    test_verilog_put();
+
+    test_verilogDelete_allTreeOps();
+    test_verilogFind_allTreeOps();
+    test_verilogPut_allTreeOps();
+
+    test_verilogDelete_superSmall();
+    //test_verilogFind_superSmall();
+    //test_verilogPut_superSmall();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_verilog_delete();
-    test_verilog_find();
-    test_verilog_put();
-    //test_delete_small_random();
+    test_verilogDelete_superSmall();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
