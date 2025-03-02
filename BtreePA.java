@@ -3565,7 +3565,7 @@ endmodule
     //say("AAAA22", t.T);
     //say("AAAA22", t.M);
     ok(t.T.at(t.data).getInt(), 7);                                             // Data associated with key
-    if (!github_actions) v.eachStatement();                                     // Generate each statement in isolation so it can be timed
+//  if (!github_actions) v.eachStatement();                                     // Generate each statement in isolation so it can be timed
    }
 
   private void runVerilogDeleteTest                                             // Run the java and verilog versions and compare the resulting memory traces
