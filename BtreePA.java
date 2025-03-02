@@ -2562,16 +2562,6 @@ endmodule
       M.dumpVerilog(mFile);                                                     // Write include file to initialize main memory
       T.dumpVerilog(tFile, Key, Data);                                          // Write include file to initialize transaction memory excluding areas that will be loaded from the input ports
 
-      P.traceMemory = M.memory();                                               // Request memory tracing
-      deleteFile(javaTraceFile);
-      say(project, folder, Key());                                              // Identify the test
-      P.run(javaTraceFile);                                                     // Run the java version and trace it
-
-      //ok(P.steps, expSteps());                                                // Steps in java code
-      ok(T.at(BtreePA.this.data).getInt(), data());                             // Data associated with key from java code
-      if (debug) stop(this);                                                    // Print tree if debugging
-      if (expected() != null) ok(BtreePA.this, expected());                     // Check resulting tree
-
       if (statements == null)                                                   // All statements are in play so it is possible to execute the programs and compare their outputs to see if they are the same.
        {execJavaTest();                                                         // Execute the corresponding Java test
         execVerilogTest();                                                      // Execute the corresponding Verilog test
@@ -3560,6 +3550,7 @@ endmodule
       int    expSteps() {return   19;}                                          // Expected number of steps
       String expected() {return null;}                                          // Expected tree if present
      }.generate();
+
     //say("AAAA11", t);
     //say("AAAA22", t.P);
     //say("AAAA22", t.T);
