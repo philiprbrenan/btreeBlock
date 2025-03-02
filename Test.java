@@ -596,6 +596,19 @@ public class Test                                                               
 
   static Timer timer() {return new Timer();}                                    // Create a new timer
 
+//D2 Methodology                                                                // Testing methodology
+
+  public enum Methodology
+   {small_memory("small_memory"),                                               // Use a small amount of meory to build limited trees that can by routed more easily
+    all_tree_ops("all_tree_ops");                                               // Memory is large enough to reuire all possible tree operations
+
+    private final String mode;                                                  // Name of the mode
+
+    Methodology(String mode) {this.mode = mode;}                                // Construct a mode (an object of this class)
+
+    public String toString() {return mode;}                                     // Return the name fo a mode
+   }
+
 //D2 Printing                                                                   // Print log messages
 
   static void sayf(String format, Object...O)                                   // Say something under the control of a format string
@@ -705,33 +718,6 @@ public class Test                                                               
     System.arraycopy(a, 0, b, 1, a.length);
     say(b);
    }
-
-  static void sa(Object...O) {ii("AAAA", O);}
-  static void sb(Object...O) {ii("BBBB", O);}
-  static void sc(Object...O) {ii("CCCC", O);}
-  static void sd(Object...O) {ii("DDDD", O);}
-  static void se(Object...O) {ii("EEEE", O);}
-  static void sf(Object...O) {ii("FFFF", O);}
-  static void sg(Object...O) {ii("GGGG", O);}
-  static void sh(Object...O) {ii("HHHH", O);}
-  static void si(Object...O) {ii("IIII", O);}
-  static void sj(Object...O) {ii("JJJJ", O);}
-  static void sk(Object...O) {ii("KKKK", O);}
-  static void sl(Object...O) {ii("LLLL", O);}
-  static void sm(Object...O) {ii("MMMM", O);}
-  static void sn(Object...O) {ii("NNNN", O);}
-  static void so(Object...O) {ii("OOOO", O);}
-  static void sp(Object...O) {ii("PPPP", O);}
-  static void sq(Object...O) {ii("QQQQ", O);}
-  static void sr(Object...O) {ii("RRRR", O);}
-  static void ss(Object...O) {ii("SSSS", O);}
-  static void st(Object...O) {ii("TTTT", O);}
-  static void su(Object...O) {ii("UUUU", O);}
-  static void sv(Object...O) {ii("VVVV", O);}
-  static void sw(Object...O) {ii("WWWW", O);}
-  static void sx(Object...O) {ii("XXXX", O);}
-  static void sy(Object...O) {ii("YYYY", O);}
-  static void sz(Object...O) {ii("ZZZZ", O);}
 
 //D1 Testing                                                                    // Test expected output against got output
 
@@ -1057,6 +1043,11 @@ BBBB
    {ok(md5Sum("Hello World"), "b10a8db164e0754105b7a99be72e3fe5");
    }
 
+  static void test_methodology()
+   {ok(""+Methodology.small_memory, "small_memory");
+    ok(""+Methodology.all_tree_ops, "all_tree_ops");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_log_two();
     test_max_min();
@@ -1070,11 +1061,12 @@ BBBB
     test_properties();
     test_ifs();
     test_md5();
+    test_methodology();
    }
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_md5();
+    test_methodology();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
