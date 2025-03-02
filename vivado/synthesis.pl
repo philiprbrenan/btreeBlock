@@ -79,7 +79,8 @@ set_param general.maxThreads 4
 read_verilog $verilog
 read_xdc     $constraints
 
-synth_design -name $design -top $design -part $part -include_dirs $includesDir -flatten_hierarchy none
+synth_design -name $design -top $design -part $part -include_dirs $includesDir -flatten_hierarchy none -no_timing_driven -directive runtimeoptimized
+
 write_checkpoint -force $synth
 
 opt_design
