@@ -79,7 +79,7 @@ set_param general.maxThreads 4
 read_verilog $verilog
 read_xdc     $constraints
 
-synth_design -name $design -top $design -part $part -include_dirs $includesDir -flatten_hierarchy none -no_timing_driven -directive runtimeoptimized
+synth_design -name $design -top $design -part $part -include_dirs $includesDir -flatten_hierarchy none -no_timing_driven -directive AlternateRoutability
 
 write_checkpoint -force $synth
 
@@ -102,7 +102,7 @@ END
 
   say   STDERR dateTimeStamp, " $part for $design ".join " ", @statement;       # Run tcl
   print STDERR qx($vivadoX -mode batch -source $synthesis 1>$reportsDir/1.txt);
-  #unlink $synthesis;
+  unlink $synthesis;
  }
 
 if    (-e q(/home/phil/)) {}                                                    # Create the verilog files if on azure
