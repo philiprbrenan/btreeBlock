@@ -3697,7 +3697,7 @@ endmodule
      }.generate();
    }
 
-  private static void test_verilogDelete_superSmall()                           // Delete using generated verilog code
+  private static void test_verilogDelete_superSmall()                           // Bit stream in 54 minutes
    {z();
     final BtreePA t = superSmall();
     t.P.run(); t.P.clear();
@@ -3790,6 +3790,101 @@ endmodule
 
     t.runVerilogDeleteTest_superSmall(0, 0, 22, """
 =0 |
+""");
+   }
+
+  private void runVerilogPutTest_superSmall                                     // Run the java and verilog versions and compare the resulting memory traces
+   (int value, int steps, String expected)
+   {z();
+    T.at(Key ).setInt(value);                                                   // Sets memory directly not via an instruction
+    T.at(Data).setInt(value);                                                   // Sets memory directly not via an instruction
+    VerilogCode v = new VerilogCode("put", "verilog")                           // Generate verilog now that memories have been initialized and the program written
+     {int    Key     () {return value;}                                         // Input key value
+      int    Data    () {return     3;}                                         // Input data value
+      int    data    () {return     0;}                                         // Expected output data value
+      int    maxSteps() {return  2000;}                                         // Maximum number if execution steps
+      int    expSteps() {return steps;}                                         // Expected number of steps
+      String expected() {return null;}                                          // Expected tree if present
+     }.generate();
+    if (debug) stop(this);
+    ok(this, expected);
+   }
+
+  private static void test_verilogPut_superSmall()                              // Delete using generated verilog code
+   {z();
+    final BtreePA t = superSmall();
+    t.P.run(); t.P.clear();
+    t.put();
+    t.runVerilogPutTest_superSmall(1, 28, """
+1=0 |
+""");
+
+    t.runVerilogPutTest_superSmall(2, 28, """
+1,2=0 |
+""");
+                                                                                // Split instruction
+    t.runVerilogPutTest_superSmall(3, 106, """
+    1      |
+    0      |
+    1      |
+    2      |
+1=1  2,3=2 |
+""");
+
+    t.runVerilogPutTest_superSmall(4, 214, """
+      2      |
+      0      |
+      1      |
+      2      |
+1,2=1  3,4=2 |
+""");
+
+    t.runVerilogPutTest_superSmall(5, 259, """
+      2    3        |
+      0    0.1      |
+      1    3        |
+           2        |
+1,2=1  3=3    4,5=2 |
+""");
+
+    t.runVerilogPutTest_superSmall(6, 285, """
+      2      4        |
+      0      0.1      |
+      1      3        |
+             2        |
+1,2=1  3,4=3    5,6=2 |
+""");
+
+    t.runVerilogPutTest_superSmall(7, 330, """
+      2      4      5        |
+      0      0.1    0.2      |
+      1      3      4        |
+                    2        |
+1,2=1  3,4=3    5=4    6,7=2 |
+""");
+
+    t.runVerilogPutTest_superSmall(8, 387, """
+             4             |
+             0             |
+             5             |
+             6             |
+      2             6      |
+      5             6      |
+      1             4      |
+      3             2      |
+1,2=1  3,4=3  5,6=4  7,8=2 |
+""");
+
+    t.runVerilogPutTest_superSmall(9, 361, """
+             4                    |
+             0                    |
+             5                    |
+             6                    |
+      2             6    7        |
+      5             6    6.1      |
+      1             4    7        |
+      3                  2        |
+1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
    }
 
@@ -4044,7 +4139,7 @@ endmodule
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_verilogDelete_superSmall();
+    test_verilogPut_superSmall();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
