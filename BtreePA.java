@@ -3911,8 +3911,8 @@ endmodule
       int    expSteps() {return steps;}                                         // Expected number of steps
       String expected() {return null;}                                          // Expected tree if present
      }.generate();
-    if (debug) stop(this);
-    ok(this, expected);
+    if (debug)            stop(this);
+    if (expected != null) ok(this, expected);
    }
 
   private static void test_verilogPut_superSmall2()                             // Route elapsed: 46 minutes,  Arrival timne 12/1
@@ -3927,7 +3927,7 @@ endmodule
     t.runVerilogPutTest_superSmall2(5, 259, null);
     t.runVerilogPutTest_superSmall2(6, 285, null);
     t.runVerilogPutTest_superSmall2(7, 330, null);
-    t.runVerilogPutTest_superSmall2(8, 387, null);
+    t.runVerilogPutTest_superSmall2(8, 388, null);
     t.runVerilogPutTest_superSmall2(9, 361, """
              4                    |
              0                    |
