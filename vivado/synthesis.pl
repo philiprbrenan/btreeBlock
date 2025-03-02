@@ -83,7 +83,7 @@ synth_design -name $design -top $design -part $part -include_dirs $includesDir -
 
 write_checkpoint -force $synth
 
-opt_design
+opt_design -directive runtimeoptimized
 write_checkpoint -force $opt
 
 $reports
