@@ -191,6 +191,16 @@ abstract class BtreePA extends Test                                             
      };
    }
 
+  private static BtreePA superSmall2()                                          // Define a super small tree
+   {return new BtreePA()
+     {int maxSize         () {return 16;}
+      int maxKeysPerLeaf  () {return  2;}
+      int maxKeysPerBranch() {return  3;}
+      int bitsPerKey      () {return  4;}
+      int bitsPerData     () {return  3;}
+     };
+   }
+
   private static BtreePA allTreeOps()                                           // Define a tree capable of performing all operations
    {return new BtreePA()
      {int maxSize         () {return 16;}
@@ -3697,7 +3707,7 @@ endmodule
      }.generate();
    }
 
-  private static void test_verilogDelete_superSmall()                           // Bit stream in 54 minutes
+  private static void test_verilogDelete_superSmall()                           // Route: 11:11, arrival time 77/2ns
    {z();
     final BtreePA t = superSmall();
     t.P.run(); t.P.clear();
@@ -3810,7 +3820,7 @@ endmodule
     ok(this, expected);
    }
 
-  private static void test_verilogPut_superSmall()                              // Delete using generated verilog code
+  private static void test_verilogPut_superSmall()                              // Route elapsed: 46 minutes,  Arrival timne 12/1
    {z();
     final BtreePA t = superSmall();
     t.P.run(); t.P.clear();
@@ -3876,6 +3886,49 @@ endmodule
 """);
 
     t.runVerilogPutTest_superSmall(9, 361, """
+             4                    |
+             0                    |
+             5                    |
+             6                    |
+      2             6    7        |
+      5             6    6.1      |
+      1             4    7        |
+      3                  2        |
+1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
+""");
+   }
+
+  private void runVerilogPutTest_superSmall2                                    // Run the java and verilog versions and compare the resulting memory traces
+   (int value, int steps, String expected)
+   {z();
+    T.at(Key ).setInt(value);                                                   // Sets memory directly not via an instruction
+    T.at(Data).setInt(value);                                                   // Sets memory directly not via an instruction
+    VerilogCode v = new VerilogCode("put", "verilog")                           // Generate verilog now that memories have been initialized and the program written
+     {int    Key     () {return value;}                                         // Input key value
+      int    Data    () {return     3;}                                         // Input data value
+      int    data    () {return     0;}                                         // Expected output data value
+      int    maxSteps() {return  2000;}                                         // Maximum number if execution steps
+      int    expSteps() {return steps;}                                         // Expected number of steps
+      String expected() {return null;}                                          // Expected tree if present
+     }.generate();
+    if (debug) stop(this);
+    ok(this, expected);
+   }
+
+  private static void test_verilogPut_superSmall2()                             // Route elapsed: 46 minutes,  Arrival timne 12/1
+   {z();
+    final BtreePA t = superSmall2();
+    t.P.run(); t.P.clear();
+    t.put();
+    t.runVerilogPutTest_superSmall2(1,  28, null);
+    t.runVerilogPutTest_superSmall2(2,  28, null);
+    t.runVerilogPutTest_superSmall2(3, 106, null);
+    t.runVerilogPutTest_superSmall2(4, 214, null);
+    t.runVerilogPutTest_superSmall2(5, 259, null);
+    t.runVerilogPutTest_superSmall2(6, 285, null);
+    t.runVerilogPutTest_superSmall2(7, 330, null);
+    t.runVerilogPutTest_superSmall2(8, 387, null);
+    t.runVerilogPutTest_superSmall2(9, 361, """
              4                    |
              0                    |
              5                    |
@@ -4135,11 +4188,12 @@ endmodule
     test_verilogDelete_superSmall();
     //test_verilogFind_superSmall();
     //test_verilogPut_superSmall();
+    test_verilogPut_superSmall2();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_verilogPut_superSmall();
+    test_verilogPut_superSmall2();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
