@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sun Mar  2 18:32:51 2025
+| Date         : Mon Mar  3 01:16:13 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_utilization -file /home/azureuser/btreeBlock/verilog/put/vivado/reports/utilization.rpt
 | Design       : put
@@ -34,11 +34,11 @@ Table of Contents
 +-------------------------+--------+-------+------------+-----------+-------+
 |        Site Type        |  Used  | Fixed | Prohibited | Available | Util% |
 +-------------------------+--------+-------+------------+-----------+-------+
-| Slice LUTs*             | 133579 |     0 |          0 |   1221600 | 10.93 |
-|   LUT as Logic          | 133579 |     0 |          0 |   1221600 | 10.93 |
+| Slice LUTs*             | 529738 |     0 |          0 |   1221600 | 43.36 |
+|   LUT as Logic          | 529738 |     0 |          0 |   1221600 | 43.36 |
 |   LUT as Memory         |      0 |     0 |          0 |    344800 |  0.00 |
-| Slice Registers         |  60721 |     0 |          0 |   2443200 |  2.49 |
-|   Register as Flip Flop |  60721 |     0 |          0 |   2443200 |  2.49 |
+| Slice Registers         | 358505 |     0 |          0 |   2443200 | 14.67 |
+|   Register as Flip Flop | 358505 |     0 |          0 |   2443200 | 14.67 |
 |   Register as Latch     |      0 |     0 |          0 |   2443200 |  0.00 |
 | F7 Muxes                |      0 |     0 |          0 |    610800 |  0.00 |
 | F8 Muxes                |      0 |     0 |          0 |    305400 |  0.00 |
@@ -51,20 +51,20 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 1.1 Summary of Registers by Type
 --------------------------------
 
-+-------+--------------+-------------+--------------+
-| Total | Clock Enable | Synchronous | Asynchronous |
-+-------+--------------+-------------+--------------+
-| 0     |            _ |           - |            - |
-| 0     |            _ |           - |          Set |
-| 0     |            _ |           - |        Reset |
-| 0     |            _ |         Set |            - |
-| 0     |            _ |       Reset |            - |
-| 0     |          Yes |           - |            - |
-| 0     |          Yes |           - |          Set |
-| 0     |          Yes |           - |        Reset |
-| 2885  |          Yes |         Set |            - |
-| 57836 |          Yes |       Reset |            - |
-+-------+--------------+-------------+--------------+
++--------+--------------+-------------+--------------+
+|  Total | Clock Enable | Synchronous | Asynchronous |
++--------+--------------+-------------+--------------+
+| 0      |            _ |           - |            - |
+| 0      |            _ |           - |          Set |
+| 0      |            _ |           - |        Reset |
+| 0      |            _ |         Set |            - |
+| 0      |            _ |       Reset |            - |
+| 0      |          Yes |           - |            - |
+| 0      |          Yes |           - |          Set |
+| 0      |          Yes |           - |        Reset |
+| 4380   |          Yes |         Set |            - |
+| 354125 |          Yes |       Reset |            - |
++--------+--------------+-------------+--------------+
 
 
 2. Memory
@@ -125,7 +125,7 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 +------------+------+-------+------------+-----------+-------+
 |  Site Type | Used | Fixed | Prohibited | Available | Util% |
 +------------+------+-------+------------+-----------+-------+
-| BUFGCTRL   |    2 |     0 |          0 |       128 |  1.56 |
+| BUFGCTRL   |    3 |     0 |          0 |       128 |  2.34 |
 | BUFIO      |    0 |     0 |          0 |        96 |  0.00 |
 | MMCME2_ADV |    0 |     0 |          0 |        24 |  0.00 |
 | PLLE2_ADV  |    0 |     0 |          0 |        24 |  0.00 |
@@ -156,22 +156,22 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 7. Primitives
 -------------
 
-+----------+-------+---------------------+
-| Ref Name |  Used | Functional Category |
-+----------+-------+---------------------+
-| LUT6     | 80243 |                 LUT |
-| FDRE     | 57836 |        Flop & Latch |
-| LUT5     | 27663 |                 LUT |
-| LUT4     | 17382 |                 LUT |
-| LUT3     | 13074 |                 LUT |
-| LUT2     |  4375 |                 LUT |
-| FDSE     |  2885 |        Flop & Latch |
-| LUT1     |   145 |                 LUT |
-| IBUF     |     9 |                  IO |
-| OBUF     |     5 |                  IO |
-| CARRY4   |     3 |          CarryLogic |
-| BUFG     |     2 |               Clock |
-+----------+-------+---------------------+
++----------+--------+---------------------+
+| Ref Name |  Used  | Functional Category |
++----------+--------+---------------------+
+| FDRE     | 354125 |        Flop & Latch |
+| LUT6     | 246150 |                 LUT |
+| LUT5     | 138952 |                 LUT |
+| LUT4     |  68269 |                 LUT |
+| LUT3     |  67012 |                 LUT |
+| LUT2     |  30481 |                 LUT |
+| FDSE     |   4380 |        Flop & Latch |
+| LUT1     |    586 |                 LUT |
+| IBUF     |      9 |                  IO |
+| OBUF     |      5 |                  IO |
+| CARRY4   |      3 |          CarryLogic |
+| BUFG     |      3 |               Clock |
++----------+--------+---------------------+
 
 
 8. Black Boxes
