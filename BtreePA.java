@@ -3533,7 +3533,7 @@ endmodule
     test_delete_random(random_large);
    }
 
-  private static void test_verilogFind_allTreeOps()                                       // Find using generated verilog code
+  private static void test_verilogFind_allTreeOps()                             // Find using generated verilog code
    {z();
     final BtreePA t = allTreeOps();
     t.P.run(); t.P.clear();
@@ -3707,7 +3707,7 @@ endmodule
      }.generate();
    }
 
-  private static void test_verilogDelete_superSmall()                           // Route: 11:11, arrival time 77/2ns
+  private static void test_verilogDelete_superSmall()
    {z();
     final BtreePA t = superSmall();
     t.P.run(); t.P.clear();
@@ -3803,7 +3803,7 @@ endmodule
 """);
    }
 
-  private void runVerilogPutTest_superSmall                                     // Run the java and verilog versions and compare the resulting memory traces
+  private void runVerilogPutTest_superSmall
    (int value, int steps, String expected)
    {z();
     T.at(Key ).setInt(value);                                                   // Sets memory directly not via an instruction
@@ -3820,7 +3820,7 @@ endmodule
     ok(this, expected);
    }
 
-  private static void test_verilogPut_superSmall()                              // Route elapsed: 46 minutes,  Arrival timne 12/1
+  private static void test_verilogPut_superSmall()                              // Route: 11:11, arrival time 77/2ns
    {z();
     final BtreePA t = superSmall();
     t.P.run(); t.P.clear();
@@ -3915,7 +3915,7 @@ endmodule
     if (expected != null) ok(this, expected);
    }
 
-  private static void test_verilogPut_superSmall2()                             // Route elapsed: 46 minutes,  Arrival timne 12/1
+  private static void test_verilogPut_superSmall2()
    {z();
     final BtreePA t = superSmall2();
     t.P.run(); t.P.clear();
