@@ -3533,6 +3533,52 @@ endmodule
     test_delete_random(random_large);
    }
 
+  private static void test_verilogFind_superSmall()                             // Find using generated verilog code
+   {z();
+    final BtreePA t = superSmall();
+    t.P.run(); t.P.clear();
+    t.put();
+    final int N = 9;
+    for (int i = 1; i <= N; ++i)
+     {say(currentTestName(),  "a", i);
+      t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(N-i);
+      t.P.run();
+     }
+    //stop(t.M);
+    //stop(t);
+    ok(t, """
+             4                    |
+             0                    |
+             5                    |
+             6                    |
+      2             6    7        |
+      5             6    6.1      |
+      1             4    7        |
+      3                  2        |
+1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
+""");
+    t.P.clear(); t.T.clear();                                                   // Clear program and transaction memory
+    t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
+    t.find();
+
+    VerilogCode v = t.new VerilogCode("find", "verilog")                        // Generate verilog now that memories have been initialized and the program written
+     {int    Key     () {return    2;}                                          // Input key value
+      int    Data    () {return    2;}                                          // Input data value
+      int    data    () {return    7;}                                          // Expected output data value
+      int    maxSteps() {return 2000;}                                          // Maximum number if execution steps
+      int    expSteps() {return   19;}                                          // Expected number of steps
+      String expected() {return null;}                                          // Expected tree if present
+     }.generate();
+
+    //say("AAAA11", t);
+    //say("AAAA22", t.P);
+    //say("AAAA22", t.T);
+    //say("AAAA22", t.M);
+    ok(t.T.at(t.data).getInt(), 7);                                             // Data associated with key
+//  if (!github_actions) v.eachStatement();                                     // Generate each statement in isolation so it can be timed
+   }
+
   private static void test_verilogFind_allTreeOps()                             // Find using generated verilog code
    {z();
     final BtreePA t = allTreeOps();
@@ -3920,15 +3966,15 @@ endmodule
     final BtreePA t = superSmall2();
     t.P.run(); t.P.clear();
     t.put();
-    t.runVerilogPutTest_superSmall2(1,  28, null);
-    t.runVerilogPutTest_superSmall2(2,  28, null);
-    t.runVerilogPutTest_superSmall2(3, 106, null);
-    t.runVerilogPutTest_superSmall2(4, 214, null);
-    t.runVerilogPutTest_superSmall2(5, 259, null);
-    t.runVerilogPutTest_superSmall2(6, 285, null);
-    t.runVerilogPutTest_superSmall2(7, 330, null);
-    t.runVerilogPutTest_superSmall2(8, 388, null);
-    t.runVerilogPutTest_superSmall2(9, 361, """
+    t.runVerilogPutTest_superSmall(1,  28, null);
+    t.runVerilogPutTest_superSmall(2,  28, null);
+    t.runVerilogPutTest_superSmall(3, 106, null);
+    t.runVerilogPutTest_superSmall(4, 214, null);
+    t.runVerilogPutTest_superSmall(5, 259, null);
+    t.runVerilogPutTest_superSmall(6, 285, null);
+    t.runVerilogPutTest_superSmall(7, 330, null);
+    t.runVerilogPutTest_superSmall(8, 388, null);
+    t.runVerilogPutTest_superSmall(9, 361, """
              4                    |
              0                    |
              5                    |
@@ -4193,7 +4239,7 @@ endmodule
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_verilogPut_superSmall2();
+    test_verilogFind_superSmall();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
