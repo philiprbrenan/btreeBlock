@@ -2109,7 +2109,7 @@ abstract class BtreePA extends Test                                             
 
                 splitLeaf();                                                    // Split the child leaf
                 findAndInsert(null);                                            // Now guaranteed to work
-                merge();
+                ////merge();
                 P.Goto(Return);
                }
              };
@@ -3966,15 +3966,15 @@ endmodule
     final BtreePA t = superSmall2();
     t.P.run(); t.P.clear();
     t.put();
-    t.runVerilogPutTest_superSmall(1,  28, null);
-    t.runVerilogPutTest_superSmall(2,  28, null);
-    t.runVerilogPutTest_superSmall(3, 106, null);
-    t.runVerilogPutTest_superSmall(4, 214, null);
-    t.runVerilogPutTest_superSmall(5, 259, null);
-    t.runVerilogPutTest_superSmall(6, 285, null);
-    t.runVerilogPutTest_superSmall(7, 330, null);
-    t.runVerilogPutTest_superSmall(8, 388, null);
-    t.runVerilogPutTest_superSmall(9, 361, """
+    t.runVerilogPutTest_superSmall2(1,  28, null);
+    t.runVerilogPutTest_superSmall2(2,  28, null);
+    t.runVerilogPutTest_superSmall2(3, 106, null);
+    t.runVerilogPutTest_superSmall2(4, 214, null);
+    t.runVerilogPutTest_superSmall2(5, 259, null);
+    t.runVerilogPutTest_superSmall2(6, 285, null);
+    t.runVerilogPutTest_superSmall2(7, 330, null);
+    t.runVerilogPutTest_superSmall2(8, 388, null);
+    t.runVerilogPutTest_superSmall2(9, 361, """
              4                    |
              0                    |
              5                    |
@@ -4239,7 +4239,7 @@ endmodule
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_verilogFind_superSmall();
+    test_verilogPut_superSmall2();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
