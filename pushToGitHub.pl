@@ -38,6 +38,7 @@ if (1)                                                                          
  }
 
 push my @qflow, searchDirectoryTreesForMatchingFiles($home, @qflowExt);         # Qflow Files to upload
+say STDERR "AAAA ", dump(\@qflow);
         @qflow = grep {m(/qflow/)} @files;
 push @files, @qflow;
 
