@@ -18,7 +18,8 @@ my $md5File = q(/home/phil/btreeBlock/.md5Sums);                                
 my $user    = q(philiprbrenan);                                                 # User
 my $repo    = q(btreeBlock);                                                    # Repo
 my $wf      = q(.github/workflows/main.yml);                                    # Work flow on Ubuntu
-my @ext     = qw(.html .java .jpg .md .pl .txt .pdf .png .py .rpt .xdc);        # Extensions of files to upload to github
+my @ext     = qw(.html .java .jpg .md .pl .pdf .png .py .rpt .txt .xdc);        # Extensions of files to upload to github
+my @qflowExt= qw(.cel2 .gds2 .spi .tb .tcl .v);                                 # Qflow file extensions
 #  @ext     = qw(.java .md .pl .txt);                                           # Reduced set of files to upload to github
 
 say STDERR timeStamp,  " push to github $repo";
@@ -35,6 +36,10 @@ if (1)                                                                          
     push @files, $f;
    }
  }
+
+push my @qflow, searchDirectoryTreesForMatchingFiles($home, @qflowExt);         # Qflow Files to upload
+        @qflow = grep {m(/qflow/)} @files;
+push @files, @qflow;
 
 @files = changedFiles $md5File, @files;                                         # Filter out files that have not changed
 
