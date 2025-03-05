@@ -1,0 +1,39 @@
+* Mixed-mode SPICE/XSPICE testbench for map9v3
+* Note: Requires ngspice with XSPICE and d_lut/d_genlut models
+
+.include map9v3.xspice
+
+XDUT VDD 0 clk reset start N0 N1 N2 N3 N4 N5 N6 N7 N8
++ dp0 dp1 dp2 dp3 dp4 dp5 dp6 dp7 dp8 done
++ counter0 counter1 counter2 counter3 counter4 counter5 counter6 counter7
++ sr0 sr1 sr2 sr3 sr4 sr5 sr6 sr7 map9v3
+
+VVDD VDD 0 DC 3.3
+
+* Clock simulated with voltage pulse train
+VCLOCK clk 0 PULSE (0 3.3 2.0e-5 1.0e-7 1.0e-7 1.0e-6 2.0e-6)
+
+* POR simulated by voltage pulse
+VRESET reset 0 PWL (0 0 1e-7 0 2e-7 3.3 1.0e-5 3.3 1.01e-5 0)
+
+* Generate start signal with voltage pulse
+VSTART start 0 PWL (0 0 3.005e-4 0 3.006e-4 3.3 3.036e-4 3.3 3.037e-4 0)
+
+* Apply value N 8'b100111010
+VVN8 N8 0 DC 3.3
+VVN7 N7 0 DC 0.0
+VVN6 N6 0 DC 0.0
+VVN5 N5 0 DC 3.3
+VVN4 N4 0 DC 3.3
+VVN3 N3 0 DC 3.3
+VVN2 N2 0 DC 0.0
+VVN1 N1 0 DC 3.3
+VVN0 N0 0 DC 0.0
+
+* ngspice control block
+.control
+tran 1.0e-3 2e-3
+plot reset start done
+.endc
+
+.end
