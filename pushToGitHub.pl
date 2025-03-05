@@ -38,8 +38,8 @@ if (1)                                                                          
  }
 
 push my @qflow, searchDirectoryTreesForMatchingFiles($home, @qflowExt);         # Qflow Files to upload
-say STDERR "AAAA ", dump(\@qflow);
         @qflow = grep {m(/qflow/)} @files;
+say STDERR "AAAA ", dump(\@qflow);
 push @files, @qflow;
 
 @files = changedFiles $md5File, @files;                                         # Filter out files that have not changed
