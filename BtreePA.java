@@ -2109,7 +2109,7 @@ abstract class BtreePA extends Test                                             
 
                 splitLeaf();                                                    // Split the child leaf
                 findAndInsert(null);                                            // Now guaranteed to work
-                ////merge();
+                merge();                                                        // Improve the tree along the path to the key
                 P.Goto(Return);
                }
              };
