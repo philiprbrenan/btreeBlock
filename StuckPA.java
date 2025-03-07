@@ -14,6 +14,7 @@ abstract class StuckPA extends Test                                             
   final String      name;                                                       // Name of the stuck
   final int bitsPerAddress;                                                     // Number of bits needed to address a bit in the memory containign the stuck
   final MemoryLayoutPA M;                                                       // Memory for stuck
+  final MemoryLayoutPA B;                                                       // Copy the stuck out of main memory, manipulate it, then return it to main memory to reduce contention on main memory induced by many small accesses
   final MemoryLayoutPA C;                                                       // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
   final MemoryLayoutPA T;                                                       // Memory for transaction intermediates
   ProgramPA            P = new ProgramPA();                                     // The program to be written to to describe the actions on the stuck.  The caller can provide a different one as this field is not final
@@ -55,21 +56,34 @@ abstract class StuckPA extends Test                                             
 
 //D1 Construction                                                               // Create a stuck
 
-  StuckPA(String Name)                                                          // Create the stuck. The memory layout containing the stuck
+  StuckPA(String Name)                                                          // Create the stuck with a maximum number of the specified elements
+   {this(Name, null); z();
+   }
+
+  StuckPA(String Name, MemoryLayoutPA Based)                                    // Create the stuck with a maximum number of the specified elements
    {zz(); name = Name;
     final Layout layout = layout();                                             // Layout out the stuck
-    M = new MemoryLayoutPA(layout, Name+"_StuckSA_Memory");                     // Mmeory for the stuck
+    if (Based != null && Based.based()) M = Based;                              // Some usable memory has been supplied
+    else M = new MemoryLayoutPA(layout, Name+"_StuckSA_Memory", Based);         // No memory has been supplied, so create some memory and then base off it to assist in testing.
+    B = new MemoryLayoutPA(layout, name+"_StuckSA_Base");                       // Base copy of stuck to reduce congestion on main memory during routing
     C = new MemoryLayoutPA(layout, name+"_StuckSA_Copy");                       // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
 
-    bitsPerAddress = logTwo(layout.size());                                     // The stuck might be located any where in this memory
+    bitsPerAddress = logTwo(M.baseSize());                                      // The stuck might be located any where in this memory
     final Layout tl = transactionLayout();                                      // Layout out of transations performed on stuck
     T = new MemoryLayoutPA(tl,     name+"_StuckSA_Transaction");                // Memory for transaction intermediates
     program(M.P);
    }
 
-  void base(MemoryLayoutPA.At Base)                                             // Copy the stuck from this address in the containing memory
+  void base(int Base)                                                           // Set the base address of the stuck in the memory layout containing the stuck
+   {z(); M.base(Base);
+   }
+
+  void base(MemoryLayoutPA.At Base)                                             // Set the base address of the stuck in the memory layout containing the stuck
    {zz();
-    M.copy(Base);
+    P.new I()
+     {void   a() {M.base(Base.setOff().result);}
+      String v() {return M.baseName() + " <= " + Base.verilogLoad()+";";}       // Set the base for this based data structure
+     };
    }
 
   void program(ProgramPA program)                                               // Set the program in which the various components should generate code
@@ -82,7 +96,7 @@ abstract class StuckPA extends Test                                             
   StuckPA copyDef()                                                             // Copy a stuck definition
    {z();
     final StuckPA parent = this;
-    final StuckPA  child = new StuckPA(parent.name)
+    final StuckPA  child = new StuckPA(parent.name, parent.M.based)             // Address the underlying memory layout which is not based so wil force a new based memory to be created for this copy
      {int maxSize    () {return parent.maxSize    ();}
       int bitsPerKey () {return parent.bitsPerKey ();}
       int bitsPerData() {return parent.bitsPerData();}
@@ -219,7 +233,7 @@ abstract class StuckPA extends Test                                             
      }
    }
 
-  void copyKeys(StuckPA source)                                                 // Copy the specified number of keys from the source stuck at the specified index into the target stuck at the specified index
+  void copyKeys(StuckPA source)                                                 // Copy the specified number of elements from the source array of keys at the specified index into the target array of keys at the specified target index
    {zz();
     P.new I()
      {void   a() {T.at(copyBitsKeys).setInt(T.at(copyCount).getInt()*bitsPerKey());}
@@ -229,10 +243,10 @@ abstract class StuckPA extends Test                                             
     final MemoryLayoutPA.At si = source.T.at(source.index);
 //  M.at(sKey, ti).copy(source.M.at(source.sKey, si), T.at(copyBitsKeys));
     M.at(sKey, ti).copy(source.M.at(source.sKey, si), T.at(copyBitsKeys),
-      T.at(copy_target_keys), T.at(copy_source_keys), T.at(copy_length_keys));
+    T.at(copy_target_keys), T.at(copy_source_keys), T.at(copy_length_keys));
    }
 
-  void copyData(StuckPA source)                                                 // Copy the specified number of data fields from the source stuck at the specified index into the target stuck at the specified index
+  void copyData(StuckPA source)                                                 // Copy the specified number of elements from the source array of data at the specified index into the target array of data at the specified target index
    {zz();
     P.new I()
      {void   a() {T.at(copyBitsData).setInt(T.at(copyCount).getInt()*bitsPerData());}
@@ -1089,7 +1103,7 @@ abstract class StuckPA extends Test                                             
       int bitsPerSize() {return s.bitsPerSize();};                              // The number of bits in size field
      };
     t.M.memory(s.M.memory());
-    //t.base(s.M.base());
+    t.base(s.M.base());
     return t.toString();
    }
 
@@ -1130,27 +1144,6 @@ StuckSML(maxSize:8 size:4)
     return s;
    }
 
-  static StuckPA test_load2()
-   {StuckPA s = stuckPA();
-
-    for (int I = 4; I > 0; --I)
-     {final int i = I-1;
-      s.T.setIntInstruction(s.tKey,  2 + 2 * i);
-      s.T.setIntInstruction(s.tData, 1 + 1 * i);
-      s.push();
-     }
-    s.P.run(); s.P.clear();
-    //stop(s);
-    ok(s, """
-StuckSML(maxSize:8 size:4)
-  3 key:8 data:4
-  2 key:6 data:3
-  1 key:4 data:2
-  0 key:2 data:1
-""");
-    return s;
-   }
-
   static void test_clear()
    {StuckPA s = test_load();
     s.size();
@@ -1173,8 +1166,8 @@ StuckSML(maxSize:8 size:0)
     s.P.run();
     //stop(s.M);
     ok(""+s.M, """
-MemoryLayout: original_StuckSA_Memory
-Memory      : original_StuckSA_Memory
+MemoryLayout: original_StuckSA_Memory_Based
+Memory      : original_StuckSA_Memory_Backing
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0       272                                      stuck
    2 V        0        16                                  4     currentSize
@@ -1199,7 +1192,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
     //stop(s.M.memory());
     ok(s.M.memory(), """
-Memory: original_StuckSA_Memory
+Memory: original_StuckSA_Memory_Backing
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
    0  0000 0000 0000 000c 000b 000a 0009 0000 0000 0000 0000 000c 000d 000e 000f 0004
@@ -1726,90 +1719,393 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(s.T.at(s.found).getInt(), 0);
    }
 
+  static void test_at()
+   {final int     N = 16;
+
+    final StuckPA D = new StuckPA("test")
+     {int maxSize     () {return 4;}
+      int bitsPerKey  () {return 8;}
+      int bitsPerData () {return 8;}
+      int bitsPerSize () {return 8;}
+      int baseAt      () {return 0;}
+     };
+
+    Layout               l = new Layout();
+    Layout.Variable  a = l.variable ("a", N);
+    Layout.Variable  b = l.variable ("b", N);
+    Layout.Field     c = l.duplicate("c", D.M.layout());
+    Layout.Array     C = l.array    ("C", c, 2);
+    Layout.Structure d = l.structure("d", a, b, C);
+
+    MemoryLayoutPA   M = new MemoryLayoutPA(l.compile(), "M");
+    M.P.new I() {void a() {M.at(a).setInt(0); }};
+    M.P.new I() {void a() {M.at(b).setInt(1); }};
+    M.P.run();
+    //stop(M);
+    ok(M, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0       176                                      d
+   2 V        0        16                                  0     a
+   3 V       16        16                                  1     b
+   4 A       32       144          2                             C
+   5 S       32        72               0                          c
+   6 V       32         8               0                  0         currentSize
+   7 A       40        32          4    0                            Keys
+   8 V       40         8               0 0                0           key
+   9 V       48         8               0 1                0           key
+  10 V       56         8               0 2                0           key
+  11 V       64         8               0 3                0           key
+  12 A       72        32          4    0                            Data
+  13 V       72         8               0 0                0           data
+  14 V       80         8               0 1                0           data
+  15 V       88         8               0 2                0           data
+  16 V       96         8               0 3                0           data
+  17 S      104        72               1                          c
+  18 V      104         8               1                  0         currentSize
+  19 A      112        32          4    1                            Keys
+  20 V      112         8               1 0                0           key
+  21 V      120         8               1 1                0           key
+  22 V      128         8               1 2                0           key
+  23 V      136         8               1 3                0           key
+  24 A      144        32          4    1                            Data
+  25 V      144         8               1 0                0           data
+  26 V      152         8               1 1                0           data
+  27 V      160         8               1 2                0           data
+  28 V      168         8               1 3                0           data
+""");
+
+    final StuckPA S = new StuckPA("test", M)
+     {int maxSize     () {return 4;}
+      int bitsPerKey  () {return 8;}
+      int bitsPerData () {return 8;}
+      int bitsPerSize () {return 8;}
+      int baseAt      () {return 0;}
+     };
+
+    final StuckPA s = S.copyDef();
+    s.P.new I() {void a() {s.base(M.at(c, M.at(a)).setOff().at);}};
+
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt(1);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(4); s.T.at(s.tData).setInt(2);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(6); s.T.at(s.tData).setInt(3);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(8); s.T.at(s.tData).setInt(4);}}; s.push();
+    s.P.run(); s.P.clear();
+
+    //stop(s.M);
+    ok(s.M, """
+MemoryLayout: test_StuckSA_Memory_Based
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S       32        72                                      stuck
+   2 V       32         8                                  4     currentSize
+   3 A       40        32          4                             Keys
+   4 V       40         8               0                  2       key
+   5 V       48         8               1                  4       key
+   6 V       56         8               2                  6       key
+   7 V       64         8               3                  8       key
+   8 A       72        32          4                             Data
+   9 V       72         8               0                  1       data
+  10 V       80         8               1                  2       data
+  11 V       88         8               2                  3       data
+  12 V       96         8               3                  4       data
+""");
+    //stop(M);
+    ok(M, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0       176                                      d
+   2 V        0        16                                  0     a
+   3 V       16        16                                  1     b
+   4 A       32       144          2                             C
+   5 S       32        72               0                          c
+   6 V       32         8               0                  4         currentSize
+   7 A       40        32          4    0                            Keys
+   8 V       40         8               0 0                2           key
+   9 V       48         8               0 1                4           key
+  10 V       56         8               0 2                6           key
+  11 V       64         8               0 3                8           key
+  12 A       72        32          4    0                            Data
+  13 V       72         8               0 0                1           data
+  14 V       80         8               0 1                2           data
+  15 V       88         8               0 2                3           data
+  16 V       96         8               0 3                4           data
+  17 S      104        72               1                          c
+  18 V      104         8               1                  0         currentSize
+  19 A      112        32          4    1                            Keys
+  20 V      112         8               1 0                0           key
+  21 V      120         8               1 1                0           key
+  22 V      128         8               1 2                0           key
+  23 V      136         8               1 3                0           key
+  24 A      144        32          4    1                            Data
+  25 V      144         8               1 0                0           data
+  26 V      152         8               1 1                0           data
+  27 V      160         8               1 2                0           data
+  28 V      168         8               1 3                0           data
+""");
+
+    s.P.new I() {void a() {s.base(M.at(c, M.at(b)).setOff().at);}};
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(1); s.T.at(s.tData).setInt(2);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt(4);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(3); s.T.at(s.tData).setInt(6);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(4); s.T.at(s.tData).setInt(8);}}; s.push();
+    s.P.run(); s.P.clear();
+    //stop(s.M);
+    ok(s.M.toString(), """
+MemoryLayout: test_StuckSA_Memory_Based
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S      104        72                                      stuck
+   2 V      104         8                                  4     currentSize
+   3 A      112        32          4                             Keys
+   4 V      112         8               0                  1       key
+   5 V      120         8               1                  2       key
+   6 V      128         8               2                  3       key
+   7 V      136         8               3                  4       key
+   8 A      144        32          4                             Data
+   9 V      144         8               0                  2       data
+  10 V      152         8               1                  4       data
+  11 V      160         8               2                  6       data
+  12 V      168         8               3                  8       data
+""");
+    //stop(M);
+    ok(M, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0       176                                      d
+   2 V        0        16                                  0     a
+   3 V       16        16                                  1     b
+   4 A       32       144          2                             C
+   5 S       32        72               0                          c
+   6 V       32         8               0                  4         currentSize
+   7 A       40        32          4    0                            Keys
+   8 V       40         8               0 0                2           key
+   9 V       48         8               0 1                4           key
+  10 V       56         8               0 2                6           key
+  11 V       64         8               0 3                8           key
+  12 A       72        32          4    0                            Data
+  13 V       72         8               0 0                1           data
+  14 V       80         8               0 1                2           data
+  15 V       88         8               0 2                3           data
+  16 V       96         8               0 3                4           data
+  17 S      104        72               1                          c
+  18 V      104         8               1                  4         currentSize
+  19 A      112        32          4    1                            Keys
+  20 V      112         8               1 0                1           key
+  21 V      120         8               1 1                2           key
+  22 V      128         8               1 2                3           key
+  23 V      136         8               1 3                4           key
+  24 A      144        32          4    1                            Data
+  25 V      144         8               1 0                2           data
+  26 V      152         8               1 1                4           data
+  27 V      160         8               1 2                6           data
+  28 V      168         8               1 3                8           data
+""");
+
+    //stop(s.M);
+    ok(s.M, """
+MemoryLayout: test_StuckSA_Memory_Based
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S      104        72                                      stuck
+   2 V      104         8                                  4     currentSize
+   3 A      112        32          4                             Keys
+   4 V      112         8               0                  1       key
+   5 V      120         8               1                  2       key
+   6 V      128         8               2                  3       key
+   7 V      136         8               3                  4       key
+   8 A      144        32          4                             Data
+   9 V      144         8               0                  2       data
+  10 V      152         8               1                  4       data
+  11 V      160         8               2                  6       data
+  12 V      168         8               3                  8       data
+""");
+
+    //stop(s.M.memory());
+    ok(s.M.memory(), """
+Memory: M
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0000 0806 0402 0403 0201 0404 0302 0108 0604 0204 0001 0000
+""");
+   }
+
   static void test_copy()                                                       // Copy one stuck into another
    {z();
 
-    final StuckPA s = test_load();
-    final StuckPA t = test_load();
-    t.program(s.P);
-    t.clear();
-    t.P.run(); t.P.clear();
-    //stop(t);
-    ok(t, """
-StuckSML(maxSize:8 size:0)
-""");
+    final MemoryLayoutPA m = new MemoryLayoutPA(1000);
+
+    final StuckPA    s = new StuckPA("source", m)
+     {int maxSize     () {return  4;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(1); s.T.at(s.tData).setInt(2);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt(4);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(3); s.T.at(s.tData).setInt(6);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(4); s.T.at(s.tData).setInt(8);}}; s.push();
+    s.P.run(); s.P.clear();
+
+    final StuckPA    t = new StuckPA("target", m)
+     {int maxSize     () {return  4;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
     t.copy(s);
     t.P.run(); t.P.clear();
+
     //stop(t);
     ok(t, """
-StuckSML(maxSize:8 size:4)
-  0 key:2 data:1
-  1 key:4 data:2
-  2 key:6 data:3
-  3 key:8 data:4
+StuckSML(maxSize:4 size:4)
+  0 key:1 data:2
+  1 key:2 data:4
+  2 key:3 data:6
+  3 key:4 data:8
+""");
+   }
+
+  static void test_copy_keys_and_data()                                         // Copy part of one stuck into another
+   {z();
+    final StuckPA    s = new StuckPA("source")
+     {int maxSize     () {return  8;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(2); s.T.at(s.tData).setInt(1);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(4); s.T.at(s.tData).setInt(2);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(6); s.T.at(s.tData).setInt(3);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(8); s.T.at(s.tData).setInt(4);}}; s.push();
+    s.P.run(); s.P.clear();
+
+    final StuckPA    t = new StuckPA("target")
+     {int maxSize     () {return  8;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
+    t.P.new I() {void a() {s.T.at(s.index    ).setInt(1);}};
+    t.P.new I() {void a() {t.T.at(t.index    ).setInt(2);}};
+    t.P.new I() {void a() {t.T.at(t.copyCount).setInt(2);}};
+    t.copyKeys(s);
+    t.P.run(); t.P.clear();
+
+    ok(s.M.memory(), """
+Memory: source_StuckSA_Memory_Backing
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0004 0003 0002 0001 0000 0000 0000 0000 0008 0006 0004 0002 0004
+   1  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
 """);
 
-    t.M.clear();
-    s.T.setIntInstruction(s.index,     1);
-    t.T.setIntInstruction(t.index,     2);
-    t.T.setIntInstruction(t.copyCount, 2);
-    t.copyKeys(s);
-    s.T.setIntInstruction(s.index,     2);
-    t.T.setIntInstruction(t.index,     1);
-    t.T.setIntInstruction(t.copyCount, 2);
+    ok(t.M.memory(), """
+Memory: target_StuckSA_Memory_Backing
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0006 0004 0000 0000 0000
+   1  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
+""");
+
+    t.P.new I() {void a() {t.T.at(t.copyCount).setInt(1);}};
     t.copyData(s);
     t.P.run(); t.P.clear();
-    //stop(t.M);
-    ok(t.M, """
-MemoryLayout: original_StuckSA_Memory
-Memory      : original_StuckSA_Memory
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0       272                                      stuck
-   2 V        0        16                                  0     currentSize
-   3 A       16       128          8                             Keys
-   4 V       16        16               0                  0       key
-   5 V       32        16               1                  0       key
-   6 V       48        16               2                  4       key
-   7 V       64        16               3                  6       key
-   8 V       80        16               4                  0       key
-   9 V       96        16               5                  0       key
-  10 V      112        16               6                  0       key
-  11 V      128        16               7                  0       key
-  12 A      144       128          8                             Data
-  13 V      144        16               0                  0       data
-  14 V      160        16               1                  3       data
-  15 V      176        16               2                  4       data
-  16 V      192        16               3                  0       data
-  17 V      208        16               4                  0       data
-  18 V      224        16               5                  0       data
-  19 V      240        16               6                  0       data
-  20 V      256        16               7                  0       data
+    ok(t.M.memory(), """
+Memory: target_StuckSA_Memory_Backing
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0002 0000 0000 0000 0000 0000 0000 0006 0004 0000 0000 0000
+   1  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
+""");
+
+    t.T.at(t.size).setInt(5);
+    t.setSize();
+    t.P.run(); t.P.clear();
+    //stop(t);
+    ok(t, """
+StuckSML(maxSize:8 size:5)
+  0 key:0 data:0
+  1 key:0 data:0
+  2 key:4 data:2
+  3 key:6 data:0
+  4 key:0 data:0
 """);
    }
 
   static void test_concatenate()
    {z();
-    final StuckPA s = test_load();
-    final StuckPA t = test_load2();
-    t.program(s.P);
+    final MemoryLayoutPA m = new MemoryLayoutPA(1000);
+    final StuckPA s = new StuckPA("source", m)
+     {int maxSize     () {return  8;}
+      int bitsPerKey  () {return 16;}
+      int bitsPerData () {return 16;}
+      int bitsPerSize () {return 16;}
+     };
+
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(5); s.T.at(s.tData).setInt(5);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(6); s.T.at(s.tData).setInt(6);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(7); s.T.at(s.tData).setInt(7);}}; s.push();
+    s.P.new I() {void a() {s.T.at(s.tKey).setInt(8); s.T.at(s.tData).setInt(8);}}; s.push();
+    s.P.run(); s.P.clear();
+
+    //stop(s);
+    ok(s, """
+StuckSML(maxSize:8 size:4)
+  0 key:5 data:5
+  1 key:6 data:6
+  2 key:7 data:7
+  3 key:8 data:8
+""");
+
+    final StuckPA t = new StuckPA("target", m)
+     {int maxSize     () {return s.maxSize     ();}
+      int bitsPerKey  () {return s.bitsPerKey  ();}
+      int bitsPerData () {return s.bitsPerData ();}
+      int bitsPerSize () {return s.bitsPerSize ();}
+     };
+
+    t.base(s.M.layout.size());
+
+    t.P.new I() {void a() {t.T.at(t.tKey).setInt(1); t.T.at(t.tData).setInt(1);}}; t.push();
+    t.P.new I() {void a() {t.T.at(t.tKey).setInt(2); t.T.at(t.tData).setInt(2);}}; t.push();
+    t.P.new I() {void a() {t.T.at(t.tKey).setInt(3); t.T.at(t.tData).setInt(3);}}; t.push();
+    t.P.new I() {void a() {t.T.at(t.tKey).setInt(4); t.T.at(t.tData).setInt(4);}}; t.push();
+    t.P.run(); t.P.clear();
+
+    //stop(t);
+    ok(t, """
+StuckSML(maxSize:8 size:4)
+  0 key:1 data:1
+  1 key:2 data:2
+  2 key:3 data:3
+  3 key:4 data:4
+""");
+
     t.concatenate(s);
     t.P.run(); t.P.clear();
 
-    stop(t);
+    //stop(t);
     ok(t, """
 StuckSML(maxSize:8 size:8)
-  0 key:2 data:1
-  1 key:4 data:2
-  2 key:6 data:3
-  3 key:8 data:4
-  4 key:2 data:1
-  5 key:4 data:2
-  6 key:6 data:3
-  7 key:8 data:4
+  0 key:1 data:1
+  1 key:2 data:2
+  2 key:3 data:3
+  3 key:4 data:4
+  4 key:5 data:5
+  5 key:6 data:6
+  6 key:7 data:7
+  7 key:8 data:8
 """);
    }
 
-/*
   static void test_prepend()
    {z();
     final MemoryLayoutPA m = new MemoryLayoutPA(1000);
@@ -2210,7 +2506,7 @@ StuckSML(maxSize:4 size:4)
   3 key:6 data:8
 """);
    }
-*/
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_load();
     test_clear();
@@ -2228,21 +2524,23 @@ StuckSML(maxSize:4 size:4)
 //  test_search_except_last();
     test_search_first_greater_than_or_equal();
     test_search_first_greater_than_or_equal_except_last();
+    test_at();
     test_copy();
+    test_copy_keys_and_data();
     test_concatenate();
-///    test_prepend();
-///    test_split();
-///    test_split_low_2();
-///    test_split_low_even();
-///    test_split_low_odd();
-///    test_split_high();
-///    test_zero_last_key();
-///    test_set_last_key();
+    test_prepend();
+    test_split();
+    test_split_low_2();
+    test_split_low_even();
+    test_split_low_odd();
+    test_split_high();
+    test_zero_last_key();
+    test_set_last_key();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_concatenate();
+   {oldTests();
+    test_search_first_greater_than_or_equal_except_last();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
