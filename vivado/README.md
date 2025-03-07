@@ -35,6 +35,15 @@ XINSTALLER_SCALE=2 bash FPGAs_AdaptiveSoCs_Unified_2024.2_1113_1001_Lin64.bin
 Supply [login](https://en.wikipedia.org/wiki/Login) details for: (https://login.amd.com)
 
 
+## Open Road
+
+Open source [Verilog](https://en.wikipedia.org/wiki/Verilog) to [Silicon](https://en.wikipedia.org/wiki/Silicon) tool chain:
+https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts
+
+Follow these instructions to [install](https://en.wikipedia.org/wiki/Installation_(computer_programs)) locally from source:
+https://openroad-flow-scripts.readthedocs.io/en/latest/user/BuildLocally.html
+
+
 ## Clone GitHub
 
 ### Update GitHub [Secure Shell](https://www.ssh.com/ssh) [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) 
