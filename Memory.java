@@ -45,9 +45,7 @@ class Memory extends Test                                                       
        }
       S.append(String.format("%4d  ", i)+(""+s.reverse()).trim()+"\n");
      }
-    final String title =
-      name != null && name.length() > 0 ? "Memory: "+name+"\n" : "";
-    return title+"      "+T+"\nLine  "+t+"\n"+S;
+    return "Memory: "+name+"\n      "+T+"\nLine  "+t+"\n"+S;
    }
 
   int size() {z(); return bits.length;}                                         // Size of memory
