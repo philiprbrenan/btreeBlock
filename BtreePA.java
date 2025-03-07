@@ -8,6 +8,7 @@ package com.AppaApps.Silicon;                                                   
 // Clean up node is leaf at end of delete()
 // Clock in the key/data to be used rather than using a large number of input pins
 // Run report_design_analysis -congestion and -complexity to find potential sources of congestion in the areas where nets are not fully routed and review UG906 for design closure techniques.
+// Although we layout nominally in bits there is, of course no reason why each bit should not repreent several bits to construct wider trees.
 import java.util.*;
 import java.nio.file.*;
 
@@ -2087,7 +2088,7 @@ abstract class BtreePA extends Test                                             
          {void code()
            {//T.at(putDepth).inc();
             //T.at(putDepth).greaterThan(T.at(MaxDepth), T.at(pastMaxDepth));
-            //P.GoOn(end, T.at(pastMaxDepth));                                    // Prevent runaway searches
+            //P.GoOn(end, T.at(pastMaxDepth));                                  // Prevent runaway searches
 
             //P.parallelStart();   tt(search, Key);
             //P.parallelSection(); tt(node_findFirstGreaterThanOrEqualInBranch, parent);
