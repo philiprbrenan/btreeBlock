@@ -16,11 +16,12 @@ class ProgramPA extends Test                                                    
   int                  steps = 0;                                               // Execution steps
   boolean              debug = false;                                           // Debug code if true
   boolean            running = false;                                           // Executing if true
-  Stack<Label>        labels = new Stack<>();                                   // Labels for some instructions
+  final Stack<Label>  labels = new Stack<>();                                   // Labels for some instructions
   Memory         traceMemory;                                                   // Labels for some instructions
   final Stack<String>  Trace = new Stack<>();                                   // Trace execution steps
   static int         numbers = 0;                                               // Program numbers
   final  int          number = ++numbers;                                       // Program number
+  final TreeSet<MemoryLayoutPA> memories = new TreeSet<>();                     // Memory layouts associated with this program
 
   ProgramPA() {z();}                                                            // Create a program that instructions can be added to and then executed
 
@@ -31,6 +32,10 @@ class ProgramPA extends Test                                                    
    }
 
   ProgramPA programPA() {return this;}                                          // Address containing class
+
+  void addMemoryLayout(MemoryLayoutPA ml)                                       // This program uses this memory layout amongst others
+   {memories.add(ml);                                                           // The instruction to which this labels applies
+   }
 
   class Label                                                                   // Label definition
    {int instruction;                                                            // The instruction location to which this labels applies
@@ -343,7 +348,7 @@ class ProgramPA extends Test                                                    
 
 //D1 Print                                                                      // Print a program
 
-  public String toString()
+  public String toString()                                                      // Print nominal code in program
    {final StringBuilder s = new StringBuilder();
     for(int i = 0; i < code.size(); ++i)
      {final Stack<I> I = code.elementAt(i);
@@ -351,9 +356,25 @@ class ProgramPA extends Test                                                    
       if (N == 1)                                                               // Only one instruction in parallel  block
        {s.append(String.format("%4d  %s\n", i+1, I.firstElement().n()));
        }
-      else if (N > 1)                                                           // Severale instructions in parallel  block
+      else if (N > 1)                                                           // Several instructions in parallel  block
        {s.append(String.format("%4d\n", i+1));
         for(I j: I) s.append(String.format("      %s\n", j.n()));
+       }
+     }
+    return s.toString();
+   }
+
+  String printVerilog()                                                         // Print verilog code in program
+   {final StringBuilder s = new StringBuilder();
+    for(int i = 0; i < code.size(); ++i)
+     {final Stack<I> I = code.elementAt(i);
+      final int N = I.size();
+      if (N == 1)                                                               // Only one instruction in parallel  block
+       {s.append(String.format("%4d  %s\n", i+1, I.firstElement().v()));
+       }
+      else if (N > 1)                                                           // Several instructions in parallel  block
+       {s.append(String.format("%4d\n", i+1));
+        for(I j: I) s.append(String.format("      %s\n", j.v()));
        }
      }
     return s.toString();
