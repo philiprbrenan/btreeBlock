@@ -1,15 +1,17 @@
 //------------------------------------------------------------------------------
-// Memory layout in Pseudo Assembler
+// MemoryLayoutPA with distributed memory
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Memory layout
 
 import java.util.*;
 
-class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         // Memory layout
+class MemoryLayoutPA extends Test                                               // Memory layout
  {final String          name;                                                   // Name of the memory layout
+  final MemoryLayoutPA based;                                                   // If true, then we are using some one else's memory with a base offset into it, otherwise if false we are the owner of the memory and the base offset is always zero
   final Layout        layout;                                                   // Layout of part of memory
   private Memory      memory;                                                   // Memory containing layout
+  private int           base;                                                   // Base of layout in memory - like located in Pl1
   boolean              debug;                                                   // Debug if true
   ProgramPA                P = new ProgramPA();                                 // Program containing generated code
   static int         numbers = 0;
@@ -17,43 +19,60 @@ class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         
 
 //D1 Construction                                                               // Construct a memory layout
 
-  MemoryLayoutPA(int size, String Name)                                         // Memory layout as an array of bits
+  MemoryLayoutPA(int size)                                                      // Memory useful for running tests.
    {z();
-    name   = Name;
-    layout = new Layout();
-    final Layout.Bit   b = layout.bit  ("bit");
-    final Layout.Array B = layout.array("bits", b, size);
-    layout.compile();
-    memory = new Memory(Name, size);
+    name   = null; based = null; layout = null;
+    memory = new Memory("", size);
    }
 
   MemoryLayoutPA(Layout Layout, String Name)                                    // Memory with an associated layout and a name so we can generate verilog from it
    {zz();
-    name   = Name; layout = Layout;
-    memory = new Memory(Name, layout.size());                                   // Create the associated memory as this memory is not based on any other memory
+    name   = Name; based = null; layout = Layout;
+    memory = new Memory(Name, size());                                          // Create the associated memory as this memory is not based on any other memory
    }
 
-  public int compareTo(MemoryLayoutPA other)                                    // A progam might access several memory layouts
-   {return Integer.compare(number, other.number);
+  MemoryLayoutPA(Layout Layout, String Name, MemoryLayoutPA Based)              // Like based storage in PL1.  If the based memory is null then we create a backing memory of the required size and base ourselves at zero in it to facilitate testing.
+   {zz();
+    layout = Layout;
+    if (Based == null)                                                          // Create the backing memory if necessary, usually for testing purposes
+     {based = new MemoryLayoutPA(layout, Name+"_Backing");                      // Create new backing memory
+      name  = Name+"_Based";
+     }
+    else
+     {based = Based;                                                            // Base off existing backing memory
+      name  = Name+"_Based";
+     }
+    P     = based.P;
+    memory = based.memory();                                                    // Backing memory
    }
 
 //D1 Control                                                                    // Testing, control and integrity
 
   Memory memory() {zz(); return memory;}                                        // Real memory used by this layout
 
-  void program(ProgramPA program) {zz(); P = program; P.addMemoryLayout(this);} // Program in which to generate instructions
+  void program(ProgramPA program) {zz(); P = program;}                          // Program in which to generate instructions
 
-  String  name    () {z(); return name+"_"+number;}                             // Name of this memory layout
+  void base(int Base)                                                           // Set the base of the layout in memory allowing such layouts to be relocated
+   {if (based == null) stop("Memory layout is not based so cannot set a base");
+    base = Base;
+   }
+
+  String  name    () {z(); return based() ? based.name() : name+"_"+number;}    // Name of this memory layout
   Layout  layout  () {z(); return layout;}                                      // Get the layout in use
   String  baseName() {z(); return name+"_"+number+"_base_offset";}              // Name of the verilog field used to hold the base being used for this memory layout
 
   String  initializeMemory() {z(); return "initialize_memory_"+name();}         // Name of the verilog field used to hold the base being used for this memory layout
 
-  int size () {z(); return layout != null ? layout.size() : memory.bits.length;}// Size of memory
+  int     base () {z(); return base;}                                           // Get the base offset into memory being used
+  boolean based() {z(); return based  != null;}                                 // Whether the memory used in the memory layout is based or not
+  int     size () {z(); return layout != null ? layout.size() : memory.bits.length;} // Size of memory
+  int baseSize () {z(); return based() ? based.size() : size();}                // Size of underlying memory
 
   void clear()                                                                  // Clear underlying memory
    {z();
-    memory.zero();
+    if (based == null) {memory.zero(); return;}                                 // Not based so we just clear the memory we have
+    final int N = size();
+    for (int i = 0; i < N; i++) memory.set(base + i, false);                    // Based so we clear the area occupied by the layout
    }
 
   void ok(String Lines)                                                         // Check that specified lines are present in the memory layout
@@ -77,7 +96,7 @@ class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         
 
   String  copyIndex() {return "index_"     +baseName();}                        // Index to a location in this memory layout
   String copyLength() {return "copyLength_"+baseName();}                        // Length of a copy in this memory layout
-  int      copySize() {return logTwo(memory.size());}                           // Size of bits for a length or index into this memory
+  int      copySize() {return logTwo(baseSize());}                              // Size of bits for a length or index into this memory
 
   String copyVerilogDec()                                                       // Verilog declaration
    {zz();
@@ -90,11 +109,11 @@ class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         
 //D1 Get and Set                                                                // Get and set values in memory but only during testing
 
   boolean getBit(int index)                                                     // Get a bit from the memory layout
-   {zz();return memory.bits[index];
+   {zz();return memory.bits[base + index];
    }
 
   void setBit(int index, boolean value)                                         // Set a value in memory occupied by the layout
-   {zz(); memory.bits[index] = value;
+   {zz(); memory.bits[base + index] = value;
    }
 
   int  getInt(Layout.Field field, int...indices)                                // Get a value from memory occupied by the layout
@@ -141,13 +160,48 @@ class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         
 
   void zero()                                                                   // Clear the memory associated with the layout to zeros
    {zz();
-    memory.zero(0, size());
+    memory.set(base, size(), 0);
    }
 
-  void ones()                                                                   // Set the memory associated with the layout to zeros
-   {zz();
-    memory.ones(0, size());
-   }
+//  void moveParallel(At...Fields)                                                // Move pairs of fields in parallel. Suceeded by parallel Section.
+//   {zz();
+//    final int N = Fields.length;
+//    if (N % 2 == 1) stop("Move in parallel requires an even number of fields");
+//    for(int i = 0; i < N; i += 2) Fields[i].sameSize(Fields[i+1]);
+//    P.new I()
+//     {void a()
+//       {for(int i = 0; i < N; i += 2)
+//         {final At target = Fields[i+0].setOff();
+//          final At source = Fields[i+1].setOff();
+//          for(int j = 0; j < target.width; ++j)
+//           {zz();
+//            final boolean b = source.getBit(j);
+//            target.setBit(j, b);
+//           }
+//         }
+//       }
+//      String v()
+//       {final StringBuilder s = new StringBuilder();
+//        for(int i = 0; i < N; i += 2)
+//         {final At target = Fields[i+0];
+//          final At source = Fields[i+1];
+//          for(int j = 0; j < target.width; ++j)
+//           {s.append(target.verilogLoad()+" <= "+source.verilogLoad() + ";");
+//           }
+//         }
+//        return s.toString();
+//       }
+//      String n()
+//       {final StringBuilder s = new StringBuilder();
+//        for(int i = 0; i < N; i += 2)
+//         {final At target = Fields[i+0];
+//          final At source = Fields[i+1];
+//          s.append(target.field.name+" = "+source.field.name);
+//         }
+//        return s.toString();
+//       }
+//     };
+//   }
 
   void copy(MemoryLayoutPA source)                                              // Copy all the bits from the source into the target as long as the source and target are the same size
    {zz();
@@ -159,20 +213,7 @@ class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         
        }
       String v()
        {final String m = name();
-        return name+"["+baseName()+" +: "+N+"] <= "+m+"["+source.baseName()+" +: "+N+"];";
-       }
-     };
-   }
-
-  void copy(final MemoryLayoutPA.At source)                                     // Fill the target from the source starting at the referenced address in the source
-   {zz();
-    final int N = size();
-    P.new I()
-     {void a()
-       {for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
-       }
-      String v()
-       {return name()+"[0 +: "+N+"] <= "+source.verilogLoad()+";";
+         return m+"["+baseName()+" +: "+N+"] <= "+m+"["+source.baseName()+" +: "+N+"];";
        }
      };
    }
@@ -184,11 +225,14 @@ class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         
     final int  width;                                                           // Width of element in memory
     final int[]indices;                                                         // Known indices to be applied directly to locate the field in memory
     final At[] directs;                                                         // Fields whose location is known at the start so they can be used for indices into memory rather like registers on a chip
+    int  delta;                                                                 // Delta due to indices
     int  at;                                                                    // Location in memory
     int  result;                                                                // The contents of memory at this location
 
     String verilogLoadAddr(boolean la, Integer delta)                           // A verilog representation of an addressed location in memory
-     {final Stack<String>      v = new Stack<>();                               // Verilog expression, index variable names
+     {final String base = based != null ? baseName()+"+" : "";                  // Base field name if a based memory layout
+
+      final Stack<String>      v = new Stack<>();                               // Verilog expression, index variable names
       Layout.Locator           L = field.locator;
       final Stack<Layout.Array>A = L.arrays;                                    // The containing arrays
 
@@ -204,8 +248,8 @@ class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         
       final String w = w(W);                                                    // The width of the field as a padded string
       final String d = delta == null ? "" :                                     // Constant delta to modify address if needed in steps of field size as in the C programming language
                        delta > 0 ? "+"+delta*W : ""+delta*W;
-      return (la ? i(field.at)+c()+joinStrings(v, "")+d    :                    // IBM S/360 Principles of Operation: LA
-        name()+"["+i(field.at)+c()+joinStrings(v, "")+d+" +: "+w+"]");          // IBM S/360 Principles of Operation: L
+      return (la ? p(base)+i(field.at)+c()+joinStrings(v, "")+d    :            // IBM S/360 Principles of Operation: LA
+        name()+"["+p(base)+i(field.at)+c()+joinStrings(v, "")+d+" +: "+w+"]");  // IBM S/360 Principles of Operation: L
      }
 
     String verilogLoad() {return verilogLoadAddr(false, null);}                 // Content of a memory location as a verilog expression
@@ -223,8 +267,9 @@ class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         
 
     void locateDirectAddress()                                                  // Locate a direct address and its content
      {final int N = indices.length;
-      at          = field.locator.at(indices);
-      result      = memory.getInt(at, width);
+      delta  = field.locator.at(indices);
+      at     = base + delta;
+      result = memory.getInt(at, width);
      }
 
     void locateInDirectAddress()                                                // Locate an indirect address and its content
@@ -321,9 +366,9 @@ class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         
          {s.append(indices[i]);
           if (i < N-1) s.append(",");
          }
-        s.append("]"+at+"="+result);
+        s.append("]");
        }
-      else s.append("@"+at+"="+result);
+      s.append("("+base+"+"+delta+")"+at+"="+result);
       return s.toString();
      }
 
@@ -581,33 +626,6 @@ class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         
            }
          };
        }
-     }
-
-    void copy(MemoryLayoutPA Source)                                            // Copy the source to the location addressed by the target
-     {zz();
-      final int N = Source.size();
-      P.new I()
-       {void a()
-         {for(int i = 0; i < N; ++i) setBit(i, Source.getBit(i));
-         }
-        String v()
-         {final String m = name();
-          return verilogLoad()+" <= "+Source.name()+"[0 +: "+N+"];";
-         }
-       };
-     }
-
-    void copy(final MemoryLayoutPA.At source)                                   // Fill the target at the referenced address from the source starting at the referenced address
-     {zz(); sameSize(source);
-      final int N = width;
-      P.new I()
-       {void a()
-         {for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
-         }
-        String v()
-         {return verilogLoad()+" <= "+source.verilogLoad()+";";
-         }
-       };
      }
 
 //D2 Bits                                                                       // Bit operations in a memory.
@@ -910,7 +928,7 @@ class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         
   class PrintPosition                                                           // Position in print
    {final StringBuilder s = new StringBuilder();
     int line = 1;
-    int bits = 0;
+    int bits = base;
     final Stack<Integer> indices = new Stack<>();
    }
 
@@ -1012,6 +1030,7 @@ class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         
     final StringBuilder s = new StringBuilder();
     final int N = memory.bits.length-1, B = logTwo(N)-1;                        // Dimensions of memory
     final String m = name();                                                    // Name of memory
+    s.append(declareVerilog());
     s.append("task "+initializeMemory()+";\n");
     s.append("    begin\n");
     for(int i = 0; i <= N; ++i)                                                 // Load each bit
@@ -1029,6 +1048,17 @@ class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         
     s.append("    end\n");
     s.append("endtask\n");
     writeFile(file, s);                                                         // Write the definition into an include file
+   }
+
+  String declareVerilog()                                                       // Declare matching memory  but do not initialize it
+   {zz();
+    final int N = memory.bits.length-1, B = logTwo(N);
+    final StringBuilder s = new StringBuilder();
+    if (based == null) s.append("reg ["+N+":0] "+name()    +"; ");              // Actual memory if it is not based
+    else               s.append("reg ["+B+":0] "+baseName()+"; ");              // Base offset for this memory
+    s.append(traceComment());
+    s.append("\n");
+    return s.toString();
    }
 
 //D0 Tests                                                                      // Testing
@@ -1059,25 +1089,25 @@ class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         
         MemoryLayoutPA m = t.M;
         ProgramPA      p = m.P;
               Layout l = m.layout;
-                      ok(m.at    (t.c,      0, 0, 0), "c[0,0,0]12=15");
+                      ok(m.at    (t.c,      0, 0, 0), "c[0,0,0](0+12)12=15");
     p.new I() {void a() {m.setInt(t.c,  11, 0, 0, 0); }}; p.run(); p.clear();
-                      ok(m.at    (t.c,      0, 0, 0), "c[0,0,0]12=11");
+                      ok(m.at    (t.c,      0, 0, 0), "c[0,0,0](0+12)12=11");
 
-                      ok(m.at( t.c,      0, 0, 1), "c[0,0,1]24=0");
+                      ok(m.at( t.c,      0, 0, 1), "c[0,0,1](0+24)24=0");
     p.new I() {void a() {m.setInt(t.c,  11, 0, 0, 1); }}; p.run(); p.clear();
-                      ok(m.at( t.c,      0, 0, 1), "c[0,0,1]24=11");
+                      ok(m.at( t.c,      0, 0, 1), "c[0,0,1](0+24)24=11");
 
-                      ok(m.at    (t.a,     0, 2, 2), "a[0,2,2]116=15");
+                      ok(m.at    (t.a,     0, 2, 2), "a[0,2,2](0+116)116=15");
     p.new I() {void a() {m.setInt(t.a,  5, 0, 2, 2); }}; p.run(); p.clear();
-                      ok(m.at    (t.a,     0, 2, 2), "a[0,2,2]116=5");
+                      ok(m.at    (t.a,     0, 2, 2), "a[0,2,2](0+116)116=5");
 
-    ok(m.at( t.b,      1, 2, 2), "b[1,2,2]252=15");
+    ok(m.at( t.b,      1, 2, 2), "b[1,2,2](0+252)252=15");
     p.new I() {void a() {m.setInt(t.b,   7, 1, 2, 2); }}; p.run(); p.clear();
-    ok(m.at( t.b,      1, 2, 2), "b[1,2,2]252=7");
+    ok(m.at( t.b,      1, 2, 2), "b[1,2,2](0+252)252=7");
 
-                      ok(m.at    (t.e,     1, 2), "e[1,2]260=15");
+                      ok(m.at    (t.e,     1, 2), "e[1,2](0+260)260=15");
     p.new I() {void a() {m.setInt(t.e, 11, 1, 2);  }}; p.run(); p.clear();
-                      ok(m.at    (t.e,     1, 2), "e[1,2]260=11");
+                      ok(m.at    (t.e,     1, 2), "e[1,2](0+260)260=11");
    }
 
   static void test_boolean()
@@ -1127,17 +1157,80 @@ class MemoryLayoutPA extends Test implements Comparable<MemoryLayoutPA>         
      };
     m.P.run(); m.P.clear();
 
-    ok(m.at(t.a, 0, 0, 0), "a[0,0,0]4=1");
-    ok(m.at(t.a, 0, 0, 1), "a[0,0,1]16=2");
-    ok(m.at(t.a, 0, 0, 2), "a[0,0,2]28=3");
+    ok(m.at(t.a, 0, 0, 0), "a[0,0,0](0+4)4=1");
+    ok(m.at(t.a, 0, 0, 1), "a[0,0,1](0+16)16=2");
+    ok(m.at(t.a, 0, 0, 2), "a[0,0,2](0+28)28=3");
 
     m.at(t.a, 0, 0, 1).move(m.at(t.a, 0, 0, 0));
     m.at(t.a, 0, 0, 1).move(m.at(t.a, 0, 0, 1));
     t.M.P.run();
 
-    ok(m.at(t.a, 0, 0, 0), "a[0,0,0]4=1");
-    ok(m.at(t.a, 0, 0, 1), "a[0,0,1]16=1");
-    ok(m.at(t.a, 0, 0, 2), "a[0,0,2]28=3");
+    ok(m.at(t.a, 0, 0, 0), "a[0,0,0](0+4)4=1");
+    ok(m.at(t.a, 0, 0, 1), "a[0,0,1](0+16)16=1");
+    ok(m.at(t.a, 0, 0, 2), "a[0,0,2](0+28)28=3");
+   }
+
+  static void test_base()
+   {z();
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Variable  c = l.variable ("c", 4);
+    Layout.Variable  d = l.variable ("d", 4);
+    Layout.Structure s = l.structure("s", a, b, c, d);
+    Layout.Array     A = l.array    ("A", s, 2);
+    l.compile();
+    MemoryLayoutPA   M = new MemoryLayoutPA(l, "test");
+    MemoryLayoutPA   m = new MemoryLayoutPA(l, "test", M);
+    ProgramPA        p = M.P;
+    p.new I() {void a() {m.base(M.at(s, 1).setOff().at);}};
+    m.memory.alternating(4);
+    //stop(M);
+    M.ok("""
+MemoryLayout: test
+Memory      : test
+Line T       At      Wide       Size    Indices        Value   Name
+   1 A        0        32          2                           A
+   2 S        0        16               0                        s
+   3 V        0         4               0                  0       a
+   4 V        4         4               0                 15       b
+   5 V        8         4               0                  0       c
+   6 V       12         4               0                 15       d
+   7 S       16        16               1                        s
+   8 V       16         4               1                  0       a
+   9 V       20         4               1                 15       b
+  10 V       24         4               1                  0       c
+  11 V       28         4               1                 15       d
+""");
+
+
+    p.new I()
+     {void a()
+       {m.setInt(a,  9, 0);
+        m.setInt(b, 10, 0);
+        m.setInt(c, 11, 0);
+        m.setInt(d, 12, 0);
+       }
+     };
+    m.P.run(); m.P.clear();
+
+    //stop(M);
+    M.ok("""
+MemoryLayout: test
+Memory      : test
+Line T       At      Wide       Size    Indices        Value   Name
+   1 A        0        32          2                           A
+   2 S        0        16               0                        s
+   3 V        0         4               0                  0       a
+   4 V        4         4               0                 15       b
+   5 V        8         4               0                  0       c
+   6 V       12         4               0                 15       d
+   7 S       16        16               1                        s
+   8 V       16         4               1                  9       a
+   9 V       20         4               1                 10       b
+  10 V       24         4               1                 11       c
+  11 V       28         4               1                 12       d
+""");
    }
 
   static void test_move()
@@ -1412,6 +1505,65 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
+  static void test_zero()
+   {z();
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Array     A = l.array    ("A", a, 6);
+    l.compile();
+
+    MemoryLayoutPA   M = new MemoryLayoutPA(l.compile(), "test");
+    MemoryLayoutPA   m = new MemoryLayoutPA(l.compile(), "over", M);
+    m.base(12);
+
+    m.memory.alternating(4);
+    //stop(M.memory);
+    ok(M.memory, """
+Memory: test
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 00f0 f0f0
+""");
+
+    //stop(M);
+    ok(M, """
+MemoryLayout: test
+Memory      : test
+Line T       At      Wide       Size    Indices        Value   Name
+   1 A        0        24          6                           A
+   2 V        0         4               0                  0     a
+   3 V        4         4               1                 15     a
+   4 V        8         4               2                  0     a
+   5 V       12         4               3                 15     a
+   6 V       16         4               4                  0     a
+   7 V       20         4               5                 15     a
+""");
+
+    M.zero();
+
+    //stop(M.memory);
+    ok(M.memory, """
+Memory: test
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
+""");
+
+    //stop(M);
+    ok(M, """
+MemoryLayout: test
+Memory      : test
+Line T       At      Wide       Size    Indices        Value   Name
+   1 A        0        24          6                           A
+   2 V        0         4               0                  0     a
+   3 V        4         4               1                  0     a
+   4 V        8         4               2                  0     a
+   5 V       12         4               3                  0     a
+   6 V       16         4               4                  0     a
+   7 V       20         4               5                  0     a
+""");
+   }
+
   static void test_boolean_result()
    {z();
     Layout           l = Layout.layout();
@@ -1614,7 +1766,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.dumpVerilog(v);
 
     final Stack<String> r = readFile(v);
-    //r.removeElementAt(0);
+    r.removeElementAt(0);
     ok(joinLines(r)+"\n", String.format("""
 task %s;
     begin
@@ -1651,7 +1803,7 @@ endtask
     m.dumpVerilog(v, b, d);
 
     final Stack<String> r = readFile(v);
-    //r.removeElementAt(0);
+    r.removeElementAt(0);
     //stop(joinLines(r));
     ok(joinLines(r)+"\n", String.format("""
 task %s;
@@ -1737,107 +1889,203 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout               l = Layout.layout();
     Layout.Variable  a = l.variable ("a", N);
     Layout.Variable  b = l.variable ("b", N);
-    Layout.Variable  c = l.variable ("c", N);
-    Layout.Structure s = l.structure("s", a, b, c);
+    Layout.Structure s = l.structure("s", a, b);
     l.compile();
 
     Layout               L = Layout.layout();
     Layout.Variable  A = L.variable ("A", N);
     L.compile();
 
-    MemoryLayoutPA.numbers = 0;
+    MemoryLayoutPA m = new MemoryLayoutPA(l, "M");                              // Original memory
+
+    MemoryLayoutPA x = new MemoryLayoutPA(L, "first",  m);                      // Overlay at "a"
+    MemoryLayoutPA o = new MemoryLayoutPA(L, "second", m);                      // Overlay at "b"
+
+    o.base(b.at);
+
+    m.at(a).setInt(3);
+    o.copy(x);
+    m.P.run(); m.P.clear();
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        16                                      s
+   2 V        0         8                                  3     a
+   3 V        8         8                                  3     b
+""");
+
+    o.clear();
+    m.P.run(); m.P.clear();
+    //stop(m);
+    ok(m, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        16                                      s
+   2 V        0         8                                  3     a
+   3 V        8         8                                  0     b
+""");
+   }
+
+  static void test_copyVerilogDec()
+   {z();
+    Layout               l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 8);
+    Layout.Variable  b = l.variable ("b", 8);
+    Layout.Structure s = l.structure("s", a, b);
+    l.compile();
+
+    MemoryLayoutPA m = new MemoryLayoutPA(l, "M");
+    MemoryLayoutPA n = new MemoryLayoutPA(l, "N",  m);
+
+    final String M = m.copyVerilogDec();
+    final String N = n.copyVerilogDec();
+
+    ok(M.contains("reg[4-1: 0] index_M"));
+    ok(M.contains("reg[4-1: 0] copyLength_M"));
+
+    ok(N.contains("reg[4-1: 0] index_N"));
+    ok(N.contains("reg[4-1: 0] copyLength_N"));
+   }
+
+  static void test_copy_variable()
+   {z();
+    final int N = 4;
+    Layout               l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", N);
+    Layout.Array     A = l.array    ("A", a, N);
+    Layout.Variable  b = l.variable ("b", N);
+    Layout.Array     B = l.array    ("B", b, N);
+    Layout.Variable  p = l.variable ("p", N);
+    Layout.Variable  q = l.variable ("q", N);
+    Layout.Variable  L = l.variable ("L", N);
+    Layout.Structure s = l.structure("s", A, B, p, q, L);
+    l.compile();
+
     MemoryLayoutPA m = new MemoryLayoutPA(l, "m");
-    MemoryLayoutPA M = new MemoryLayoutPA(L, "M");
-    M.program(m.P);
+    MemoryLayoutPA S = new MemoryLayoutPA(l, "S", m);
+    MemoryLayoutPA T = new MemoryLayoutPA(l, "T", m);
 
-    m.at(a).setInt(1);
-    m.at(b).setInt(2);
-
+    m.at(a, 0).setInt(1);
+    m.at(a, 1).setInt(2);
+    m.at(a, 2).setInt(3);
+    m.at(a, 3).setInt(4);
+    m.at(p)   .setInt(1);
+    m.at(q)   .setInt(2);
+    m.at(L)   .setInt(2 * a.width);
+    T.at(b, T.at(q)).copy(S.at(a, S.at(p)), T.at(L));
+    m.P.run();
     //stop(m);
     ok(m, """
 MemoryLayout: m
 Memory      : m
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        24                                      s
-   2 V        0         8                                  1     a
-   3 V        8         8                                  2     b
-   4 V       16         8                                  0     c
+   1 S        0        44                                      s
+   2 A        0        16          4                             A
+   3 V        0         4               0                  1       a
+   4 V        4         4               1                  2       a
+   5 V        8         4               2                  3       a
+   6 V       12         4               3                  4       a
+   7 A       16        16          4                             B
+   8 V       16         4               0                  0       b
+   9 V       20         4               1                  0       b
+  10 V       24         4               2                  2       b
+  11 V       28         4               3                  3       b
+  12 V       32         4                                  1     p
+  13 V       36         4                                  2     q
+  14 V       40         4                                  8     L
 """);
+   }
 
-    M.copy(m.at(a));
-    ok(m.P.printVerilog(), """
-   1  M_2[0 +: 8] <= m_1[       0/*a       */ +: 8];
-""");
+  static void test_copy_variable2()
+   {z();
+    final int N = 8;
+    Layout               y = Layout.layout();
+    Layout.Variable  a = y.variable ("a", N);
+    Layout.Array     A = y.array    ("A", a, N);
+    Layout.Variable  b = y.variable ("b", N);
+    Layout.Array     B = y.array    ("B", b, N);
+    Layout.Variable  p = y.variable ("p", N);
+    Layout.Variable  q = y.variable ("q", N);
+    Layout.Variable  l = y.variable ("l", N);
+    Layout.Variable  P = y.variable ("P", N);
+    Layout.Variable  Q = y.variable ("Q", N);
+    Layout.Variable  L = y.variable ("L", N);
+    Layout.Structure s = y.structure("s", A, B, p, q, l, P, Q, L);
+    y.compile();
 
-    m.P.run(); m.P.clear();
-    //stop(M);
-    ok(M, """
-MemoryLayout: M
-Memory      : M
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         8                                  1   A
-""");
+    MemoryLayoutPA m = new MemoryLayoutPA(y, "m");
 
-    m.at(c).copy(M);
-    ok(m.P.printVerilog(), """
-   1  m_1[      16/*c       */ +: 8] <= M_2[0 +: 8];
-""");
-    m.P.run(); m.P.clear();
-    //stop(m);
-    ok(m, """
-MemoryLayout: m
-Memory      : m
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        24                                      s
-   2 V        0         8                                  1     a
-   3 V        8         8                                  2     b
-   4 V       16         8                                  1     c
-""");
-
-    M.copy(m.at(b));
-    ok(m.P.printVerilog(), """
-   1  M_2[0 +: 8] <= m_1[       8/*b       */ +: 8];
-""");
-
-    m.P.run(); m.P.clear();
-    //stop(M);
-    ok(M, """
-MemoryLayout: M
-Memory      : M
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         8                                  2   A
-""");
-
-    m.at(c).copy(M);
-    ok(m.P.printVerilog(), """
-   1  m_1[      16/*c       */ +: 8] <= M_2[0 +: 8];
-""");
+    for (int i = 0; i < N; i++) m.at(a, i).setInt(i+1);
+    m.at(p)   .setInt(1);
+    m.at(q)   .setInt(2);
+    m.at(l)   .setInt(2 * N);
     m.P.run(); m.P.clear();
     //stop(m);
     ok(m, """
 MemoryLayout: m
 Memory      : m
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        24                                      s
-   2 V        0         8                                  1     a
-   3 V        8         8                                  2     b
-   4 V       16         8                                  2     c
+   1 S        0       176                                      s
+   2 A        0        64          8                             A
+   3 V        0         8               0                  1       a
+   4 V        8         8               1                  2       a
+   5 V       16         8               2                  3       a
+   6 V       24         8               3                  4       a
+   7 V       32         8               4                  5       a
+   8 V       40         8               5                  6       a
+   9 V       48         8               6                  7       a
+  10 V       56         8               7                  8       a
+  11 A       64        64          8                             B
+  12 V       64         8               0                  0       b
+  13 V       72         8               1                  0       b
+  14 V       80         8               2                  0       b
+  15 V       88         8               3                  0       b
+  16 V       96         8               4                  0       b
+  17 V      104         8               5                  0       b
+  18 V      112         8               6                  0       b
+  19 V      120         8               7                  0       b
+  20 V      128         8                                  1     p
+  21 V      136         8                                  2     q
+  22 V      144         8                                 16     l
+  23 V      152         8                                  0     P
+  24 V      160         8                                  0     Q
+  25 V      168         8                                  0     L
 """);
-
-    m.at(c).copy(m.at(a));
-    ok(m.P.printVerilog(), """
-   1  m_1[      16/*c       */ +: 8] <= m_1[       0/*a       */ +: 8];
-""");
-    m.P.run(); m.P.clear();
-//  stop(m);
+    m.at(b, m.at(q)).copy(m.at(a, m.at(p)), m.at(l), m.at(P), m.at(Q), m.at(L));
+    m.P.run();
+    //stop(m);
     ok(m, """
 MemoryLayout: m
 Memory      : m
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        24                                      s
-   2 V        0         8                                  1     a
-   3 V        8         8                                  2     b
-   4 V       16         8                                  1     c
+   1 S        0       176                                      s
+   2 A        0        64          8                             A
+   3 V        0         8               0                  1       a
+   4 V        8         8               1                  2       a
+   5 V       16         8               2                  3       a
+   6 V       24         8               3                  4       a
+   7 V       32         8               4                  5       a
+   8 V       40         8               5                  6       a
+   9 V       48         8               6                  7       a
+  10 V       56         8               7                  8       a
+  11 A       64        64          8                             B
+  12 V       64         8               0                  0       b
+  13 V       72         8               1                  0       b
+  14 V       80         8               2                  2       b
+  15 V       88         8               3                  3       b
+  16 V       96         8               4                  0       b
+  17 V      104         8               5                  0       b
+  18 V      112         8               6                  0       b
+  19 V      120         8               7                  0       b
+  20 V      128         8                                  1     p
+  21 V      136         8                                  2     q
+  22 V      144         8                                 16     l
+  23 V      152         8                                 96     P
+  24 V      160         8                                 24     Q
+  25 V      168         8                                  0     L
 """);
    }
 
@@ -1845,11 +2093,13 @@ Line T       At      Wide       Size    Indices        Value   Name
    {test_get_set();
     test_boolean();
     test_copy();
+    test_base();
     test_move();
     test_move_to();
 //  test_move_parallel();
     test_set_inc_dec_get();
     test_addressing();
+    test_zero();
     test_boolean_result();
     test_is_ones_or_zeros();
     test_union();
@@ -1858,11 +2108,14 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_dump_verilog_ignore();
     test_copy_bits();
     test_copy_memory();
+    test_copyVerilogDec();
+    test_copy_variable();
+    test_copy_variable2();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
-    test_copy_memory();
+   {//oldTests();
+    test_copy_variable2();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
