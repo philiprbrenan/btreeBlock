@@ -273,7 +273,7 @@ abstract class BtreeDM extends Test                                             
     return t;
    }
 
-  static BtreeDM btreeDM(BtreePA p)                                                    // Convert from an earlier version known to work correctly
+  static BtreeDM btreeDM(BtreePA p)                                             // Convert from an earlier version known to work correctly
    {final BtreeDM t = new BtreeDM()
      {int maxSize         () {return p.maxSize         () ;}
       int maxKeysPerLeaf  () {return p.maxKeysPerLeaf  () ;}
@@ -665,7 +665,7 @@ abstract class BtreeDM extends Test                                             
 
   private MemoryLayoutDM.At ifRootLeaf(Node n)                                  // A variable that indicates whether the root is a leaf
    {zz();
-    return n.M.at(isLeaf);
+    return n.N.at(isLeaf);
    }
 
   private void isLeaf(MemoryLayoutDM.At node)                                   // A leaf if true
@@ -749,7 +749,7 @@ abstract class BtreeDM extends Test                                             
 
   private void leafBase(StuckDM Stuck, Node leafBase)                           // Set base of leaf stuck in memory
    {zz();
-    Stuck.M.copy(leafBase.M.at(Node));
+    Stuck.M.copy(leafBase.N.at(Node));
    }
 
   private void leafBaseSize                                                     // Set base of leaf stuck in memory and get its size
@@ -786,7 +786,7 @@ abstract class BtreeDM extends Test                                             
 
   private void branchBase(StuckDM Stuck, Node branchBase)                       // Set base of branch stuck in memory
    {zz();
-    Stuck.base(branchBase.M.at(branch));
+    Stuck.base(branchBase.N.at(branch));
    }
 
   private void leafSize()                                                       // Number of children in body of leaf
@@ -902,24 +902,41 @@ abstract class BtreeDM extends Test                                             
 
   class Node                                                                    // Node
    {final String      name;
-    final MemoryLayoutDM M;
+    final MemoryLayoutDM N;
 
     Node(String Name)
      {name = Name;
-      M = new MemoryLayoutDM(nodeLayout, name);
-      M.program(BtreeDM.this.P);
+      N = new MemoryLayoutDM(nodeLayout, name);
+      N.program(P);
      }
 
     void root()                                                                 // Load with the node describing a root
-     {final MemoryLayoutDM.At source = BtreeDM.this.M.at(Node, 0);              // Node zero is always the root
-      M.copy(source);
+     {final MemoryLayoutDM.At source = M.at(Node, 0);                           // Node zero is always the root
+      N.copy(source);
      }
 
-    void node(MemoryLayoutDM.At at)                                             // Load with the node addressed by this variable
-     {M.copy(at);
+    void load(MemoryLayoutDM.At at)                                             // Load with the node addressed by this variable
+     {N.copy(at);
      }
 
-    public String toString() {return ""+M;}                                     // As string
+    void saveRoot()                                                             // Save root
+     {final MemoryLayoutDM.At target = M.at(Node, 0);                           // Node zero is always the root
+      target.copy(N);
+     }
+
+    void save(MemoryLayoutDM.At at)                                             // Load with the node addressed by this variable
+     {at.copy(N);
+     }
+
+    void loadStuck(StuckDM Stuck)                                               // Load a stuck from a node
+     {Stuck.M.copy(N.at(branch));
+     }
+
+    void saveStuck(StuckDM Stuck)                                               // Save a stuck from a node
+     {N.at(branch).copy(Stuck.M);
+     }
+
+    public String toString() {return ""+N;}                                     // As string
    }
 
 //D2 Search                                                                     // Search within a node and update the node description with the results
@@ -4101,6 +4118,189 @@ endmodule
 """);
    }
 
+  private static void test_node()
+   {z();
+    final int N = 3;
+    final BtreePA T = new BtreePA()
+     {int maxSize         () {return  3;}
+      int maxKeysPerLeaf  () {return  2;}
+      int maxKeysPerBranch() {return  3;}
+      int bitsPerKey      () {return  4;}
+      int bitsPerData     () {return  4;}
+     };
+    T.P.run(); T.P.clear();
+    T.put();
+    for(int i = 1; i <= N; ++i)
+     {T.T.at(T.Key).setInt (i);
+      T.T.at(T.Data).setInt(i);
+      T.P.run();
+     }
+
+    //stop(T);
+    ok(T, """
+    1      |
+    0      |
+    1      |
+    2      |
+1=1  2,3=2 |
+""");
+
+    final BtreeDM t = btreeDM(T);
+    t.P.clear();
+    //stop(t.M);
+
+    StuckDM l = new StuckDM("leaf")
+     {int     maxSize() {return t.maxKeysPerLeaf();}
+      int  bitsPerKey() {return t.bitsPerKey();}
+      int bitsPerData() {return t.bitsPerData();}
+      int bitsPerSize() {return t.bitsPerSize;}
+     };
+    l.program(t.P);
+
+    StuckDM b = new StuckDM("branch")
+     {int     maxSize() {return t.maxKeysPerBranch()+1;}
+      int  bitsPerKey() {return t.bitsPerKey();}
+      int bitsPerData() {return t.bitsPerNext;}
+      int bitsPerSize() {return t.bitsPerSize;}
+     };
+    b.program(t.P);
+
+    Node n = t.new Node("node");
+    n.root();
+    n.loadStuck(b);
+    t.P.run(); t.P.clear();
+    //stop(b);
+    ok(b, """
+StuckSML(maxSize:4 size:2)
+  0 key:1 data:1
+  1 key:0 data:2
+""");
+
+    b.pop();
+    n.saveStuck(b);
+    n.saveRoot();
+    t.P.run(); t.P.clear();
+    //stop(b);
+    ok(b, """
+StuckSML(maxSize:4 size:1)
+  0 key:1 data:1
+""");
+
+    n.load(t.M.at(t.Node, 1));
+    n.loadStuck(l);
+    t.P.run(); t.P.clear();
+    //stop(l);
+
+    ok(l, """
+StuckSML(maxSize:2 size:1)
+  0 key:1 data:1
+""");
+
+    n.load(t.M.at(t.Node, 2));
+    n.loadStuck(l);
+    t.P.run(); t.P.clear();
+    //stop(l);
+
+    ok(l, """
+StuckSML(maxSize:2 size:2)
+  0 key:2 data:2
+  1 key:3 data:3
+""");
+
+    l.pop();
+    n.saveStuck(l);
+    n.save(t.M.at(t.Node, 2));
+    t.P.run(); t.P.clear();
+    //stop(l);
+
+    ok(l, """
+StuckSML(maxSize:2 size:1)
+  0 key:2 data:2
+""");
+
+    //stop(t.M);
+    ok(t.M, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        92                                      bTree
+   2 V        0         2                                  0     freeList
+   3 A        2        90          3                             nodes
+   4 S        2        30               0                          node
+   5 B        2         1               0                  0         isLeaf
+   6 V        3         2               0                  0         free
+   7 U        5        27               0                            branchOrLeaf
+   8 S        5        19               0                              leaf
+   9 V        5         3               0                  1             currentSize
+  10 A        8         8          2    0                                Keys
+  11 V        8         4               0 0                1               key
+  12 V       12         4               0 1                0               key
+  13 A       16         8          2    0                                Data
+  14 V       16         4               0 0                1               data
+  15 V       20         4               0 1                2               data
+  16 S        5        27               0                              branch
+  17 V        5         3               0                  1             currentSize
+  18 A        8        16          4    0                                Keys
+  19 V        8         4               0 0                1               key
+  20 V       12         4               0 1                0               key
+  21 V       16         4               0 2                1               key
+  22 V       20         4               0 3                2               key
+  23 A       24         8          4    0                                Data
+  24 V       24         2               0 0                1               data
+  25 V       26         2               0 1                2               data
+  26 V       28         2               0 2                0               data
+  27 V       30         2               0 3                0               data
+  28 S       32        30               1                          node
+  29 B       32         1               1                  1         isLeaf
+  30 V       33         2               1                  0         free
+  31 U       35        27               1                            branchOrLeaf
+  32 S       35        19               1                              leaf
+  33 V       35         3               1                  1             currentSize
+  34 A       38         8          2    1                                Keys
+  35 V       38         4               1 0                1               key
+  36 V       42         4               1 1                2               key
+  37 A       46         8          2    1                                Data
+  38 V       46         4               1 0                1               data
+  39 V       50         4               1 1                2               data
+  40 S       35        27               1                              branch
+  41 V       35         3               1                  1             currentSize
+  42 A       38        16          4    1                                Keys
+  43 V       38         4               1 0                1               key
+  44 V       42         4               1 1                2               key
+  45 V       46         4               1 2                1               key
+  46 V       50         4               1 3                2               key
+  47 A       54         8          4    1                                Data
+  48 V       54         2               1 0                0               data
+  49 V       56         2               1 1                0               data
+  50 V       58         2               1 2                0               data
+  51 V       60         2               1 3                0               data
+  52 S       62        30               2                          node
+  53 B       62         1               2                  1         isLeaf
+  54 V       63         2               2                  0         free
+  55 U       65        27               2                            branchOrLeaf
+  56 S       65        19               2                              leaf
+  57 V       65         3               2                  1             currentSize
+  58 A       68         8          2    2                                Keys
+  59 V       68         4               2 0                2               key
+  60 V       72         4               2 1                3               key
+  61 A       76         8          2    2                                Data
+  62 V       76         4               2 0                2               data
+  63 V       80         4               2 1                3               data
+  64 S       65        27               2                              branch
+  65 V       65         3               2                  1             currentSize
+  66 A       68        16          4    2                                Keys
+  67 V       68         4               2 0                2               key
+  68 V       72         4               2 1                3               key
+  69 V       76         4               2 2                2               key
+  70 V       80         4               2 3                3               key
+  71 A       84         8          4    2                                Data
+  72 V       84         2               2 0                0               data
+  73 V       86         2               2 1                0               data
+  74 V       88         2               2 2                0               data
+  75 V       90         2               2 3                0               data
+""");
+   }
+
   protected static void oldTests()                                              // Tests thought to be in good shape
    {if (true) return;
     test_put_ascending();
@@ -4123,11 +4323,13 @@ endmodule
     //test_verilogFind_superSmall();
     //test_verilogPut_superSmall();
     test_verilogPut_superSmall2();
+    test_node();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_find_small();
+    //test_find_small();
+    test_node();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
