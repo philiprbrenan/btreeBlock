@@ -279,7 +279,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
 
     At(Layout.Field Field, At...Directs)                                        // Variable indices used for obtaining run time values
      {zz(); checkCompiled(Field);
-      final int N = Directs.length;
+      final int N = Directs.length, E = layout.new Locator(Field).arrays.size();// Number of indices supplied, number expected
+      if (N != E) stop("Got", N, "indices but expected", E);
       for (int i = 0; i < N; i++)
        {if (Directs[i].directs != null)
          {stop("Index:", i, "must not have a base or indices");
@@ -905,15 +906,15 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
    } // At
 
   At at(Layout.Field Field)                                                     // A field without indices or base addressing
-   {zz(); return new    At(Field);
+   {zz(); return new At(Field);
    }
 
   At at(Layout.Field Field, int...Indices)                                      // A field with constant indices
-   {zz(); return new    At(Field,       Indices);
+   {zz(); return new At(Field,    Indices);
    }
 
   At at(Layout.Field Field, At...Indices)                                       // A field with  variable indices. Each index being a field with no indices
-   {zz(); return new    At(Field,      Indices);
+   {zz(); return new At(Field,   Indices);
    }
 
 //D1 Print                                                                      // Print a memory layout
@@ -1148,17 +1149,17 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      };
     m.P.run(); m.P.clear();
 
-    ok(m.at(t.a, 0, 0, 0), "a[0,0,0]4=1");
-    ok(m.at(t.a, 0, 0, 1), "a[0,0,1]16=2");
-    ok(m.at(t.a, 0, 0, 2), "a[0,0,2]28=3");
+    ok(m.at(t.a, 0, 0, 0), "test.a[0,0,0]4=1");
+    ok(m.at(t.a, 0, 0, 1), "test.a[0,0,1]16=2");
+    ok(m.at(t.a, 0, 0, 2), "test.a[0,0,2]28=3");
 
     m.at(t.a, 0, 0, 1).move(m.at(t.a, 0, 0, 0));
     m.at(t.a, 0, 0, 1).move(m.at(t.a, 0, 0, 1));
     t.M.P.run();
 
-    ok(m.at(t.a, 0, 0, 0), "a[0,0,0]4=1");
-    ok(m.at(t.a, 0, 0, 1), "a[0,0,1]16=1");
-    ok(m.at(t.a, 0, 0, 2), "a[0,0,2]28=3");
+    ok(m.at(t.a, 0, 0, 0), "test.a[0,0,0]4=1");
+    ok(m.at(t.a, 0, 0, 1), "test.a[0,0,1]16=1");
+    ok(m.at(t.a, 0, 0, 2), "test.a[0,0,2]28=3");
    }
 
   static void test_move()
