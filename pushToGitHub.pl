@@ -37,8 +37,8 @@ if (1)                                                                          
    }
  }
 
-if (1)
- {push my @qflow, searchDirectoryTreesForMatchingFiles($home, @qflowExt);         # Qflow Files to upload
+if (0)
+ {push my @qflow, searchDirectoryTreesForMatchingFiles($home, @qflowExt);       # Qflow Files to upload
           @qflow = grep {m(/qflow/)} @qflow;
   push @files, @qflow;
  }
