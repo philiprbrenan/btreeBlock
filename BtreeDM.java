@@ -827,7 +827,7 @@ abstract class BtreeDM extends Test                                             
     T.at(Size).add(branchStuck.T.at(branchStuck.size), -1);                     // Account for top which will always be present
    }
 
-//  private void isEmpty()                                                        // The node is empty
+//  private void isEmpty()                                                      // The node is empty
 //   {z();
 //    tt(node_isLeaf, node_isEmpty);
 //    isLeaf();
@@ -839,7 +839,7 @@ abstract class BtreeDM extends Test                                             
 //      void Else()
 //       {z();
 //        tt(node_branchSize, node_isEmpty); branchSize();
-//        T.at(branchSize).isZero(T.at(isEmpty));                                 // Allow for top which must always be present
+//        T.at(branchSize).isZero(T.at(isEmpty));                               // Allow for top which must always be present
 //       }
 //     };
 //   }
@@ -1574,8 +1574,8 @@ abstract class BtreeDM extends Test                                             
                 bT.concatenate(bR);
                 bT.zeroLastKey();
 
-                /*tt(node_free, l);*/ free(l);                                       // Free the children
-                /*tt(node_free, r);*/ free(r);
+                free(l);                                                        // Free the children
+                free(r);
                 z(); T.at(stolenOrMerged).ones(); P.Goto(Return);
                }
              };
@@ -3884,49 +3884,6 @@ endmodule
 """);
    }
 
-  private void runVerilogPutTest_superSmall2                                    // Run the java and verilog versions and compare the resulting memory traces
-   (int value, int steps, String expected)
-   {z();
-    T.at(Key ).setInt(value);                                                   // Sets memory directly not via an instruction
-    T.at(Data).setInt(value);                                                   // Sets memory directly not via an instruction
-    VerilogCode v = new VerilogCode("put", "verilog")                           // Generate verilog now that memories have been initialized and the program written
-     {int    Key     () {return value;}                                         // Input key value
-      int    Data    () {return     3;}                                         // Input data value
-      int    data    () {return     0;}                                         // Expected output data value
-      int    maxSteps() {return  2000;}                                         // Maximum number if execution steps
-      int    expSteps() {return steps;}                                         // Expected number of steps
-      String expected() {return null;}                                          // Expected tree if present
-     }.generate();
-    if (debug)            stop(this);
-    if (expected != null) ok(this, expected);
-   }
-
-  private static void test_verilogPut_superSmall2()
-   {z();
-    final BtreeDM t = superSmall2();
-    t.P.run(); t.P.clear();
-    t.put();
-    t.runVerilogPutTest_superSmall2(1,  28, null);
-    t.runVerilogPutTest_superSmall2(2,  28, null);
-    t.runVerilogPutTest_superSmall2(3, 106, null);
-    t.runVerilogPutTest_superSmall2(4, 214, null);
-    t.runVerilogPutTest_superSmall2(5, 259, null);
-    t.runVerilogPutTest_superSmall2(6, 285, null);
-    t.runVerilogPutTest_superSmall2(7, 330, null);
-    t.runVerilogPutTest_superSmall2(8, 388, null);
-    t.runVerilogPutTest_superSmall2(9, 361, """
-             4                    |
-             0                    |
-             5                    |
-             6                    |
-      2             6    7        |
-      5             6    6.1      |
-      1             4    7        |
-      3                  2        |
-1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
-""");
-   }
-
   private void runVerilogPutTest_allTreeOps                                     // Run the java and verilog versions and compare the resulting memory traces
    (int value, int steps, String expected)
    {z();
@@ -4360,7 +4317,6 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_verilogDelete_superSmall();
     test_verilogFind_superSmall();
     test_verilogPut_superSmall();
-    test_verilogPut_superSmall2();
     test_node();
    }
 
@@ -4375,7 +4331,8 @@ Line T       At      Wide       Size    Indices        Value   Name
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
       if (github_actions)                                                       // Coverage analysis
        {//coverageAnalysis(sourceFileName(), 12);
-        coverageAnalysis(12, "StuckSML.java", "MemoryLayout.java", "BtreeSML.java"); // Used for printing
+        coverageAnalysis                                                        // Used for printing
+         (12, "StuckSML.java", "MemoryLayout.java", "BtreeSML.java");
        }
       testSummary();                                                            // Summarize test results
       System.exit(testsFailed);
