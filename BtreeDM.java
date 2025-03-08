@@ -948,6 +948,12 @@ abstract class BtreeDM extends Test                                             
     lEqual.search(Key, T.at(found), T.at(index), T.at(data));
    }
 
+  private void findEqualInLeaf(MemoryLayoutDM.At Key, Node Node)                // Find the first key in the node that is equal to the search key
+   {zz();
+    Node.loadStuck(lEqual);
+    lEqual.search(Key, T.at(found), T.at(index), T.at(data));
+   }
+
   public String findEqualInLeaf_toString()                                      // Print details of find equal in leaf node
    {z();
     final StringBuilder s = new StringBuilder();
@@ -1828,7 +1834,7 @@ abstract class BtreeDM extends Test                                             
         P.new Block()                                                           // The root is a leaf
          {void code()
            {P.GoOff(end, ifRootLeaf(nT));                                       // Confirm that the root is a leaf
-            findEqualInLeaf(T.at(Key), null);
+            findEqualInLeaf(T.at(Key), nT);
 
             P.parallelStart();   T.at(find).zero();                             // Leaf that should contain this key is the root
             P.parallelSection(); P.Goto(Return);
@@ -2687,14 +2693,14 @@ endmodule
 
   private static void test_find_small()
    {z();
-    final int N = 1;
+    final int N = 2;
     final BtreePA T = BtreePA.btreePA(2, 3);
     T.P.run(); T.P.clear();
     T.put();
-    for(int i = 0; i <= N; ++i)
-     {T.T.at(T.Key).setInt (i+1);
-      T.T.at(T.Data).setInt(i+1);
-      T.P.run();                                                                // Update
+    for(int i = 1; i <= N; ++i)
+     {T.T.at(T.Key).setInt (i);
+      T.T.at(T.Data).setInt(i-1);
+      T.P.run();
      }
 
     //stop(T);
@@ -2705,9 +2711,20 @@ endmodule
     final BtreeDM t = btreeDM(T);
     t.P.clear();
     t.find();
+
     t.T.at(t.Key).setInt(1);
     t.P.run();
     ok(t.T.at(t.found).getInt(), 1);
+    ok(t.T.at(t.data) .getInt(), 0);
+
+    t.T.at(t.Key).setInt(2);
+    t.P.run();
+    ok(t.T.at(t.found).getInt(), 1);
+    ok(t.T.at(t.data) .getInt(), 1);
+
+    t.T.at(t.Key).setInt(3);
+    t.P.run();
+    ok(t.T.at(t.found).getInt(), 0);
    }
 
   private static void test_find()
@@ -4328,8 +4345,8 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    //test_find_small();
-    test_node();
+    test_find_small();
+    //test_node();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
