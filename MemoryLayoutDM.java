@@ -150,9 +150,9 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
     memory.ones(0, size());
    }
 
-  void copy(MemoryLayoutDM source)                                              // Copy all the bits from the source into the target as long as the source and target are the same size
+  void copy(MemoryLayoutDM source)                                              // Copy as many of the bits from the source into the target as possible
    {zz();
-    if (size() != source.size()) stop("Memory layouts have different sizes");
+    //if (size() != source.size()) stop("Memory layouts have different sizes");
     final int N = size();
     P.new I()
      {void a()
@@ -167,13 +167,18 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
 
   void copy(final MemoryLayoutDM.At source)                                     // Fill the target from the source starting at the referenced address in the source
    {zz();
+    final MemoryLayoutDM m = this;
     final int N = size();
     P.new I()
      {void a()
-       {for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
+       {source.setOff();
+        for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
        }
       String v()
        {return name()+"[0 +: "+N+"] <= "+source.verilogLoad()+";";
+       }
+      String n()
+       {return "copy "+N+" bits from "+source+" to "+m.name;
        }
      };
    }
@@ -306,7 +311,9 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       return this;
      }
 
-    boolean getBit(int i)            {return memory.getBit(at+i);}              // Get a bit from memory assuming that setOff() has been called to fix the location of the field containing the bit
+    boolean getBit(int i)                                                       // Get a bit from memory assuming that setOff() has been called to fix the location of the field containing the bit
+     {return memory.getBit(at+i);
+     }
     void    setBit(int i, boolean b) {memory.set(at+i, b);}                     // Set a bit in memory  assuming that setOff() has been called to fix the location of the field containing the bit
 
     int  getInt()          {zz(); return result;}                               // The value in memory, at the indicated location, treated as an integer or the value of the constant, assumming setOff has been called to update the variable description
@@ -314,7 +321,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
 
     public String toString()                                                    // Print field name(indices)=value or name=value if there are no indices
      {final StringBuilder s = new StringBuilder();
-      s.append(field.name);
+      s.append(ml().name+"."+field.name);
       if (indices.length > 0)
        {setOff(false);
         s.append("[");
@@ -1035,6 +1042,16 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
     writeFile(file, s);                                                         // Write the definition into an include file
    }
 
+  String declareVerilog()                                                       // Declare matching memory  but do not initialize it
+   {zz();
+    final int N = memory.bits.length-1, B = logTwo(N);
+    final StringBuilder s = new StringBuilder();
+    s.append("reg ["+N+":0] "+name()    +"; ");                                 // Actual memory if it is not based
+    s.append(traceComment());
+    s.append("\n");
+    return s.toString();
+   }
+
 //D0 Tests                                                                      // Testing
 
   static class TestMemoryLayout
@@ -1063,25 +1080,25 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
         MemoryLayoutDM m = t.M;
         ProgramDM      p = m.P;
               Layout l = m.layout;
-                      ok(m.at    (t.c,      0, 0, 0), "c[0,0,0]12=15");
+                      ok(m.at    (t.c,      0, 0, 0), "test.c[0,0,0]12=15");
     p.new I() {void a() {m.setInt(t.c,  11, 0, 0, 0); }}; p.run(); p.clear();
-                      ok(m.at    (t.c,      0, 0, 0), "c[0,0,0]12=11");
+                      ok(m.at    (t.c,      0, 0, 0), "test.c[0,0,0]12=11");
 
-                      ok(m.at( t.c,      0, 0, 1), "c[0,0,1]24=0");
+                      ok(m.at( t.c,      0, 0, 1), "test.c[0,0,1]24=0");
     p.new I() {void a() {m.setInt(t.c,  11, 0, 0, 1); }}; p.run(); p.clear();
-                      ok(m.at( t.c,      0, 0, 1), "c[0,0,1]24=11");
+                      ok(m.at( t.c,      0, 0, 1), "test.c[0,0,1]24=11");
 
-                      ok(m.at    (t.a,     0, 2, 2), "a[0,2,2]116=15");
+                      ok(m.at    (t.a,     0, 2, 2), "test.a[0,2,2]116=15");
     p.new I() {void a() {m.setInt(t.a,  5, 0, 2, 2); }}; p.run(); p.clear();
-                      ok(m.at    (t.a,     0, 2, 2), "a[0,2,2]116=5");
+                      ok(m.at    (t.a,     0, 2, 2), "test.a[0,2,2]116=5");
 
-    ok(m.at( t.b,      1, 2, 2), "b[1,2,2]252=15");
+    ok(m.at( t.b,      1, 2, 2), "test.b[1,2,2]252=15");
     p.new I() {void a() {m.setInt(t.b,   7, 1, 2, 2); }}; p.run(); p.clear();
-    ok(m.at( t.b,      1, 2, 2), "b[1,2,2]252=7");
+    ok(m.at( t.b,      1, 2, 2), "test.b[1,2,2]252=7");
 
-                      ok(m.at    (t.e,     1, 2), "e[1,2]260=15");
+                      ok(m.at    (t.e,     1, 2), "test.e[1,2]260=15");
     p.new I() {void a() {m.setInt(t.e, 11, 1, 2);  }}; p.run(); p.clear();
-                      ok(m.at    (t.e,     1, 2), "e[1,2]260=11");
+                      ok(m.at    (t.e,     1, 2), "test.e[1,2]260=11");
    }
 
   static void test_boolean()
