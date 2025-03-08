@@ -3,13 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024-2025
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-// SplitBranch() in parallel. Concatenate currently blocks parallel but can be improved by concatenating to a known point.
-// isleaf() HasLeaves() and  other such queries like an If statement so we can evaluate the condition and jump in one instruction
-// Clean up node is leaf at end of delete()
-// Clock in the key/data to be used rather than using a large number of input pins
-// Run report_design_analysis -congestion and -complexity to find potential sources of congestion in the areas where nets are not fully routed and review UG906 for design closure techniques.
-// Although we layout nominally in bits there is, of course no reason why each bit should not repreent several bits to construct wider trees.
-// Rewrite with buffering rather than basing
+
 import java.util.*;
 import java.nio.file.*;
 
@@ -36,10 +30,12 @@ abstract class BtreeDM extends Test                                             
   Layout.Union     branchOrLeaf;                                                // Layout of either a leaf or a branch in the memory used by btree
   Layout.Bit       isLeaf;                                                      // Whether the current node is a leaf or a branch
   Layout.Variable  free;                                                        // Free list chain
-  Layout.Structure Node;                                                        // Layout of a node in the memory used by btree
+  Layout.Field     Node;                                                        // Layout of a node in the memory used by btree
   Layout.Array     nodes;                                                       // Layout of an array of nodes in the memory used by btree
   Layout.Variable  freeList;                                                    // Single linked list of nodes that have been freed and so can be reused without fragmenting memory
   Layout.Structure bTree;                                                       // Btree
+
+  Layout           nodeLayout;                                                  // Layout of a node in the btree
 
   final static int
     linesToPrintABranch =  4,                                                   // The number of lines required to print a branch
@@ -89,6 +85,10 @@ abstract class BtreeDM extends Test                                             
   final StuckDM lL;                                                             // Process a left node
   final StuckDM lR;                                                             // Process a right node
 
+  final Node nT;                                                                // Memory sufficient to contain a single node
+  final Node nL;                                                                // Memory sufficient to contain a single node
+  final Node nR;                                                                // Memory sufficient to contain a single node
+
   boolean debug = false;                                                        // Debugging enabled
 
 //D1 Construction                                                               // Create a Btree from nodes which can be branches or leaves.  The data associated with the BTree is stored only in the leaves opposite the keys
@@ -116,7 +116,7 @@ abstract class BtreeDM extends Test                                             
       branchTransactions = new StuckDM[N];
 
       for (int i = 0; i < N; i++)
-       {final StuckDM b = branchTransactions[i] = new StuckDM("branch_"+i, M)   // Based stucks
+       {final StuckDM b = branchTransactions[i] = new StuckDM("branch_"+i)      // Branch stucks
          {int     maxSize() {return BtreeDM.this.maxKeysPerBranch()+1;}         // Not forgetting top next
           int  bitsPerKey() {return BtreeDM.this.bitsPerKey();}
           int bitsPerData() {return BtreeDM.this.bitsPerNext;}
@@ -132,7 +132,7 @@ abstract class BtreeDM extends Test                                             
       leafTransactions = new StuckDM[N];
 
       for (int i = 0; i < N; i++)
-       {final StuckDM l = leafTransactions[i] = new StuckDM("leaf_"+i, M)       // Based stucks
+       {final StuckDM l = leafTransactions[i] = new StuckDM("leaf_"+i)          // Leaf stucks
          {int     maxSize() {return BtreeDM.this.maxKeysPerLeaf();}
           int  bitsPerKey() {return BtreeDM.this.bitsPerKey();}
           int bitsPerData() {return BtreeDM.this.bitsPerData();}
@@ -171,6 +171,10 @@ abstract class BtreeDM extends Test                                             
     allocate(false);                                                            // The root is always at zero, which frees zero to act as the end of list marker on the free chain
     T.setIntInstruction(node_setLeaf, root);
     setLeaf();                                                                  // The root starts as a leaf
+
+    nT = new Node("nT");
+    nL = new Node("nL");
+    nR = new Node("nR");
   }
 
   private static BtreeDM BtreeDM(final int leafKeys, int branchKeys)            // Define a test btree with the specified dimensions
@@ -213,11 +217,11 @@ abstract class BtreeDM extends Test                                             
      };
    }
 
-  Layout layout()                                                               // Layout describing memory used by btree
+  Layout nodeLayout()                                                           // Layout describing a node in btree
    {zz();
     final BtreeDM btree = this;
 
-    final StuckDM leafStuck = new StuckDM("leaf", M)                            // Leaf
+    final StuckDM leafStuck = new StuckDM("leaf")                               // Leaf
      {int               maxSize() {return btree.maxKeysPerLeaf();}
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerData();}
@@ -225,7 +229,7 @@ abstract class BtreeDM extends Test                                             
      };
     leafStuck.T.layout.layoutName = "leaf";
 
-    final StuckDM branchStuck = new StuckDM("branch", M)                        // Branch
+    final StuckDM branchStuck = new StuckDM("branch")                           // Branch
      {int               maxSize() {return btree.maxKeysPerBranch()+1;}          // Not forgetting top next
       int            bitsPerKey() {return btree.bitsPerKey();}
       int           bitsPerData() {return btree.bitsPerNext;}
@@ -233,24 +237,59 @@ abstract class BtreeDM extends Test                                             
      };
     branchStuck.T.layout.layoutName = "branch";
 
-    final Layout l = Layout.layout();
+    final Layout   l = Layout.layout();
     leaf         = l.duplicate("leaf",         leafStuck.layout());
     branch       = l.duplicate("branch",       branchStuck.layout());
     branchOrLeaf = l.union    ("branchOrLeaf", leaf,   branch);
     isLeaf       = l.bit      ("isLeaf");
     free         = l.variable ("free",         btree.bitsPerNext);
     Node         = l.structure("node",         isLeaf, free, branchOrLeaf);
-    nodes        = l.array    ("nodes",        Node,         maxSize());
-    freeList     = l.variable ("freeList",     btree.bitsPerNext);
-    bTree        = l.structure("bTree",        freeList  , nodes);
+    return nodeLayout = l.compile();
+   }
+
+  Layout layout()                                                               // Layout describing memory used by btree
+   {zz();
+    final BtreeDM btree = this;
+    nodeLayout();
+
+    final Layout l = Layout.layout();
+    Node         = l.duplicate(nodeLayout);
+    nodes        = l.array    ("nodes",    Node, maxSize());
+    freeList     = l.variable ("freeList", btree.bitsPerNext);
+    bTree        = l.structure("bTree",    freeList, nodes);
     return l.compile();
+   }
+
+  BtreePA btreePA()                                                             // Convert to an earlier version known to work correctly
+   {final BtreeDM d = this;
+    final BtreePA t = new BtreePA()
+     {int maxSize         () {return d.maxSize         () ;}
+      int maxKeysPerLeaf  () {return d.maxKeysPerLeaf  () ;}
+      int maxKeysPerBranch() {return d.maxKeysPerBranch() ;}
+      int bitsPerKey      () {return d.bitsPerKey      () ;}
+      int bitsPerData     () {return d.bitsPerData     () ;}
+     };
+    t.M.memory().copy(d.M.memory());
+    return t;
+   }
+
+  static BtreeDM btreeDM(BtreePA p)                                                    // Convert from an earlier version known to work correctly
+   {final BtreeDM t = new BtreeDM()
+     {int maxSize         () {return p.maxSize         () ;}
+      int maxKeysPerLeaf  () {return p.maxKeysPerLeaf  () ;}
+      int maxKeysPerBranch() {return p.maxKeysPerBranch() ;}
+      int bitsPerKey      () {return p.bitsPerKey      () ;}
+      int bitsPerData     () {return p.bitsPerData     () ;}
+     };
+    t.M.memory().copy(p.M.memory());
+    return t;
    }
 
 //D1 Control                                                                    // Testing, control and integrity
 
   private void ok(String expected) {Test.ok(toString(), expected);}             // Confirm tree is as expected
   private void stop()              {Test.stop(toString());}                     // Stop after printing the tree
-  public String toString()         {return print();}                            // Print the tree
+  public String toString()         {return ""+btreePA();}                       // Print the tree
 
 //D1 Memory access                                                              // Access to memory
 
@@ -624,9 +663,9 @@ abstract class BtreeDM extends Test                                             
   private void   setLeaf()  {zz(); M.at(isLeaf, T.at(node_setLeaf))  .ones();}  // Set as leaf
   private void setBranch()  {zz(); M.at(isLeaf, T.at(node_setBranch)).zero();}  // Set as branch
 
-  private MemoryLayoutDM.At ifRootLeaf()                                        // A variable that indicates whether the root is a leaf
+  private MemoryLayoutDM.At ifRootLeaf(Node n)                                  // A variable that indicates whether the root is a leaf
    {zz();
-    return M.at(isLeaf, root);
+    return n.M.at(isLeaf);
    }
 
   private void isLeaf(MemoryLayoutDM.At node)                                   // A leaf if true
@@ -697,8 +736,8 @@ abstract class BtreeDM extends Test                                             
    {zz();
     P.new I()
      {void a()
-       {if (node_leafBase != null) Stuck.M.base(M.at(leaf, T.at(node_leafBase)).setOff().at);
-        else                       Stuck.M.base(M.at(leaf, 0)                  .setOff().at);
+       {if (node_leafBase != null) Stuck.base(M.at(leaf, T.at(node_leafBase)));
+        else                       Stuck.base(M.at(leaf, 0)                  );
        }
       String v()
        {return node_leafBase != null ?
@@ -706,6 +745,11 @@ abstract class BtreeDM extends Test                                             
           Stuck.M.baseName() + " <= " + M.at(leaf, 0)                  .verilogAddr() + ";";
        }
      };
+   }
+
+  private void leafBase(StuckDM Stuck, Node leafBase)                           // Set base of leaf stuck in memory
+   {zz();
+    Stuck.M.copy(leafBase.M.at(Node));
    }
 
   private void leafBaseSize                                                     // Set base of leaf stuck in memory and get its size
@@ -731,13 +775,18 @@ abstract class BtreeDM extends Test                                             
    {zz();
     P.new I()
      {void a()
-       {Stuck.M.base(M.at(branch, T.at(node_branchBase)).setOff().at);
+       {Stuck.M.copy(M.at(branch, T.at(node_branchBase)));
        }
       String v()
        {return Stuck.M.baseName() + " <= " +
           M.at(branch, T.at(node_branchBase)).verilogAddr() + ";";
        }
      };
+   }
+
+  private void branchBase(StuckDM Stuck, Node branchBase)                       // Set base of branch stuck in memory
+   {zz();
+    Stuck.base(branchBase.M.at(branch));
    }
 
   private void leafSize()                                                       // Number of children in body of leaf
@@ -836,21 +885,42 @@ abstract class BtreeDM extends Test                                             
 
   private void hasLeavesForChildren()                                           // The node has leaves for children
    {zz();
-    if (Assert) {tt(node_assertBranch, node_hasLeavesForChildren); assertBranch();}
-    branchBase(bLeaf, node_hasLeavesForChildren);
     bLeaf.firstElement();                                                       // Was lastElement but firstElement() is faster
-    T.at(node_isLeaf).move(bLeaf.T.at(bLeaf.tData)); isLeaf(bLeaf.T.at(bLeaf.tData));
+    T.at(node_isLeaf).move(bLeaf.T.at(bLeaf.tData));
+    isLeaf(bLeaf.T.at(bLeaf.tData));
     tt(hasLeavesForChildren, IsLeaf);
    }
 
-//  private void top()                                                            // The top next element of a branch - only used in printing
-//   {z();
-//    if (Assert) {tt(node_assertBranch, node_top); assertBranch();}
-//    branchBase(bTop, node_top);
-//    tt(node_branchSize, node_top); branchSize(); bTop.T.at(bTop.index).move(T.at(branchSize));
-//    bTop.elementAt();
-//    T.at(top).move(bTop.T.at(bTop.tData));
-//   }
+  private void hasLeavesForChildren(StuckDM bLeaf)                              // The node has leaves for children
+   {zz();
+    bLeaf.firstElement();                                                       // Was lastElement but firstElement() is faster
+    T.at(hasLeavesForChildren).move(M.at(isLeaf, bLeaf.T.at(bLeaf.tData)));
+   }
+
+
+//D2 Node                                                                       // Description of a node
+
+  class Node                                                                    // Node
+   {final String      name;
+    final MemoryLayoutDM M;
+
+    Node(String Name)
+     {name = Name;
+      M = new MemoryLayoutDM(nodeLayout, name);
+      M.program(BtreeDM.this.P);
+     }
+
+    void root()                                                                 // Load with the node describing a root
+     {final MemoryLayoutDM.At source = BtreeDM.this.M.at(Node, 0);              // Node zero is always the root
+      M.copy(source);
+     }
+
+    void node(MemoryLayoutDM.At at)                                             // Load with the node addressed by this variable
+     {M.copy(at);
+     }
+
+    public String toString() {return ""+M;}                                     // As string
+   }
 
 //D2 Search                                                                     // Search within a node and update the node description with the results
 
@@ -904,133 +974,17 @@ abstract class BtreeDM extends Test                                             
 //    T.at(first).move(lFirstLeaf.T.at(lFirstLeaf.index));
 //  P.parallelEnd();
    }
-
   private void findFirstGreaterThanOrEqualInBranch                              // Find the first key in the branch that is equal to or greater than the search key
    (Layout.Variable Branch,  MemoryLayoutDM.At Search, MemoryLayoutDM.At Found,
     MemoryLayoutDM.At Index, MemoryLayoutDM.At Data)
+   {stop("Replaced");
+   }
+  private void findFirstGreaterThanOrEqualInBranch                              // Find the first key in the branch that is equal to or greater than the search key
+   (Node Branch,  MemoryLayoutDM.At Search, MemoryLayoutDM.At Found,
+    MemoryLayoutDM.At Index, MemoryLayoutDM.At Data)
    {zz();
-//  if (Assert)
-//   {tt(node_assertBranch, node_findFirstGreaterThanOrEqualInBranch);
-//    assertBranch();
-//   }
-//  bFirstBranch.T.at(bFirstBranch.search).move(T.at(search));
-//bFirstBranch.T.setIntInstruction(bFirstBranch.limit, 1);
-
     branchBase(bFirstBranch, Branch);
     bFirstBranch.searchFirstGreaterThanOrEqual(false, Search, Found, Index, null, Data);
-
-//  P.parallelStart();
-//    T.at(found).move(bFirstBranch.T.at(bFirstBranch.found));
-//  P.parallelSection();
-//    T.at(first).move(bFirstBranch.T.at(bFirstBranch.index));
-//  P.parallelEnd();
-
-//    P.new If (T.at(found))                                                      // Next if key matches else top
-//     {void Then()
-//       {T.at(next).move(bFirstBranch.T.at(bFirstBranch.tData));
-//       }
-//      void Else()                                                               // Top as no key matched
-//       {z();
-//        bFirstBranch.lastElement();
-//        T.at(next).move(bFirstBranch.T.at(bFirstBranch.tData));
-//       }
-//     };
-   }
-
-//D2 Array                                                                      // Represent the contents of the tree as an array
-
-  private void leafToArray(int node, Stack<ArrayElement> s)                     // Leaf as an array
-   {z();
-    if (Assert) {T.at(node_assertLeaf).setInt(node); assertLeaf();}
-    T.at(node_leafSize).setInt(node);
-    leafSize();
-    final int     K = T.at(leafSize).getInt();
-    final StuckDM t = lLeaf.copyDef();
-    leafBase(t, node_leafBase);
-    for  (int i = 0; i < K; i++)
-     {z();
-      t.T.at(t.index).setInt(i); t.elementAt();
-      s.push(new ArrayElement(i, t.T.at(t.tKey).getInt(), t.T.at(t.tData).getInt()));
-     }
-   }
-
-  private void branchToArray(int node, Stack<ArrayElement> s)                   // Branch to array
-   {z();
-    if (Assert) {T.at(node_assertBranch).setInt(node); assertBranch();}
-    T.at(node_branchSize  ).setInt(node); branchSize();
-    final int K = T.at(branchSize).getInt()+1;                                  // Include top next
-
-    if (K > 0)                                                                  // Branch has key, next pairs
-     {z();
-      final StuckDM t = bLeaf.copyDef();
-      T.at(node_branchBase).setInt(node); branchBase(t, node_branchBase);
-      for  (int i = 0; i < K; i++)
-       {z();
-        t.T.at(t.index).setInt(i); t.elementAt();                               // Each node in the branch
-
-        T.at(node_isLeaf).move(t.T.at(t.tData)); isLeaf(t.T.at(t.tData));
-        if (T.at(IsLeaf).isOnes())
-         {z();
-          leafToArray(t.T.at(t.tData).getInt(), s);
-         }
-        else
-         {z();
-          if (t.T.at(t.tData).isZero())
-           {say("Cannot descend through root from index", i,
-                "in branch", node);
-            break;
-           }
-          z(); branchToArray(t.T.at(t.tData).getInt(), s);
-         }
-       }
-     }
-   }
-
-//D2 Print                                                                      // Print the contents of the tree
-
-  public String find_toString()                                                 // Print find result
-   {final StringBuilder s = new StringBuilder();
-    s.append("Find(");
-    s.append(    " search:"+T.at(search).getInt());
-    s.append(     " found:"+T.at(found) .getInt());
-    s.append(      " data:"+T.at(data)  .getInt());
-    s.append(     " index:"+T.at(index) .getInt());
-    s.append(")\n");
-    return s.toString();
-   }
-
-  public String findAndInsert_toString()                                        // Print find and insert result
-   {final StringBuilder s = new StringBuilder();
-    s.append("FindAndInsert(");
-    s.append(    " key:"+T.at(key)    .getInt());
-    s.append(   " data:"+T.at(data)   .getInt());
-    s.append(" success:"+T.at(success).getInt());
-    if (T.at(success).isOnes()) s.append(" inserted:"+T.at(inserted));
-    s.append(")\n" );
-    return s.toString();
-   }
-
-  public String findFirstGreaterThanOrEqualInLeaf_toString()                    // Print results of search
-   {final StringBuilder s = new StringBuilder();
-    s.append("FindFirstGreaterThanOrEqualInLeaf(");
-    s.append(  "Leaf:"+T.at(node_findFirstGreaterThanOrEqualInLeaf).getInt());
-    s.append(  " Key:"+T.at(search).getInt());
-    s.append(" found:"+T.at(found).getInt());
-    if (T.at(found).isOnes()) s.append(" first:"+T.at(first).getInt());
-    s.append(")\n");
-    return s.toString();
-   }
-
-  public String findFirstGreaterThanOrEqualInBranch_toString()                  // Print search results
-   {final StringBuilder s = new StringBuilder();
-    s.append("FindFirstGreaterThanOrEqualInBranch(");
-    s.append("branch:"+T.at(node_findFirstGreaterThanOrEqualInBranch).getInt());
-    s.append(  " Key:"+T.at(search).getInt());
-    s.append(" found:"+T.at(found).getInt());
-    s.append( " next:"+T.at(next).getInt());
-    if (T.at(found).isOnes()) s.append(" first:"+T.at(first).getInt());
-    s.append(")\n");
-    return s.toString();
    }
 
 //D2 Split                                                                      // Split nodes in half to increase the number of nodes in the tree
@@ -1856,78 +1810,6 @@ abstract class BtreeDM extends Test                                             
      };
    }
 
-//D1 Array                                                                      // Key, data pairs in the tree as an array
-
-  private class ArrayElement                                                    // A key, data pair in the btree as an array element
-   {final int i, key, data;
-    ArrayElement(int I, int Key, int Data)
-     {i = I; key = Key; data = Data;
-     }
-    public String toString()
-     {return "("+i+", key:"+key+" data:"+data+")\n";
-     }
-   }
-
-  private Stack<ArrayElement> toArray()                                         // Key, data pairs in the tree as an array
-   {z();
-    final Stack<ArrayElement> s = new Stack<>();
-    T.at(node_isLeaf).setInt(root); isLeaf();
-    if (T.at(IsLeaf).isOnes()) {z();   leafToArray(root, s);}
-    else        {z(); branchToArray(root, s);}
-    return s;
-   }
-
-//D1 Print                                                                      // Print a BTree horizontally
-
-   private String printBoxed()                                                  // Print a tree in a box
-    {final String  s = toString();
-     final int     n = longestLine(s)-1;
-     final String[]L = s.split("\n");
-     final StringBuilder t = new StringBuilder();
-     t.append("+"); t.append("-".repeat(n)); t.append("+\n");
-     for(String l : L) t.append("| "+l+"\n");
-     t.append("+"); t.append("-".repeat(n)); t.append("+\n");
-     return t.toString();
-    }
-
-  private void padStrings(Stack<StringBuilder> S, int level)                    // Pad the strings at each level of the tree so we have a vertical face to continue with - a bit like Marc Brunel's tunneling shield
-   {final int N = level * linesToPrintABranch + maxKeysPerLeaf();               // Number of lines we might want
-    for (int i = S.size(); i <= N; ++i) S.push(new StringBuilder());            // Make sure we have a full deck of strings
-    int m = 0;                                                                  // Maximum length
-    for (StringBuilder s : S) m = m < s.length() ? s.length() : m;              // Find maximum length
-    for (StringBuilder s : S)                                                   // Pad each string to maximum length
-     {if (s.length() < m) s.append(" ".repeat(m - s.length()));                 // Pad string to maximum length
-     }
-   }
-
-  String printCollapsed(Stack<StringBuilder> S)                                 // Collapse horizontal representation into a string
-   {z();
-    final StringBuilder t = new StringBuilder();                                // Print the lines of the tree that are not blank
-    for  (StringBuilder s : S)
-     {z();
-      final String l = s.toString();
-      if (l.isBlank()) continue;
-      t.append(l+"|\n");
-     }
-    return t.toString();
-   }
-
-  private String print()                                                        // Print a tree horizontally
-   {final BtreeDM  p = this;
-    final BtreeSML s = new BtreeSML()                                           // Create a btree of the same dimensions in aclass that can already print the btree so that we do not have to deal with the complexity of printing from assembler
-     {int maxSize         () {return p.maxSize         ();}
-      int maxKeysPerLeaf  () {return p.maxKeysPerLeaf  ();}
-      int maxKeysPerBranch() {return p.maxKeysPerBranch();}
-      int bitsPerKey      () {return p.bitsPerKey      ();}
-      int bitsPerData     () {return p.bitsPerData     ();}
-      int bitsPerNext     () {return p.bitsPerNext       ;}
-      int bitsPerSize     () {return p.bitsPerSize       ;}
-      Memory   memory     () {return p.M.memory();}                             // The memory to be used by the btree
-     };
-    s.fixMemory(p.M.memory());
-    return s.toString();
-   }
-
 //D1 Find                                                                       // Find the data associated with a key.
 
   public void find()                                                            // Find the leaf associated with a key in the tree
@@ -1935,14 +1817,11 @@ abstract class BtreeDM extends Test                                             
     P.new Block()
      {void code()
        {final ProgramDM.Label Return = end;
-        nT.base(root);
+        nT.root();                                                              // The first thing in the tree is the node
+
         P.new Block()                                                           // The root is a leaf
          {void code()
-           {P.GoOff(end, ifRootLeaf(bT));                                       // Confirm that the root is a leaf
-            //P.parallelStart();   tt(search, Key);
-            //P.parallelSection(); T.at(node_findEqualInLeaf).zero();
-            //P.parallelEnd();
-
+           {P.GoOff(end, ifRootLeaf(nT));                                       // Confirm that the root is a leaf
             findEqualInLeaf(T.at(Key), null);
 
             P.parallelStart();   T.at(find).zero();                             // Leaf that should contain this key is the root
@@ -1950,25 +1829,10 @@ abstract class BtreeDM extends Test                                             
             P.parallelEnd();
            }
          };
-        P.parallelStart();   T.at(parent).zero();                               // Parent starts at root which is now known to be a branch
-        P.parallelSection(); //T.at(findDepth).zero();                            // Limit number of levels searched
-        P.parallelEnd();
 
         P.new Block()
          {void code()
-           {//T.at(findDepth).inc();
-            //T.at(findDepth).greaterThan(T.at(MaxDepth), T.at(pastMaxDepth));
-            //P.GoOn(end, T.at(pastMaxDepth));                                    // Prevent runaway searches
-
-            //P.parallelStart();   tt(search, Key);
-            //P.parallelSection(); tt(node_findFirstGreaterThanOrEqualInBranch, parent);
-            //P.parallelEnd();
-
-            findFirstGreaterThanOrEqualInBranch(parent, T.at(Key), null, null, T.at(child));                              // Find next child in search path of key
-
-            //P.parallelStart();   tt(child, next);
-            //P.parallelSection(); tt(node_isLeaf, child);
-            //P.parallelEnd();
+           {findFirstGreaterThanOrEqualInBranch(nT, T.at(Key), null, null, T.at(child));  // Find next child in search path of key
 
             P.new Block()                                                       // Found the containing leaf
              {void code()
@@ -2171,10 +2035,10 @@ abstract class BtreeDM extends Test                                             
        {final ProgramDM.Label Return = end;
         T.at(node_mergeRoot).zero(); mergeRoot();
 
-
+        nT.root();
         P.new Block()                                                           // Find and delete directly in root as a leaf
          {void code()
-           {P.GoOff(end, ifRootLeaf());
+           {P.GoOff(end, ifRootLeaf(nT));
             findAndDelete();
 
             P.parallelStart();   tt(deleted, found);
@@ -2299,6 +2163,10 @@ abstract class BtreeDM extends Test                                             
        }
      };
    }
+
+   private String printBoxed()                                                  // Print a tree in a box
+    {return btreePA().printBoxed();                                                                                //
+    }
 
 //D1 Verilog                                                                    // Generate verilog code that implements the instructions used to manipulate a btree
 
@@ -2601,7 +2469,7 @@ endmodule
 
       //ok(P.steps, expSteps());                                                // Steps in Java code
       ok(T.at(BtreeDM.this.data).getInt(), data());                             // Data associated with key from java code
-      if (debug) stop(print());                                                 // Print tree if debugging
+      if (debug) stop(toString());                                              // Print tree if debugging
       if (expected() != null) ok(BtreeDM.this, expected());                     // Check resulting tree
      }
 
@@ -2811,22 +2679,47 @@ endmodule
      }
    }
 
+  private static void test_find_small()
+   {z();
+    final int N = 1;
+    final BtreePA T = BtreePA.btreePA(2, 3);
+    T.P.run(); T.P.clear();
+    T.put();
+    for(int i = 0; i <= N; ++i)
+     {T.T.at(T.Key).setInt (i+1);
+      T.T.at(T.Data).setInt(i+1);
+      T.P.run();                                                                // Update
+     }
+
+    //stop(T);
+    ok(T, """
+1,2=0 |
+""");
+
+    final BtreeDM t = btreeDM(T);
+    t.P.clear();
+    t.find();
+    t.T.at(t.Key).setInt(1);
+    t.P.run();
+    ok(t.T.at(t.found).getInt(), 1);
+   }
+
   private static void test_find()
    {z();
     final int N = 64;
-    final BtreeDM t = BtreeDM(8, 3);
-    t.P.run(); t.P.clear();
-    t.put();
+    final BtreePA T = BtreePA.btreePA(8, 3);
+    T.P.run(); T.P.clear();
+    T.put();
     for(int i = 2; i <= N; i += 2)
      {//say(currentTestName(),  "a", i);
-      t.T.at(t.Key).setInt(  i);
-      t.T.at(t.Data).setInt( i);
-      t.P.run();                                                                // Insert
-      t.P.run();                                                                // Update
+      T.T.at(T.Key).setInt(  i);
+      T.T.at(T.Data).setInt( i);
+      T.P.run();                                                                // Insert
+      T.P.run();                                                                // Update
      }
 
-    //stop(t);
-    t.ok("""
+    //stop(T);
+    ok(T, """
                                                   33                                                      |
                                                   0                                                       |
                                                   5                                                       |
@@ -2838,6 +2731,7 @@ endmodule
 2,4,6,8,10,12,14,16=1   18,20,22,24,26,28,30,32=3   34,36,38,40,42,44,46,48=4   50,52,54,56,58,60,62,64=2 |
 """);
 
+    final BtreeDM t = btreeDM(T);
     t.P.clear();
     t.find();
     for(int i = 1; i <= N+1; i += 2)                                            // Keys that cannot be found
@@ -4243,7 +4137,7 @@ endmodule
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_verilogPut_superSmall2();
+    test_find_small();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
