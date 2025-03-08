@@ -61,6 +61,15 @@ class Memory extends Test                                                       
     if  (width < 1) stop("Width must be one or more, not:", width);
    }
 
+  void copy(Memory source)                                                      // Initialize teh is memory from a source memory copying as many bits as possible into the start of the memory
+   {zz();
+    final int N = min(size(), source.size());
+    for(int i = 0; i < N; ++i)
+     {z();
+      bits[i] = source.bits[i];
+     }
+   }
+
 //D3 Set                                                                        // Set a bit
 
   void set(int start, boolean value)                                            // Set a bit from a boolean
@@ -350,6 +359,35 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 """);
    }
 
+  static void test_copy_memory()
+   {z();
+    Memory m = memory("aaa", 8);
+    Memory n = memory("bbb", 8);
+    m.alternating(4);
+    //stop(m);
+    ok(m, """
+Memory: aaa
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 00f0
+""");
+    //stop(n);
+    ok(n, """
+Memory: bbb
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
+""");
+    n.copy(m);
+    //stop(n);
+    ok(n, """
+Memory: bbb
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 00f0
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_set_get();
     test_zero_ones();
@@ -358,10 +396,12 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
     test_boolean();
     test_alternating();
     test_all_zeros_and_ones();
+    test_copy_memory();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_copy_memory();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
