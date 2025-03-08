@@ -34,6 +34,8 @@ abstract class BtreeDM extends Test                                             
   Layout.Array     nodes;                                                       // Layout of an array of nodes in the memory used by btree
   Layout.Variable  freeList;                                                    // Single linked list of nodes that have been freed and so can be reused without fragmenting memory
   Layout.Structure bTree;                                                       // Btree
+  Layout.Field     bTree_free;                                                  // Free list in node observed from btree main memory and thus likely to add to memory congestion unless separated out into a spearate memory block
+  Layout.Field     bTree_isLeaf;                                                // Is a leaf in node observed from btree main memory and thus likely to add to memory congestion unless separated out into a spearate memory block
 
   Layout           nodeLayout;                                                  // Layout of a node in the btree
 
@@ -257,7 +259,10 @@ abstract class BtreeDM extends Test                                             
     nodes        = l.array    ("nodes",    Node, maxSize());
     freeList     = l.variable ("freeList", btree.bitsPerNext);
     bTree        = l.structure("bTree",    freeList, nodes);
-    return l.compile();
+    l.compile();
+    bTree_free   = l.get("nodes.node.free");
+    bTree_isLeaf = l.get("nodes.node.isLeaf");
+    return l;
    }
 
   BtreePA btreePA()                                                             // Convert to an earlier version known to work correctly
@@ -339,7 +344,7 @@ abstract class BtreeDM extends Test                                             
          }
        };
      }
-    M.at(freeList).move(M.at(free, T.at(allocate)));                            // Second node on free list
+    M.at(freeList).move(M.at(bTree_free, T.at(allocate)));                      // Second node on free list
 
 //  tt(node_clear, allocate);
     clear(T.at(allocate));                                                      // Construct and clear the node
@@ -658,10 +663,10 @@ abstract class BtreeDM extends Test                                             
     return L.compile();
    }
 
-  private void    isLeaf()  {zz(); T.at(IsLeaf).move(M.at(isLeaf, T.at(node_isLeaf)));} // Whether a node is a leaf
-  private void isRootLeaf() {zz(); T.at(IsLeaf).move(M.at(isLeaf, root));}      // Whether the root is a leaf
-  private void   setLeaf()  {zz(); M.at(isLeaf, T.at(node_setLeaf))  .ones();}  // Set as leaf
-  private void setBranch()  {zz(); M.at(isLeaf, T.at(node_setBranch)).zero();}  // Set as branch
+  private void    isLeaf()  {zz(); T.at(IsLeaf).move(M.at(bTree_isLeaf, T.at(node_isLeaf)));}           // Whether a node is a leaf
+  private void isRootLeaf() {zz(); T.at(IsLeaf).move(M.at(bTree_isLeaf, root));}                        // Whether the root is a leaf
+  private void   setLeaf()  {zz();                   M.at(bTree_isLeaf, T.at(node_setLeaf))  .ones();}  // Set as leaf
+  private void setBranch()  {zz();                   M.at(bTree_isLeaf, T.at(node_setBranch)).zero();}  // Set as branch
 
   private MemoryLayoutDM.At ifRootLeaf(Node n)                                  // A variable that indicates whether the root is a leaf
    {zz();
@@ -674,7 +679,11 @@ abstract class BtreeDM extends Test                                             
    }
 
   private MemoryLayoutDM.At ifLeaf(MemoryLayoutDM.At node)                      // A variable that indicates whether the node is a leaf
-   {zz(); return M.at(isLeaf, node);
+   {zz(); return M.at(bTree_isLeaf, node);
+   }
+
+  private MemoryLayoutDM.At ifLeaf(Node Node)                                   // A variable that indicates whether the node is a leaf
+   {zz(); return Node.N.at(isLeaf);
    }
 
   private void assertLeaf()
@@ -736,7 +745,8 @@ abstract class BtreeDM extends Test                                             
    {zz();
     P.new I()
      {void a()
-       {if (node_leafBase != null) Stuck.base(M.at(leaf, T.at(node_leafBase)));
+       {say("AAAA", traceBack);
+        if (node_leafBase != null) Stuck.base(M.at(leaf, T.at(node_leafBase)));
         else                       Stuck.base(M.at(leaf, 0)                  );
        }
       String v()
@@ -992,11 +1002,12 @@ abstract class BtreeDM extends Test                                             
    {stop("Replaced");
    }
   private void findFirstGreaterThanOrEqualInBranch                              // Find the first key in the branch that is equal to or greater than the search key
-   (Node Branch,  MemoryLayoutDM.At Search, MemoryLayoutDM.At Found,
+   (Node Node,  MemoryLayoutDM.At Search, MemoryLayoutDM.At Found,
     MemoryLayoutDM.At Index, MemoryLayoutDM.At Data)
    {zz();
-    branchBase(bFirstBranch, Branch);
-    bFirstBranch.searchFirstGreaterThanOrEqual(false, Search, Found, Index, null, Data);
+    Node.loadStuck(bFirstBranch);
+    bFirstBranch.searchFirstGreaterThanOrEqual
+     (false, Search, Found, Index, null, Data);
    }
 
 //D2 Split                                                                      // Split nodes in half to increase the number of nodes in the tree
@@ -1844,13 +1855,14 @@ abstract class BtreeDM extends Test                                             
 
         P.new Block()
          {void code()
-           {findFirstGreaterThanOrEqualInBranch(nT, T.at(Key), null, null, T.at(child));  // Find next child in search path of key
+           {findFirstGreaterThanOrEqualInBranch                                 // Find next child in search path of key
+             (nT, T.at(Key), null, null, T.at(child));
+            nT.load(M.at(Node, T.at(child)));
 
             P.new Block()                                                       // Found the containing leaf
              {void code()
-               {P.GoOff(end, ifLeaf(T.at(child)));                              // Confirm that it is a leaf
-
-                findEqualInLeaf(T.at(Key), child);
+               {P.GoOff(end, ifLeaf(nT));                                       // Confirm that it is a leaf
+                findEqualInLeaf(T.at(Key), nT);
 
                 P.parallelStart();   tt(find, child);
                 P.parallelSection(); P.Goto(Return);
@@ -1858,10 +1870,8 @@ abstract class BtreeDM extends Test                                             
                }
              };
 
-            P.parallelStart();
-              tt(parent, child);                                                // Step down to lower branch
-            P.parallelSection();
-              P.Goto(start);                                                    // Restart search
+            P.parallelStart();   tt(parent, child);                             // Step down to lower branch
+            P.parallelSection(); P.Goto(start);                                 // Restart search
             P.parallelEnd();
            }
          };
@@ -2691,9 +2701,9 @@ endmodule
      }
    }
 
-  private static void test_find_small()
+  private static void test_find()
    {z();
-    final int N = 2;
+    final int N = 32;
     final BtreePA T = BtreePA.btreePA(2, 3);
     T.P.run(); T.P.clear();
     T.put();
@@ -2705,29 +2715,38 @@ endmodule
 
     //stop(T);
     ok(T, """
-1,2=0 |
+                                                                            16                                                                                           |
+                                                                            0                                                                                            |
+                                                                            17                                                                                           |
+                                                                            21                                                                                           |
+                               8                                                                                            24                    28                     |
+                               17                                                                                           21                    21.1                   |
+                               5                                                                                            16                    23                     |
+                               11                                                                                                                 6                      |
+      2      4        6                 10         12          14                      18         20           22                      26                      30        |
+      5      5.1      5.2               11         11.1        11.2                    16         16.1         16.2                    23                      6         |
+      1      3        4                 8          10          9                       13         15           14                      18                      20        |
+                      7                                        12                                              19                      22                      2         |
+1,2=1  3,4=3    5,6=4    7,8=7   9,10=8   11,12=10     13,14=9     15,16=12   17,18=13   19,20=15     21,22=14     23,24=19   25,26=18   27,28=22     29,30=20   31,32=2 |
 """);
 
     final BtreeDM t = btreeDM(T);
     t.P.clear();
     t.find();
 
-    t.T.at(t.Key).setInt(1);
-    t.P.run();
-    ok(t.T.at(t.found).getInt(), 1);
-    ok(t.T.at(t.data) .getInt(), 0);
+    for(int i = 1; i <= N; ++i)
+     {t.T.at(t.Key).setInt(i);
+      t.P.run();
+      ok(t.T.at(t.found).getInt(), 1);
+      ok(t.T.at(t.data) .getInt(), i-1);
+     }
 
-    t.T.at(t.Key).setInt(2);
-    t.P.run();
-    ok(t.T.at(t.found).getInt(), 1);
-    ok(t.T.at(t.data) .getInt(), 1);
-
-    t.T.at(t.Key).setInt(3);
+    t.T.at(t.Key).setInt(N+1);
     t.P.run();
     ok(t.T.at(t.found).getInt(), 0);
    }
 
-  private static void test_find()
+  private static void test_find_and_update()
    {z();
     final int N = 64;
     final BtreePA T = BtreePA.btreePA(8, 3);
@@ -4319,13 +4338,15 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
-   {if (true) return;
+   {test_find();
+    if (true) return;
     test_put_ascending();
     test_put_ascending_wide();
     test_put_descending();
     test_put_small_random();
     //test_put_large_random();
     test_find();
+    test_find_and_update();
     test_delete_ascending();
     test_delete_descending();
     //test_to_array();
@@ -4337,15 +4358,15 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_verilogPut_allTreeOps();
 
     test_verilogDelete_superSmall();
-    //test_verilogFind_superSmall();
-    //test_verilogPut_superSmall();
+    test_verilogFind_superSmall();
+    test_verilogPut_superSmall();
     test_verilogPut_superSmall2();
     test_node();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_find_small();
+    test_find();
     //test_node();
    }
 
