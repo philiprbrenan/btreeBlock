@@ -89,7 +89,7 @@ alias x='bash ~/btreeBlock/j.sh
 END
 
 my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
-   @java = grep {fn($_) !~ /BtreeDM/} @java;                                    # Still working on this so it will not work yet
+#  @java = grep {fn($_) !~ /BtreeDM/} @java;                                    # Still working on this so it will not work yet
 
 if (@java)                                                                      # Write workflow
  {my $d = dateTimeStamp;
