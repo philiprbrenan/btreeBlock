@@ -171,7 +171,7 @@ abstract class BtreePA extends Test                                             
     setLeaf();                                                                  // The root starts as a leaf
   }
 
-  private static BtreePA btreePA(final int leafKeys, int branchKeys)            // Define a test btree with the specified dimensions
+  static BtreePA btreePA(final int leafKeys, int branchKeys)                    // Define a test btree with the specified dimensions
    {return new BtreePA()
      {int maxSize         () {return testMaxSize;}
       int maxKeysPerLeaf  () {return    leafKeys;}
@@ -311,8 +311,8 @@ abstract class BtreePA extends Test                                             
 
 //D1 Components                                                                 // A branch or leaf in the tree
 
-  private Layout.Variable               Key;                                    // Key being found, inserted or deleted
-  private Layout.Variable              Data;                                    // Data associated with the key being inserted
+  public  Layout.Variable               Key;                                    // Key being found, inserted or deleted
+  public  Layout.Variable              Data;                                    // Data associated with the key being inserted
   private Layout.Bit                  found;                                    // Whether the key was found
   private Layout.Variable               key;                                    // Key to insert
   private Layout.Variable              data;                                    // Data associated with the key found
@@ -1874,16 +1874,16 @@ abstract class BtreePA extends Test                                             
 
 //D1 Print                                                                      // Print a BTree horizontally
 
-   private String printBoxed()                                                  // Print a tree in a box
-    {final String  s = toString();
-     final int     n = longestLine(s)-1;
-     final String[]L = s.split("\n");
-     final StringBuilder t = new StringBuilder();
-     t.append("+"); t.append("-".repeat(n)); t.append("+\n");
-     for(String l : L) t.append("| "+l+"\n");
-     t.append("+"); t.append("-".repeat(n)); t.append("+\n");
-     return t.toString();
-    }
+  String printBoxed()                                                           // Print a tree in a box
+   {final String  s = toString();
+    final int     n = longestLine(s)-1;
+    final String[]L = s.split("\n");
+    final StringBuilder t = new StringBuilder();
+    t.append("+"); t.append("-".repeat(n)); t.append("+\n");
+    for(String l : L) t.append("| "+l+"\n");
+    t.append("+"); t.append("-".repeat(n)); t.append("+\n");
+    return t.toString();
+   }
 
   private void padStrings(Stack<StringBuilder> S, int level)                    // Pad the strings at each level of the tree so we have a vertical face to continue with - a bit like Marc Brunel's tunneling shield
    {final int N = level * linesToPrintABranch + maxKeysPerLeaf();               // Number of lines we might want
