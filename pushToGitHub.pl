@@ -142,7 +142,7 @@ jobs:
     - name: Position files in package
       run: |
         mkdir -p $c
-        cp `find .  -name j $c
+        cp $j $c
 
     - name: Files
       run:
