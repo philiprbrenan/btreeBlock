@@ -927,19 +927,8 @@ abstract class BtreeDM extends Test                                             
   private void findEqualInLeaf                                                  // Find the first key in the leaf that is equal to the search key
    (MemoryLayoutDM.At Key, Layout.Variable node_findEqualInLeaf)
    {zz();
-//  if (Assert) {tt(node_assertLeaf, node_findEqualInLeaf); assertLeaf();}
     leafBase(lEqual, node_findEqualInLeaf);
-
-//  lEqual.T.at(lEqual.search).move(T.at(search));
-//  lEqual.T.setIntInstruction(lEqual.limit, 0);
     lEqual.search(Key, T.at(found), T.at(index), T.at(data));
-//  P.parallelStart();
-//    T.at(found).move(lEqual.T.at(lEqual.found));
-//  P.parallelSection();
-//    T.at(index).move(lEqual.T.at(lEqual.index));
-//  P.parallelSection();
-//    T.at(data ).move(lEqual.T.at(lEqual.tData));
-//  P.parallelEnd();
    }
 
   public String findEqualInLeaf_toString()                                      // Print details of find equal in leaf node
