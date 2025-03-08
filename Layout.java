@@ -97,7 +97,13 @@ public class Layout extends Test                                                
        }
      }
 
-    Field get(String path) {z(); return fullNames.get(path);}                   // Address a contained field by name
+    Field get(String path)                                                      // Address a contained field by name
+     {z();
+      final Field f = fullNames.get(path);
+      if (f == null) stop("Cannot find path:"+path);
+      return f;
+     }
+
     abstract void indexNames();                                                 // Set the full names of all the sub fields in a field
 
     int sameSize(Field b)                                                       // Check the specified field is the same size as this field
@@ -381,6 +387,21 @@ public class Layout extends Test                                                
        {zz();
         if (f instanceof Array)
          {zz();
+          arrays.insertElementAt((Array)f, 0);
+         }
+       }
+     }
+
+    Locator(Field Field, boolean debug)                                         // Locate a field
+     {zz();
+      field = Field;
+say("BBBB11", field);
+      for(Field f = field.up; f != null; f = f.up)                              // Convolute path to field with indices of the arrays encountered in the path down to the element but not including the element (which might be an array definition which should be indexed by its parent arrays but not by itself.)
+       {zz();
+say("BBBB22");
+        if (f instanceof Array)
+         {zz();
+say("BBBB33");
           arrays.insertElementAt((Array)f, 0);
          }
        }
