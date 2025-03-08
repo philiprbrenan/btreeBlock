@@ -91,13 +91,10 @@ END
 my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
    @java = grep {fn($_) !~ /BtreeDM/} @java;                                    # Still working on this so it will not work yet
 
-say STDERR "AAAA ", dump(\@java);
-
 if (@java)                                                                      # Write workflow
  {my $d = dateTimeStamp;
   my $c = q(com/AppaApps/Silicon);                                              # Package to classes folder
   my $j = join ', ', @java;                                                     # Java files
-  my $J = join ' ',  @java;                                                     # Java files
   my $y = <<"END";
 # Test $d
 
@@ -145,7 +142,7 @@ jobs:
     - name: Position files in package
       run: |
         mkdir -p $c
-        cp $J $c
+        cp `find .  -name "*.java"` $c
 
     - name: Files
       run:
