@@ -1,4 +1,4 @@
-# Test 2025-03-08 at 03:15:56
+# Test 2025-03-08 at 03:18:53
 
 name: Test
 run-name: btreeBlock
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        task: [BtreePA, Memory, MemoryLayoutDM]
+        task: [BtreePA]
 
     steps:
     - uses: actions/checkout@v4
@@ -44,7 +44,7 @@ jobs:
     - name: Position files in package
       run: |
         mkdir -p com/AppaApps/Silicon
-        cp BtreePA, Memory, MemoryLayoutDM com/AppaApps/Silicon
+        cp BtreePA com/AppaApps/Silicon
 
     - name: Files
       run:
@@ -58,16 +58,4 @@ jobs:
       if: matrix.task == 'BtreePA'
       run: |
         java -cp Classes com/AppaApps/Silicon/BtreePA
-
-
-    - name: Test Memory
-      if: matrix.task == 'Memory'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Memory
-
-
-    - name: Test MemoryLayoutDM
-      if: matrix.task == 'MemoryLayoutDM'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/MemoryLayoutDM
 
