@@ -3,7 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024-2025
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-
+// Double allocation would be faster as allocations are often done in pairs
 import java.util.*;
 import java.nio.file.*;
 
@@ -668,6 +668,11 @@ abstract class BtreeDM extends Test                                             
   private void   setLeaf()  {zz();                   M.at(bTree_isLeaf, T.at(node_setLeaf))  .ones();}  // Set as leaf
   private void setBranch()  {zz();                   M.at(bTree_isLeaf, T.at(node_setBranch)).zero();}  // Set as branch
 
+  void isLeaf(Node Node)                                                        // Whether a node is a leaf
+   {zz();
+    T.at(IsLeaf).move(Node.N.at(isLeaf));
+   }
+
   private MemoryLayoutDM.At ifRootLeaf(Node n)                                  // A variable that indicates whether the root is a leaf
    {zz();
     return n.N.at(isLeaf);
@@ -861,6 +866,25 @@ abstract class BtreeDM extends Test                                             
      };
    }
 
+
+  private void isFull(Node Node)                                                // The node is full
+   {zz();
+    //tt(node_isLeaf, node_isFull);
+    isLeaf(Node);
+    P.new If (T.at(IsLeaf))
+     {void Then()
+       {Node.loadStuck(lSize);
+        lSize.size();
+        lSize.T.at(lSize.currentSize).equal(T.at(maxKeysPerLeaf), T.at(isFull));
+       }
+      void Else()
+       {Node.loadStuck(bSize);
+        bSize.size();
+        bSize.T.at(bSize.currentSize).equal(T.at(maxKeysPerBranch), T.at(isFull));
+       }
+     };
+   }
+
   private void leafIsFull()                                                     // Whether a node known to be a leaf is full
    {zz();
     tt(node_leafSize, node_leafIsFull);
@@ -943,6 +967,14 @@ abstract class BtreeDM extends Test                                             
 
     void saveStuck(StuckDM Stuck)                                               // Save a stuck from a node
      {N.at(branch).copy(Stuck.M);
+     }
+
+    void setLeaf()                                                              // Mark a node as a leaf
+     {N.at(isLeaf).ones();
+     }
+
+    void setBranch()                                                            // Mark a node as a bramch
+     {N.at(isLeaf).zero();
      }
 
     public String toString() {return ""+N;}                                     // As string
@@ -1032,18 +1064,14 @@ abstract class BtreeDM extends Test                                             
 
     P.parallelStart();
       T.at(node_leafBase).zero(); leafBase(lT, node_leafBase);                  // Set address of the referenced root stuck
-    P.parallelSection();
-      leafBase(lL, l);
-    P.parallelSection();
-      leafBase(lR, r);                                                          // Set address of the referenced right leaf stuck
+    P.parallelSection(); leafBase(lL, l);
+    P.parallelSection(); leafBase(lR, r);                                                          // Set address of the referenced right leaf stuck
     P.parallelEnd();
 
     lT.split(lL, lR);                                                           // Split root leaf into child leaves
 
-    P.parallelStart();
-      lR.firstElement();
-    P.parallelSection();
-      lL. lastElement();
+    P.parallelStart();   lR.firstElement();
+    P.parallelSection(); lL. lastElement();
     P.parallelSection();
       T.setIntInstruction(node_setBranch,  root); setBranch();                  // The root is now a branch
     P.parallelSection();
@@ -1052,10 +1080,8 @@ abstract class BtreeDM extends Test                                             
       bT.clear();                                                               // Clear the branch
     P.parallelEnd();
 
-    P.parallelStart();
-      T.at(firstKey).move(lR.T.at(lR.tKey));                                    // First of right leaf
-    P.parallelSection();
-      T.at(lastKey ).move(lL.T.at(lL.tKey));                                    // Last of left leaf
+    P.parallelStart();    T.at(firstKey).move(lR.T.at(lR.tKey));                // First of right leaf
+    P.parallelSection();  T.at(lastKey ).move(lL.T.at(lL.tKey));                // Last of left leaf
     P.parallelEnd();
 
     P.new I()                                                                   // Mid key - keys are likely to be bigger than 31 bits
@@ -1069,17 +1095,13 @@ abstract class BtreeDM extends Test                                             
        }
      };
 
-    P.parallelStart();
-      bT.T.at(bT.tKey ).move(T.at(flKey));
-    P.parallelSection();
-      bT.T.at(bT.tData).move(T.at(l));
+    P.parallelStart();    bT.T.at(bT.tKey ).move(T.at(flKey));
+    P.parallelSection();  bT.T.at(bT.tData).move(T.at(l));
     P.parallelEnd();
     bT.push();                                                                  // Insert left leaf into root
 
-    P.parallelStart();
-      bT.T.at(bT.tKey).zero();
-    P.parallelSection();
-      bT.T.at(bT.tData).move(T.at(r));
+    P.parallelStart();    bT.T.at(bT.tKey).zero();
+    P.parallelSection();  bT.T.at(bT.tData).move(T.at(r));
     P.parallelEnd();
     bT.push();                                                                  // Insert right into root. This will be the top node and so ignored by search ... except last.
    }
@@ -1953,13 +1975,15 @@ abstract class BtreeDM extends Test                                             
        {final ProgramDM.Label Return = end;
         findAndInsert(Return);                                                  // Try direct insertion with no modifications to the shape of the tree
         //P.GoOn(Return, T.at(success));                                        // Inserted or updated successfully
-        T.at(node_isFull).zero(); isFull();                                     // Start the insertion at the root(), after splitting it if necessary
+        //T.at(node_isFull).zero();                                             // Start the insertion at the root(), after splitting it if necessary
+        nT.root();                                                              // Load root
+        isFull(nT);
         P.new If (T.at(isFull))                                                 // Start the insertion at the root(), after splitting it if necessary
          {void Then()
            {//T.at(node_isLeaf).zero();
             isRootLeaf();
             P.new If (T.at(IsLeaf))
-             {void Then() {splitLeafRoot();}
+             {void Then() {splitLeafRoot  ();}
               void Else() {splitBranchRoot();}
              };
             z();
@@ -4215,6 +4239,7 @@ StuckSML(maxSize:4 size:2)
 """);
 
     b.pop();
+    n.setLeaf();
     n.saveStuck(b);
     n.saveRoot();
     t.P.run(); t.P.clear();
@@ -4252,6 +4277,7 @@ StuckSML(maxSize:2 size:2)
     M.at(index).setInt(2);
 
     l.pop();
+    n.setBranch();
     n.saveStuck(l);
     n.save(t.M.at(t.Node, M.at(index)));
     t.P.run(); t.P.clear();
@@ -4271,7 +4297,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    2 V        0         2                                  0     freeList
    3 A        2        90          3                             nodes
    4 S        2        30               0                          node
-   5 B        2         1               0                  0         isLeaf
+   5 B        2         1               0                  1         isLeaf
    6 V        3         2               0                  0         free
    7 U        5        27               0                            branchOrLeaf
    8 S        5        19               0                              leaf
@@ -4319,7 +4345,7 @@ Line T       At      Wide       Size    Indices        Value   Name
   50 V       58         2               1 2                0               data
   51 V       60         2               1 3                0               data
   52 S       62        30               2                          node
-  53 B       62         1               2                  1         isLeaf
+  53 B       62         1               2                  0         isLeaf
   54 V       63         2               2                  0         free
   55 U       65        27               2                            branchOrLeaf
   56 S       65        19               2                              leaf
@@ -4376,7 +4402,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    {//oldTests();
     //test_find();
     //test_find_and_insert();
-    //test_node();
+    test_node();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
