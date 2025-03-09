@@ -597,7 +597,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       final int N = Source.size();
       P.new I()
        {void a()
-         {for(int i = 0; i < N; ++i)
+         {setOff();
+          for(int i = 0; i < N; ++i)
            {final boolean b = Source.getBit(i);
             setBit(i, b);
            }
@@ -614,7 +615,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       final int N = width;
       P.new I()
        {void a()
-         {for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
+         {setOff(); source.setOff();
+          for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
          }
         String v()
          {return verilogLoad()+" <= "+source.verilogLoad()+";";
@@ -1776,7 +1778,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.at(b).setInt(2);
 
     //stop(m);
-    ok(m, """
+    ok(""+m, """
 MemoryLayout: m
 Memory      : m
 Line T       At      Wide       Size    Indices        Value   Name
