@@ -977,6 +977,10 @@ abstract class BtreeDM extends Test                                             
      {N.at(isLeaf).zero();
      }
 
+    void isLeaf(MemoryLayoutDM.At at)                                           // Check for a leaf
+     {at.copy(N.at(isLeaf));
+     }
+
     public String toString() {return ""+N;}                                     // As string
    }
 
@@ -4270,14 +4274,19 @@ StuckSML(maxSize:2 size:2)
   1 key:3 data:3
 """);
 
-
-    final Layout                  L = new Layout();
-    final Layout.Variable index = L.variable("index", 8);
-    final MemoryLayoutDM M = new MemoryLayoutDM(L.compile(), "M");
+    final Layout                    L = new Layout();
+    final Layout.Variable   index = L.variable("index", 8);
+    final Layout.Bit    branchBit = L.bit("branchBit");
+    final Layout.Bit      leafBit = L.bit("leafBit");
+    final Layout.Structure struct = L.structure("struct", index, branchBit, leafBit);
+    final MemoryLayoutDM        M = new MemoryLayoutDM(L.compile(), "M");
+    M.program(t.P);
     M.at(index).setInt(2);
 
     l.pop();
+    n.isLeaf(M.at(leafBit));
     n.setBranch();
+    n.isLeaf(M.at(branchBit));
     n.saveStuck(l);
     n.save(t.M.at(t.Node, M.at(index)));
     t.P.run(); t.P.clear();
@@ -4286,6 +4295,17 @@ StuckSML(maxSize:2 size:2)
     ok(l, """
 StuckSML(maxSize:2 size:1)
   0 key:2 data:2
+""");
+    //stop(M);
+
+    ok(""+M, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        10                                      struct
+   2 V        0         8                                  2     index
+   3 B        8         1                                  0     branchBit
+   4 B        9         1                                  1     leafBit
 """);
 
     //stop(t.M);
