@@ -4347,6 +4347,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   protected static void oldTests()                                              // Tests thought to be in good shape
    {test_find();
+    test_find_and_insert();
     if (true) return;
     test_put_ascending();
     test_put_ascending_wide();
