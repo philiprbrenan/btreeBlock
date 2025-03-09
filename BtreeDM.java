@@ -745,8 +745,7 @@ abstract class BtreeDM extends Test                                             
    {zz();
     P.new I()
      {void a()
-       {say("AAAA", traceBack);
-        if (node_leafBase != null) Stuck.base(M.at(leaf, T.at(node_leafBase)));
+       {if (node_leafBase != null) Stuck.base(M.at(leaf, T.at(node_leafBase)));
         else                       Stuck.base(M.at(leaf, 0)                  );
        }
       String v()
@@ -1870,9 +1869,7 @@ abstract class BtreeDM extends Test                                             
                }
              };
 
-            P.parallelStart();   tt(parent, child);                             // Step down to lower branch
-            P.parallelSection(); P.Goto(start);                                 // Restart search
-            P.parallelEnd();
+            P.Goto(start);                                                      // Restart search one level down
            }
          };
         if (Halt) P.halt("Search did not terminate in a leaf");
@@ -1887,18 +1884,20 @@ abstract class BtreeDM extends Test                                             
        {final ProgramDM.Label Return = end;
         find();
         tt(leafFound, find);                                                    // Find the leaf that should contain this key
-        leafBase(lT, leafFound);
-
+        //leafBase(lT, leafFound);
         P.new If (T.at(found))                                                  // Found the key in the leaf so update it with the new data
          {void Then()
            {z();
-            P.parallelStart();    lT.T.at(lT.tKey ).move(T.at(Key));
-            P.parallelSection();  lT.T.at(lT.tData).move(T.at(Data));
-            P.parallelSection();  lT.T.at(lT.index).move(T.at(index));
+            P.parallelStart();    lEqual.T.at(lEqual.tKey ).move(T.at(Key));
+            P.parallelSection();  lEqual.T.at(lEqual.tData).move(T.at(Data));
+            P.parallelSection();  lEqual.T.at(lEqual.index).move(T.at(index));
             P.parallelEnd();
 
-            P.parallelStart();    lT.setElementAt();
-            P.parallelSection();  T.at(success).ones();
+            lEqual.setElementAt();                                              // Update stuck - we are assuming that the new data element differs from the old one to  justify this action
+            nT.saveStuck(lEqual);                                               // Save the Stuck into the Node
+            nT.save(M.at(Node, T.at(leafFound)));                               // Save the node into memory
+
+            P.parallelStart();    T.at(success).ones();
             P.parallelSection();  T.at(inserted).zero();
             P.parallelSection();  tt(findAndInsert, leafFound);
             P.parallelSection();  P.Goto(Success == null ? Return : Success);
@@ -2744,6 +2743,52 @@ endmodule
     t.T.at(t.Key).setInt(N+1);
     t.P.run();
     ok(t.T.at(t.found).getInt(), 0);
+   }
+
+  private static void test_find_and_insert()
+   {z();
+    final int N = 14;
+    final BtreePA T = BtreePA.btreePA(2, 3);
+    T.P.run(); T.P.clear();
+    T.put();
+    for(int i = 1; i <= N; ++i)
+     {T.T.at(T.Key) .setInt(i);
+      T.T.at(T.Data).setInt(i-1);
+      T.P.run();
+     }
+
+    //stop(T);
+    ok(T, """
+                               8                             |
+                               0                             |
+                               5                             |
+                               6                             |
+      2      4        6                10         12         |
+      5      5.1      5.2              6          6.1        |
+      1      3        4                8          10         |
+                      7                           2          |
+1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=2 |
+""");
+
+    final BtreeDM t = btreeDM(T);
+    t.P.clear();
+
+    t.findAndInsert(null);
+
+    for(int i = 1; i <= N; ++i)
+     {t.T.at(t.Key) .setInt(i);
+      t.T.at(t.Data).setInt(i);
+      t.P.run();
+     }
+
+    t.P.clear();
+    t.find();
+    for(int i = 1; i <= N; ++i)
+     {t.T.at(t.Key) .setInt(i);
+      t.P.run();
+      ok(t.T.at(t.found).getInt(), 1);
+      ok(t.T.at(t.data) .getInt(), i);
+     }
    }
 
   private static void test_find_and_update()
@@ -4200,9 +4245,15 @@ StuckSML(maxSize:2 size:2)
   1 key:3 data:3
 """);
 
+
+    final Layout                  L = new Layout();
+    final Layout.Variable index = L.variable("index", 8);
+    final MemoryLayoutDM M = new MemoryLayoutDM(L.compile(), "M");
+    M.at(index).setInt(2);
+
     l.pop();
     n.saveStuck(l);
-    n.save(t.M.at(t.Node, 2));
+    n.save(t.M.at(t.Node, M.at(index)));
     t.P.run(); t.P.clear();
     //stop(l);
 
@@ -4212,7 +4263,7 @@ StuckSML(maxSize:2 size:1)
 """);
 
     //stop(t.M);
-    ok(t.M, """
+    ok(""+t.M, """
 MemoryLayout: M
 Memory      : M
 Line T       At      Wide       Size    Indices        Value   Name
@@ -4322,7 +4373,8 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_find();
+    //test_find();
+    //test_find_and_insert();
     //test_node();
    }
 
