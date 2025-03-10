@@ -2170,8 +2170,7 @@ abstract class BtreePA extends Test                                             
     P.new Block()                                                               // Step down through the tree, splitting as we go
      {void code()
        {final ProgramPA.Label Return = end;
-        T.at(node_mergeRoot).zero(); mergeRoot();
-
+        mergeRoot();
 
         P.new Block()                                                           // Find and delete directly in root as a leaf
          {void code()
@@ -3674,7 +3673,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest_allTreeOps(3, 6, 398, """
+    t.runVerilogDeleteTest_allTreeOps(3, 6, 397, """
                     6           |
                     0           |
                     5           |
@@ -3686,7 +3685,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(4, 5, 339, """
+    t.runVerilogDeleteTest_allTreeOps(4, 5, 338, """
              6           |
              0           |
              5           |
@@ -3698,7 +3697,7 @@ endmodule
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(2, 7, 361, """
+    t.runVerilogDeleteTest_allTreeOps(2, 7, 360, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3706,7 +3705,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(1, 8, 284, """
+    t.runVerilogDeleteTest_allTreeOps(1, 8, 283, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3714,7 +3713,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(5, 4, 173, """
+    t.runVerilogDeleteTest_allTreeOps(5, 4, 172, """
       7      |
       0      |
       1      |
@@ -3722,7 +3721,7 @@ endmodule
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(6, 3, 180, """
+    t.runVerilogDeleteTest_allTreeOps(6, 3, 179, """
     7      |
     0      |
     1      |
@@ -3730,15 +3729,15 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(7, 2, 208, """
+    t.runVerilogDeleteTest_allTreeOps(7, 2, 207, """
 8,9=0 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(8, 1, 22, """
+    t.runVerilogDeleteTest_allTreeOps(8, 1, 21, """
 9=0 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(9, 0, 22, """
+    t.runVerilogDeleteTest_allTreeOps(9, 0, 21, """
 =0 |
 """);
    }
@@ -3786,7 +3785,7 @@ endmodule
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest_superSmall(3, 1, 398, """
+    t.runVerilogDeleteTest_superSmall(3, 1, 397, """
                     6           |
                     0           |
                     5           |
@@ -3798,7 +3797,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_superSmall(4, 2, 378, """
+    t.runVerilogDeleteTest_superSmall(4, 2, 377, """
              5           |
              0           |
              5           |
@@ -3809,7 +3808,7 @@ endmodule
       3           2      |
 """);
 
-    t.runVerilogDeleteTest_superSmall(2, 1, 313, """
+    t.runVerilogDeleteTest_superSmall(2, 1, 312, """
       1      6        |
       0      0.1      |
       1      3        |
@@ -3817,7 +3816,7 @@ endmodule
 0,1=1  5,6=3    7,8=2 |
 """);
 
-    t.runVerilogDeleteTest_superSmall(1, 0, 219, """
+    t.runVerilogDeleteTest_superSmall(1, 0, 218, """
     1      6        |
     0      0.1      |
     1      3        |
@@ -3825,7 +3824,7 @@ endmodule
 0=1  5,6=3    7,8=2 |
 """);
 
-    t.runVerilogDeleteTest_superSmall(5, 2, 173, """
+    t.runVerilogDeleteTest_superSmall(5, 2, 172, """
     6      |
     0      |
     1      |
@@ -3833,7 +3832,7 @@ endmodule
 0=1  7,8=2 |
 """);
 
-    t.runVerilogDeleteTest_superSmall(6, 3, 180, """
+    t.runVerilogDeleteTest_superSmall(6, 3, 179, """
     7      |
     0      |
     1      |
@@ -3841,15 +3840,15 @@ endmodule
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_superSmall(7, 3, 168, """
+    t.runVerilogDeleteTest_superSmall(7, 3, 167, """
 0,8=0 |
 """);
 
-    t.runVerilogDeleteTest_superSmall(8, 4, 22, """
+    t.runVerilogDeleteTest_superSmall(8, 4, 21, """
 0=0 |
 """);
 
-    t.runVerilogDeleteTest_superSmall(0, 0, 22, """
+    t.runVerilogDeleteTest_superSmall(0, 0, 21, """
 =0 |
 """);
    }
