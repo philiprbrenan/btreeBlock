@@ -875,25 +875,6 @@ abstract class BtreeDM extends Test                                             
      };
    }
 
-
-  private void isFull(Node Node)                                                // The node is full
-   {zz();
-    //tt(node_isLeaf, node_isFull);
-    isLeaf(Node);
-    P.new If (T.at(IsLeaf))
-     {void Then()
-       {Node.loadStuck(lSize);
-        lSize.size();
-        lSize.T.at(lSize.currentSize).equal(T.at(maxKeysPerLeaf), T.at(isFull));
-       }
-      void Else()
-       {Node.loadStuck(bSize);
-        bSize.size();
-        bSize.T.at(bSize.currentSize).equal(T.at(maxKeysPerBranch), T.at(isFull));
-       }
-     };
-   }
-
   private void leafIsFull()                                                     // Whether a node known to be a leaf is full
    {zz();
     tt(node_leafSize, node_leafIsFull);
@@ -1036,6 +1017,20 @@ abstract class BtreeDM extends Test                                             
 
     void copy(Node source)                                                      // Copy the memory of another node
      {N.memory().copy(source.N.memory());
+     }
+
+    void isFull()                                                               // Set isFull to show whether the node is full or not, incidentlly setting IsLeaf as well
+     {zz();
+      isLeaf(T.at(IsLeaf));
+      size(T.at(childSize));
+      P.new If (T.at(IsLeaf))
+       {void Then()
+         {T.at(childSize).equal(T.at(maxKeysPerLeaf),   T.at(isFull));
+         }
+        void Else()
+         {T.at(childSize).equal(T.at(maxKeysPerBranch), T.at(isFull));
+         }
+       };
      }
 
     public String toString() {return ""+N;}                                     // As string
@@ -1918,7 +1913,7 @@ abstract class BtreeDM extends Test                                             
        {final ProgramDM.Label Return = end;
         findAndInsert(Return);                                                  // Try direct insertion with no modifications to the shape of the tree
         nT.loadRoot();                                                              // Load root
-        isFull(nT);
+        nT.isFull();
         P.new If (T.at(isFull))                                                 // Start the insertion at the root(), after splitting it if necessary
          {void Then()
            {nT.isLeaf(T.at(IsLeaf));
@@ -2057,26 +2052,19 @@ abstract class BtreeDM extends Test                                             
        {final ProgramDM.Label Return = end;
         mergeRoot();
 
-        P.parallelStart();   T.at(parent).zero();                               // Start at root
-        P.parallelSection(); T.at(mergeDepth).zero();
-        P.parallelEnd();
+        nT.loadRoot();                                                          // Start at root
+        T.at(parent).move(T.at(root));
 
         P.new Block()                                                           // Step down through the tree, splitting as we go
          {void code()
-           {T.at(mergeDepth).inc();
-            T.at(mergeDepth).greaterThan(T.at(MaxDepth), T.at(pastMaxDepth));
-            P.GoOn(end, T.at(pastMaxDepth));                                    // Prevent runaway searches
-
-            tt(node_isLeaf, parent);
-            isLeaf(T.at(parent));
+           {nT.isLeaf(T.at(IsLeaf));
             P.GoOn(Return, T.at(IsLeaf));                                       // Reached a leaf
 
             T.at(mergeIndex).zero();                                            // Index of child being merged
             P.new Block()                                                       // Try merging each sibling pair which might change the size of the parent
              {void code()
-               {tt(node_branchSize, parent);
-                branchSize();
-                T.at(mergeIndex).greaterThanOrEqual(T.at(branchSize), T.at(nodeMerged));
+               {nT.size(T.at(childSize))
+                T.at(mergeIndex).greaterThanOrEqual(T.at(childSize), T.at(nodeMerged));
                 P.GoOn(end, T.at(nodeMerged));                                  // All sequential pairs of siblings have been offered a chance to merge
 
                 P.parallelStart();  T.at(index).move(T.at(mergeIndex));
