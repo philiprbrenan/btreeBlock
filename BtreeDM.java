@@ -1987,7 +1987,7 @@ abstract class BtreeDM extends Test                                             
      {void code()
        {find();                                                                 // Try direct insertion with no modifications to the shape of the tree
         P.GoOff(end, T.at(found));                                              // Key not found so nothing to delete
-        z(); leafBase(lT, find);                                                // The leaf that contains the key
+        z(); nT.loadStuck(lT, find);                                            // The leaf that contains the key
         lT.T.at(lT.index).move(T.at(index));
         lT.elementAt();                                                         // Position in the leaf of the key
         T.at(Data).move(lT.T.at(lT.tData));                                     // Key, data pairs in the leaf
@@ -2015,21 +2015,11 @@ abstract class BtreeDM extends Test                                             
            }
          };
 
-        P.parallelStart();   T.at(parent)     .zero();                          // Start at root
-        P.parallelSection(); //T.at(deleteDepth).zero();
-        P.parallelEnd();
+        T.at(parent).zero();                                                    // Start at root
 
         P.new Block()                                                           // Step down through the tree, splitting as we go
          {void code()
-           {//T.at(deleteDepth).inc();
-            //T.at(deleteDepth).greaterThan(T.at(MaxDepth), T.at(pastMaxDepth));
-            //P.GoOn(end, T.at(pastMaxDepth));                                    // Prevent runaway searches
-
-            //P.parallelStart();   tt(search, Key);
-            //P.parallelSection(); tt(node_findFirstGreaterThanOrEqualInBranch, parent);
-            //P.parallelEnd();
-
-            findFirstGreaterThanOrEqualInBranch(parent, T.at(Key), null, T.at(first), T.at(child));
+           {findFirstGreaterThanOrEqualInBranch(parent, T.at(Key), null, T.at(first), T.at(child));
 
             P.parallelStart();   tt(index, first);
             P.parallelSection(); tt(node_balance, parent);
@@ -2037,10 +2027,6 @@ abstract class BtreeDM extends Test                                             
             /// Load nT/bT with node to balance
             augment();                                                          // Make sure there are enough entries in the parent to permit a deletion
 
-            //P.parallelStart();   tt(child,       next);
-            //P.parallelSection(); tt(node_isLeaf, next);
-            //P.parallelSection(); isLeaf(T.at(next));
-            //P.parallelEnd();
             isLeaf(T.at(child));
 
             P.new If (T.at(IsLeaf))                                             // Reached a leaf
