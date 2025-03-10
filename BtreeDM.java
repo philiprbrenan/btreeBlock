@@ -2001,9 +2001,9 @@ abstract class BtreeDM extends Test                                             
     P.new Block()                                                               // Step down through the tree, splitting as we go
      {void code()
        {final ProgramDM.Label Return = end;
-        T.at(node_mergeRoot).zero(); mergeRoot();
-
+        mergeRoot();
         nT.loadRoot();
+
         P.new Block()                                                           // Find and delete directly in root as a leaf
          {void code()
            {P.GoOff(end, ifRootLeaf(nT));
@@ -2019,16 +2019,17 @@ abstract class BtreeDM extends Test                                             
 
         P.new Block()                                                           // Step down through the tree, splitting as we go
          {void code()
-           {findFirstGreaterThanOrEqualInBranch(parent, T.at(Key), null, T.at(first), T.at(child));
+           {findFirstGreaterThanOrEqualInBranch
+             (nT, T.at(Key), null, T.at(first), T.at(child));
 
             P.parallelStart();   tt(index, first);
             P.parallelSection(); tt(node_balance, parent);
             P.parallelEnd();
-            /// Load nT/bT with node to balance
+
             augment();                                                          // Make sure there are enough entries in the parent to permit a deletion
 
-            isLeaf(T.at(child));
-
+            nC.loadNode(T.at(child));
+            nC.isLeaf(T.at(IsLeaf));
             P.new If (T.at(IsLeaf))                                             // Reached a leaf
              {void Then()
                {z();
@@ -2038,9 +2039,8 @@ abstract class BtreeDM extends Test                                             
                 P.Goto(Return);
                }
              };
-            P.parallelStart();   tt(parent, child);
-            P.parallelSection(); P.Goto(start);
-            P.parallelEnd();
+            nT.copy(nC);
+            P.Goto(start);
            }
          };
         if (Halt) P.halt("Fallen off the end of the tree");                     // The tree must be missing a leaf
