@@ -2051,13 +2051,12 @@ abstract class BtreeDM extends Test                                             
      {void code()
        {final ProgramDM.Label Return = end;
         mergeRoot();
-
-        nT.loadRoot();                                                          // Start at root
-        T.at(parent).zero();
+        T.at(parent).zero();                                                    // Start at root
 
         P.new Block()                                                           // Step down through the tree, splitting as we go
          {void code()
-           {nT.isLeaf(T.at(IsLeaf));
+           {nT.loadStuck(bT, parent);
+            nT.isLeaf(T.at(IsLeaf));
             P.GoOn(Return, T.at(IsLeaf));                                       // Reached a leaf
 
             T.at(mergeIndex).zero();                                            // Index of child being merged
@@ -2087,11 +2086,8 @@ abstract class BtreeDM extends Test                                             
                 P.Goto(start);
                }
              };
-            //P.parallelStart();   tt(search, Key);
-            //P.parallelSection(); tt(node_findFirstGreaterThanOrEqualInBranch, parent);
-            //P.parallelEnd();
 
-            findFirstGreaterThanOrEqualInBranch(parent, T.at(Key), null, null, T.at(next));                              // Step down
+            findFirstGreaterThanOrEqualInBranch(nT, T.at(Key), null, null, T.at(next));  // Step down
 
             P.parallelStart();   tt(parent, next);
             P.parallelSection(); P.Goto(start);
