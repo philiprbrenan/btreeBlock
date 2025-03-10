@@ -4,6 +4,9 @@
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
 // Double allocation would be faster as allocations are often done in pairs
+// Node confirm that a load or a save identified by the trace back is actually changing the node - eliminate this that never have an effect
+// Stuck - get penultimate element. Use currentSize field directly instead of copy in it to a temporary variable
+// Merge*Sibling place free at end in a parallel
 import java.util.*;
 import java.nio.file.*;
 
@@ -36,6 +39,7 @@ abstract class BtreeDM extends Test                                             
   Layout.Structure bTree;                                                       // Btree
   Layout.Field     bTree_free;                                                  // Free list in node observed from btree main memory and thus likely to add to memory congestion unless separated out into a spearate memory block
   Layout.Field     bTree_isLeaf;                                                // Is a leaf in node observed from btree main memory and thus likely to add to memory congestion unless separated out into a spearate memory block
+  Layout.Field     node_size;                                                   // Size of a node observed from a node
 
   Layout           nodeLayout;                                                  // Layout of a node in the btree
 
@@ -87,9 +91,10 @@ abstract class BtreeDM extends Test                                             
   final StuckDM lL;                                                             // Process a left node
   final StuckDM lR;                                                             // Process a right node
 
-  final Node nT;                                                                // Memory sufficient to contain a single node
-  final Node nL;                                                                // Memory sufficient to contain a single node
-  final Node nR;                                                                // Memory sufficient to contain a single node
+  final Node nT;                                                                // Memory sufficient to contain a single parent node
+  final Node nL;                                                                // Memory sufficient to contain a single left node
+  final Node nR;                                                                // Memory sufficient to contain a single right node
+  final Node nC;                                                                // Memory sufficient to contain a single child node - equated to a left node until we dicover teh need for a separate memory area
 
   boolean debug = false;                                                        // Debugging enabled
 
@@ -175,7 +180,7 @@ abstract class BtreeDM extends Test                                             
     setLeaf();                                                                  // The root starts as a leaf
 
     nT = new Node("nT");
-    nL = new Node("nL");
+    nL = new Node("nL"); nC = nL;
     nR = new Node("nR");
   }
 
@@ -246,7 +251,9 @@ abstract class BtreeDM extends Test                                             
     isLeaf       = l.bit      ("isLeaf");
     free         = l.variable ("free",         btree.bitsPerNext);
     Node         = l.structure("node",         isLeaf, free, branchOrLeaf);
-    return nodeLayout = l.compile();
+    nodeLayout   = l.compile();
+    node_size    = l.get("branchOrLeaf.branch.size");                           // Relies on size being in the same position and having the same size in branches and leaves
+    return nodeLayout;
    }
 
   Layout layout()                                                               // Layout describing memory used by btree
@@ -409,6 +416,7 @@ abstract class BtreeDM extends Test                                             
   private Layout.Variable        branchBase;                                    // The offset of a branch in memory
   private Layout.Variable          leafSize;                                    // Number of children in body of leaf
   private Layout.Variable        branchSize;                                    // Number of children in body of branch taking top for granted as it is always there
+  private Layout.Variable         childSize;                                    // Number of children in body of a child node that might be a branch or a leaf - fortuately the size field of a stuck is in the same location reagrdless of whether it represents a leaf or a branch
   private Layout.Variable               top;                                    // The top next element of a branch - only used in printing
                                                                                 // Find, insert, delete - the public entry points to this module
   private Layout.Variable              find;                                    // Results of a find operation
@@ -511,7 +519,7 @@ abstract class BtreeDM extends Test                                             
 
                                   branchBase = L.variable ("branchBase"                                    , bitsPerAddress);
                                     leafSize = L.variable ("leafSize"                                      , bitsPerSize);
-                                  branchSize = L.variable ("branchSize"                                    , bitsPerSize);
+                      childSize = branchSize = L.variable ("branchSize"                                    , bitsPerSize);
                                          top = L.variable ("top"                                           , bitsPerNext);
 
                                          Key = L.variable ("Key"                                           , bitsPerKey());
@@ -609,6 +617,7 @@ abstract class BtreeDM extends Test                                             
 
       branchBase,
       leafSize,
+      //childSize
       branchSize,
       top,
       Key,
@@ -933,22 +942,22 @@ abstract class BtreeDM extends Test                                             
 
 //D2 Node                                                                       // Description of a node
 
-  class Node                                                                    // Node
+  class Node                                                                    // Node in a btree. Assumes that both leaves and branches occupy the same amount of memory and compute their size in the same way avoiding the need to differentiate between the two.
    {final String      name;
     final MemoryLayoutDM N;
 
-    Node(String Name)
+    Node(String Name)                                                           // Create a node.
      {name = Name;
       N = new MemoryLayoutDM(nodeLayout, name);
       N.program(P);
      }
 
-    void root()                                                                 // Load with the node describing a root
+    void loadRoot()                                                             // Load with the node describing a root
      {final MemoryLayoutDM.At source = M.at(Node, 0);                           // Node zero is always the root
       N.copy(source);
      }
 
-    void load(MemoryLayoutDM.At at)                                             // Load with the node addressed by this variable
+    void loadNode(MemoryLayoutDM.At at)                                         // Load with the node addressed by this variable
      {N.copy(at);
      }
 
@@ -957,16 +966,56 @@ abstract class BtreeDM extends Test                                             
       target.copy(N);
      }
 
-    void save(MemoryLayoutDM.At at)                                             // Load with the node addressed by this variable
+    void saveNode(MemoryLayoutDM.At at)                                         // Load with the node addressed by this variable
      {at.copy(N);
      }
 
+    void loadRootStuck(StuckDM Stuck)                                           // Load a root stuck from main memory
+     {loadRoot();
+      loadStuck(Stuck);
+     }
+
     void loadStuck(StuckDM Stuck)                                               // Load a stuck from a node
-     {Stuck.M.copy(N.at(branch));
+     {Stuck.M.copy(N.at(branchOrLeaf));
+     }
+
+    void loadStuck(StuckDM Stuck, Layout.Variable at)                           // Load a stuck from indexed main memory
+     {loadNode(M.at(Node, T.at(at)));
+      loadStuck(Stuck);
+     }
+
+    void loadRootStuckAndSize(StuckDM Stuck, Layout.Variable size)              // Load the root from memory and get its size
+     {loadRootStuck(Stuck);                                                     // Load stuck from node memory
+      Stuck.size();                                                             // Get size - relies on the fact that both leaves and branches have their size computed in the same way
+      T.at(size).move(Stuck.T.at(size));                                        // Save size
+     }
+
+    void loadLeafStuckAndSize                                                   // Load a stuck from the node memory and store its size in a temporary variable,
+     (StuckDM Stuck, Layout.Variable at, Layout.Variable size)
+     {loadStuck(Stuck);                                                         // Load stuck from node memory
+      Stuck.size();                                                             // Get size - relies on the fact that both leaves and branches have their size computed in the same way
+      T.at(size).move(Stuck.T.at(size));                                        // Save size
+     }
+
+    void loadBranchStuckAndSize                                                 // Load a stuck from indexed main memory and store its size in a temporary variable,
+     (StuckDM Stuck, Layout.Variable at, Layout.Variable size)
+     {loadStuck(Stuck, at);
+      Stuck.size();                                                             // Get size - relies on teh fact that both leaves and branches have their size computed in the same way
+      T.at(size).add(Stuck.T.at(size), -1);                                     // Account for top
+     }
+
+    void saveRootStuck(StuckDM Stuck)                                           // Save root stuck into main memory
+     {saveStuck(Stuck);
+      saveRoot();
      }
 
     void saveStuck(StuckDM Stuck)                                               // Save a stuck from a node
-     {N.at(branch).copy(Stuck.M);
+     {N.at(branchOrLeaf).copy(Stuck.M);
+     }
+
+    void saveStuck(StuckDM Stuck, Layout.Variable at)                           // Save a stuck into indexed main memory
+     {saveStuck(Stuck);
+      saveNode(M.at(Node, T.at(at)));
      }
 
     void setLeaf()                                                              // Mark a node as a leaf
@@ -979,6 +1028,10 @@ abstract class BtreeDM extends Test                                             
 
     void isLeaf(MemoryLayoutDM.At at)                                           // Check for a leaf
      {at.copy(N.at(isLeaf));
+     }
+
+    void size(MemoryLayoutDM.At at)                                             // Get size of stuck
+     {at.copy(N.at(node_size));                                                 // Relies on size being in the same position and having the same size in both branches and leaves
      }
 
     public String toString() {return ""+N;}                                     // As string
@@ -1049,39 +1102,20 @@ abstract class BtreeDM extends Test                                             
 
   private void splitLeafRoot()                                                  // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
    {zz();
-    if (Assert)                                                                 // Assert that we are indeed  on a leaf
-     {T.setIntInstruction(node_assertLeaf, root);
-      assertLeaf();
-     }
-    if (Halt)                                                                   // Confirm that the leaf is full and tso can be split
-     {T.setIntInstruction(node_leafIsFull, root);
-      leafIsFull();
-      P.new If (T.at(leafIsFull))
-       {void Else()
-         {P.halt("Root is not full");
-         }
-       };
-     }
-
     allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
     allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
 
-    P.parallelStart();
-      T.at(node_leafBase).zero(); leafBase(lT, node_leafBase);                  // Set address of the referenced root stuck
-    P.parallelSection(); leafBase(lL, l);
-    P.parallelSection(); leafBase(lR, r);                                                          // Set address of the referenced right leaf stuck
+    P.parallelStart();   nT.loadRootStuck(lT);                                  // Load root
+    P.parallelSection(); nL.loadStuck(lL, l);                                   // Clear left stuck
+    P.parallelSection(); nR.loadStuck(lR, r);                                   // Clear right stuck
     P.parallelEnd();
 
     lT.split(lL, lR);                                                           // Split root leaf into child leaves
 
-    P.parallelStart();   lR.firstElement();
-    P.parallelSection(); lL. lastElement();
-    P.parallelSection();
-      T.setIntInstruction(node_setBranch,  root); setBranch();                  // The root is now a branch
-    P.parallelSection();
-      T.setIntInstruction(node_branchBase, root);
-      branchBase(bT, node_branchBase);                                          // Set address of the referenced leaf stuck
-      bT.clear();                                                               // Clear the branch
+    P.parallelStart();   lR.firstElement();                                     // First of right
+    P.parallelSection(); lL. lastElement();                                     // Lat of left
+    P.parallelSection(); nT.setBranch();                                        // The root is a branch
+    P.parallelSection(); bT.clear();                                            // Clear the root
     P.parallelEnd();
 
     P.parallelStart();    T.at(firstKey).move(lR.T.at(lR.tKey));                // First of right leaf
@@ -1108,111 +1142,68 @@ abstract class BtreeDM extends Test                                             
     P.parallelSection();  bT.T.at(bT.tData).move(T.at(r));
     P.parallelEnd();
     bT.push();                                                                  // Insert right into root. This will be the top node and so ignored by search ... except last.
+
+    P.parallelStart();    nT.saveRootStuck(bT);
+    P.parallelSection();  nL.saveStuck(lL, l);
+    P.parallelSection();  nR.saveStuck(lR, r);
+    P.parallelEnd();
+
    }
 
   private void splitBranchRoot()                                                // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
    {zz();
-    if (Assert) {T.setIntInstruction(node_assertBranch, root); assertBranch();}
-    if (Halt)                                                                   // Confirm the root is fiull
-     {T.setIntInstruction(node_branchIsFull, root); branchIsFull();
-      P.new If (T.at(branchIsFull))
-       {void Else()
-         {P.halt("Root is not full");
-         }
-       };
-     }
-    z();
-
     allocBranch(); tt(l, allocBranch);                                          // New left branch
     allocBranch(); tt(r, allocBranch);                                          // New right branch
 
-    P.parallelStart();   T.setIntInstruction(node_branchBase, root);            // Set address of the referenced branch stuck
-                         branchBase(bT, node_branchBase);
-    P.parallelSection(); branchBase(bL, l);
-    P.parallelSection(); branchBase(bR, r);
+    P.parallelStart();   nT.loadRootStuck(bT);                                  // Load root
+    P.parallelSection(); nL.loadStuck(bL, l);                                   // Clear left stuck
+    P.parallelSection(); nR.loadStuck(bR, r);                                   // Clear right stuck
     P.parallelEnd();
 
     bT.split(bL, bR);                                                           // Split the root as a branch
 
-    P.parallelStart();
-      bL.T.setIntInstruction(bL.tKey, 0);
-    P.parallelSection();
-      bT.T.setIntInstruction(bT.index, splitBranchSize);
+    P.parallelStart();   bL.T.setIntInstruction(bL.tKey, 0);                    // Left top components
+    P.parallelSection(); bT.T.setIntInstruction(bT.index, splitBranchSize);
     P.parallelEnd();
-
     bT.elementAt();
 
-    P.parallelStart();
-      T.at(parentKey)  .move(bT.T.at(bT.tKey));
-    P.parallelSection();
-      bL.T.at(bL.tData).move(bT.T.at(bT.tData));
-    P.parallelSection();
-      bL.T.setIntInstruction(bL.index, splitBranchSize);
+    P.parallelStart();   T.at(parentKey)  .move(bT.T.at(bT.tKey));              // Set left top
+    P.parallelSection(); bL.T.at(bL.tData).move(bT.T.at(bT.tData));
+    P.parallelSection(); bL.T.setIntInstruction(bL.index, splitBranchSize);
     P.parallelEnd();
-
     bL.setElementAt();
+                                                                                // Right top components
     bR.T.setIntInstruction(bR.tKey, 0);
     bT.lastElement();
 
-    P.parallelStart();
-      bR.T.at(bR.tData).move(bT.T.at(bT.tData));
-    P.parallelSection();
-      bR.T.setIntInstruction(bR.index, splitBranchSize);
+    P.parallelStart();   bR.T.at(bR.tData).move(bT.T.at(bT.tData));             // Set right top
+    P.parallelSection(); bR.T.setIntInstruction(bR.index, splitBranchSize);
     P.parallelEnd();
     bR.setElementAt();
 
-    P.parallelStart();
-      bT.clear();                                                               // Refer to new branches from root
-    P.parallelSection();
-      bT.T.at(bT.tKey) .move(T.at(parentKey));
-    P.parallelSection();
-      bT.T.at(bT.tData).move(T.at(l));
+    P.parallelStart();   bT.clear();                                            // Refer to new branches from root
+    P.parallelSection(); bT.T.at(bT.tKey) .move(T.at(parentKey));
+    P.parallelSection(); bT.T.at(bT.tData).move(T.at(l));
     P.parallelEnd();
     bT.push();
 
-    P.parallelStart();
-      bT.T.at(bT.tKey ).zero();
-    P.parallelSection();
-      bT.T.at(bT.tData).move(T.at(r));
+    P.parallelStart();   bT.T.at(bT.tKey ).zero();
+    P.parallelSection(); bT.T.at(bT.tData).move(T.at(r));
     P.parallelEnd();
     bT.push();                                                                  // Becomes top and so ignored by search ... except last
+
+    P.parallelStart();   nT.saveRootStuck(bT);
+    P.parallelSection(); nL.saveStuck(bL, l);
+    P.parallelSection(); nR.saveStuck(bR, r);
+    P.parallelEnd();
    }
 
   private void splitLeaf()                                                      // Split a leaf which is not the root
    {zz();
-    if (Assert) {tt(node_assertLeaf, node_splitLeaf); assertLeaf();}
-    if (Halt) P.new If (T.at(node_splitLeaf))
-     {void Else()
-       {P.halt("Cannot split root with this method");
-       }
-     };
-
-    if (Halt)
-     {tt(node_leafSize,   node_splitLeaf); leafSize();
-      tt(node_leafIsFull, node_splitLeaf); leafIsFull();
-
-      P.new If (T.at(leafIsFull))
-       {void Else()
-         {P.halt("Leaf is not full");
-         }
-       };
-     }
-
-    if (Halt)
-     {tt(node_branchIsFull, splitParent); branchIsFull();
-      P.new If (T.at(branchIsFull))
-       {void Then()
-         {P.halt("Leaf split parent must not be full");
-         }
-       };
-     }
-
     allocLeaf(); tt(l, allocLeaf);                                              // New  split out leaf
 
-    P.parallelStart();
-      leafBase(lL, l);
-    P.parallelSection();
-      leafBase(lR, node_splitLeaf);
+    P.parallelStart();   nL.loadStuck(lL);                                      // Clear the left stuck - perhaps unnecessary
+    P.parallelSection(); nR.loadStuck(lR, node_splitLeaf);                      // Load stuck on right to be split
     P.parallelEnd();
 
     lR.splitLow(lL);                                                            // Split out the lower half
@@ -1221,7 +1212,6 @@ abstract class BtreeDM extends Test                                             
     P.parallelSection(); lL. lastElement();
     P.parallelSection(); branchBase(bT, splitParent);                           // The parent branch
     P.parallelEnd();
-
 
     P.parallelStart();
       P.new I()                                                                 // Splitting key
@@ -1235,60 +1225,39 @@ abstract class BtreeDM extends Test                                             
                  lL.T.at(lL.tKey).verilogLoad() + ") / 2;";
          }
        };
-    P.parallelSection();
-      bT.T.at(bT.tData).move(T.at(l));
-    P.parallelSection();
-      bT.T.at(bT.index).move(T.at(index));
+    P.parallelSection(); bT.T.at(bT.tData).move(T.at(l));                       // Insert splitting key into parent
+    P.parallelSection(); bT.T.at(bT.index).move(T.at(index));
     P.parallelEnd();
-    bT.insertElementAt();                                                       // Insert new key, next pair in parent
+    bT.insertElementAt();                                                       // Insert new key, next pair into parent
+
+    P.parallelStart();   nT.saveRootStuck(bT);
+    P.parallelSection(); nL.saveStuck(lL, l);
+    P.parallelSection(); nR.saveStuck(lR, node_splitLeaf);
+    P.parallelEnd();
    }
 
   private void splitBranch()                                                    // Split a branch which is not the root by splitting right to left
    {zz();
-    if (Assert) {tt(node_assertBranch, node_splitBranch); assertBranch();}
-    if (Halt)
-     {tt(node_branchSize, node_splitBranch); branchSize();
-      P.new If (T.at(node_splitBranch))
-       {void Else()
-         {P.halt("Cannot split root with this method");
-         }
-       };
-     }
-
-    if (Halt)
-     {tt(node_branchIsFull, node_splitBranch); branchIsFull();
-      P.new If (T.at(branchIsFull))
-       {void Else()
-         {P.halt("Branch is not full");
-         }
-       };
-     }
-
-    if (Halt)
-     {tt(node_branchIsFull, splitParent); branchIsFull();
-      P.new If (T.at(branchIsFull))
-       {void Then()
-         {P.halt("Branch split parent must not be full");
-         }
-       };
-     }
-
-    z();
     allocBranch(); tt(l, allocBranch);
 
-    P.parallelStart();    branchBase(bT, splitParent);                          // The parent branch
-    P.parallelSection();  branchBase(bL, l);
-    P.parallelSection();  branchBase(bR, node_splitBranch);
+    P.parallelStart();    nT.loadStuck(bT, splitParent);                        // The parent branch
+    P.parallelSection();  nL.loadStuck(bL, l);                                  // Clear left stuck -perhaps unnecessary
+    P.parallelSection();  nR.loadStuck(bR, node_splitBranch);                   // Load right stuck to be split
     P.parallelEnd();
 
-    bR.splitLow(bL);
+    bR.splitLow(bL);                                                            // Split right
     bL.zeroLastKey();
 
-    P.parallelStart();    bT.T.at(bT.tKey ).move(bL.T.at(bL.tKey));
+    P.parallelStart();    bT.T.at(bT.tKey ).move(bL.T.at(bL.tKey));             // Insert splitting key into parent
     P.parallelSection();  bT.T.at(bT.tData).move(T.at(l));
     P.parallelSection();  bT.T.at(bT.index).move(T.at(index));
     P.parallelEnd();
     bT.insertElementAt();
+
+    P.parallelStart();   nT.saveRootStuck(bT);
+    P.parallelSection(); nL.saveStuck(bL, l);
+    P.parallelSection(); nR.saveStuck(bR, node_splitBranch);
+    P.parallelEnd();
    }
 
   private void stealNotPossible(ProgramDM.Label end)                            // Cannot perform the requested steal
@@ -1302,40 +1271,33 @@ abstract class BtreeDM extends Test                                             
    }
 
   private void stealFromLeft()                                                  // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
-   {zz();
+   {zz();                                                                       // Assume that index has the node wanting to steal from the left and that the parent branch is fully loaded in to nT/bT while being indexed by node_stealFromLeft
     P.new Block()
      {void code()
-       {if (Assert) {tt(node_assertBranch, node_stealFromLeft); assertBranch();}
-        P.new If (T.at(index))                                                  // Nothing on the left to steal from
+       {P.new If (T.at(index))                                                  // Nothing on the left to steal from
          {void Else()
            {T.at(stolenOrMerged).zero();
             P.Goto(end);
            }
          };
 
-        branchBase(bT, node_stealFromLeft);
+        //nT.loadStuck(bT, node_stealFromLeft);                                 // Parent
 
-        bT.T.at(bT.index).add(T.at(index), -1);                                 // Account for top
+        bT.T.at(bT.index).add(T.at(index), -1);                                 // Node to the left of the indexed node
         bT.elementAt();
 
         P.parallelStart();    T.at(l).move(bT.T.at(bT.tData));
         P.parallelSection();  bT.T.at(bT.index).move(T.at(index));
         P.parallelEnd();
-
         bT.elementAt();
 
-        P.parallelStart();    T.at(r).move(bT.T.at(bT.tData));
-        P.parallelSection();  tt(node_hasLeavesForChildren, node_stealFromLeft);
-        P.parallelEnd();
-
-        hasLeavesForChildren();
+        T.at(r).move(bT.T.at(bT.tData));                                        // Index of right node
+        hasLeavesForChildren(bT);
 
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
-           {P.parallelStart();    leafBaseSize(lL, l, nl);                      // Address leaves on each side and get their size
-                                  //leafSize(lL, nl);
-            P.parallelSection();  leafBaseSize(lR, r, nr);
-                                  //leafSize(lR, nr);
+           {P.parallelStart();    nL.loadLeafStuckAndSize(lL, l, nl);           // Address leaves on each side and get their size
+            P.parallelSection();  nR.loadLeafStuckAndSize(lR, r, nr);
             P.parallelEnd();
 
             T.at(nr).greaterThanOrEqual(T.at(maxKeysPerLeaf), T.at(stolenOrMerged));
@@ -1359,13 +1321,16 @@ abstract class BtreeDM extends Test                                             
             P.parallelSection();  bT.T.at(bT.index).add(T.at(index), -1);
             P.parallelEnd();
             bT.setElementAt();                                                  // Reduce key of parent of left
+
+            P.parallelStart();    nT.saveStuck(bT, node_stealFromLeft);         // Save parent branch and modified left and right leaves
+            P.parallelSection();  nL.saveStuck(lL, l);
+            P.parallelSection();  nR.saveStuck(lR, r);
+            P.parallelEnd();
            }
           void Else()                                                           // Children are branches
            {z();
-            P.parallelStart();    branchBase(bL, l);
-                                  branchSize(bL, nl);
-            P.parallelSection();  branchBase(bR, r);
-                                  branchSize(bR, nr);
+            P.parallelStart();    nL.loadBranchStuckAndSize(bL, l, nl);
+            P.parallelSection();  nR.loadBranchStuckAndSize(bR, r, nr);
             P.parallelEnd();
 
             T.at(nr).greaterThanOrEqual(T.at(maxKeysPerBranch), T.at(stolenOrMerged));
@@ -1382,7 +1347,6 @@ abstract class BtreeDM extends Test                                             
             P.parallelSection(); bR.T.at(bR.tData).move(bL.T.at(bL.tData));
             P.parallelEnd();
             bR.unshift();                                                       // Increase right with left top
-//          bL.pop();                                                           // Remove left top
 
             bR.firstElement();                                                  // Increase right with left top
 
@@ -1393,7 +1357,6 @@ abstract class BtreeDM extends Test                                             
             P.parallelStart();   bR.T.at(bR.tKey).move(bT.T.at(bT.tKey));
             P.parallelSection(); bR.T.at(bR.index).zero();
             P.parallelEnd();
-
             bR.setElementAt();                                                  // Reduce key of parent of right
 
             bL.lastElement();                                                   // Last left key
@@ -1403,6 +1366,11 @@ abstract class BtreeDM extends Test                                             
             P.parallelSection(); bT.T.at(bT.index).add(T.at(index), -1);
             P.parallelEnd();
             bT.setElementAt();                                                  // Reduce key of parent of left
+
+            P.parallelStart();    nT.saveStuck(bT, node_stealFromLeft);         // Save parent branch and modified left and right branches
+            P.parallelSection();  nL.saveStuck(bL, l);
+            P.parallelSection();  nR.saveStuck(bR, r);
+            P.parallelEnd();
            }
          };
         z(); T.at(stolenOrMerged).ones();
@@ -1411,42 +1379,33 @@ abstract class BtreeDM extends Test                                             
    }
 
   private void stealFromRight()                                                 // Steal from the right sibling of the indicated child if possible
-   {zz();
+   {zz();                                                                       // Assume that index has the node wanting to steal from the right and that the parent branch is fully loaded in to nT/bT whil ebeing indexed by node_stealFromRight
     P.new Block()
      {void code()
-       {if (Assert) {tt(node_assertBranch, node_stealFromRight); assertBranch();}
-        tt(node_branchSize, node_stealFromRight); branchSize();
-        T.at(index).equal(T.at(branchSize), T.at(stolenOrMerged));
+       {T.at(index).equal(bT.T.at(bT.size), T.at(stolenOrMerged));              // If we are at the last index of the parent there is nothing to the right
         stealNotPossible(end);
         z();
 
-        branchBase(bT, node_stealFromRight);
-
-        bT.base(T.at(branchBase));
-        bT.T.at(bT.index).move(T.at(index));
+        bT.T.at(bT.index).move(T.at(index));                                    // Get details of indexed key, next pair in parent branch
         bT.elementAt();
 
-        P.parallelStart();    T.at(lk).move(bT.T.at(bT.tKey));
+        P.parallelStart();    T.at(lk).move(bT.T.at(bT.tKey));                  // Save details of indexed key, next pair and get details of next element to the right now that we know there is one
         P.parallelSection();  T.at(l) .move(bT.T.at(bT.tData));
         P.parallelSection();  bT.T.at(bT.index).add(T.at(index), +1);
         P.parallelEnd();
-
         bT.elementAt();
 
-        P.parallelStart();    T.at(rk).move(bT.T.at(bT.tKey));
+        P.parallelStart();    T.at(rk).move(bT.T.at(bT.tKey));                  // Check for leaves or branches as children
         P.parallelSection();  T.at(r) .move(bT.T.at(bT.tData));
-        P.parallelSection();  tt(node_hasLeavesForChildren, node_stealFromRight);
         P.parallelEnd();
 
-        hasLeavesForChildren();
+        hasLeavesForChildren(bT);
 
         P.new If(T.at(hasLeavesForChildren))                                    // Children are leaves
          {void Then()
            {z();
-            P.parallelStart();   leafBaseSize(lL, l, nl);
-                                 //leafSize(lL, nl);
-            P.parallelSection(); leafBaseSize(lR, r, nr);
-                                 //leafSize(lR, nr);
+            P.parallelStart();   nL.loadLeafStuckAndSize(lL, l, nl);
+            P.parallelSection(); nR.loadLeafStuckAndSize(lR, r, nr);
             P.parallelEnd();
 
             T.at(nl).greaterThanOrEqual(T.at(maxKeysPerLeaf), T.at(stolenOrMerged));
@@ -1465,11 +1424,16 @@ abstract class BtreeDM extends Test                                             
             P.parallelEnd();
             lL.push();                                                          // Increase left
             bT.setElementAt();                                                  // Swap key of parent
+
+            P.parallelStart();    nT.saveStuck(bT, node_stealFromRight);        // Save parent branch and modified left and right leaves
+            P.parallelSection();  nL.saveStuck(lL, l);
+            P.parallelSection();  nR.saveStuck(lR, r);
+            P.parallelEnd();
            }
           void Else()                                                           // Children are branches
            {z();
-            P.parallelStart();   branchBase(bL, l); branchSize(bL, nl);
-            P.parallelSection(); branchBase(bR, r); branchSize(bR, nr);
+            P.parallelStart();   nL.loadBranchStuckAndSize(bL, l, nl);
+            P.parallelSection(); nR.loadBranchStuckAndSize(bR, r, nr);
             P.parallelEnd();
 
             T.at(nl).greaterThanOrEqual(T.at(maxKeysPerBranch), T.at(stolenOrMerged));
@@ -1495,6 +1459,11 @@ abstract class BtreeDM extends Test                                             
             P.parallelSection(); bT.T.at(bT.index).move(T.at(index));
             P.parallelEnd();
             bT.setElementAt();                                                  // Swap key of parent
+
+            P.parallelStart();    nT.saveStuck(bT, node_stealFromRight);        // Save parent branch and modified left and right branches
+            P.parallelSection();  nL.saveStuck(bL, l);
+            P.parallelSection();  nR.saveStuck(bR, r);
+            P.parallelEnd();
            }
          };
         z(); T.at(stolenOrMerged).ones();
@@ -1504,7 +1473,7 @@ abstract class BtreeDM extends Test                                             
 
 //D2 Merge                                                                      // Merge two nodes together and free the resulting free node
 
-  private void mergeRoot()                                                      // Merge into the root
+  private void mergeRoot()                                                      // Merge into the root. Assume that the root has not yet been loaded
    {zz();
     P.new Block()
      {void code()
@@ -1517,22 +1486,19 @@ abstract class BtreeDM extends Test                                             
             P.Goto(Return);
            }
          };
-        T.at(node_branchSize).zero();
-        branchSize();
+        nT.loadRootStuckAndSize(bT, branchSize);                                // Lood root and get its size
         T.at(branchSize).greaterThanOrEqual(T.at(two), T.at(stolenOrMerged));   // Confirm we are on an almost empty root
         stealNotPossible(end);
 
         z();
-        branchBase(bT, node_branchBase);
-        bT.firstElement(); T.at(l).move(bT.T.at(bT.tData));
+        bT.firstElement(); T.at(l).move(bT.T.at(bT.tData));                     // Two elements in root
         bT. lastElement(); T.at(r).move(bT.T.at(bT.tData));
 
-        T.setIntInstruction(node_hasLeavesForChildren, root);
-        hasLeavesForChildren();
+        hasLeavesForChildren(bT);
         P.new If (T.at(hasLeavesForChildren))                                   // Leaves
          {void Then()
-           {tt(node_leafSize, l); leafSize(); tt(nl, leafSize);
-            tt(node_leafSize, r); leafSize(); tt(nr, leafSize);
+           {nL.loadLeafStuckAndSize(lL, l, nl);
+            nR.loadLeafStuckAndSize(lR, r, nr);
 
             P.new I()                                                           // Check that combined node would not be too big
              {void a()
@@ -1548,27 +1514,25 @@ abstract class BtreeDM extends Test                                             
                }
              };
 
-            P.new If (T.at(mergeable))
+            P.new If (T.at(mergeable))                                          // Merge
              {void Then()
                {z(); bT.clear();
-                T.at(node_leafBase).zero(); leafBase(lT, node_leafBase);
-                leafBase(lL, l);
-                leafBase(lR, r);
-
+                lT.clear();
                 lT.concatenate(lL);                                             // Merge in left  child leaf
                 lT.concatenate(lR);                                             // Merge in right child leaf
 
-                T.setIntInstruction(node_setLeaf, root);  setLeaf();            // The root is now a leaf
-                /*tt(node_free, l);*/ free(l);                                  // Free the children
-                /*tt(node_free, r);*/ free(r);
+                free(l);                                                        // Free the children
+                free(r);
+                nT.setLeaf();                                                   // The root is now a leaf
+                nT.saveRootStuck(lT);                                           // Save the leaf root
                 z(); T.at(stolenOrMerged).ones(); P.Goto(Return);
                }
              };
-            z(); T.at(stolenOrMerged).zero(); //Goto P.Goto(Return);;
+            z(); T.at(stolenOrMerged).zero();
            }
           void Else()                                                           // Branches
-           {tt(node_branchSize, l); branchSize(); tt(nl, branchSize);
-            tt(node_branchSize, r); branchSize(); tt(nr, branchSize);
+           {nL.loadBranchStuckAndSize(bL, l, nl);
+            nR.loadBranchStuckAndSize(bR, r, nr);
 
             P.new I()                                                           // Check that combined node would not be too big
              {void a()
@@ -1586,9 +1550,7 @@ abstract class BtreeDM extends Test                                             
 
             P.new If (T.at(mergeable))
              {void Then()
-               {branchBase(bL, l);
-                branchBase(bR, r);
-                bT.firstElement();
+               {bT.firstElement();
                 T.at(parentKey).move(bT.T.at(bT.tKey));
                 bT.clear();
 
@@ -1601,6 +1563,7 @@ abstract class BtreeDM extends Test                                             
 
                 free(l);                                                        // Free the children
                 free(r);
+                nT.saveRootStuck(bT);                                           // Save the branch root
                 z(); T.at(stolenOrMerged).ones(); P.Goto(Return);
                }
              };
@@ -1612,49 +1575,33 @@ abstract class BtreeDM extends Test                                             
    }
 
   private void mergeLeftSibling()                                               // Merge the left sibling
-   {zz();
+   {zz();                                                                       // Assume that index has the node wanting to merge from its left sibling and that the parent branch is fully loaded in to nT/bT while being indexed with: node_mergeLeftSibling
     P.new Block()
      {void code()
-       {if (Assert) {tt(node_assertBranch, node_mergeLeftSibling); assertBranch();}
+       {z();
         T.at(index).isZero(T.at(stolenOrMerged));
         stealNotPossible(end);
-        tt(node_branchSize, node_mergeLeftSibling);
-        branchSize();
 
-        T.at(index).greaterThan(T.at(branchSize), T.at(stolenOrMerged));
-        if (Halt) P.new If (T.at(stolenOrMerged))
-         {void Then()
-           {P.halt("Index too big");
-           }
-         };
-        T.at(branchSize).lessThan(T.at(two), T.at(stolenOrMerged));
+        bT.size();
+        bT.T.at(bT.size).lessThan(T.at(two), T.at(stolenOrMerged));
         stealNotPossible(end);
 
-        z();
-        branchBase(bT, node_mergeLeftSibling);
-        bT.T.at(bT.index).add(T.at(index), -1);
+        bT.T.at(bT.index).add(T.at(index), -1);                                 // Locate left sibling
         bT.elementAt();
 
-        P.parallelStart();
-          T.at(l).move(bT.T.at(bT.tData));
-        P.parallelSection();
-          bT.T.at(bT.index).move(T.at(index));
+        P.parallelStart();   T.at(l).move(bT.T.at(bT.tData));                   // Locate right sibling being merged into
+        P.parallelSection(); bT.T.at(bT.index).move(T.at(index));
         P.parallelEnd();
-
         bT.elementAt();
 
-        P.parallelStart();
-          T.at(r).move(bT.T.at(bT.tData));
-        P.parallelSection();
-          tt(node_hasLeavesForChildren, node_mergeLeftSibling);
-        P.parallelEnd();
-
-        hasLeavesForChildren();
+        T.at(r).move(bT.T.at(bT.tData));
+                                                                                // Right sibling
+        hasLeavesForChildren(bT);
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
            {z();
-            P.parallelStart();   leafBaseSize(lL, l, nl); //leafSize(lL, nl);
-            P.parallelSection(); leafBaseSize(lR, r, nr); //leafSize(lR, nr);
+            P.parallelStart();   nL.loadLeafStuckAndSize(lL, l, nl);
+            P.parallelSection(); nR.loadLeafStuckAndSize(lR, r, nr);
             P.parallelEnd();
 
             P.new I()                                                           // Check that combined node would not be too big
@@ -1676,10 +1623,8 @@ abstract class BtreeDM extends Test                                             
            }
           void Else()                                                           // Children are branches
            {z();
-            P.parallelStart();   branchBase(bL, l);
-                                 branchSize(bL, nl);
-            P.parallelSection(); branchBase(bR, r);
-                                 branchSize(bR, nr);
+            P.parallelStart();   nL.loadBranchStuckAndSize(bL, l, nl);
+            P.parallelSection(); nR.loadBranchStuckAndSize(bR, r, nr);
             P.parallelEnd();
 
             P.new I()                                                           // Check that combined node would not be too big
@@ -1702,56 +1647,54 @@ abstract class BtreeDM extends Test                                             
             bT.elementAt();                                                     // Top key
 
             bL.pop();                                                           // Last element of left child
-            P.parallelStart();
-              bR.T.at(bR.tKey ).move(bT.T.at(bT.tKey));
-            P.parallelSection();
-              bR.T.at(bR.tData).move(bL.T.at(bL.tData));
+            P.parallelStart();   bR.T.at(bR.tKey ).move(bT.T.at(bT.tKey));
+            P.parallelSection(); bR.T.at(bR.tData).move(bL.T.at(bL.tData));
             P.parallelEnd();
             bR.unshift();                                                       // Left top to right
 
             bR.prepend(bL);
            }
          };
-        /* tt(node_free, l); */ free(l);                                        // Free the empty left node
-        bT.T.at(bT.index).add(T.at(index), -1);                                 // Account for top
 
+        bT.T.at(bT.index).add(T.at(index), -1);                                 // Account for top
         bT.removeElementAt();                                                   // Reduce parent on left
+
+        P.parallelStart();    nT.saveStuck(bT, node_mergeLeftSibling);          // Save parent branch and modified right branch
+        P.parallelSection();  nR.saveStuck(bR, r);
+        P.parallelSection();  free(l);                                          // Free the left node whose contents have been merged away
+        P.parallelEnd();
+
         z(); T.at(stolenOrMerged).ones();
        }
      };
    }
 
   private void mergeRightSibling()                                              // Merge the right sibling
-   {zz();
+   {zz();                                                                       // Assume that index has the node wanting to merge from its right sibling and that the parent branch is fully loaded in to nT/bT while being indexed with: node_mergeRightSibling
     P.new Block()
      {void code()
-       {if (Assert) {tt(node_assertBranch, node_mergeRightSibling);  assertBranch();}
-
-        tt(node_branchSize, node_mergeRightSibling);
-        branchSize();
-        T.at(index).greaterThanOrEqual(T.at(branchSize), T.at(stolenOrMerged));
+       {bT.size();
+        T.at(index).greaterThanOrEqual(bT.T.at(bT.size), T.at(stolenOrMerged));
         stealNotPossible(end);
-        T.at(branchSize).lessThan(T.at(two), T.at(stolenOrMerged));
+        bT.T.at(bT.size).lessThan(T.at(two), T.at(stolenOrMerged));
         stealNotPossible(end);
 
         z();
-        branchBase(bT, node_mergeRightSibling);
-
         bT.T.at(bT.index).move(T.at(index));
         bT.elementAt();
-        T.at(l).move(bT.T.at(bT.tData));
-        bT.T.at(bT.index).add(T.at(index), +1);
+
+        P.parallelStart();   T.at(l).move(bT.T.at(bT.tData));
+        P.parallelSection(); bT.T.at(bT.index).add(T.at(index), +1);
+        P.parallelEnd();
+
         bT.elementAt();
         T.at(r).move(bT.T.at(bT.tData));
 
-        tt(node_hasLeavesForChildren, node_mergeRightSibling);
-        hasLeavesForChildren();
+        hasLeavesForChildren(bT);
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
-           {P.parallelStart();    leafBaseSize(lL, l, nl);
-                                  //leafSize(lL, nl);
-            P.parallelSection();  leafBaseSize(lR, r, nr);
-                                  //leafSize(lR, nr);
+           {P.parallelStart();    nL.loadLeafStuckAndSize(lL, l, nl);
+            P.parallelSection();  nR.loadLeafStuckAndSize(lR, r, nr);
             P.parallelEnd();
 
             P.new I()                                                           // Check that combined node would not be too big
@@ -1772,10 +1715,8 @@ abstract class BtreeDM extends Test                                             
             lL.concatenate(lR);
            }
           void Else()                                                           // Children are branches
-           {P.parallelStart();     branchBase(bL, l);
-                                   branchSize(bL, nl);
-            P.parallelSection();   branchBase(bR, r);
-                                   branchSize(bR, nr);
+           {P.parallelStart();     nL.loadBranchStuckAndSize(bL, l, nl);
+            P.parallelSection();   nR.loadBranchStuckAndSize(bR, r, nr);
             P.parallelEnd();
 
             P.new I()                                                           // Check that combined node would not be too big
@@ -1806,13 +1747,12 @@ abstract class BtreeDM extends Test                                             
            } // Else
          };
 
-        /*tt(node_free, r);*/ free(r);                                          // Free the empty right node
-
         bT.T.at(bT.index).add(T.at(index), +1);
         bT.elementAt();
 
         P.parallelStart();   T.at(parentKey  ).move(bT.T.at(bT.tKey));          // One up from dividing point in parent
         P.parallelSection(); bT.T.at(bT.index).move(T.at(index));
+        P.parallelSection(); free(r);                                           // Free the empty right node
         P.parallelEnd();
         bT.elementAt();                                                         // Dividing point in parent
 
@@ -1821,33 +1761,28 @@ abstract class BtreeDM extends Test                                             
 
         bT.T.at(bT.index).add(T.at(index), +1);                                 // Reduce parent on right
         bT.removeElementAt();                                                   // Reduce parent on right
+
+        P.parallelStart();    nT.saveStuck(bT, node_mergeLeftSibling);          // Save parent branch and modified left branch
+        P.parallelSection();  nL.saveStuck(bL, l);
+        P.parallelEnd();
+
         z(); T.at(stolenOrMerged).ones();
        }
      };
    }
 
-//D2 Balance                                                                    // Balance the tree by merging and stealing
+//D2 Augment                                                                    // Fill out a node by merging and stealing
 
-  private void balance()                                                        // Augment the indexed child so it has at least two children in its body
+  private void augment()                                                        // Augment the indexed child if it has at least two children in its body
    {zz();
     P.new Block()
      {void code()
-       {if (Assert) {tt(node_assertBranch, node_balance); assertBranch();}
-        tt(node_branchSize,   node_balance); branchSize();
-        T.at(index).greaterThan(T.at(branchSize), T.at(stolenOrMerged));
-        if (Halt) P.new If (T.at(stolenOrMerged))
-         {void Then()
-           {P.halt("Index too big");
-           }
-         };
-
-        branchBase(bT, node_balance);
-
-        bT.T.at(bT.index).move(T.at(index));                                    // Index child to be augmented
+       {bT.T.at(bT.index).move(T.at(index));                                    // Index child to be augmented
         bT.elementAt();
 
-        T.at(node_isLow).move(bT.T.at(bT.tData));                               // Child must have only one entry to be balanced
-        isLow();
+        nC.loadNode(bT.T.at(bT.tData));                                         // Child node
+        nC.size(T.at(childSize));                                               // Size of child - leaves and branches share a size field
+        T.at(childSize).lessThan(T.at(two), T.at(isLow));                       // Check that the child node has at least two elements otherwise we cannot steal from it
         P.GoOff(end, T.at(isLow));
         tt(node_stealFromLeft,     node_balance); stealFromLeft    (); P.GoOn(end, T.at(stolenOrMerged));
         tt(node_stealFromRight,    node_balance); stealFromRight   (); P.GoOn(end, T.at(stolenOrMerged));
@@ -1865,7 +1800,7 @@ abstract class BtreeDM extends Test                                             
     P.new Block()
      {void code()
        {final ProgramDM.Label Return = end;
-        nT.root();                                                              // The first thing in the tree is the node
+        nT.loadRoot();                                                          // The first thing in the tree is the node
 
         P.new Block()                                                           // The root is a leaf
          {void code()
@@ -1882,7 +1817,7 @@ abstract class BtreeDM extends Test                                             
          {void code()
            {findFirstGreaterThanOrEqualInBranch                                 // Find next child in search path of key
              (nT, T.at(Key), null, null, T.at(child));
-            nT.load(M.at(Node, T.at(child)));
+            nT.loadNode(M.at(Node, T.at(child)));
 
             P.new Block()                                                       // Found the containing leaf
              {void code()
@@ -1921,7 +1856,7 @@ abstract class BtreeDM extends Test                                             
 
             lEqual.setElementAt();                                              // Update stuck - we are assuming that the new data element differs from the old one to  justify this action
             nT.saveStuck(lEqual);                                               // Save the Stuck into the Node
-            nT.save(M.at(Node, T.at(leafFound)));                               // Save the node into memory
+            nT.saveNode(M.at(Node, T.at(leafFound)));                           // Save the node into memory
 
             P.parallelStart();    T.at(success).ones();
             P.parallelSection();  T.at(inserted).zero();
@@ -1980,7 +1915,7 @@ abstract class BtreeDM extends Test                                             
         findAndInsert(Return);                                                  // Try direct insertion with no modifications to the shape of the tree
         //P.GoOn(Return, T.at(success));                                        // Inserted or updated successfully
         //T.at(node_isFull).zero();                                             // Start the insertion at the root(), after splitting it if necessary
-        nT.root();                                                              // Load root
+        nT.loadRoot();                                                              // Load root
         isFull(nT);
         P.new If (T.at(isFull))                                                 // Start the insertion at the root(), after splitting it if necessary
          {void Then()
@@ -2084,7 +2019,7 @@ abstract class BtreeDM extends Test                                             
        {final ProgramDM.Label Return = end;
         T.at(node_mergeRoot).zero(); mergeRoot();
 
-        nT.root();
+        nT.loadRoot();
         P.new Block()                                                           // Find and delete directly in root as a leaf
          {void code()
            {P.GoOff(end, ifRootLeaf(nT));
@@ -2115,8 +2050,8 @@ abstract class BtreeDM extends Test                                             
             P.parallelStart();   tt(index, first);
             P.parallelSection(); tt(node_balance, parent);
             P.parallelEnd();
-
-            balance();                                                          // Make sure there are enough entries in the parent to permit a deletion
+            /// Load nT/bT with node to balance
+            augment();                                                          // Make sure there are enough entries in the parent to permit a deletion
 
             //P.parallelStart();   tt(child,       next);
             //P.parallelSection(); tt(node_isLeaf, next);
@@ -4232,7 +4167,7 @@ endmodule
     b.program(t.P);
 
     Node n = t.new Node("node");
-    n.root();
+    n.loadRoot();
     n.loadStuck(b);
     t.P.run(); t.P.clear();
     //stop(b);
@@ -4253,7 +4188,7 @@ StuckSML(maxSize:4 size:1)
   0 key:1 data:1
 """);
 
-    n.load(t.M.at(t.Node, 1));
+    n.loadNode(t.M.at(t.Node, 1));
     n.loadStuck(l);
     t.P.run(); t.P.clear();
     //stop(l);
@@ -4263,7 +4198,7 @@ StuckSML(maxSize:2 size:1)
   0 key:1 data:1
 """);
 
-    n.load(t.M.at(t.Node, 2));
+    n.loadNode(t.M.at(t.Node, 2));
     n.loadStuck(l);
     t.P.run(); t.P.clear();
     //stop(l);
@@ -4288,7 +4223,7 @@ StuckSML(maxSize:2 size:2)
     n.setBranch();
     n.isLeaf(M.at(branchBit));
     n.saveStuck(l);
-    n.save(t.M.at(t.Node, M.at(index)));
+    n.saveNode(t.M.at(t.Node, M.at(index)));
     t.P.run(); t.P.clear();
     //stop(l);
 
