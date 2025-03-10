@@ -1034,6 +1034,10 @@ abstract class BtreeDM extends Test                                             
      {at.copy(N.at(node_size));                                                 // Relies on size being in the same position and having the same size in both branches and leaves
      }
 
+    void copy(Node source)                                                      // Copy the memory of another node
+     {N.memory().copy(source.N.memory());
+     }
+
     public String toString() {return ""+N;}                                     // As string
    }
 
@@ -1198,11 +1202,11 @@ abstract class BtreeDM extends Test                                             
     P.parallelEnd();
    }
 
-  private void splitLeaf()                                                      // Split a leaf which is not the root
+  private void splitLeaf()                                                      // Split a leaf which is not the root assuming the nT/bT ahave the full details of the parent and that the node to be split is indexed by node_splitLeaf
    {zz();
     allocLeaf(); tt(l, allocLeaf);                                              // New  split out leaf
 
-    P.parallelStart();   nL.loadStuck(lL);                                      // Clear the left stuck - perhaps unnecessary
+    P.parallelStart();   nL.loadStuck(lL, l);                                   // Clear the left stuck
     P.parallelSection(); nR.loadStuck(lR, node_splitLeaf);                      // Load stuck on right to be split
     P.parallelEnd();
 
@@ -1210,7 +1214,7 @@ abstract class BtreeDM extends Test                                             
 
     P.parallelStart();   lR.firstElement();
     P.parallelSection(); lL. lastElement();
-    P.parallelSection(); branchBase(bT, splitParent);                           // The parent branch
+    //P.parallelSection(); branchBase(bT, splitParent);                           // The parent branch
     P.parallelEnd();
 
     P.parallelStart();
@@ -1236,13 +1240,13 @@ abstract class BtreeDM extends Test                                             
     P.parallelEnd();
    }
 
-  private void splitBranch()                                                    // Split a branch which is not the root by splitting right to left
+  private void splitBranch()                                                    // Split a branch which is not the root which is not the root assuming the nT/bT ahave the full details of the parent and that the node to be split is indexed by node_splitBranch
    {zz();
     allocBranch(); tt(l, allocBranch);
 
-    P.parallelStart();    nT.loadStuck(bT, splitParent);                        // The parent branch
-    P.parallelSection();  nL.loadStuck(bL, l);                                  // Clear left stuck -perhaps unnecessary
-    P.parallelSection();  nR.loadStuck(bR, node_splitBranch);                   // Load right stuck to be split
+    P.parallelStart();   nL.loadStuck(bL, l);                                   // Clear left stuck
+    P.parallelSection(); nR.loadStuck(bR, node_splitBranch);                    // Load right stuck to be split
+    //P.parallelSection(); nT.loadStuck(bT, splitParent);                       // The parent branch
     P.parallelEnd();
 
     bR.splitLow(bL);                                                            // Split right
@@ -1913,50 +1917,32 @@ abstract class BtreeDM extends Test                                             
      {void code()
        {final ProgramDM.Label Return = end;
         findAndInsert(Return);                                                  // Try direct insertion with no modifications to the shape of the tree
-        //P.GoOn(Return, T.at(success));                                        // Inserted or updated successfully
-        //T.at(node_isFull).zero();                                             // Start the insertion at the root(), after splitting it if necessary
         nT.loadRoot();                                                              // Load root
         isFull(nT);
         P.new If (T.at(isFull))                                                 // Start the insertion at the root(), after splitting it if necessary
          {void Then()
-           {//T.at(node_isLeaf).zero();
-            isRootLeaf();
+           {nT.isLeaf(T.at(IsLeaf));
             P.new If (T.at(IsLeaf))
              {void Then() {splitLeafRoot  ();}
               void Else() {splitBranchRoot();}
              };
             z();
             findAndInsert(Return);                                              // Splitting the root() might have been enough
-            //P.GoOn(Return, T.at(success));                                      // Inserted or updated successfully
            }
          };
 
-        P.parallelStart();   T.at(parent  ).zero();
-        P.parallelSection(); //T.at(putDepth).zero();
-        P.parallelEnd();
+        nT.loadStuck(bT);                                                       // Load root as branch
 
         P.new Block()                                                           // Step down through the tree, splitting as we go
          {void code()
-           {//T.at(putDepth).inc();
-            //T.at(putDepth).greaterThan(T.at(MaxDepth), T.at(pastMaxDepth));
-            //P.GoOn(end, T.at(pastMaxDepth));                                  // Prevent runaway searches
-
-            //P.parallelStart();   tt(search, Key);
-            //P.parallelSection(); tt(node_findFirstGreaterThanOrEqualInBranch, parent);
-            //P.parallelEnd();
-
-            findFirstGreaterThanOrEqualInBranch(parent, T.at(Key), null, T.at(first), T.at(child));
-
-            //P.parallelStart();   tt(child, next);
-            //P.parallelSection(); tt(node_isLeaf, next);
-            //P.parallelEnd();
+           {findFirstGreaterThanOrEqualInBranch(nT, T.at(Key), null, T.at(first), T.at(child));
 
             P.new Block()                                                       // Reached a leaf
              {void code()
                {P.GoOff(end, M.at(isLeaf, T.at(child)));
-                P.parallelStart();   tt(splitParent, parent);
-                P.parallelSection(); tt(index, first);
+                P.parallelStart();   tt(index, first);                          // Index of the matching key
                 P.parallelSection(); tt(node_splitLeaf, child);
+                //P.parallelSection(); tt(splitParent, parent);
                 P.parallelEnd();
 
                 splitLeaf();                                                    // Split the child leaf
@@ -1967,26 +1953,24 @@ abstract class BtreeDM extends Test                                             
              };
             z();
 
-            tt(node_branchIsFull, child); branchIsFull();
+            nC.loadNode(T.at(child));
+            nC.size(T.at(childSize));
+            T.at(childSize).equal(T.at(maxKeysPerBranch), T.at(branchIsFull));  // Check whether the child needs splitting because it is full
+
             P.new If (T.at(branchIsFull))                                       // Step down, splitting full branches as we go
              {void Then()
-               {P.parallelStart();   tt(splitParent, parent);
-                P.parallelSection(); tt(index, first);
+               {P.parallelStart();   tt(index, first);
                 P.parallelSection(); tt(node_splitBranch, child);
+                //P.parallelSection(); tt(splitParent, parent);
                 P.parallelEnd();
 
                 splitBranch();                                                  // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
 
-                //P.parallelStart();   tt(search, Key);
-                //P.parallelSection(); //tt(node_findFirstGreaterThanOrEqualInBranch, parent);
-                //P.parallelEnd();
-
-                findFirstGreaterThanOrEqualInBranch(parent, T.at(Key), null, null, T.at(child));                          // Perform the step down again as the split will have altered the local layout
-                //tt(parent, child);
+                findFirstGreaterThanOrEqualInBranch                             // Perform the step down again as the split will have altered the local layout
+                 (nT, T.at(Key), null, null, T.at(child));
                }
-              //void Else() {z(); tt(parent, child);}                             // Step down directly as no split was required
              };
-            tt(parent, child);
+            nT.copy(nC);                                                        // Step down "From the heights"
             P.Goto(start);
            }
          };
