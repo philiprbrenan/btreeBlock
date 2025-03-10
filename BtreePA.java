@@ -2282,11 +2282,9 @@ abstract class BtreePA extends Test                                             
             //P.parallelSection(); tt(node_findFirstGreaterThanOrEqualInBranch, parent);
             //P.parallelEnd();
 
-            findFirstGreaterThanOrEqualInBranch(parent, T.at(Key), null, null, T.at(next));                              // Step down
+            findFirstGreaterThanOrEqualInBranch(parent, T.at(Key), null, null, T.at(parent));                              // Step down
 
-            P.parallelStart();   tt(parent, next);
-            P.parallelSection(); P.Goto(start);
-            P.parallelEnd();
+            P.Goto(start);
            }
          };
         if (Halt) P.halt("Fallen off the end of the tree");                     // The tree must be missing a leaf
