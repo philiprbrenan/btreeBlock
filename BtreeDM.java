@@ -965,17 +965,11 @@ abstract class BtreeDM extends Test                                             
       loadStuck(Stuck);
      }
 
-    void loadRootStuckAndSize(StuckDM Stuck, Layout.Variable size)              // Load the root from memory and get its size
-     {loadRootStuck(Stuck);                                                     // Load stuck from node memory
-      Stuck.size();                                                             // Get size - relies on the fact that both leaves and branches have their size computed in the same way
-      T.at(size).move(Stuck.T.at(size));                                        // Save size
-     }
-
     void loadLeafStuckAndSize                                                   // Load a stuck from the node memory and store its size in a temporary variable,
-     (StuckDM Stuck, Layout.Variable at, Layout.Variable size)
+     (StuckDM Stuck, Layout.Variable at, Layout.Variable field)
      {loadStuck(Stuck);                                                         // Load stuck from node memory
       Stuck.size();                                                             // Get size - relies on the fact that both leaves and branches have their size computed in the same way
-      T.at(size).move(Stuck.T.at(size));                                        // Save size
+      T.at(field).move(Stuck.T.at(Stuck.size));                                 // Save size
      }
 
     void loadBranchStuckAndSize                                                 // Load a stuck from indexed main memory and store its size in a temporary variable,
@@ -1485,8 +1479,8 @@ abstract class BtreeDM extends Test                                             
             P.Goto(Return);
            }
          };
-        nT.loadRootStuckAndSize(bT, branchSize);                                // Lood root and get its size
-        T.at(branchSize).greaterThanOrEqual(T.at(two), T.at(stolenOrMerged));   // Confirm we are on an almost empty root
+        nT.loadRootStuck(bT);                                                   // Lood root and get its size
+        bT.T.at(bT.size).greaterThanOrEqual(T.at(two), T.at(stolenOrMerged));   // Confirm we are on an almost empty root
         stealNotPossible(end);
 
         z();
@@ -2087,11 +2081,10 @@ abstract class BtreeDM extends Test                                             
                }
              };
 
-            findFirstGreaterThanOrEqualInBranch(nT, T.at(Key), null, null, T.at(next));  // Step down
+            findFirstGreaterThanOrEqualInBranch                                 // Step down
+             (nT, T.at(Key), null, null, T.at(parent));
 
-            P.parallelStart();   tt(parent, next);
-            P.parallelSection(); P.Goto(start);
-            P.parallelEnd();
+            P.Goto(start);
            }
          };
         if (Halt) P.halt("Fallen off the end of the tree");                     // The tree must be missing a leaf
