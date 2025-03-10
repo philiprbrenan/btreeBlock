@@ -1308,7 +1308,7 @@ abstract class BtreePA extends Test                                             
 
         branchBase(bT, node_stealFromLeft);
 
-        bT.T.at(bT.index).add(T.at(index), -1);                                 // Account for top
+        bT.T.at(bT.index).add(T.at(index), -1);                                 // Node to the left of the indexed node
         bT.elementAt();
 
         P.parallelStart();    T.at(l).move(bT.T.at(bT.tData));
@@ -1705,8 +1705,11 @@ abstract class BtreePA extends Test                                             
             bR.prepend(bL);
            }
          };
-        /* tt(node_free, l); */ free(l);                                        // Free the empty left node
-        bT.T.at(bT.index).add(T.at(index), -1);                                 // Account for top
+
+        P.parallelStart();
+        P.parallelSection(); free(l);                                           // Free the empty left node
+        P.parallelSection(); bT.T.at(bT.index).add(T.at(index), -1);            // Account for top
+        P.parallelEnd();
 
         bT.removeElementAt();                                                   // Reduce parent on left
         z(); T.at(stolenOrMerged).ones();
@@ -1799,13 +1802,14 @@ abstract class BtreePA extends Test                                             
            } // Else
          };
 
-        /*tt(node_free, r);*/ free(r);                                          // Free the empty right node
+
 
         bT.T.at(bT.index).add(T.at(index), +1);
         bT.elementAt();
 
         P.parallelStart();   T.at(parentKey  ).move(bT.T.at(bT.tKey));          // One up from dividing point in parent
         P.parallelSection(); bT.T.at(bT.index).move(T.at(index));
+        P.parallelSection(); free(r);                                           // Free the empty right node
         P.parallelEnd();
         bT.elementAt();                                                         // Dividing point in parent
 
@@ -1819,9 +1823,9 @@ abstract class BtreePA extends Test                                             
      };
    }
 
-//D2 Balance                                                                    // Balance the tree by merging and stealing
+//D2 Augment                                                                    // Fill out a node by merging and stealing
 
-  private void balance()                                                        // Augment the indexed child so it has at least two children in its body
+  private void augment()                                                        // Augment the indexed child if it has at least two children in its body
    {zz();
     P.new Block()
      {void code()
@@ -1839,7 +1843,7 @@ abstract class BtreePA extends Test                                             
         bT.T.at(bT.index).move(T.at(index));                                    // Index child to be augmented
         bT.elementAt();
 
-        T.at(node_isLow).move(bT.T.at(bT.tData));                               // Child must have only one entry to be balanced
+        T.at(node_isLow).move(bT.T.at(bT.tData));
         isLow();
         P.GoOff(end, T.at(isLow));
         tt(node_stealFromLeft,     node_balance); stealFromLeft    (); P.GoOn(end, T.at(stolenOrMerged));
@@ -2080,9 +2084,9 @@ abstract class BtreePA extends Test                                             
            }
          };
 
-        P.parallelStart();   T.at(parent  ).zero();
-        P.parallelSection(); //T.at(putDepth).zero();
-        P.parallelEnd();
+        T.at(parent).zero();
+        //P.parallelSection(); //T.at(putDepth).zero();
+        //P.parallelEnd();
 
         P.new Block()                                                           // Step down through the tree, splitting as we go
          {void code()
@@ -2200,7 +2204,7 @@ abstract class BtreePA extends Test                                             
             P.parallelSection(); tt(node_balance, parent);
             P.parallelEnd();
 
-            balance();                                                          // Make sure there are enough entries in the parent to permit a deletion
+            augment();                                                          // Make sure there are enough entries in the parent to permit a deletion
 
             //P.parallelStart();   tt(child,       next);
             //P.parallelSection(); tt(node_isLeaf, next);
@@ -3682,7 +3686,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(4, 5, 340, """
+    t.runVerilogDeleteTest_allTreeOps(4, 5, 339, """
              6           |
              0           |
              5           |
@@ -3702,7 +3706,7 @@ endmodule
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(1, 8, 285, """
+    t.runVerilogDeleteTest_allTreeOps(1, 8, 284, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3710,7 +3714,7 @@ endmodule
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(5, 4, 174, """
+    t.runVerilogDeleteTest_allTreeOps(5, 4, 173, """
       7      |
       0      |
       1      |
@@ -3794,7 +3798,7 @@ endmodule
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_superSmall(4, 2, 379, """
+    t.runVerilogDeleteTest_superSmall(4, 2, 378, """
              5           |
              0           |
              5           |
@@ -3805,7 +3809,7 @@ endmodule
       3           2      |
 """);
 
-    t.runVerilogDeleteTest_superSmall(2, 1, 314, """
+    t.runVerilogDeleteTest_superSmall(2, 1, 313, """
       1      6        |
       0      0.1      |
       1      3        |
@@ -3821,7 +3825,7 @@ endmodule
 0=1  5,6=3    7,8=2 |
 """);
 
-    t.runVerilogDeleteTest_superSmall(5, 2, 174, """
+    t.runVerilogDeleteTest_superSmall(5, 2, 173, """
     6      |
     0      |
     1      |
@@ -3888,7 +3892,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest_superSmall(4, 212, """
+    t.runVerilogPutTest_superSmall(4, 211, """
       2      |
       0      |
       1      |
@@ -3904,7 +3908,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest_superSmall(6, 283, """
+    t.runVerilogPutTest_superSmall(6, 282, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3920,7 +3924,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest_superSmall(8, 384, """
+    t.runVerilogPutTest_superSmall(8, 383, """
              4             |
              0             |
              5             |
@@ -3970,11 +3974,11 @@ endmodule
     t.runVerilogPutTest_superSmall2(1,  27, null);
     t.runVerilogPutTest_superSmall2(2,  27, null);
     t.runVerilogPutTest_superSmall2(3, 104, null);
-    t.runVerilogPutTest_superSmall2(4, 212, null);
+    t.runVerilogPutTest_superSmall2(4, 211, null);
     t.runVerilogPutTest_superSmall2(5, 257, null);
-    t.runVerilogPutTest_superSmall2(6, 283, null);
+    t.runVerilogPutTest_superSmall2(6, 282, null);
     t.runVerilogPutTest_superSmall2(7, 328, null);
-    t.runVerilogPutTest_superSmall2(8, 385, null);
+    t.runVerilogPutTest_superSmall2(8, 384, null);
     t.runVerilogPutTest_superSmall2(9, 359, """
              4                    |
              0                    |
@@ -4026,7 +4030,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(4, 212, """
+    t.runVerilogPutTest_allTreeOps(4, 211, """
       2      |
       0      |
       1      |
@@ -4042,7 +4046,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(6, 283, """
+    t.runVerilogPutTest_allTreeOps(6, 282, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -4058,7 +4062,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(8, 385, """
+    t.runVerilogPutTest_allTreeOps(8, 384, """
              4             |
              0             |
              5             |
@@ -4082,7 +4086,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(10, 385, """
+    t.runVerilogPutTest_allTreeOps(10, 384, """
              4                       |
              0                       |
              5                       |
@@ -4106,7 +4110,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9=8    10,11=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(12, 374, """
+    t.runVerilogPutTest_allTreeOps(12, 372, """
                                8                 |
                                0                 |
                                5                 |
@@ -4130,7 +4134,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(14, 385, """
+    t.runVerilogPutTest_allTreeOps(14, 384, """
                                8                             |
                                0                             |
                                5                             |
@@ -4154,7 +4158,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(16, 415, """
+    t.runVerilogPutTest_allTreeOps(16, 414, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -4178,7 +4182,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(18, 450, """
+    t.runVerilogPutTest_allTreeOps(18, 449, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -4202,7 +4206,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(20, 447, """
+    t.runVerilogPutTest_allTreeOps(20, 445, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
