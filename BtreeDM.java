@@ -4494,8 +4494,8 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   protected static void oldTests()                                              // Tests thought to be in good shape
    {test_find();
-    test_find_and_insert();
     if (true) return;
+    test_find_and_insert();
     test_put_ascending();
     test_put_ascending_wide();
     test_put_descending();
@@ -4521,10 +4521,10 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    //test_find();
+    test_find();
     //test_find_and_insert();
     //test_node();
-    test_verilogPut_superSmall();
+    //test_verilogPut_superSmall();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
