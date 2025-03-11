@@ -324,7 +324,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      {final StringBuilder s = new StringBuilder();
       s.append(ml().name+"."+field.name);
       if (indices.length > 0)
-       {setOff(false);
+       {//setOff(false);
         s.append("[");
         for (int i = 0, N = indices.length; i < N; i++)
          {s.append(indices[i]);
