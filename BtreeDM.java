@@ -170,7 +170,7 @@ abstract class BtreeDM extends Test                                             
     P.new I()
      {void a()
        {final int N = maxSize();                                                // Put all the nodes on the free chain at the start with low nodes first
-        for (int i = N; i > 0; --i) setInt(free, (i == N ? 0 : i), i - 1);      // Link this node to the previous node
+        for (int i = N; i > 0; --i) setInt(bTree_free, (i == N ? 0 : i), i - 1);// Link this node to the previous node
         setInt(freeList, root);                                                 // Root is first on free chain
        }
       String v() {return "/* Construct Free list */";}
@@ -739,7 +739,7 @@ abstract class BtreeDM extends Test                                             
    {zz();
 //  P.new If (T.at(node_free)) {void Else() {P.halt("Cannot free root");}};     // The root is never freed
     z(); tt(node_erase, node_free); erase();                                    // Clear the node to encourage erroneous frees to do damage that shows up quickly.
-    M.at(free, T.at(node_free)).move(M.at(freeList));                           // Chain this node in front of the last freed node
+    M.at(bTree_free, T.at(node_free)).move(M.at(freeList));                     // Chain this node in front of the last freed node
     M.at(freeList).move(T.at(node_free));                                       // Make this node the head of the free chain
 //  maxNodeUsed = max(maxNodeUsed, --nodeUsed);                                 // Number of nodes in use
    }
@@ -757,6 +757,7 @@ abstract class BtreeDM extends Test                                             
 
   private void leafBase(StuckDM Stuck, Layout.Variable node_leafBase)           // Set base of leaf stuck in memory
    {zz();
+stop("Deprecated");
     P.new I()
      {void a()
        {if (node_leafBase != null) Stuck.base(M.at(leaf, T.at(node_leafBase)));
@@ -917,7 +918,7 @@ abstract class BtreeDM extends Test                                             
   private void hasLeavesForChildren(StuckDM bLeaf)                              // The node has leaves for children
    {zz();
     bLeaf.firstElement();                                                       // Was lastElement but firstElement() is faster
-    T.at(hasLeavesForChildren).move(M.at(isLeaf, bLeaf.T.at(bLeaf.tData)));
+    T.at(hasLeavesForChildren).move(M.at(bTree_isLeaf, bLeaf.T.at(bLeaf.tData)));
    }
 
 
@@ -1936,7 +1937,7 @@ abstract class BtreeDM extends Test                                             
 
             P.new Block()                                                       // Reached a leaf
              {void code()
-               {P.GoOff(end, M.at(isLeaf, T.at(child)));
+               {P.GoOff(end, M.at(bTree_isLeaf, T.at(child)));
                 P.parallelStart();   tt(index, first);                          // Index of the matching key
                 P.parallelSection(); tt(node_splitLeaf, child);
                 //P.parallelSection(); tt(splitParent, parent);
@@ -2180,6 +2181,15 @@ abstract class BtreeDM extends Test                                             
     VerilogCode(String Project, String Folder)                                  // Generate verilog code
      {zz();
       project = Project; folder = Folder; program = P;
+     }
+
+    void eachStatement()                                                        // Generate verilog with each statement appearing once
+     {final int N = ops.outputOrder.size();
+      for (int i = 0; i < N; i++) {statements = i; generate();}
+     }
+
+    VerilogCode generate()                                                      // Generate verilog
+     {zz();
 
       for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
        {final Stack<ProgramDM.I> I = program.code.elementAt(i);                 // The block of parallel instructions to write
@@ -2195,15 +2205,6 @@ abstract class BtreeDM extends Test                                             
        }
 
       ops.order();                                                              // Order the instructions
-     }
-
-    void eachStatement()                                                        // Generate verilog with each statement appearing once
-     {final int N = ops.outputOrder.size();
-      for (int i = 0; i < N; i++) {statements = i; generate();}
-     }
-
-    VerilogCode generate()                                                      // Generate verilog
-     {zz();
 
       final String subProject = ""+Key() +
        (statements == null ? "" : "/statement/"+statements);                    // Some times we only want the specified statement to be generated (a block in always) so that we can use timing analysis to estimate the timing for that block
@@ -2397,7 +2398,7 @@ endmodule
       return this;
      }
 
-    private void execJavaTest()                                                 // Execute the Java test
+    VerilogCode execJavaTest()                                                  // Execute the Java test
      {P.traceMemory = M.memory();                                               // Request memory tracing
       deleteFile(javaTraceFile);
       say(project, folder, Key());                                              // Identify the test
@@ -2407,9 +2408,10 @@ endmodule
       ok(T.at(BtreeDM.this.data).getInt(), data());                             // Data associated with key from java code
       if (debug) stop(toString());                                              // Print tree if debugging
       if (expected() != null) ok(BtreeDM.this, expected());                     // Check resulting tree
+      return this;
      }
 
-    private void execVerilogTest()                                              // Execute the Verilog test and compare it with the results from execution under Java
+    VerilogCode execVerilogTest()                                               // Execute the Verilog test and compare it with the results from execution under Java
      {zz();
       final StringBuilder s = new StringBuilder(editVariables("cd $projectFolder && iverilog $project.tb $project.v -Iincludes -g2012 -o $project && ./$project"));
       deleteFile(traceFile);
@@ -2422,6 +2424,7 @@ endmodule
       final TreeMap<String,String> p = readProperties(testsFile);               // Load test results
       ok(ifs(p.get("Steps")), expSteps());                                      // Confirm results from Verilog
       ok(ifs(p.get("data")),  data());
+      return this;
      }
 
     private String editVariables(StringBuilder S) {return editVariables(""+S);} // Edit the variables in a string builder
@@ -3755,13 +3758,14 @@ endmodule
     T.at(Key ).setInt(value);                                                   // Sets memory directly not via an instruction
     T.at(Data).setInt(value);                                                   // Sets memory directly not via an instruction
     VerilogCode v = new VerilogCode("put", "verilog")                           // Generate verilog now that memories have been initialized and the program written
-     {int    Key     () {return value;}                                         // Input key value
-      int    Data    () {return     3;}                                         // Input data value
-      int    data    () {return     0;}                                         // Expected output data value
-      int    maxSteps() {return  2000;}                                         // Maximum number if execution steps
-      int    expSteps() {return steps;}                                         // Expected number of steps
-      String expected() {return null;}                                          // Expected tree if present
-     }.generate();
+     {int    Key     () {return    value;}                                      // Input key value
+      int    Data    () {return        3;}                                      // Input data value
+      int    data    () {return        0;}                                      // Expected output data value
+      int    maxSteps() {return     2000;}                                      // Maximum number if execution steps
+      int    expSteps() {return    steps;}                                      // Expected number of steps
+      String expected() {return expected;}                                      // Expected tree if present
+//   }.generate();
+     }.execJavaTest();
     if (debug) stop(this);
     ok(this, expected);
    }
@@ -4519,7 +4523,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    {//oldTests();
     //test_find();
     //test_find_and_insert();
-    test_node();
+    //test_node();
+    test_verilogPut_superSmall();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
