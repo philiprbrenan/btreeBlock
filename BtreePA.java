@@ -2025,8 +2025,10 @@ abstract class BtreePA extends Test                                             
         P.new If(T.at(leafIsFull))                                              // Leaf is not full so we can insert immediately
          {void Else()
            {z();
-            tt(search, Key);
-            tt(node_findFirstGreaterThanOrEqualInLeaf, leafFound);
+
+            P.parallelStart();   tt(search, Key);
+            P.parallelSection(); tt(node_findFirstGreaterThanOrEqualInLeaf, leafFound);
+            P.parallelEnd();
 
             findFirstGreaterThanOrEqualInLeaf(leafFound, T.at(Key),             // Leaf known not to contain the search key
               T.at(found), lT.T.at(lT.index));
@@ -3866,15 +3868,15 @@ endmodule
     final BtreePA t = superSmall();
     t.P.run(); t.P.clear();
     t.put();
-    t.runVerilogPutTest_superSmall(1, 27, """
+    t.runVerilogPutTest_superSmall(1, 26, """
 1=0 |
 """);
 
-    t.runVerilogPutTest_superSmall(2, 27, """
+    t.runVerilogPutTest_superSmall(2, 26, """
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest_superSmall(3, 104, """
+    t.runVerilogPutTest_superSmall(3, 103, """
     1      |
     0      |
     1      |
@@ -3882,7 +3884,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest_superSmall(4, 200, """
+    t.runVerilogPutTest_superSmall(4, 199, """
       2      |
       0      |
       1      |
@@ -3890,7 +3892,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest_superSmall(5, 241, """
+    t.runVerilogPutTest_superSmall(5, 240, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -3898,7 +3900,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest_superSmall(6, 266, """
+    t.runVerilogPutTest_superSmall(6, 265, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -3906,7 +3908,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest_superSmall(7, 307, """
+    t.runVerilogPutTest_superSmall(7, 306, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -3914,7 +3916,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest_superSmall(8, 364, """
+    t.runVerilogPutTest_superSmall(8, 363, """
              4             |
              0             |
              5             |
@@ -3926,7 +3928,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest_superSmall(9, 335, """
+    t.runVerilogPutTest_superSmall(9, 334, """
              4                    |
              0                    |
              5                    |
@@ -3961,15 +3963,15 @@ endmodule
     final BtreePA t = superSmall2();
     t.P.run(); t.P.clear();
     t.put();
-    t.runVerilogPutTest_superSmall2(1,  27, null);
-    t.runVerilogPutTest_superSmall2(2,  27, null);
-    t.runVerilogPutTest_superSmall2(3, 104, null);
-    t.runVerilogPutTest_superSmall2(4, 200, null);
-    t.runVerilogPutTest_superSmall2(5, 241, null);
-    t.runVerilogPutTest_superSmall2(6, 266, null);
-    t.runVerilogPutTest_superSmall2(7, 307, null);
-    t.runVerilogPutTest_superSmall2(8, 365, null);
-    t.runVerilogPutTest_superSmall2(9, 335, """
+    t.runVerilogPutTest_superSmall2(1,  26, null);
+    t.runVerilogPutTest_superSmall2(2,  26, null);
+    t.runVerilogPutTest_superSmall2(3, 103, null);
+    t.runVerilogPutTest_superSmall2(4, 199, null);
+    t.runVerilogPutTest_superSmall2(5, 240, null);
+    t.runVerilogPutTest_superSmall2(6, 265, null);
+    t.runVerilogPutTest_superSmall2(7, 306, null);
+    t.runVerilogPutTest_superSmall2(8, 364, null);
+    t.runVerilogPutTest_superSmall2(9, 334, """
              4                    |
              0                    |
              5                    |
@@ -4004,15 +4006,15 @@ endmodule
     final BtreePA t = allTreeOps();
     t.P.run(); t.P.clear();
     t.put();
-    t.runVerilogPutTest_allTreeOps(1, 27, """
+    t.runVerilogPutTest_allTreeOps(1, 26, """
 1=0 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(2, 27, """
+    t.runVerilogPutTest_allTreeOps(2, 26, """
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest_allTreeOps(3, 104, """
+    t.runVerilogPutTest_allTreeOps(3, 103, """
     1      |
     0      |
     1      |
@@ -4020,7 +4022,7 @@ endmodule
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(4, 200, """
+    t.runVerilogPutTest_allTreeOps(4, 199, """
       2      |
       0      |
       1      |
@@ -4028,7 +4030,7 @@ endmodule
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(5, 241, """
+    t.runVerilogPutTest_allTreeOps(5, 240, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -4036,7 +4038,7 @@ endmodule
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(6, 266, """
+    t.runVerilogPutTest_allTreeOps(6, 265, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -4044,7 +4046,7 @@ endmodule
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(7, 307, """
+    t.runVerilogPutTest_allTreeOps(7, 306, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -4052,7 +4054,7 @@ endmodule
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(8, 365, """
+    t.runVerilogPutTest_allTreeOps(8, 364, """
              4             |
              0             |
              5             |
@@ -4064,7 +4066,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(9, 335, """
+    t.runVerilogPutTest_allTreeOps(9, 334, """
              4                    |
              0                    |
              5                    |
@@ -4076,7 +4078,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(10, 360, """
+    t.runVerilogPutTest_allTreeOps(10, 359, """
              4                       |
              0                       |
              5                       |
@@ -4088,7 +4090,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9,10=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(11, 401, """
+    t.runVerilogPutTest_allTreeOps(11, 400, """
              4                               |
              0                               |
              5                               |
@@ -4100,7 +4102,7 @@ endmodule
 1,2=1  3,4=3  5,6=4  7,8=7    9=8    10,11=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(12, 353, """
+    t.runVerilogPutTest_allTreeOps(12, 352, """
                                8                 |
                                0                 |
                                5                 |
@@ -4112,7 +4114,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(13, 335, """
+    t.runVerilogPutTest_allTreeOps(13, 334, """
                                8                          |
                                0                          |
                                5                          |
@@ -4124,7 +4126,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(14, 360, """
+    t.runVerilogPutTest_allTreeOps(14, 359, """
                                8                             |
                                0                             |
                                5                             |
@@ -4136,7 +4138,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(15, 401, """
+    t.runVerilogPutTest_allTreeOps(15, 400, """
                                8                                     |
                                0                                     |
                                5                                     |
@@ -4148,7 +4150,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(16, 390, """
+    t.runVerilogPutTest_allTreeOps(16, 389, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -4160,7 +4162,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(17, 395, """
+    t.runVerilogPutTest_allTreeOps(17, 394, """
                                8                  12                            |
                                0                  0.1                           |
                                5                  11                            |
@@ -4172,7 +4174,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(18, 420, """
+    t.runVerilogPutTest_allTreeOps(18, 419, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -4184,7 +4186,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17,18=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(19, 461, """
+    t.runVerilogPutTest_allTreeOps(19, 460, """
                                8                  12                                        |
                                0                  0.1                                       |
                                5                  11                                        |
@@ -4196,7 +4198,7 @@ endmodule
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(20, 421, """
+    t.runVerilogPutTest_allTreeOps(20, 420, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
