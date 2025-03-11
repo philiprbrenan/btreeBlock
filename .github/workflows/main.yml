@@ -1,4 +1,4 @@
-# Test 2025-03-11 at 01:02:21
+# Test 2025-03-11 at 14:21:06
 
 name: Test
 run-name: btreeBlock
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        task: [BtreeDM, Layout, MemoryLayoutDM]
+        task: [BtreeDM, BtreePA]
 
     steps:
     - uses: actions/checkout@v4
@@ -60,14 +60,8 @@ jobs:
         java -cp Classes com/AppaApps/Silicon/BtreeDM
 
 
-    - name: Test Layout
-      if: matrix.task == 'Layout'
+    - name: Test BtreePA
+      if: matrix.task == 'BtreePA'
       run: |
-        java -cp Classes com/AppaApps/Silicon/Layout
-
-
-    - name: Test MemoryLayoutDM
-      if: matrix.task == 'MemoryLayoutDM'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/MemoryLayoutDM
+        java -cp Classes com/AppaApps/Silicon/BtreePA
 
