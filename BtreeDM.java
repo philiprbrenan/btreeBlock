@@ -94,7 +94,7 @@ abstract class BtreeDM extends Test                                             
   final Node nT;                                                                // Memory sufficient to contain a single parent node
   final Node nL;                                                                // Memory sufficient to contain a single left node
   final Node nR;                                                                // Memory sufficient to contain a single right node
-  final Node nC;                                                                // Memory sufficient to contain a single child node - equated to a left node until we dicover teh need for a separate memory area
+  final Node nC;                                                                // Memory sufficient to contain a single child node - equated to a left node until we dicover the  need for a separate memory area
 
   boolean debug = false;                                                        // Debugging enabled
 
@@ -252,7 +252,7 @@ abstract class BtreeDM extends Test                                             
     free         = l.variable ("free",         btree.bitsPerNext);
     Node         = l.structure("node",         isLeaf, free, branchOrLeaf);
     nodeLayout   = l.compile();
-    node_size    = l.get("branchOrLeaf.branch.size");                           // Relies on size being in the same position and having the same size in branches and leaves
+    node_size    = l.get("branchOrLeaf.branch.currentSize");                    // Relies on size being in the same position and having the same size in branches and leaves
     return nodeLayout;
    }
 
@@ -928,101 +928,109 @@ abstract class BtreeDM extends Test                                             
     final MemoryLayoutDM N;
 
     Node(String Name)                                                           // Create a node.
-     {name = Name;
+     {zz(); name = Name;
       N = new MemoryLayoutDM(nodeLayout, name);
       N.program(P);
      }
 
     void loadRoot()                                                             // Load with the node describing a root
-     {final MemoryLayoutDM.At source = M.at(Node, 0);                           // Node zero is always the root
+     {zz();
+      final MemoryLayoutDM.At source = M.at(Node, 0);                           // Node zero is always the root
       N.copy(source);
      }
 
     void loadNode(MemoryLayoutDM.At at)                                         // Load with the node addressed by this variable
-     {N.copy(at);
+     {zz();
+      N.copy(at);
      }
 
     void saveRoot()                                                             // Save root
-     {final MemoryLayoutDM.At target = M.at(Node, 0);                           // Node zero is always the root
+     {zz();
+      final MemoryLayoutDM.At target = M.at(Node, 0);                           // Node zero is always the root
       target.copy(N);
      }
 
     void saveNode(MemoryLayoutDM.At at)                                         // Load with the node addressed by this variable
-     {at.copy(N);
+     {zz(); at.copy(N);
      }
 
     void loadRootStuck(StuckDM Stuck)                                           // Load a root stuck from main memory
-     {loadRoot();
+     {zz();
+      loadRoot();
       loadStuck(Stuck);
      }
 
     void loadStuck(StuckDM Stuck)                                               // Load a stuck from a node
-     {Stuck.M.copy(N.at(branchOrLeaf));
+     {zz(); Stuck.M.copy(N.at(branchOrLeaf));
      }
 
     void loadStuck(StuckDM Stuck, Layout.Variable at)                           // Load a stuck from indexed main memory
-     {loadNode(M.at(Node, T.at(at)));
+     {zz();
+      loadNode(M.at(Node, T.at(at)));
       loadStuck(Stuck);
      }
 
-    void loadLeafStuckAndSize                                                   // Load a stuck from the node memory and store its size in a temporary variable,
+    void loadLeafStuckAndSize                                                   // Load a stuck from indexed main memory and store its size in a temporary variable,
      (StuckDM Stuck, Layout.Variable at, Layout.Variable field)
-     {loadStuck(Stuck);                                                         // Load stuck from node memory
-      Stuck.size();                                                             // Get size - relies on the fact that both leaves and branches have their size computed in the same way
-      T.at(field).move(Stuck.T.at(Stuck.size));                                 // Save size
+     {zz();
+      loadStuck(Stuck, at);                                                     // Load stuck from node memory
+      T.at(field).move(Stuck.M.at(Stuck.currentSize));                          // Save size
      }
 
     void loadBranchStuckAndSize                                                 // Load a stuck from indexed main memory and store its size in a temporary variable,
-     (StuckDM Stuck, Layout.Variable at, Layout.Variable size)
-     {loadStuck(Stuck, at);
-      Stuck.size();                                                             // Get size - relies on teh fact that both leaves and branches have their size computed in the same way
-      T.at(size).add(Stuck.T.at(size), -1);                                     // Account for top
+     (StuckDM Stuck, Layout.Variable at, Layout.Variable field)
+     {zz();
+      loadStuck(Stuck, at);
+      T.at(field).add(Stuck.M.at(Stuck.currentSize), -1);                       // Account for top
      }
 
-    void saveRootStuck(StuckDM Stuck)                                           // Save root stuck into main memory
-     {saveStuck(Stuck);
+    void saveRootStuck(StuckDM Stuck)  ///                                         // Save root stuck into main memory
+     {zz();
+      saveStuck(Stuck);
       saveRoot();
      }
 
     void saveStuck(StuckDM Stuck)                                               // Save a stuck from a node
-     {N.at(branchOrLeaf).copy(Stuck.M);
+     {zz(); N.at(branchOrLeaf).copy(Stuck.M);
      }
 
-    void saveStuck(StuckDM Stuck, Layout.Variable at)                           // Save a stuck into indexed main memory
-     {saveStuck(Stuck);
+    void saveStuck(StuckDM Stuck, Layout.Variable at)///                           // Save a stuck into indexed main memory
+     {zz();
+      saveStuck(Stuck);
       saveNode(M.at(Node, T.at(at)));
      }
 
     void setLeaf()                                                              // Mark a node as a leaf
-     {N.at(isLeaf).ones();
+     {zz(); N.at(isLeaf).ones();
      }
 
     void setBranch()                                                            // Mark a node as a bramch
-     {N.at(isLeaf).zero();
+     {zz(); N.at(isLeaf).zero();
      }
 
     void isLeaf(MemoryLayoutDM.At at)                                           // Check for a leaf
-     {at.copy(N.at(isLeaf));
+     {zz(); at.copy(N.at(isLeaf));
      }
 
-    void size(MemoryLayoutDM.At at)                                             // Get size of stuck
-     {at.copy(N.at(node_size));                                                 // Relies on size being in the same position and having the same size in both branches and leaves
+    void size(MemoryLayoutDM.At at)    ///                                         // Get size of stuck
+     {zz();
+      at.copy(N.at(node_size));                                                 // Relies on size being in the same position and having the same size in both branches and leaves
      }
 
-    void copy(Node source)                                                      // Copy the memory of another node
-     {N.memory().copy(source.N.memory());
+    void copy(Node source)        ///                                              // Copy the memory of another node
+     {zz(); N.memory().copy(source.N.memory());
      }
 
-    void isFull()                                                               // Set isFull to show whether the node is full or not, incidentlly setting IsLeaf as well
+    void isFull()        ///                                                       // Set isFull to show whether the node is full or not, incidentlly setting IsLeaf as well
      {zz();
       isLeaf(T.at(IsLeaf));
       size(T.at(childSize));
       P.new If (T.at(IsLeaf))
        {void Then()
-         {T.at(childSize).equal(T.at(maxKeysPerLeaf),   T.at(isFull));
+         {z(); T.at(childSize).equal(T.at(maxKeysPerLeaf),   T.at(isFull));
          }
         void Else()
-         {T.at(childSize).equal(T.at(maxKeysPerBranch), T.at(isFull));
+         {z(); T.at(childSize).equal(T.at(maxKeysPerBranch), T.at(isFull));
          }
        };
      }
@@ -4112,10 +4120,117 @@ endmodule
 
     Node n = t.new Node("node");
     n.loadRoot();
+    b.clear();
     n.loadStuck(b);
     t.P.run(); t.P.clear();
     //stop(b);
     ok(b, """
+StuckSML(maxSize:4 size:2)
+  0 key:1 data:1
+  1 key:0 data:2
+""");
+
+    Node o = t.new Node("node");
+    n.loadRoot();
+    o.copy(n);
+    b.clear();
+    o.loadStuck(b);
+    t.P.run(); t.P.clear();
+    //stop(b);
+    ok(b, """
+StuckSML(maxSize:4 size:2)
+  0 key:1 data:1
+  1 key:0 data:2
+""");
+
+    n.loadNode(t.M.at(t.Node, 1));
+    l.clear();
+    n.loadStuck(l);
+    t.P.run(); t.P.clear();
+    //stop(l);
+    ok(l, """
+StuckSML(maxSize:2 size:1)
+  0 key:1 data:1
+""");
+
+    n.loadNode(t.M.at(t.Node, 2));
+    l.clear();
+    n.loadStuck(l);
+    t.P.run(); t.P.clear();
+    //stop(l);
+    ok(l, """
+StuckSML(maxSize:2 size:2)
+  0 key:2 data:2
+  1 key:3 data:3
+""");
+
+    t.T.at(t.l).setInt(1);
+    l.clear();
+    n.loadStuck(l, t.l);
+    t.P.run(); t.P.clear();
+    //stop(l);
+    ok(l, """
+StuckSML(maxSize:2 size:1)
+  0 key:1 data:1
+""");
+
+    t.T.at(t.l).setInt(2);
+    l.clear();
+    n.loadStuck(l, t.l);
+    t.P.run(); t.P.clear();
+    //stop(l);
+    ok(l, """
+StuckSML(maxSize:2 size:2)
+  0 key:2 data:2
+  1 key:3 data:3
+""");
+
+    t.T.at(t.l).setInt(0);
+    b.clear();
+    n.loadBranchStuckAndSize(b, t.l, t.index);
+    n.isFull();
+    t.P.run(); t.P.clear();
+    ok(t.T.at(t.index),  "T.index@56=1");
+    ok(t.T.at(t.isFull), "T.mergeable@71=0");
+    //stop(b);
+    ok(b, """
+StuckSML(maxSize:4 size:2)
+  0 key:1 data:1
+  1 key:0 data:2
+""");
+
+    t.T.at(t.l).setInt(1);
+    l.clear();
+    n.loadLeafStuckAndSize(l, t.l, t.index);
+    n.isFull();
+    t.P.run(); t.P.clear();
+    ok(t.T.at(t.index),  "T.index@56=1");
+    ok(t.T.at(t.isFull), "T.mergeable@71=0");
+    //stop(l);
+    ok(l, """
+StuckSML(maxSize:2 size:1)
+  0 key:1 data:1
+""");
+
+    t.T.at(t.l).setInt(2);
+    l.clear();
+    n.loadLeafStuckAndSize(l, t.l, t.index);
+    n.isFull();
+    t.P.run(); t.P.clear();
+    ok(t.T.at(t.index),  "T.index@56=2");
+    ok(t.T.at(t.isFull), "T.mergeable@71=1");
+    //stop(l);
+    ok(l, """
+StuckSML(maxSize:2 size:2)
+  0 key:2 data:2
+  1 key:3 data:3
+""");
+
+    l.clear();
+    t.new Node("root").loadRootStuck(t.bT);
+    t.P.run(); t.P.clear();
+    //stop(t.bT);
+    ok(t.bT, """
 StuckSML(maxSize:4 size:2)
   0 key:1 data:1
   1 key:0 data:2
@@ -4268,6 +4383,109 @@ Line T       At      Wide       Size    Indices        Value   Name
   74 V       88         2               2 2                0               data
   75 V       90         2               2 3                0               data
 """);
+
+
+    n.loadRootStuck(l);
+    t.P.run(); t.P.clear();
+    l.T.setIntInstruction(l.tKey , 2);
+    l.T.setIntInstruction(l.tData, 2);
+    l.push();
+    l.P.run(); l.P.clear();
+    //stop(l);
+    ok(l, """
+StuckSML(maxSize:2 size:2)
+  0 key:1 data:1
+  1 key:2 data:2
+""");
+
+    n.saveRootStuck(l);
+    t.T.setIntInstruction(t.index, 1);
+    n.saveStuck(l, t.index);
+    t.T.setIntInstruction(t.index, 2);
+    n.saveStuck(l, t.index);
+    t.P.run(); t.P.clear();
+    //stop(t.M);
+    ok(t.M, """
+MemoryLayout: M
+Memory      : M
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        92                                      bTree
+   2 V        0         2                                  0     freeList
+   3 A        2        90          3                             nodes
+   4 S        2        30               0                          node
+   5 B        2         1               0                  1         isLeaf
+   6 V        3         2               0                  0         free
+   7 U        5        27               0                            branchOrLeaf
+   8 S        5        19               0                              leaf
+   9 V        5         3               0                  2             currentSize
+  10 A        8         8          2    0                                Keys
+  11 V        8         4               0 0                1               key
+  12 V       12         4               0 1                2               key
+  13 A       16         8          2    0                                Data
+  14 V       16         4               0 0                1               data
+  15 V       20         4               0 1                2               data
+  16 S        5        27               0                              branch
+  17 V        5         3               0                  2             currentSize
+  18 A        8        16          4    0                                Keys
+  19 V        8         4               0 0                1               key
+  20 V       12         4               0 1                2               key
+  21 V       16         4               0 2                1               key
+  22 V       20         4               0 3                2               key
+  23 A       24         8          4    0                                Data
+  24 V       24         2               0 0                1               data
+  25 V       26         2               0 1                2               data
+  26 V       28         2               0 2                0               data
+  27 V       30         2               0 3                0               data
+  28 S       32        30               1                          node
+  29 B       32         1               1                  1         isLeaf
+  30 V       33         2               1                  0         free
+  31 U       35        27               1                            branchOrLeaf
+  32 S       35        19               1                              leaf
+  33 V       35         3               1                  2             currentSize
+  34 A       38         8          2    1                                Keys
+  35 V       38         4               1 0                1               key
+  36 V       42         4               1 1                2               key
+  37 A       46         8          2    1                                Data
+  38 V       46         4               1 0                1               data
+  39 V       50         4               1 1                2               data
+  40 S       35        27               1                              branch
+  41 V       35         3               1                  2             currentSize
+  42 A       38        16          4    1                                Keys
+  43 V       38         4               1 0                1               key
+  44 V       42         4               1 1                2               key
+  45 V       46         4               1 2                1               key
+  46 V       50         4               1 3                2               key
+  47 A       54         8          4    1                                Data
+  48 V       54         2               1 0                1               data
+  49 V       56         2               1 1                2               data
+  50 V       58         2               1 2                0               data
+  51 V       60         2               1 3                0               data
+  52 S       62        30               2                          node
+  53 B       62         1               2                  1         isLeaf
+  54 V       63         2               2                  0         free
+  55 U       65        27               2                            branchOrLeaf
+  56 S       65        19               2                              leaf
+  57 V       65         3               2                  2             currentSize
+  58 A       68         8          2    2                                Keys
+  59 V       68         4               2 0                1               key
+  60 V       72         4               2 1                2               key
+  61 A       76         8          2    2                                Data
+  62 V       76         4               2 0                1               data
+  63 V       80         4               2 1                2               data
+  64 S       65        27               2                              branch
+  65 V       65         3               2                  2             currentSize
+  66 A       68        16          4    2                                Keys
+  67 V       68         4               2 0                1               key
+  68 V       72         4               2 1                2               key
+  69 V       76         4               2 2                1               key
+  70 V       80         4               2 3                2               key
+  71 A       84         8          4    2                                Data
+  72 V       84         2               2 0                1               data
+  73 V       86         2               2 1                2               data
+  74 V       88         2               2 2                0               data
+  75 V       90         2               2 3                0               data
+""");
+
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
