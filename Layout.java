@@ -35,8 +35,13 @@ public class Layout extends Test                                                
 
   int size() {z(); return top == null ? 0 : top.width;}                         // Size of memory
   void ok(String expected) {Test.ok(top.toString(), expected);}                 // Confirm layout is as expected
-  Field get(String path)   {return top.fullNames.get(path);}                    // Address a contained field by name
   Field top()              {return top;}                                        // Topmost field
+
+  Field get(String path)                                                        // Address a contained field by name
+   {final Field f = top.fullNames.get(path);
+    if (f == null) stop("No such path:", f, toString());
+    return f;
+   }
 
   public String toString() {return top.toString();}                             // Print layout
 
@@ -387,21 +392,6 @@ public class Layout extends Test                                                
        {zz();
         if (f instanceof Array)
          {zz();
-          arrays.insertElementAt((Array)f, 0);
-         }
-       }
-     }
-
-    Locator(Field Field, boolean debug)                                         // Locate a field
-     {zz();
-      field = Field;
-say("BBBB11", field);
-      for(Field f = field.up; f != null; f = f.up)                              // Convolute path to field with indices of the arrays encountered in the path down to the element but not including the element (which might be an array definition which should be indexed by its parent arrays but not by itself.)
-       {zz();
-say("BBBB22");
-        if (f instanceof Array)
-         {zz();
-say("BBBB33");
           arrays.insertElementAt((Array)f, 0);
          }
        }
