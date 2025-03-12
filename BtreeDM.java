@@ -6,7 +6,7 @@ package com.AppaApps.Silicon;                                                   
 // Double allocation would be faster as allocations are often done in pairs
 // Node confirm that a load or a save identified by the trace back is actually changing the node - eliminate this that never have an effect
 // Stuck - get penultimate element. Use currentSize field directly instead of copy in it to a temporary variable
-// Merge*Sibling place free at end in a parallel
+// Use free in node to hold node number while allocasted so that Node knows where to write it back to without being told
 import java.util.*;
 import java.nio.file.*;
 
@@ -1013,16 +1013,16 @@ stop("Deprecated");
      {zz(); at.copy(N.at(isLeaf));
      }
 
-    void size(MemoryLayoutDM.At at)    ///                                         // Get size of stuck
+    void size(MemoryLayoutDM.At at)                                             // Get size of stuck
      {zz();
       at.copy(N.at(node_size));                                                 // Relies on size being in the same position and having the same size in both branches and leaves
      }
 
-    void copy(Node source)        ///                                              // Copy the memory of another node
+    void copy(Node source)                                                      // Copy the memory of another node
      {zz(); N.memory().copy(source.N.memory());
      }
 
-    void isFull()        ///                                                       // Set isFull to show whether the node is full or not, incidentlly setting IsLeaf as well
+    void isFull()                                                               // Set isFull to show whether the node is full or not, incidentlly setting IsLeaf as well
      {zz();
       isLeaf(T.at(IsLeaf));
       size(T.at(childSize));
@@ -1034,6 +1034,16 @@ stop("Deprecated");
          {z(); T.at(childSize).equal(T.at(maxKeysPerBranch), T.at(isFull));
          }
        };
+     }
+
+    void isLeafFull()                                                           // Set isFull to show whether the node known to be a leaf is full or not
+     {zz();
+      N.at(node_size).equal(T.at(maxKeysPerLeaf), T.at(isFull));
+     }
+
+    void isBranchFull()                                                         // Set isFull to show whether the node known to be a brnach is full or not
+     {zz();
+      N.at(node_size).equal(T.at(maxKeysPerBranch), T.at(isFull));
      }
 
     public String toString() {return ""+N;}                                     // As string
@@ -1072,25 +1082,24 @@ stop("Deprecated");
    (Layout.Variable Leaf,  MemoryLayoutDM.At Search, MemoryLayoutDM.At Found,
     MemoryLayoutDM.At Index)
    {zz();
-//  if (Assert) {tt(node_assertLeaf, node_findFirstGreaterThanOrEqualInLeaf); assertLeaf();}
-//  leafBase(lFirstLeaf, node_findFirstGreaterThanOrEqualInLeaf);
-//  lFirstLeaf.T.at(lFirstLeaf.search).move(T.at(search));
-//    lFirstLeaf.T.setIntInstruction(lFirstLeaf.limit, 0);
 
     leafBase(lFirstLeaf, Leaf);
     lFirstLeaf.searchFirstGreaterThanOrEqual(true, Search, Found, Index, null, null);
-
-//  P.parallelStart();
-//    T.at(found).move(lFirstLeaf.T.at(lFirstLeaf.found));
-//  P.parallelSection();
-//    T.at(first).move(lFirstLeaf.T.at(lFirstLeaf.index));
-//  P.parallelEnd();
    }
+
+  private void findFirstGreaterThanOrEqualInLeaf                                // Find the first key in the  leaf that is equal to or greater than the search key
+   (StuckDM Leaf, MemoryLayoutDM.At Search,
+    MemoryLayoutDM.At Found, MemoryLayoutDM.At Index)
+   {zz();
+    Leaf.searchFirstGreaterThanOrEqual(true, Search, Found, Index, null, null);
+   }
+
   private void findFirstGreaterThanOrEqualInBranch                              // Find the first key in the branch that is equal to or greater than the search key
    (Layout.Variable Branch,  MemoryLayoutDM.At Search, MemoryLayoutDM.At Found,
     MemoryLayoutDM.At Index, MemoryLayoutDM.At Data)
    {stop("Replaced");
    }
+
   private void findFirstGreaterThanOrEqualInBranch                              // Find the first key in the branch that is equal to or greater than the search key
    (Node Node,  MemoryLayoutDM.At Search, MemoryLayoutDM.At Found,
     MemoryLayoutDM.At Index, MemoryLayoutDM.At Data)
@@ -1868,14 +1877,14 @@ stop("Deprecated");
            }
          };
 
-        tt(node_leafIsFull, leafFound); leafIsFull();
-        P.new If(T.at(leafIsFull))                                              // Leaf is not full so we can insert immediately
-         {void Else()
+        nT.isLeafFull();
+        P.new If(T.at(isFull))
+         {void Else()                                                           // Leaf is not full so we can insert immediately
            {z();
             tt(search, Key);
             tt(node_findFirstGreaterThanOrEqualInLeaf, leafFound);
 
-            findFirstGreaterThanOrEqualInLeaf(leafFound, T.at(Key),             // Leaf known not to contain the search key
+            findFirstGreaterThanOrEqualInLeaf(lEqual, T.at(Key),                // Leaf known not to contain the search key
               T.at(found), lT.T.at(lT.index));
 
             P.new If(T.at(found))                                               // Insert
@@ -4203,6 +4212,11 @@ StuckSML(maxSize:4 size:2)
   1 key:0 data:2
 """);
 
+    t.T.at(t.isFull).ones();
+    n.isBranchFull();
+    t.P.run(); t.P.clear();
+    ok(t.T.at(t.isFull), "T.mergeable@71=0");
+
     t.T.at(t.l).setInt(1);
     l.clear();
     n.loadLeafStuckAndSize(l, t.l, t.index);
@@ -4215,6 +4229,11 @@ StuckSML(maxSize:4 size:2)
 StuckSML(maxSize:2 size:1)
   0 key:1 data:1
 """);
+
+    t.T.at(t.isFull).ones();
+    n.isLeafFull();
+    t.P.run(); t.P.clear();
+    ok(t.T.at(t.isFull), "T.mergeable@71=0");
 
     t.T.at(t.l).setInt(2);
     l.clear();
@@ -4229,6 +4248,11 @@ StuckSML(maxSize:2 size:2)
   0 key:2 data:2
   1 key:3 data:3
 """);
+
+    t.T.at(t.isFull).zero();
+    n.isLeafFull();
+    t.P.run(); t.P.clear();
+    ok(t.T.at(t.isFull), "T.mergeable@71=1");
 
     l.clear();
     t.new Node("root").loadRootStuck(t.bT);
@@ -4521,10 +4545,10 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_find();
-    //test_find_and_insert();
+    //test_find();
+    test_find_and_insert();
     //test_node();
-    //test_verilogPut_superSmall();
+//  test_verilogPut_superSmall();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
