@@ -7,6 +7,7 @@ package com.AppaApps.Silicon;                                                   
 // Node confirm that a load or a save identified by the trace back is actually changing the node - eliminate this that never have an effect
 // Stuck - get penultimate element. Use currentSize field directly instead of copy in it to a temporary variable
 // Use free in node to hold node number while allocasted so that Node knows where to write it back to without being told
+// Set an updated field for when an existing key has its associated data updated by put()
 import java.util.*;
 import java.nio.file.*;
 
@@ -1048,10 +1049,10 @@ stop("Deprecated");
 
     public String toString() {return ""+N;}                                     // As string
 
-    void print(int at)                                                          // Print the indexed node
+    String print(int at)                                                        // Print the indexed node
      {zz();
-      N.copy(M.at(Node, 0));
-      return ""+this;
+      N.memory().copy(M.memory(), M.at(Node, at).at);
+      return ""+N;
      }
    }
 
@@ -1862,17 +1863,15 @@ stop("Deprecated");
        {final ProgramDM.Label Return = end;
         find();
         tt(leafFound, find);                                                    // Find the leaf that should contain this key
-        //leafBase(lT, leafFound);
+
         P.new If (T.at(found))                                                  // Found the key in the leaf so update it with the new data
          {void Then()
            {z();
-P.new I() {void a() {say("AAAA");}};
             P.parallelStart();    lEqual.T.at(lEqual.tKey ).move(T.at(Key));
             P.parallelSection();  lEqual.T.at(lEqual.tData).move(T.at(Data));
             P.parallelSection();  lEqual.T.at(lEqual.index).move(T.at(index));
             P.parallelEnd();
             lEqual.setElementAt();                                              // Update stuck - we are assuming that the new data element differs from the old one to  justify this action
-
             nT.saveStuck(lEqual, leafFound);                                    // Save the node into memory
 
             P.parallelStart();    T.at(success).ones();
@@ -1887,32 +1886,32 @@ P.new I() {void a() {say("AAAA");}};
         P.new If(T.at(isFull))
          {void Else()                                                           // Leaf is not full so we can insert immediately
            {z();
-P.new I() {void a() {say("BBBB");}};
             tt(search, Key);
             tt(node_findFirstGreaterThanOrEqualInLeaf, leafFound);
 
             findFirstGreaterThanOrEqualInLeaf(lEqual, T.at(Key),                // Leaf known not to contain the search key
-              T.at(found), lT.T.at(lT.index));
+              T.at(found), lEqual.T.at(lEqual.index));
 
             P.new If(T.at(found))                                               // Insert
              {void Then()
                {z();
-                P.parallelStart();    lT.T.at(lT.tKey ).move(T.at(Key));
-                P.parallelSection();  lT.T.at(lT.tData).move(T.at(Data));
-//                P.parallelSection();  lT.T.at(lT.index).move(T.at(first));
+                P.parallelStart();    lEqual.T.at(lEqual.tKey ).move(T.at(Key));
+                P.parallelSection();  lEqual.T.at(lEqual.tData).move(T.at(Data));
                 P.parallelEnd();
 
-                lT.insertElementAt();
+                lEqual.insertElementAt();
                }
               void Else()                                                       // Extend
                {z();
-                P.parallelStart();   lT.T.at(lT.tKey ).move(T.at(Key));
-                P.parallelSection(); lT.T.at(lT.tData).move(T.at(Data));
+                P.parallelStart();   lEqual.T.at(lEqual.tKey ).move(T.at(Key));
+                P.parallelSection(); lEqual.T.at(lEqual.tData).move(T.at(Data));
                 P.parallelEnd();
-                lT.push();
+                lEqual.push();
                }
              };
+            nT.saveStuck(lEqual, leafFound);                                    // Save stuck back into memory
             P.parallelStart();   T.at(success).ones();
+            P.parallelSection(); T.at(inserted).ones();
             P.parallelSection(); tt(findAndInsert, leafFound);
             P.parallelSection(); P.Goto(Success == null ? Return : Success);
             P.parallelEnd();
@@ -2705,16 +2704,111 @@ endmodule
 
     t.findAndInsert(null);
 
-//    t.T.at(t.Key) .setInt(3);
-//    t.T.at(t.Data).setInt(3);
-//    t.P.run();
-//    stop(t.M);
+    final Node node = t.new Node("Node");
+    ok(node.print(1), """
+MemoryLayout: Node
+Memory      : Node
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0       165                                      node
+   2 B        0         1                                  1     isLeaf
+   3 V        1         6                                  0     free
+   4 U        7       158                                        branchOrLeaf
+   5 S        7       134                                          leaf
+   6 V        7         6                                  1         currentSize
+   7 A       13        64          2                                 Keys
+   8 V       13        32               0                  2           key
+   9 V       45        32               1                  4           key
+  10 A       77        64          2                                 Data
+  11 V       77        32               0                  1           data
+  12 V      109        32               1                  2           data
+  13 S        7       158                                          branch
+  14 V        7         6                                  1         currentSize
+  15 A       13       128          4                                 Keys
+  16 V       13        32               0                  2           key
+  17 V       45        32               1                  4           key
+  18 V       77        32               2                  1           key
+  19 V      109        32               3                  2           key
+  20 A      141        24          4                                 Data
+  21 V      141         6               0                  0           data
+  22 V      147         6               1                  0           data
+  23 V      153         6               2                  0           data
+  24 V      159         6               3                  0           data
+""");
 
-//  t.T.at(t.Key) .setInt(2);
-//  t.T.at(t.Data).setInt(2);
-//  t.P.run();
-//  ok(t.T.at(t.found).getInt(), 1);
-    final Node node = t.new Node("Node"); say(node.print(1));
+
+    t.T.at(t.Key) .setInt(2);
+    t.T.at(t.Data).setInt(2);
+    t.P.run();
+    ok(t.T.at(t.success) .getInt(), 1);
+    ok(t.T.at(t.found)   .getInt(), 1);
+    ok(t.T.at(t.inserted).getInt(), 0);
+    ok(node.print(1), """
+MemoryLayout: Node
+Memory      : Node
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0       165                                      node
+   2 B        0         1                                  1     isLeaf
+   3 V        1         6                                  0     free
+   4 U        7       158                                        branchOrLeaf
+   5 S        7       134                                          leaf
+   6 V        7         6                                  1         currentSize
+   7 A       13        64          2                                 Keys
+   8 V       13        32               0                  2           key
+   9 V       45        32               1                  4           key
+  10 A       77        64          2                                 Data
+  11 V       77        32               0                  2           data
+  12 V      109        32               1                  2           data
+  13 S        7       158                                          branch
+  14 V        7         6                                  1         currentSize
+  15 A       13       128          4                                 Keys
+  16 V       13        32               0                  2           key
+  17 V       45        32               1                  4           key
+  18 V       77        32               2                  2           key
+  19 V      109        32               3                  2           key
+  20 A      141        24          4                                 Data
+  21 V      141         6               0                  0           data
+  22 V      147         6               1                  0           data
+  23 V      153         6               2                  0           data
+  24 V      159         6               3                  0           data
+""");
+
+
+    t.T.at(t.Key) .setInt(3);
+    t.T.at(t.Data).setInt(3);
+    t.P.run();
+    //stop(node.print(1));
+    ok(t.T.at(t.success) .getInt(), 1);
+    ok(t.T.at(t.found)   .getInt(), 0);
+    ok(t.T.at(t.inserted).getInt(), 1);
+    ok(node.print(1), """
+MemoryLayout: Node
+Memory      : Node
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0       165                                      node
+   2 B        0         1                                  1     isLeaf
+   3 V        1         6                                  0     free
+   4 U        7       158                                        branchOrLeaf
+   5 S        7       134                                          leaf
+   6 V        7         6                                  2         currentSize
+   7 A       13        64          2                                 Keys
+   8 V       13        32               0                  2           key
+   9 V       45        32               1                  3           key
+  10 A       77        64          2                                 Data
+  11 V       77        32               0                  2           data
+  12 V      109        32               1                  3           data
+  13 S        7       158                                          branch
+  14 V        7         6                                  2         currentSize
+  15 A       13       128          4                                 Keys
+  16 V       13        32               0                  2           key
+  17 V       45        32               1                  3           key
+  18 V       77        32               2                  2           key
+  19 V      109        32               3                  3           key
+  20 A      141        24          4                                 Data
+  21 V      141         6               0                  0           data
+  22 V      147         6               1                  0           data
+  23 V      153         6               2                  0           data
+  24 V      159         6               3                  0           data
+""");
    }
 
   private static void test_find_and_update()
