@@ -1106,7 +1106,7 @@ abstract class BtreePA extends Test                                             
   private void splitBranchRoot()                                                // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
    {zz();
     if (Assert) {T.setIntInstruction(node_assertBranch, root); assertBranch();}
-    if (Halt)                                                                   // Confirm the root is fiull
+    if (Halt)                                                                   // Confirm the root is full
      {T.setIntInstruction(node_branchIsFull, root); branchIsFull();
       P.new If (T.at(branchIsFull))
        {void Else()
