@@ -72,10 +72,11 @@ class Memory extends Test                                                       
 
   void copy(Memory source, int offset)                                          // Initialize this memory from a source memory by copying as many bits as possible into the start of the target memory from the indexed location in the source memory
    {zz();
-    final int N = min(size()-offset, source.size());
+    final int N = min(size(), source.size()-offset);
+
     for(int i = 0; i < N; ++i)
      {z();
-      bits[offset+i] = source.bits[i];
+      bits[i] = source.bits[offset+i];
      }
    }
 
@@ -399,15 +400,15 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 
   static void test_copy_source()
    {z();
-    Memory m = memory("aaa",  128);
-    Memory n = memory("bbb",  256);
+    Memory m = memory("aaa",  256);
+    Memory n = memory("bbb",  128);
     m.alternating(4);
     //stop(m);
     ok(m, """
 Memory: aaa
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
-   0  0000 0000 0000 0000 0000 0000 0000 0000 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0
+   0  f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0
 """);
 
     //stop(n);
@@ -424,7 +425,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 Memory: bbb
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
-   0  0000 0000 0000 0000 0000 0000 0000 0001 e1e1 e1e1 e1e1 e1e1 e1e1 e1e1 e1e1 e1e0
+   0  0000 0000 0000 0000 0000 0000 0000 0000 7878 7878 7878 7878 7878 7878 7878 7878
 """);
    }
 
