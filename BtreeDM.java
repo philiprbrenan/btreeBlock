@@ -7,12 +7,14 @@ package com.AppaApps.Silicon;                                                   
 // Node confirm that a load or a save identified by the trace back is actually changing the node - eliminate this that never have an effect
 // Stuck - get penultimate element. Use currentSize field directly instead of copy in it to a temporary variable
 // Use free in node to hold node number while allocasted so that Node knows where to write it back to without being told
-// Set an updated field for when an existing key has its associated data updated by put()
+// Set an updated field for when an existing key has its associated data updated by put
+// Merge only on either side of the key path
 import java.util.*;
 import java.nio.file.*;
 
 abstract class BtreeDM extends Test                                             // Manipulate a btree using static methods and memory
- {final MemoryLayoutDM M;                                                       // The memory layout of the btree
+ {final BtreeDM thisBTree = this;                                               // Direct access to this btree even when this goes out of range
+  final MemoryLayoutDM M;                                                       // The memory layout of the btree
   final MemoryLayoutDM T;                                                       // The memory used to hold temporary variable used during a transaction on the btree
   final ProgramDM      P = new ProgramDM();                                     // Program in which to generate instructions
   final boolean   Assert = false;                                               // Execute asserts if true
@@ -1014,9 +1016,10 @@ stop("Deprecated");
      {zz(); at.copy(N.at(isLeaf));
      }
 
-    void size(MemoryLayoutDM.At at)                                             // Get size of stuck
+    void branchSize(MemoryLayoutDM.At at)                                       // Get size of branch stuck
      {zz();
       at.copy(N.at(node_size));                                                 // Relies on size being in the same position and having the same size in both branches and leaves
+      at.dec();                                                                 // Account for top
      }
 
     void copy(Node source)                                                      // Copy the memory of another node
@@ -1026,13 +1029,14 @@ stop("Deprecated");
     void isFull()                                                               // Set isFull to show whether the node is full or not, incidentlly setting IsLeaf as well
      {zz();
       isLeaf(T.at(IsLeaf));
-      size(T.at(childSize));
       P.new If (T.at(IsLeaf))
        {void Then()
-         {z(); T.at(childSize).equal(T.at(maxKeysPerLeaf),   T.at(isFull));
+         {z();
+          N.at(node_size).equal(T.at(maxKeysPerLeaf), T.at(isFull));
          }
         void Else()
-         {z(); T.at(childSize).equal(T.at(maxKeysPerBranch), T.at(isFull));
+         {z();
+          N.at(node_size).greaterThan(T.at(maxKeysPerBranch), T.at(isFull));    // The presence of top adds one more to the size so greater than is required rather than equals
          }
        };
      }
@@ -1042,7 +1046,7 @@ stop("Deprecated");
       N.at(node_size).equal(T.at(maxKeysPerLeaf), T.at(isFull));
      }
 
-    void isBranchFull()                                                         // Set isFull to show whether the node known to be a brnach is full or not
+    void isBranchFull()                                                         // Set isFull to show whether the node known to be a branch is full or not
      {zz();
       N.at(node_size).equal(T.at(maxKeysPerBranch), T.at(isFull));
      }
@@ -1228,7 +1232,6 @@ stop("Deprecated");
 
     P.parallelStart();   lR.firstElement();
     P.parallelSection(); lL. lastElement();
-    //P.parallelSection(); branchBase(bT, splitParent);                           // The parent branch
     P.parallelEnd();
 
     P.parallelStart();
@@ -1248,7 +1251,7 @@ stop("Deprecated");
     P.parallelEnd();
     bT.insertElementAt();                                                       // Insert new key, next pair into parent
 
-    P.parallelStart();   nT.saveRootStuck(bT);
+    P.parallelStart();   nT.saveStuck(bT,  splitParent);
     P.parallelSection(); nL.saveStuck(lL, l);
     P.parallelSection(); nR.saveStuck(lR, node_splitLeaf);
     P.parallelEnd();
@@ -1637,7 +1640,8 @@ stop("Deprecated");
              };
             stealNotPossible(end);
 
-            lR.prepend(lL);
+           lR.prepend(lL);
+            nR.saveStuck(lR, r);                                                // Save modified right branch
            }
           void Else()                                                           // Children are branches
            {z();
@@ -1660,7 +1664,6 @@ stop("Deprecated");
              };
             stealNotPossible(end);
 
-            z();
             bT.T.at(bT.index).add(T.at(index), -1);                             // Top key
             bT.elementAt();                                                     // Top key
 
@@ -1671,16 +1674,15 @@ stop("Deprecated");
             bR.unshift();                                                       // Left top to right
 
             bR.prepend(bL);
+            nR.saveStuck(bR, r);                                                // Save modified right branch
            }
          };
 
         bT.T.at(bT.index).add(T.at(index), -1);                                 // Account for top
         bT.removeElementAt();                                                   // Reduce parent on left
 
-        P.parallelStart();    nT.saveStuck(bT, node_mergeLeftSibling);          // Save parent branch and modified right branch
-        P.parallelSection();  nR.saveStuck(bR, r);
-        P.parallelSection();  free(l);                                          // Free the left node whose contents have been merged away
-        P.parallelEnd();
+        nT.saveStuck(bT, node_mergeLeftSibling);                                // Save parent branch
+        free(l);                                                                // Free the left node whose contents have been merged away
 
         z(); T.at(stolenOrMerged).ones();
        }
@@ -1697,17 +1699,15 @@ stop("Deprecated");
         bT.T.at(bT.size).lessThan(T.at(two), T.at(stolenOrMerged));
         stealNotPossible(end);
 
-        z();
         bT.T.at(bT.index).move(T.at(index));
         bT.elementAt();
 
         P.parallelStart();   T.at(l).move(bT.T.at(bT.tData));
         P.parallelSection(); bT.T.at(bT.index).add(T.at(index), +1);
         P.parallelEnd();
-
         bT.elementAt();
-        T.at(r).move(bT.T.at(bT.tData));
 
+        T.at(r).move(bT.T.at(bT.tData));
         hasLeavesForChildren(bT);
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
@@ -1731,6 +1731,7 @@ stop("Deprecated");
             stealNotPossible(end);
 
             lL.concatenate(lR);
+            nL.saveStuck(lL, l);                                                // Save modified left branch
            }
           void Else()                                                           // Children are branches
            {P.parallelStart();     nL.loadBranchStuckAndSize(bL, l, nl);
@@ -1762,6 +1763,7 @@ stop("Deprecated");
             bL.setElementAt();                                                  // Re-key left top
 
             bL.concatenate(bR);
+            nL.saveStuck(bL, l);                                                // Save modified left branch
            } // Else
          };
 
@@ -1780,9 +1782,7 @@ stop("Deprecated");
         bT.T.at(bT.index).add(T.at(index), +1);                                 // Reduce parent on right
         bT.removeElementAt();                                                   // Reduce parent on right
 
-        P.parallelStart();    nT.saveStuck(bT, node_mergeLeftSibling);          // Save parent branch and modified left branch
-        P.parallelSection();  nL.saveStuck(bL, l);
-        P.parallelEnd();
+        nT.saveStuck(bT, node_mergeRightSibling);                               // Save parent branch
 
         z(); T.at(stolenOrMerged).ones();
        }
@@ -1799,7 +1799,7 @@ stop("Deprecated");
         bT.elementAt();
 
         nC.loadNode(bT.T.at(bT.tData));                                         // Child node
-        nC.size(T.at(childSize));                                               // Size of child - leaves and branches share a size field
+        nC.branchSize(T.at(childSize));                                         // Size of branch accounting for top
         T.at(childSize).lessThan(T.at(two), T.at(isLow));                       // Check that the child node has at least two elements otherwise we cannot steal from it
         P.GoOff(end, T.at(isLow));
         tt(node_stealFromLeft,     node_balance); stealFromLeft    (); P.GoOn(end, T.at(stolenOrMerged));
@@ -1930,7 +1930,7 @@ stop("Deprecated");
      {void code()
        {final ProgramDM.Label Return = end;
         findAndInsert(Return);                                                  // Try direct insertion with no modifications to the shape of the tree
-        nT.loadRoot();                                                              // Load root
+        nT.loadRoot();                                                          // Load root
         nT.isFull();
         P.new If (T.at(isFull))                                                 // Start the insertion at the root(), after splitting it if necessary
          {void Then()
@@ -1944,22 +1944,24 @@ stop("Deprecated");
            }
          };
 
-        nT.loadStuck(bT);                                                       // Load root as branch
+        nT.loadRootStuck(bT);                                                   // Load root as branch. If it were a leaf and had spae find and insert would have worked or the root would have been split and so must be branch.
+        T.at(parent).zero();
 
         P.new Block()                                                           // Step down through the tree, splitting as we go
          {void code()
-           {findFirstGreaterThanOrEqualInBranch(nT, T.at(Key), null, T.at(first), T.at(child));
+           {findFirstGreaterThanOrEqualInBranch                                 // Step down from parent to child
+             (nT, T.at(Key), null, T.at(first), T.at(child));
 
             P.new Block()                                                       // Reached a leaf
              {void code()
                {P.GoOff(end, M.at(bTree_isLeaf, T.at(child)));
-                P.parallelStart();   tt(index, first);                          // Index of the matching key
+                P.parallelStart();   tt(index,          first);                 // Index of the matching key
                 P.parallelSection(); tt(node_splitLeaf, child);
-                //P.parallelSection(); tt(splitParent, parent);
+                P.parallelSection(); tt(splitParent,   parent);
                 P.parallelEnd();
-
                 splitLeaf();                                                    // Split the child leaf
                 findAndInsert(null);                                            // Now guaranteed to work
+
                 merge();                                                        // Improve the tree along the path to the key
                 P.Goto(Return);
                }
@@ -1967,14 +1969,14 @@ stop("Deprecated");
             z();
 
             nC.loadNode(T.at(child));
-            nC.size(T.at(childSize));
+            nC.branchSize(T.at(childSize));
             T.at(childSize).equal(T.at(maxKeysPerBranch), T.at(branchIsFull));  // Check whether the child needs splitting because it is full
 
             P.new If (T.at(branchIsFull))                                       // Step down, splitting full branches as we go
              {void Then()
                {P.parallelStart();   tt(index, first);
                 P.parallelSection(); tt(node_splitBranch, child);
-                //P.parallelSection(); tt(splitParent, parent);
+                P.parallelSection(); tt(splitParent, parent);
                 P.parallelEnd();
 
                 splitBranch();                                                  // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
@@ -1983,7 +1985,8 @@ stop("Deprecated");
                  (nT, T.at(Key), null, null, T.at(child));
                }
              };
-            nT.copy(nC);                                                        // Step down "From the heights"
+            nT.loadStuck(bT, child);                                            // Step down "From the heights"
+            tt(parent, child);
             P.Goto(start);
            }
          };
@@ -2080,7 +2083,7 @@ stop("Deprecated");
             T.at(mergeIndex).zero();                                            // Index of child being merged
             P.new Block()                                                       // Try merging each sibling pair which might change the size of the parent
              {void code()
-               {nT.size(T.at(childSize));
+               {nT.branchSize(T.at(childSize));
                 T.at(mergeIndex).greaterThanOrEqual(T.at(childSize), T.at(nodeMerged));
                 P.GoOn(end, T.at(nodeMerged));                                  // All sequential pairs of siblings have been offered a chance to merge
 
@@ -2170,16 +2173,16 @@ stop("Deprecated");
   abstract class VerilogCode                                                    // Generate verilog code
    {final String       project;                                                 // Project name - used to generate file names
     final String        folder;                                                 // Folder in which to place project
-          String projectFolder;                                                 // Folder in which to place verilog
-          String sourceVerilog;                                                 // Source verilog file
-          String   testVerilog;                                                 // Verilog test bench file
-          String         mFile;                                                 // Folder in which to place include for btree memory
-          String         tFile;                                                 // Folder in which to place include for btree transaction memory
-          String     opCodeMap = "opCodeMap";                                   // Name of op code map
-          String opCodeMapFile;                                                 // File to contain op code map
-          String     testsFile;                                                 // File in which to place verilog test results sumamry
-          String     traceFile;                                                 // Folder in which to place verilog execution trace file
-          String javaTraceFile;                                                 // Folder in which to place java    execution trace file
+    final String projectFolder;                                                 // Folder in which to place verilog
+    final String sourceVerilog;                                                 // Source verilog file
+    final String   testVerilog;                                                 // Verilog test bench file
+    final String         mFile;                                                 // Folder in which to place include for btree memory
+    final String         tFile;                                                 // Folder in which to place include for btree transaction memory
+    final String     opCodeMap = "opCodeMap";                                   // Name of op code map
+    final String opCodeMapFile;                                                 // File to contain op code map
+    final String     testsFile;                                                 // File in which to place verilog test results sumamry
+    final String     traceFile;                                                 // Folder in which to place verilog execution trace file
+    final String javaTraceFile;                                                 // Folder in which to place java    execution trace file
     final ProgramDM    program;                                                 // Program associated with this tree
     final StringToNumbers  ops = new StringToNumbers();                         // Collapse identical instructions
     final String blockIndent = " ".repeat(10), statementIndent = " ".repeat(16);// Indentation for Verilog
@@ -2196,6 +2199,20 @@ stop("Deprecated");
     VerilogCode(String Project, String Folder)                                  // Generate verilog code
      {zz();
       project = Project; folder = Folder; program = P;
+
+      final String subProject = ""+Key() +
+       (statements == null ? "" : "/statement/"+statements);                    // Some times we only want the specified statement to be generated (a block in always) so that we can use timing analysis to estimate the timing for that block
+
+      projectFolder = ""+Paths.get(folder, project, subProject);                // Use the  key to identify the sub project
+      sourceVerilog = ""+Paths.get(projectFolder, project+Verilog.ext);
+        testVerilog = ""+Paths.get(projectFolder, project+Verilog.testExt);
+              mFile = ""+Paths.get(projectFolder, "includes", "M"+Verilog.header);
+              tFile = ""+Paths.get(projectFolder, "includes", "T"+Verilog.header);
+      opCodeMapFile = ""+Paths.get(projectFolder, "includes", opCodeMap+Verilog.header);
+          testsFile = ""+Paths.get(projectFolder, "tests.txt");
+          traceFile = ""+Paths.get(projectFolder, "trace.txt");
+      javaTraceFile = ""+Paths.get(projectFolder, "traceJava.txt");
+      makePath(projectFolder);
      }
 
     void eachStatement()                                                        // Generate verilog with each statement appearing once
@@ -2220,21 +2237,6 @@ stop("Deprecated");
        }
 
       ops.order();                                                              // Order the instructions
-
-      final String subProject = ""+Key() +
-       (statements == null ? "" : "/statement/"+statements);                    // Some times we only want the specified statement to be generated (a block in always) so that we can use timing analysis to estimate the timing for that block
-
-      projectFolder = ""+Paths.get(folder, project, subProject);                // Use the  key to identify the sub project
-      sourceVerilog = ""+Paths.get(projectFolder, project+Verilog.ext);
-        testVerilog = ""+Paths.get(projectFolder, project+Verilog.testExt);
-              mFile = ""+Paths.get(projectFolder, "includes", "M"+Verilog.header);
-              tFile = ""+Paths.get(projectFolder, "includes", "T"+Verilog.header);
-      opCodeMapFile = ""+Paths.get(projectFolder, "includes", opCodeMap+Verilog.header);
-          testsFile = ""+Paths.get(projectFolder, "tests.txt");
-          traceFile = ""+Paths.get(projectFolder, "trace.txt");
-      javaTraceFile = ""+Paths.get(projectFolder, "traceJava.txt");
-      makePath(projectFolder);
-
       ops.genVerilog(opCodeMapFile, opCodeMap);                                 // Write op code map
 
       final StringBuilder s = new StringBuilder();                              // Generate code
@@ -4639,9 +4641,9 @@ Line T       At      Wide       Size    Indices        Value   Name
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
     //test_find();
-    test_find_and_insert();
+    //test_find_and_insert();
     //test_node();
-//  test_verilogPut_superSmall();
+    test_verilogPut_superSmall();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
