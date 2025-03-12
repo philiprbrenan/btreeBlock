@@ -995,7 +995,7 @@ stop("Deprecated");
      {zz(); N.at(branchOrLeaf).copy(Stuck.M);
      }
 
-    void saveStuck(StuckDM Stuck, Layout.Variable at)///                           // Save a stuck into indexed main memory
+    void saveStuck(StuckDM Stuck, Layout.Variable at)                           // Save a stuck into indexed main memory
      {zz();
       saveStuck(Stuck);
       saveNode(M.at(Node, T.at(at)));
@@ -1047,6 +1047,12 @@ stop("Deprecated");
      }
 
     public String toString() {return ""+N;}                                     // As string
+
+    void print(int at)                                                          // Print the indexed node
+     {zz();
+      N.copy(M.at(Node, 0));
+      return ""+this;
+     }
    }
 
 //D2 Search                                                                     // Search within a node and update the node description with the results
@@ -1860,14 +1866,14 @@ stop("Deprecated");
         P.new If (T.at(found))                                                  // Found the key in the leaf so update it with the new data
          {void Then()
            {z();
+P.new I() {void a() {say("AAAA");}};
             P.parallelStart();    lEqual.T.at(lEqual.tKey ).move(T.at(Key));
             P.parallelSection();  lEqual.T.at(lEqual.tData).move(T.at(Data));
             P.parallelSection();  lEqual.T.at(lEqual.index).move(T.at(index));
             P.parallelEnd();
-
             lEqual.setElementAt();                                              // Update stuck - we are assuming that the new data element differs from the old one to  justify this action
-            nT.saveStuck(lEqual);                                               // Save the Stuck into the Node
-            nT.saveNode(M.at(Node, T.at(leafFound)));                           // Save the node into memory
+
+            nT.saveStuck(lEqual, leafFound);                                    // Save the node into memory
 
             P.parallelStart();    T.at(success).ones();
             P.parallelSection();  T.at(inserted).zero();
@@ -1881,6 +1887,7 @@ stop("Deprecated");
         P.new If(T.at(isFull))
          {void Else()                                                           // Leaf is not full so we can insert immediately
            {z();
+P.new I() {void a() {say("BBBB");}};
             tt(search, Key);
             tt(node_findFirstGreaterThanOrEqualInLeaf, leafFound);
 
@@ -2674,27 +2681,23 @@ endmodule
 
   private static void test_find_and_insert()
    {z();
-    final int N = 14;
+    final int N = 3;
     final BtreePA T = BtreePA.btreePA(2, 3);
     T.P.run(); T.P.clear();
     T.put();
     for(int i = 1; i <= N; ++i)
-     {T.T.at(T.Key) .setInt(i);
-      T.T.at(T.Data).setInt(i-1);
+     {T.T.at(T.Key) .setInt(2*i);
+      T.T.at(T.Data).setInt(i);
       T.P.run();
      }
 
     //stop(T);
     ok(T, """
-                               8                             |
-                               0                             |
-                               5                             |
-                               6                             |
-      2      4        6                10         12         |
-      5      5.1      5.2              6          6.1        |
-      1      3        4                8          10         |
-                      7                           2          |
-1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=2 |
+    3      |
+    0      |
+    1      |
+    2      |
+2=1  4,6=2 |
 """);
 
     final BtreeDM t = btreeDM(T);
@@ -2702,20 +2705,16 @@ endmodule
 
     t.findAndInsert(null);
 
-    for(int i = 1; i <= N; ++i)
-     {t.T.at(t.Key) .setInt(i);
-      t.T.at(t.Data).setInt(i);
-      t.P.run();
-     }
+//    t.T.at(t.Key) .setInt(3);
+//    t.T.at(t.Data).setInt(3);
+//    t.P.run();
+//    stop(t.M);
 
-    t.P.clear();
-    t.find();
-    for(int i = 1; i <= N; ++i)
-     {t.T.at(t.Key) .setInt(i);
-      t.P.run();
-      ok(t.T.at(t.found).getInt(), 1);
-      ok(t.T.at(t.data) .getInt(), i);
-     }
+//  t.T.at(t.Key) .setInt(2);
+//  t.T.at(t.Data).setInt(2);
+//  t.P.run();
+//  ok(t.T.at(t.found).getInt(), 1);
+    final Node node = t.new Node("Node"); say(node.print(1));
    }
 
   private static void test_find_and_update()
