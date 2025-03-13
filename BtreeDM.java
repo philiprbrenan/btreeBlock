@@ -2036,12 +2036,8 @@ stop("Deprecated");
 
         P.new Block()                                                           // Step down through the tree, merging as we go
          {void code()
-           {
-P.new I() {void a() {say("AAAA1111", bT);}};
-
-            findFirstGreaterThanOrEqualInBranch
+           {findFirstGreaterThanOrEqualInBranch
              (nT, T.at(Key), null, T.at(first), T.at(child));
-P.new I() {void a() {if (debug) {say("AAAA2222", T.at(first), T.at(child));}}};
 
             P.parallelStart();   tt(index, first);
             P.parallelSection(); tt(node_balance, parent);
@@ -2049,26 +2045,18 @@ P.new I() {void a() {if (debug) {say("AAAA2222", T.at(first), T.at(child));}}};
 
             augment();                                                          // Make sure there are enough entries in the parent to permit a deletion
 
-            nC.loadNode(T.at(child));
-P.new I() {void a() {if (debug) {say("AAAA333a", thisBTree, T.at(child), nC);}}};
-            nC.isLeaf(T.at(IsLeaf));
-P.new I() {void a() {if (debug) {say("AAAA333b", thisBTree, T.at(IsLeaf));}}};
-
-            P.new If (T.at(IsLeaf))                                             // Reached a leaf
+            T.at(isLeaf).move(M.at(bTree_isLeaf, T.at(child)));
+            P.new If (T.at(isLeaf))                                             // Reached a leaf
              {void Then()
                {z();
-P.new I() {void a() {if (debug) {say("AAAA444", thisBTree, bT);}}};
                 findAndDelete();
-P.new I() {void a() {if (debug) {say("AAAA555", thisBTree, bT);}}};
                 tt(deleted, found);
                 merge();
-P.new I() {void a() {if (debug) {say("AAAA6666", thisBTree, bT);}}};
                 P.Goto(Return);
                }
              };
             nT.loadStuck(bT, child);
             tt(parent, child);
-P.new I() {void a() {if (debug) {say("AAAA777", T.at(Key), thisBTree, bT);}}};
             P.Goto(start);
            }
          };
@@ -3815,7 +3803,6 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-t.debug = true;
     t.runVerilogDeleteTest_superSmall(4, 2, 379, """
              5           |
              0           |
@@ -4659,7 +4646,8 @@ Line T       At      Wide       Size    Indices        Value   Name
     //test_find();
     //test_find_and_insert();
     //test_node();
-    //test_verilogPut_superSmall();
+    test_verilogFind_superSmall();
+    test_verilogPut_superSmall();
     test_verilogDelete_superSmall();
    }
 
