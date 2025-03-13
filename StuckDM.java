@@ -1,11 +1,12 @@
 //------------------------------------------------------------------------------
-// StuckDM using duistributed memory
+// StuckDM using distributed memory
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
 
 abstract class StuckDM extends Test                                             // A fixed size stack of ordered key, data pairs
- {abstract int maxSize();                                                       // The maximum number of entries in the stuck.
+ {final StuckDM thisStuckDM = this;                                             // Easy access from inside other classes that obscure this this
+  abstract int maxSize();                                                       // The maximum number of entries in the stuck.
   abstract int bitsPerKey();                                                    // The number of bits needed to define a key
   abstract int bitsPerData();                                                   // The number of bits needed to define a data field
   abstract int bitsPerSize();                                                   // The number of bits needed to define the size field
