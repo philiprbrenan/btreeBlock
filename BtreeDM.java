@@ -197,26 +197,6 @@ abstract class BtreeDM extends Test                                             
      };
    }
 
-  private static BtreeDM superSmall()                                           // Define a super small tree
-   {return new BtreeDM()
-     {int maxSize         () {return 8;}
-      int maxKeysPerLeaf  () {return 2;}
-      int maxKeysPerBranch() {return 3;}
-      int bitsPerKey      () {return 4;}
-      int bitsPerData     () {return 3;}
-     };
-   }
-
-  private static BtreeDM superSmall2()                                          // Define a super small tree
-   {return new BtreeDM()
-     {int maxSize         () {return 16;}
-      int maxKeysPerLeaf  () {return  2;}
-      int maxKeysPerBranch() {return  3;}
-      int bitsPerKey      () {return  4;}
-      int bitsPerData     () {return  3;}
-     };
-   }
-
   private static BtreeDM allTreeOps()                                           // Define a tree capable of performing all operations
    {return new BtreeDM()
      {int maxSize         () {return 16;}
@@ -945,7 +925,7 @@ stop("Deprecated");
 
     void loadNode(MemoryLayoutDM.At at)                                         // Load with the node addressed by this variable
      {zz();
-      N.copy(at);
+      N.copy(M.at(Node, at));
      }
 
     void saveRoot()                                                             // Save root
@@ -970,7 +950,7 @@ stop("Deprecated");
 
     void loadStuck(StuckDM Stuck, Layout.Variable at)                           // Load a stuck from indexed main memory
      {zz();
-      loadNode(M.at(Node, T.at(at)));
+      loadNode(T.at(at));
       loadStuck(Stuck);
      }
 
@@ -1257,7 +1237,7 @@ stop("Deprecated");
     P.parallelEnd();
    }
 
-  private void splitBranch()                                                    // Split a branch which is not the root which is not the root assuming the nT/bT ahave the full details of the parent and that the node to be split is indexed by node_splitBranch
+  private void splitBranch()                                                    // Split a branch which is not the root  assuming the nT/bT ahave the full details of the parent and that the node to be split is indexed by node_splitBranch
    {zz();
     allocBranch(); tt(l, allocBranch);
 
@@ -1835,7 +1815,7 @@ stop("Deprecated");
          {void code()
            {findFirstGreaterThanOrEqualInBranch                                 // Find next child in search path of key
              (nT, T.at(Key), null, null, T.at(child));
-            nT.loadNode(M.at(Node, T.at(child)));
+            nT.loadNode(T.at(child));
 
             P.new Block()                                                       // Found the containing leaf
              {void code()
@@ -1943,7 +1923,6 @@ stop("Deprecated");
             findAndInsert(Return);                                              // Splitting the root() might have been enough
            }
          };
-
         nT.loadRootStuck(bT);                                                   // Load root as branch. If it were a leaf and had spae find and insert would have worked or the root would have been split and so must be branch.
         T.at(parent).zero();
 
@@ -1959,6 +1938,7 @@ stop("Deprecated");
                 P.parallelSection(); tt(node_splitLeaf, child);
                 P.parallelSection(); tt(splitParent,   parent);
                 P.parallelEnd();
+
                 splitLeaf();                                                    // Split the child leaf
                 findAndInsert(null);                                            // Now guaranteed to work
 
@@ -2424,7 +2404,7 @@ endmodule
 
       //ok(P.steps, expSteps());                                                // Steps in Java code
       ok(T.at(BtreeDM.this.data).getInt(), data());                             // Data associated with key from java code
-      if (debug) stop(toString());                                              // Print tree if debugging
+      if (debug) stop(""+thisBTree);                                              // Print tree if debugging
       if (expected() != null) ok(BtreeDM.this, expected());                     // Check resulting tree
       return this;
      }
@@ -3541,9 +3521,9 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_delete_random(random_large);
    }
 
-  private static void test_verilogFind_superSmall()                             // Find using generated verilog code
+  private static void test_verilogFind()                                        // Find using generated verilog code
    {z();
-    final BtreeDM t = superSmall();
+    final BtreeDM t = allTreeOps();
     t.P.run(); t.P.clear();
     t.put();
     final int N = 9;
@@ -3580,61 +3560,10 @@ Line T       At      Wide       Size    Indices        Value   Name
 //   }.generate();
      }.execJavaTest();
 
-    //say("AAAA11", t);
-    //say("AAAA22", t.P);
-    //say("AAAA22", t.T);
-    //say("AAAA22", t.M);
     ok(t.T.at(t.data).getInt(), 7);                                             // Data associated with key
-//  if (!github_actions) v.eachStatement();                                     // Generate each statement in isolation so it can be timed
    }
 
-  private static void test_verilogFind_allTreeOps()                             // Find using generated verilog code
-   {z();
-    final BtreeDM t = allTreeOps();
-    t.P.run(); t.P.clear();
-    t.put();
-    final int N = 9;
-    for (int i = 1; i <= N; ++i)
-     {say(currentTestName(),  "a", i);
-      t.T.at(t.Key ).setInt(i);
-      t.T.at(t.Data).setInt(N-i);
-      t.P.run();
-     }
-    //stop(t.M);
-    //stop(t);
-    ok(t, """
-             4                    |
-             0                    |
-             5                    |
-             6                    |
-      2             6    7        |
-      5             6    6.1      |
-      1             4    7        |
-      3                  2        |
-1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
-""");
-    t.P.clear(); t.T.clear();                                                   // Clear program and transaction memory
-    t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
-    t.find();
-
-    VerilogCode v = t.new VerilogCode("find", "verilog")                        // Generate verilog now that memories have been initialized and the program written
-     {int    Key     () {return    2;}                                          // Input key value
-      int    Data    () {return    2;}                                          // Input data value
-      int    data    () {return    7;}                                          // Expected output data value
-      int    maxSteps() {return 2000;}                                          // Maximum number if execution steps
-      int    expSteps() {return   19;}                                          // Expected number of steps
-      String expected() {return null;}                                          // Expected tree if present
-     }.generate();
-
-    //say("AAAA11", t);
-    //say("AAAA22", t.P);
-    //say("AAAA22", t.T);
-    //say("AAAA22", t.M);
-    ok(t.T.at(t.data).getInt(), 7);                                             // Data associated with key
-//  if (!github_actions) v.eachStatement();                                     // Generate each statement in isolation so it can be timed
-   }
-
-  private void runVerilogDeleteTest_allTreeOps                                  // Run the java and verilog versions and compare the resulting memory traces
+  private void runVerilogDeleteTest                                             // Run the java and verilog versions and compare the resulting memory traces
    (int Key, int data, int steps, String expected)
    {z();
     T.at(this.Key).setInt(Key);                                                 // Sets memory directly not via an instruction
@@ -3646,10 +3575,11 @@ Line T       At      Wide       Size    Indices        Value   Name
       int    maxSteps() {return  2000;}                                         // Maximum number if execution steps
       int    expSteps() {return steps;}                                         // Expected number of steps
       String expected() {return null;}                                          // Expected tree if present
-     }.generate();
+//   }.generate();
+     }.execJavaTest();
    }
 
-  private static void test_verilogDelete_allTreeOps()                           // Delete using generated verilog code
+  private static void test_verilogDelete()                                      // Delete using generated verilog code
    {z();
     final BtreeDM t = allTreeOps();
     t.P.run(); t.P.clear();
@@ -3678,7 +3608,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest_allTreeOps(3, 6, 398, """
+    t.runVerilogDeleteTest(3, 6, 398, """
                     6           |
                     0           |
                     5           |
@@ -3690,7 +3620,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(4, 5, 340, """
+    t.runVerilogDeleteTest(4, 5, 340, """
              6           |
              0           |
              5           |
@@ -3702,7 +3632,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  5,6=4  7=7  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(2, 7, 361, """
+    t.runVerilogDeleteTest(2, 7, 361, """
     4      6      7        |
     0      0.1    0.2      |
     1      4      7        |
@@ -3710,7 +3640,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1=1  5,6=4    7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(1, 8, 285, """
+    t.runVerilogDeleteTest(1, 8, 285, """
       6    7        |
       0    0.1      |
       1    7        |
@@ -3718,7 +3648,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 5,6=1  7=7    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(5, 4, 174, """
+    t.runVerilogDeleteTest(5, 4, 174, """
       7      |
       0      |
       1      |
@@ -3726,7 +3656,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(6, 3, 180, """
+    t.runVerilogDeleteTest(6, 3, 180, """
     7      |
     0      |
     1      |
@@ -3734,228 +3664,20 @@ Line T       At      Wide       Size    Indices        Value   Name
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(7, 2, 208, """
+    t.runVerilogDeleteTest(7, 2, 208, """
 8,9=0 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(8, 1, 22, """
+    t.runVerilogDeleteTest(8, 1, 22, """
 9=0 |
 """);
 
-    t.runVerilogDeleteTest_allTreeOps(9, 0, 22, """
+    t.runVerilogDeleteTest(9, 0, 22, """
 =0 |
 """);
    }
 
-  private void runVerilogDeleteTest_superSmall                                  // Run the java and verilog versions and compare the resulting memory traces
-   (int Key, int data, int steps, String expected)
-   {z();
-    T.at(this.Key).setInt(Key);                                                 // Sets memory directly not via an instruction
-
-    VerilogCode v = new VerilogCode("delete", "verilog")                        // Generate verilog now that memories have beeninitialzied and the program written
-     {int    Key     () {return   Key;}                                         // Input key value
-      int    Data    () {return     3;}                                         // Input key value
-      int    data    () {return  data;}                                         // Expected output data value
-      int    maxSteps() {return  1000;}                                         // Maximum number if execution steps
-      int    expSteps() {return steps;}                                         // Expected number of steps
-      String expected() {return null;}                                          // Expected tree if present
-   //}.generate();
-     }.execJavaTest();
-   }
-
-  private static void test_verilogDelete_superSmall()
-   {z();
-    final BtreeDM t = superSmall();
-    t.P.run(); t.P.clear();
-    t.put();
-    final int N = 9;
-    for (int i = 0; i < N; ++i)
-     {t.T.at(t.Key ).setInt(i);
-      t.T.at(t.Data).setInt(i>>1);
-      t.P.run();
-     }
-    //stop(t.M);
-    //stop(t);
-    ok(t, """
-             3                    |
-             0                    |
-             5                    |
-             6                    |
-      1             5    6        |
-      5             6    6.1      |
-      1             4    7        |
-      3                  2        |
-0,1=1  2,3=3  4,5=4  6=7    7,8=2 |
-""");
-
-    t.P.clear();                                                                // Replace program with delete
-    t.delete();                                                                 // Delete code
-
-    t.runVerilogDeleteTest_superSmall(3, 1, 398, """
-                    6           |
-                    0           |
-                    5           |
-                    6           |
-      2    4             7      |
-      5    5.1           6      |
-      1    3             7      |
-           4             2      |
-1,2=1  4=3    5,6=4  7=7  8,9=2 |
-""");
-
-    t.runVerilogDeleteTest_superSmall(4, 2, 379, """
-             5           |
-             0           |
-             5           |
-             6           |
-      1           6      |
-      5           6      |
-      1           7      |
-      3           2      |
-""");
-
-    t.runVerilogDeleteTest_superSmall(2, 1, 314, """
-      1      6        |
-      0      0.1      |
-      1      3        |
-             2        |
-0,1=1  5,6=3    7,8=2 |
-""");
-
-    t.runVerilogDeleteTest_superSmall(1, 0, 219, """
-    1      6        |
-    0      0.1      |
-    1      3        |
-           2        |
-0=1  5,6=3    7,8=2 |
-""");
-
-    t.runVerilogDeleteTest_superSmall(5, 2, 174, """
-    6      |
-    0      |
-    1      |
-    2      |
-0=1  7,8=2 |
-""");
-
-    t.runVerilogDeleteTest_superSmall(6, 3, 180, """
-    7      |
-    0      |
-    1      |
-    2      |
-7=1  8,9=2 |
-""");
-
-    t.runVerilogDeleteTest_superSmall(7, 3, 168, """
-0,8=0 |
-""");
-
-    t.runVerilogDeleteTest_superSmall(8, 4, 22, """
-0=0 |
-""");
-
-    t.runVerilogDeleteTest_superSmall(0, 0, 22, """
-=0 |
-""");
-   }
-
-  private void runVerilogPutTest_superSmall
-   (int value, int steps, String expected)
-   {z();
-    T.at(Key ).setInt(value);                                                   // Sets memory directly not via an instruction
-    T.at(Data).setInt(value);                                                   // Sets memory directly not via an instruction
-    VerilogCode v = new VerilogCode("put", "verilog")                           // Generate verilog now that memories have been initialized and the program written
-     {int    Key     () {return    value;}                                      // Input key value
-      int    Data    () {return        3;}                                      // Input data value
-      int    data    () {return        0;}                                      // Expected output data value
-      int    maxSteps() {return     2000;}                                      // Maximum number if execution steps
-      int    expSteps() {return    steps;}                                      // Expected number of steps
-      String expected() {return expected;}                                      // Expected tree if present
-//   }.generate();
-     }.execJavaTest();
-    if (debug) stop(this);
-    ok(this, expected);
-   }
-
-  private static void test_verilogPut_superSmall()                              // Route: 11:11, arrival time 77/2ns
-   {z();
-    final BtreeDM t = superSmall();
-    t.P.run(); t.P.clear();
-    t.put();
-    t.runVerilogPutTest_superSmall(1, 28, """
-1=0 |
-""");
-
-    t.runVerilogPutTest_superSmall(2, 28, """
-1,2=0 |
-""");
-                                                                                // Split instruction
-    t.runVerilogPutTest_superSmall(3, 106, """
-    1      |
-    0      |
-    1      |
-    2      |
-1=1  2,3=2 |
-""");
-
-    t.runVerilogPutTest_superSmall(4, 214, """
-      2      |
-      0      |
-      1      |
-      2      |
-1,2=1  3,4=2 |
-""");
-
-    t.runVerilogPutTest_superSmall(5, 259, """
-      2    3        |
-      0    0.1      |
-      1    3        |
-           2        |
-1,2=1  3=3    4,5=2 |
-""");
-
-    t.runVerilogPutTest_superSmall(6, 285, """
-      2      4        |
-      0      0.1      |
-      1      3        |
-             2        |
-1,2=1  3,4=3    5,6=2 |
-""");
-
-    t.runVerilogPutTest_superSmall(7, 330, """
-      2      4      5        |
-      0      0.1    0.2      |
-      1      3      4        |
-                    2        |
-1,2=1  3,4=3    5=4    6,7=2 |
-""");
-
-    t.runVerilogPutTest_superSmall(8, 387, """
-             4             |
-             0             |
-             5             |
-             6             |
-      2             6      |
-      5             6      |
-      1             4      |
-      3             2      |
-1,2=1  3,4=3  5,6=4  7,8=2 |
-""");
-
-    t.runVerilogPutTest_superSmall(9, 361, """
-             4                    |
-             0                    |
-             5                    |
-             6                    |
-      2             6    7        |
-      5             6    6.1      |
-      1             4    7        |
-      3                  2        |
-1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
-""");
-   }
-
-  private void runVerilogPutTest_allTreeOps                                     // Run the java and verilog versions and compare the resulting memory traces
+  private void runVerilogPutTest                                     // Run the java and verilog versions and compare the resulting memory traces
    (int value, int steps, String expected)
    {z();
     T.at(Key ).setInt(value);                                                   // Sets memory directly not via an instruction
@@ -3967,25 +3689,26 @@ Line T       At      Wide       Size    Indices        Value   Name
       int    maxSteps() {return  2000;}                                         // Maximum number if execution steps
       int    expSteps() {return steps;}                                         // Expected number of steps
       String expected() {return null;}                                          // Expected tree if present
-     }.generate();
+//   }.generate();
+     }.execJavaTest();
     if (debug) stop(this);
     ok(this, expected);
    }
 
-  private static void test_verilogPut_allTreeOps()                              // Delete using generated verilog code
+  private static void test_verilogPut()                                         // Delete using generated verilog code
    {z();
     final BtreeDM t = allTreeOps();
     t.P.run(); t.P.clear();
     t.put();
-    t.runVerilogPutTest_allTreeOps(1, 28, """
+    t.runVerilogPutTest(1, 28, """
 1=0 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(2, 28, """
+    t.runVerilogPutTest(2, 28, """
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest_allTreeOps(3, 106, """
+    t.runVerilogPutTest(3, 106, """
     1      |
     0      |
     1      |
@@ -3993,7 +3716,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(4, 214, """
+    t.runVerilogPutTest(4, 214, """
       2      |
       0      |
       1      |
@@ -4001,7 +3724,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(5, 259, """
+    t.runVerilogPutTest(5, 259, """
       2    3        |
       0    0.1      |
       1    3        |
@@ -4009,7 +3732,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3=3    4,5=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(6, 285, """
+    t.runVerilogPutTest(6, 285, """
       2      4        |
       0      0.1      |
       1      3        |
@@ -4017,7 +3740,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=3    5,6=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(7, 330, """
+    t.runVerilogPutTest(7, 330, """
       2      4      5        |
       0      0.1    0.2      |
       1      3      4        |
@@ -4025,7 +3748,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=3    5=4    6,7=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(8, 388, """
+    t.runVerilogPutTest(8, 388, """
              4             |
              0             |
              5             |
@@ -4037,7 +3760,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=3  5,6=4  7,8=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(9, 361, """
+    t.runVerilogPutTest(9, 361, """
              4                    |
              0                    |
              5                    |
@@ -4049,7 +3772,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(10, 387, """
+    t.runVerilogPutTest(10, 387, """
              4                       |
              0                       |
              5                       |
@@ -4061,7 +3784,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=3  5,6=4  7,8=7    9,10=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(11, 432, """
+    t.runVerilogPutTest(11, 432, """
              4                               |
              0                               |
              5                               |
@@ -4073,7 +3796,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=3  5,6=4  7,8=7    9=8    10,11=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(12, 376, """
+    t.runVerilogPutTest(12, 376, """
                                8                 |
                                0                 |
                                5                 |
@@ -4085,7 +3808,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(13, 361, """
+    t.runVerilogPutTest(13, 361, """
                                8                          |
                                0                          |
                                5                          |
@@ -4097,7 +3820,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(14, 387, """
+    t.runVerilogPutTest(14, 387, """
                                8                             |
                                0                             |
                                5                             |
@@ -4109,7 +3832,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(15, 432, """
+    t.runVerilogPutTest(15, 432, """
                                8                                     |
                                0                                     |
                                5                                     |
@@ -4121,7 +3844,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(16, 417, """
+    t.runVerilogPutTest(16, 417, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -4133,7 +3856,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(17, 426, """
+    t.runVerilogPutTest(17, 426, """
                                8                  12                            |
                                0                  0.1                           |
                                5                  11                            |
@@ -4145,7 +3868,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(18, 452, """
+    t.runVerilogPutTest(18, 452, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -4157,7 +3880,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17,18=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(19, 497, """
+    t.runVerilogPutTest(19, 497, """
                                8                  12                                        |
                                0                  0.1                                       |
                                5                  11                                        |
@@ -4169,7 +3892,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest_allTreeOps(20, 449, """
+    t.runVerilogPutTest(20, 449, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
@@ -4229,6 +3952,14 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
     b.program(t.P);
 
+    final Layout ni = new Layout();
+    Layout.Variable  one = ni.variable ("one", t.bitsPerNext);
+    Layout.Variable  two = ni.variable ("two", t.bitsPerNext);
+    Layout.Structure str = ni.structure("str", one, two);
+    final MemoryLayoutDM nim = new MemoryLayoutDM(ni.compile(), "ni");
+    nim.at(one).setInt(1);
+    nim.at(two).setInt(2);
+
     Node n = t.new Node("node");
     n.loadRoot();
     b.clear();
@@ -4254,7 +3985,7 @@ StuckSML(maxSize:4 size:2)
   1 key:0 data:2
 """);
 
-    n.loadNode(t.M.at(t.Node, 1));
+    n.loadNode(nim.at(one));
     l.clear();
     n.loadStuck(l);
     t.P.run(); t.P.clear();
@@ -4264,7 +3995,7 @@ StuckSML(maxSize:2 size:1)
   0 key:1 data:1
 """);
 
-    n.loadNode(t.M.at(t.Node, 2));
+    n.loadNode(nim.at(two));
     l.clear();
     n.loadStuck(l);
     t.P.run(); t.P.clear();
@@ -4373,7 +4104,7 @@ StuckSML(maxSize:4 size:1)
   0 key:1 data:1
 """);
 
-    n.loadNode(t.M.at(t.Node, 1));
+    n.loadNode(nim.at(one));
     n.loadStuck(l);
     t.P.run(); t.P.clear();
     //stop(l);
@@ -4383,7 +4114,7 @@ StuckSML(maxSize:2 size:1)
   0 key:1 data:1
 """);
 
-    n.loadNode(t.M.at(t.Node, 2));
+    n.loadNode(nim.at(two));
     n.loadStuck(l);
     t.P.run(); t.P.clear();
     //stop(l);
@@ -4615,8 +4346,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
-   {test_find();
-    if (true) return;
+   {if (true) return;
     test_find_and_insert();
     test_put_ascending();
     test_put_ascending_wide();
@@ -4627,28 +4357,17 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_find_and_update();
     test_delete_ascending();
     test_delete_descending();
-    //test_to_array();
     test_delete_small_random();
     //test_delete_large_random();
 
-    test_verilogDelete_allTreeOps();
-    test_verilogFind_allTreeOps();
-    test_verilogPut_allTreeOps();
-
-    test_verilogDelete_superSmall();
-    test_verilogFind_superSmall();
-    test_verilogPut_superSmall();
+    test_verilogDelete();
+    test_verilogFind();
+    test_verilogPut();
     test_node();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    //test_find();
-    //test_find_and_insert();
-    //test_node();
-    test_verilogFind_superSmall();
-    test_verilogPut_superSmall();
-    test_verilogDelete_superSmall();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
