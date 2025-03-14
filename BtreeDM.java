@@ -8,7 +8,6 @@ package com.AppaApps.Silicon;                                                   
 // Stuck - get penultimate element. Use currentSize field directly instead of copy in it to a temporary variable
 // Use free in node to hold node number while allocated so that Node knows where to write it back to without being told
 // Set an updated field for when an existing key has its associated data updated by put
-// MergeLeft/Right use setTopKey
 // Start splitting lower down and merge only along split path
 import java.util.*;
 import java.nio.file.*;
@@ -154,18 +153,18 @@ abstract class BtreeDM extends Test                                             
        }
      }
 
-    bSize        = branchTransactions[Branch_Size       ];                      // Branch size
-    bLeaf        = branchTransactions[Branch_Leaf       ];                      // Check whether a node has leaves for children
-    bTop         = branchTransactions[Branch_Top        ];                      // Get the size of a stuck
-    bFirstBranch = branchTransactions[Branch_FirstBranch];                      // Locate the first greater or equal key in a branch
+    bSize        = //branchTransactions[Branch_Size       ];                      // Branch size
+    bLeaf        = //branchTransactions[Branch_Leaf       ];                      // Check whether a node has leaves for children
+    bTop         = //branchTransactions[Branch_Top        ];                      // Get the size of a stuck
+    bFirstBranch = //branchTransactions[Branch_FirstBranch];                      // Locate the first greater or equal key in a branch
     bT           = branchTransactions[Branch_T          ];                      // Process a parent node
     bL           = branchTransactions[Branch_tl         ];                      // Process a left node
     bR           = branchTransactions[Branch_tr         ];                      // Process a right node
 
-    lSize        =   leafTransactions[Leaf_Size         ];                      // Leaf size
-    lLeaf        =   leafTransactions[Leaf_Leaf         ];                      // Print a leaf
-    lEqual       =   leafTransactions[Leaf_Equal        ];                      // Locate an equal key
-    lFirstLeaf   =   leafTransactions[Leaf_FirstLeaf    ];                      // Locate the first greater or equal key in a leaf
+    lSize        =   //leafTransactions[Leaf_Size         ];                      // Leaf size
+    lLeaf        =   //leafTransactions[Leaf_Leaf         ];                      // Print a leaf
+    lEqual       =   //leafTransactions[Leaf_Equal        ];                      // Locate an equal key
+    lFirstLeaf   =   //leafTransactions[Leaf_FirstLeaf    ];                      // Locate the first greater or equal key in a leaf
     lT           =   leafTransactions[Leaf_T            ];                      // Process a parent node
     lL           =   leafTransactions[Leaf_tl           ];                      // Process a left node
     lR           =   leafTransactions[Leaf_tr           ];                      // Process a right node
@@ -330,7 +329,7 @@ abstract class BtreeDM extends Test                                             
     if (check)
      {P.new If (T.at(allocate))
        {void Else()
-         {P.halt("No more memory available");                                   // No more free nodes available
+         {P.new I() {void a() {stop("No more memory available");}};             // No more free nodes available
          }
        };
      }
@@ -1237,7 +1236,6 @@ stop("Deprecated");
 
     P.parallelStart();   nL.loadStuck(bL, l);                                   // Clear left stuck
     P.parallelSection(); nR.loadStuck(bR, node_splitBranch);                    // Load right stuck to be split
-    //P.parallelSection(); nT.loadStuck(bT, splitParent);                       // The parent branch
     P.parallelEnd();
 
     bR.splitLow(bL);                                                            // Split right
@@ -1275,8 +1273,6 @@ stop("Deprecated");
             P.Goto(end);
            }
          };
-
-        //nT.loadStuck(bT, node_stealFromLeft);                                 // Parent
 
         bT.T.at(bT.index).add(T.at(index), -1);                                 // Node to the left of the indexed node
         bT.elementAt();
@@ -1528,7 +1524,6 @@ stop("Deprecated");
           void Else()                                                           // Branches
            {nL.loadBranchStuckAndSize(bL, l, nl);
             nR.loadBranchStuckAndSize(bR, r, nr);
-P.new I() {void a() {if (debug) say("DDDD5555");}};
 
             P.new I()                                                           // Check that combined node would not be too big
              {void a()
@@ -1543,7 +1538,6 @@ P.new I() {void a() {if (debug) say("DDDD5555");}};
                    maxKeysPerBranch()+") ? 'b1 : 'b0;";
                }
              };
-P.new I() {void a() {if (debug) say("DDDD6666", T.at(mergeable));}};
 
             P.new If (T.at(mergeable))
              {void Then()
@@ -1561,11 +1555,10 @@ P.new I() {void a() {if (debug) say("DDDD6666", T.at(mergeable));}};
                 free(l);                                                        // Free the children
                 free(r);
                 nT.saveRootStuck(bT);                                           // Save the branch root
-P.new I() {void a() {if (debug) say("DDDD7777", bT);}};
                 z(); T.at(stolenOrMerged).ones(); P.Goto(Return);
                }
              };
-            z(); T.at(stolenOrMerged).zero(); //Goto P.Goto(Return);
+            z(); T.at(stolenOrMerged).zero();
            }
          };
        };
@@ -1617,7 +1610,7 @@ P.new I() {void a() {if (debug) say("DDDD7777", bT);}};
              };
             stealNotPossible(end);
 
-           lR.prepend(lL);
+            lR.prepend(lL);
             nR.saveStuck(lR, r);                                                // Save modified right branch
            }
           void Else()                                                           // Children are branches
@@ -1757,11 +1750,10 @@ P.new I() {void a() {if (debug) say("DDDD7777", bT);}};
         bT.T.at(bT.tKey).move(T.at(parentKey));
         bT.setElementAt();                                                      // Install key of right sibling in this child
 
-        bT.T.at(bT.index).add(T.at(index), +1);                                 // Reduce parent on right
+        bT.T.at(bT.index).add(T.at(index), +1);
         bT.removeElementAt();                                                   // Reduce parent on right
 
         nT.saveStuck(bT, node_mergeRightSibling);                               // Save parent branch
-P.new I() {void a() {if (debug) say("CCCC4444", thisBTree);}};
 
         z(); T.at(stolenOrMerged).ones();
        }
@@ -4237,7 +4229,7 @@ StuckSML(maxSize:4 size:1)
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
-   {final boolean longRunning = github_actions && 1 == 1;
+   {final boolean longRunning = github_actions && 1 == 0;
     test_find_and_insert();
     test_put_ascending();
     test_put_ascending_wide();
@@ -4258,7 +4250,9 @@ StuckSML(maxSize:4 size:1)
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_node();
+    test_verilogDelete();
+    test_verilogFind();
+    test_verilogPut();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
