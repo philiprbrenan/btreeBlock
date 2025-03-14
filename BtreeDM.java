@@ -2623,34 +2623,33 @@ endmodule
 
   private static void test_find()
    {z();
-    final int N = 32;
-    final BtreePA T = BtreePA.btreePA(2, 3);
-    T.P.run(); T.P.clear();
-    T.put();
+    final int     N = 32;
+    final BtreeDM t = BtreeDM(2, 3, N);
+    t.P.run(); t.P.clear();
+    t.put();
     for(int i = 1; i <= N; ++i)
-     {T.T.at(T.Key).setInt (i);
-      T.T.at(T.Data).setInt(i-1);
-      T.P.run();
+     {t.T.at(t.Key).setInt (i);
+      t.T.at(t.Data).setInt(i-1);
+      t.P.run();
      }
 
-    //stop(T);
-    ok(T, """
+    //stop(t);
+    ok(t, """
                                                                             16                                                                                           |
                                                                             0                                                                                            |
                                                                             17                                                                                           |
-                                                                            21                                                                                           |
+                                                                            16                                                                                           |
                                8                                                                                            24                    28                     |
-                               17                                                                                           21                    21.1                   |
-                               5                                                                                            16                    23                     |
+                               17                                                                                           16                    16.1                   |
+                               5                                                                                            21                    23                     |
                                11                                                                                                                 6                      |
       2      4        6                 10         12          14                      18         20           22                      26                      30        |
-      5      5.1      5.2               11         11.1        11.2                    16         16.1         16.2                    23                      6         |
-      1      3        4                 8          10          9                       13         15           14                      18                      20        |
-                      7                                        12                                              19                      22                      2         |
-1,2=1  3,4=3    5,6=4    7,8=7   9,10=8   11,12=10     13,14=9     15,16=12   17,18=13   19,20=15     21,22=14     23,24=19   25,26=18   27,28=22     29,30=20   31,32=2 |
+      5      5.1      5.2               11         11.1        11.2                    21         21.1         21.2                    23                      6         |
+      1      4        3                 7          10          9                       13         15           14                      18                      20        |
+                      8                                        12                                              19                      22                      2         |
+1,2=1  3,4=4    5,6=3    7,8=8   9,10=7   11,12=10     13,14=9     15,16=12   17,18=13   19,20=15     21,22=14     23,24=19   25,26=18   27,28=22     29,30=20   31,32=2 |
 """);
 
-    final BtreeDM t = btreeDM(T);
     t.P.clear();
     t.find();
 
@@ -2669,17 +2668,17 @@ endmodule
   private static void test_find_and_insert()
    {z();
     final int N = 3;
-    final BtreePA T = BtreePA.btreePA(2, 3);
-    T.P.run(); T.P.clear();
-    T.put();
+    final BtreeDM t = BtreeDM(2, 3, 10);
+    t.P.run(); t.P.clear();
+    t.put();
     for(int i = 1; i <= N; ++i)
-     {T.T.at(T.Key) .setInt(2*i);
-      T.T.at(T.Data).setInt(i);
-      T.P.run();
+     {t.T.at(t.Key) .setInt(2*i);
+      t.T.at(t.Data).setInt(i);
+      t.P.run();
      }
 
     //stop(T);
-    ok(T, """
+    ok(t, """
     3      |
     0      |
     1      |
@@ -2687,42 +2686,41 @@ endmodule
 2=1  4,6=2 |
 """);
 
-    final BtreeDM t = btreeDM(T);
     t.P.clear();
-
     t.findAndInsert(null);
 
     final Node node = t.new Node("Node");
+
+    //stop(node.print(1));
     ok(node.print(1), """
 MemoryLayout: Node
 Memory      : Node
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0       165                                      node
+   1 S        0       155                                      node
    2 B        0         1                                  1     isLeaf
-   3 V        1         6                                  0     free
-   4 U        7       158                                        branchOrLeaf
-   5 S        7       134                                          leaf
-   6 V        7         6                                  1         currentSize
-   7 A       13        64          2                                 Keys
-   8 V       13        32               0                  2           key
-   9 V       45        32               1                  4           key
-  10 A       77        64          2                                 Data
-  11 V       77        32               0                  1           data
-  12 V      109        32               1                  2           data
-  13 S        7       158                                          branch
-  14 V        7         6                                  1         currentSize
-  15 A       13       128          4                                 Keys
-  16 V       13        32               0                  2           key
-  17 V       45        32               1                  4           key
-  18 V       77        32               2                  1           key
-  19 V      109        32               3                  2           key
-  20 A      141        24          4                                 Data
-  21 V      141         6               0                  0           data
-  22 V      147         6               1                  0           data
-  23 V      153         6               2                  0           data
-  24 V      159         6               3                  0           data
+   3 V        1         4                                  0     free
+   4 U        5       150                                        branchOrLeaf
+   5 S        5       134                                          leaf
+   6 V        5         6                                  1         currentSize
+   7 A       11        64          2                                 Keys
+   8 V       11        32               0                  2           key
+   9 V       43        32               1                  4           key
+  10 A       75        64          2                                 Data
+  11 V       75        32               0                  1           data
+  12 V      107        32               1                  2           data
+  13 S        5       150                                          branch
+  14 V        5         6                                  1         currentSize
+  15 A       11       128          4                                 Keys
+  16 V       11        32               0                  2           key
+  17 V       43        32               1                  4           key
+  18 V       75        32               2                  1           key
+  19 V      107        32               3                  2           key
+  20 A      139        16          4                                 Data
+  21 V      139         4               0                  0           data
+  22 V      143         4               1                  0           data
+  23 V      147         4               2                  0           data
+  24 V      151         4               3                  0           data
 """);
-
 
     t.T.at(t.Key) .setInt(2);
     t.T.at(t.Data).setInt(2);
@@ -2730,72 +2728,73 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(t.T.at(t.success) .getInt(), 1);
     ok(t.T.at(t.found)   .getInt(), 1);
     ok(t.T.at(t.inserted).getInt(), 0);
+    //stop(node.print(1));
     ok(node.print(1), """
 MemoryLayout: Node
 Memory      : Node
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0       165                                      node
+   1 S        0       155                                      node
    2 B        0         1                                  1     isLeaf
-   3 V        1         6                                  0     free
-   4 U        7       158                                        branchOrLeaf
-   5 S        7       134                                          leaf
-   6 V        7         6                                  1         currentSize
-   7 A       13        64          2                                 Keys
-   8 V       13        32               0                  2           key
-   9 V       45        32               1                  4           key
-  10 A       77        64          2                                 Data
-  11 V       77        32               0                  2           data
-  12 V      109        32               1                  2           data
-  13 S        7       158                                          branch
-  14 V        7         6                                  1         currentSize
-  15 A       13       128          4                                 Keys
-  16 V       13        32               0                  2           key
-  17 V       45        32               1                  4           key
-  18 V       77        32               2                  2           key
-  19 V      109        32               3                  2           key
-  20 A      141        24          4                                 Data
-  21 V      141         6               0                  0           data
-  22 V      147         6               1                  0           data
-  23 V      153         6               2                  0           data
-  24 V      159         6               3                  0           data
+   3 V        1         4                                  0     free
+   4 U        5       150                                        branchOrLeaf
+   5 S        5       134                                          leaf
+   6 V        5         6                                  1         currentSize
+   7 A       11        64          2                                 Keys
+   8 V       11        32               0                  2           key
+   9 V       43        32               1                  4           key
+  10 A       75        64          2                                 Data
+  11 V       75        32               0                  2           data
+  12 V      107        32               1                  2           data
+  13 S        5       150                                          branch
+  14 V        5         6                                  1         currentSize
+  15 A       11       128          4                                 Keys
+  16 V       11        32               0                  2           key
+  17 V       43        32               1                  4           key
+  18 V       75        32               2                  2           key
+  19 V      107        32               3                  2           key
+  20 A      139        16          4                                 Data
+  21 V      139         4               0                  0           data
+  22 V      143         4               1                  0           data
+  23 V      147         4               2                  0           data
+  24 V      151         4               3                  0           data
 """);
 
 
     t.T.at(t.Key) .setInt(3);
     t.T.at(t.Data).setInt(3);
     t.P.run();
-    //stop(node.print(1));
     ok(t.T.at(t.success) .getInt(), 1);
     ok(t.T.at(t.found)   .getInt(), 0);
     ok(t.T.at(t.inserted).getInt(), 1);
+    //stop(node.print(1));
     ok(node.print(1), """
 MemoryLayout: Node
 Memory      : Node
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0       165                                      node
+   1 S        0       155                                      node
    2 B        0         1                                  1     isLeaf
-   3 V        1         6                                  0     free
-   4 U        7       158                                        branchOrLeaf
-   5 S        7       134                                          leaf
-   6 V        7         6                                  2         currentSize
-   7 A       13        64          2                                 Keys
-   8 V       13        32               0                  2           key
-   9 V       45        32               1                  3           key
-  10 A       77        64          2                                 Data
-  11 V       77        32               0                  2           data
-  12 V      109        32               1                  3           data
-  13 S        7       158                                          branch
-  14 V        7         6                                  2         currentSize
-  15 A       13       128          4                                 Keys
-  16 V       13        32               0                  2           key
-  17 V       45        32               1                  3           key
-  18 V       77        32               2                  2           key
-  19 V      109        32               3                  3           key
-  20 A      141        24          4                                 Data
-  21 V      141         6               0                  0           data
-  22 V      147         6               1                  0           data
-  23 V      153         6               2                  0           data
-  24 V      159         6               3                  0           data
+   3 V        1         4                                  0     free
+   4 U        5       150                                        branchOrLeaf
+   5 S        5       134                                          leaf
+   6 V        5         6                                  2         currentSize
+   7 A       11        64          2                                 Keys
+   8 V       11        32               0                  2           key
+   9 V       43        32               1                  3           key
+  10 A       75        64          2                                 Data
+  11 V       75        32               0                  2           data
+  12 V      107        32               1                  3           data
+  13 S        5       150                                          branch
+  14 V        5         6                                  2         currentSize
+  15 A       11       128          4                                 Keys
+  16 V       11        32               0                  2           key
+  17 V       43        32               1                  3           key
+  18 V       75        32               2                  2           key
+  19 V      107        32               3                  3           key
+  20 A      139        16          4                                 Data
+  21 V      139         4               0                  0           data
+  22 V      143         4               1                  0           data
+  23 V      147         4               2                  0           data
+  24 V      151         4               3                  0           data
 """);
    }
 
@@ -3486,7 +3485,7 @@ Line T       At      Wide       Size    Indices        Value   Name
      }
    }
 
-  private static void test_delete_random(int[]random_array, int maxSize)
+  private static void test_delete_random(int[]random_array, int maxSize, String expected)
    {z();
     final BtreeDM t = BtreeDM(4, 3, maxSize);
     t.P.run(); t.P.clear();
@@ -3499,21 +3498,8 @@ Line T       At      Wide       Size    Indices        Value   Name
       t.T.at(t.Data).setInt(i);
       t.P.run();
      }
-    t.ok("""
-                                                                                                                                                                                                                        379                                                                                                                    528                                                                                                                                                                                                                                                                  |
-                                                                                                                                                                                                                        0                                                                                                                      0.1                                                                                                                                                                                                                                                                  |
-                                                                                                                                                                                                                        48                                                                                                                     43                                                                                                                                                                                                                                                                   |
-                                                                                                                                                                                                                                                                                                                                               41                                                                                                                                                                                                                                                                   |
-                                                               143                                                              253                                                     341                                                             429                                                   497                                                                     582                                                                          718                                                                      894                                                                     |
-                                                               48                                                               48.1                                                    48.2                                                            43                                                    43.1                                                                    41                                                                           41.1                                                                     41.2                                                                    |
-                                                               36                                                               25                                                      46                                                              14                                                    44                                                                      21                                                                           11                                                                       3                                                                       |
-                                                                                                                                                                                        10                                                                                                                    5                                                                                                                                                                                                                             6                                                                       |
-              34               87               104                          156               210                235                          266               283                                   356                            402                                 440          457                                   507                                     568                                    630                   672                688                              805           819                   856                                  909                   946               988          |
-              36               36.1             36.2                         25                25.1               25.2                         46                46.1                                  10                             14                                  44           44.1                                  5                                       21                                     11                    11.1               11.2                             3             3.1                   3.2                                  6                     6.1               6.2          |
-              37               24               17                           49                26                 38                           47                30                                    39                             15                                  45           8                                     33                                      18                                     27                    13                 42                               29            34                    32                                   40                    12                35           |
-                                                16                                                                9                                              19                                    1                              20                                               28                                    22                                      7                                                                               4                                                                    23                                                                           2            |
-1,13,27,29=37   39,43,55,72=24     90,96,103=17     106,135=16    151,155=49    157,186,188=26     229,232,234=38     237,246=9     260,261=47    272,273,279=30     288,298,317,338=19     344,354=39    358,376,377=1    391,401=15    403,422,425=20    436,437,438=45    442,447=8     472,480,490,494=28     501,503=33    511,516,526=22    545,554,560,564=18    576,577,578=7    586,611,612,615=27    650,657,658,667=13     679,681,686=42     690,704=4     769,773,804=29    806,809=34    826,830,839,854=32    858,882,884=23     903,906,907=40    912,922,937,946=12    961,976,987=35    989,993=2 |
-""");
+
+    if (expected != null) t.ok(expected);
 
     t.P.clear();
     t.delete();
@@ -3535,13 +3521,27 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   private static void test_delete_small_random()
    {z();
-    test_delete_random(random_small, 50);
+    test_delete_random(random_small, 50, """
+                                                                                                                                                                                                                        379                                                                                                                    528                                                                                                                                                                                                                                                                  |
+                                                                                                                                                                                                                        0                                                                                                                      0.1                                                                                                                                                                                                                                                                  |
+                                                                                                                                                                                                                        48                                                                                                                     43                                                                                                                                                                                                                                                                   |
+                                                                                                                                                                                                                                                                                                                                               41                                                                                                                                                                                                                                                                   |
+                                                               143                                                              253                                                     341                                                             429                                                   497                                                                     582                                                                          718                                                                      894                                                                     |
+                                                               48                                                               48.1                                                    48.2                                                            43                                                    43.1                                                                    41                                                                           41.1                                                                     41.2                                                                    |
+                                                               36                                                               25                                                      46                                                              14                                                    44                                                                      21                                                                           11                                                                       3                                                                       |
+                                                                                                                                                                                        10                                                                                                                    5                                                                                                                                                                                                                             6                                                                       |
+              34               87               104                          156               210                235                          266               283                                   356                            402                                 440          457                                   507                                     568                                    630                   672                688                              805           819                   856                                  909                   946               988          |
+              36               36.1             36.2                         25                25.1               25.2                         46                46.1                                  10                             14                                  44           44.1                                  5                                       21                                     11                    11.1               11.2                             3             3.1                   3.2                                  6                     6.1               6.2          |
+              37               24               17                           49                26                 38                           47                30                                    39                             15                                  45           8                                     33                                      18                                     27                    13                 42                               29            34                    32                                   40                    12                35           |
+                                                16                                                                9                                              19                                    1                              20                                               28                                    22                                      7                                                                               4                                                                    23                                                                           2            |
+1,13,27,29=37   39,43,55,72=24     90,96,103=17     106,135=16    151,155=49    157,186,188=26     229,232,234=38     237,246=9     260,261=47    272,273,279=30     288,298,317,338=19     344,354=39    358,376,377=1    391,401=15    403,422,425=20    436,437,438=45    442,447=8     472,480,490,494=28     501,503=33    511,516,526=22    545,554,560,564=18    576,577,578=7    586,611,612,615=27    650,657,658,667=13     679,681,686=42     690,704=4     769,773,804=29    806,809=34    826,830,839,854=32    858,882,884=23     903,906,907=40    912,922,937,946=12    961,976,987=35    989,993=2 |
+""");
    }
 
   private static void test_delete_large_random()
    {z();
     if (!github_actions) return;
-    test_delete_random(random_large, 1000);
+    test_delete_random(random_large, 1000, null);
    }
 
   private static void test_verilogFind()                                        // Find using generated verilog code
