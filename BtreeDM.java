@@ -288,7 +288,7 @@ abstract class BtreeDM extends Test                                             
 //D1 Memory access                                                              // Access to memory
 
   private void checkMainField(Layout.Field field)                               // Check that a variable is in main memory
-   {z();
+   {zz();
     if (field.container() != M.layout)
      {final String name = field.container().layoutName;
       stop("Field:", field.name, "is part of memory layout:", name, "not main");
@@ -296,7 +296,7 @@ abstract class BtreeDM extends Test                                             
    }
 
   private void checkTransactionField(Layout.Field field)                        // Check that a variable is in transaction memory
-   {z();
+   {zz();
     if (field.container() != T.layout)
      {final String name = field.container().layoutName;
       stop("Field:", field.name, "is part of memory layout:",
@@ -305,10 +305,10 @@ abstract class BtreeDM extends Test                                             
    }
 
   private void setInt(Layout.Field field, int value)                            // Set an integer in main memory
-   {z(); checkMainField(field); M.setInt(field, value);
+   {zz(); checkMainField(field); M.setInt(field, value);
    }
   private void setInt(Layout.Field field, int value, int index)
-   {z(); checkMainField(field); M.setInt(field, value, index);
+   {zz(); checkMainField(field); M.setInt(field, value, index);
    }
 
   void tt(Layout.Variable target, Layout.Variable source)                       // Copy the value of one transaction variable into another
@@ -660,18 +660,15 @@ abstract class BtreeDM extends Test                                             
   private void setBranch()  {zz();                   M.at(bTree_isLeaf, T.at(node_setBranch)).zero();}  // Set as branch
 
   void isLeaf(Node Node)                                                        // Whether a node is a leaf
-   {zz();
-    T.at(IsLeaf).move(Node.N.at(isLeaf));
+   {zz(); T.at(IsLeaf).move(Node.N.at(isLeaf));
    }
 
   private MemoryLayoutDM.At ifRootLeaf(Node n)                                  // A variable that indicates whether the root is a leaf
-   {zz();
-    return n.N.at(isLeaf);
+   {zz(); return n.N.at(isLeaf);
    }
 
   private void isLeaf(MemoryLayoutDM.At node)                                   // A leaf if true
-   {zz();
-    T.at(IsLeaf).move(M.at(isLeaf, node));
+   {zz(); T.at(IsLeaf).move(M.at(isLeaf, node));
    }
 
   private MemoryLayoutDM.At ifLeaf(MemoryLayoutDM.At node)                      // A variable that indicates whether the node is a leaf
@@ -680,26 +677,6 @@ abstract class BtreeDM extends Test                                             
 
   private MemoryLayoutDM.At ifLeaf(Node Node)                                   // A variable that indicates whether the node is a leaf
    {zz(); return Node.N.at(isLeaf);
-   }
-
-  private void assertLeaf()
-   {z();
-    tt(node_isLeaf, node_assertLeaf); isLeaf();
-    P.new If (T.at(IsLeaf))
-     {void Else()
-       {P.halt("Leaf required");
-       }
-     };
-   }
-  private void assertBranch()
-   {z();
-    tt(node_isLeaf, node_assertBranch);
-    isLeaf();
-    P.new If (T.at(IsLeaf))
-     {void Then()
-      {P.halt("Branch required");
-      }
-    };
    }
 
   private void allocLeaf()                                                      // Allocate leaf
@@ -719,11 +696,9 @@ abstract class BtreeDM extends Test                                             
 
   private void free(Layout.Variable node_free)                                  // Free a new node to make it available for reuse
    {zz();
-//  P.new If (T.at(node_free)) {void Else() {P.halt("Cannot free root");}};     // The root is never freed
     z(); tt(node_erase, node_free); erase();                                    // Clear the node to encourage erroneous frees to do damage that shows up quickly.
     M.at(bTree_free, T.at(node_free)).move(M.at(freeList));                     // Chain this node in front of the last freed node
     M.at(freeList).move(T.at(node_free));                                       // Make this node the head of the free chain
-//  maxNodeUsed = max(maxNodeUsed, --nodeUsed);                                 // Number of nodes in use
    }
 
   private void clear() {zz();  clear(T.at(node_clear));}                        // Clear a new node to zeros ready for use
@@ -736,157 +711,9 @@ abstract class BtreeDM extends Test                                             
    {zz();
     M.at(Node, T.at(node_erase)).ones();
    }
-
-  private void leafBase(StuckDM Stuck, Layout.Variable node_leafBase)           // Set base of leaf stuck in memory
-   {zz();
-stop("Deprecated");
-    P.new I()
-     {void a()
-       {if (node_leafBase != null) Stuck.base(M.at(leaf, T.at(node_leafBase)));
-        else                       Stuck.base(M.at(leaf, 0)                  );
-       }
-      String v()
-       {return node_leafBase != null ?
-          Stuck.M.baseName() + " <= " + M.at(leaf, T.at(node_leafBase)).verilogAddr() + ";":
-          Stuck.M.baseName() + " <= " + M.at(leaf, 0)                  .verilogAddr() + ";";
-       }
-     };
-   }
-
-  private void leafBase(StuckDM Stuck, Node leafBase)                           // Set base of leaf stuck in memory
-   {zz();
-    Stuck.M.copy(leafBase.N.at(Node));
-   }
-
-  private void leafBaseSize                                                     // Set base of leaf stuck in memory and get its size
-   (StuckDM Stuck, Layout.Variable node_leafBase, Layout.Variable size)
-   {zz();
-    leafBase(Stuck, node_leafBase);                                             // Set base of leaf stuck in memory
-    T.at(size).move(Stuck.M.at(Stuck.currentSize));                             // Get the size
-   }
-
-  private void branchBase(Layout.Variable      branchBase,                      // Base of branch stuck in memory
-                          Layout.Variable node_branchBase)
-   {zz();
-    P.new I()
-     {void a()
-       {final MemoryLayoutDM.At a = M.at(branch, T.at(node_branchBase)).setOff();
-        T.at(branchBase).setInt(a.at);
-       }
-      String v() {return T.at(branchBase).verilogLoad() + " <= " + M.at(branch, T.at(node_branchBase)).verilogAddr() + ";";}
-     };
-   }
-
-  private void branchBase(StuckDM Stuck, Layout.Variable node_branchBase)       // Set base of branch stuck in memory
-   {zz();
-    P.new I()
-     {void a()
-       {Stuck.M.copy(M.at(branch, T.at(node_branchBase)));
-       }
-      String v()
-       {return Stuck.M.baseName() + " <= " +
-          M.at(branch, T.at(node_branchBase)).verilogAddr() + ";";
-       }
-     };
-   }
-
-  private void branchBase(StuckDM Stuck, Node branchBase)                       // Set base of branch stuck in memory
-   {zz();
-    Stuck.base(branchBase.N.at(branch));
-   }
-
-  private void leafSize()                                                       // Number of children in body of leaf
-   {zz();
-    leafBase(lSize, node_leafSize);
-    lSize.size(); T.at(leafSize).move(lSize.T.at(lSize.size));
-   }
-
   private void leafSize(StuckDM leafStuck, Layout.Variable Size)                // Place number of children in body of specified leaf stuck in the specified variable
    {zz();
     leafStuck.size(); T.at(Size).move(leafStuck.T.at(leafStuck.size));
-   }
-
-  private void branchSize()                                                     // Number of children in body of branch taking top for granted as it is always there
-   {zz();
-    P.parallelStart();   tt(node_branchBase, node_branchSize);
-    P.parallelSection(); branchBase(branchBase, node_branchBase);
-    P.parallelEnd();
-
-    bSize.base(T.at(branchBase));
-    bSize.size();
-    T.at(branchSize).add(bSize.T.at(bSize.size), -1);                           // Account for top which will always be present
-   }
-
-  private void branchSize(StuckDM branchStuck, Layout.Variable Size)            // Number of children in body of branch taking top for granted as it is always there
-   {zz();
-    branchStuck.size();
-    T.at(Size).add(branchStuck.T.at(branchStuck.size), -1);                     // Account for top which will always be present
-   }
-
-//  private void isEmpty()                                                      // The node is empty
-//   {z();
-//    tt(node_isLeaf, node_isEmpty);
-//    isLeaf();
-//    P.new If (T.at(IsLeaf))
-//     {void Then()
-//       {tt(node_leafSize, node_isEmpty); leafSize();
-//        T.at(leafSize).isZero(T.at(isEmpty));
-//       }
-//      void Else()
-//       {z();
-//        tt(node_branchSize, node_isEmpty); branchSize();
-//        T.at(branchSize).isZero(T.at(isEmpty));                               // Allow for top which must always be present
-//       }
-//     };
-//   }
-
-  private void isFull()                                                         // The node is full
-   {zz();
-    tt(node_isLeaf, node_isFull);
-    isLeaf();
-    P.new If (T.at(IsLeaf))
-     {void Then()
-       {tt(node_leafSize, node_isFull);
-        leafSize();
-        T.at(leafSize)  .equal(T.at(maxKeysPerLeaf),   T.at(isFull));
-       }
-      void Else()
-       {tt(node_branchSize, node_isFull);
-        branchSize();
-        T.at(branchSize).equal(T.at(maxKeysPerBranch), T.at(isFull));
-       }
-     };
-   }
-
-  private void leafIsFull()                                                     // Whether a node known to be a leaf is full
-   {zz();
-    tt(node_leafSize, node_leafIsFull);
-    leafSize();
-    T.at(leafSize).equal(T.at(maxKeysPerLeaf),   T.at(leafIsFull));
-   }
-
-  private void branchIsFull()                                                   // Whether a node known to be a branch is full
-   {z();
-    tt(node_branchSize, node_branchIsFull);
-    branchSize();
-    T.at(branchSize).equal(T.at(maxKeysPerBranch), T.at(branchIsFull));
-   }
-
-  private void isLow()                                                          // The node is low on children making it impossible to merge two sibling children
-   {zz();
-    tt(node_isLeaf, node_isLow); isLeaf();
-    P.new If (T.at(IsLeaf))
-     {void Then()
-       {tt(node_leafSize, node_isLow);
-        leafSize();
-        T.at(leafSize).lessThan(T.at(two), T.at(isLow));
-       }
-      void Else()
-       {tt(node_branchSize, node_isLow);
-        branchSize();
-        T.at(branchSize).lessThan(T.at(two), T.at(isLow));
-       }
-     };
    }
 
   private void hasLeavesForChildren()                                           // The node has leaves for children
@@ -1041,13 +868,6 @@ stop("Deprecated");
 
 //D2 Search                                                                     // Search within a node and update the node description with the results
 
-  private void findEqualInLeaf                                                  // Find the first key in the leaf that is equal to the search key
-   (MemoryLayoutDM.At Key, Layout.Variable node_findEqualInLeaf)
-   {zz();
-    leafBase(lEqual, node_findEqualInLeaf);
-    lEqual.search(Key, T.at(found), T.at(index), T.at(data));
-   }
-
   private void findEqualInLeaf(MemoryLayoutDM.At Key, Node Node)                // Find the first key in the node that is equal to the search key
    {zz();
     Node.loadStuck(lEqual);
@@ -1066,15 +886,6 @@ stop("Deprecated");
      }
     s.append(")\n");
     return s.toString();
-   }
-
-  private void findFirstGreaterThanOrEqualInLeaf                                // Find the first key in the  leaf that is equal to or greater than the search key
-   (Layout.Variable Leaf,  MemoryLayoutDM.At Search, MemoryLayoutDM.At Found,
-    MemoryLayoutDM.At Index)
-   {zz();
-
-    leafBase(lFirstLeaf, Leaf);
-    lFirstLeaf.searchFirstGreaterThanOrEqual(true, Search, Found, Index, null, null);
    }
 
   private void findFirstGreaterThanOrEqualInLeaf                                // Find the first key in the  leaf that is equal to or greater than the search key
