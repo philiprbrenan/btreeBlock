@@ -67,16 +67,6 @@ abstract class StuckDM extends Test                                             
     program(M.P);
    }
 
-  void base(MemoryLayoutDM.At Base)                                             // Copy the stuck from this address in the containing memory
-   {zz();
-    M.copy(Base);
-   }
-
-  void save(MemoryLayoutDM.At Save)                                             // Copy the stuck to this address in the containing memory
-   {zz();
-    Save.copy(M);
-   }
-
   void program(ProgramDM program)                                               // Set the program in which the various components should generate code
    {zz();  P = program;
     M.program(P);
@@ -165,52 +155,6 @@ abstract class StuckDM extends Test                                             
     M.at(currentSize).move(T.at(size));
    }
 
-  void isFull()                                                                 // Check the stuck is full
-   {zz();
-    T.setIntInstruction(full, maxSize());
-    T.at(size).greaterThanOrEqual(T.at(full), T.at(isFull));
-   }
-
-  void isEmpty()                                                                // Check the stuck is empty
-   {zz();
-    T.setIntInstruction(full, 0);
-    T.at(size).equal(T.at(full), T.at(isEmpty));
-   }
-
-  void assertNotFull()                                                          // Assert the stuck is not full
-   {zz();
-    if (Assert)
-     {P.new If(T.at(isFull))
-       {void Then() {P.halt("Stuck full");}
-       };
-     }
-   }
-
-  void assertNotEmpty()                                                         // Assert the stuck is not empty
-   {zz();
-    if (Assert)
-     {P.new If(T.at(isEmpty))
-       {void Then() {P.halt("Empty");}
-       };
-     }
-   }
-
-  void assertInNormal()                                                         // Check that the index would yield a valid element
-   {zz();
-    if (Assert)
-     {P.new I()
-       {void a()
-         {final int i = T.at(index).getInt();
-          final int n = T.at(size) .getInt();
-          if (i < 0 || i >= n) stop("Out of normal range",   i, "for size", n, traceBack);
-         }
-        String v()
-         {return "/* assertInNormal */";
-         }
-       };
-     }
-   }
-
   void copyKeys(StuckDM source)                                                 // Copy the specified number of keys from the source stuck at the specified index into the target stuck at the specified index
    {zz();
     P.new I()
@@ -242,22 +186,6 @@ abstract class StuckDM extends Test                                             
     P.parallelStart();   copyKeys(source);
     P.parallelSection(); copyData(source);
     P.parallelEnd();
-   }
-
-  void assertInExtended()                                                       // Check that the index would yield a valid element
-   {zz();
-    if (Assert)                                                                 // Delete fails
-     {P.new I()
-       {void a()
-         {final int i = T.at(index).getInt();
-          final int n = T.at(size) .getInt();
-          if (i < 0 || i > n) stop("Out of extended range", i, "for size", n, traceBack);
-         }
-        String v()
-         {return "/* assertInExtended */";
-         }
-       };
-     }
    }
 
   void inc()                                                                    // Increment the current size
@@ -320,9 +248,6 @@ abstract class StuckDM extends Test                                             
     P.parallelEnd();
    }
 
-  void sizeFullEmpty() {z(); size(); isFull(); isEmpty();}                      // Status
-  void setFound()      {zz(); T.setIntInstruction(found, 1);}                    // Set found to true
-
   void push()                                                                   // Push an element onto the stuck
    {zz(); action = "push";
     //size();
@@ -375,21 +300,6 @@ abstract class StuckDM extends Test                                             
     moveKeyData();
     //sizeFullEmpty();
    }
-
-//  void shift()                                                                  // Shift an element from the stuck
-//   {zz(); action = "shift";
-//    size();
-//    //isEmpty();
-//    //assertNotEmpty();
-//    //setFound();
-//    T.setIntInstruction(index, 0);
-//    moveKeyData();
-//    T.zero();
-//    M.at(Keys).moveDown(T.at(index), C.at(Keys));
-//    M.at(Data).moveDown(T.at(index), C.at(Data));
-//    dec();
-//    //sizeFullEmpty();
-//   }
 
   void shift()                                                                  // Shift an element from the stuck
    {zz(); action = "shift";
@@ -501,57 +411,6 @@ abstract class StuckDM extends Test                                             
     setKey();
    }
 
-  void search2                                                                  // Search for an element within all elements of the stuck
-   (MemoryLayoutDM.At Search, MemoryLayoutDM.At Found,
-    MemoryLayoutDM.At Index,  MemoryLayoutDM.At Data)
-   {zz(); action = "search";
-
-    P.new I()
-     {void a()
-       {Found.setOff().setInt(0);                                               // Assume we will not find the key
-        final int s = Search           .setOff().getInt();                      // Key to search for
-        final int N = M.at(currentSize).setOff().getInt();                      // Number of elements to search
-
-        for (int i = 0; i < N; i++)                                             // Search
-         {z();
-          final int k = M.at(sKey, i)  .setOff().getInt();                      // Current key
-          if (k == s)                                                           // Current key equals search key with limits of a java integer
-           {Found.setInt(1);                                                    // Show found
-            Index.setInt(i);                                                    // Index of key found
-            Data .setInt(M.at(sData, i).setOff().getInt());                     // Data associated with key found
-            break;
-           }
-         }
-       }
-      String v()
-       {final StringBuilder v = new StringBuilder();                            // Verilog
-        final String        s = Search.verilogLoad();
-        final String        c = M.at(currentSize).verilogLoad();
-        final int           N = maxSize();
-
-        v.append("/* StuckDM.search */\n");
-        v.append(Found.verilogLoad()+" <= ( 0\n");                              // Found
-        for (int i = 0; i < N; i++)
-         {v.append(" || ("+M.at(sKey, i).verilogLoad()+" == "+s+" &&  "+i+ " < "+c+")\n");
-         }
-        v.append(") ? 1 : 0;\n");
-
-        v.append(Index.verilogLoad()+" <=\n");                                  // Index of found key if any
-        for (int i = 0; i < N; i++)
-         {v.append(    "("+M.at(sKey, i).verilogLoad()+" == "+s+" && "+i+ " < "+c+") ? "+i+" :\n");
-         }
-        v.append("0;\n");
-
-        v.append(Data.verilogLoad()+" <=\n");                                   // Data of found key if any
-        for (int i = 0; i < N; i++)
-         {v.append(    "("+M.at(sKey, i).verilogLoad()+" == "+s+" && "+i+ " < "+c+") ? "+M.at(sData, i).verilogLoad()+" :\n");
-         }
-        v.append("0;\n");
-        return v.toString();
-       }
-     };
-   }
-
   void search                                                                   // Search for an element within all elements of the stuck using multiple instructions with shorter paths than the original one instruction solution.
    (MemoryLayoutDM.At Search, MemoryLayoutDM.At Found,
     MemoryLayoutDM.At Index,  MemoryLayoutDM.At Data)
@@ -643,84 +502,6 @@ abstract class StuckDM extends Test                                             
         for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+M.at(sData, i).verilogLoad()+" : ");
         v.append("0;\n");                                                       // Not found so it can be anything
         return ""+v;
-       }
-     };
-   }
-
-  void searchFirstGreaterThanOrEqual2(boolean all,                              // Search for an element within all elements of the stuck or all but one
-    MemoryLayoutDM.At Search, MemoryLayoutDM.At Found,
-    MemoryLayoutDM.At Index,
-    MemoryLayoutDM.At Key,    MemoryLayoutDM.At Data)
-   {zz(); action = "search";
-    if (Search == null) stop("Search must not be null");
-    //if (Found  == null) err("Found");
-    //if (Index  == null) err("Index");
-    //if (Key    == null) err("Key");
-    //if (Data   == null) err("Data");
-
-    P.new I()
-     {void a()
-       {if (Found != null) Found.setInt(0);                                     // Assume we will not find the key
-        final int s = Search.setOff().getInt();                                 // Key to search for
-
-        final int c = M.at(currentSize).setOff().getInt();                      // Number of elements in stuck
-        final int N = c - (all ? 0 : 1);                                        // Number of elements to search
-        if (Index != null) Index.setInt(N);                                     // Default index if no key matches
-        if (Data  != null) Data.setInt(M.at(sData, N).setOff().getInt());       // Default data  if no key matches
-
-        for  (int i = 0; i < N; i++)                                            // Search
-         {z();
-          final int k = M.at(sKey, i).setOff().getInt();
-          if (Key != null) Key.setInt(k);                                       // Key being considered
-          if (k >= s)                                                           // Current key greater than or equal to search key with limits of a java integer
-           {if (Found != null) Found.setInt(1);                                 // Show found
-            if (Index != null) Index.setInt(i);                                 // Index of key found
-            if (Data  != null) Data .setInt(M.at(sData, i).setOff().getInt());  // Data associated with key found
-            break;
-           }
-         }
-       }
-
-      String v()
-       {final StringBuilder v = new StringBuilder();                            // Verilog
-        final String        s = Search == null ? T.at(search).verilogLoad() : Search.verilogLoad();
-        final String        c = M.at(currentSize).verilogLoad() + (all ? "-0" : "-1");
-        final int           N = maxSize();
-
-        v.append("/* StuckDM.searchFirstGreaterThanOrEqual */\n");
-        if (Found != null)                                                      // Found
-         {v.append(Found.verilogLoad()+" <= ( 0\n");
-          for (int i = 0; i < N; i++)
-           {v.append(" || ("+M.at(sKey, i).verilogLoad()+" >= "+s+" &&  "+i+ " < "+c+")\n");
-           }
-          v.append(") ? 1 : 0;\n");
-         }
-
-        if (Index != null)                                                      // Index of found
-         {v.append(Index.verilogLoad()+" <=\n");
-          for (int i = 0; i < N; i++)
-           {v.append(    "("+M.at(sKey, i).verilogLoad()+" >= "+s+" && "+i+ " < "+c+") ? "+i+" :\n");
-           }
-          v.append(c+";\n");
-         }
-
-        if (Key != null)                                                        // Greater than or equal key
-         {v.append(Key.verilogLoad()+" <=\n");
-          for (int i = 0; i < N; i++)
-           {v.append(    "("+M.at(sKey, i).verilogLoad()+" >= "+s+" && "+i+ " < "+c+") ? "+M.at(sKey, i).verilogLoad()+" :\n");
-           }
-          v.append("0;\n");
-         }
-
-        if (Data != null)
-         {v.append(Data.verilogLoad()+" <=\n");                                 // Data of found
-          for (int i = 0; i < N; i++)
-           {v.append(    "("+M.at(sKey, i).verilogLoad()+" >= "+s+" && "+i+ " < "+c+") ? "+M.at(sData, i).verilogLoad()+" :\n");
-           }
-          if (all) v.append(M.at(sData, M.at(currentSize)).verilogLoad() + ";\n");              // Normal address
-          else     v.append(M.at(sData, M.at(currentSize)).verilogLoadAddr(false, -1) + ";\n"); // Address one back
-         }
-        return v.toString();
        }
      };
    }
@@ -962,7 +743,7 @@ abstract class StuckDM extends Test                                             
    }
 
   void splitHigh(StuckDM High)                                                  // Split out the upper half of a full stuck
-   {z(); action = "splitHigh";
+   {zz(); action = "splitHigh";
     final int H = High.maxSize()>>1;                                            // Should check theat Low, High, Source all have the same shape
     final StuckDM Source = this;
     checkSameProgram(High);                                                     // Confirm that we are writing into the same program
@@ -1510,59 +1291,6 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
-  static void test_search2()
-   {StuckDM s = test_load();
-
-    Layout               l = Layout.layout();
-    Layout.Variable  k = l.variable ("k", s.bitsPerKey());
-    Layout.Variable  f = l.bit      ("f");
-    Layout.Variable  i = l.variable ("i", s.bitsPerSize());
-    Layout.Variable  d = l.variable ("d", s.bitsPerData());
-    Layout.Structure S = l.structure("S", k, f, i, d);
-    MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "m");
-                     m.program(s.P);
-
-    m.setIntInstruction(k, 6);
-    s.search2(m.at(k), m.at(f), m.at(i), m.at(d));
-    s.P.run(); s.P.clear();
-
-    //stop(s/print());
-//  ok(s.print(), """
-//Transaction(action:search search:2 limit:0 found:1 index:0 key:2 data:1 size:4 isFull:0 isEmpty:0)
-//""");
-    //stop(m);
-    ok(m, """
-MemoryLayout: m
-Memory      : m
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        49                                      S
-   2 V        0        16                                  6     k
-   3 B       16         1                                  1     f
-   4 V       17        16                                  2     i
-   5 V       33        16                                  3     d
-""");
-
-    m.setIntInstruction(k, 3);
-    s.search(m.at(k), m.at(f), m.at(i), m.at(d));
-    s.P.run(); s.P.clear();
-    ok(m.at(f).getInt(), 0);
-
-    m.setIntInstruction(k, 8);
-    s.search(m.at(k), m.at(f), m.at(i), m.at(d));
-    s.P.run(); s.P.clear();
-    //stop(m);
-    ok(m, """
-MemoryLayout: m
-Memory      : m
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        49                                      S
-   2 V        0        16                                  8     k
-   3 B       16         1                                  1     f
-   4 V       17        16                                  3     i
-   5 V       33        16                                  4     d
-""");
-   }
-
   static void test_search_first_greater_than_or_equal()
    {StuckDM s = test_load();
     Layout               l = Layout.layout();
@@ -1888,38 +1616,6 @@ StuckSML(maxSize:8 size:4)
 """);
    }
 
-  static void test_base_save()
-   {z();
-    final StuckDM s = test_load();
-    final StuckDM t = test_load();
-    t.program(s.P);
-    t.clear();
-    s.P.run(); s.P.clear();
-
-    //stop(t);
-    ok(t, """
-StuckSML(maxSize:8 size:0)
-""");
-
-    final MemoryLayoutDM m = new MemoryLayoutDM(s.M.size()*2, "m");
-    m.P = s.P;
-    Layout               l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", 8);
-    Layout.Array     A = l.array    ("A", a, 8);
-    l.compile();
-    s.save(m.at(a, 4));
-    t.base(m.at(a, 4));
-    s.P.run(); s.P.clear();
-    //stop(t);
-    ok(t, """
-StuckSML(maxSize:8 size:4)
-  0 key:2 data:1
-  1 key:4 data:2
-  2 key:6 data:3
-  3 key:8 data:4
-""");
-   }
-
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_load();
     test_clear();
@@ -1933,7 +1629,6 @@ StuckSML(maxSize:8 size:4)
     test_remove_element_at();
     test_first_last();
     test_search();
-    test_search2();
     test_search_first_greater_than_or_equal();
     test_search_first_greater_than_or_equal_except_last();
     test_copy();
@@ -1944,12 +1639,10 @@ StuckSML(maxSize:8 size:4)
     test_split_high();
     test_zero_last_key();
     test_set_last_key();
-    test_base_save();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_base_save();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
