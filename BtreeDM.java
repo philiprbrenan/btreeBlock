@@ -6,9 +6,8 @@ package com.AppaApps.Silicon;                                                   
 // Double allocation would be faster as allocations are often done in pairs
 // Node confirm that a load or a save identified by the trace back is actually changing the node - eliminate this that never have an effect
 // Stuck - get penultimate element. Use currentSize field directly instead of copy in it to a temporary variable
-// Use free in node to hold node number while allocasted so that Node knows where to write it back to without being told
+// Use free in node to hold node number while allocated so that Node knows where to write it back to without being told
 // Set an updated field for when an existing key has its associated data updated by put
-// Merge only on either side of the key path
 // MergeLeft/Right use setTopKey
 // Start splitting lower down and merge only along split path
 import java.util.*;
@@ -4370,7 +4369,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
-   {final boolean longRunning = github_actions && 1 == 1;
+   {final boolean longRunning = github_actions && 1 == 0;
     test_find_and_insert();
     test_put_ascending();
     test_put_ascending_wide();
@@ -4391,6 +4390,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
+    test_find_and_insert();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
