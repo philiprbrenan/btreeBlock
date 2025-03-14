@@ -2801,31 +2801,30 @@ Line T       At      Wide       Size    Indices        Value   Name
   private static void test_find_and_update()
    {z();
     final int N = 64;
-    final BtreePA T = BtreePA.btreePA(8, 3);
-    T.P.run(); T.P.clear();
-    T.put();
+    final BtreeDM t = BtreeDM(8, 3, 48);
+    t.P.run(); t.P.clear();
+    t.put();
     for(int i = 2; i <= N; i += 2)
      {//say(currentTestName(),  "a", i);
-      T.T.at(T.Key).setInt(  i);
-      T.T.at(T.Data).setInt( i);
-      T.P.run();                                                                // Insert
-      T.P.run();                                                                // Update
+      t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(i);
+      t.P.run();                                                                // Insert
+      t.P.run();                                                                // Update
      }
 
-    //stop(T);
-    ok(T, """
-                                                  33                                                      |
-                                                  0                                                       |
-                                                  5                                                       |
-                                                  6                                                       |
-                      17                                                      49                          |
-                      5                                                       6                           |
-                      1                                                       4                           |
-                      3                                                       2                           |
-2,4,6,8,10,12,14,16=1   18,20,22,24,26,28,30,32=3   34,36,38,40,42,44,46,48=4   50,52,54,56,58,60,62,64=2 |
+    //stop(t);
+    ok(t, """
+                                                  33                                                           |
+                                                  0                                                            |
+                                                  5                                                            |
+                                                  6                                                            |
+                      17                                          41              49                           |
+                      5                                           6               6.1                          |
+                      1                                           3               7                            |
+                      4                                                           2                            |
+2,4,6,8,10,12,14,16=1   18,20,22,24,26,28,30,32=4   34,36,38,40=3   42,44,46,48=7    50,52,54,56,58,60,62,64=2 |
 """);
 
-    final BtreeDM t = btreeDM(T);
     t.P.clear();
     t.find();
     for(int i = 1; i <= N+1; i += 2)                                            // Keys that cannot be found
@@ -3931,23 +3930,23 @@ Line T       At      Wide       Size    Indices        Value   Name
   private static void test_node()
    {z();
     final int N = 3;
-    final BtreePA T = new BtreePA()
+    final BtreeDM t = new BtreeDM()
      {int maxSize         () {return  3;}
       int maxKeysPerLeaf  () {return  2;}
       int maxKeysPerBranch() {return  3;}
       int bitsPerKey      () {return  4;}
       int bitsPerData     () {return  4;}
      };
-    T.P.run(); T.P.clear();
-    T.put();
+    t.P.run(); t.P.clear();
+    t.put();
     for(int i = 1; i <= N; ++i)
-     {T.T.at(T.Key).setInt (i);
-      T.T.at(T.Data).setInt(i);
-      T.P.run();
+     {t.T.at(t.Key).setInt (i);
+      t.T.at(t.Data).setInt(i);
+      t.P.run();
      }
 
-    //stop(T);
-    ok(T, """
+    //stop(t);
+    ok(t, """
     1      |
     0      |
     1      |
@@ -3955,9 +3954,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1=1  2,3=2 |
 """);
 
-    final BtreeDM t = btreeDM(T);
     t.P.clear();
-    //stop(t.M);
 
     StuckDM l = new StuckDM("leaf")
      {int     maxSize() {return t.maxKeysPerLeaf();}
@@ -4007,6 +4004,8 @@ StuckSML(maxSize:4 size:2)
   0 key:1 data:1
   1 key:0 data:2
 """);
+
+
 
     n.loadNode(nim.at(one));
     l.clear();
@@ -4182,89 +4181,6 @@ Line T       At      Wide       Size    Indices        Value   Name
    4 B        9         1                                  1     leafBit
 """);
 
-    //stop(t.M);
-    ok(""+t.M, """
-MemoryLayout: M
-Memory      : M
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        92                                      bTree
-   2 V        0         2                                  0     freeList
-   3 A        2        90          3                             nodes
-   4 S        2        30               0                          node
-   5 B        2         1               0                  1         isLeaf
-   6 V        3         2               0                  0         free
-   7 U        5        27               0                            branchOrLeaf
-   8 S        5        19               0                              leaf
-   9 V        5         3               0                  1             currentSize
-  10 A        8         8          2    0                                Keys
-  11 V        8         4               0 0                1               key
-  12 V       12         4               0 1                0               key
-  13 A       16         8          2    0                                Data
-  14 V       16         4               0 0                1               data
-  15 V       20         4               0 1                2               data
-  16 S        5        27               0                              branch
-  17 V        5         3               0                  1             currentSize
-  18 A        8        16          4    0                                Keys
-  19 V        8         4               0 0                1               key
-  20 V       12         4               0 1                0               key
-  21 V       16         4               0 2                1               key
-  22 V       20         4               0 3                2               key
-  23 A       24         8          4    0                                Data
-  24 V       24         2               0 0                1               data
-  25 V       26         2               0 1                2               data
-  26 V       28         2               0 2                0               data
-  27 V       30         2               0 3                0               data
-  28 S       32        30               1                          node
-  29 B       32         1               1                  1         isLeaf
-  30 V       33         2               1                  0         free
-  31 U       35        27               1                            branchOrLeaf
-  32 S       35        19               1                              leaf
-  33 V       35         3               1                  1             currentSize
-  34 A       38         8          2    1                                Keys
-  35 V       38         4               1 0                1               key
-  36 V       42         4               1 1                2               key
-  37 A       46         8          2    1                                Data
-  38 V       46         4               1 0                1               data
-  39 V       50         4               1 1                2               data
-  40 S       35        27               1                              branch
-  41 V       35         3               1                  1             currentSize
-  42 A       38        16          4    1                                Keys
-  43 V       38         4               1 0                1               key
-  44 V       42         4               1 1                2               key
-  45 V       46         4               1 2                1               key
-  46 V       50         4               1 3                2               key
-  47 A       54         8          4    1                                Data
-  48 V       54         2               1 0                0               data
-  49 V       56         2               1 1                0               data
-  50 V       58         2               1 2                0               data
-  51 V       60         2               1 3                0               data
-  52 S       62        30               2                          node
-  53 B       62         1               2                  0         isLeaf
-  54 V       63         2               2                  0         free
-  55 U       65        27               2                            branchOrLeaf
-  56 S       65        19               2                              leaf
-  57 V       65         3               2                  1             currentSize
-  58 A       68         8          2    2                                Keys
-  59 V       68         4               2 0                2               key
-  60 V       72         4               2 1                3               key
-  61 A       76         8          2    2                                Data
-  62 V       76         4               2 0                2               data
-  63 V       80         4               2 1                3               data
-  64 S       65        27               2                              branch
-  65 V       65         3               2                  1             currentSize
-  66 A       68        16          4    2                                Keys
-  67 V       68         4               2 0                2               key
-  68 V       72         4               2 1                3               key
-  69 V       76         4               2 2                2               key
-  70 V       80         4               2 3                3               key
-  71 A       84         8          4    2                                Data
-  72 V       84         2               2 0                0               data
-  73 V       86         2               2 1                0               data
-  74 V       88         2               2 2                0               data
-  75 V       90         2               2 3                0               data
-""");
-
-
     n.loadRootStuck(l);
     t.P.run(); t.P.clear();
     l.T.setIntInstruction(l.tKey , 2);
@@ -4274,102 +4190,54 @@ Line T       At      Wide       Size    Indices        Value   Name
     //stop(l);
     ok(l, """
 StuckSML(maxSize:2 size:2)
-  0 key:1 data:1
+  0 key:1 data:0
   1 key:2 data:2
+""");
+    //stop(b);
+    ok(b, """
+StuckSML(maxSize:4 size:1)
+  0 key:1 data:1
 """);
 
     n.saveRootStuck(l);
     t.T.setIntInstruction(t.index, 1);
     n.saveStuck(l, t.index);
     t.T.setIntInstruction(t.index, 2);
-    n.saveStuck(l, t.index);
+    n.saveStuck(b, t.index);
     t.P.run(); t.P.clear();
-    //stop(t.M);
-    ok(t.M, """
-MemoryLayout: M
-Memory      : M
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        92                                      bTree
-   2 V        0         2                                  0     freeList
-   3 A        2        90          3                             nodes
-   4 S        2        30               0                          node
-   5 B        2         1               0                  1         isLeaf
-   6 V        3         2               0                  0         free
-   7 U        5        27               0                            branchOrLeaf
-   8 S        5        19               0                              leaf
-   9 V        5         3               0                  2             currentSize
-  10 A        8         8          2    0                                Keys
-  11 V        8         4               0 0                1               key
-  12 V       12         4               0 1                2               key
-  13 A       16         8          2    0                                Data
-  14 V       16         4               0 0                1               data
-  15 V       20         4               0 1                2               data
-  16 S        5        27               0                              branch
-  17 V        5         3               0                  2             currentSize
-  18 A        8        16          4    0                                Keys
-  19 V        8         4               0 0                1               key
-  20 V       12         4               0 1                2               key
-  21 V       16         4               0 2                1               key
-  22 V       20         4               0 3                2               key
-  23 A       24         8          4    0                                Data
-  24 V       24         2               0 0                1               data
-  25 V       26         2               0 1                2               data
-  26 V       28         2               0 2                0               data
-  27 V       30         2               0 3                0               data
-  28 S       32        30               1                          node
-  29 B       32         1               1                  1         isLeaf
-  30 V       33         2               1                  0         free
-  31 U       35        27               1                            branchOrLeaf
-  32 S       35        19               1                              leaf
-  33 V       35         3               1                  2             currentSize
-  34 A       38         8          2    1                                Keys
-  35 V       38         4               1 0                1               key
-  36 V       42         4               1 1                2               key
-  37 A       46         8          2    1                                Data
-  38 V       46         4               1 0                1               data
-  39 V       50         4               1 1                2               data
-  40 S       35        27               1                              branch
-  41 V       35         3               1                  2             currentSize
-  42 A       38        16          4    1                                Keys
-  43 V       38         4               1 0                1               key
-  44 V       42         4               1 1                2               key
-  45 V       46         4               1 2                1               key
-  46 V       50         4               1 3                2               key
-  47 A       54         8          4    1                                Data
-  48 V       54         2               1 0                1               data
-  49 V       56         2               1 1                2               data
-  50 V       58         2               1 2                0               data
-  51 V       60         2               1 3                0               data
-  52 S       62        30               2                          node
-  53 B       62         1               2                  1         isLeaf
-  54 V       63         2               2                  0         free
-  55 U       65        27               2                            branchOrLeaf
-  56 S       65        19               2                              leaf
-  57 V       65         3               2                  2             currentSize
-  58 A       68         8          2    2                                Keys
-  59 V       68         4               2 0                1               key
-  60 V       72         4               2 1                2               key
-  61 A       76         8          2    2                                Data
-  62 V       76         4               2 0                1               data
-  63 V       80         4               2 1                2               data
-  64 S       65        27               2                              branch
-  65 V       65         3               2                  2             currentSize
-  66 A       68        16          4    2                                Keys
-  67 V       68         4               2 0                1               key
-  68 V       72         4               2 1                2               key
-  69 V       76         4               2 2                1               key
-  70 V       80         4               2 3                2               key
-  71 A       84         8          4    2                                Data
-  72 V       84         2               2 0                1               data
-  73 V       86         2               2 1                2               data
-  74 V       88         2               2 2                0               data
-  75 V       90         2               2 3                0               data
+
+    l.M.zero(); b.M.zero();
+    //stop(l);
+    ok(l, """
+StuckSML(maxSize:2 size:0)
+""");
+    //stop(b);
+    ok(b, """
+StuckSML(maxSize:4 size:0)
+""");
+
+    t.T.setIntInstruction(t.index, 1);
+    n.loadStuck(l, t.index);
+    t.T.setIntInstruction(t.index, 2);
+    n.loadStuck(b, t.index);
+    t.P.run(); t.P.clear();
+
+    //stop(l);
+    ok(l, """
+StuckSML(maxSize:2 size:2)
+  0 key:1 data:0
+  1 key:2 data:2
+""");
+    //stop(b);
+    ok(b, """
+StuckSML(maxSize:4 size:1)
+  0 key:1 data:1
 """);
 
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
-   {final boolean longRunning = github_actions && 1 == 0;
+   {final boolean longRunning = github_actions && 1 == 1;
     test_find_and_insert();
     test_put_ascending();
     test_put_ascending_wide();
@@ -4390,7 +4258,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_find_and_insert();
+    test_node();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
