@@ -1087,12 +1087,6 @@ stop("Deprecated");
    }
 
   private void findFirstGreaterThanOrEqualInBranch                              // Find the first key in the branch that is equal to or greater than the search key
-   (Layout.Variable Branch,  MemoryLayoutDM.At Search, MemoryLayoutDM.At Found,
-    MemoryLayoutDM.At Index, MemoryLayoutDM.At Data)
-   {stop("Replaced");
-   }
-
-  private void findFirstGreaterThanOrEqualInBranch                              // Find the first key in the branch that is equal to or greater than the search key
    (Node Node,  MemoryLayoutDM.At Search, MemoryLayoutDM.At Found,
     MemoryLayoutDM.At Index, MemoryLayoutDM.At Data)
    {zz();
@@ -2063,7 +2057,6 @@ P.new I() {void a() {if (debug) say("CCCC4444", thisBTree);}};
      {void code()
        {final ProgramDM.Label Return = end;
         mergeRoot();
-P.new I() {void a() {if (debug) {say("CCCC1111", thisBTree); stop("");}}};
         T.at(parent).zero();                                                    // Start at root
 
         P.new Block()                                                           // Step down through the tree, splitting as we go
@@ -2478,10 +2471,11 @@ endmodule
 
   private static void test_put_ascending()
    {z();
-    final BtreeDM t = BtreeDM(4, 3, 24);
+    final int N = 32;
+    final BtreeDM t = BtreeDM(4, 3, N);
     t.P.run(); t.P.clear();
     t.put();
-    for(int i = 1; i <= 64; ++i)
+    for(int i = 1; i <= N+N; ++i)
      {//say(currentTestName(), i);
       t.T.at(t.Key).setInt(  i);
       t.T.at(t.Data).setInt( i);
@@ -2492,23 +2486,23 @@ endmodule
                                                                                                                             32                                                                                                                                           |
                                                                                                                             0                                                                                                                                            |
                                                                                                                             17                                                                                                                                           |
-                                                                                                                            21                                                                                                                                           |
+                                                                                                                            16                                                                                                                                           |
                                                       16                                                                                                                                            48                                56                                 |
-                                                      17                                                                                                                                            21                                21.1                               |
-                                                      5                                                                                                                                             16                                23                                 |
+                                                      17                                                                                                                                            16                                16.1                               |
+                                                      5                                                                                                                                             21                                23                                 |
                                                       11                                                                                                                                                                              6                                  |
           4          8               12                               20               24                28                                  36               40                 44                                  52                                  60              |
-          5          5.1             5.2                              11               11.1              11.2                                16               16.1               16.2                                23                                  6               |
-          1          3               4                                8                10                9                                   13               15                 14                                  18                                  20              |
-                                     7                                                                   12                                                                      19                                  22                                  2               |
-1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=12   33,34,35,36=13   37,38,39,40=15     41,42,43,44=14     45,46,47,48=19   49,50,51,52=18   53,54,55,56=22     57,58,59,60=20   61,62,63,64=2 |
+          5          5.1             5.2                              11               11.1              11.2                                21               21.1               21.2                                23                                  6               |
+          1          4               3                                7                10                9                                   13               15                 14                                  18                                  20              |
+                                     8                                                                   12                                                                      19                                  22                                  2               |
+1,2,3,4=1  5,6,7,8=4    9,10,11,12=3    13,14,15,16=8   17,18,19,20=7   21,22,23,24=10     25,26,27,28=9     29,30,31,32=12   33,34,35,36=13   37,38,39,40=15     41,42,43,44=14     45,46,47,48=19   49,50,51,52=18   53,54,55,56=22     57,58,59,60=20   61,62,63,64=2 |
 """);
     // stop("maximumNodes used", t.maxNodeUsed); // 25
    }
 
   private static void test_put_ascending_wide()
    {z();
-    final BtreeDM    t = BtreeDM(8, 7, 12);
+    final BtreeDM    t = BtreeDM(8, 7, 48);
     t.P.run(); t.P.clear();
     t.put();
     for(int i = 1; i <= 64; ++i)
@@ -2525,16 +2519,16 @@ endmodule
                                                                                                       10                                                                                                                  |
                   8                         16                           24                                                       40                          48                            56                            |
                   9                         9.1                          9.2                                                      10                          10.1                          10.2                          |
-                  1                         3                            4                                                        6                           7                             8                             |
+                  1                         4                            3                                                        6                           7                             8                             |
                                                                          5                                                                                                                  2                             |
-1,2,3,4,5,6,7,8=1  9,10,11,12,13,14,15,16=3    17,18,19,20,21,22,23,24=4    25,26,27,28,29,30,31,32=5   33,34,35,36,37,38,39,40=6   41,42,43,44,45,46,47,48=7     49,50,51,52,53,54,55,56=8     57,58,59,60,61,62,63,64=2 |
+1,2,3,4,5,6,7,8=1  9,10,11,12,13,14,15,16=4    17,18,19,20,21,22,23,24=3    25,26,27,28,29,30,31,32=5   33,34,35,36,37,38,39,40=6   41,42,43,44,45,46,47,48=7     49,50,51,52,53,54,55,56=8     57,58,59,60,61,62,63,64=2 |
 """);
     // stop("maximumNodes used", t.maxNodeUsed); // 12
    }
 
   private static void test_put_descending()
    {z();
-    final BtreeDM t = BtreeDM(2, 3, 44);
+    final BtreeDM t = BtreeDM(2, 3, 60);
     t.P.run(); t.P.clear();
     t.put();
     for(int i = 64; i > 0; --i)
@@ -2564,7 +2558,7 @@ endmodule
 
   private static void test_put_small_random()
    {z();
-    final BtreeDM    t = BtreeDM(6, 3, 16);
+    final BtreeDM    t = BtreeDM(6, 3, 100);
     t.P.run(); t.P.clear();
     t.put();
     for(int i = 0; i < random_small.length; i++)
@@ -2874,7 +2868,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   private static void test_delete_ascending()
    {z();
-    final BtreeDM t = BtreeDM(4, 3, 12);
+    final BtreeDM t = BtreeDM(4, 3, 48);
     t.P.run(); t.P.clear();
 
     final int N = 32;
@@ -2895,9 +2889,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                                                                        6                                |
           4          8               12                               20                                28              |
           5          5.1             5.2                              11                                6               |
-          1          3               4                                8                                 9               |
-                                     7                                10                                2               |
-1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10    25,26,27,28=9   29,30,31,32=2 |
+          1          4               3                                7                                 9               |
+                                     8                                10                                2               |
+1,2,3,4=1  5,6,7,8=4    9,10,11,12=3    13,14,15,16=8   17,18,19,20=7   21,22,23,24=10    25,26,27,28=9   29,30,31,32=2 |
 """);
 
     if (box) say("At start with", N, "elements", t.printBoxed());
@@ -2918,9 +2912,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                                     11                                                                   |
         4          8               12                               20               24                28                |
         5          5.1             5.2                              11               11.1              11.2              |
-        1          3               4                                8                10                9                 |
-                                   7                                                                   2                 |
-2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
+        1          4               3                                7                10                9                 |
+                                   8                                                                   2                 |
+2,3,4=1  5,6,7,8=4    9,10,11,12=3    13,14,15,16=8   17,18,19,20=7   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 2 -> t.ok("""
                                                   16                                                                   |
@@ -2929,9 +2923,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                                   11                                                                   |
       4          8               12                               20               24                28                |
       5          5.1             5.2                              11               11.1              11.2              |
-      1          3               4                                8                10                9                 |
-                                 7                                                                   2                 |
-3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
+      1          4               3                                7                10                9                 |
+                                 8                                                                   2                 |
+3,4=1  5,6,7,8=4    9,10,11,12=3    13,14,15,16=8   17,18,19,20=7   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 3 -> t.ok("""
                                                 16                                                                   |
@@ -2940,9 +2934,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                                 11                                                                   |
       5        8               12                               20               24                28                |
       5        5.1             5.2                              11               11.1              11.2              |
-      1        3               4                                8                10                9                 |
-                               7                                                                   2                 |
-4,5=1  6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
+      1        4               3                                7                10                9                 |
+                               8                                                                   2                 |
+4,5=1  6,7,8=4    9,10,11,12=3    13,14,15,16=8   17,18,19,20=7   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 4 -> t.ok("""
                                          16                                                                   |
@@ -2951,9 +2945,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                          11                                                                   |
           8             12                               20               24                28                |
           5             5.1                              11               11.1              11.2              |
-          1             4                                8                10                9                 |
-                        7                                                                   2                 |
-5,6,7,8=1  9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
+          1             3                                7                10                9                 |
+                        8                                                                   2                 |
+5,6,7,8=1  9,10,11,12=3    13,14,15,16=8   17,18,19,20=7   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 5 -> t.ok("""
                                        16                                                                   |
@@ -2962,9 +2956,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                        11                                                                   |
         8             12                               20               24                28                |
         5             5.1                              11               11.1              11.2              |
-        1             4                                8                10                9                 |
-                      7                                                                   2                 |
-6,7,8=1  9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
+        1             3                                7                10                9                 |
+                      8                                                                   2                 |
+6,7,8=1  9,10,11,12=3    13,14,15,16=8   17,18,19,20=7   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 6 -> t.ok("""
                                      16                                                                   |
@@ -2973,9 +2967,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                      11                                                                   |
       8             12                               20               24                28                |
       5             5.1                              11               11.1              11.2              |
-      1             4                                8                10                9                 |
-                    7                                                                   2                 |
-7,8=1  9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
+      1             3                                7                10                9                 |
+                    8                                                                   2                 |
+7,8=1  9,10,11,12=3    13,14,15,16=8   17,18,19,20=7   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 7 -> t.ok("""
                                    16                                                                   |
@@ -2984,9 +2978,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                    11                                                                   |
       9           12                               20               24                28                |
       5           5.1                              11               11.1              11.2              |
-      1           4                                8                10                9                 |
-                  7                                                                   2                 |
-8,9=1  10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
+      1           3                                7                10                9                 |
+                  8                                                                   2                 |
+8,9=1  10,11,12=3    13,14,15,16=8   17,18,19,20=7   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 8 -> t.ok("""
                              16                                                                   |
@@ -2995,9 +2989,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                              11                                                                   |
              12                              20               24                28                |
              5                               11               11.1              11.2              |
-             1                               8                10                9                 |
-             7                                                                  2                 |
-9,10,11,12=1   13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
+             1                               7                10                9                 |
+             8                                                                  2                 |
+9,10,11,12=1   13,14,15,16=8   17,18,19,20=7   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 9 -> t.ok("""
                                             20                                                 |
@@ -3006,9 +3000,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                             11                                                 |
            12              16                                24              28                |
            5               5.1                               11              11.1              |
-           1               7                                 10              9                 |
-                           8                                                 2                 |
-10,11,12=1   13,14,15,16=7    17,18,19,20=8   21,22,23,24=10   25,26,27,28=9     29,30,31,32=2 |
+           1               8                                 10              9                 |
+                           7                                                 2                 |
+10,11,12=1   13,14,15,16=8    17,18,19,20=7   21,22,23,24=10   25,26,27,28=9     29,30,31,32=2 |
 """);
         case 10 -> t.ok("""
                                          20                                                 |
@@ -3017,9 +3011,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                          11                                                 |
         12              16                                24              28                |
         5               5.1                               11              11.1              |
-        1               7                                 10              9                 |
-                        8                                                 2                 |
-11,12=1   13,14,15,16=7    17,18,19,20=8   21,22,23,24=10   25,26,27,28=9     29,30,31,32=2 |
+        1               8                                 10              9                 |
+                        7                                                 2                 |
+11,12=1   13,14,15,16=8    17,18,19,20=7   21,22,23,24=10   25,26,27,28=9     29,30,31,32=2 |
 """);
         case 11 -> t.ok("""
                                       20                                                 |
@@ -3028,9 +3022,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                       11                                                 |
         13           16                                24              28                |
         5            5.1                               11              11.1              |
-        1            7                                 10              9                 |
-                     8                                                 2                 |
-12,13=1   14,15,16=7    17,18,19,20=8   21,22,23,24=10   25,26,27,28=9     29,30,31,32=2 |
+        1            8                                 10              9                 |
+                     7                                                 2                 |
+12,13=1   14,15,16=8    17,18,19,20=7   21,22,23,24=10   25,26,27,28=9     29,30,31,32=2 |
 """);
         case 12 -> t.ok("""
                               20                                                 |
@@ -3040,8 +3034,8 @@ Line T       At      Wide       Size    Indices        Value   Name
               16                               24              28                |
               5                                11              11.1              |
               1                                10              9                 |
-              8                                                2                 |
-13,14,15,16=1   17,18,19,20=8   21,22,23,24=10   25,26,27,28=9     29,30,31,32=2 |
+              7                                                2                 |
+13,14,15,16=1   17,18,19,20=7   21,22,23,24=10   25,26,27,28=9     29,30,31,32=2 |
 """);
         case 13 -> t.ok("""
                                              24                              |
@@ -3050,9 +3044,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                              11                              |
            16              20                                28              |
            5               5.1                               11              |
-           1               8                                 9               |
+           1               7                                 9               |
                            10                                2               |
-14,15,16=1   17,18,19,20=8    21,22,23,24=10   25,26,27,28=9   29,30,31,32=2 |
+14,15,16=1   17,18,19,20=7    21,22,23,24=10   25,26,27,28=9   29,30,31,32=2 |
 """);
         case 14 -> t.ok("""
                                           24                              |
@@ -3061,9 +3055,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                           11                              |
         16              20                                28              |
         5               5.1                               11              |
-        1               8                                 9               |
+        1               7                                 9               |
                         10                                2               |
-15,16=1   17,18,19,20=8    21,22,23,24=10   25,26,27,28=9   29,30,31,32=2 |
+15,16=1   17,18,19,20=7    21,22,23,24=10   25,26,27,28=9   29,30,31,32=2 |
 """);
         case 15 -> t.ok("""
                                        24                              |
@@ -3072,9 +3066,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                        11                              |
         17           20                                28              |
         5            5.1                               11              |
-        1            8                                 9               |
+        1            7                                 9               |
                      10                                2               |
-16,17=1   18,19,20=8    21,22,23,24=10   25,26,27,28=9   29,30,31,32=2 |
+16,17=1   18,19,20=7    21,22,23,24=10   25,26,27,28=9   29,30,31,32=2 |
 """);
         case 16 -> t.ok("""
                                24                              |
@@ -3185,7 +3179,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   private static void test_delete_descending()
    {z();
-    final BtreeDM     t = BtreeDM(4, 3, 20);
+    final BtreeDM t = BtreeDM(4, 3, 20);
     t.P.run(); t.P.clear();
     final int N = 32;
     final boolean box = false;                                                  // Print read me
@@ -3493,9 +3487,9 @@ Line T       At      Wide       Size    Indices        Value   Name
      }
    }
 
-  private static void test_delete_random(int[]random_array)
+  private static void test_delete_random(int[]random_array, int maxSize)
    {z();
-    final BtreeDM t = BtreeDM(4, 3, 50);
+    final BtreeDM t = BtreeDM(4, 3, maxSize);
     t.P.run(); t.P.clear();
     t.put();
     final int N = random_array.length;
@@ -3542,13 +3536,13 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   private static void test_delete_small_random()
    {z();
-    test_delete_random(random_small);
+    test_delete_random(random_small, 50);
    }
 
   private static void test_delete_large_random()
    {z();
     if (!github_actions) return;
-    test_delete_random(random_large);
+    test_delete_random(random_large, 1000);
    }
 
   private static void test_verilogFind()                                        // Find using generated verilog code
@@ -3572,9 +3566,9 @@ Line T       At      Wide       Size    Indices        Value   Name
              6                    |
       2             6    7        |
       5             6    6.1      |
-      1             4    7        |
-      3                  2        |
-1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
+      1             3    8        |
+      4                  2        |
+1,2=1  3,4=4  5,6=3  7=8    8,9=2 |
 """);
     t.P.clear(); t.T.clear();                                                   // Clear program and transaction memory
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
@@ -3630,9 +3624,9 @@ Line T       At      Wide       Size    Indices        Value   Name
              6                    |
       2             6    7        |
       5             6    6.1      |
-      1             4    7        |
-      3                  2        |
-1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
+      1             3    8        |
+      4                  2        |
+1,2=1  3,4=4  5,6=3  7=8    8,9=2 |
 """);
 
     t.P.clear();                                                                // Replace program with delete
@@ -3747,47 +3741,47 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
 
     t.runVerilogPutTest(4, 214, """
-      2      |
-      0      |
-      1      |
-      2      |
-1,2=1  3,4=2 |
+    1    2        |
+    0    0.1      |
+    1    3        |
+         2        |
+1=1  2=3    3,4=2 |
 """);
 
     t.runVerilogPutTest(5, 259, """
       2    3        |
       0    0.1      |
-      1    3        |
+      1    4        |
            2        |
-1,2=1  3=3    4,5=2 |
+1,2=1  3=4    4,5=2 |
 """);
 
     t.runVerilogPutTest(6, 285, """
       2      4        |
       0      0.1      |
-      1      3        |
+      1      4        |
              2        |
-1,2=1  3,4=3    5,6=2 |
+1,2=1  3,4=4    5,6=2 |
 """);
 
     t.runVerilogPutTest(7, 330, """
       2      4      5        |
       0      0.1    0.2      |
-      1      3      4        |
+      1      4      3        |
                     2        |
-1,2=1  3,4=3    5=4    6,7=2 |
+1,2=1  3,4=4    5=3    6,7=2 |
 """);
 
     t.runVerilogPutTest(8, 388, """
-             4             |
-             0             |
-             5             |
-             6             |
-      2             6      |
-      5             6      |
-      1             4      |
-      3             2      |
-1,2=1  3,4=3  5,6=4  7,8=2 |
+             4                  |
+             0                  |
+             5                  |
+             6                  |
+      2           5    6        |
+      5           6    6.1      |
+      1           3    7        |
+      4                2        |
+1,2=1  3,4=4  5=3  6=7    7,8=2 |
 """);
 
     t.runVerilogPutTest(9, 361, """
@@ -3797,9 +3791,9 @@ Line T       At      Wide       Size    Indices        Value   Name
              6                    |
       2             6    7        |
       5             6    6.1      |
-      1             4    7        |
-      3                  2        |
-1,2=1  3,4=3  5,6=4  7=7    8,9=2 |
+      1             3    8        |
+      4                  2        |
+1,2=1  3,4=4  5,6=3  7=8    8,9=2 |
 """);
 
     t.runVerilogPutTest(10, 387, """
@@ -3809,9 +3803,9 @@ Line T       At      Wide       Size    Indices        Value   Name
              6                       |
       2             6      8         |
       5             6      6.1       |
-      1             4      7         |
-      3                    2         |
-1,2=1  3,4=3  5,6=4  7,8=7    9,10=2 |
+      1             3      8         |
+      4                    2         |
+1,2=1  3,4=4  5,6=3  7,8=8    9,10=2 |
 """);
 
     t.runVerilogPutTest(11, 432, """
@@ -3821,9 +3815,9 @@ Line T       At      Wide       Size    Indices        Value   Name
              6                               |
       2             6      8      9          |
       5             6      6.1    6.2        |
-      1             4      7      8          |
-      3                           2          |
-1,2=1  3,4=3  5,6=4  7,8=7    9=8    10,11=2 |
+      1             3      8      7          |
+      4                           2          |
+1,2=1  3,4=4  5,6=3  7,8=8    9=7    10,11=2 |
 """);
 
     t.runVerilogPutTest(12, 376, """
@@ -3833,9 +3827,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                6                 |
       2      4        6                10        |
       5      5.1      5.2              6         |
-      1      3        4                8         |
-                      7                2         |
-1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=2 |
+      1      4        3                7         |
+                      8                2         |
+1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=2 |
 """);
 
     t.runVerilogPutTest(13, 361, """
@@ -3845,9 +3839,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                6                          |
       2      4        6                10      11         |
       5      5.1      5.2              6       6.1        |
-      1      3        4                8       10         |
-                      7                        2          |
-1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11=10    12,13=2 |
+      1      4        3                7       10         |
+                      8                        2          |
+1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11=10    12,13=2 |
 """);
 
     t.runVerilogPutTest(14, 387, """
@@ -3857,9 +3851,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                6                             |
       2      4        6                10         12         |
       5      5.1      5.2              6          6.1        |
-      1      3        4                8          10         |
-                      7                           2          |
-1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=2 |
+      1      4        3                7          10         |
+                      8                           2          |
+1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=2 |
 """);
 
     t.runVerilogPutTest(15, 432, """
@@ -3869,9 +3863,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                6                                     |
       2      4        6                10         12      13         |
       5      5.1      5.2              6          6.1     6.2        |
-      1      3        4                8          10      9          |
-                      7                                   2          |
-1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13=9    14,15=2 |
+      1      4        3                7          10      9          |
+                      8                                   2          |
+1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13=9    14,15=2 |
 """);
 
     t.runVerilogPutTest(16, 417, """
@@ -3881,9 +3875,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                                   6                    |
       2      4        6                10                    14        |
       5      5.1      5.2              11                    6         |
-      1      3        4                8                     9         |
-                      7                10                    2         |
-1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=2 |
+      1      4        3                7                     9         |
+                      8                10                    2         |
+1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=2 |
 """);
 
     t.runVerilogPutTest(17, 426, """
@@ -3893,9 +3887,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                                   6                             |
       2      4        6                10                    14      15         |
       5      5.1      5.2              11                    6       6.1        |
-      1      3        4                8                     9       12         |
-                      7                10                            2          |
-1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15=12    16,17=2 |
+      1      4        3                7                     9       12         |
+                      8                10                            2          |
+1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
     t.runVerilogPutTest(18, 452, """
@@ -3905,9 +3899,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                                   6                                |
       2      4        6                10                    14         16         |
       5      5.1      5.2              11                    6          6.1        |
-      1      3        4                8                     9          12         |
-                      7                10                               2          |
-1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17,18=2 |
+      1      4        3                7                     9          12         |
+                      8                10                               2          |
+1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=12    17,18=2 |
 """);
 
     t.runVerilogPutTest(19, 497, """
@@ -3917,9 +3911,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                                   6                                         |
       2      4        6                10                    14         16       17         |
       5      5.1      5.2              11                    6          6.1      6.2        |
-      1      3        4                8                     9          12       13         |
-                      7                10                                        2          |
-1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
+      1      4        3                7                     9          12       13         |
+                      8                10                                        2          |
+1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
     t.runVerilogPutTest(20, 449, """
@@ -3929,9 +3923,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                                                                            6                     |
       2      4        6                10         12          14                       18        |
       5      5.1      5.2              11         11.1        11.2                     6         |
-      1      3        4                8          10          9                        13        |
-                      7                                       12                       2         |
-1,2=1  3,4=3    5,6=4    7,8=7  9,10=8   11,12=10     13,14=9     15,16=12    17,18=13   19,20=2 |
+      1      4        3                7          10          9                        13        |
+                      8                                       12                       2         |
+1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10     13,14=9     15,16=12    17,18=13   19,20=2 |
 """);
    }
 
@@ -4389,7 +4383,6 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_delete_descending();
     test_delete_small_random();
     if (longRunning) test_delete_large_random();
-
     test_node();
     test_verilogDelete();
     test_verilogFind();
