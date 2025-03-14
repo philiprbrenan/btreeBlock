@@ -115,33 +115,6 @@ class ProgramDM extends Test                                                    
     currentCode      = max(currentCode, p.end);                                 // Furthest extent of parallel block
    }
 
-//  class Parallel                                                                // The start and end of the current parallel range
-//   {int start;                                                                  // Start of the parallel range
-//    int   end;                                                                  // End of the parallel range
-//    final String traceBack = traceComment();
-//    Parallel() {start = end = currentCode-1; currentParallel.push(this);}       // Start at current code position
-//   }
-//
-//  void  parallelStart()                                                         // Start a parallel block.  Only one parallel block is allowed at a time.  Parallel blocks are much easoer to deal with than automated optimization as we can make local incremental changes.
-//   {zz();
-//    new Parallel();
-//   }
-//
-//  void  parallelSection()                                                       // Start a parallel block.  Only one parallel block is allowed at a time
-//   {zz();
-//    if (currentParallel.size() == 0) stop("No active parallel section");        // Check we are in a parallel section
-//    final Parallel p = currentParallel.lastElement();                           // Current parallel block
-//    p.end            = max(currentCode, p.end);                                 // Furthest extent of parallel block
-//    currentCode      = p.start + (currentParallel.size() > 1 ? 1 : 0);          // Add the instructions in this section from the start of the block
-//   }
-
-//  void  parallelEnd()                                                           // End a parallel block
-//   {zz();
-//    if (currentParallel.size() == 0) stop("No active parallel section");        // Check we are in apralle section
-//    final Parallel p = currentParallel.pop();                                   // Current parallel block
-//    currentCode      = max(currentCode, p.end);                                 // Furthest extent of parallel block
-//   }
-
   void  parallelDump()                                                          // Dump the openeing locations for the current set of paalle blocks
    {final int N = currentParallel.size();                                       // Open sections
     say(N, "open parallel sections started at:");
