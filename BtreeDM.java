@@ -654,25 +654,16 @@ abstract class BtreeDM extends Test                                             
     return L.compile();
    }
 
-  private void    isLeaf()  {zz(); T.at(IsLeaf).move(M.at(bTree_isLeaf, T.at(node_isLeaf)));}           // Whether a node is a leaf
-  private void isRootLeaf() {zz(); T.at(IsLeaf).move(M.at(bTree_isLeaf, root));}                        // Whether the root is a leaf
-  private void   setLeaf()  {zz();                   M.at(bTree_isLeaf, T.at(node_setLeaf))  .ones();}  // Set as leaf
-  private void setBranch()  {zz();                   M.at(bTree_isLeaf, T.at(node_setBranch)).zero();}  // Set as branch
+  private void setLeaf()                                                        // Set as leaf
+   {zz(); M.at(bTree_isLeaf, T.at(node_setLeaf))  .ones();
+   }
 
-  void isLeaf(Node Node)                                                        // Whether a node is a leaf
-   {zz(); T.at(IsLeaf).move(Node.N.at(isLeaf));
+  private void setBranch()                                                      // Set as branch
+   {zz(); M.at(bTree_isLeaf, T.at(node_setBranch)).zero();
    }
 
   private MemoryLayoutDM.At ifRootLeaf(Node n)                                  // A variable that indicates whether the root is a leaf
    {zz(); return n.N.at(isLeaf);
-   }
-
-  private void isLeaf(MemoryLayoutDM.At node)                                   // A leaf if true
-   {zz(); T.at(IsLeaf).move(M.at(isLeaf, node));
-   }
-
-  private MemoryLayoutDM.At ifLeaf(MemoryLayoutDM.At node)                      // A variable that indicates whether the node is a leaf
-   {zz(); return M.at(bTree_isLeaf, node);
    }
 
   private MemoryLayoutDM.At ifLeaf(Node Node)                                   // A variable that indicates whether the node is a leaf
@@ -701,8 +692,6 @@ abstract class BtreeDM extends Test                                             
     M.at(freeList).move(T.at(node_free));                                       // Make this node the head of the free chain
    }
 
-  private void clear() {zz();  clear(T.at(node_clear));}                        // Clear a new node to zeros ready for use
-
   private void clear(MemoryLayoutDM.At node)                                    // Clear a new node to zeros ready for use
    {zz(); M.at(Node, node).zero();
    }
@@ -710,18 +699,6 @@ abstract class BtreeDM extends Test                                             
   private void erase()                                                          // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
    {zz();
     M.at(Node, T.at(node_erase)).ones();
-   }
-  private void leafSize(StuckDM leafStuck, Layout.Variable Size)                // Place number of children in body of specified leaf stuck in the specified variable
-   {zz();
-    leafStuck.size(); T.at(Size).move(leafStuck.T.at(leafStuck.size));
-   }
-
-  private void hasLeavesForChildren()                                           // The node has leaves for children
-   {zz();
-    bLeaf.firstElement();                                                       // Was lastElement but firstElement() is faster
-    T.at(node_isLeaf).move(bLeaf.T.at(bLeaf.tData));
-    isLeaf(bLeaf.T.at(bLeaf.tData));
-    tt(hasLeavesForChildren, IsLeaf);
    }
 
   private void hasLeavesForChildren(StuckDM bLeaf)                              // The node has leaves for children
@@ -828,10 +805,6 @@ abstract class BtreeDM extends Test                                             
       at.dec();                                                                 // Account for top
      }
 
-    void copy(Node source)                                                      // Copy the memory of another node
-     {zz(); N.memory().copy(source.N.memory());
-     }
-
     void isFull()                                                               // Set isFull to show whether the node is full or not, incidentlly setting IsLeaf as well
      {zz();
       isLeaf(T.at(IsLeaf));
@@ -852,16 +825,10 @@ abstract class BtreeDM extends Test                                             
       N.at(node_size).equal(T.at(maxKeysPerLeaf), T.at(isFull));
      }
 
-    void isBranchFull()                                                         // Set isFull to show whether the node known to be a branch is full or not
-     {zz();
-      N.at(node_size).equal(T.at(maxKeysPerBranch), T.at(isFull));
-     }
-
     public String toString() {return ""+N;}                                     // As string
 
     String print(int at)                                                        // Print the indexed node
-     {zz();
-      N.memory().copy(M.memory(), M.at(Node, at).at);
+     {N.memory().copy(M.memory(), M.at(Node, at).at);
       return ""+N;
      }
    }
@@ -872,20 +839,6 @@ abstract class BtreeDM extends Test                                             
    {zz();
     Node.loadStuck(lEqual);
     lEqual.search(Key, T.at(found), T.at(index), T.at(data));
-   }
-
-  public String findEqualInLeaf_toString()                                      // Print details of find equal in leaf node
-   {z();
-    final StringBuilder s = new StringBuilder();
-    s.append("FindEqualInLeaf(");
-    s.append(  "Leaf:"+T.at(node_findEqualInLeaf).getInt());
-    s.append(  " Key:"+T.at(search)              .getInt());
-    s.append(" found:"+T.at(found)               .getInt());
-    if (T.at(found).isOnes())
-     {s.append(" data:"+T.at(data).getInt()+" index:"+T.at(index).getInt());
-     }
-    s.append(")\n");
-    return s.toString();
    }
 
   private void findFirstGreaterThanOrEqualInLeaf                                // Find the first key in the  leaf that is equal to or greater than the search key
@@ -1281,7 +1234,7 @@ abstract class BtreeDM extends Test                                             
     P.new Block()
      {void code()
        {final ProgramDM.Label Return = end;
-        isRootLeaf();
+        T.at(IsLeaf).move(M.at(bTree_isLeaf, root));
         P.new If (T.at(IsLeaf))                                                 // Confirm we are on a branch
          {void Then()
            {T.at(stolenOrMerged).zero();
@@ -3795,21 +3748,6 @@ StuckSML(maxSize:4 size:2)
   1 key:0 data:2
 """);
 
-    Node o = t.new Node("node");
-    n.loadRoot();
-    o.copy(n);
-    b.clear();
-    o.loadStuck(b);
-    t.P.run(); t.P.clear();
-    //stop(b);
-    ok(b, """
-StuckSML(maxSize:4 size:2)
-  0 key:1 data:1
-  1 key:0 data:2
-""");
-
-
-
     n.loadNode(nim.at(one));
     l.clear();
     n.loadStuck(l);
@@ -3865,11 +3803,6 @@ StuckSML(maxSize:4 size:2)
   0 key:1 data:1
   1 key:0 data:2
 """);
-
-    t.T.at(t.isFull).ones();
-    n.isBranchFull();
-    t.P.run(); t.P.clear();
-    ok(t.T.at(t.isFull), "T.mergeable@71=0");
 
     t.T.at(t.l).setInt(1);
     l.clear();
@@ -4069,10 +4002,17 @@ StuckSML(maxSize:4 size:1)
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      if (github_actions)                                                       // Coverage analysis
+      //if (github_actions)                                                       // Coverage analysis
        {//coverageAnalysis(sourceFileName(), 12);
         coverageAnalysis                                                        // Used for printing
-         (12, "StuckSML.java", "MemoryLayout.java", "BtreeSML.java");
+         (12,
+         "BtreePA.java",
+         "BtreeSML.java",
+         "MemoryLayout.java",
+         "MemoryLayoutPA.java",
+         "ProgramPA.java",
+         "StuckPA.java",
+         "StuckSML.java");
        }
       testSummary();                                                            // Summarize test results
       System.exit(testsFailed);
