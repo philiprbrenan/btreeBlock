@@ -9,6 +9,8 @@ package com.AppaApps.Silicon;                                                   
 // Use free in node to hold node number while allocasted so that Node knows where to write it back to without being told
 // Set an updated field for when an existing key has its associated data updated by put
 // Merge only on either side of the key path
+// MergeLeft/Right use setTopKey
+// Start splitting lower down and merge only along split path
 import java.util.*;
 import java.nio.file.*;
 
@@ -1249,13 +1251,13 @@ stop("Deprecated");
     bR.splitLow(bL);                                                            // Split right
     bL.zeroLastKey();
 
-    P.parallelStart();    bT.T.at(bT.tKey ).move(bL.T.at(bL.tKey));             // Insert splitting key into parent
-    P.parallelSection();  bT.T.at(bT.tData).move(T.at(l));
-    P.parallelSection();  bT.T.at(bT.index).move(T.at(index));
+    P.parallelStart();   bT.T.at(bT.tKey ).move(bL.T.at(bL.tKey));              // Insert splitting key into parent
+    P.parallelSection(); bT.T.at(bT.tData).move(T.at(l));
+    P.parallelSection(); bT.T.at(bT.index).move(T.at(index));
     P.parallelEnd();
     bT.insertElementAt();
 
-    P.parallelStart();   nT.saveRootStuck(bT);
+    P.parallelStart();   nT.saveStuck(bT, parent);
     P.parallelSection(); nL.saveStuck(bL, l);
     P.parallelSection(); nR.saveStuck(bR, node_splitBranch);
     P.parallelEnd();
@@ -1479,7 +1481,6 @@ stop("Deprecated");
     P.new Block()
      {void code()
        {final ProgramDM.Label Return = end;
-        //T.at(node_isLeaf).zero();                                             // Address the root
         isRootLeaf();
         P.new If (T.at(IsLeaf))                                                 // Confirm we are on a branch
          {void Then()
@@ -1488,7 +1489,7 @@ stop("Deprecated");
            }
          };
         nT.loadRootStuck(bT);                                                   // Lood root and get its size
-        bT.T.at(bT.size).greaterThanOrEqual(T.at(two), T.at(stolenOrMerged));   // Confirm we are on an almost empty root
+        bT.M.at(bT.currentSize).greaterThan(T.at(two), T.at(stolenOrMerged));   // Confirm we are on an almost empty root
         stealNotPossible(end);
 
         z();
@@ -1534,6 +1535,7 @@ stop("Deprecated");
           void Else()                                                           // Branches
            {nL.loadBranchStuckAndSize(bL, l, nl);
             nR.loadBranchStuckAndSize(bR, r, nr);
+P.new I() {void a() {if (debug) say("DDDD5555");}};
 
             P.new I()                                                           // Check that combined node would not be too big
              {void a()
@@ -1548,6 +1550,7 @@ stop("Deprecated");
                    maxKeysPerBranch()+") ? 'b1 : 'b0;";
                }
              };
+P.new I() {void a() {if (debug) say("DDDD6666", T.at(mergeable));}};
 
             P.new If (T.at(mergeable))
              {void Then()
@@ -1565,6 +1568,7 @@ stop("Deprecated");
                 free(l);                                                        // Free the children
                 free(r);
                 nT.saveRootStuck(bT);                                           // Save the branch root
+P.new I() {void a() {if (debug) say("DDDD7777", bT);}};
                 z(); T.at(stolenOrMerged).ones(); P.Goto(Return);
                }
              };
@@ -1743,6 +1747,7 @@ stop("Deprecated");
             bL.setElementAt();                                                  // Re-key left top
 
             bL.concatenate(bR);
+
             nL.saveStuck(bL, l);                                                // Save modified left branch
            } // Else
          };
@@ -1763,6 +1768,7 @@ stop("Deprecated");
         bT.removeElementAt();                                                   // Reduce parent on right
 
         nT.saveStuck(bT, node_mergeRightSibling);                               // Save parent branch
+P.new I() {void a() {if (debug) say("CCCC4444", thisBTree);}};
 
         z(); T.at(stolenOrMerged).ones();
        }
@@ -1917,7 +1923,9 @@ stop("Deprecated");
            {nT.isLeaf(T.at(IsLeaf));
             P.new If (T.at(IsLeaf))
              {void Then() {splitLeafRoot  ();}
-              void Else() {splitBranchRoot();}
+              void Else() {
+                splitBranchRoot();
+                }
              };
             z();
             findAndInsert(Return);                                              // Splitting the root() might have been enough
@@ -1988,6 +1996,7 @@ stop("Deprecated");
         lT.elementAt();                                                         // Position in the leaf of the key
         T.at(Data).move(lT.T.at(lT.tData));                                     // Key, data pairs in the leaf
         lT.removeElementAt();                                                   // Remove the key, data pair from the leaf
+        nT.saveStuck(lT, find);
        }
      };
    }
@@ -2053,6 +2062,7 @@ stop("Deprecated");
      {void code()
        {final ProgramDM.Label Return = end;
         mergeRoot();
+P.new I() {void a() {if (debug) {say("CCCC1111", thisBTree); stop("");}}};
         T.at(parent).zero();                                                    // Start at root
 
         P.new Block()                                                           // Step down through the tree, splitting as we go
@@ -2476,20 +2486,21 @@ endmodule
       t.T.at(t.Data).setInt( i);
       t.P.run();
      }
+    //stop(t);
     t.ok("""
                                                                                                                             32                                                                                                                                           |
                                                                                                                             0                                                                                                                                            |
-                                                                                                                            17                                                                                                                                           |
+                                                                                                                            20                                                                                                                                           |
                                                                                                                             21                                                                                                                                           |
                                                       16                                                                                                                                            48                                56                                 |
-                                                      17                                                                                                                                            21                                21.1                               |
+                                                      20                                                                                                                                            21                                21.1                               |
                                                       5                                                                                                                                             16                                23                                 |
                                                       11                                                                                                                                                                              6                                  |
           4          8               12                               20               24                28                                  36               40                 44                                  52                                  60              |
           5          5.1             5.2                              11               11.1              11.2                                16               16.1               16.2                                23                                  6               |
-          1          3               4                                8                10                9                                   13               15                 14                                  18                                  20              |
+          1          3               4                                8                10                9                                   13               15                 14                                  18                                  17              |
                                      7                                                                   12                                                                      19                                  22                                  2               |
-1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=12   33,34,35,36=13   37,38,39,40=15     41,42,43,44=14     45,46,47,48=19   49,50,51,52=18   53,54,55,56=22     57,58,59,60=20   61,62,63,64=2 |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=12   33,34,35,36=13   37,38,39,40=15     41,42,43,44=14     45,46,47,48=19   49,50,51,52=18   53,54,55,56=22     57,58,59,60=17   61,62,63,64=2 |
 """);
     // stop("maximumNodes used", t.maxNodeUsed); // 25
    }
@@ -2522,7 +2533,7 @@ endmodule
 
   private static void test_put_descending()
    {z();
-    final BtreeDM     t = BtreeDM(2, 3);
+    final BtreeDM t = BtreeDM(2, 3);
     t.P.run(); t.P.clear();
     t.put();
     for(int i = 64; i > 0; --i)
@@ -2871,12 +2882,11 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.put();
     for(int i = 1; i <= N; ++i)
      {//say(currentTestName(), "a", i);
-      t.T.at(t.Key).setInt(  i);
-      t.T.at(t.Data).setInt( i);
+      t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(i);
       t.P.run();
      }
     //t.stop();
-
     t.ok("""
                                                       16                               24                               |
                                                       0                                0.1                              |
@@ -2927,11 +2937,11 @@ Line T       At      Wide       Size    Indices        Value   Name
                                                 0                                                                    |
                                                 5                                                                    |
                                                 11                                                                   |
-    4          8               12                               20               24                28                |
-    5          5.1             5.2                              11               11.1              11.2              |
-    1          3               4                                8                10                9                 |
+      5        8               12                               20               24                28                |
+      5        5.1             5.2                              11               11.1              11.2              |
+      1        3               4                                8                10                9                 |
                                7                                                                   2                 |
-4=1  5,6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
+4,5=1  6,7,8=3    9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 4 -> t.ok("""
                                          16                                                                   |
@@ -2971,11 +2981,11 @@ Line T       At      Wide       Size    Indices        Value   Name
                                    0                                                                    |
                                    5                                                                    |
                                    11                                                                   |
-    8             12                               20               24                28                |
-    5             5.1                              11               11.1              11.2              |
-    1             4                                8                10                9                 |
+      9           12                               20               24                28                |
+      5           5.1                              11               11.1              11.2              |
+      1           4                                8                10                9                 |
                   7                                                                   2                 |
-8=1  9,10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
+8,9=1  10,11,12=4    13,14,15,16=7   17,18,19,20=8   21,22,23,24=10     25,26,27,28=9     29,30,31,32=2 |
 """);
         case 8 -> t.ok("""
                              16                                                                   |
@@ -3015,11 +3025,11 @@ Line T       At      Wide       Size    Indices        Value   Name
                                       0                                                  |
                                       5                                                  |
                                       11                                                 |
-     12              16                                24              28                |
-     5               5.1                               11              11.1              |
-     1               7                                 10              9                 |
+        13           16                                24              28                |
+        5            5.1                               11              11.1              |
+        1            7                                 10              9                 |
                      8                                                 2                 |
-12=1   13,14,15,16=7    17,18,19,20=8   21,22,23,24=10   25,26,27,28=9     29,30,31,32=2 |
+12,13=1   14,15,16=7    17,18,19,20=8   21,22,23,24=10   25,26,27,28=9     29,30,31,32=2 |
 """);
         case 12 -> t.ok("""
                               20                                                 |
@@ -3059,11 +3069,11 @@ Line T       At      Wide       Size    Indices        Value   Name
                                        0                               |
                                        5                               |
                                        11                              |
-     16              20                                28              |
-     5               5.1                               11              |
-     1               8                                 9               |
+        17           20                                28              |
+        5            5.1                               11              |
+        1            8                                 9               |
                      10                                2               |
-16=1   17,18,19,20=8    21,22,23,24=10   25,26,27,28=9   29,30,31,32=2 |
+16,17=1   18,19,20=8    21,22,23,24=10   25,26,27,28=9   29,30,31,32=2 |
 """);
         case 16 -> t.ok("""
                                24                              |
@@ -3091,11 +3101,11 @@ Line T       At      Wide       Size    Indices        Value   Name
 19,20=1   21,22,23,24=10    25,26,27,28=9    29,30,31,32=2 |
 """);
         case 19 -> t.ok("""
-     20               24               28               |
-     0                0.1              0.2              |
-     1                10               9                |
+        21            24               28               |
+        0             0.1              0.2              |
+        1             10               9                |
                                        2                |
-20=1   21,22,23,24=10    25,26,27,28=9    29,30,31,32=2 |
+20,21=1   22,23,24=10    25,26,27,28=9    29,30,31,32=2 |
 """);
         case 20 -> t.ok("""
               24              28               |
@@ -3119,11 +3129,11 @@ Line T       At      Wide       Size    Indices        Value   Name
 23,24=1   25,26,27,28=9    29,30,31,32=2 |
 """);
         case 23 -> t.ok("""
-     24              28               |
-     0               0.1              |
-     1               9                |
+        25           28               |
+        0            0.1              |
+        1            9                |
                      2                |
-24=1   25,26,27,28=9    29,30,31,32=2 |
+24,25=1   26,27,28=9    29,30,31,32=2 |
 """);
         case 24 -> t.ok("""
               28              |
@@ -3147,11 +3157,11 @@ Line T       At      Wide       Size    Indices        Value   Name
 27,28=1   29,30,31,32=2 |
 """);
         case 27 -> t.ok("""
-     28              |
-     0               |
-     1               |
-     2               |
-28=1   29,30,31,32=2 |
+        29           |
+        0            |
+        1            |
+        2            |
+28,29=1   30,31,32=2 |
 """);
         case 28 -> t.ok("""
 29,30,31,32=0 |
@@ -4346,27 +4356,29 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
-   {test_find_and_insert();
+   {final boolean longRunning = github_actions && 1 == 1;
+    test_find_and_insert();
     test_put_ascending();
     test_put_ascending_wide();
     test_put_descending();
     test_put_small_random();
-    //test_put_large_random();
+    if (longRunning) test_put_large_random();
     test_find();
     test_find_and_update();
     test_delete_ascending();
     test_delete_descending();
     test_delete_small_random();
-    //test_delete_large_random();
+    if (longRunning) test_delete_large_random();
 
+    test_node();
     test_verilogDelete();
     test_verilogFind();
     test_verilogPut();
-    test_node();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
+    test_verilogPut();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
