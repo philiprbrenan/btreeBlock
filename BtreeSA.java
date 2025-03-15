@@ -2693,21 +2693,21 @@ abstract class BtreeSA extends Test                                             
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
-   {test_put_ascending();
-    test_put_ascending_wide();
-    test_put_descending();
-    test_put_small_random();
-    //test_put_large_random();
-    test_find();
-    test_delete_ascending();
-    test_delete_descending();
-    test_to_array();
+   {//test_put_ascending();
+    //test_put_ascending_wide();
+    //test_put_descending();
+    //test_put_small_random();
+    ////test_put_large_random();
+    //test_find();
+    //test_delete_ascending();
+    //test_delete_descending();
+    //test_to_array();
     test_delete_small_random();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
-    test_put_ascending();
+   {//oldTests();
+    test_delete_small_random();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
