@@ -1,0 +1,87 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
+| Date         : Sat Mar 15 16:31:02 2025
+| Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
+| Command      : report_design_analysis -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/design_analysis.rpt
+| Design       : delete
+| Device       : xc7v2000t
+| Design State : Synthesized
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Report Design Analysis
+
+Table of Contents
+-----------------
+1. Setup Path Characteristics 1-1
+2. Logic Level Distribution
+3. Placer Final Level Congestion Reporting
+4. SLR Net Crossing Reporting
+
+1. Setup Path Characteristics 1-1
+---------------------------------
+
++---------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------+
+|      Characteristics      |                                                                         Path #1                                                                        |
++---------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Requirement               | 100.000                                                                                                                                                |
+| Path Delay                | 8.369                                                                                                                                                  |
+| Logic Delay               | 1.114(14%)                                                                                                                                             |
+| Net Delay                 | 7.255(86%)                                                                                                                                             |
+| Clock Skew                | -0.145                                                                                                                                                 |
+| Slack                     | 91.488                                                                                                                                                 |
+| Clock Uncertainty         | 0.035                                                                                                                                                  |
+| Clock Relationship        | Timed                                                                                                                                                  |
+| Clock Delay Group         | Same Clock                                                                                                                                             |
+| Logic Levels              | 14                                                                                                                                                     |
+| Routes                    | NA                                                                                                                                                     |
+| Logical Path              | FDRE/C-(2)-LUT6-(1)-LUT6-(1)-LUT6-(1)-LUT6-(1)-LUT6-(19)-LUT5-(484)-LUT6-(1)-LUT6-(2)-LUT6-(105)-LUT3-(1)-LUT6-(1)-LUT6-(1)-LUT5-(232)-LUT3-(1)-FDRE/D |
+| Start Point Clock         | clock                                                                                                                                                  |
+| End Point Clock           | clock                                                                                                                                                  |
+| DSP Block                 | None                                                                                                                                                   |
+| RAM Registers             | None-None                                                                                                                                              |
+| IO Crossings              | 0                                                                                                                                                      |
+| Config Crossings          | 0                                                                                                                                                      |
+| SLR Crossings             | 0                                                                                                                                                      |
+| PBlocks                   | 0                                                                                                                                                      |
+| High Fanout               | 484                                                                                                                                                    |
+| Dont Touch                | 0                                                                                                                                                      |
+| Mark Debug                | 0                                                                                                                                                      |
+| Start Point Pin Primitive | FDRE/C                                                                                                                                                 |
+| End Point Pin Primitive   | FDRE/D                                                                                                                                                 |
+| Start Point Pin           | opCodeMap_reg[683][4]/C                                                                                                                                |
+| End Point Pin             | step_reg[2]/D                                                                                                                                          |
++---------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------+
+* Bounding box calculated as % of dimensions for the target device (1156, 1200)
+
+
+2. Logic Level Distribution
+---------------------------
+
++-----------------+-------------+-----+-----+
+| End Point Clock | Requirement |  13 |  14 |
++-----------------+-------------+-----+-----+
+| clock           | 100.000ns   | 702 | 298 |
++-----------------+-------------+-----+-----+
+* Columns represent the logic levels per end point clock
+** Distribution is for top worst 1000 paths
+
+
+3. Placer Final Level Congestion Reporting
+------------------------------------------
+
++-----------+------+-------+------------+--------+---------------+---------------+-----+--------+------+------+------+-----+-------+-----+------------+
+| Direction | Type | Level | Congestion | Window | Combined LUTs | Avg LUT Input | LUT | LUTRAM | Flop | MUXF | RAMB | DSP | CARRY | SRL | Cell Names |
++-----------+------+-------+------------+--------+---------------+---------------+-----+--------+------+------+------+-----+-------+-----+------------+
+* The design has not been placed, hence congestion data is not available. The command report_design_analysis -congestion should be run only after place_design has completed.
+
+
+4. SLR Net Crossing Reporting
+-----------------------------
+
++------------+-----------------------------+-------------+-------------+-------------+-------------+-------------+-------------+
+| Cell Names | Number of Nets crossing SLR | 0 - 1 Cuts  | 0 - 2 Cuts  | 0 - 3 Cuts  | 1 - 2 Cuts  | 1 - 3 Cuts  | 2 - 3 Cuts  |
++------------+-----------------------------+-------------+-------------+-------------+-------------+-------------+-------------+
+* Information not available. There are no nets crossing SLRs.
+
+
