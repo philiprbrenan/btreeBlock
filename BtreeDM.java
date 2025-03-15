@@ -1893,9 +1893,10 @@ abstract class BtreeDM extends Test                                             
 
       compactCode();                                                            // Compact the code to make better use of the surface area of the chip
 
-      if      (eachStatement) eachStatement();
-      else if (runVerilog)    generate();
-      else                    execJavaTest();
+      if      (github_actions) generateVerilog();
+      else if (eachStatement)  eachStatement();
+      else if (runVerilog)     generateVerilog();
+      else                     execJavaTest();
      }
 
     void compactCode()                                                          // Reuse comon instructions rather then regenerating them
@@ -1955,10 +1956,10 @@ abstract class BtreeDM extends Test                                             
 
     void eachStatement()                                                        // Generate verilog with each statement appearing once
      {final int N = ops.outputOrder.size();
-      for (int i = 0; i < N; i++) {statements = i; generate();}
+      for (int i = 0; i < N; i++) {statements = i; generateVerilog();}
      }
 
-    VerilogCode generate()                                                      // Generate verilog
+    VerilogCode generateVerilog()                                               // Generate verilog
      {zz();
 
       makePath(projectFolder());                                                // Write files to the project folder
