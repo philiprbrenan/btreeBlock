@@ -71,7 +71,7 @@ class Memory extends Test                                                       
    }
 
   void copy(Memory source, int offset)                                          // Initialize this memory from a source memory by copying as many bits as possible into the start of the target memory from the indexed location in the source memory
-   {zz();
+   {z();
     final int N = min(size(), source.size()-offset);
 
     for(int i = 0; i < N; ++i)
