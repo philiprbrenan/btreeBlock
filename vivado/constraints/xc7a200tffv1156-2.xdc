@@ -61,4 +61,3 @@ set_property DIRECTION OUT [get_ports stop]
 set_property IOSTANDARD LVCMOS18 [get_ports stop]
 set_property DRIVE 12 [get_ports stop]
 set_property SLEW SLOW [get_ports stop]
-2025-02-20
