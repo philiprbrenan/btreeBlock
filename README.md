@@ -4,7 +4,8 @@
 
 # Btree in a block
 
-An implementation of the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in synthesized, placed and routed Verilog targeted at a [Virtex7](https://www.amd.com/en/products/adaptive-socs-and-fpgas/fpga/virtex-7.html#product-table) [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array) .
+An implementation of the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in synthesized, placed and routed
+Verilog targeted at a [Virtex7](https://www.amd.com/en/products/adaptive-socs-and-fpgas/fpga/virtex-7.html#product-table) [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array) .
 
 For reasons why you might want to get involved in this implementation of the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [Silicon](https://en.wikipedia.org/wiki/Silicon) rather than [software](https://en.wikipedia.org/wiki/Software) see:
 
@@ -16,21 +17,15 @@ http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html
 
 # Roadmap
 
-I implemented the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in
-[Java](https://en.wikipedia.org/wiki/Java_(programming_language)),
-then successively reduced the [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) [code](https://en.wikipedia.org/wiki/Computer_program)
-until it looked just like [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program),
-at which point it was easy to generate a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit)
-in [Verilog](https://en.wikipedia.org/wiki/Verilog)
-to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program).  The resulting design
-was compacted by reusing identical instructions and pipelined to reduce congestion.
-![Roadmap](flowChart/DevelopmentFlowChart.png)
+I implemented the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [Java](https://en.wikipedia.org/wiki/Java_(programming_language)), then successively reduced the [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) [code](https://en.wikipedia.org/wiki/Computer_program) until it looked just like [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program), at which point it was easy to
+generate a [code](https://en.wikipedia.org/wiki/Computer_program) in [Verilog](https://en.wikipedia.org/wiki/Verilog) to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program).  The resulting design
+was compacted by reusing identical instructions and pipelined to reduce
+congestion. ![Roadmap](flowChart/DevelopmentFlowChart.png)
 
 # Synthesis, Placement and Routing
 
 The logs of the successful synthesis, placement and routing of the individual
-components of [Database on a Chip](http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html)
-on [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) can be seen here:
+components of [Database on a Chip](http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html) on [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) can be seen here:
 
  [find  ](https://github.com/philiprbrenan/btreeBlock/tree/main/verilog/find/vivado/reports),
 
@@ -39,10 +34,8 @@ on [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) can be seen here:
  [delete](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/delete/vivado/reports).
 
 
-# Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database)
-
-For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)):
-```
+# Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) 
+For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)): ```
    BtreePA t = new BtreePA()
      {int maxSize         () {return  8;}
       int maxKeysPerLeaf  () {return  2;}
@@ -51,8 +44,7 @@ For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)):
       int bitsPerData     () {return  4;}
      };
 ```
-
-[Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) Synthesis uses the following resources to implement the **find**
+ [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) Synthesis uses the following resources to implement the **find**
 operation.
 
 ```
@@ -67,8 +59,7 @@ Finished Writing Synthesis Report : Time (s): cpu = 00:00:30 ; elapsed = 00:00:3
 ---------------------------------------------------------------------------------
 Synthesis finished with 0 errors, 0 critical warnings and 53 warnings.
 ```
-
-[Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) Synthesis uses the following resources to implement the **put**
+ [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) Synthesis uses the following resources to implement the **put**
 operation.
 
 ```
@@ -83,8 +74,7 @@ Finished Writing Synthesis Report : Time (s): cpu = 00:24:57 ; elapsed = 00:25:4
 ---------------------------------------------------------------------------------
 Synthesis finished with 0 errors, 0 critical warnings and 80 warnings.
 ```
-
-[Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) Synthesis uses the following resources to implement the **delete**
+ [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) Synthesis uses the following resources to implement the **delete**
 operation.
 
 ```
