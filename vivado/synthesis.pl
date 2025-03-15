@@ -109,7 +109,7 @@ if    (-e q(/home/phil/)) {}                                                    
 elsif (-e q(/home/azureuser/btreeblock/vivado/find/1/)) {}                      # Create the verilog files if they have not already been created
 else
  {say STDERR dateTimeStamp, " Generate   btreeBlock";
-  say STDERR qx(cd $projectDir; bash j.sh BtreePA);
+  say STDERR qx(cd $projectDir; bash j.sh BtreeDM);
  }
 
 say STDERR dateTimeStamp, " Synthesize btreeBlock";                             # Synthesize the verilog description
