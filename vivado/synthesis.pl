@@ -74,8 +74,6 @@ sub gen                                                                         
   die "No such path: $dcpDir"      unless -d $dcpDir;
 
   my @s = <<"END";                                                              # Write tcl to run the synthesis
-set_param general.maxThreads 4
-
 read_verilog $verilog
 read_xdc     $constraints
 
