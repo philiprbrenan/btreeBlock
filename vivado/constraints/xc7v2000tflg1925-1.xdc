@@ -35,7 +35,7 @@ set_property PACKAGE_PIN Y37  [get_ports {Data[2]}]
 set_property PACKAGE_PIN Y38  [get_ports {Data[3]}]
 
 # Set max fan-out for all non-clock signals
-set_property MAX_FANOUT 2 [get_nets]
+# set_property MAX_FANOUT 2 [get_nets]
 
 # Voltage
 set_property CFGBVS GND [current_design]
