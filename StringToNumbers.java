@@ -25,7 +25,7 @@ class StringToNumbers extends Test                                              
      }                                                                          // Compare two ordered elements by the lowest integer associated with each
 
     String joinKeys()                                                           // Join the keys with commas
-     {zz();
+     {z();
       final String j = ", ";
       final StringBuilder s = new StringBuilder();
       for(int k : keys) s.append(""+k+j);
