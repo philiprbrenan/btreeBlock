@@ -65,14 +65,14 @@ class MemoryLayoutPA extends Test                                               
 
   int     base () {z(); return base;}                                           // Get the base offset into memory being used
   boolean based() {z(); return based  != null;}                                 // Whether the memory used in the memory layout is based or not
-  int     size () {z(); return memory.size();}                                  // Size of memory
+  int     size () {z(); return layout != null ? layout.size() : memory.size();} // Size of memory is ideally the size of its layout otherwise if there is no layout, the size of the underlying memory
   int baseSize () {z(); return based() ? based.size() : size();}                // Size of underlying memory
 
   void clear()                                                                  // Clear underlying memory
    {z();
     if (based == null) {memory.zero(); return;}                                 // Not based so we just clear the memory we have
     final int N = size();
-    for (int i = 0; i < N; i++) memory.set(base + i, false);                    // Based so we clear the area occupied by the layout
+    for (int i = 0; i < N; i++) setBit(i, false);                               // Based so we clear the area occupied by the layout
    }
 
   void ok(String Lines)                                                         // Check that specified lines are present in the memory layout
@@ -209,7 +209,10 @@ class MemoryLayoutPA extends Test                                               
     final int N = size();
     P.new I()
      {void a()
-       {for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
+       {for(int i = 0; i < N; ++i)
+         {final boolean b = source.getBit(i);
+          setBit(i, b);
+         }
        }
       String v()
        {final String m = name();
@@ -1810,25 +1813,25 @@ task %s;
     begin
         %s[0] <= 0;
      `ifndef SYNTHESIS
-        %s[1] <= 0;
+        %s[1] <= 0; /* dumpVerilog */
      `endif
      `ifndef SYNTHESIS
-        %s[2] <= 0;
+        %s[2] <= 0; /* dumpVerilog */
      `endif
         %s[3] <= 0;
         %s[4] <= 1;
         %s[5] <= 1;
      `ifndef SYNTHESIS
-        %s[6] <= 1;
+        %s[6] <= 1; /* dumpVerilog */
      `endif
      `ifndef SYNTHESIS
-        %s[7] <= 1;
+        %s[7] <= 1; /* dumpVerilog */
      `endif
      `ifndef SYNTHESIS
-        %s[8] <= 0;
+        %s[8] <= 0; /* dumpVerilog */
      `endif
      `ifndef SYNTHESIS
-        %s[9] <= 0;
+        %s[9] <= 0; /* dumpVerilog */
      `endif
         %s[10] <= 0;
         %s[11] <= 0;
@@ -2115,7 +2118,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_copy_variable2();
+    test_copy_memory();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
