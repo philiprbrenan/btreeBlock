@@ -24,7 +24,8 @@ then successively reduced the [Java](https://en.wikipedia.org/wiki/Java_(program
 until it looked just like [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program),
 at which point it was easy to generate a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit)
 in [Verilog](https://en.wikipedia.org/wiki/Verilog)
-to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program):
+to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program).  The resulting design
+was compacted by reusing identical instructions and pipelined to reduce congestion.
 ![Roadmap](flowChart/DevelopmentFlowChart.png)
 
 # Synthesis, Placement and Routing
@@ -37,7 +38,7 @@ on [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) can be seen here:
 
  [put   ](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/put/vivado/reports),
 
- [delete](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/delete/vivado/reports)
+ [delete](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/delete/vivado/reports).
 
 
 # Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database)
