@@ -7,8 +7,9 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 class Memory extends Test                                                       // Memory provided in bits
- {final boolean[]bits;                                                          // The memory in bits
+ {private final boolean[]bits;                                                  // The memory in bits
   final String name;                                                            // The name of the memory
+  private long reads, writes;                                                   // Number of reads and writes for this memory
 
 //D1 Construct                                                                  // Memory provided in bits
 
@@ -18,6 +19,19 @@ class Memory extends Test                                                       
 
   static Memory memory(String Name, int Size)                                   // Create memory
    {z(); return new Memory(Name, Size);
+   }
+
+  int size() {z(); return bits.length;}                                         // Size of memory
+
+//D1 Print                                                                      // Print memory
+
+  StringBuilder print()                                                         // Print a memory
+   {zz();
+    final StringBuilder s = new StringBuilder();
+    final int N = bits.length;
+    for(int i = 0; i < N; i++) s.append(bits[i] ? "1" : "0");
+    s.reverse();
+    return s;
    }
 
   public String toString()                                                      // Print memory in hex
@@ -48,11 +62,17 @@ class Memory extends Test                                                       
     return "Memory: "+name+"\n      "+T+"\nLine  "+t+"\n"+S;
    }
 
-  int size() {z(); return bits.length;}                                         // Size of memory
-
 //D1 Operations                                                                 // Operations on memory
 
 //D2 Basic                                                                      // Basic memory access
+
+//D3 Statistics                                                                 // Statistics on memory usage
+
+  long   reads() {return reads;}                                                // Number of reads
+  long  writes() {return writes;}                                               // Number of writes
+  boolean used() {return reads > 0 || writes > 0;}
+
+//D3 Copy                                                                       // Copy memory from source to target
 
   void check(int start, int width)                                              // Check a request is in the range of the memory
    {if (start < 0) stop("Too small:", start);
@@ -68,6 +88,7 @@ class Memory extends Test                                                       
      {z();
       bits[i] = source.bits[i];
      }
+    writes += N; source.reads += N;
    }
 
   void copy(Memory source, int offset)                                          // Initialize this memory from a source memory by copying as many bits as possible into the start of the target memory from the indexed location in the source memory
@@ -78,6 +99,7 @@ class Memory extends Test                                                       
      {z();
       bits[i] = source.bits[offset+i];
      }
+    writes += N; source.reads += N;
    }
 
 //D3 Set                                                                        // Set a bit
@@ -86,6 +108,7 @@ class Memory extends Test                                                       
    {zz();
     //check(start, 1);
     bits[start] = value;
+    writes += 1;
    }
 
   void set(int start, int width, int value)                                     // Set some memory from an integer
@@ -103,7 +126,7 @@ class Memory extends Test                                                       
 
   boolean getBit(int start)                                                     // Get a boolean from memory
    {//check(start, 1);
-    zz(); return bits[start];
+    zz(); reads += 1; return bits[start];
    }
 
   int getInt(int start, int width)                                              // Get an int from memory
@@ -429,6 +452,22 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 """);
    }
 
+  static void test_print()
+   {z();
+    Memory m = memory("aaa",  256);
+    m.alternating(4);
+    //stop(m);
+    ok(m, """
+Memory: aaa
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0 f0f0
+""");
+
+    //stop(m.print());
+    ok(m.print(), "1111000011110000111100001111000011110000111100001111000011110000111100001111000011110000111100001111000011110000111100001111000011110000111100001111000011110000111100001111000011110000111100001111000011110000111100001111000011110000111100001111000011110000");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_set_get();
     test_zero_ones();
@@ -439,11 +478,12 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
     test_all_zeros_and_ones();
     test_copy_memory();
     test_copy_source();
+    test_print();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
-    test_copy_source();
+   {//oldTests();
+    test_print();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
