@@ -156,10 +156,7 @@ class ProgramPA extends Test                                                    
   void traceMemory()                                                            // Trace memory
    {zz();
     if (traceMemory != null)
-     {final StringBuilder s = new StringBuilder();
-      final boolean[]b = traceMemory.bits;
-      for(int i = 0; i < b.length; i++) s.append(b[i] ? "1" : "0");             // Match iverilog
-      s.reverse();
+     {final StringBuilder s = traceMemory.print();
       Trace.push(String.format("%4d  %4d  %s", steps, step, s));
      }
    }
