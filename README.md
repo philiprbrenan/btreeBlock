@@ -29,7 +29,9 @@ to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assem
 
 # Synthesis, Placement and Routing
 
-The logs of the successful synthesis, placement and routing of the individual components of [Database on a Chip](http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html) on [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) can be see here:
+The logs of the successful synthesis, placement and routing of the individual
+components of [Database on a Chip](http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html)
+on [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) can be seen here:
 
  [find  ](https://github.com/philiprbrenan/btreeBlock/tree/main/verilog/find/vivado/reports),
 
