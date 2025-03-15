@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sat Mar 15 16:12:08 2025
+| Date         : Sat Mar 15 20:33:06 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_clock_interaction -file /home/azureuser/btreeBlock/verilog/find/vivado/reports/clock_interaction.rpt
 | Design       : find
@@ -12,12 +12,7 @@ Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanc
 
 Clock Interaction Report
 
-Clock Interaction Table
------------------------
+No timing paths found between clocks.
 
-                            WNS                            TNS Failing  TNS Total    WNS Path         Clock-Pair           Inter-Clock  
-From Clock    To Clock      Clock Edges  WNS(ns)  TNS(ns)    Endpoints    Endpoints  Requirement(ns)  Classification       Constraints  
-------------  ------------  -----------  -------  -------  -----------  -----------  ---------------  -------------------  -----------  
-clock         clock         rise - rise    95.44     0.00            0        17184           100.00  Clean                Timed        
 
 
