@@ -3978,7 +3978,7 @@ StuckSML(maxSize:4 size:1)
    {//oldTests();
     //test_verilogDelete();
     //test_verilogFind();
-    //test_verilogPut();
+    ////test_verilogPut();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
