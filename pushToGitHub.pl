@@ -131,7 +131,7 @@ jobs:
         website: jdk.java.net
 
     - name: Verilog install
-      if: matrix.task == 'BtreePA'
+      if: matrix.task == 'BtreeDM'
       run: |
         sudo apt install iverilog
 
