@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Tue Mar  4 15:46:34 2025
+| Date         : Sat Mar 15 15:17:08 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_utilization -file /home/azureuser/btreeBlock/verilog/put/vivado/reports/utilization.rpt
 | Design       : put
@@ -34,11 +34,11 @@ Table of Contents
 +-------------------------+--------+-------+------------+-----------+-------+
 |        Site Type        |  Used  | Fixed | Prohibited | Available | Util% |
 +-------------------------+--------+-------+------------+-----------+-------+
-| Slice LUTs*             | 286654 |     0 |          0 |   1221600 | 23.47 |
-|   LUT as Logic          | 286654 |     0 |          0 |   1221600 | 23.47 |
+| Slice LUTs*             | 110692 |     0 |          0 |   1221600 |  9.06 |
+|   LUT as Logic          | 110692 |     0 |          0 |   1221600 |  9.06 |
 |   LUT as Memory         |      0 |     0 |          0 |    344800 |  0.00 |
-| Slice Registers         | 178389 |     0 |          0 |   2443200 |  7.30 |
-|   Register as Flip Flop | 178389 |     0 |          0 |   2443200 |  7.30 |
+| Slice Registers         |  77800 |     0 |          0 |   2443200 |  3.18 |
+|   Register as Flip Flop |  77800 |     0 |          0 |   2443200 |  3.18 |
 |   Register as Latch     |      0 |     0 |          0 |   2443200 |  0.00 |
 | F7 Muxes                |      0 |     0 |          0 |    610800 |  0.00 |
 | F8 Muxes                |      0 |     0 |          0 |    305400 |  0.00 |
@@ -51,20 +51,20 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 1.1 Summary of Registers by Type
 --------------------------------
 
-+--------+--------------+-------------+--------------+
-|  Total | Clock Enable | Synchronous | Asynchronous |
-+--------+--------------+-------------+--------------+
-| 0      |            _ |           - |            - |
-| 0      |            _ |           - |          Set |
-| 0      |            _ |           - |        Reset |
-| 0      |            _ |         Set |            - |
-| 0      |            _ |       Reset |            - |
-| 0      |          Yes |           - |            - |
-| 0      |          Yes |           - |          Set |
-| 0      |          Yes |           - |        Reset |
-| 2149   |          Yes |         Set |            - |
-| 176240 |          Yes |       Reset |            - |
-+--------+--------------+-------------+--------------+
++-------+--------------+-------------+--------------+
+| Total | Clock Enable | Synchronous | Asynchronous |
++-------+--------------+-------------+--------------+
+| 0     |            _ |           - |            - |
+| 0     |            _ |           - |          Set |
+| 0     |            _ |           - |        Reset |
+| 0     |            _ |         Set |            - |
+| 0     |            _ |       Reset |            - |
+| 0     |          Yes |           - |            - |
+| 0     |          Yes |           - |          Set |
+| 0     |          Yes |           - |        Reset |
+| 2983  |          Yes |         Set |            - |
+| 74817 |          Yes |       Reset |            - |
++-------+--------------+-------------+--------------+
 
 
 2. Memory
@@ -96,9 +96,9 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 +-----------------------------+------+-------+------------+-----------+-------+
 |          Site Type          | Used | Fixed | Prohibited | Available | Util% |
 +-----------------------------+------+-------+------------+-----------+-------+
-| Bonded IOB                  |   14 |    14 |          0 |      1200 |  1.17 |
+| Bonded IOB                  |   17 |    17 |          0 |      1200 |  1.42 |
 |   IOB Master Pads           |   10 |       |            |           |       |
-|   IOB Slave Pads            |    4 |       |            |           |       |
+|   IOB Slave Pads            |    6 |       |            |           |       |
 | Bonded IPADs                |    0 |     0 |          0 |        50 |  0.00 |
 | Bonded OPADs                |    0 |     0 |          0 |        32 |  0.00 |
 | PHY_CONTROL                 |    0 |     0 |          0 |        24 |  0.00 |
@@ -156,22 +156,21 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 7. Primitives
 -------------
 
-+----------+--------+---------------------+
-| Ref Name |  Used  | Functional Category |
-+----------+--------+---------------------+
-| FDRE     | 176240 |        Flop & Latch |
-| LUT6     | 104418 |                 LUT |
-| LUT5     |  58461 |                 LUT |
-| LUT3     |  56652 |                 LUT |
-| LUT2     |  42975 |                 LUT |
-| LUT4     |  32626 |                 LUT |
-| FDSE     |   2149 |        Flop & Latch |
-| LUT1     |    522 |                 LUT |
-| IBUF     |      9 |                  IO |
-| OBUF     |      5 |                  IO |
-| CARRY4   |      2 |          CarryLogic |
-| BUFG     |      2 |               Clock |
-+----------+--------+---------------------+
++----------+-------+---------------------+
+| Ref Name |  Used | Functional Category |
++----------+-------+---------------------+
+| FDRE     | 74817 |        Flop & Latch |
+| LUT6     | 35896 |                 LUT |
+| LUT2     | 32452 |                 LUT |
+| LUT5     | 21754 |                 LUT |
+| LUT3     | 13688 |                 LUT |
+| LUT4     | 10885 |                 LUT |
+| FDSE     |  2983 |        Flop & Latch |
+| IBUF     |    11 |                  IO |
+| OBUF     |     6 |                  IO |
+| CARRY4   |     3 |          CarryLogic |
+| BUFG     |     2 |               Clock |
++----------+-------+---------------------+
 
 
 8. Black Boxes
@@ -248,11 +247,11 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 | SLR Index | Used IOBs | (%)IOBs | Used IPADs | (%)IPADs | Used OPADs | (%)OPADs | GTs |
 +-----------+-----------+---------+------------+----------+------------+----------+-----+
 | SLR3      |         0 |    0.00 |          0 |     0.00 |          0 |     0.00 |   0 |
-| SLR2      |         6 |    2.00 |          0 |     0.00 |          0 |     0.00 |   0 |
-| SLR1      |         6 |    2.00 |          0 |     0.00 |          0 |     0.00 |   0 |
+| SLR2      |         7 |    2.33 |          0 |     0.00 |          0 |     0.00 |   0 |
+| SLR1      |         8 |    2.67 |          0 |     0.00 |          0 |     0.00 |   0 |
 | SLR0      |         2 |    0.67 |          0 |     0.00 |          0 |     0.00 |   0 |
 +-----------+-----------+---------+------------+----------+------------+----------+-----+
-| Total     |        14 |         |          0 |          |          0 |          |   0 |
+| Total     |        17 |         |          0 |          |          0 |          |   0 |
 +-----------+-----------+---------+------------+----------+------------+----------+-----+
 
 
