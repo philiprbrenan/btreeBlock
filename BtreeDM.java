@@ -14,13 +14,12 @@ import java.nio.file.*;
 
 abstract class BtreeDM extends Test                                             // Manipulate a btree using static methods and memory
  {final BtreeDM   thisBTree = this;                                             // Direct access to this btree even when this goes out of range
-  final MemoryLayoutDM    M;                                                    // The memory layout of the btree
-  final MemoryLayoutDM    T;                                                    // The memory used to hold temporary variable used during a transaction on the btree
-  final ProgramDM         P = new ProgramDM();                                  // Program in which to generate instructions
-  final boolean      Assert = false;                                            // Execute asserts if true
-  final boolean        Halt = false;                                            // Execute tests that result in a halt
-  final boolean     OpCodes = true;                                             // Refactor op codes
-  final boolean  runVerilog = true;                                             // Refactor op codes
+  final MemoryLayoutDM      M;                                                  // The memory layout of the btree
+  final MemoryLayoutDM      T;                                                  // The memory used to hold temporary variable used during a transaction on the btree
+  final ProgramDM           P = new ProgramDM();                                // Program in which to generate instructions
+  final boolean       OpCodes = true;                                           // Refactor op codes
+  final boolean eachStatement = true;                                           // Isolate each statement
+  final boolean    runVerilog = true;                                           // Refactor op codes
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -1534,7 +1533,6 @@ abstract class BtreeDM extends Test                                             
         tt(node_stealFromRight,    node_balance); stealFromRight   (); P.GoOn(end, T.at(stolenOrMerged));
         tt(node_mergeLeftSibling,  node_balance); mergeLeftSibling (); P.GoOn(end, T.at(stolenOrMerged));
         tt(node_mergeRightSibling, node_balance); mergeRightSibling(); P.GoOn(end, T.at(stolenOrMerged));
-        if (Halt) P.halt("Unable to balance child");
        }
      };
    }
@@ -1579,7 +1577,6 @@ abstract class BtreeDM extends Test                                             
             P.Goto(start);                                                      // Restart search one level down
            }
          };
-        if (Halt) P.halt("Search did not terminate in a leaf");
        }
      };
    }
@@ -1720,7 +1717,6 @@ abstract class BtreeDM extends Test                                             
             P.Goto(start);
            }
          };
-        if (Halt) P.halt("Fallen off the end of the tree");                     // The tree must be missing a leaf
        }
      };
    }
@@ -1791,7 +1787,6 @@ abstract class BtreeDM extends Test                                             
             P.Goto(start);
            }
          };
-        if (Halt) P.halt("Fallen off the end of the tree");                     // The tree must be missing a leaf
        };
      };
    }
@@ -1846,7 +1841,6 @@ abstract class BtreeDM extends Test                                             
             P.Goto(start);
            }
          };
-        if (Halt) P.halt("Fallen off the end of the tree");                     // The tree must be missing a leaf
        }
      };
    }
@@ -1860,16 +1854,7 @@ abstract class BtreeDM extends Test                                             
   abstract class VerilogCode                                                    // Generate verilog code
    {final String          project;                                              // Project name - used to generate file names
     final String           folder;                                              // Folder in which to place project
-    final String    projectFolder;                                              // Folder in which to place verilog
-    final String    sourceVerilog;                                              // Source verilog file
-    final String      testVerilog;                                              // Verilog test bench file
-    final String    declareMemory;                                              // Name of file containing memory declaration code
-    final String initializeMemory;                                              // Name of file containing memory initialization code
     final String        opCodeMap = "opCodeMap";                                // Name of op code map
-    final String    opCodeMapFile;                                              // File to contain op code map
-    final String        testsFile;                                              // File in which to place verilog test results sumamry
-    final String        traceFile;                                              // Folder in which to place verilog execution trace file
-    final String    javaTraceFile;                                              // Folder in which to place java    execution trace file
     final ProgramDM       program;                                              // Program associated with this tree
     final StringToNumbers     ops = new StringToNumbers();                      // Collapse identical instructions
     final String      blockIndent = " ".repeat(10);                             // Indentationm for Verilog case statements
@@ -1884,28 +1869,49 @@ abstract class BtreeDM extends Test                                             
     abstract int    expSteps();                                                 // Expected number of steps
     abstract String expected();                                                 // Expected number of steps
 
+    String projectFolder()                                                      // Define the project folder
+     {if  (statements == null)
+       {return ""+Paths.get(folder, project, ""+Key());
+       }
+      else
+       {return ""+Paths.get(folder, project, ""+Key(), "statement", ""+statements);
+       }
+     }
+
+    String    sourceVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.ext);}
+    String      testVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.testExt);}
+    String    declareMemory() {return ""+Paths.get(projectFolder(), "includes", "declareMemory"   +Verilog.header);}
+    String initializeMemory() {return ""+Paths.get(projectFolder(), "includes", "initializeMemory"+Verilog.header);}
+    String    opCodeMapFile() {return ""+Paths.get(projectFolder(), "includes", opCodeMap         +Verilog.header);}
+    String        testsFile() {return ""+Paths.get(projectFolder(), "tests.txt");}
+    String        traceFile() {return ""+Paths.get(projectFolder(), "trace.txt");}
+    String    javaTraceFile() {return ""+Paths.get(projectFolder(), "traceJava.txt");}
+
     VerilogCode(String Project, String Folder)                                  // Generate verilog code
      {zz();
       project = Project; folder = Folder; program = P;
 
-      final String subProject = ""+Key() +
-       (statements == null ? "" : "/statement/"+statements);                    // Some times we only want the specified statement to be generated (a block in always) so that we can use timing analysis to estimate the timing for that block
+      compactCode();                                                            // Compact the code to make better use of the surface area of the chip
 
-      projectFolder = ""+Paths.get(folder, project, subProject);                // Use the  key to identify the sub project
-      sourceVerilog = ""+Paths.get(projectFolder, project                       +Verilog.ext);
-        testVerilog = ""+Paths.get(projectFolder, project                       +Verilog.testExt);
-      declareMemory = ""+Paths.get(projectFolder, "includes", "declareMemory"   +Verilog.header);
-   initializeMemory = ""+Paths.get(projectFolder, "includes", "initializeMemory"+Verilog.header);
-      opCodeMapFile = ""+Paths.get(projectFolder, "includes", opCodeMap         +Verilog.header);
-          testsFile = ""+Paths.get(projectFolder, "tests.txt");
-          traceFile = ""+Paths.get(projectFolder, "trace.txt");
-      javaTraceFile = ""+Paths.get(projectFolder, "traceJava.txt");
-      makePath(projectFolder);
+      if      (eachStatement) eachStatement();
+      else if (runVerilog)    generate();
+      else                    execJavaTest();
      }
 
-    void eachStatement()                                                        // Generate verilog with each statement appearing once
-     {final int N = ops.outputOrder.size();
-      for (int i = 0; i < N; i++) {statements = i; generate();}
+    void compactCode()                                                          // Reuse comon instructions rather then regenerating them
+     {for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
+       {final Stack<ProgramDM.I> I = program.code.elementAt(i);                 // The block of parallel instructions to write
+        if (I.size() > 1)
+         {final StringBuilder t = new StringBuilder();
+          for(ProgramDM.I j : I) t.append(statementIndent+"    "+j.v()+"\n");
+          ops.put(t.toString(), i);
+         }
+        else
+         {final ProgramDM.I j = I.firstElement();
+          ops.put(j.v(), i);
+         }
+       }
+      ops.order();                                                              // Order the instructions
      }
 
     void removeAllButLastTrailingZero(StringBuilder S)
@@ -1920,7 +1926,7 @@ abstract class BtreeDM extends Test                                             
       for(MemoryLayoutDM m : P.memories)                                        // Each memory used by the program
        {s.append("  reg["+m.size()+"-1 : 0] "+m.name+";\n");                    // Declare the memory
        }
-      writeFile(declareMemory, s);
+      writeFile(declareMemory(), s);
      }
 
     void initializeMemories()                                                   // Initialize memories
@@ -1933,7 +1939,7 @@ abstract class BtreeDM extends Test                                             
         S.reverse();
         s.append("  "+m.name+" <= "+N+"'b"+S+";\n");                            // Initialize memory
        }
-      writeFile(initializeMemory, s);
+      writeFile(initializeMemory(), s);
      }
 
     String memoryPrintFormat()                                                  // Print format
@@ -1947,24 +1953,17 @@ abstract class BtreeDM extends Test                                             
       return ""+f+s;
      }
 
+    void eachStatement()                                                        // Generate verilog with each statement appearing once
+     {final int N = ops.outputOrder.size();
+      for (int i = 0; i < N; i++) {statements = i; generate();}
+     }
+
     VerilogCode generate()                                                      // Generate verilog
      {zz();
 
-      for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
-       {final Stack<ProgramDM.I> I = program.code.elementAt(i);                 // The block of parallel instructions to write
-        if (I.size() > 1)
-         {final StringBuilder t = new StringBuilder();
-          for(ProgramDM.I j : I) t.append(statementIndent+"    "+j.v()+"\n");
-          ops.put(t.toString(), i);
-         }
-        else
-         {final ProgramDM.I j = I.firstElement();
-          ops.put(j.v(), i);
-         }
-       }
+      makePath(projectFolder());                                                // Write files to the project folder
 
-      ops.order();                                                              // Order the instructions
-      ops.genVerilog(opCodeMapFile, opCodeMap);                                 // Write op code map
+      ops.genVerilog(opCodeMapFile(), opCodeMap);                               // Write op code map
 
       declareMemories();
       initializeMemories();
@@ -2131,8 +2130,8 @@ module $project_tb;                                                             
 endmodule
 """);
 
-      writeFile(sourceVerilog, editVariables(s));                               // Write verilog module
-      writeFile(testVerilog,   editVariables(t));                               // Write verilog test bench
+      writeFile(sourceVerilog(), editVariables(s));                             // Write verilog module
+      writeFile(testVerilog  (), editVariables(t));                             // Write verilog test bench
 
       if (statements == null)                                                   // All statements are in play so it is possible to execute the programs and compare their outputs to see if they are the same.
        {execJavaTest();                                                         // Execute the corresponding Java test
@@ -2143,13 +2142,13 @@ endmodule
 
     VerilogCode execJavaTest()                                                  // Execute the Java test
      {zz();
-      deleteFile(javaTraceFile);
+      deleteFile(javaTraceFile());
       say(project, folder, Key());                                              // Identify the test
-      P.run(javaTraceFile);                                                     // Run the Java version and trace it
+      P.run(javaTraceFile());                                                   // Run the Java version and trace it
 
       //ok(P.steps, expSteps());                                                // Steps in Java code
       ok(T.at(BtreeDM.this.data).getInt(), data());                             // Data associated with key from java code
-      if (debug) stop(""+thisBTree);                                              // Print tree if debugging
+      if (debug) stop(""+thisBTree);                                            // Print tree if debugging
       if (expected() != null) ok(BtreeDM.this, expected());                     // Check resulting tree
       return this;
      }
@@ -2157,14 +2156,14 @@ endmodule
     VerilogCode execVerilogTest()                                               // Execute the Verilog test and compare it with the results from execution under Java
      {zz();
       final StringBuilder s = new StringBuilder(editVariables("cd $projectFolder && iverilog $project.tb $project.v -Iincludes -g2012 -o $project && ./$project"));
-      deleteFile(traceFile);
+      deleteFile(traceFile());
       final ExecCommand   x = new ExecCommand(s);
-      final String        e = joinLines(readFile(javaTraceFile));               // Read java output
-      final String        g = joinLines(readFile(traceFile));                   // Execute verilog
+      final String        e = joinLines(readFile(javaTraceFile()));             // Read java output
+      final String        g = joinLines(readFile(traceFile()));                 // Execute verilog
       ok(x.exitCode, 0);                                                        // Confirm exit code
       ok(12, g, e);                                                             // Width of margin in verilog traces
       //ok(0, g, e);                                                            // Width of margin in verilog traces
-      final TreeMap<String,String> p = readProperties(testsFile);               // Load test results
+      final TreeMap<String,String> p = readProperties(testsFile());             // Load test results
       ok(ifs(p.get("Steps")), expSteps());                                      // Confirm results from Verilog
       ok(ifs(p.get("data")),  data());
       return this;
@@ -2175,23 +2174,23 @@ endmodule
     private String editVariables(String s)                                      // Edit the variables in a string builder
      {s = s.replace("$bitsPerKey",    ""  + bitsPerKey());
       s = s.replace("$bitsPerData",   ""  + bitsPerData());
-      s = s.replace("$testsFile",           fileName(testsFile));
-      s = s.replace("$traceFile",           fileName(traceFile));
-      s = s.replace("$projectFolder",       projectFolder);
+      s = s.replace("$testsFile",           fileName(testsFile()));
+      s = s.replace("$traceFile",           fileName(traceFile()));
+      s = s.replace("$projectFolder",       projectFolder());
       s = s.replace("$project",             project);
-      s = s.replace("$Key_at",              ""+Key.at);
-      s = s.replace("$Key_width",           ""+Key.width);
-      s = s.replace("$Data_at",             ""+Data.at);
-      s = s.replace("$Data_width",          ""+Data.width);
-      s = s.replace("$data_at",             ""+data.at);
-      s = s.replace("$data_width",          ""+data.width);
-      s = s.replace("$data",                ""+data());
-      s = s.replace("$Key",                 ""+Key());
-      s = s.replace("$Data",                ""+Data());
-      s = s.replace("$maxSteps",            ""+maxSteps());
-      s = s.replace("$expSteps",            ""+expSteps());
-      s = s.replace("$found_at",            ""+found.at);
-      s = s.replace("$format",              ""+memoryPrintFormat());
+      s = s.replace("$Key_at",           ""+Key.at);
+      s = s.replace("$Key_width",        ""+Key.width);
+      s = s.replace("$Data_at",          ""+Data.at);
+      s = s.replace("$Data_width",       ""+Data.width);
+      s = s.replace("$data_at",          ""+data.at);
+      s = s.replace("$data_width",       ""+data.width);
+      s = s.replace("$data",             ""+data());
+      s = s.replace("$Key",              ""+Key());
+      s = s.replace("$Data",             ""+Data());
+      s = s.replace("$maxSteps",         ""+maxSteps());
+      s = s.replace("$expSteps",         ""+expSteps());
+      s = s.replace("$found_at",         ""+found.at);
+      s = s.replace("$format",           ""+memoryPrintFormat());
       s = s.replace("$initialize_opCodeMap","initialize_"+opCodeMap);           // Initialize op code map
 
       return s;
@@ -3315,7 +3314,6 @@ Line T       At      Wide       Size    Indices        Value   Name
       int    expSteps() {return   21;}                                          // Expected number of steps
       String expected() {return null;}                                          // Expected tree if present
      };
-    if (t.runVerilog) v.generate(); else v.execJavaTest();
 
     ok(t.T.at(t.data).getInt(), 7);                                             // Data associated with key
    }
@@ -3333,7 +3331,6 @@ Line T       At      Wide       Size    Indices        Value   Name
       int    expSteps() {return steps;}                                         // Expected number of steps
       String expected() {return null;}                                          // Expected tree if present
      };
-    if (runVerilog) v.generate(); else v.execJavaTest();
    }
 
   private static void test_verilogDelete()                                      // Delete using generated verilog code
@@ -3376,6 +3373,7 @@ Line T       At      Wide       Size    Indices        Value   Name
            4             2      |
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
+    if (t.eachStatement) return;
 
     t.runVerilogDeleteTest(4, 5, 279, """
              6           |
@@ -3447,7 +3445,6 @@ Line T       At      Wide       Size    Indices        Value   Name
       int    expSteps() {return steps;}                                         // Expected number of steps
       String expected() {return null;}                                          // Expected tree if present
      };
-    if (runVerilog) v.generate(); else v.execJavaTest();
 
     ok(this, expected);
     if (debug) stop(this);
@@ -3461,6 +3458,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.runVerilogPutTest(1, 25, """
 1=0 |
 """);
+    if (t.eachStatement) return;
 
     t.runVerilogPutTest(2, 25, """
 1,2=0 |
