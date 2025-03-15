@@ -1,4 +1,4 @@
-# Test 2025-03-15 at 04:58:59
+# Test 2025-03-15 at 05:09:53
 
 name: Test
 run-name: btreeBlock
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        task: [BtreeDM, Memory, MemoryLayoutDM, MemoryLayoutPA, ProgramDM, StringToNumbers, StuckDM]
+        task: [ProgramDM, Test]
 
     steps:
     - uses: actions/checkout@v4
@@ -54,44 +54,14 @@ jobs:
       run: |
         javac -g -d Classes -cp Classes `find com/AppaApps/Silicon -name "*.java"`
 
-    - name: Test BtreeDM
-      if: matrix.task == 'BtreeDM'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeDM
-
-
-    - name: Test Memory
-      if: matrix.task == 'Memory'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Memory
-
-
-    - name: Test MemoryLayoutDM
-      if: matrix.task == 'MemoryLayoutDM'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/MemoryLayoutDM
-
-
-    - name: Test MemoryLayoutPA
-      if: matrix.task == 'MemoryLayoutPA'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/MemoryLayoutPA
-
-
     - name: Test ProgramDM
       if: matrix.task == 'ProgramDM'
       run: |
         java -cp Classes com/AppaApps/Silicon/ProgramDM
 
 
-    - name: Test StringToNumbers
-      if: matrix.task == 'StringToNumbers'
+    - name: Test Test
+      if: matrix.task == 'Test'
       run: |
-        java -cp Classes com/AppaApps/Silicon/StringToNumbers
-
-
-    - name: Test StuckDM
-      if: matrix.task == 'StuckDM'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/StuckDM
+        java -cp Classes com/AppaApps/Silicon/Test
 
