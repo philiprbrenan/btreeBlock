@@ -140,7 +140,7 @@ jobs:
 
     - name: Compile
       run: |
-        javac -g -d Classes -cp Classes `find $c -name "*.java"`
+        javac -g -d Classes -cp Classes `find $c -name "*.java"` --enable-preview
 END
 
 #    - name: 'JDK 22'
@@ -154,7 +154,7 @@ END
     - name: Test $j
       if: matrix.task == '$j'
       run: |
-        java -cp Classes $c/$j
+        java -cp Classes $c/$j  --enable-preview
 
 END
    }
