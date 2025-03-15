@@ -213,7 +213,7 @@ class MemoryLayoutPA extends Test                                               
        }
       String v()
        {final String m = name();
-         return m+"["+baseName()+" +: "+N+"] <= "+m+"["+source.baseName()+" +: "+N+"];";
+         return m+"["+baseName()+" +: "+N+"] <= "+m+"["+source.baseName()+" +: "+N+"]; /* MemoryLayoutPA.copy */";
        }
      };
    }
@@ -550,7 +550,7 @@ class MemoryLayoutPA extends Test                                               
 
           for (int i = N+1; i > 0; --i)
            {final int u = 1<<(i-1);
-            v.append("if (" +l+" >= "+u+") begin\n");
+            v.append("if (" +l+" >= "+u+") begin /* MemoryLayoutPA.copy */\n");
             v.append("   "+m+"["+t+" +: "+u+"] <= "+m+"["+s+" +: "+u+"];\n");
             v.append("   "  +l+" = "+l+" - "+u+";\n");                          // These assigns have to be made immediately else each block has to be executed one after another to drive the length and pointers sequentially.
             v.append("   "  +s+" = "+s+" + "+u+";\n");
@@ -1035,7 +1035,7 @@ class MemoryLayoutPA extends Test                                               
     s.append("    begin\n");
     for(int i = 0; i <= N; ++i)                                                 // Load each bit
      {final int b = memory.bits[i] ? 1 : 0;                                     // Bit to dump
-      final String l = "        "+m+"["+i+"] <= "+b+";\n";                      // Load bit into memory
+      final String l = "        "+m+"["+i+"] <= "+b+"; /* dumpVerilog */\n";    // Load bit into memory
       if (ignore.contains(i))                                                   // Ignore bits loaded from other sources during synthesis
        {s.append("     `ifndef SYNTHESIS\n");                                   // Load bit into memory
         s.append(l);
