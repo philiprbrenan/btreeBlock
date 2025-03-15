@@ -1,4 +1,4 @@
-# Test 2025-03-15 at 21:16:18
+# Test 2025-03-15 at 21:17:05
 
 name: Test
 run-name: btreeBlock
@@ -27,9 +27,10 @@ jobs:
       with:
         ref: 'main'
 
-    - name: 'Java'
-      run: |
-        sudo apt install default-jdk
+    - name: 'JDK 22'
+      uses: oracle-actions/setup-java@v1
+      with:
+        website: jdk.java.net
 
     - name: Verilog install
       run: |
@@ -42,166 +43,166 @@ jobs:
 
     - name: Compile
       run: |
-        javac -g -d Classes -cp Classes `find com/AppaApps/Silicon -name "*.java"` --enable-preview
+        javac -g -d Classes -cp Classes `find com/AppaApps/Silicon -name "*.java"`
 
     - name: Test Btree
       if: matrix.task == 'Btree'
       run: |
-        java -cp Classes com/AppaApps/Silicon/Btree  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/Btree
 
 
     - name: Test BtreeDM
       if: matrix.task == 'BtreeDM'
       run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeDM  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/BtreeDM
 
 
     - name: Test BtreePA
       if: matrix.task == 'BtreePA'
       run: |
-        java -cp Classes com/AppaApps/Silicon/BtreePA  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/BtreePA
 
 
     - name: Test BtreeSA
       if: matrix.task == 'BtreeSA'
       run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeSA  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/BtreeSA
 
 
     - name: Test BtreeSML
       if: matrix.task == 'BtreeSML'
       run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeSML  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/BtreeSML
 
 
     - name: Test BtreeSP
       if: matrix.task == 'BtreeSP'
       run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeSP  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/BtreeSP
 
 
     - name: Test BtreeStuck
       if: matrix.task == 'BtreeStuck'
       run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeStuck  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/BtreeStuck
 
 
     - name: Test BtreeStuckStatic
       if: matrix.task == 'BtreeStuckStatic'
       run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeStuckStatic  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/BtreeStuckStatic
 
 
     - name: Test If
       if: matrix.task == 'If'
       run: |
-        java -cp Classes com/AppaApps/Silicon/If  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/If
 
 
     - name: Test Layout
       if: matrix.task == 'Layout'
       run: |
-        java -cp Classes com/AppaApps/Silicon/Layout  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/Layout
 
 
     - name: Test Memory
       if: matrix.task == 'Memory'
       run: |
-        java -cp Classes com/AppaApps/Silicon/Memory  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/Memory
 
 
     - name: Test MemoryLayout
       if: matrix.task == 'MemoryLayout'
       run: |
-        java -cp Classes com/AppaApps/Silicon/MemoryLayout  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/MemoryLayout
 
 
     - name: Test MemoryLayoutDM
       if: matrix.task == 'MemoryLayoutDM'
       run: |
-        java -cp Classes com/AppaApps/Silicon/MemoryLayoutDM  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/MemoryLayoutDM
 
 
     - name: Test MemoryLayoutPA
       if: matrix.task == 'MemoryLayoutPA'
       run: |
-        java -cp Classes com/AppaApps/Silicon/MemoryLayoutPA  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/MemoryLayoutPA
 
 
     - name: Test Program
       if: matrix.task == 'Program'
       run: |
-        java -cp Classes com/AppaApps/Silicon/Program  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/Program
 
 
     - name: Test ProgramDM
       if: matrix.task == 'ProgramDM'
       run: |
-        java -cp Classes com/AppaApps/Silicon/ProgramDM  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/ProgramDM
 
 
     - name: Test ProgramPA
       if: matrix.task == 'ProgramPA'
       run: |
-        java -cp Classes com/AppaApps/Silicon/ProgramPA  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/ProgramPA
 
 
     - name: Test StringToNumbers
       if: matrix.task == 'StringToNumbers'
       run: |
-        java -cp Classes com/AppaApps/Silicon/StringToNumbers  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/StringToNumbers
 
 
     - name: Test Stuck
       if: matrix.task == 'Stuck'
       run: |
-        java -cp Classes com/AppaApps/Silicon/Stuck  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/Stuck
 
 
     - name: Test StuckDM
       if: matrix.task == 'StuckDM'
       run: |
-        java -cp Classes com/AppaApps/Silicon/StuckDM  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/StuckDM
 
 
     - name: Test StuckPA
       if: matrix.task == 'StuckPA'
       run: |
-        java -cp Classes com/AppaApps/Silicon/StuckPA  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/StuckPA
 
 
     - name: Test StuckSA
       if: matrix.task == 'StuckSA'
       run: |
-        java -cp Classes com/AppaApps/Silicon/StuckSA  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/StuckSA
 
 
     - name: Test StuckSML
       if: matrix.task == 'StuckSML'
       run: |
-        java -cp Classes com/AppaApps/Silicon/StuckSML  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/StuckSML
 
 
     - name: Test StuckSP
       if: matrix.task == 'StuckSP'
       run: |
-        java -cp Classes com/AppaApps/Silicon/StuckSP  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/StuckSP
 
 
     - name: Test StuckStatic
       if: matrix.task == 'StuckStatic'
       run: |
-        java -cp Classes com/AppaApps/Silicon/StuckStatic  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/StuckStatic
 
 
     - name: Test Test
       if: matrix.task == 'Test'
       run: |
-        java -cp Classes com/AppaApps/Silicon/Test  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/Test
 
 
     - name: Test Verilog
       if: matrix.task == 'Verilog'
       run: |
-        java -cp Classes com/AppaApps/Silicon/Verilog  --enable-preview
+        java -cp Classes com/AppaApps/Silicon/Verilog
 
