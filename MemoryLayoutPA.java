@@ -28,7 +28,7 @@ class MemoryLayoutPA extends Test                                               
   MemoryLayoutPA(Layout Layout, String Name)                                    // Memory with an associated layout and a name so we can generate verilog from it
    {zz();
     name   = Name; based = null; layout = Layout;
-    memory = new Memory(Name, size());                                          // Create the associated memory as this memory is not based on any other memory
+    memory = new Memory(Name, layout.size());                                   // Create the associated memory as this memory is not based on any other memory
    }
 
   MemoryLayoutPA(Layout Layout, String Name, MemoryLayoutPA Based)              // Like based storage in PL1.  If the based memory is null then we create a backing memory of the required size and base ourselves at zero in it to facilitate testing.
@@ -65,7 +65,7 @@ class MemoryLayoutPA extends Test                                               
 
   int     base () {z(); return base;}                                           // Get the base offset into memory being used
   boolean based() {z(); return based  != null;}                                 // Whether the memory used in the memory layout is based or not
-  int     size () {z(); return layout != null ? layout.size() : memory.bits.length;} // Size of memory
+  int     size () {z(); return memory.size();}                                  // Size of memory
   int baseSize () {z(); return based() ? based.size() : size();}                // Size of underlying memory
 
   void clear()                                                                  // Clear underlying memory
@@ -109,11 +109,11 @@ class MemoryLayoutPA extends Test                                               
 //D1 Get and Set                                                                // Get and set values in memory but only during testing
 
   boolean getBit(int index)                                                     // Get a bit from the memory layout
-   {zz();return memory.bits[base + index];
+   {zz();return memory.getBit(base + index);
    }
 
   void setBit(int index, boolean value)                                         // Set a value in memory occupied by the layout
-   {zz(); memory.bits[base + index] = value;
+   {zz(); memory.set(base + index,  value);
    }
 
   int  getInt(Layout.Field field, int...indices)                                // Get a value from memory occupied by the layout
@@ -1028,13 +1028,13 @@ class MemoryLayoutPA extends Test                                               
      }
 
     final StringBuilder s = new StringBuilder();
-    final int N = memory.bits.length-1, B = logTwo(N)-1;                        // Dimensions of memory
+    final int N = memory.size()-1, B = logTwo(N)-1;                             // Dimensions of memory
     final String m = name();                                                    // Name of memory
     s.append(declareVerilog());
     s.append("task "+initializeMemory()+";\n");
     s.append("    begin\n");
     for(int i = 0; i <= N; ++i)                                                 // Load each bit
-     {final int b = memory.bits[i] ? 1 : 0;                                     // Bit to dump
+     {final int b = memory.getBit(i) ? 1 : 0;                                     // Bit to dump
       final String l = "        "+m+"["+i+"] <= "+b+"; /* dumpVerilog */\n";    // Load bit into memory
       if (ignore.contains(i))                                                   // Ignore bits loaded from other sources during synthesis
        {s.append("     `ifndef SYNTHESIS\n");                                   // Load bit into memory
@@ -1052,7 +1052,7 @@ class MemoryLayoutPA extends Test                                               
 
   String declareVerilog()                                                       // Declare matching memory  but do not initialize it
    {zz();
-    final int N = memory.bits.length-1, B = logTwo(N);
+    final int N = memory.size()-1, B = logTwo(N);
     final StringBuilder s = new StringBuilder();
     if (based == null) s.append("reg ["+N+":0] "+name()    +"; ");              // Actual memory if it is not based
     else               s.append("reg ["+B+":0] "+baseName()+"; ");              // Base offset for this memory
