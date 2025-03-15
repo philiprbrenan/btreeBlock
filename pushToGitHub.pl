@@ -43,9 +43,7 @@ if (0)
   push @files, @qflow;
  }
 
-say STDERR "AAAA ", dump(\@files);
-
-@files = changedFiles $md5File, @files if 0;                                    # Filter out files that have not changed
+@files = changedFiles $md5File, @files if 1;                                    # Filter out files that have not changed
 
 if (!@files)                                                                    # No new files
  {say "Everything up to date";
