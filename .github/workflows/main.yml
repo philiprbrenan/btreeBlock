@@ -1,4 +1,4 @@
-# Test 2025-03-15 at 14:43:12
+# Test 2025-03-15 at 14:52:36
 
 name: Test
 run-name: btreeBlock
@@ -33,22 +33,13 @@ jobs:
         website: jdk.java.net
 
     - name: Verilog install
-      if: matrix.task == 'BtreeDM'
       run: |
         sudo apt install iverilog
-
-    - name: Install Tree
-      run:
-        sudo apt install tree
 
     - name: Position files in package
       run: |
         mkdir -p com/AppaApps/Silicon
         cp `find .  -name "*.java"` com/AppaApps/Silicon
-
-    - name: Files
-      run:
-        tree
 
     - name: Compile
       run: |
