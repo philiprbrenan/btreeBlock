@@ -1933,7 +1933,7 @@ abstract class BtreeDM extends Test                                             
         for (int i = 0; i < N; i++) S.append(m.getBit(i) ? 1 : 0);
         removeAllButLastTrailingZero(S);
         S.reverse();
-        s.append("  "+n+" = "+N+"'b"+S+";\n");
+        s.append("  "+n+" <= "+N+"'b"+S+";\n");
        }
       writeFile(initializeMemory, s);
      }
