@@ -31,7 +31,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
   MemoryLayoutDM(Layout Layout, String Name)                                    // Memory with an associated layout and a name so we can generate verilog from it
    {zz();
     name   = Name; layout = Layout;
-    memory = new Memory(Name, layout.size());                                   // Create the associated memory as this memory is not based on any other memory
+    memory = new Memory(Name, layout.size());                                   // Create the associated memory
    }
 
   public int compareTo(MemoryLayoutDM other)                                    // A progam might access several memory layouts
@@ -44,11 +44,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
 
   void program(ProgramDM program) {zz(); P = program; P.addMemoryLayout(this);} // Program in which to generate instructions
 
-  String  name    () {z(); return name+"_"+number;}                             // Name of this memory layout
+  String  name    () {z(); return name;}                                        // Name of this memory layout
   Layout  layout  () {z(); return layout;}                                      // Get the layout in use
-  String  baseName() {z(); return name+"_"+number+"_base_offset";}              // Name of the verilog field used to hold the base being used for this memory layout
-
-  String  initializeMemory() {z(); return "initialize_memory_"+name();}         // Name of the verilog field used to hold the base being used for this memory layout
 
   int size () {z(); return layout != null ? layout.size() : memory.bits.length;}// Size of memory
 
@@ -76,17 +73,9 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
 
 //D1 Copy control                                                               // Verilog variables used to implement a variable length copy
 
-  String  copyIndex() {return "index_"     +baseName();}                        // Index to a location in this memory layout
-  String copyLength() {return "copyLength_"+baseName();}                        // Length of a copy in this memory layout
+  String  copyIndex() {return "index_"     +name();}                            // Index to a location in this memory layout
+  String copyLength() {return "copyLength_"+name();}                            // Length of a copy in this memory layout
   int      copySize() {return logTwo(memory.size());}                           // Size of bits for a length or index into this memory
-
-  String copyVerilogDec()                                                       // Verilog declaration
-   {zz();
-    final StringBuilder s = new StringBuilder();                                // Text of declaration
-    s.append("reg["+copySize()+"-1: 0] "+copyIndex ()+"; "+traceComment()+"\n");
-    s.append("reg["+copySize()+"-1: 0] "+copyLength()+"; "+traceComment()+"\n");
-    return ""+s;
-   }
 
 //D1 Get and Set                                                                // Get and set values in memory but only during testing
 
@@ -126,7 +115,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
 
   void setIntInstruction(Layout.Field field1, int value1,                       // Set values in memory occupied by the layout
                          Layout.Field field2, int value2)                       // Set a value in memory occupied by the layout
-   {zz();
+   {z();
     P.new I()
      {void a()
        {final At a1 = new At(field1).setOff(), a2 = new At(field2).setOff();
@@ -134,19 +123,19 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
         memory.set(a2.at, a2.width, value2);
        }
       String v()
-       {return new At(field1).verilogLoad() + " <= " + value1 + ";"
-             + new At(field2).verilogLoad() + " <= " + value2 + ";";
+       {return new At(field1).verilogLoad() + " <= " + value1 + "; /* setIntInstruction */"
+             + new At(field2).verilogLoad() + " <= " + value2 + "; /* setIntInstruction */";
        }
      };
    }
 
   void zero()                                                                   // Clear the memory associated with the layout to zeros
-   {zz();
+   {z();
     memory.zero(0, size());
    }
 
   void ones()                                                                   // Set the memory associated with the layout to zeros
-   {zz();
+   {z();
     memory.ones(0, size());
    }
 
@@ -159,8 +148,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
        {for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
        }
       String v()
-       {final String m = name();
-        return name+"["+baseName()+" +: "+N+"] <= "+m+"["+source.baseName()+" +: "+N+"];";
+       {return name()+"[0 +: "+N+"] <= "+source.name()+"[0 +: "+N+"]; /* copy1 */";
        }
      };
    }
@@ -175,7 +163,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
         for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
        }
       String v()
-       {return name()+"[0 +: "+N+"] <= "+source.verilogLoad()+";";
+       {return name()+"[0 +: "+N+"] <= "+source.verilogLoad()+"; /* copy2 */";
        }
       String n()
        {return "copy "+N+" bits from "+source+" to "+m.name;
@@ -210,6 +198,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       final String w = w(W);                                                    // The width of the field as a padded string
       final String d = delta == null ? "" :                                     // Constant delta to modify address if needed in steps of field size as in the C programming language
                        delta > 0 ? "+"+delta*W : ""+delta*W;
+
       return (la ? i(field.at)+c()+joinStrings(v, "")+d    :                    // IBM S/360 Principles of Operation: LA
         name()+"["+i(field.at)+c()+joinStrings(v, "")+d+" +: "+w+"]");          // IBM S/360 Principles of Operation: L
      }
@@ -261,7 +250,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
        }
      }
 
-    At(Layout.Field Field)                                                      // No indices or base
+    At(Layout.Field Field)                                                      // No indices
      {zz(); checkCompiled(Field);
       field = Field; indices = new int[0];
       width = field.width;
@@ -283,7 +272,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       if (N != E) stop("Got", N, "indices but expected", E);
       for (int i = 0; i < N; i++)
        {if (Directs[i].directs != null)
-         {stop("Index:", i, "must not have a base or indices");
+         {stop("Index:", i, "must not have indices");
          }
        }
 
@@ -486,7 +475,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      }
 
     void copy(At Source, At Length)                                             // Copy the specified number of bits from the location addressed by the source to the location addressed by the target.
-     {zz();
+     {z();
       final At Target = this;
       P.new I()
        {void a()
@@ -515,7 +504,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           for (int i = N+1; i > 0; --i)
            {final int u = 1<<(i-1);
             v.append("if (" +l+" >= "+u+") begin\n");
-            v.append("   "+m+"["+t+" +: "+u+"] <= "+m+"["+s+" +: "+u+"];\n");
+            v.append("   "+m+"["+t+" +: "+u+"] <= "+m+"["+s+" +: "+u+"]; /* copy */\n");
             v.append("   "  +l+" = "+l+" - "+u+";\n");                          // These assigns have to be made immediately else each block has to be executed one after another to drive the length and pointers sequentially.
             v.append("   "  +s+" = "+s+" + "+u+";\n");
             v.append("   "  +t+" = "+t+" + "+u+";\n");
@@ -581,7 +570,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
                          T = Target.ml().name();
 
             v.append("if (" +l+" >= "+I+") begin\n");
-            v.append("   "  +T+"["+t+" +: "  +I+"] <= "+S+"["+s+" +: "+I+"];\n");
+            v.append("   "  +T+"["+t+" +: "  +I+"] <= "+S+"["+s+" +: "+I+"]; /* copy2 */\n");
             v.append("   "  +l+" <= "+l+" - "+I+";\n");                         // These assigns have to be made immediately else each block has to be executed one after another to drive the length and pointers sequentially.
             v.append("   "  +s+" <= "+s+" + "+I+";\n");
             v.append("   "  +t+" <= "+t+" + "+I+";\n");
@@ -604,8 +593,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
            }
          }
         String v()
-         {final String m = name();
-          return verilogLoad()+" <= "+Source.name()+"[0 +: "+N+"];";
+         {final int    n = min(size(), N);
+          return ml().name()+"["+verilogAddr()+" +: "+n+"] <= "+Source.name()+"[0 +: "+n+"]; /* MemoryLayoutDM.copy1 */";
          }
        };
      }
@@ -619,7 +608,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
          }
         String v()
-         {return verilogLoad()+" <= "+source.verilogLoad()+";";
+         {final int n = min(width, source.width);
+           return ml().name()+"["+verilogAddr()+" +: "+n +"] <= "+source.ml().name() + "["+source.verilogAddr()+" +: "+n+"]; /* MemoryLayoutDM.copy2 */";
          }
        };
      }
@@ -631,7 +621,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       P.new I()
        {void a() {setOff(); memory.zero(at, width);}
         String v()
-         {return verilogLoad()+" <= 0;";
+         {return verilogLoad()+" <= 0; /* MemoryLayoutDM.zero */";
          }
         String n()
          {return field.name+" <= 0";
@@ -647,7 +637,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          {setOff(); memory.ones(at, width);
          }
         String v()
-         {return verilogLoad()+" <= "+one+ ";";
+         {return verilogLoad()+" <= "+one+ "; /* MemoryLayoutDM.ones */";
          }
         String n()
          {return field.name+" <= "+one;
@@ -662,7 +652,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          {setOff(); memory.invert(a.result, a.width());
          }
         String v()
-         {return verilogLoad()+" <= ~"+verilogLoad()+ ";";
+         {return verilogLoad()+" <= ~"+verilogLoad()+ ";  /* MemoryLayoutDM.invert */";
          }
         String n()
          {return field.name+" <= ~"+field.name;
@@ -696,7 +686,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          {result.setOff().setInt(setOff().isZero() ? 1 : 0);
          }
         String v()
-         {return result.verilogLoad()+" <= "+target.verilogLoad()+" == 0;";
+         {return result.verilogLoad()+" <= "+target.verilogLoad()+" == 0;  /* MemoryLayoutDM.isZero */";
          }
         String n() {return result.field.name+" <= isZero "+field.name;}
        };
@@ -719,7 +709,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          }
         String v()
          {return result.verilogLoad()+" <= "+target.verilogLoad()+
-            " == " + target.field.verilogOnes()+ ";";
+            " == " + target.field.verilogOnes()+ "; /* MemoryLayoutDM.isOnes */";
          }
         String n() {return result.field.name+" <= isOnes "+field.name;}
        };
@@ -743,7 +733,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          }
         String v()
          {return result.verilogLoad()+" <= "+a.verilogLoad()+
-                                       " == " + b.verilogLoad()+ ";";
+                                       " == " + b.verilogLoad()+ ";  /* MemoryLayoutDM.equal */";
          }
         String n() {return result.field.name+"="+field.name+" == "+b.field.name;}
        };
@@ -758,7 +748,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          }
         String v()
          {return result.verilogLoad()+" <= "+a.verilogLoad()+
-                                         " != "+b.verilogLoad()+ ";";
+                                         " != "+b.verilogLoad()+ ";  /* MemoryLayoutDM.notEqual */";
          }
         String n() {return result.field.name+"="+field.name+"!="+b.field.name;}
        };
@@ -783,7 +773,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          }
         String v()
          {return result.verilogLoad()+" <= "+a.verilogLoad()+
-                                          " < "+b.verilogLoad()+ ";";
+                                          " < "+b.verilogLoad()+ ";  /* MemoryLayoutDM.lessThan */";
          }
         String n() {return result.field.name+"="+field.name+"<"+b.field.name;}
        };
@@ -798,7 +788,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
         }
         String v()
          {return result.verilogLoad()+" <= "+a.verilogLoad()+
-                                         " <= "+b.verilogLoad()+ ";";
+                                         " <= "+b.verilogLoad()+ "; /* MemoryLayoutDM.lessThanOrEqual */";
          }
         String n() {return result.field.name+"="+field.name+"<="+b.field.name;}
       };
@@ -813,7 +803,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          }
         String v()
          {return result.verilogLoad()+" <= "+a.verilogLoad()+
-                                          " > "+b.verilogLoad()+ ";";
+                                          " > "+b.verilogLoad()+ "; /* MemoryLayoutDM.greaterThan */";
          }
         String n() {return result.field.name+"="+field.name+">"+b.field.name;}
        };
@@ -828,7 +818,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          }
         String v()
          {return result.verilogLoad()+" <= "+a.verilogLoad()+
-                                         " >= "+b.verilogLoad()+ ";";
+                                         " >= "+b.verilogLoad()+ ";/* MemoryLayoutDM.greaterThanOrEqual */";
          }
         String n() {return result.field.name+"="+field.name+">="+b.field.name;}
        };
@@ -848,7 +838,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           setInt(i);
          }
         String v()
-         {return a.verilogLoad()+" <= "+a.verilogLoad()+"+ 1;";
+         {return a.verilogLoad()+" <= "+a.verilogLoad()+"+ 1; /* MemoryLayoutDM.inc */";
          }
         String n()
          {return "++"+field.name;
@@ -865,15 +855,16 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           setInt(i);
          }
         String v()
-         {return a.verilogLoad()+" <= "+a.verilogLoad()+"- 1;";
+         {return a.verilogLoad()+" <= "+a.verilogLoad()+"- 1; /* MemoryLayoutDM.dec */";
          }
         String n()
          {return "--"+field.name;
          }
        };
      }
+
     void dec(int n)                                                             // Decrement a variable treated as an unsigned binary integer by a constant amount with wrap around on overflow.  Return the result after  the increment.
-     {zz();
+     {z();
       final At a = this;
       P.new I()
        {void a()
@@ -882,7 +873,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           setInt(i);
          }
         String v()
-         {return a.verilogLoad()+" <= "+a.verilogLoad()+"- "+n+";";
+         {return a.verilogLoad()+" <= "+a.verilogLoad()+"- "+n+"; /* MemoryLayoutDM.decN */";
          }
         String n()
          {return field.name + "-= " + n;
@@ -899,7 +890,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           target.setOff().setInt(v + constant);
          }
         String v()
-         {return target.verilogLoad()+" <= "+source.verilogLoad() + "+" + constant + ";";
+         {return target.verilogLoad()+" <= "+source.verilogLoad() + "+" + constant + "; /* MemoryLayoutDM.add */";
          }
         String n() {return field.name+"="+source.field.name + "+ "+ constant;}
         void   i() {}
@@ -1011,48 +1002,6 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
        }
       default -> stop("Unknown field type:", field);
      };
-   }
-
-//D1 Verilog                                                                    // Transfer memory to Verilog
-
-  void dumpVerilog(String file, Layout.Variable...ignores)                      // Initialize memory in Verilog with the contents of this memory ignoring some fields that will be loaded from input ports
-   {zz();
-    final TreeSet<Integer> ignore = new TreeSet<>();                            // The bits to be ignored
-    for (Layout.Variable v : ignores)                                           // Load the bits to be ignored
-     {final int N = v.width;
-      for (int i = 0; i < N; i++) ignore.add(v.at+i);                           // Bit to be ignored
-     }
-
-    final StringBuilder s = new StringBuilder();
-    final int N = memory.bits.length-1, B = logTwo(N)-1;                        // Dimensions of memory
-    final String m = name();                                                    // Name of memory
-    s.append("task "+initializeMemory()+";\n");
-    s.append("    begin\n");
-    for(int i = 0; i <= N; ++i)                                                 // Load each bit
-     {final int b = memory.bits[i] ? 1 : 0;                                     // Bit to dump
-      final String l = "        "+m+"["+i+"] <= "+b+";\n";                      // Load bit into memory
-      if (ignore.contains(i))                                                   // Ignore bits loaded from other sources during synthesis
-       {s.append("     `ifndef SYNTHESIS\n");                                   // Load bit into memory
-        s.append(l);
-        s.append("     `endif\n");
-       }
-      else                                                                      // Load all bits as not in synthesis
-       {s.append("        "+m+"["+i+"] <= "+b+";\n");                           // Load bit into memory
-       }
-     }
-    s.append("    end\n");
-    s.append("endtask\n");
-    writeFile(file, s);                                                         // Write the definition into an include file
-   }
-
-  String declareVerilog()                                                       // Declare matching memory  but do not initialize it
-   {zz();
-    final int N = memory.bits.length-1, B = logTwo(N);
-    final StringBuilder s = new StringBuilder();
-    s.append("reg ["+N+":0] "+name()    +"; ");                                 // Actual memory if it is not based
-    s.append(traceComment());
-    s.append("\n");
-    return s.toString();
    }
 
 //D0 Tests                                                                      // Testing
@@ -1612,7 +1561,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
 
     MemoryLayoutDM.At at = m.at(a, m.at(I));
-    final String n = m.name();
+    final String n = m.name;
     ok(at.verilogLoad(), n+"[       0/*a       */ + "+n+"[      24/*I       */ +: 4] * 6 +: 2]");
     ok(at.verilogAddr(),   "       0/*a       */ + "+n+"[      24/*I       */ +: 4] * 6");
     ok(m.at(a, 0).verilogLoad(), n+"[       0/*a       */ + 0 * 6 +: 2]");
@@ -1623,7 +1572,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(m.at(b, 2).verilogLoad(), n+"[       2/*b       */ + 2 * 6 +: 2]");
    }
 
-  static void test_dump_verilog()
+/*  static void test_dump_verilog()
    {z();
     final String v = "verilog/memoryLayoutPA/dump_verilog.txt";
 
@@ -1712,7 +1661,7 @@ endtask
 """, i, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n));
     deleteAllFiles(folderName(v), 1);
    }
-
+*/
   static void test_copy_bits()
    {z();
     Layout               l = Layout.layout();
@@ -1789,8 +1738,9 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
 
     M.copy(m.at(a));
+    //stop(m.P.printVerilog());
     ok(m.P.printVerilog(), """
-   1  M_2[0 +: 8] <= m_1[       0/*a       */ +: 8];
+   1  M[0 +: 8] <= m[       0/*a       */ +: 8]; /* copy2 */
 """);
 
     m.P.run(); m.P.clear();
@@ -1804,7 +1754,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     m.at(c).copy(M);
     ok(m.P.printVerilog(), """
-   1  m_1[      16/*c       */ +: 8] <= M_2[0 +: 8];
+   1  m[      16/*c       */ +: 8] <= M[0 +: 8]; /* MemoryLayoutDM.copy1 */
 """);
     m.P.run(); m.P.clear();
     //stop(m);
@@ -1820,7 +1770,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     M.copy(m.at(b));
     ok(m.P.printVerilog(), """
-   1  M_2[0 +: 8] <= m_1[       8/*b       */ +: 8];
+   1  M[0 +: 8] <= m[       8/*b       */ +: 8]; /* copy2 */
 """);
 
     m.P.run(); m.P.clear();
@@ -1834,7 +1784,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     m.at(c).copy(M);
     ok(m.P.printVerilog(), """
-   1  m_1[      16/*c       */ +: 8] <= M_2[0 +: 8];
+   1  m[      16/*c       */ +: 8] <= M[0 +: 8]; /* MemoryLayoutDM.copy1 */
 """);
     m.P.run(); m.P.clear();
     //stop(m);
@@ -1850,7 +1800,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     m.at(c).copy(m.at(a));
     ok(m.P.printVerilog(), """
-   1  m_1[      16/*c       */ +: 8] <= m_1[       0/*a       */ +: 8];
+   1  m[      16/*c       */ +: 8] <= m[       0/*a       */ +: 8]; /* MemoryLayoutDM.copy2 */
 """);
     m.P.run(); m.P.clear();
 //  stop(m);
@@ -1878,8 +1828,8 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_is_ones_or_zeros();
     test_union();
     test_verilog_address();
-    test_dump_verilog();
-    test_dump_verilog_ignore();
+//  test_dump_verilog();
+//  test_dump_verilog_ignore();
     test_copy_bits();
     test_copy_memory();
    }
