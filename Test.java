@@ -486,7 +486,7 @@ public class Test                                                               
   static void writeFile(String filePath, StringBuilder string)                  // Write a string builder to a file
    {try
      {makePath(folderName(filePath));
-       Files.write(Paths.get(filePath), string.toString().getBytes());
+      Files.write(Paths.get(filePath), string.toString().getBytes());
      }
     catch (Exception e)
      {stop("Cannot write file", filePath, e);
