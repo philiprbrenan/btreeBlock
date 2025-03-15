@@ -13,9 +13,8 @@ my $part          = q(XC7Z007S);
    $part          = q(xc7v2000tflg1925-1);                                      # 1 million
 #  $part          = q(xcvu440-flga2892-1-c);                                    # 5 million
 
-my $localHome     = "/home/phil/";                                              # Home on local machine
-my $local         = -e $localHome;                                              # On local machine
-my $home          = fpd(($local ? $localHome : "/home/azureuser/"));            # Working folder
+my $home          = $ENV{HOME};                                                 # Home
+my $local         = "/home/phil";                                               # Home on local machine
 my $projectDir    = fpd $home, $project;                                        # Folder containing generated verilog files
 my $verilogDir    = fpd $projectDir, q(verilog);                                # Folder containing generated verilog files
 my $vivadoDir     = fpd $projectDir, q(vivado);                                 # Folder containing vivado specific files
@@ -114,7 +113,16 @@ say STDERR dateTimeStamp, " Synthesize btreeBlock";                             
 #gen(qw(find   2));
 #gen(qw(delete 3));
 #gen(qw(put    1));
-gen(qw(find   2), $_) for 0..14;
-gen(qw(delete 3), $_) for 0..310;
-gen(qw(put    1), $_) for 0..334;
+
+if (1)                                                                          # Arrival time for each statement
+ {my @files = searchDirectoryTreesForMatchingFiles($verilogDir, qw(.tb));
+
+  for my $f(@files)
+   {if ($f =~ m(/(\w+)/(\d+)/statement/(\d+)/)igs)
+     {my ($project, $key, $statement) = ($1, $2, $3);
+      say STDERR "gen($project, $key, $statement);\n";
+     }
+   }
+ }
+
 say STDERR dateTimeStamp, " Finished";                                          # Done
