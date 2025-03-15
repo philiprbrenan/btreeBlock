@@ -34,7 +34,7 @@ class ProgramDM extends Test                                                    
   ProgramDM programDM() {return this;}                                          // Address containing class
 
   void addMemoryLayout(MemoryLayoutDM ml)                                       // This program uses this memory layout amongst others
-   {memories.add(ml);                                                           // The instruction to which this labels applies
+   {memories.add(ml);
    }
 
   class Label                                                                   // Label definition
@@ -128,13 +128,16 @@ class ProgramDM extends Test                                                    
 
   void traceMemory()                                                            // Trace memory
    {zz();
-    if (traceMemory != null)
-     {final StringBuilder s = new StringBuilder();
-      final boolean[]b = traceMemory.bits;
+    final StringBuilder S = new StringBuilder();
+    for(MemoryLayoutDM m : memories)
+     {final boolean[]b = m.memory().bits;
+      final StringBuilder s = new StringBuilder();
       for(int i = 0; i < b.length; i++) s.append(b[i] ? "1" : "0");             // Match iverilog
       s.reverse();
-      Trace.push(String.format("%4d  %4d  %s", steps, step, s));
+      S.append(m.name()+"="+s); S.append(" ");
      }
+    if (S.length() > 0) S.setLength(S.length() - 1);
+    Trace.push(String.format("%4d  %4d  %s", steps, step, S));
    }
 
   void run(String traceFile)                                                    // Run the program tracing to the named file
@@ -153,7 +156,7 @@ class ProgramDM extends Test                                                    
     traceMemory();
     if (steps >= maxSteps) stop("Out of steps: ", steps);
     running = false;
-    if (traceMemory != null) writeFile(traceFile, joinLines(Trace));            // Write the trace
+    writeFile(traceFile, joinLines(Trace));                                     // Write the trace
    }
 
   void run()                                                                    // Run the program tracing to a default file
