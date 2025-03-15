@@ -131,22 +131,13 @@ jobs:
         website: jdk.java.net
 
     - name: Verilog install
-      if: matrix.task == 'BtreeDM'
       run: |
         sudo apt install iverilog
-
-    - name: Install Tree
-      run:
-        sudo apt install tree
 
     - name: Position files in package
       run: |
         mkdir -p $c
         cp `find .  -name "*.java"` $c
-
-    - name: Files
-      run:
-        tree
 
     - name: Compile
       run: |
