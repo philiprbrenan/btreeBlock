@@ -4,6 +4,8 @@
 
 # Btree in a block
 
+An implementation of the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in synthesized, placed and routed Verilog targetted at a [Virtex7](https://www.amd.com/en/products/adaptive-socs-and-fpgas/fpga/virtex-7.html#product-table) [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array) .
+
 The reasons why you might want to get involved in this implementation of the
 [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in
 [Silicon](https://en.wikipedia.org/wiki/Silicon) rather than [software](https://en.wikipedia.org/wiki/Software) are:
@@ -25,24 +27,14 @@ in [Verilog](https://en.wikipedia.org/wiki/Verilog)
 to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program):
 ![Roadmap](flowChart/DevelopmentFlowChart.png)
 
-# Synthesis
+# Synthesis, Placement and Routing
 
-The [Verilog](https://en.wikipedia.org/wiki/Verilog) [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) has now been synthesized on an
-[fpga](https://en.wikipedia.org/wiki/Field-programmable_gate_array) as a prelude to implementing it
-as an [application specific integrated circuit](https://en.wikipedia.org/wiki/Application-specific_integrated_circuit) to
-implement the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [hardware](https://en.wikipedia.org/wiki/Digital_electronics) rather than [software](https://en.wikipedia.org/wiki/Software).
+The logs of the successful synthesis, placement and routing of the individual components of [Database on a Chip](http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html) on [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) can be see here:
 
-```
------------------------------------------------------------------------------------
-| Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Design       : doc
-| Design State : Synthesized
------------------------------------------------------------------------------------
-```
-
-The logs of the successful synthesis of the individual components of [Database on a Chip](http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html) on [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) can be see here:
  [find  ](https://github.com/philiprbrenan/btreeBlock/tree/main/verilog/find/vivado/reports),
+
  [put   ](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/put/vivado/reports),
+
  [delete](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/delete/vivado/reports),
 
 
