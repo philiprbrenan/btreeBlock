@@ -2018,8 +2018,8 @@ module $project(reset, stop, clock, Key, Data, data, found);                    
      `endif
 
      `ifdef SYNTHESIS
-        $T[$Key_at +:$Key_width ] <= Key;                                       // Load test key
-        $T[$Data_at+:$Data_width] <= Data;                                      // Load test data
+        T[$Key_at +:$Key_width ] <= Key;                                        // Load test key
+        T[$Data_at+:$Data_width] <= Data;                                       // Load test data
      `endif
     end
     else begin                                                                  // Run
