@@ -35,7 +35,7 @@ The logs of the successful synthesis, placement and routing of the individual co
 
  [put   ](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/put/vivado/reports),
 
- [delete](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/delete/vivado/reports),
+ [delete](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/delete/vivado/reports)
 
 
 # Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database)
