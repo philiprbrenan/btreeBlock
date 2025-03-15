@@ -156,11 +156,13 @@ class ProgramDM extends Test                                                    
     traceMemory();
     if (steps >= maxSteps) stop("Out of steps: ", steps);
     running = false;
-    writeFile(traceFile, joinLines(Trace));                                     // Write the trace
+    if (traceFile != null) writeFile(traceFile, joinLines(Trace));              // Write the trace
    }
 
   void run()                                                                    // Run the program tracing to a default file
-   {z(); run("trace/"+currentTestName()+".txt");
+   {z();
+    //run("trace/"+currentTestName()+".txt");
+    run(null);
    }
 
   void halt(final Object...O)                                                   // Halt execution with an explanatory message and traceback of current instruction
