@@ -1,4 +1,4 @@
-# Test 2025-03-15 at 05:18:15
+# Test 2025-03-15 at 05:20:14
 
 name: Test
 run-name: btreeBlock
@@ -33,7 +33,7 @@ jobs:
         website: jdk.java.net
 
     - name: Verilog install
-      if: matrix.task == 'BtreePA'
+      if: matrix.task == 'BtreeDM'
       run: |
         sudo apt install iverilog
 
