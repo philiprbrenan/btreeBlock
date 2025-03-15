@@ -159,7 +159,7 @@ abstract class StuckDM extends Test                                             
    {zz();
     P.new I()
      {void   a() {T.at(copyBitsKeys).setInt(T.at(copyCount).getInt()*bitsPerKey());}
-      String v() {return T.at(copyBitsKeys).verilogLoad()+ " <= " + T.at(copyCount).verilogLoad() + "*" + bitsPerKey()+";" + traceComment();}
+      String v() {return T.at(copyBitsKeys).verilogLoad()+ " <= " + T.at(copyCount).verilogLoad() + "*" + bitsPerKey()+"; /* copyKeys */";}
      };
     final MemoryLayoutDM.At ti = T.at(index);
     final MemoryLayoutDM.At si = source.T.at(source.index);
@@ -172,7 +172,7 @@ abstract class StuckDM extends Test                                             
    {zz();
     P.new I()
      {void   a() {T.at(copyBitsData).setInt(T.at(copyCount).getInt()*bitsPerData());}
-      String v() {return T.at(copyBitsData).verilogLoad()+ " <= " + T.at(copyCount).verilogLoad() + "*" + bitsPerData()+";";}
+      String v() {return T.at(copyBitsData).verilogLoad()+ " <= " + T.at(copyCount).verilogLoad() + "*" + bitsPerData()+"; /* copyData */";}
      };
     final MemoryLayoutDM.At ti = T.at(index);
     final MemoryLayoutDM.At si = source.T.at(source.index);
@@ -418,8 +418,7 @@ abstract class StuckDM extends Test                                             
 
     P.new I()                                                                   // Equals search key, in valid part of  stuck
      {void a()
-       {Found.setOff().setInt(0);                                               // Assume we will not find the key
-        final int s = Search           .setOff().getInt();                      // Key to search for
+       {final int s = Search           .setOff().getInt();                      // Key to search for
         final int X = M.at(currentSize).setOff().getInt();                      // Number of elements to search
         final int N = maxSize();                                                // Maximum number of elements to search
         for (int i = 0; i < N; i++)                                             // Search
@@ -446,13 +445,12 @@ abstract class StuckDM extends Test                                             
 
     P.new I()                                                                   // Equals search key and in valid part of stuck
      {void a()
-       {Found.setOff().setInt(0);                                               // Assume we will not find the key
-        final int N = maxSize();                                                // Maximum number of elements to search
+       {final int N = maxSize();                                                // Maximum number of elements to search
         for (int i = 0; i < N; i++)                                             // Search
          {z();
           final boolean e = T.at(equalLeafKey,     i).setOff().getInt() > 0;
           final boolean v = T.at(lessThanLeafSize, i).setOff().getInt() > 0;
-          T.at(equalLeafKey,     i).setInt(v && e ? 1 : 0);
+          T.at(equalLeafKey, i).setInt(v && e ? 1 : 0);
          }
        }
       String v()
@@ -471,16 +469,16 @@ abstract class StuckDM extends Test                                             
 
     P.new I()                                                                   // Found or not
      {void a()
-       {Found.setOff().setInt(0);                                               // Assume we will not find the key
-        final int N = maxSize();                                                // Maximum number of elements to search
+       {final int N = maxSize();                                                // Maximum number of elements to search
         boolean found = false;
-        Found.setOff();
-        Index.setOff();
-        Data .setOff();
+        Found.setOff().setInt(0);                                               // Assume we will not find the key
+        Index.setOff().setInt(0);
+        Data .setOff().setInt(0);
+
         for (int i = 0; i < N; i++)                                             // Search
          {z();
           final boolean f = T.at(equalLeafKey, i).setOff().getInt() > 0;        // Whether this key is in range and is equal
-          Found.setInt((f || Found.setOff().getInt() > 0) ? 1 : 0);             // Any key matched ?
+          if (f) Found.setInt(1);                                               // Any key matched ?
           if (f) Index.setInt(i);                                               // Save index if this key matched
           if (f) Data .setInt(M.at(sData, i).setOff().getInt());                // Save data if this key matched
          }
@@ -530,7 +528,7 @@ abstract class StuckDM extends Test                                             
         final String X = M.at(currentSize).verilogLoad()+ (all ? "" : "-1");    // Number of elements to search
         final int    N = maxSize();
 
-        v.append("/* StuckDM.search2.1 */\n");
+        v.append("/* searchFirstGreaterThanOrEqual1 */\n");
         for (int i = 0; i < N; i++)
          {v.append(T.at(equalLeafKey,     i).verilogLoad()+" <= "+M.at(sKey, i).verilogLoad()+" >= "+s+";\n");
           v.append(T.at(lessThanLeafSize, i).verilogLoad()+" <= "+i+                          " < " +X+";\n");
@@ -555,7 +553,7 @@ abstract class StuckDM extends Test                                             
        {final StringBuilder v = new StringBuilder();                            // Verilog
         final int           N = maxSize();
 
-        v.append("/* StuckDM.search2.2 */\n");
+        v.append("/* searchFirstGreaterThanOrEqual2 */\n");
         for (int i = 0; i < N; i++)
          {v.append(T.at(lessThanLeafSize, i).verilogLoad()+" <= ");
           v.append(T.at(equalLeafKey,     i).verilogLoad()+" >  0 && ");
@@ -590,7 +588,7 @@ abstract class StuckDM extends Test                                             
        {final StringBuilder v = new StringBuilder();                            // Verilog
         final int           N = maxSize();
 
-        v.append("/* StuckDM.search2.3 */\n");
+        v.append("/* searchFirstGreaterThanOrEqual3 */\n");
         if (Found != null)                                                      // Found
          {v.append(Found.verilogLoad()+" = 0");
           for (int i = 0; i < N; i++) v.append(" || "+T.at(equalLeafKey, i).verilogLoad() + " > 0");
@@ -663,7 +661,7 @@ abstract class StuckDM extends Test                                             
       String v()
        {return Target.T.at(Target.size).verilogLoad() + " <= " +
                Target.T.at(Target.size).verilogLoad() + " +  " +
-               Source.T.at(Source.size).verilogLoad() + ";";
+               Source.T.at(Source.size).verilogLoad() + "; /* concatenate */";
        }
      };
     Target.setSize();
@@ -692,6 +690,11 @@ abstract class StuckDM extends Test                                             
          (Target.T.at(Target.size).getInt() +
           Source.T.at(Source.size).getInt());
        }
+      String v()
+       {return Target.T.at(Target.size).verilogLoad() + " <= "+
+          Target.T.at(Target.size).verilogLoad() + " + " +
+          Source.T.at(Source.size).verilogLoad() + "; /* prepend */";
+       }
      };
     Target.setSize();
    }
@@ -706,7 +709,7 @@ abstract class StuckDM extends Test                                             
 
     P.new I()                                                                   // Set size of low
      {void   a() {Low.T.at(Low.size).setInt(H);}                                // Size of half in elements
-      String v() {return Low.T.at(Low.size).verilogLoad() + " <= "+H+";";}      // Size of half in elements
+      String v() {return Low.T.at(Low.size).verilogLoad() + " <= "+H+"; /* split */";} // Size of half in elements
      };
 
     P.parallelStart();   Low.setSize();                                         // Set size of lower half
@@ -742,8 +745,8 @@ abstract class StuckDM extends Test                                             
     Source.setSize();
    }
 
-  void splitHigh(StuckDM High)                                                  // Split out the upper half of a full stuck
-   {zz(); action = "splitHigh";
+  void splitHigh(StuckDM High)                                                  // Split out the upper half of a full stuck. Not actually used but included for completeness even though we probably are not going to need it.
+   {z(); action = "splitHigh";
     final int H = High.maxSize()>>1;                                            // Should check theat Low, High, Source all have the same shape
     final StuckDM Source = this;
     checkSameProgram(High);                                                     // Confirm that we are writing into the same program
