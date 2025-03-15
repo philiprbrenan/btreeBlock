@@ -1,4 +1,4 @@
-# Test 2025-03-15 at 05:09:53
+# Test 2025-03-15 at 05:11:28
 
 name: Test
 run-name: btreeBlock
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        task: [ProgramDM, Test]
+        task: [BtreeDM]
 
     steps:
     - uses: actions/checkout@v4
@@ -54,14 +54,8 @@ jobs:
       run: |
         javac -g -d Classes -cp Classes `find com/AppaApps/Silicon -name "*.java"`
 
-    - name: Test ProgramDM
-      if: matrix.task == 'ProgramDM'
+    - name: Test BtreeDM
+      if: matrix.task == 'BtreeDM'
       run: |
-        java -cp Classes com/AppaApps/Silicon/ProgramDM
-
-
-    - name: Test Test
-      if: matrix.task == 'Test'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/Test
+        java -cp Classes com/AppaApps/Silicon/BtreeDM
 
