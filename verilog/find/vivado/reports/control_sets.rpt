@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sat Mar 15 16:12:08 2025
+| Date         : Sat Mar 15 20:33:06 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_control_sets -file /home/azureuser/btreeBlock/verilog/find/vivado/reports/control_sets.rpt
 | Design       : find
@@ -22,8 +22,8 @@ Table of Contents
 +---------------------------------------------------+-------+
 |                       Status                      | Count |
 +---------------------------------------------------+-------+
-| Total control sets                                |  1109 |
-|    Minimum number of control sets                 |  1109 |
+| Total control sets                                |     1 |
+|    Minimum number of control sets                 |     1 |
 |    Addition due to synthesis replication          |     0 |
 |    Addition due to physical synthesis replication |     0 |
 +---------------------------------------------------+-------+
@@ -37,15 +37,15 @@ Table of Contents
 +--------------------+-------+
 |       Fanout       | Count |
 +--------------------+-------+
-| Total control sets |  1109 |
-| >= 0 to < 4        |  1102 |
-| >= 4 to < 6        |     1 |
+| Total control sets |     1 |
+| >= 0 to < 4        |     1 |
+| >= 4 to < 6        |     0 |
 | >= 6 to < 8        |     0 |
 | >= 8 to < 10       |     0 |
 | >= 10 to < 12      |     0 |
 | >= 12 to < 14      |     0 |
 | >= 14 to < 16      |     0 |
-| >= 16              |     6 |
+| >= 16              |     0 |
 +--------------------+-------+
 * Control sets can be remapped at either synth_design or opt_design
 
@@ -58,10 +58,10 @@ Table of Contents
 +--------------+-----------------------+------------------------+-----------------+--------------+
 | No           | No                    | No                     |               0 |            0 |
 | No           | No                    | Yes                    |               0 |            0 |
-| No           | Yes                   | No                     |            2655 |            0 |
-| Yes          | No                    | No                     |            3520 |            0 |
+| No           | Yes                   | No                     |               1 |            0 |
+| Yes          | No                    | No                     |               0 |            0 |
 | Yes          | No                    | Yes                    |               0 |            0 |
-| Yes          | Yes                   | No                     |            4530 |            0 |
+| Yes          | Yes                   | No                     |               0 |            0 |
 +--------------+-----------------------+------------------------+-----------------+--------------+
 
 
