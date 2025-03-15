@@ -88,13 +88,13 @@ alias t='top -u azureuser -E g'
 alias x='bash ~/btreeBlock/j.sh
 END
 
-my @java = map {fn $_}  grep {fe($_) eq q(java) && fn($_) !~ m(Able\Z)} @files; # Java files to test do not include interfaces
-#  @java = grep {fn($_) !~ /BtreeDM/} @java;                                    # Still working on this so it will not work yet
+if (1)                                                                          # Write workflow
+ {my @j = map {fn $_}  grep {fn($_) !~ m(Able\Z)}                               # Java files to test do not include interfaces
+          searchDirectoryTreesForMatchingFiles($home, qw(.java));               # Java files
 
-if (@java)                                                                      # Write workflow
- {my $d = dateTimeStamp;
+  my $d = dateTimeStamp;
   my $c = q(com/AppaApps/Silicon);                                              # Package to classes folder
-  my $j = join ', ', @java;                                                     # Java files
+  my $j = join ', ', @j;                                                        # Java files
   my $y = <<"END";
 # Test $d
 
@@ -153,7 +153,7 @@ jobs:
         javac -g -d Classes -cp Classes `find $c -name "*.java"`
 END
 
-  for my $j(@java)                                                              # Java files
+  for my $j(@j)                                                                 # Java files
    {$y .= <<END;
 
     - name: Test $j
