@@ -1915,25 +1915,23 @@ abstract class BtreeDM extends Test                                             
      }
 
     void declareMemories()                                                      // Declare memories
-     {final StringBuilder s = new StringBuilder();
-      for(MemoryLayoutDM m : P.memories)
-       {final int    N = m.size();
-        final String n = m.name;
-        s.append("  reg["+N+"-1 : 0] "+n+";\n");
+     {zz();
+      final StringBuilder s = new StringBuilder();
+      for(MemoryLayoutDM m : P.memories)                                        // Each memory used by the program
+       {s.append("  reg["+m.size()+"-1 : 0] "+m.name+";\n");                    // Declare the memory
        }
       writeFile(declareMemory, s);
      }
 
     void initializeMemories()                                                   // Initialize memories
      {final StringBuilder s = new StringBuilder();
-      for(MemoryLayoutDM m : P.memories)
+      for(MemoryLayoutDM m : P.memories)                                        // Each memory declared by the program
        {final int    N = m.size();
-        final String n = m.name;
-        final StringBuilder S = new StringBuilder();                            // Initializer
+        final StringBuilder S = new StringBuilder();
         for (int i = 0; i < N; i++) S.append(m.getBit(i) ? 1 : 0);
         removeAllButLastTrailingZero(S);
         S.reverse();
-        s.append("  "+n+" <= "+N+"'b"+S+";\n");
+        s.append("  "+m.name+" <= "+N+"'b"+S+";\n");                            // Initialize memory
        }
       writeFile(initializeMemory, s);
      }
