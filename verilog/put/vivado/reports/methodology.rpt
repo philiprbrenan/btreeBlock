@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Tue Mar  4 15:43:49 2025
+| Date         : Sat Mar 15 15:15:49 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_methodology -file /home/azureuser/btreeBlock/verilog/put/vivado/reports/methodology.rpt
 | Design       : put
@@ -23,11 +23,11 @@ Table of Contents
           Floorplan: put
       Design limits: <entire design considered>
              Max checks: <unlimited>
-             Checks found: 13
+             Checks found: 16
 +-----------+----------+-------------------------------+--------+
 | Rule      | Severity | Description                   | Checks |
 +-----------+----------+-------------------------------+--------+
-| TIMING-18 | Warning  | Missing input or output delay | 13     |
+| TIMING-18 | Warning  | Missing input or output delay | 16     |
 +-----------+----------+-------------------------------+--------+
 
 2. REPORT DETAILS
@@ -49,50 +49,65 @@ Related violations: <none>
 
 TIMING-18#4 Warning
 Missing input or output delay  
-An input delay is missing on Key[0] relative to the rising and/or falling clock edge(s) of clock.
+An input delay is missing on Data[3] relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#5 Warning
 Missing input or output delay  
-An input delay is missing on Key[1] relative to the rising and/or falling clock edge(s) of clock.
+An input delay is missing on Key[0] relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#6 Warning
 Missing input or output delay  
-An input delay is missing on Key[2] relative to the rising and/or falling clock edge(s) of clock.
+An input delay is missing on Key[1] relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#7 Warning
 Missing input or output delay  
-An input delay is missing on Key[3] relative to the rising and/or falling clock edge(s) of clock.
+An input delay is missing on Key[2] relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#8 Warning
 Missing input or output delay  
-An input delay is missing on reset relative to the rising and/or falling clock edge(s) of clock.
+An input delay is missing on Key[3] relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#9 Warning
 Missing input or output delay  
-An output delay is missing on data[0] relative to the rising and/or falling clock edge(s) of clock.
+An input delay is missing on Key[4] relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#10 Warning
 Missing input or output delay  
-An output delay is missing on data[1] relative to the rising and/or falling clock edge(s) of clock.
+An input delay is missing on reset relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#11 Warning
 Missing input or output delay  
-An output delay is missing on data[2] relative to the rising and/or falling clock edge(s) of clock.
+An output delay is missing on data[0] relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#12 Warning
 Missing input or output delay  
-An output delay is missing on found relative to the rising and/or falling clock edge(s) of clock.
+An output delay is missing on data[1] relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 TIMING-18#13 Warning
+Missing input or output delay  
+An output delay is missing on data[2] relative to the rising and/or falling clock edge(s) of clock.
+Related violations: <none>
+
+TIMING-18#14 Warning
+Missing input or output delay  
+An output delay is missing on data[3] relative to the rising and/or falling clock edge(s) of clock.
+Related violations: <none>
+
+TIMING-18#15 Warning
+Missing input or output delay  
+An output delay is missing on found relative to the rising and/or falling clock edge(s) of clock.
+Related violations: <none>
+
+TIMING-18#16 Warning
 Missing input or output delay  
 An output delay is missing on stop relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
