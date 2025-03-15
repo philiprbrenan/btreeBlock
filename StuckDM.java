@@ -590,26 +590,26 @@ abstract class StuckDM extends Test                                             
 
         v.append("/* searchFirstGreaterThanOrEqual3 */\n");
         if (Found != null)                                                      // Found
-         {v.append(Found.verilogLoad()+" = 0");
+         {v.append(Found.verilogLoad()+" <= 0");
           for (int i = 0; i < N; i++) v.append(" || "+T.at(equalLeafKey, i).verilogLoad() + " > 0");
           v.append(";\n");
          }
 
         if (Index != null)                                                      // Index
-         {v.append(Index.verilogLoad()+" = ");
+         {v.append(Index.verilogLoad()+" <= ");
           for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+i+" : ");
           if (all) v.append(M.at(currentSize).verilogLoad() + ";\n");           // Normal index
           else     v.append(M.at(currentSize).verilogLoad() + " -1;\n");        // Index one back
          }
 
         if (Key != null)                                                        // Key
-         {v.append(Key.verilogLoad()+" = ");
+         {v.append(Key.verilogLoad()+" <= ");
           for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+M.at(sKey, i).verilogLoad()+" : ");
           v.append("0;\n");                                                     // Not found so it can be anything
          }
 
         if (Data != null)
-         {v.append(Data.verilogLoad()+" = ");                                  // Data
+         {v.append(Data.verilogLoad()+" <= ");                                  // Data
           for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+M.at(sData, i).verilogLoad()+" : ");
           if (all) v.append(M.at(sData, M.at(currentSize)).verilogLoad() + ";\n");              // Normal address
           else     v.append(M.at(sData, M.at(currentSize)).verilogLoadAddr(false, -1) + ";\n"); // Address one back
