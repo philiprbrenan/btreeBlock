@@ -111,10 +111,10 @@ else
  }
 
 say STDERR dateTimeStamp, " Synthesize btreeBlock";                             # Synthesize the verilog description
-gen(qw(find   2));
-gen(qw(delete 2));
-gen(qw(put    2));
+#gen(qw(find   2));
+#gen(qw(delete 3));
+#gen(qw(put    1));
 gen(qw(find   2), $_) for 0..14;
-gen(qw(delete 2), $_) for 0..310;
-gen(qw(put    2), $_) for 0..334;
+gen(qw(delete 3), $_) for 0..310;
+gen(qw(put    1), $_) for 0..334;
 say STDERR dateTimeStamp, " Finished";                                          # Done
