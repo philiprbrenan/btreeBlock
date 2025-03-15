@@ -15,6 +15,10 @@ A more detailed presentation:
 
 http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html
 
+# Installation
+
+See this [action](https://github.com/philiprbrenan/btreeBlock/blob/main/.github/workflows/main.yml).
+
 # Roadmap
 
 I implemented the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [Java](https://en.wikipedia.org/wiki/Java_(programming_language)), then successively reduced the [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) [code](https://en.wikipedia.org/wiki/Computer_program) until it looked just like [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program), at which point it was easy to
