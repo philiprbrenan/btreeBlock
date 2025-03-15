@@ -130,10 +130,7 @@ class ProgramDM extends Test                                                    
    {zz();
     final StringBuilder S = new StringBuilder();
     for(MemoryLayoutDM m : memories)
-     {final boolean[]b = m.memory().bits;
-      final StringBuilder s = new StringBuilder();
-      for(int i = 0; i < b.length; i++) s.append(b[i] ? "1" : "0");             // Match iverilog
-      s.reverse();
+     {final StringBuilder s = m.memory().print();
       S.append(m.name()+"="+s); S.append(" ");
      }
     if (S.length() > 0) S.setLength(S.length() - 1);
