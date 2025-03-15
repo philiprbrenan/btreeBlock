@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sun Mar  2 17:10:31 2025
+| Date         : Sat Mar 15 06:59:19 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_utilization -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/utilization.rpt
 | Design       : delete
@@ -31,18 +31,18 @@ Table of Contents
 1. Slice Logic
 --------------
 
-+-------------------------+--------+-------+------------+-----------+-------+
-|        Site Type        |  Used  | Fixed | Prohibited | Available | Util% |
-+-------------------------+--------+-------+------------+-----------+-------+
-| Slice LUTs*             | 126956 |     0 |          0 |   1221600 | 10.39 |
-|   LUT as Logic          | 126956 |     0 |          0 |   1221600 | 10.39 |
-|   LUT as Memory         |      0 |     0 |          0 |    344800 |  0.00 |
-| Slice Registers         |  63016 |     0 |          0 |   2443200 |  2.58 |
-|   Register as Flip Flop |  63016 |     0 |          0 |   2443200 |  2.58 |
-|   Register as Latch     |      0 |     0 |          0 |   2443200 |  0.00 |
-| F7 Muxes                |      0 |     0 |          0 |    610800 |  0.00 |
-| F8 Muxes                |      0 |     0 |          0 |    305400 |  0.00 |
-+-------------------------+--------+-------+------------+-----------+-------+
++-------------------------+-------+-------+------------+-----------+-------+
+|        Site Type        |  Used | Fixed | Prohibited | Available | Util% |
++-------------------------+-------+-------+------------+-----------+-------+
+| Slice LUTs*             | 91774 |     0 |          0 |   1221600 |  7.51 |
+|   LUT as Logic          | 91774 |     0 |          0 |   1221600 |  7.51 |
+|   LUT as Memory         |     0 |     0 |          0 |    344800 |  0.00 |
+| Slice Registers         | 68878 |     0 |          0 |   2443200 |  2.82 |
+|   Register as Flip Flop | 68878 |     0 |          0 |   2443200 |  2.82 |
+|   Register as Latch     |     0 |     0 |          0 |   2443200 |  0.00 |
+| F7 Muxes                |     0 |     0 |          0 |    610800 |  0.00 |
+| F8 Muxes                |     0 |     0 |          0 |    305400 |  0.00 |
++-------------------------+-------+-------+------------+-----------+-------+
 * Warning! The Final LUT count, after physical optimizations and full implementation, is typically lower. Run opt_design after synthesis, if not already completed, for a more realistic count.
 Warning! LUT value is adjusted to account for LUT combining.
 Warning! For any ECO changes, please run place_design if there are unplaced instances
@@ -62,8 +62,8 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 | 0     |          Yes |           - |            - |
 | 0     |          Yes |           - |          Set |
 | 0     |          Yes |           - |        Reset |
-| 4650  |          Yes |         Set |            - |
-| 58366 |          Yes |       Reset |            - |
+| 7844  |          Yes |         Set |            - |
+| 61034 |          Yes |       Reset |            - |
 +-------+--------------+-------------+--------------+
 
 
@@ -96,9 +96,9 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 +-----------------------------+------+-------+------------+-----------+-------+
 |          Site Type          | Used | Fixed | Prohibited | Available | Util% |
 +-----------------------------+------+-------+------------+-----------+-------+
-| Bonded IOB                  |   11 |    11 |          0 |      1200 |  0.92 |
+| Bonded IOB                  |   13 |    13 |          0 |      1200 |  1.08 |
 |   IOB Master Pads           |    8 |       |            |           |       |
-|   IOB Slave Pads            |    3 |       |            |           |       |
+|   IOB Slave Pads            |    4 |       |            |           |       |
 | Bonded IPADs                |    0 |     0 |          0 |        50 |  0.00 |
 | Bonded OPADs                |    0 |     0 |          0 |        32 |  0.00 |
 | PHY_CONTROL                 |    0 |     0 |          0 |        24 |  0.00 |
@@ -159,16 +159,15 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 +----------+-------+---------------------+
 | Ref Name |  Used | Functional Category |
 +----------+-------+---------------------+
-| LUT6     | 69165 |                 LUT |
-| FDRE     | 58366 |        Flop & Latch |
-| LUT5     | 35633 |                 LUT |
-| LUT4     | 12226 |                 LUT |
-| LUT3     | 11889 |                 LUT |
-| LUT2     |  4870 |                 LUT |
-| FDSE     |  4650 |        Flop & Latch |
-| LUT1     |   486 |                 LUT |
-| IBUF     |     6 |                  IO |
-| OBUF     |     5 |                  IO |
+| FDRE     | 61034 |        Flop & Latch |
+| LUT2     | 28322 |                 LUT |
+| LUT6     | 23181 |                 LUT |
+| LUT5     | 18754 |                 LUT |
+| LUT4     | 13618 |                 LUT |
+| LUT3     | 10199 |                 LUT |
+| FDSE     |  7844 |        Flop & Latch |
+| IBUF     |     7 |                  IO |
+| OBUF     |     6 |                  IO |
 | CARRY4   |     3 |          CarryLogic |
 | BUFG     |     2 |               Clock |
 +----------+-------+---------------------+
@@ -248,11 +247,11 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 | SLR Index | Used IOBs | (%)IOBs | Used IPADs | (%)IPADs | Used OPADs | (%)OPADs | GTs |
 +-----------+-----------+---------+------------+----------+------------+----------+-----+
 | SLR3      |         0 |    0.00 |          0 |     0.00 |          0 |     0.00 |   0 |
-| SLR2      |         6 |    2.00 |          0 |     0.00 |          0 |     0.00 |   0 |
-| SLR1      |         3 |    1.00 |          0 |     0.00 |          0 |     0.00 |   0 |
+| SLR2      |         7 |    2.33 |          0 |     0.00 |          0 |     0.00 |   0 |
+| SLR1      |         4 |    1.33 |          0 |     0.00 |          0 |     0.00 |   0 |
 | SLR0      |         2 |    0.67 |          0 |     0.00 |          0 |     0.00 |   0 |
 +-----------+-----------+---------+------------+----------+------------+----------+-----+
-| Total     |        11 |         |          0 |          |          0 |          |   0 |
+| Total     |        13 |         |          0 |          |          0 |          |   0 |
 +-----------+-----------+---------+------------+----------+------------+----------+-----+
 
 
