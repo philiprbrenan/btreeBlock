@@ -6,9 +6,9 @@
 
 An implementation of the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in synthesized, placed and routed Verilog targeted at a [Virtex7](https://www.amd.com/en/products/adaptive-socs-and-fpgas/fpga/virtex-7.html#product-table) [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array) .
 
-The reasons why you might want to get involved in this implementation of the
+For reasons why you might want to get involved in this implementation of the
 [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in
-[Silicon](https://en.wikipedia.org/wiki/Silicon) rather than [software](https://en.wikipedia.org/wiki/Software) are:
+[Silicon](https://en.wikipedia.org/wiki/Silicon) rather than [software](https://en.wikipedia.org/wiki/Software) see:
 
 https://prb.appaapps.com/zesal/presentation/index.html
 
