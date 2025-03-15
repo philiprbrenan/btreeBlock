@@ -125,10 +125,9 @@ jobs:
       with:
         ref: 'main'
 
-    - name: 'JDK 22'
-      uses: oracle-actions/setup-java\@v1
-      with:
-        website: jdk.java.net
+    - name: 'Java'
+      run: |
+        sudo apt install default-jdk
 
     - name: Verilog install
       run: |
@@ -143,6 +142,11 @@ jobs:
       run: |
         javac -g -d Classes -cp Classes `find $c -name "*.java"`
 END
+
+#    - name: 'JDK 22'
+#      uses: oracle-actions/setup-java\@v1
+#      with:
+#        website: jdk.java.net
 
   for my $j(@j)                                                                 # Java files
    {$y .= <<END;
