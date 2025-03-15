@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sun Mar  2 02:49:30 2025
+| Date         : Sat Mar 15 16:12:23 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_high_fanout_nets -file /home/azureuser/btreeBlock/verilog/find/vivado/reports/high_fanout_nets.rpt
 | Design       : find
@@ -13,19 +13,19 @@ High Fan-out Nets Information
 1. Summary
 ----------
 
-+----------------------------------------------+--------+-------------+
-| Net Name                                     | Fanout | Driver Type |
-+----------------------------------------------+--------+-------------+
-| T_440_out__0                                 |   1762 | IBUF        |
-| branch_0_StuckSA_Transaction_47[94]_i_92_n_0 |    138 | LUT4        |
-| leaf_0_StuckSA_Transaction_59[94]_i_96_n_0   |    138 | LUT3        |
-| branch_0_StuckSA_Transaction_47[94]_i_94_n_0 |    137 | LUT3        |
-| leaf_0_StuckSA_Transaction_59[94]_i_97_n_0   |    137 | LUT2        |
-| p_7_in__0_inst_i_69_n_0                      |    136 | LUT6        |
-| p_7_in__0_inst_i_70_n_0                      |    135 | LUT5        |
-| T_44[31]_i_82_n_0                            |    132 | LUT3        |
-| T_44[31]_i_54_n_0                            |    132 | LUT3        |
-| T_44[31]_i_83_n_0                            |    131 | LUT3        |
-+----------------------------------------------+--------+-------------+
++------------------------------------+--------+-------------+
+| Net Name                           | Fanout | Driver Type |
++------------------------------------+--------+-------------+
+| reset__0                           |  10235 | IBUF        |
+| T[137]_i_1_n_0                     |   2730 | LUT5        |
+| bT_StuckSA_Memory[38]_i_2_n_0      |   2300 | LUT6        |
+| bT_StuckSA_Transaction[73]_i_1_n_0 |   1240 | LUT4        |
+| nT[43]_i_1_n_0                     |   1156 | LUT4        |
+| bT_StuckSA_Memory[38]_i_3_n_0      |   1142 | LUT6        |
+| bT_StuckSA_Memory[38]_i_4_n_0      |   1142 | LUT6        |
+| bT_StuckSA_Memory[38]_i_5_n_0      |   1142 | LUT6        |
+| nT[43]_i_21_n_0                    |    518 | LUT6        |
+| T1_out[3]__0                       |    389 | IBUF        |
++------------------------------------+--------+-------------+
 
 
