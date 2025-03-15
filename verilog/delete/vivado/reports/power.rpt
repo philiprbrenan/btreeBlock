@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date             : Sun Mar  2 17:10:21 2025
+| Date             : Sat Mar 15 06:59:11 2025
 | Host             : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command          : report_power -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/power.rpt
 | Design           : delete
@@ -30,10 +30,10 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.795        |
+| Total On-Chip Power (W)  | 0.785        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 0.157        |
+| Dynamic (W)              | 0.147        |
 | Device Static (W)        | 0.638        |
 | Effective TJA (C/W)      | 0.8          |
 | Max Ambient (C)          | 84.3         |
@@ -52,17 +52,17 @@ Table of Contents
 +----------------+-----------+----------+-----------+-----------------+
 | On-Chip        | Power (W) | Used     | Available | Utilization (%) |
 +----------------+-----------+----------+-----------+-----------------+
-| Clocks         |     0.024 |        3 |       --- |             --- |
-| Slice Logic    |     0.066 |   197291 |       --- |             --- |
-|   LUT as Logic |     0.066 |   126956 |   1221600 |           10.39 |
-|   Register     |    <0.001 |    63016 |   2443200 |            2.58 |
+| Clocks         |     0.034 |        3 |       --- |             --- |
+| Slice Logic    |     0.055 |   162958 |       --- |             --- |
+|   LUT as Logic |     0.054 |    91774 |   1221600 |            7.51 |
+|   Register     |    <0.001 |    68878 |   2443200 |            2.82 |
 |   CARRY4       |    <0.001 |        3 |    305400 |           <0.01 |
 |   BUFG         |    <0.001 |        1 |       128 |            0.78 |
 |   Others       |     0.000 |        2 |       --- |             --- |
-| Signals        |     0.067 |   197305 |       --- |             --- |
-| I/O            |    <0.001 |       11 |      1200 |            0.92 |
+| Signals        |     0.058 |   162973 |       --- |             --- |
+| I/O            |    <0.001 |       13 |      1200 |            1.08 |
 | Static Power   |     0.638 |          |           |                 |
-| Total          |     0.795 |          |           |                 |
+| Total          |     0.785 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
 
 
@@ -72,7 +72,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     0.467 |       0.157 |      0.311 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     0.457 |       0.147 |      0.311 |       NA    | Unspecified | NA         |
 | Vccaux    |       1.800 |     0.099 |       0.000 |      0.099 |       NA    | Unspecified | NA         |
 | Vcco33    |       3.300 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -145,7 +145,7 @@ Table of Contents
 +--------+-----------+
 | Name   | Power (W) |
 +--------+-----------+
-| delete |     0.157 |
+| delete |     0.147 |
 +--------+-----------+
 
 
