@@ -63,7 +63,7 @@ if  (1)                                                                         
  }
 else                                                                            # Upload files via git
  {my $g = join " ", @files;
-  qx(git add $g; git commit -m aaa; git push --force);                           # Force used to overcome changes to workflow file which is used as a surrogate for any change
+  qx(git add $g; git commit -m aaa; git push --force);                          # Force used to overcome changes to workflow file which is used as a surrogate for any change
  }
 
 writeFileUsingSavedToken($user, $repo, q(.config/geany/snippets.conf),          # Save the snippets file as this was the thing I missed most after a rebuild
