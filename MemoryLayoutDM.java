@@ -47,7 +47,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
   String  name    () {z(); return name;}                                        // Name of this memory layout
   Layout  layout  () {z(); return layout;}                                      // Get the layout in use
 
-  int size () {z(); return layout != null ? layout.size() : memory.bits.length;}// Size of memory
+  int size () {z(); return memory.size();}                                      // Size of associated memory
 
   void clear()                                                                  // Clear underlying memory
    {z();
@@ -80,11 +80,11 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
 //D1 Get and Set                                                                // Get and set values in memory but only during testing
 
   boolean getBit(int index)                                                     // Get a bit from the memory layout
-   {zz();return memory.bits[index];
+   {zz();return memory.getBit(index);
    }
 
   void setBit(int index, boolean value)                                         // Set a value in memory occupied by the layout
-   {zz(); memory.bits[index] = value;
+   {zz(); memory.set(index, value);
    }
 
   int  getInt(Layout.Field field, int...indices)                                // Get a value from memory occupied by the layout
