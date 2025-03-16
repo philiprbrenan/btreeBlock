@@ -8,9 +8,10 @@ use Data::Table::Text qw(:all);
 # Clock was k11 now C7
 my $project       = q(btreeBlock);                                              # The name of the project
 my $part          = q(xc7a50tcpg236);                                           # 50K
-#  $part          = q(xc7a200tffv1156-2);                                       # 150K - good
-#  $part          = q(xc7v2000tflg1925-1);                                      # 1 million - good
+#  $part          = q(xc7a200tffv1156-2);                                       # 150K
+#  $part          = q(xc7v2000tflg1925-1);                                      # 1 million
 #  $part          = q(xcvu440-flga2892-1-c);                                    # 5 million
+my $statements    = 1;                                                          # Time statements individually if true else delete/find/put components
 
 my $home          = $ENV{HOME};                                                 # Home
 my $local         = "/home/phil";                                               # Home on local machine
@@ -31,10 +32,10 @@ sub gen                                                                         
   my @statement = defined($statement) ? (q(statement), $statement) : ();        # Address statement files
 
   my $designDir   = fpd $verilogDir, $design, $key, @statement;                 # Location of project input files
-  my $designOut   = fpd $verilogDir, $design, qw(vivado);                       # Location of project output files
-  my $includesDir = fpd $designDir, qw(includes);                               # Set the path to the includes directory
-  my $reportsDir  = fpd $designOut, qw(reports);                                # Reports
-  my $dcpDir      = fpd $designOut, qw(dcp);                                    # Checkpoints
+  my $designOut   = fpd $$designDir, qw(vivado);                                # Location of project output files
+  my $includesDir = fpd $designDir,  qw(includes);                              # Set the path to the includes directory
+  my $reportsDir  = fpd $designOut,  qw(reports);                               # Reports
+  my $dcpDir      = fpd $designOut,  qw(dcp);                                   # Checkpoints
   my $synthesis   = fpe $vivadoDir,      $design, qw(tcl);                      # Generated vivado commands
   my $constraints = fpe $constraintsDir, $part,   qw(xdc);                      # Constraints file
   my $final       = fpe $designOut,      $design, qw(bit);                      # Final output bit stream
@@ -44,7 +45,8 @@ sub gen                                                                         
   my $opt         = fpe $dcpDir, qw(opt   dcp);                                 # After optimization checkpoint
   my $synth       = fpe $dcpDir, qw(synth dcp);                                 # After synthesis checkpoint
   my $timingRoute = fpe $reportsDir, qw(timing_route rpt);                      # Timing after routing
-  if (defined($statement) and -e $timingRoute)                                  # File has already been created
+
+  if (defined($statement) and -e $timingRoute)                                  # Timing file has already been created
    {say STDERR "Exists: $timingRoute";
     return;
    }
@@ -93,7 +95,7 @@ write_checkpoint -force $place
 
 route_design -directive Quick
 write_checkpoint -force $route
-report_timing_summary    -file ${reportsDir}timing_route.rpt
+report_timing_summary    -file $timingRoute
 
 write_bitstream  -force $final
 END
@@ -112,13 +114,16 @@ else
   system("cd $projectDir; bash j.sh BtreeDM");
  }
 
-say STDERR dateTimeStamp, " Synthesize btreeBlock";                             # Synthesize the verilog description
-gen(qw(find   2));
-gen(qw(delete 3));
-gen(qw(put    1));
 
-if (1)                                                                          # Arrival time for each statement
- {my @files = searchDirectoryTreesForMatchingFiles($verilogDir, qw(.tb));
+if (!$statements)                                                               # Synthesize, place and route the verilog description
+ {say STDERR dateTimeStamp, " Synthesize, place and route btreeBlock";
+  gen(qw(find   2));
+  gen(qw(delete 3));
+  gen(qw(put    1));
+ }
+else                                                                            # Arrival time for each statement
+ {say STDERR dateTimeStamp, " Time individual statements";
+  my @files = searchDirectoryTreesForMatchingFiles($verilogDir, qw(.tb));
 
   for my $f(@files)
    {if ($f =~ m(/(\w+)/(\d+)/statement/(\d+)/)igs)
