@@ -1,12 +1,12 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sat Mar 15 17:08:50 2025
+| Date         : Sun Mar 16 21:51:18 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_timing_summary -file /home/azureuser/btreeBlock/verilog/put/vivado/reports/timing_summary.rpt
 | Design       : put
-| Device       : 7v2000t-flg1925
-| Speed File   : -1  PRODUCTION 1.10 2014-09-11
+| Device       : 7a50t-cpg236
+| Speed File   : -3  PRODUCTION 1.23 2018-06-13
 | Design State : Optimized
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ Timing Summary Report
 
 Rule       Severity  Description                    Violations  
 ---------  --------  -----------------------------  ----------  
-TIMING-18  Warning   Missing input or output delay  16          
+TIMING-18  Warning   Missing input or output delay  15          
 
 Note: This report is based on the most recent report_methodology run and may not be up-to-date. Run report_methodology on the current design for the latest report.
 
@@ -58,7 +58,7 @@ Table of Contents
 3. checking pulse_width_clock (0)
 4. checking unconstrained_internal_endpoints (0)
 5. checking no_input_delay (10)
-6. checking no_output_delay (6)
+6. checking no_output_delay (5)
 7. checking multiple_clock (0)
 8. checking generated_clocks (0)
 9. checking loops (0)
@@ -95,9 +95,9 @@ Table of Contents
  There are 0 input ports with no input delay but user has a false path constraint.
 
 
-6. checking no_output_delay (6)
+6. checking no_output_delay (5)
 -------------------------------
- There are 6 ports with no output delay specified. (HIGH)
+ There are 5 ports with no output delay specified. (HIGH)
 
  There are 0 ports with no output delay but user has a false path constraint
 
@@ -142,7 +142,7 @@ Table of Contents
 
     WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
     -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
-     91.999        0.000                      0               132088        0.056        0.000                      0               132088       49.650        0.000                       0                 77801  
+     92.023        0.000                      0                 2379        0.138        0.000                      0                 2379       49.500        0.000                       0                  1682  
 
 
 All user specified timing constraints are met.
@@ -165,7 +165,7 @@ clock  {0.000 50.000}       100.000         10.000
 
 Clock             WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
 -----             -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
-clock              91.999        0.000                      0               132088        0.056        0.000                      0               132088       49.650        0.000                       0                 77801  
+clock              92.023        0.000                      0                 2379        0.138        0.000                      0                 2379       49.500        0.000                       0                  1682  
 
 
 ------------------------------------------------------------------------------------------------
@@ -196,28 +196,28 @@ Path Group    From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing 
 From Clock:  clock
   To Clock:  clock
 
-Setup :            0  Failing Endpoints,  Worst Slack       91.999ns,  Total Violation        0.000ns
-Hold  :            0  Failing Endpoints,  Worst Slack        0.056ns,  Total Violation        0.000ns
-PW    :            0  Failing Endpoints,  Worst Slack       49.650ns,  Total Violation        0.000ns
+Setup :            0  Failing Endpoints,  Worst Slack       92.023ns,  Total Violation        0.000ns
+Hold  :            0  Failing Endpoints,  Worst Slack        0.138ns,  Total Violation        0.000ns
+PW    :            0  Failing Endpoints,  Worst Slack       49.500ns,  Total Violation        0.000ns
 ---------------------------------------------------------------------------------------------------
 
 
 Max Delay Paths
 --------------------------------------------------------------------------------------
-Slack (MET) :             91.999ns  (required time - arrival time)
-  Source:                 bR_StuckSA_Memory_reg[31]_rep__9/C
+Slack (MET) :             92.023ns  (required time - arrival time)
+  Source:                 step_reg[1]/C
                             (rising edge-triggered cell FDRE clocked by clock  {rise@0.000ns fall@50.000ns period=100.000ns})
-  Destination:            bT_StuckSA_Memory_reg[24]/D
+  Destination:            step_reg[1]/D
                             (rising edge-triggered cell FDRE clocked by clock  {rise@0.000ns fall@50.000ns period=100.000ns})
   Path Group:             clock
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            100.000ns  (clock rise@100.000ns - clock rise@0.000ns)
-  Data Path Delay:        7.858ns  (logic 1.217ns (15.487%)  route 6.641ns (84.513%))
-  Logic Levels:           16  (LUT3=3 LUT5=8 LUT6=5)
+  Data Path Delay:        7.827ns  (logic 1.639ns (20.940%)  route 6.188ns (79.060%))
+  Logic Levels:           12  (LUT3=2 LUT5=1 LUT6=9)
   Clock Path Skew:        -0.145ns (DCD - SCD + CPR)
-    Destination Clock Delay (DCD):    1.722ns = ( 101.722 - 100.000 ) 
-    Source Clock Delay      (SCD):    2.028ns
-    Clock Pessimism Removal (CPR):    0.162ns
+    Destination Clock Delay (DCD):    1.707ns = ( 101.707 - 100.000 ) 
+    Source Clock Delay      (SCD):    2.015ns
+    Clock Pessimism Removal (CPR):    0.163ns
   Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
     Total System Jitter     (TSJ):    0.071ns
     Total Input Jitter      (TIJ):    0.000ns
@@ -227,67 +227,59 @@ Slack (MET) :             91.999ns  (required time - arrival time)
     Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
   -------------------------------------------------------------------    -------------------
                          (clock clock rise edge)      0.000     0.000 r  
-    BB39                                              0.000     0.000 r  clock (IN)
+    C15                                               0.000     0.000 r  clock (IN)
                          net (fo=0)                   0.000     0.000    clock
-    BB39                 IBUF (Prop_ibuf_I_O)         0.741     0.741 r  clock_IBUF_inst/O
-                         net (fo=1, unplaced)         0.584     1.324    clock__0
-                         BUFG (Prop_bufg_I_O)         0.120     1.444 r  clock__0_BUFG_inst/O
-                         net (fo=77800, unplaced)     0.584     2.028    clock__0_BUFG
-                         FDRE                                         r  bR_StuckSA_Memory_reg[31]_rep__9/C
+    C15                  IBUF (Prop_ibuf_I_O)         0.784     0.784 r  clock_IBUF_inst/O
+                         net (fo=1, unplaced)         0.571     1.355    clock_IBUF
+                         BUFG (Prop_bufg_I_O)         0.076     1.431 r  clock_IBUF_BUFG_inst/O
+                         net (fo=1681, unplaced)      0.584     2.015    clock_IBUF_BUFG
+                         FDRE                                         r  step_reg[1]/C
   -------------------------------------------------------------------    -------------------
-                         FDRE (Prop_fdre_C_Q)         0.269     2.297 r  bR_StuckSA_Memory_reg[31]_rep__9/Q
-                         net (fo=2, unplaced)         0.669     2.966    bR_StuckSA_Memory_reg[31]_rep__9_n_0
-                         LUT6 (Prop_lut6_I0_O)        0.153     3.119 r  bT_StuckSA_Memory121_in_inst_i_46/O
-                         net (fo=2, unplaced)         0.532     3.651    bT_StuckSA_Memory121_in_inst_i_46_n_0
-                         LUT5 (Prop_lut5_I0_O)        0.053     3.704 r  bT_StuckSA_Memory121_in_inst_i_24/O
-                         net (fo=3, unplaced)         0.539     4.243    bT_StuckSA_Memory121_in_inst_i_24_n_0
-                         LUT5 (Prop_lut5_I0_O)        0.053     4.296 r  bT_StuckSA_Memory121_in_inst_i_19/O
-                         net (fo=2, unplaced)         0.532     4.828    bT_StuckSA_Memory121_in_inst_i_19_n_0
-                         LUT5 (Prop_lut5_I0_O)        0.053     4.881 r  bT_StuckSA_Memory121_in_inst_i_8/O
-                         net (fo=8, unplaced)         0.378     5.259    bT_StuckSA_Memory121_in_inst_i_8_n_0
-                         LUT3 (Prop_lut3_I1_O)        0.053     5.312 r  bT_StuckSA_Memory033_in_inst__17_i_34/O
-                         net (fo=12, unplaced)        0.569     5.881    bT_StuckSA_Memory033_in_inst__17_i_34_n_0
-                         LUT5 (Prop_lut5_I0_O)        0.053     5.934 r  bT_StuckSA_Memory[8]_i_49/O
-                         net (fo=2, unplaced)         0.351     6.285    bT_StuckSA_Memory[8]_i_49_n_0
-                         LUT6 (Prop_lut6_I4_O)        0.053     6.338 r  bT_StuckSA_Memory[24]_i_63/O
-                         net (fo=2, unplaced)         0.351     6.689    bT_StuckSA_Memory121_in[24]
-                         LUT6 (Prop_lut6_I0_O)        0.053     6.742 r  bT_StuckSA_Memory[24]_i_68/O
-                         net (fo=1, unplaced)         0.340     7.082    bT_StuckSA_Memory[24]_i_68_n_0
-                         LUT6 (Prop_lut6_I5_O)        0.053     7.135 r  bT_StuckSA_Memory[24]_i_62/O
-                         net (fo=1, unplaced)         0.340     7.475    bT_StuckSA_Memory022_in[24]
-                         LUT3 (Prop_lut3_I0_O)        0.053     7.528 r  bT_StuckSA_Memory[24]_i_55/O
-                         net (fo=1, unplaced)         0.340     7.868    bT_StuckSA_Memory[24]_i_55_n_0
-                         LUT5 (Prop_lut5_I4_O)        0.053     7.921 r  bT_StuckSA_Memory[24]_i_43/O
-                         net (fo=1, unplaced)         0.340     8.261    bT_StuckSA_Memory[24]_i_43_n_0
-                         LUT5 (Prop_lut5_I0_O)        0.053     8.314 r  bT_StuckSA_Memory[24]_i_29/O
-                         net (fo=1, unplaced)         0.340     8.654    bT_StuckSA_Memory[24]_i_29_n_0
-                         LUT5 (Prop_lut5_I4_O)        0.053     8.707 r  bT_StuckSA_Memory[24]_i_11/O
-                         net (fo=1, unplaced)         0.340     9.047    bT_StuckSA_Memory[24]_i_11_n_0
-                         LUT6 (Prop_lut6_I3_O)        0.053     9.100 r  bT_StuckSA_Memory[24]_i_4/O
-                         net (fo=1, unplaced)         0.340     9.440    bT_StuckSA_Memory[24]_i_4_n_0
-                         LUT5 (Prop_lut5_I0_O)        0.053     9.493 r  bT_StuckSA_Memory[24]_i_2/O
-                         net (fo=1, unplaced)         0.340     9.833    bT_StuckSA_Memory[24]
-                         LUT3 (Prop_lut3_I0_O)        0.053     9.886 r  bT_StuckSA_Memory[24]_i_1/O
-                         net (fo=420, unplaced)       0.000     9.886    bT_StuckSA_Memory[24]_i_1_n_0
-                         FDRE                                         r  bT_StuckSA_Memory_reg[24]/D
+                         FDRE (Prop_fdre_C_Q)         0.341     2.356 r  step_reg[1]/Q
+                         net (fo=114, unplaced)       0.622     2.978    step_reg_n_0_[1]
+                         LUT3 (Prop_lut3_I0_O)        0.215     3.193 r  nT[4]_i_39/O
+                         net (fo=1, unplaced)         0.840     4.033    nT[4]_i_39_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.097     4.130 r  nT[4]_i_29/O
+                         net (fo=1, unplaced)         0.463     4.593    nT[4]_i_29_n_0
+                         LUT6 (Prop_lut6_I2_O)        0.097     4.690 r  nT[4]_i_10/O
+                         net (fo=10, unplaced)        0.344     5.034    nT[4]_i_10_n_0
+                         LUT6 (Prop_lut6_I3_O)        0.097     5.131 r  T[161]_i_3/O
+                         net (fo=121, unplaced)       0.615     5.746    opCodeMap[0]
+                         LUT6 (Prop_lut6_I2_O)        0.097     5.843 f  step[6]_i_29/O
+                         net (fo=1, unplaced)         0.840     6.683    step[6]_i_29_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.097     6.780 f  step[6]_i_23/O
+                         net (fo=1, unplaced)         0.463     7.243    step[6]_i_23_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.097     7.340 r  step[6]_i_15/O
+                         net (fo=65, unplaced)        0.600     7.940    step[6]_i_15_n_0
+                         LUT3 (Prop_lut3_I0_O)        0.113     8.053 f  step[9]_i_25/O
+                         net (fo=14, unplaced)        0.352     8.405    step[9]_i_25_n_0
+                         LUT6 (Prop_lut6_I5_O)        0.097     8.502 r  step[1]_i_16/O
+                         net (fo=1, unplaced)         0.463     8.965    step[1]_i_16_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.097     9.062 r  step[1]_i_10/O
+                         net (fo=1, unplaced)         0.285     9.347    step[1]_i_10_n_0
+                         LUT6 (Prop_lut6_I4_O)        0.097     9.444 r  step[1]_i_4/O
+                         net (fo=1, unplaced)         0.301     9.745    step[1]_i_4_n_0
+                         LUT5 (Prop_lut5_I4_O)        0.097     9.842 r  step[1]_i_1/O
+                         net (fo=1, unplaced)         0.000     9.842    step[1]
+                         FDRE                                         r  step_reg[1]/D
   -------------------------------------------------------------------    -------------------
 
                          (clock clock rise edge)    100.000   100.000 r  
-    BB39                                              0.000   100.000 r  clock (IN)
+    C15                                               0.000   100.000 r  clock (IN)
                          net (fo=0)                   0.000   100.000    clock
-    BB39                 IBUF (Prop_ibuf_I_O)         0.615   100.615 r  clock_IBUF_inst/O
-                         net (fo=1, unplaced)         0.554   101.170    clock__0
-                         BUFG (Prop_bufg_I_O)         0.113   101.283 r  clock__0_BUFG_inst/O
-                         net (fo=77800, unplaced)     0.439   101.722    clock__0_BUFG
-                         FDRE                                         r  bT_StuckSA_Memory_reg[24]/C
-                         clock pessimism              0.162   101.883    
-                         clock uncertainty           -0.035   101.848    
-                         FDRE (Setup_fdre_C_D)        0.037   101.885    bT_StuckSA_Memory_reg[24]
+    C15                  IBUF (Prop_ibuf_I_O)         0.653   100.653 r  clock_IBUF_inst/O
+                         net (fo=1, unplaced)         0.543   101.196    clock_IBUF
+                         BUFG (Prop_bufg_I_O)         0.072   101.268 r  clock_IBUF_BUFG_inst/O
+                         net (fo=1681, unplaced)      0.439   101.707    clock_IBUF_BUFG
+                         FDRE                                         r  step_reg[1]/C
+                         clock pessimism              0.163   101.870    
+                         clock uncertainty           -0.035   101.835    
+                         FDRE (Setup_fdre_C_D)        0.030   101.865    step_reg[1]
   -------------------------------------------------------------------
-                         required time                        101.885    
-                         arrival time                          -9.886    
+                         required time                        101.865    
+                         arrival time                          -9.842    
   -------------------------------------------------------------------
-                         slack                                 91.999    
+                         slack                                 92.023    
 
 
 
@@ -295,54 +287,54 @@ Slack (MET) :             91.999ns  (required time - arrival time)
 
 Min Delay Paths
 --------------------------------------------------------------------------------------
-Slack (MET) :             0.056ns  (arrival time - required time)
-  Source:                 lL_StuckSA_Transaction_reg[18]_rep/C
+Slack (MET) :             0.138ns  (arrival time - required time)
+  Source:                 lL_StuckSA_Transaction_reg[17]/C
                             (rising edge-triggered cell FDRE clocked by clock  {rise@0.000ns fall@50.000ns period=100.000ns})
-  Destination:            lL_StuckSA_Transaction_reg[23]/D
+  Destination:            lL_StuckSA_Transaction_reg[22]/D
                             (rising edge-triggered cell FDRE clocked by clock  {rise@0.000ns fall@50.000ns period=100.000ns})
   Path Group:             clock
   Path Type:              Hold (Min at Fast Process Corner)
   Requirement:            0.000ns  (clock rise@0.000ns - clock rise@0.000ns)
-  Data Path Delay:        0.266ns  (logic 0.164ns (61.652%)  route 0.102ns (38.348%))
+  Data Path Delay:        0.374ns  (logic 0.239ns (63.843%)  route 0.135ns (36.157%))
   Logic Levels:           1  (LUT3=1)
   Clock Path Skew:        0.145ns (DCD - SCD - CPR)
-    Destination Clock Delay (DCD):    0.856ns
-    Source Clock Delay      (SCD):    0.527ns
-    Clock Pessimism Removal (CPR):    0.183ns
+    Destination Clock Delay (DCD):    0.992ns
+    Source Clock Delay      (SCD):    0.637ns
+    Clock Pessimism Removal (CPR):    0.209ns
 
     Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
   -------------------------------------------------------------------    -------------------
                          (clock clock rise edge)      0.000     0.000 r  
-    BB39                                              0.000     0.000 r  clock (IN)
+    C15                                               0.000     0.000 r  clock (IN)
                          net (fo=0)                   0.000     0.000    clock
-    BB39                 IBUF (Prop_ibuf_I_O)         0.141     0.141 r  clock_IBUF_inst/O
-                         net (fo=1, unplaced)         0.246     0.387    clock__0
-                         BUFG (Prop_bufg_I_O)         0.026     0.413 r  clock__0_BUFG_inst/O
-                         net (fo=77800, unplaced)     0.114     0.527    clock__0_BUFG
-                         FDRE                                         r  lL_StuckSA_Transaction_reg[18]_rep/C
+    C15                  IBUF (Prop_ibuf_I_O)         0.164     0.164 r  clock_IBUF_inst/O
+                         net (fo=1, unplaced)         0.333     0.497    clock_IBUF
+                         BUFG (Prop_bufg_I_O)         0.026     0.523 r  clock_IBUF_BUFG_inst/O
+                         net (fo=1681, unplaced)      0.114     0.637    clock_IBUF_BUFG
+                         FDRE                                         r  lL_StuckSA_Transaction_reg[17]/C
   -------------------------------------------------------------------    -------------------
-                         FDRE (Prop_fdre_C_Q)         0.100     0.627 r  lL_StuckSA_Transaction_reg[18]_rep/Q
-                         net (fo=1, unplaced)         0.102     0.729    lL_StuckSA_Transaction_reg[18]_rep_n_0
-                         LUT3 (Prop_lut3_I2_O)        0.064     0.793 r  lL_StuckSA_Transaction[23]_i_1/O
-                         net (fo=1, unplaced)         0.000     0.793    lL_StuckSA_Transaction[23]
-                         FDRE                                         r  lL_StuckSA_Transaction_reg[23]/D
+                         FDRE (Prop_fdre_C_Q)         0.141     0.778 r  lL_StuckSA_Transaction_reg[17]/Q
+                         net (fo=4, unplaced)         0.135     0.914    lL_StuckSA_Transaction0[1]
+                         LUT3 (Prop_lut3_I2_O)        0.098     1.012 r  lL_StuckSA_Transaction[22]_i_1/O
+                         net (fo=1, unplaced)         0.000     1.012    lL_StuckSA_Transaction[22]_i_1_n_0
+                         FDRE                                         r  lL_StuckSA_Transaction_reg[22]/D
   -------------------------------------------------------------------    -------------------
 
                          (clock clock rise edge)      0.000     0.000 r  
-    BB39                                              0.000     0.000 r  clock (IN)
+    C15                                               0.000     0.000 r  clock (IN)
                          net (fo=0)                   0.000     0.000    clock
-    BB39                 IBUF (Prop_ibuf_I_O)         0.308     0.308 r  clock_IBUF_inst/O
-                         net (fo=1, unplaced)         0.259     0.567    clock__0
-                         BUFG (Prop_bufg_I_O)         0.030     0.597 r  clock__0_BUFG_inst/O
-                         net (fo=77800, unplaced)     0.259     0.856    clock__0_BUFG
-                         FDRE                                         r  lL_StuckSA_Transaction_reg[23]/C
-                         clock pessimism             -0.183     0.672    
-                         FDRE (Hold_fdre_C_D)         0.065     0.737    lL_StuckSA_Transaction_reg[23]
+    C15                  IBUF (Prop_ibuf_I_O)         0.353     0.353 r  clock_IBUF_inst/O
+                         net (fo=1, unplaced)         0.351     0.704    clock_IBUF
+                         BUFG (Prop_bufg_I_O)         0.029     0.733 r  clock_IBUF_BUFG_inst/O
+                         net (fo=1681, unplaced)      0.259     0.992    clock_IBUF_BUFG
+                         FDRE                                         r  lL_StuckSA_Transaction_reg[22]/C
+                         clock pessimism             -0.209     0.782    
+                         FDRE (Hold_fdre_C_D)         0.091     0.873    lL_StuckSA_Transaction_reg[22]
   -------------------------------------------------------------------
-                         required time                         -0.737    
-                         arrival time                           0.793    
+                         required time                         -0.873    
+                         arrival time                           1.012    
   -------------------------------------------------------------------
-                         slack                                  0.056    
+                         slack                                  0.138    
 
 
 
@@ -356,9 +348,9 @@ Period(ns):         100.000
 Sources:            { clock }
 
 Check Type        Corner  Lib Pin  Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location  Pin
-Min Period        n/a     BUFG/I   n/a            1.600         100.000     98.400               clock__0_BUFG_inst/I
-Low Pulse Width   Slow    FDSE/C   n/a            0.350         50.000      49.650               M_reg[0]/C
-High Pulse Width  Slow    FDSE/C   n/a            0.350         50.000      49.650               M_reg[0]/C
+Min Period        n/a     BUFG/I   n/a            1.592         100.000     98.408               clock_IBUF_BUFG_inst/I
+Low Pulse Width   Slow    FDSE/C   n/a            0.500         50.000      49.500               M_reg[0]/C
+High Pulse Width  Slow    FDSE/C   n/a            0.500         50.000      49.500               M_reg[0]/C
 
 
 
