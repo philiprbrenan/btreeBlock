@@ -55,23 +55,16 @@ sub gen                                                                         
    qw(bus_skew clock_interaction control_sets cdc design_analysis
       drc high_fanout_nets methodology power timing_summary utilization);
 
-  my $reports = sub
+  my $reports = sub                                                             # Generate report commands
    {my @r;
     for my $r(@reports)
-     {if (defined($statement) and $r =~ m(timing)is)
-       {my $f = fpe $reportsDir, q(statement), $statement, $r,  q(rpt);
-        makePath $f;
-        push @r, qq(report_$r -file $f);
-       }
-      else
-       {push @r, qq(report_$r -file ${reportsDir}$r.rpt);
-       }
+     {push @r, qq(report_$r -file ${reportsDir}$r.rpt);
      }
     join "\n", @r;
    }->();
 
-  makePath fpd $reportsDir;                                                     # Ensure folder structure is present
-  makePath fpd $dcpDir;                                                         # Ensure folder structure is present
+  makePath fpd $reportsDir;                                                     # Ensure reports folder is present
+  makePath fpd $dcpDir;                                                         # Ensure checkpoints folder is present
 
   die "No such file: $constraints" unless -f $constraints;
   die "No such path: $reportsDir"  unless -d $reportsDir;
