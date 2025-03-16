@@ -6,15 +6,15 @@ use Carp;
 use Data::Table::Text qw(:all);
 # https://docs.amd.com/v/u/en-US/zynq-7000-product-selection-guide
 # Clock was k11 now C7
-my $project       = q(btreeBlock);                                              # The name of the project
+my $statements    = 1;                                                          # Time statements individually if true else delete/find/put components
 my $part          = q(xc7a50tcpg236);                                           # 50K
 #  $part          = q(xc7a200tffv1156-2);                                       # 150K
 #  $part          = q(xc7v2000tflg1925-1);                                      # 1 million
 #  $part          = q(xcvu440-flga2892-1-c);                                    # 5 million
-my $statements    = 1;                                                          # Time statements individually if true else delete/find/put components
 
-my $home          = $ENV{HOME};                                                 # Home
+my $home          = $ENV{HOME};                                                 # Home on this machine
 my $local         = "/home/phil";                                               # Home on local machine
+my $project       = q(btreeBlock);                                              # The name of the project
 my $projectDir    = fpd $home, $project;                                        # Folder containing generated verilog files
 my $verilogDir    = fpd $projectDir, q(verilog);                                # Folder containing generated verilog files
 my $vivadoDir     = fpd $projectDir, q(vivado);                                 # Folder containing vivado specific files
@@ -23,8 +23,8 @@ my $constraintsDir= fpd $vivadoDir,  q(constraints);                            
 my $vivado        = fpd $home,   qw(Vivado 2024.2);                             # Location of vivado installation
 my $vivadoX       = fpf $vivado, qw(bin vivado);                                # Location of vivado executable
 
-die "No such path: $vivado"    unless -d $vivado  or -e "/home/phil";           # Check vivado files exist
-die "No such file: $vivadoX"   unless -f $vivadoX or -e "/home/phil";
+die "No such path: $vivado"    unless -d $vivado  or -e $local;                 # Check vivado files exist
+die "No such file: $vivadoX"   unless -f $vivadoX or -e $local;
 
 sub gen                                                                         # Generate tcl to synthesize design
  {my ($design, $key, $statement) = @_;                                          # Project, key, optional statement
@@ -32,10 +32,10 @@ sub gen                                                                         
   my @statement = defined($statement) ? (q(statement), $statement) : ();        # Address statement files
 
   my $designDir   = fpd $verilogDir, $design, $key, @statement;                 # Location of project input files
-  my $designOut   = fpd $$designDir, qw(vivado);                                # Location of project output files
-  my $includesDir = fpd $designDir,  qw(includes);                              # Set the path to the includes directory
-  my $reportsDir  = fpd $designOut,  qw(reports);                               # Reports
-  my $dcpDir      = fpd $designOut,  qw(dcp);                                   # Checkpoints
+  my $designOut   = fpd $designDir, qw(vivado);                                 # Location of project output files
+  my $includesDir = fpd $designDir, qw(includes);                               # Set the path to the includes directory
+  my $reportsDir  = fpd $designOut, qw(reports);                                # Reports
+  my $dcpDir      = fpd $designOut, qw(dcp);                                    # Checkpoints
   my $synthesis   = fpe $vivadoDir,      $design, qw(tcl);                      # Generated vivado commands
   my $constraints = fpe $constraintsDir, $part,   qw(xdc);                      # Constraints file
   my $final       = fpe $designOut,      $design, qw(bit);                      # Final output bit stream
