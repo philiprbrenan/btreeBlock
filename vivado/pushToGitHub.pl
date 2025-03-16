@@ -77,8 +77,8 @@ sub files() {return [
   "/home/phil/aaa/btreeBlock/verilog/put/vivado/reports/timing_route.rpt",
   "/home/phil/aaa/btreeBlock/verilog/put/vivado/reports/timing_summary.rpt",
   "/home/phil/aaa/btreeBlock/verilog/put/vivado/reports/utilization.rpt",
-  (map {"/home/phil/aaa/btreeBlock/verilog/delete/vivado/reports/statement/$_/timing_summary.rpt"} 0..20 ),
-  (map {"/home/phil/aaa/btreeBlock/verilog/find/vivado/reports/statement/$_/timing_summary.rpt"}   0..400),
+  (map {"/home/phil/aaa/btreeBlock/verilog/delete/vivado/reports/statement/$_/timing_summary.rpt"} 0..400),
+  (map {"/home/phil/aaa/btreeBlock/verilog/find/vivado/reports/statement/$_/timing_summary.rpt"}   0..20),
   (map {"/home/phil/aaa/btreeBlock/verilog/put/vivado/reports/statement/$_/timing_summary.rpt"}    0..400),
 
 ]}
