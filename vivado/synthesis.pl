@@ -10,7 +10,7 @@ my $project       = q(btreeBlock);                                              
 my $part          = q(XC7Z007S);
    $part          = q(XC7V2000T);
    $part          = q(xc7a200tffv1156-2);                                       # 150K
-   $part          = q(xc7v2000tflg1925-1);                                      # 1 million
+#  $part          = q(xc7v2000tflg1925-1);                                      # 1 million - good
 #  $part          = q(xcvu440-flga2892-1-c);                                    # 5 million
 
 my $home          = $ENV{HOME};                                                 # Home
@@ -44,7 +44,11 @@ sub gen                                                                         
   my $place       = fpe $dcpDir, qw(place dcp);                                 # After place checkpoint
   my $opt         = fpe $dcpDir, qw(opt   dcp);                                 # After optimization checkpoint
   my $synth       = fpe $dcpDir, qw(synth dcp);                                 # After synthesis checkpoint
-
+  my $timingRoute = fpe $reportsDir, qw(timing_route rpt);                      # Timing after routing
+  if (defined($statement) and -e $timingRoute)                                  # File has already been created
+   {say STDERR "Exists: $timingRoute";
+    return;
+   }
 
   my @reports     =                                                             # Reports
    qw(bus_skew clock_interaction control_sets cdc design_analysis
@@ -98,7 +102,7 @@ END
   owf($synthesis, join "\n", @s);                                               # Write tcl to run the synthesis
 
   say   STDERR dateTimeStamp, " $part for $design ".join " ", @statement;       # Run tcl
-  print STDERR qx($vivadoX -mode batch -source $synthesis 1>$reportsDir/1.txt);
+  system($vivadoX -mode batch -source $synthesis 1>$reportsDir/1.txt);
   unlink $synthesis;
  }
 
@@ -106,13 +110,13 @@ if    (-e q(/home/phil/)) {}                                                    
 elsif (-e q(/home/azureuser/btreeblock/vivado/find/1/)) {}                      # Create the verilog files if they have not already been created
 else
  {say STDERR dateTimeStamp, " Generate   btreeBlock";
-  say STDERR qx(cd $projectDir; bash j.sh BtreeDM);
+  system(cd $projectDir; bash j.sh BtreeDM);
  }
 
 say STDERR dateTimeStamp, " Synthesize btreeBlock";                             # Synthesize the verilog description
-#gen(qw(find   2));
-#gen(qw(delete 3));
-#gen(qw(put    1));
+gen(qw(find   2));
+gen(qw(delete 3));
+gen(qw(put    1));
 
 if (1)                                                                          # Arrival time for each statement
  {my @files = searchDirectoryTreesForMatchingFiles($verilogDir, qw(.tb));
@@ -120,7 +124,7 @@ if (1)                                                                          
   for my $f(@files)
    {if ($f =~ m(/(\w+)/(\d+)/statement/(\d+)/)igs)
      {my ($project, $key, $statement) = ($1, $2, $3);
-      say STDERR "gen($project, $key, $statement);\n";
+      gen($project, $key, $statement);
      }
    }
  }
