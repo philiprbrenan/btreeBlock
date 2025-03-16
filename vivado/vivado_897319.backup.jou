@@ -1,0 +1,24 @@
+#-----------------------------------------------------------
+# Vivado v2024.2 (64-bit)
+# SW Build 5239630 on Fri Nov 08 22:34:34 MST 2024
+# IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
+# SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
+# Start of session at: Sun Mar 16 22:35:53 2025
+# Process ID         : 897319
+# Current directory  : /home/azureuser/btreeBlock/vivado
+# Command line       : vivado -mode batch -source /home/azureuser/btreeBlock/vivado/delete.tcl
+# Log file           : /home/azureuser/btreeBlock/vivado/vivado.log
+# Journal file       : /home/azureuser/btreeBlock/vivado/vivado.jou
+# Running On         : vivado
+# Platform           : Ubuntu
+# Operating System   : Ubuntu 24.04.1 LTS
+# Processor Detail   : Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz
+# CPU Frequency      : 3127.120 MHz
+# CPU Physical cores : 1
+# CPU Logical cores  : 2
+# Host memory        : 16714 MB
+# Swap memory        : 0 MB
+# Total Virtual      : 16714 MB
+# Available Virtual  : 15583 MB
+#-----------------------------------------------------------
+source /home/azureuser/btreeBlock/vivado/delete.tcl
