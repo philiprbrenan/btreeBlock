@@ -3,16 +3,15 @@
   **** SW Build 5239630 on Fri Nov 08 22:34:34 MST 2024
   **** IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
   **** SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
-  **** Start of session at: Sun Mar 16 04:40:02 2025
+  **** Start of session at: Sun Mar 16 19:38:58 2025
     ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
     ** Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 
 source /home/azureuser/btreeBlock/vivado/delete.tcl
-# read_verilog /home/azureuser/btreeBlock/verilog/delete/3/statement/64/delete.v
-read_verilog: Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 1430.531 ; gain = 0.027 ; free physical = 11303 ; free virtual = 14313
+# read_verilog /home/azureuser/btreeBlock/verilog/delete/3/statement/133/delete.v
 # read_xdc     /home/azureuser/btreeBlock/vivado/constraints/xc7v2000tflg1925-1.xdc
-# synth_design -name delete -top delete -part xc7v2000tflg1925-1 -include_dirs /home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/ -flatten_hierarchy none -no_timing_driven -directive AlternateRoutability
-Command: synth_design -name delete -top delete -part xc7v2000tflg1925-1 -include_dirs /home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/ -flatten_hierarchy none -no_timing_driven -directive AlternateRoutability
+# synth_design -name delete -top delete -part xc7v2000tflg1925-1 -include_dirs /home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/ -flatten_hierarchy none -no_timing_driven -directive AlternateRoutability
+Command: synth_design -name delete -top delete -part xc7v2000tflg1925-1 -include_dirs /home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/ -flatten_hierarchy none -no_timing_driven -directive AlternateRoutability
 Starting synth_design
 Attempting to get a license for feature 'Synthesis' and/or device 'xc7v2000t'
 INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7v2000t'
@@ -20,46 +19,45 @@ INFO: [Common 17-86] Your Synthesis license expires in 9 day(s)
 INFO: [Device 21-403] Loading part xc7v2000tflg1925-1
 INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 7 processes.
 INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
-INFO: [Synth 8-7075] Helper process launched with PID 1638634
+INFO: [Synth 8-7075] Helper process launched with PID 562994
 ---------------------------------------------------------------------------------
-Starting RTL Elaboration : Time (s): cpu = 00:00:08 ; elapsed = 00:00:09 . Memory (MB): peak = 2573.984 ; gain = 437.980 ; free physical = 9887 ; free virtual = 12896
+Starting RTL Elaboration : Time (s): cpu = 00:00:06 ; elapsed = 00:00:07 . Memory (MB): peak = 2573.422 ; gain = 437.980 ; free physical = 10979 ; free virtual = 13118
 ---------------------------------------------------------------------------------
-INFO: [Synth 8-6157] synthesizing module 'delete' [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/delete.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'delete' (0#1) [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/delete.v:6]
-WARNING: [Synth 8-6014] Unused sequential element M_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:1]
-WARNING: [Synth 8-6014] Unused sequential element bT_StuckSA_Memory_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:3]
-WARNING: [Synth 8-6014] Unused sequential element bT_StuckSA_Copy_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:4]
-WARNING: [Synth 8-6014] Unused sequential element bL_StuckSA_Memory_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:6]
-WARNING: [Synth 8-6014] Unused sequential element bL_StuckSA_Copy_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:7]
-WARNING: [Synth 8-6014] Unused sequential element bL_StuckSA_Transaction_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:8]
-WARNING: [Synth 8-6014] Unused sequential element bR_StuckSA_Memory_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:9]
-WARNING: [Synth 8-6014] Unused sequential element bR_StuckSA_Copy_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:10]
-WARNING: [Synth 8-6014] Unused sequential element bR_StuckSA_Transaction_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:11]
-WARNING: [Synth 8-6014] Unused sequential element lT_StuckSA_Memory_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:12]
-WARNING: [Synth 8-6014] Unused sequential element lT_StuckSA_Copy_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:13]
-WARNING: [Synth 8-6014] Unused sequential element lT_StuckSA_Transaction_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:14]
-WARNING: [Synth 8-6014] Unused sequential element lL_StuckSA_Memory_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:15]
-WARNING: [Synth 8-6014] Unused sequential element lL_StuckSA_Copy_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:16]
-WARNING: [Synth 8-6014] Unused sequential element lL_StuckSA_Transaction_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:17]
-WARNING: [Synth 8-6014] Unused sequential element lR_StuckSA_Memory_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:18]
-WARNING: [Synth 8-6014] Unused sequential element lR_StuckSA_Copy_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:19]
-WARNING: [Synth 8-6014] Unused sequential element lR_StuckSA_Transaction_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:20]
-WARNING: [Synth 8-6014] Unused sequential element nT_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:21]
-WARNING: [Synth 8-6014] Unused sequential element nL_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:22]
-WARNING: [Synth 8-6014] Unused sequential element nR_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/64/includes/initializeMemory.vh:23]
+INFO: [Synth 8-6157] synthesizing module 'delete' [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/delete.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'delete' (0#1) [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/delete.v:6]
+WARNING: [Synth 8-6014] Unused sequential element M_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:1]
+WARNING: [Synth 8-6014] Unused sequential element bT_StuckSA_Memory_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:3]
+WARNING: [Synth 8-6014] Unused sequential element bT_StuckSA_Copy_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:4]
+WARNING: [Synth 8-6014] Unused sequential element bT_StuckSA_Transaction_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:5]
+WARNING: [Synth 8-6014] Unused sequential element bL_StuckSA_Memory_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:6]
+WARNING: [Synth 8-6014] Unused sequential element bL_StuckSA_Copy_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:7]
+WARNING: [Synth 8-6014] Unused sequential element bL_StuckSA_Transaction_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:8]
+WARNING: [Synth 8-6014] Unused sequential element bR_StuckSA_Memory_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:9]
+WARNING: [Synth 8-6014] Unused sequential element bR_StuckSA_Copy_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:10]
+WARNING: [Synth 8-6014] Unused sequential element bR_StuckSA_Transaction_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:11]
+WARNING: [Synth 8-6014] Unused sequential element lT_StuckSA_Memory_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:12]
+WARNING: [Synth 8-6014] Unused sequential element lT_StuckSA_Copy_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:13]
+WARNING: [Synth 8-6014] Unused sequential element lT_StuckSA_Transaction_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:14]
+WARNING: [Synth 8-6014] Unused sequential element lL_StuckSA_Copy_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:16]
+WARNING: [Synth 8-6014] Unused sequential element lL_StuckSA_Transaction_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:17]
+WARNING: [Synth 8-6014] Unused sequential element lR_StuckSA_Copy_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:19]
+WARNING: [Synth 8-6014] Unused sequential element lR_StuckSA_Transaction_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:20]
+WARNING: [Synth 8-6014] Unused sequential element nT_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:21]
+WARNING: [Synth 8-6014] Unused sequential element nL_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:22]
+WARNING: [Synth 8-6014] Unused sequential element nR_reg was removed.  [/home/azureuser/btreeBlock/verilog/delete/3/statement/133/includes/initializeMemory.vh:23]
 ---------------------------------------------------------------------------------
-Finished RTL Elaboration : Time (s): cpu = 00:00:10 ; elapsed = 00:00:12 . Memory (MB): peak = 2675.953 ; gain = 539.949 ; free physical = 9784 ; free virtual = 12795
+Finished RTL Elaboration : Time (s): cpu = 00:00:09 ; elapsed = 00:00:09 . Memory (MB): peak = 2676.359 ; gain = 540.918 ; free physical = 10869 ; free virtual = 13010
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:11 ; elapsed = 00:00:12 . Memory (MB): peak = 2681.891 ; gain = 545.887 ; free physical = 9784 ; free virtual = 12795
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 2676.359 ; gain = 540.918 ; free physical = 10869 ; free virtual = 13010
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:11 ; elapsed = 00:00:12 . Memory (MB): peak = 2681.891 ; gain = 545.887 ; free physical = 9784 ; free virtual = 12795
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 2676.359 ; gain = 540.918 ; free physical = 10869 ; free virtual = 13010
 ---------------------------------------------------------------------------------
-Netlist sorting complete. Time (s): cpu = 00:00:00.09 ; elapsed = 00:00:00.1 . Memory (MB): peak = 2681.891 ; gain = 0.000 ; free physical = 9767 ; free virtual = 12778
+Netlist sorting complete. Time (s): cpu = 00:00:00.07 ; elapsed = 00:00:00.08 . Memory (MB): peak = 2676.359 ; gain = 0.000 ; free physical = 10885 ; free virtual = 13025
 INFO: [Project 1-570] Preparing netlist for logic optimization
 
 Processing XDC Constraints
@@ -70,29 +68,29 @@ INFO: [Project 1-236] Implementation specific constraints were found while readi
 Resolution: To avoid this warning, move constraints listed in [.Xil/delete_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
 Completed Processing XDC Constraints
 
-Netlist sorting complete. Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00 . Memory (MB): peak = 2834.383 ; gain = 0.000 ; free physical = 9833 ; free virtual = 12844
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2821.938 ; gain = 0.000 ; free physical = 10996 ; free virtual = 13136
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
-Constraint Validation Runtime : Time (s): cpu = 00:00:00.03 ; elapsed = 00:00:00.04 . Memory (MB): peak = 2834.383 ; gain = 0.000 ; free physical = 9833 ; free virtual = 12844
+Constraint Validation Runtime : Time (s): cpu = 00:00:00.03 ; elapsed = 00:00:00.03 . Memory (MB): peak = 2821.938 ; gain = 0.000 ; free physical = 10996 ; free virtual = 13136
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:35 ; elapsed = 00:00:37 . Memory (MB): peak = 2834.383 ; gain = 698.379 ; free physical = 9813 ; free virtual = 12824
+Finished Constraint Validation : Time (s): cpu = 00:00:29 ; elapsed = 00:00:30 . Memory (MB): peak = 2821.938 ; gain = 686.496 ; free physical = 10995 ; free virtual = 13136
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7v2000tflg1925-1
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:35 ; elapsed = 00:00:37 . Memory (MB): peak = 2842.387 ; gain = 706.383 ; free physical = 9813 ; free virtual = 12824
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:29 ; elapsed = 00:00:30 . Memory (MB): peak = 2829.941 ; gain = 694.500 ; free physical = 10995 ; free virtual = 13136
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying 'set_property' XDC Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:36 ; elapsed = 00:00:37 . Memory (MB): peak = 2842.387 ; gain = 706.383 ; free physical = 9813 ; free virtual = 12824
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:29 ; elapsed = 00:00:30 . Memory (MB): peak = 2829.941 ; gain = 694.500 ; free physical = 10995 ; free virtual = 13136
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:39 ; elapsed = 00:00:41 . Memory (MB): peak = 2842.387 ; gain = 706.383 ; free physical = 9809 ; free virtual = 12821
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:32 ; elapsed = 00:00:33 . Memory (MB): peak = 2829.941 ; gain = 694.500 ; free physical = 10995 ; free virtual = 13137
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start RTL Component Statistics 
@@ -100,7 +98,7 @@ Start RTL Component Statistics
 Detailed RTL Component Info : 
 +---Registers : 
 	              182 Bit    Registers := 1     
-	               78 Bit    Registers := 1     
+	               21 Bit    Registers := 2     
 	                9 Bit    Registers := 316   
 	                1 Bit    Registers := 1     
 +---Muxes : 
@@ -122,19 +120,19 @@ Start Cross Boundary and Area Optimization
 ---------------------------------------------------------------------------------
 WARNING: [Synth 8-7080] Parallel synthesis criteria is not met
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:55 ; elapsed = 00:00:57 . Memory (MB): peak = 2922.418 ; gain = 786.414 ; free physical = 9679 ; free virtual = 12698
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:45 ; elapsed = 00:00:46 . Memory (MB): peak = 2922.973 ; gain = 787.531 ; free physical = 10854 ; free virtual = 13003
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:00:55 ; elapsed = 00:00:57 . Memory (MB): peak = 2922.418 ; gain = 786.414 ; free physical = 9679 ; free virtual = 12698
+Finished Timing Optimization : Time (s): cpu = 00:00:45 ; elapsed = 00:00:46 . Memory (MB): peak = 2922.973 ; gain = 787.531 ; free physical = 10854 ; free virtual = 13003
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Technology Mapping
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:00:55 ; elapsed = 00:00:57 . Memory (MB): peak = 2922.418 ; gain = 786.414 ; free physical = 9679 ; free virtual = 12698
+Finished Technology Mapping : Time (s): cpu = 00:00:45 ; elapsed = 00:00:46 . Memory (MB): peak = 2922.973 ; gain = 787.531 ; free physical = 10854 ; free virtual = 13003
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start IO Insertion
@@ -146,19 +144,19 @@ Start Final Netlist Cleanup
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:01:01 ; elapsed = 00:01:02 . Memory (MB): peak = 2922.418 ; gain = 786.414 ; free physical = 9675 ; free virtual = 12695
+Finished IO Insertion : Time (s): cpu = 00:00:50 ; elapsed = 00:00:51 . Memory (MB): peak = 2922.973 ; gain = 787.531 ; free physical = 10850 ; free virtual = 13000
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:01:01 ; elapsed = 00:01:02 . Memory (MB): peak = 2922.418 ; gain = 786.414 ; free physical = 9675 ; free virtual = 12695
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:50 ; elapsed = 00:00:51 . Memory (MB): peak = 2922.973 ; gain = 787.531 ; free physical = 10850 ; free virtual = 13000
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:01:01 ; elapsed = 00:01:02 . Memory (MB): peak = 2922.418 ; gain = 786.414 ; free physical = 9675 ; free virtual = 12695
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:50 ; elapsed = 00:00:51 . Memory (MB): peak = 2922.973 ; gain = 787.531 ; free physical = 10850 ; free virtual = 13000
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Writing Synthesis Report
@@ -171,49 +169,57 @@ Report BlackBoxes:
 +-+--------------+----------+
 
 Report Cell Usage: 
-+------+-----+------+
-|      |Cell |Count |
-+------+-----+------+
-|1     |BUFG |     1|
-|2     |FDRE |     1|
-|3     |IBUF |     2|
-|4     |OBUF |     6|
-+------+-----+------+
++------+-------+------+
+|      |Cell   |Count |
++------+-------+------+
+|1     |BUFG   |     1|
+|2     |CARRY4 |     3|
+|3     |LUT1   |     1|
+|4     |LUT2   |     1|
+|5     |LUT3   |     1|
+|6     |LUT5   |     3|
+|7     |LUT6   |     8|
+|8     |FDRE   |    11|
+|9     |IBUF   |     2|
+|10    |OBUF   |     6|
++------+-------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:01:01 ; elapsed = 00:01:02 . Memory (MB): peak = 2922.418 ; gain = 786.414 ; free physical = 9675 ; free virtual = 12695
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:50 ; elapsed = 00:00:51 . Memory (MB): peak = 2922.973 ; gain = 787.531 ; free physical = 10850 ; free virtual = 13000
 ---------------------------------------------------------------------------------
 Synthesis finished with 0 errors, 0 critical warnings and 1 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:00:44 ; elapsed = 00:00:45 . Memory (MB): peak = 2922.418 ; gain = 633.922 ; free physical = 9675 ; free virtual = 12695
-Synthesis Optimization Complete : Time (s): cpu = 00:01:01 ; elapsed = 00:01:02 . Memory (MB): peak = 2922.426 ; gain = 786.414 ; free physical = 9675 ; free virtual = 12695
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:36 ; elapsed = 00:00:37 . Memory (MB): peak = 2922.973 ; gain = 641.953 ; free physical = 10850 ; free virtual = 13000
+Synthesis Optimization Complete : Time (s): cpu = 00:00:50 ; elapsed = 00:00:51 . Memory (MB): peak = 2922.980 ; gain = 787.531 ; free physical = 10850 ; free virtual = 13000
 INFO: [Project 1-571] Translating synthesized netlist
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2925.387 ; gain = 0.000 ; free physical = 9675 ; free virtual = 12695
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2925.941 ; gain = 0.000 ; free physical = 10850 ; free virtual = 13000
+INFO: [Netlist 29-17] Analyzing 3 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 INFO: [Project 1-570] Preparing netlist for logic optimization
 Parsing XDC File [/home/azureuser/btreeBlock/vivado/constraints/xc7v2000tflg1925-1.xdc]
 Finished Parsing XDC File [/home/azureuser/btreeBlock/vivado/constraints/xc7v2000tflg1925-1.xdc]
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3021.684 ; gain = 0.000 ; free physical = 9773 ; free virtual = 12792
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3031.453 ; gain = 0.000 ; free physical = 10951 ; free virtual = 13101
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
-Synth Design complete | Checksum: a7235ef2
+Synth Design complete | Checksum: 1d008c0f
 INFO: [Common 17-83] Releasing license: Synthesis
-16 Infos, 22 Warnings, 0 Critical Warnings and 0 Errors encountered.
+18 Infos, 21 Warnings, 0 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:01:42 ; elapsed = 00:01:39 . Memory (MB): peak = 3021.684 ; gain = 1591.152 ; free physical = 9773 ; free virtual = 12792
-INFO: [Common 17-2834] synth_design peak Physical Memory [PSS] (MB): overall = 2561.902; main = 2493.913; forked = 323.609
-INFO: [Common 17-2834] synth_design peak Virtual Memory [VSS] (MB): overall = 3831.785; main = 3021.688; forked = 909.363
+synth_design: Time (s): cpu = 00:01:24 ; elapsed = 00:01:21 . Memory (MB): peak = 3031.453 ; gain = 1658.570 ; free physical = 10951 ; free virtual = 13101
+INFO: [Common 17-2834] synth_design peak Physical Memory [PSS] (MB): overall = 2560.394; main = 2494.152; forked = 323.746
+INFO: [Common 17-2834] synth_design peak Virtual Memory [VSS] (MB): overall = 3832.344; main = 3031.457; forked = 909.367
 # write_checkpoint -force /home/azureuser/btreeBlock/verilog/delete/vivado/dcp/synth.dcp
 INFO: [Timing 38-480] Writing timing data to binary archive.
-Wrote PlaceDB: Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00 . Memory (MB): peak = 3053.699 ; gain = 0.000 ; free physical = 9773 ; free virtual = 12792
-Wrote PulsedLatchDB: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3053.699 ; gain = 0.000 ; free physical = 9773 ; free virtual = 12792
+Wrote PlaceDB: Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00.01 . Memory (MB): peak = 3063.469 ; gain = 0.000 ; free physical = 10949 ; free virtual = 13099
+Wrote PulsedLatchDB: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3063.469 ; gain = 0.000 ; free physical = 10949 ; free virtual = 13099
 Writing XDEF routing.
-Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3053.699 ; gain = 0.000 ; free physical = 9773 ; free virtual = 12792
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3063.469 ; gain = 0.000 ; free physical = 10949 ; free virtual = 13099
 Writing XDEF routing logical nets.
 Writing XDEF routing special nets.
-Wrote RouteStorage: Time (s): cpu = 00:00:00.13 ; elapsed = 00:00:00.07 . Memory (MB): peak = 3053.699 ; gain = 0.000 ; free physical = 9773 ; free virtual = 12793
-Wrote Netlist Cache: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3053.699 ; gain = 0.000 ; free physical = 9773 ; free virtual = 12793
-Wrote Device Cache: Time (s): cpu = 00:00:00.05 ; elapsed = 00:00:00.02 . Memory (MB): peak = 3053.699 ; gain = 0.000 ; free physical = 9773 ; free virtual = 12794
-Write Physdb Complete: Time (s): cpu = 00:00:00.22 ; elapsed = 00:00:00.11 . Memory (MB): peak = 3053.699 ; gain = 0.000 ; free physical = 9773 ; free virtual = 12794
+Wrote RouteStorage: Time (s): cpu = 00:00:00.12 ; elapsed = 00:00:00.05 . Memory (MB): peak = 3063.469 ; gain = 0.000 ; free physical = 10949 ; free virtual = 13099
+Wrote Netlist Cache: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3063.469 ; gain = 0.000 ; free physical = 10949 ; free virtual = 13099
+Wrote Device Cache: Time (s): cpu = 00:00:00.04 ; elapsed = 00:00:00.02 . Memory (MB): peak = 3063.469 ; gain = 0.000 ; free physical = 10947 ; free virtual = 13098
+Write Physdb Complete: Time (s): cpu = 00:00:00.2 ; elapsed = 00:00:00.11 . Memory (MB): peak = 3063.469 ; gain = 0.000 ; free physical = 10947 ; free virtual = 13098
 INFO: [Common 17-1381] The checkpoint '/home/azureuser/btreeBlock/verilog/delete/vivado/dcp/synth.dcp' has been generated.
 # opt_design -directive RuntimeOptimized
 Command: opt_design -directive RuntimeOptimized
@@ -228,109 +234,109 @@ INFO: [DRC 23-27] Running DRC with 2 threads
 INFO: [Project 1-461] DRC finished with 0 Errors
 INFO: [Project 1-462] Please refer to the DRC report (report_drc) for more information.
 
-Time (s): cpu = 00:00:00.87 ; elapsed = 00:00:00.72 . Memory (MB): peak = 3053.699 ; gain = 0.000 ; free physical = 9749 ; free virtual = 12769
+Time (s): cpu = 00:00:04 ; elapsed = 00:00:02 . Memory (MB): peak = 3063.469 ; gain = 0.000 ; free physical = 10939 ; free virtual = 13089
 
 Starting Logic Optimization Task
 
 Phase 1 Initialization
 
 Phase 1.1 Core Generation And Design Setup
-Phase 1.1 Core Generation And Design Setup | Checksum: 235dfb39f
+Phase 1.1 Core Generation And Design Setup | Checksum: 22d114cdb
 
-Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3098.512 ; gain = 0.000 ; free physical = 9734 ; free virtual = 12753
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 3112.453 ; gain = 0.000 ; free physical = 10885 ; free virtual = 13035
 
 Phase 1.2 Setup Constraints And Sort Netlist
-Phase 1.2 Setup Constraints And Sort Netlist | Checksum: 235dfb39f
+Phase 1.2 Setup Constraints And Sort Netlist | Checksum: 22d114cdb
 
-Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3098.512 ; gain = 0.000 ; free physical = 9734 ; free virtual = 12753
-Phase 1 Initialization | Checksum: 235dfb39f
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 3112.453 ; gain = 0.000 ; free physical = 10885 ; free virtual = 13035
+Phase 1 Initialization | Checksum: 22d114cdb
 
-Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3098.512 ; gain = 0.000 ; free physical = 9734 ; free virtual = 12753
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 3112.453 ; gain = 0.000 ; free physical = 10885 ; free virtual = 13035
 
 Phase 2 Timer Update And Timing Data Collection
 
 Phase 2.1 Timer Update
 INFO: [Timing 38-35] Done setting XDC timing constraints.
-Phase 2.1 Timer Update | Checksum: 235dfb39f
+Phase 2.1 Timer Update | Checksum: 22d114cdb
 
-Time (s): cpu = 00:00:20 ; elapsed = 00:00:20 . Memory (MB): peak = 3691.613 ; gain = 593.102 ; free physical = 9150 ; free virtual = 12170
+Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 3736.555 ; gain = 624.102 ; free physical = 10314 ; free virtual = 12463
 
 Phase 2.2 Timing Data Collection
-Phase 2.2 Timing Data Collection | Checksum: 235dfb39f
+Phase 2.2 Timing Data Collection | Checksum: 22d114cdb
 
-Time (s): cpu = 00:00:20 ; elapsed = 00:00:20 . Memory (MB): peak = 3691.613 ; gain = 593.102 ; free physical = 9146 ; free virtual = 12166
-Phase 2 Timer Update And Timing Data Collection | Checksum: 235dfb39f
+Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 3736.555 ; gain = 624.102 ; free physical = 10314 ; free virtual = 12463
+Phase 2 Timer Update And Timing Data Collection | Checksum: 22d114cdb
 
-Time (s): cpu = 00:00:20 ; elapsed = 00:00:20 . Memory (MB): peak = 3691.613 ; gain = 593.102 ; free physical = 9146 ; free virtual = 12166
+Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 3736.555 ; gain = 624.102 ; free physical = 10314 ; free virtual = 12463
 
 Phase 3 Retarget
 INFO: [Opt 31-1851] Number of loadless carry chains removed were: 0
 INFO: [Opt 31-1834] Total Chains To Be Transformed Were: 0 AND Number of Transformed insts Created are: 0
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
 INFO: [Opt 31-49] Retargeted 0 cell(s).
-Phase 3 Retarget | Checksum: 235dfb39f
+Phase 3 Retarget | Checksum: 22d114cdb
 
-Time (s): cpu = 00:00:20 ; elapsed = 00:00:20 . Memory (MB): peak = 3691.613 ; gain = 593.102 ; free physical = 9146 ; free virtual = 12166
-Retarget | Checksum: 235dfb39f
+Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 3736.555 ; gain = 624.102 ; free physical = 10314 ; free virtual = 12463
+Retarget | Checksum: 22d114cdb
 INFO: [Opt 31-389] Phase Retarget created 0 cells and removed 0 cells
 
 Phase 4 Constant propagation
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Phase 4 Constant propagation | Checksum: 235dfb39f
+Phase 4 Constant propagation | Checksum: 22d114cdb
 
-Time (s): cpu = 00:00:20 ; elapsed = 00:00:20 . Memory (MB): peak = 3691.613 ; gain = 593.102 ; free physical = 9146 ; free virtual = 12166
-Constant propagation | Checksum: 235dfb39f
+Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 3736.555 ; gain = 624.102 ; free physical = 10314 ; free virtual = 12463
+Constant propagation | Checksum: 22d114cdb
 INFO: [Opt 31-389] Phase Constant propagation created 0 cells and removed 0 cells
 
 Phase 5 Sweep
 INFO: [Constraints 18-11670] Building netlist checker database with flags, 0x8
-Done building netlist checker database: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3691.613 ; gain = 0.000 ; free physical = 9146 ; free virtual = 12166
-Phase 5 Sweep | Checksum: 235dfb39f
+Done building netlist checker database: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3736.555 ; gain = 0.000 ; free physical = 10314 ; free virtual = 12463
+Phase 5 Sweep | Checksum: 2609e2896
 
-Time (s): cpu = 00:00:20 ; elapsed = 00:00:20 . Memory (MB): peak = 3691.613 ; gain = 593.102 ; free physical = 9146 ; free virtual = 12166
-Sweep | Checksum: 235dfb39f
+Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 3736.555 ; gain = 624.102 ; free physical = 10314 ; free virtual = 12463
+Sweep | Checksum: 2609e2896
 INFO: [Opt 31-389] Phase Sweep created 0 cells and removed 0 cells
 
 Phase 6 BUFG optimization
-Phase 6 BUFG optimization | Checksum: 235dfb39f
+Phase 6 BUFG optimization | Checksum: 2609e2896
 
-Time (s): cpu = 00:00:20 ; elapsed = 00:00:20 . Memory (MB): peak = 3699.617 ; gain = 601.105 ; free physical = 9146 ; free virtual = 12166
-BUFG optimization | Checksum: 235dfb39f
+Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 3736.555 ; gain = 624.102 ; free physical = 10314 ; free virtual = 12463
+BUFG optimization | Checksum: 2609e2896
 INFO: [Opt 31-662] Phase BUFG optimization created 0 cells of which 0 are BUFGs and removed 0 cells.
 
 Phase 7 Shift Register Optimization
 INFO: [Opt 31-1064] SRL Remap converted 0 SRLs to 0 registers and converted 0 registers of register chains to 0 SRLs
-Phase 7 Shift Register Optimization | Checksum: 235dfb39f
+Phase 7 Shift Register Optimization | Checksum: 2609e2896
 
-Time (s): cpu = 00:00:20 ; elapsed = 00:00:20 . Memory (MB): peak = 3699.617 ; gain = 601.105 ; free physical = 9146 ; free virtual = 12166
-Shift Register Optimization | Checksum: 235dfb39f
+Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 3736.555 ; gain = 624.102 ; free physical = 10314 ; free virtual = 12463
+Shift Register Optimization | Checksum: 2609e2896
 INFO: [Opt 31-389] Phase Shift Register Optimization created 0 cells and removed 0 cells
 
 Phase 8 Post Processing Netlist
-Phase 8 Post Processing Netlist | Checksum: 235dfb39f
+Phase 8 Post Processing Netlist | Checksum: 2609e2896
 
-Time (s): cpu = 00:00:20 ; elapsed = 00:00:20 . Memory (MB): peak = 3699.617 ; gain = 601.105 ; free physical = 9146 ; free virtual = 12166
-Post Processing Netlist | Checksum: 235dfb39f
+Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 3736.555 ; gain = 624.102 ; free physical = 10314 ; free virtual = 12463
+Post Processing Netlist | Checksum: 2609e2896
 INFO: [Opt 31-389] Phase Post Processing Netlist created 0 cells and removed 0 cells
 
 Phase 9 Finalization
 
 Phase 9.1 Finalizing Design Cores and Updating Shapes
-Phase 9.1 Finalizing Design Cores and Updating Shapes | Checksum: 235dfb39f
+Phase 9.1 Finalizing Design Cores and Updating Shapes | Checksum: 2588c8b57
 
-Time (s): cpu = 00:00:20 ; elapsed = 00:00:20 . Memory (MB): peak = 3699.617 ; gain = 601.105 ; free physical = 9146 ; free virtual = 12166
+Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 3736.555 ; gain = 624.102 ; free physical = 10314 ; free virtual = 12463
 
 Phase 9.2 Verifying Netlist Connectivity
 
 Starting Connectivity Check Task
 
-Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9142 ; free virtual = 12162
-Phase 9.2 Verifying Netlist Connectivity | Checksum: 235dfb39f
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3736.555 ; gain = 0.000 ; free physical = 10314 ; free virtual = 12463
+Phase 9.2 Verifying Netlist Connectivity | Checksum: 2588c8b57
 
-Time (s): cpu = 00:00:20 ; elapsed = 00:00:20 . Memory (MB): peak = 3699.617 ; gain = 601.105 ; free physical = 9142 ; free virtual = 12162
-Phase 9 Finalization | Checksum: 235dfb39f
+Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 3736.555 ; gain = 624.102 ; free physical = 10314 ; free virtual = 12463
+Phase 9 Finalization | Checksum: 2588c8b57
 
-Time (s): cpu = 00:00:20 ; elapsed = 00:00:20 . Memory (MB): peak = 3699.617 ; gain = 601.105 ; free physical = 9142 ; free virtual = 12162
+Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 3736.555 ; gain = 624.102 ; free physical = 10314 ; free virtual = 12463
 Opt_design Change Summary
 =========================
 
@@ -347,31 +353,31 @@ Opt_design Change Summary
 -------------------------------------------------------------------------------------------------------------------------
 
 
-Ending Logic Optimization Task | Checksum: 235dfb39f
+Ending Logic Optimization Task | Checksum: 2588c8b57
 
-Time (s): cpu = 00:00:20 ; elapsed = 00:00:20 . Memory (MB): peak = 3699.617 ; gain = 601.105 ; free physical = 9142 ; free virtual = 12162
+Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 3736.555 ; gain = 624.102 ; free physical = 10314 ; free virtual = 12463
 
 Starting Netlist Obfuscation Task
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9142 ; free virtual = 12162
-Ending Netlist Obfuscation Task | Checksum: 235dfb39f
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3736.555 ; gain = 0.000 ; free physical = 10314 ; free virtual = 12463
+Ending Netlist Obfuscation Task | Checksum: 2588c8b57
 
-Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9142 ; free virtual = 12162
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3736.555 ; gain = 0.000 ; free physical = 10314 ; free virtual = 12463
 INFO: [Common 17-83] Releasing license: Implementation
 21 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
 opt_design completed successfully
-opt_design: Time (s): cpu = 00:00:24 ; elapsed = 00:00:24 . Memory (MB): peak = 3699.617 ; gain = 645.918 ; free physical = 9142 ; free virtual = 12162
+opt_design: Time (s): cpu = 00:00:23 ; elapsed = 00:00:21 . Memory (MB): peak = 3736.555 ; gain = 673.086 ; free physical = 10314 ; free virtual = 12463
 # write_checkpoint -force /home/azureuser/btreeBlock/verilog/delete/vivado/dcp/opt.dcp
 INFO: [Timing 38-480] Writing timing data to binary archive.
-Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9142 ; free virtual = 12161
-Wrote PlaceDB: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9142 ; free virtual = 12161
-Wrote PulsedLatchDB: Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9142 ; free virtual = 12161
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3736.555 ; gain = 0.000 ; free physical = 10314 ; free virtual = 12463
+Wrote PlaceDB: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3736.555 ; gain = 0.000 ; free physical = 10314 ; free virtual = 12463
+Wrote PulsedLatchDB: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3736.555 ; gain = 0.000 ; free physical = 10314 ; free virtual = 12463
 Writing XDEF routing.
 Writing XDEF routing logical nets.
 Writing XDEF routing special nets.
-Wrote RouteStorage: Time (s): cpu = 00:00:00.12 ; elapsed = 00:00:00.07 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9142 ; free virtual = 12162
-Wrote Netlist Cache: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9142 ; free virtual = 12162
-Wrote Device Cache: Time (s): cpu = 00:00:00.06 ; elapsed = 00:00:00.02 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9142 ; free virtual = 12163
-Write Physdb Complete: Time (s): cpu = 00:00:00.2 ; elapsed = 00:00:00.1 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9142 ; free virtual = 12163
+Wrote RouteStorage: Time (s): cpu = 00:00:00.11 ; elapsed = 00:00:00.06 . Memory (MB): peak = 3736.555 ; gain = 0.000 ; free physical = 10314 ; free virtual = 12464
+Wrote Netlist Cache: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3736.555 ; gain = 0.000 ; free physical = 10314 ; free virtual = 12464
+Wrote Device Cache: Time (s): cpu = 00:00:00.04 ; elapsed = 00:00:00.02 . Memory (MB): peak = 3736.555 ; gain = 0.000 ; free physical = 10312 ; free virtual = 12463
+Write Physdb Complete: Time (s): cpu = 00:00:00.16 ; elapsed = 00:00:00.09 . Memory (MB): peak = 3736.555 ; gain = 0.000 ; free physical = 10312 ; free virtual = 12463
 INFO: [Common 17-1381] The checkpoint '/home/azureuser/btreeBlock/verilog/delete/vivado/dcp/opt.dcp' has been generated.
 # report_bus_skew -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/bus_skew.rpt
 INFO: [Timing 38-35] Done setting XDC timing constraints.
@@ -381,7 +387,7 @@ INFO: [Timing 38-191] Multithreading enabled for timing update using a maximum o
 INFO: [Timing 38-91] UpdateTimingParams: Speed grade: -1, Delay Type: max.
 INFO: [Timing 38-191] Multithreading enabled for timing update using a maximum of 2 CPUs
 # report_control_sets -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/control_sets.rpt
-report_control_sets: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.1 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9136 ; free virtual = 12155
+report_control_sets: Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00.05 . Memory (MB): peak = 3736.555 ; gain = 0.000 ; free physical = 10304 ; free virtual = 12454
 # report_cdc -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/cdc.rpt
 INFO: [Timing 38-91] UpdateTimingParams: No interconnect No Cell Dly, Speed grade: -1, Delay Type: max.
 INFO: [Timing 38-191] Multithreading enabled for timing update using a maximum of 2 CPUs
@@ -394,218 +400,3 @@ INFO: [IP_Flow 19-234] Refreshing IP repositories
 INFO: [IP_Flow 19-1704] No user IP repositories specified
 INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/home/azureuser/Vivado/2024.2/data/ip'.
 INFO: [DRC 23-27] Running DRC with 2 threads
-INFO: [Vivado_Tcl 2-168] The results of DRC are in file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/drc.rpt.
-report_drc completed successfully
-report_drc: Time (s): cpu = 00:00:07 ; elapsed = 00:00:06 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9129 ; free virtual = 12148
-# report_high_fanout_nets -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/high_fanout_nets.rpt
-report_high_fanout_nets: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.07 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9129 ; free virtual = 12148
-# report_methodology -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/methodology.rpt
-Command: report_methodology -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/methodology.rpt
-INFO: [Timing 38-35] Done setting XDC timing constraints.
-INFO: [DRC 23-133] Running Methodology with 2 threads
-INFO: [Vivado_Tcl 2-1520] The results of Report Methodology are in file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/methodology.rpt.
-report_methodology completed successfully
-# report_power -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/power.rpt
-Command: report_power -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/power.rpt
-INFO: [Timing 38-35] Done setting XDC timing constraints.
-Running Vector-less Activity Propagation...
-
-Finished Running Vector-less Activity Propagation
-1 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
-report_power completed successfully
-# report_timing_summary -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/statement/64/timing_summary.rpt
-INFO: [Timing 38-91] UpdateTimingParams: Speed grade: -1, Delay Type: min_max.
-INFO: [Timing 38-191] Multithreading enabled for timing update using a maximum of 2 CPUs
-# report_utilization -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/utilization.rpt
-# place_design -directive AltSpreadLogic_high
-Command: place_design -directive AltSpreadLogic_high
-Attempting to get a license for feature 'Implementation' and/or device 'xc7v2000t'
-INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7v2000t'
-INFO: [Common 17-86] Your Implementation license expires in 9 day(s)
-INFO: [Common 17-83] Releasing license: Implementation
-INFO: [DRC 23-27] Running DRC with 2 threads
-INFO: [Vivado_Tcl 4-198] DRC finished with 0 Errors
-INFO: [Vivado_Tcl 4-199] Please refer to the DRC report (report_drc) for more information.
-INFO: [Vivado_Tcl 4-2302] The placer was invoked with the 'AltSpreadLogic_high' directive.
-Running DRC as a precondition to command place_design
-INFO: [DRC 23-27] Running DRC with 2 threads
-INFO: [Vivado_Tcl 4-198] DRC finished with 0 Errors
-INFO: [Vivado_Tcl 4-199] Please refer to the DRC report (report_drc) for more information.
-INFO: [Place 30-611] Multithreading enabled for place_design using a maximum of 2 CPUs
-
-Starting Placer Task
-
-Phase 1 Placer Initialization
-
-Phase 1.1 Placer Initialization Netlist Sorting
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9113 ; free virtual = 12133
-Phase 1.1 Placer Initialization Netlist Sorting | Checksum: 18ebc54ad
-
-Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9113 ; free virtual = 12133
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9113 ; free virtual = 12133
-
-Phase 1.2 IO Placement/ Clock Placement/ Build Placer Device
-Phase 1.2 IO Placement/ Clock Placement/ Build Placer Device | Checksum: 18bb76ba2
-
-Time (s): cpu = 00:00:05 ; elapsed = 00:00:03 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9113 ; free virtual = 12133
-
-Phase 1.3 Build Placer Netlist Model
-WARNING: [Place 30-2953] Timing driven mode will be turned off because no critical terminals were found.
-Phase 1.3 Build Placer Netlist Model | Checksum: 1d0cdedc2
-
-Time (s): cpu = 00:00:05 ; elapsed = 00:00:04 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9113 ; free virtual = 12133
-
-Phase 1.4 Constrain Clocks/Macros
-Phase 1.4 Constrain Clocks/Macros | Checksum: 1d0cdedc2
-
-Time (s): cpu = 00:00:05 ; elapsed = 00:00:04 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9113 ; free virtual = 12133
-Phase 1 Placer Initialization | Checksum: 1d0cdedc2
-
-Time (s): cpu = 00:00:06 ; elapsed = 00:00:04 . Memory (MB): peak = 3699.617 ; gain = 0.000 ; free physical = 9113 ; free virtual = 12133
-
-Phase 2 Global Placement
-
-Phase 2.1 Floorplanning
-Phase 2.1 Floorplanning | Checksum: 2707277a3
-
-Time (s): cpu = 00:00:06 ; elapsed = 00:00:05 . Memory (MB): peak = 3702.629 ; gain = 3.012 ; free physical = 9113 ; free virtual = 12133
-
-Phase 2.2 Update Timing before SLR Path Opt
-Phase 2.2 Update Timing before SLR Path Opt | Checksum: 2707277a3
-
-Time (s): cpu = 00:00:06 ; elapsed = 00:00:05 . Memory (MB): peak = 3702.629 ; gain = 3.012 ; free physical = 9113 ; free virtual = 12133
-
-Phase 2.3 Post-Processing in Floorplanning
-Phase 2.3 Post-Processing in Floorplanning | Checksum: 2707277a3
-
-Time (s): cpu = 00:00:06 ; elapsed = 00:00:05 . Memory (MB): peak = 3702.629 ; gain = 3.012 ; free physical = 9113 ; free virtual = 12133
-
-Phase 2.4 Global Place Phase1
-Phase 2.4 Global Place Phase1 | Checksum: 26a49ba3f
-
-Time (s): cpu = 00:00:08 ; elapsed = 00:00:07 . Memory (MB): peak = 3801.137 ; gain = 101.520 ; free physical = 9028 ; free virtual = 12048
-
-Phase 2.5 Global Place Phase2
-WARNING: [Place 46-29] Timing had been disabled during Placer and, therefore, physical synthesis in Placer will be skipped.
-Phase 2.5 Global Place Phase2 | Checksum: 26a49ba3f
-
-Time (s): cpu = 00:00:09 ; elapsed = 00:00:07 . Memory (MB): peak = 3801.137 ; gain = 101.520 ; free physical = 9028 ; free virtual = 12048
-Phase 2 Global Placement | Checksum: 26a49ba3f
-
-Time (s): cpu = 00:00:09 ; elapsed = 00:00:07 . Memory (MB): peak = 3801.137 ; gain = 101.520 ; free physical = 9028 ; free virtual = 12048
-
-Phase 3 Detail Placement
-
-Phase 3.1 Commit Multi Column Macros
-Phase 3.1 Commit Multi Column Macros | Checksum: 26a49ba3f
-
-Time (s): cpu = 00:00:09 ; elapsed = 00:00:07 . Memory (MB): peak = 3801.137 ; gain = 101.520 ; free physical = 9028 ; free virtual = 12048
-
-Phase 3.2 Commit Most Macros & LUTRAMs
-Phase 3.2 Commit Most Macros & LUTRAMs | Checksum: 206151433
-
-Time (s): cpu = 00:00:09 ; elapsed = 00:00:07 . Memory (MB): peak = 3809.105 ; gain = 109.488 ; free physical = 9005 ; free virtual = 12024
-
-Phase 3.3 Area Swap Optimization
-Phase 3.3 Area Swap Optimization | Checksum: 24dfaf1ab
-
-Time (s): cpu = 00:00:09 ; elapsed = 00:00:08 . Memory (MB): peak = 3809.105 ; gain = 109.488 ; free physical = 9005 ; free virtual = 12024
-
-Phase 3.4 Pipeline Register Optimization
-Phase 3.4 Pipeline Register Optimization | Checksum: 24dfaf1ab
-
-Time (s): cpu = 00:00:09 ; elapsed = 00:00:08 . Memory (MB): peak = 3809.105 ; gain = 109.488 ; free physical = 9005 ; free virtual = 12024
-
-Phase 3.5 Small Shape Detail Placement
-Phase 3.5 Small Shape Detail Placement | Checksum: 22124df94
-
-Time (s): cpu = 00:00:12 ; elapsed = 00:00:10 . Memory (MB): peak = 3909.363 ; gain = 209.746 ; free physical = 8910 ; free virtual = 11929
-
-Phase 3.6 Re-assign LUT pins
-Phase 3.6 Re-assign LUT pins | Checksum: 22124df94
-
-Time (s): cpu = 00:00:12 ; elapsed = 00:00:11 . Memory (MB): peak = 3909.363 ; gain = 209.746 ; free physical = 8910 ; free virtual = 11929
-
-Phase 3.7 Pipeline Register Optimization
-Phase 3.7 Pipeline Register Optimization | Checksum: 22124df94
-
-Time (s): cpu = 00:00:12 ; elapsed = 00:00:11 . Memory (MB): peak = 3909.363 ; gain = 209.746 ; free physical = 8910 ; free virtual = 11929
-Phase 3 Detail Placement | Checksum: 22124df94
-
-Time (s): cpu = 00:00:12 ; elapsed = 00:00:11 . Memory (MB): peak = 3909.363 ; gain = 209.746 ; free physical = 8910 ; free virtual = 11929
-
-Phase 4 Post Placement Optimization and Clean-Up
-
-Phase 4.1 Post Commit Optimization
-Phase 4.1 Post Commit Optimization | Checksum: 22124df94
-
-Time (s): cpu = 00:00:13 ; elapsed = 00:00:12 . Memory (MB): peak = 3909.363 ; gain = 209.746 ; free physical = 8910 ; free virtual = 11929
-
-Phase 4.2 Post Placement Cleanup
-Phase 4.2 Post Placement Cleanup | Checksum: 22124df94
-
-Time (s): cpu = 00:00:13 ; elapsed = 00:00:12 . Memory (MB): peak = 3909.363 ; gain = 209.746 ; free physical = 8910 ; free virtual = 11929
-
-Phase 4.3 Placer Reporting
-
-Phase 4.3.1 Print Estimated Congestion
-INFO: [Place 30-612] Post-Placement Estimated Congestion 
- ____________________________________________________
-|           | Global Congestion | Short Congestion  |
-| Direction | Region Size       | Region Size       |
-|___________|___________________|___________________|
-|      North|                1x1|                1x1|
-|___________|___________________|___________________|
-|      South|                1x1|                1x1|
-|___________|___________________|___________________|
-|       East|                1x1|                1x1|
-|___________|___________________|___________________|
-|       West|                1x1|                1x1|
-|___________|___________________|___________________|
-
-Phase 4.3.1 Print Estimated Congestion | Checksum: 22124df94
-
-Time (s): cpu = 00:00:13 ; elapsed = 00:00:12 . Memory (MB): peak = 3909.363 ; gain = 209.746 ; free physical = 8910 ; free virtual = 11929
-Phase 4.3 Placer Reporting | Checksum: 22124df94
-
-Time (s): cpu = 00:00:13 ; elapsed = 00:00:12 . Memory (MB): peak = 3909.363 ; gain = 209.746 ; free physical = 8910 ; free virtual = 11929
-
-Phase 4.4 Final Placement Cleanup
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3909.363 ; gain = 0.000 ; free physical = 8910 ; free virtual = 11929
-
-Time (s): cpu = 00:00:13 ; elapsed = 00:00:12 . Memory (MB): peak = 3909.363 ; gain = 209.746 ; free physical = 8910 ; free virtual = 11929
-Phase 4 Post Placement Optimization and Clean-Up | Checksum: 22124df94
-
-Time (s): cpu = 00:00:13 ; elapsed = 00:00:12 . Memory (MB): peak = 3909.363 ; gain = 209.746 ; free physical = 8910 ; free virtual = 11929
-Ending Placer Task | Checksum: 17bc4f89b
-
-Time (s): cpu = 00:00:13 ; elapsed = 00:00:12 . Memory (MB): peak = 3909.363 ; gain = 209.746 ; free physical = 8910 ; free virtual = 11929
-12 Infos, 2 Warnings, 0 Critical Warnings and 0 Errors encountered.
-place_design completed successfully
-place_design: Time (s): cpu = 00:00:20 ; elapsed = 00:00:17 . Memory (MB): peak = 3909.363 ; gain = 209.746 ; free physical = 8910 ; free virtual = 11929
-# write_checkpoint -force /home/azureuser/btreeBlock/verilog/delete/vivado/dcp/place.dcp
-INFO: [Timing 38-480] Writing timing data to binary archive.
-Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3909.363 ; gain = 0.000 ; free physical = 8909 ; free virtual = 11929
-Wrote PlaceDB: Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00 . Memory (MB): peak = 3909.363 ; gain = 0.000 ; free physical = 8909 ; free virtual = 11929
-Wrote PulsedLatchDB: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3909.363 ; gain = 0.000 ; free physical = 8909 ; free virtual = 11929
-Writing XDEF routing.
-Writing XDEF routing logical nets.
-Writing XDEF routing special nets.
-Wrote RouteStorage: Time (s): cpu = 00:00:00.13 ; elapsed = 00:00:00.07 . Memory (MB): peak = 3909.363 ; gain = 0.000 ; free physical = 8909 ; free virtual = 11929
-Wrote Netlist Cache: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3909.363 ; gain = 0.000 ; free physical = 8909 ; free virtual = 11929
-Wrote Device Cache: Time (s): cpu = 00:00:00.05 ; elapsed = 00:00:00.03 . Memory (MB): peak = 3909.363 ; gain = 0.000 ; free physical = 8909 ; free virtual = 11931
-Write Physdb Complete: Time (s): cpu = 00:00:00.21 ; elapsed = 00:00:00.11 . Memory (MB): peak = 3909.363 ; gain = 0.000 ; free physical = 8909 ; free virtual = 11931
-INFO: [Common 17-1381] The checkpoint '/home/azureuser/btreeBlock/verilog/delete/vivado/dcp/place.dcp' has been generated.
-# route_design -directive Quick
-Command: route_design -directive Quick
-Attempting to get a license for feature 'Implementation' and/or device 'xc7v2000t'
-INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7v2000t'
-INFO: [Common 17-86] Your Implementation license expires in 9 day(s)
-
-
-Starting Routing Task
-INFO: [Route 35-270] Using Router directive 'Quick'.
-INFO: [Route 35-254] Multithreading enabled for route_design using a maximum of 2 CPUs
-
-Phase 1 Build RT Design
-Checksum: PlaceDB: e415f0a1 ConstDB: 0 ShapeSum: 221e9f57 RouteDB: 759068a3
