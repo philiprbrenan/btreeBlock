@@ -8,7 +8,7 @@ use Data::Table::Text qw(:all);
 # Clock was k11 now C7
 my $project       = q(btreeBlock);                                              # The name of the project
 my $part          = q(xc7a50tcpg236);                                           # 50K
-   $part          = q(xc7a200tffv1156-2);                                       # 150K - good
+#  $part          = q(xc7a200tffv1156-2);                                       # 150K - good
 #  $part          = q(xc7v2000tflg1925-1);                                      # 1 million - good
 #  $part          = q(xcvu440-flga2892-1-c);                                    # 5 million
 
@@ -123,6 +123,8 @@ if (1)                                                                          
   for my $f(@files)
    {if ($f =~ m(/(\w+)/(\d+)/statement/(\d+)/)igs)
      {my ($project, $key, $statement) = ($1, $2, $3);
+      next if $project =~ m(find)i;
+      next if $project =~ m(delete)i and $statement < 140;
       gen($project, $key, $statement);
      }
    }
