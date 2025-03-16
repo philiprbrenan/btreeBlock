@@ -1,12 +1,12 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sat Mar 15 17:07:33 2025
+| Date         : Sun Mar 16 21:50:58 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_methodology -file /home/azureuser/btreeBlock/verilog/put/vivado/reports/methodology.rpt
 | Design       : put
-| Device       : xc7v2000tflg1925-1
-| Speed File   : -1
+| Device       : xc7a50tcpg236-3
+| Speed File   : -3
 | Design State : Synthesized
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -23,11 +23,11 @@ Table of Contents
           Floorplan: put
       Design limits: <entire design considered>
              Max checks: <unlimited>
-             Checks found: 16
+             Checks found: 15
 +-----------+----------+-------------------------------+--------+
 | Rule      | Severity | Description                   | Checks |
 +-----------+----------+-------------------------------+--------+
-| TIMING-18 | Warning  | Missing input or output delay | 16     |
+| TIMING-18 | Warning  | Missing input or output delay | 15     |
 +-----------+----------+-------------------------------+--------+
 
 2. REPORT DETAILS
@@ -105,11 +105,6 @@ Related violations: <none>
 TIMING-18#15 Warning
 Missing input or output delay  
 An output delay is missing on found relative to the rising and/or falling clock edge(s) of clock.
-Related violations: <none>
-
-TIMING-18#16 Warning
-Missing input or output delay  
-An output delay is missing on stop relative to the rising and/or falling clock edge(s) of clock.
 Related violations: <none>
 
 
