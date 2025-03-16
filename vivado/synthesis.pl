@@ -128,8 +128,9 @@ else                                                                            
   for my $f(@files)
    {if ($f =~ m(/(\w+)/(\d+)/statement/(\d+)/)igs)
      {my ($project, $key, $statement) = ($1, $2, $3);
-      next if $project =~ m(find)i;
-      next if $project =~ m(delete)i and $statement < 140;
+      #next if $project =~ m(find)i;
+      #next if $project =~ m(delete)i and $statement < 140;
+      #next if $project =~ m(put)i    and $statement < 140;
       gen($project, $key, $statement);
      }
    }
