@@ -18,7 +18,7 @@ abstract class BtreeDM extends Test                                             
   final MemoryLayoutDM      T;                                                  // The memory used to hold temporary variable used during a transaction on the btree
   final ProgramDM           P = new ProgramDM();                                // Program in which to generate instructions
   final boolean       OpCodes = true;                                           // Refactor op codes
-  final boolean eachStatement = true;                                           // Isolate each statement
+  final boolean eachStatement = false;                                          // Isolate each statement to get per statement timing
   final boolean    runVerilog = true;                                           // Refactor op codes
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
