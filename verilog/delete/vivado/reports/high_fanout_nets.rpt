@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sun Mar 16 04:42:24 2025
+| Date         : Sun Mar 16 19:34:25 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_high_fanout_nets -file /home/azureuser/btreeBlock/verilog/delete/vivado/reports/high_fanout_nets.rpt
 | Design       : delete
@@ -13,12 +13,19 @@ High Fan-out Nets Information
 1. Summary
 ----------
 
-+------------+--------+-------------+
-| Net Name   | Fanout | Driver Type |
-+------------+--------+-------------+
-| clock_IBUF |      1 | IBUF        |
-| reset_IBUF |      1 | IBUF        |
-| stop_OBUF  |      1 | FDRE        |
-+------------+--------+-------------+
++-------------+--------+-------------+
+| Net Name    | Fanout | Driver Type |
++-------------+--------+-------------+
+| reset_IBUF  |     11 | IBUF        |
+| step        |     10 | LUT6        |
+| step_reg[3] |      7 | FDRE        |
+| step_reg[5] |      7 | FDRE        |
+| step_reg[6] |      7 | FDRE        |
+| step_reg[1] |      7 | FDRE        |
+| step_reg[2] |      7 | FDRE        |
+| step_reg[9] |      7 | FDRE        |
+| step_reg[7] |      6 | FDRE        |
+| step_reg[8] |      6 | FDRE        |
++-------------+--------+-------------+
 
 
