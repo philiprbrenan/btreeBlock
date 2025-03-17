@@ -4,6 +4,7 @@ use warnings FATAL => qw(all);
 use strict;
 use Carp;
 use Data::Table::Text qw(:all);
+use Time::HiRes qw(time);
 # https://docs.amd.com/v/u/en-US/zynq-7000-product-selection-guide
 # Clock was k11 now C7
 my $statements    = 1;                                                          # Time statements individually if true else delete/find/put components
@@ -26,8 +27,20 @@ my $vivadoX       = fpf $vivado, qw(bin vivado);                                
 die "No such path: $vivado"    unless -d $vivado  or -e $local;                 # Check vivado files exist
 die "No such file: $vivadoX"   unless -f $vivadoX or -e $local;
 
+sub formatTimeDelta($)                                                          # Format a time delta preented in seconds as hours, minutes, seconds ommitting elements that are zero
+ {my ($Seconds) = @_;
+  my  $seconds  =   int $Seconds;
+  return join ":", map {sprintf("%02d", int $_)}
+      $seconds / 3600,
+     ($seconds  % 3600) / 60,
+      $seconds  %         60;
+ }
+
 sub gen                                                                         # Generate tcl to synthesize design
- {my ($design, $key, $statement) = @_;                                          # Project, key, optional statement
+ {my ($design, $key, %options) = @_;                                            # Project, key, options
+  my $statement = $options{statement};                                          # Statement to be timed
+  my $exists    = $options{test};                                               # Test whether a statement file exists
+  my $title     = $options{title} // '';                                        # Title to print
 
   my @statement = defined($statement) ? (q(statement), $statement) : ();        # Address statement files
 
@@ -46,10 +59,7 @@ sub gen                                                                         
   my $synth       = fpe $dcpDir, qw(synth dcp);                                 # After synthesis checkpoint
   my $timingRoute = fpe $reportsDir, qw(timing_route rpt);                      # Timing after routing
 
-  if (defined($statement) and -e $timingRoute)                                  # Timing file has already been created
-   {say STDERR "Exists: $timingRoute";
-    return;
-   }
+  return -e $timingRoute if defined($statement) and defined($exists);           # Test for the existance of a timing file report
 
   my @reports     =                                                             # Reports
    qw(bus_skew clock_interaction control_sets cdc design_analysis
@@ -75,27 +85,31 @@ read_verilog $verilog
 read_xdc     $constraints
 
 synth_design -name $design -top $design -part $part -include_dirs $includesDir -flatten_hierarchy none -no_timing_driven -directive AlternateRoutability
-
 write_checkpoint -force $synth
+puts "[clock format [clock seconds] -format \"%H:%M:%S\"] synth_design"
 
 opt_design -directive RuntimeOptimized
 write_checkpoint -force $opt
+puts "[clock format [clock seconds] -format \"%H:%M:%S\"] opt_design"
 
 $reports
 
 place_design -directive AltSpreadLogic_high
 write_checkpoint -force $place
+puts "[clock format [clock seconds] -format \"%H:%M:%S\"] place_design"
 
 route_design -directive Quick
 write_checkpoint -force $route
 report_timing_summary    -file $timingRoute
+puts "[clock format [clock seconds] -format \"%H:%M:%S\"] route_design"
 
 write_bitstream  -force $final
+puts "[clock format [clock seconds] -format \"%H:%M:%S\"] write_bitstream"
 END
 
   owf($synthesis, join "\n", @s);                                               # Write tcl to run the synthesis
 
-  say   STDERR dateTimeStamp, " $part for $design ".join " ", @statement;       # Run tcl
+  say STDERR dateTimeStamp, " $part for $design ".join(" ", @statement), $title;# Run tcl
   system("$vivadoX -mode batch -source $synthesis 1>$reportsDir/1.txt");
   unlink $synthesis;
  }
@@ -117,15 +131,33 @@ if (!$statements)                                                               
 else                                                                            # Arrival time for each statement
  {say STDERR dateTimeStamp, " Time individual statements";
   my @files = searchDirectoryTreesForMatchingFiles($verilogDir, qw(.tb));
+  my @remainder;                                                                # Statements still to be tested
 
-  for my $f(@files)
+  for my $f(@files)                                                             # Find statements still to be tested
    {if ($f =~ m(/(\w+)/(\d+)/statement/(\d+)/)igs)
-     {my ($project, $key, $statement) = ($1, $2, $3);
-      #next if $project =~ m(find)i;
-      #next if $project =~ m(delete)i and $statement < 140;
-      #next if $project =~ m(put)i    and $statement < 140;
-      gen($project, $key, $statement);
+     {my ($p, $k, $s) = ($1, $2, $3);
+      if (!gen($p, $k, statement=>$s, exists=>1)
+       {push @tests, [$project, $key, $statement];
+       }
      }
+   }
+
+  my $start = time; my $processed = 0;                                          # Start time of processing, number of statements processed
+
+  for my $f(@remainder)                                                         # Process remaining statements with estimated time of arrival
+   {my ($p, $k, $s) = @$f;
+    if (!$processed)                                                            # No timing  information yet as we are on the first one
+     {gen($p, $k, statement=>$s);
+     }
+    else                                                                        # Compute ETA from avergae time per statement
+     {my $d = time - $start;
+      my $r = @remainder - $processed;
+      my $a = $d / $processed;
+      my $e = $start + $a * @remainder;
+      my $t = " ETA: ".strftime("%Y-%m-%d %H:%M:%S", localtime($e);
+      gen($p, $k, statement=>$s, title=>$t);
+     }
+    ++$processed;
    }
  }
 
