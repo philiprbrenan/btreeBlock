@@ -17,17 +17,21 @@ my $target = q(/home/phil/btreeBlock/verilog/);                                 
 say STDERR "Recover reports";
 
 my @files = &files();                                                           # Files to recover
+
 for my $f(@files)                                                               # Target each source file
  {my ($s, $t) = @$f;
-  if (!-e $t && -e $s)
+  if (!-e $t and -e $s)
    {say STDERR sprintf("%-72s  to  %-72s", $s, $t);
     copyFile($s, $t);
+   }
+  else
+   {say STDERR "Fail: $s";
    }
  }
 
 sub files()                                                                     # Files associated with each project
  {my @f;
-  my %p = (delete=>[3, 400], find=>[2, 20], put=>[1, 400]);
+  my %p = (delete=>[3, 315], find=>[2, 14], put=>[1, 363]);
 
   for my $p(sort keys %p)
    {my ($k, $s) = $p{$p}->@*;
