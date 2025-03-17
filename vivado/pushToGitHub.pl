@@ -19,8 +19,10 @@ say STDERR "Recover reports";
 my @files = &files();                                                           # Files to recover
 for my $f(@files)                                                               # Target each source file
  {my ($s, $t) = @$f;
-  say STDERR sprintf("%-72s  to  %-72s", $s, $t);
-  copyFile($s, $t) if !-e $t && -e $s;
+  if (!-e $t && -e $s)
+   {say STDERR sprintf("%-72s  to  %-72s", $s, $t);
+    copyFile($s, $t);
+   }
  }
 
 sub files()                                                                     # Files associated with each project
