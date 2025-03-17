@@ -32,7 +32,7 @@ push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              
 if (1)                                                                          # Remove most of the verilog except the reports
  {my @f = @files; @files = ();
   for my $f(@f)
-   {next if $f =~ m(verilog) and $f !~ m(/vivado/reports/);
+   {next if $f =~ m(verilog) and $f !~ m(/vivado/(reports|timing_route)/);
     push @files, $f;
    }
  }
