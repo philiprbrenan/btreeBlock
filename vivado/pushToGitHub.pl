@@ -11,7 +11,7 @@ use Data::Table::Text qw(:all);
 use GitHub::Crud qw(:all);
 use feature qw(say current_sub);
 
-my $source = q(/home/phil/aaa/btreeBlockStatements/verilog/);                   # Source folder
+my $source = q(/home/phil/aaa/btreeBlock/verilog/);                             # Source folder
 my $target = q(/home/phil/btreeBlock/verilog/);                                 # Target folder
 
 say STDERR "Recover reports";
@@ -29,8 +29,8 @@ sub files()                                                                     
 
   for my $p(sort keys %p)
    {my ($k, $s) = $p{$p}->@*;
-   #push @f, map {[qq(${source}$project/$k/statement/$_/vivado/reports/timing_route.rpt),
-   #               qq(${target}$project/vivado/timing_route/$_.rpt)]} 0..$s;
+    push @f, map {[qq(${source}$p/$k/statement/$_/vivado/reports/timing_route.rpt),
+                   qq(${target}$p/vivado/timing_route/$_.rpt)]} 0..$s;
 
     push @f, [qq(${source}$p/vivado/reports/1.txt),                  qq(${target}$p/vivado/reports/1.txt)];
     push @f, [qq(${source}$p/vivado/reports/bus_skew.rpt),           qq(${target}$p/vivado/reports/bus_skew.rpt)];
