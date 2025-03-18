@@ -20,7 +20,7 @@ my @files = &files();                                                           
 
 for my $f(@files)                                                               # Target each source file
  {my ($s, $t) = @$f;
-  if (!-e $t and -e $s)
+  if (-e $s)
    {say STDERR sprintf("%-72s  to  %-72s", $s, $t);
     copyFile($s, $t);
    }
