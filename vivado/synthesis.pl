@@ -121,14 +121,15 @@ else
   system("cd $projectDir; bash j.sh BtreeDM");
  }
 
+my $ranges = eval readFile( "ranges.txt");                                      # Load statement ranges
 
-if (!$statements)                                                               # Synthesize, place and route the verilog description
+if (!$$ranges{statements})                                                      # Synthesize, place and route the verilog description
  {say STDERR dateTimeStamp, " Synthesize, place and route btreeBlock";
-  gen(qw(find   2));
-  gen(qw(delete 3));
-  gen(qw(put    1));
+  gen(q(find)  , $$ranges{projects}{find}  [0]);
+  gen(q(delete), $$ranges{projects}{delete}[0]);
+  gen(q(put)   , $$ranges{projects}{put}   [0]);
  }
-else                                                                            # Arrival time for each statement
+else                                                                            # Arrival time for each statement by synthesizing each statement in isolation
  {say STDERR dateTimeStamp, " Time individual statements";
   my @files = searchDirectoryTreesForMatchingFiles($verilogDir, qw(.tb));
   my @remainder;                                                                # Statements still to be tested
@@ -136,8 +137,8 @@ else                                                                            
   for my $f(@files)                                                             # Find statements still to be tested
    {if ($f =~ m(/(\w+)/(\d+)/statement/(\d+)/)igs)
      {my ($p, $k, $s) = ($1, $2, $3);
-      if (!gen($p, $k, statement=>$s, exists=>1)
-       {push @tests, [$project, $key, $statement];
+      if (!gen($p, $k, statement=>$s, exists=>1))
+       {push @remainder, [$p, $k, $s];
        }
      }
    }
@@ -154,7 +155,7 @@ else                                                                            
       my $r = @remainder - $processed;
       my $a = $d / $processed;
       my $e = $start + $a * @remainder;
-      my $t = " ETA: ".strftime("%Y-%m-%d %H:%M:%S", localtime($e);
+      my $t = " ETA: ".strftime("%Y-%m-%d %H:%M:%S", localtime($e));
       gen($p, $k, statement=>$s, title=>$t);
      }
     ++$processed;
