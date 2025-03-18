@@ -1,0 +1,5 @@
+{statements=>0, projects=>{
+  delete=>[3, 316],
+  find=>[2, 15],
+  put=>[1, 364],
+}}
