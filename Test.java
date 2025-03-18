@@ -508,7 +508,8 @@ public class Test                                                               
   static void deleteFile(String filePath) {deleteFile(filePath, false);}
 
   static void makePath(String folder)                                           // Make a path
-   {try
+   {if (folder == null) return;
+    try
      {Files.createDirectories(Paths.get(folder));
      }
     catch (Exception e)
@@ -572,7 +573,9 @@ public class Test                                                               
    }
 
   static String folderName(String filePath)                                     // Get the folder name from a file path name
-   {return Paths.get(filePath).getParent().toString() + "/";
+   {final Path p = Paths.get(filePath).getParent();
+    if (p == null) return null;
+    return p.toString() + "/";
    }
 
   static String fileExt(String filePath)                                        // Get the extension name from a file path name
