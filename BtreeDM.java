@@ -13,13 +13,14 @@ import java.util.*;
 import java.nio.file.*;
 
 abstract class BtreeDM extends Test                                             // Manipulate a btree using static methods and memory
- {final BtreeDM   thisBTree = this;                                             // Direct access to this btree even when this goes out of range
-  final MemoryLayoutDM      M;                                                  // The memory layout of the btree
-  final MemoryLayoutDM      T;                                                  // The memory used to hold temporary variable used during a transaction on the btree
-  final ProgramDM           P = new ProgramDM();                                // Program in which to generate instructions
-  final boolean       OpCodes = true;                                           // Refactor op codes
-  final boolean eachStatement = true;                                           // Isolate each statement to get per statement timing
-  final boolean    runVerilog = true;                                           // Refactor op codes
+ {final BtreeDM            thisBTree = this;                                    // Direct access to this btree even when this goes out of range
+  final MemoryLayoutDM             M;                                           // The memory layout of the btree
+  final MemoryLayoutDM             T;                                           // The memory used to hold temporary variable used during a transaction on the btree
+  final ProgramDM                  P = new ProgramDM();                         // Program in which to generate instructions
+  final boolean              OpCodes = true;                                    // Refactor op codes
+  final boolean           runVerilog = true;                                    // Refactor op codes
+  final static boolean eachStatement = false;                                   // Isolate each statement to get per statement timing
+  final static TreeSet<VerilogCode.Range> ranges = new TreeSet<>();             // Record ranges in each project
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -1899,6 +1900,22 @@ abstract class BtreeDM extends Test                                             
       else                     execJavaTest();
      }
 
+    class Range implements Comparable<Range>                                    // Number of statements in project and key
+     {final String project;
+      final int key;
+      final int statements;                                                     // Number of unique statements in propgram
+      Range(String Project, int Key, int Statements)
+       {project    = Project;
+        key        = Key;
+        statements = Statements;
+        if (!ranges.contains(this)) ranges.add(this);                           // First test executed for each project will be used during synthesis and routing
+       }
+
+      public int compareTo(Range other)                                         // First of each project
+       {return project.compareTo(other.project);
+       }
+     }
+
     void compactCode()                                                          // Reuse comon instructions rather then regenerating them
      {for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
        {final Stack<ProgramDM.I> I = program.code.elementAt(i);                 // The block of parallel instructions to write
@@ -1913,6 +1930,7 @@ abstract class BtreeDM extends Test                                             
          }
        }
       ops.order();                                                              // Order the instructions
+      new Range(project, Key(), ops.outputOrder.size());                        // Record number of statements on this project and key
      }
 
     void removeAllButLastTrailingZero(StringBuilder S)
@@ -2196,6 +2214,17 @@ endmodule
 
       return s;
      }
+   }
+
+  static void rangesAsPerl(String File)                                         // Print the ranges as a Perl data structure
+   {final StringBuilder s = new StringBuilder("{statements=>");                 // Generated perl
+    s.append(eachStatement ? "1" : "0");
+    s.append(",\n");
+    for(VerilogCode.Range r : ranges)
+     {s.append("  "+r.project+"=>["+r.key+", "+r.statements+"],\n");
+     }
+    s.append("}");
+    writeFile(File, s);
    }
 
 //D0 Tests                                                                      // Testing
@@ -3374,7 +3403,7 @@ Line T       At      Wide       Size    Indices        Value   Name
            4             2      |
 1,2=1  4=3    5,6=4  7=7  8,9=2 |
 """);
-    if (t.eachStatement) return;
+    if (eachStatement) return;                                                  // Generate just one so vivado can generate timimg for it rather than executing it.
 
     t.runVerilogDeleteTest(4, 5, 279, """
              6           |
@@ -3459,7 +3488,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.runVerilogPutTest(1, 25, """
 1=0 |
 """);
-    if (t.eachStatement) return;
+    if (eachStatement) return;                                                  // Generate just one so vivado can generate timimg for it rather than executing it.
 
     t.runVerilogPutTest(2, 25, """
 1,2=0 |
@@ -3981,6 +4010,7 @@ StuckSML(maxSize:4 size:1)
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
+      rangesAsPerl("vivado/ranges.txt");                                        // Print the ranges as a Perl data structure
       if (github_actions)                                                       // Coverage analysis
        {//coverageAnalysis(sourceFileName(), 12);
         coverageAnalysis                                                        // Used for printing
