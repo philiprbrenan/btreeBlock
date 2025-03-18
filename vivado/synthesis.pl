@@ -114,10 +114,8 @@ END
 # unlink $synthesis;
  }
 
-if    (-e q(/home/phil/)) {}                                                    # Create the verilog files if on azure
-elsif (-e q(/home/azureuser/btreeblock/vivado/find/1/)) {}                      # Create the verilog files if they have not already been created
-else
- {say STDERR dateTimeStamp, " Generate   btreeBlock";
+if  (!-e q(/home/phil/))                                                        # Create the verilog files if on azure
+ {say STDERR dateTimeStamp, " Generate btreeBlock";
   system("cd $projectDir; bash j.sh BtreeDM");
  }
 
