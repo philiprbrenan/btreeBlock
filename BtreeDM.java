@@ -2219,11 +2219,11 @@ endmodule
   static void rangesAsPerl(String File)                                         // Print the ranges as a Perl data structure
    {final StringBuilder s = new StringBuilder("{statements=>");                 // Generated perl
     s.append(eachStatement ? "1" : "0");
-    s.append(",\n");
+    s.append(", projects=>{\n");
     for(VerilogCode.Range r : ranges)
      {s.append("  "+r.project+"=>["+r.key+", "+r.statements+"],\n");
      }
-    s.append("}");
+    s.append("}}");
     writeFile(File, s);
    }
 
