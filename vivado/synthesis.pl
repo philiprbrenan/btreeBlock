@@ -111,7 +111,7 @@ END
 
   say STDERR dateTimeStamp, " $part for $design ".join(" ", @statement), $title;# Run tcl
   system("$vivadoX -mode batch -source $synthesis 1>$reportsDir/1.txt");
-  unlink $synthesis;
+# unlink $synthesis;
  }
 
 if    (-e q(/home/phil/)) {}                                                    # Create the verilog files if on azure
