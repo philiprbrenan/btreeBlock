@@ -131,6 +131,7 @@ if (!$$ranges{statements})                                                      
  }
 else                                                                            # Arrival time for each statement by synthesizing each statement in isolation
  {say STDERR dateTimeStamp, " Time individual statements";
+
   my @files = searchDirectoryTreesForMatchingFiles($verilogDir, qw(.tb));
   my @remainder;                                                                # Statements still to be tested
 
