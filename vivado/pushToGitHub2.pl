@@ -37,8 +37,8 @@ sub files()                                                                     
 
   for my $p(sort keys %p)
    {my ($k, $s) = $p{$p}->@*;
-    push @f, map {[qq(${source}$p/$k/statement/$_/vivado/reports/timing_route.rpt),
-           sprintf(qq(${target}$p/vivado/timing_route/%03d.rpt), $_)]} 0..$s;
+    #push @f, map {[qq(${source}$p/$k/statement/$_/vivado/reports/timing_route.rpt),
+    #       sprintf(qq(${target}$p/vivado/timing_route/%03d.rpt), $_)]} 0..$s;
 
     push @f, [qq(${source}$p/vivado/reports/1.txt),                  qq(${target}$p/vivado/reports/1.txt)];
     push @f, [qq(${source}$p/vivado/reports/bus_skew.rpt),           qq(${target}$p/vivado/reports/bus_skew.rpt)];
