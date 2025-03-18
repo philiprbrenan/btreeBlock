@@ -1,4 +1,4 @@
-create_clock -period 20         [get_ports clock]
+create_clock -period 30         [get_ports clock]
 
 set_input_delay  -clock clock -min 0 [get_ports -filter {DIRECTION == IN}]
 set_input_delay  -clock clock -max 3 [get_ports -filter {DIRECTION == IN}]
