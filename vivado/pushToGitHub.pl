@@ -23,6 +23,7 @@ for my $f(@files)                                                               
   if (-e $s)
    {say STDERR sprintf("%-72s  to  %-72s", $s, $t);
     copyFile($s, $t);
+    say STDERR $@ if $@;
    }
   else
    {say STDERR "Fail: $s";
@@ -31,7 +32,8 @@ for my $f(@files)                                                               
 
 sub files()                                                                     # Files associated with each project
  {my @f;
-  my %p = (delete=>[3, 315], find=>[2, 14], put=>[1, 363]);
+  my %P = eval(readFile(q(ranges.txt)))->%*;
+  my %p = $P{projects}->%*;
 
   for my $p(sort keys %p)
    {my ($k, $s) = $p{$p}->@*;
