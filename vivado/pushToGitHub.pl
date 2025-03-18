@@ -26,7 +26,7 @@ for my $f(@files)                                                               
     say STDERR $@ if $@;
    }
   else
-   {say STDERR "Fail: $s";
+   {#say STDERR "Fail: $s";
    }
  }
 
