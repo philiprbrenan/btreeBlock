@@ -1,11 +1,11 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Sat Mar 15 17:07:02 2025
+| Date         : Wed Mar 19 04:05:02 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
-| Command      : report_high_fanout_nets -file /home/azureuser/btreeBlock/verilog/put/vivado/reports/high_fanout_nets.rpt
+| Command      : report_high_fanout_nets -file /home/azureuser/btreeBlock/verilog/put/1/vivado/reports/high_fanout_nets.rpt
 | Design       : put
-| Device       : xc7v2000t
+| Device       : xc7a50t
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
 High Fan-out Nets Information
@@ -13,19 +13,19 @@ High Fan-out Nets Information
 1. Summary
 ----------
 
-+------------------------------------------+--------+-------------+
-| Net Name                                 | Fanout | Driver Type |
-+------------------------------------------+--------+-------------+
-| reset__0_BUFG                            |  70625 | BUFG        |
-| T[90]_i_1_n_0                            |   6414 | LUT6        |
-| T[141]_i_1_n_0                           |   6248 | LUT6        |
-| T[137]_i_1_n_0                           |   4812 | LUT6        |
-| M09_in_inst__644_i_4_n_0                 |   3990 | LUT5        |
-| T[133]_i_1_n_0                           |   3441 | LUT6        |
-| bT_StuckSA_Memory124_in_inst__3_i_2_n_0  |   3193 | LUT5        |
-| reset__0                                 |   3191 | IBUF        |
-| opCodeMap[8]                             |   2941 | LUT5        |
-| bR_StuckSA_Memory124_in_inst__11_i_2_n_0 |   2710 | LUT5        |
-+------------------------------------------+--------+-------------+
++-------------------------------------+--------+-------------+
+| Net Name                            | Fanout | Driver Type |
++-------------------------------------+--------+-------------+
+| reset_IBUF                          |   1702 | IBUF        |
+| M[707]_i_33_n_0                     |    660 | LUT3        |
+| M[456]_i_14_n_0                     |    599 | LUT4        |
+| T_reg_n_0_[130]                     |    585 | FDRE        |
+| M[700]_i_30_n_0                     |    517 | LUT4        |
+| M[707]_i_83_n_0                     |    516 | LUT4        |
+| M[707]_i_80_n_0                     |    496 | LUT4        |
+| T_reg_n_0_[179]                     |    485 | FDRE        |
+| T_reg_n_0_[178]                     |    460 | FDRE        |
+| bR_StuckSA_Transaction_reg_n_0_[41] |    388 | FDRE        |
++-------------------------------------+--------+-------------+
 
 
