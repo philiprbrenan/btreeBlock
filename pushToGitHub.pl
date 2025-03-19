@@ -3,8 +3,6 @@
 # Push Btree block code to GitHub
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2024
 #-------------------------------------------------------------------------------
-# die "Switched off to prevent accidental uploads";
-# Save last modified date and upload a file only if the file has been changed
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -28,7 +26,6 @@ push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              
         @files = grep {!m(/\.|backups/|Classes/)} @files;                       # Remove files that do not need to be saved
         @files = grep {!m(vivado/runs/)} @files;
         @files = grep {!m(vivado/pins/)} @files;
-say STDERR "AAAA ", dump(\@files);
 
 if (1)                                                                          # Remove most of the verilog except the reports
  {my @f = @files; @files = ();
