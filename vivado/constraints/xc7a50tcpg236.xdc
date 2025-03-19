@@ -1,10 +1,10 @@
 #create_clock -period 40 [get_ports clock]
-create_clock -period 25 [get_ports clock]
+create_clock -period 10 [get_ports clock]
 
 set_input_delay  -clock clock -min   1 [get_ports -filter {DIRECTION == IN}]
-set_input_delay  -clock clock -max  19 [get_ports -filter {DIRECTION == IN}]
+set_input_delay  -clock clock -max   9 [get_ports -filter {DIRECTION == IN}]
 set_output_delay -clock clock -min   1 [get_ports -filter {DIRECTION == OUT}]
-set_output_delay -clock clock -max  19 [get_ports -filter {DIRECTION == OUT}]
+set_output_delay -clock clock -max   9 [get_ports -filter {DIRECTION == OUT}]
 
 set_property PACKAGE_PIN C15  [get_ports clock]
 set_property IOSTANDARD LVCMOS18 [get_ports clock]
