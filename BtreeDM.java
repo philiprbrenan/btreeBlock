@@ -151,7 +151,7 @@ abstract class BtreeDM extends Test                                             
     nT = new Node("nT");
     nL = new Node("nL"); nC = nL;
     nR = new Node("nR");
-    removableMemories.put("find", "bT_StuckSA_Copy_reg bL_StuckSA_Memory_reg bL_StuckSA_Copy_reg bL_StuckSA_Transaction_reg bR_StuckSA_Memory_reg bR_StuckSA_Copy_reg bR_StuckSA_Transaction_reg lT_StuckSA_Copy_reg lL_StuckSA_Memory_reg lL_StuckSA_Copy_reg lL_StuckSA_Transaction_reg lR_StuckSA_Memory_reg  lR_StuckSA_Copy_reg lR_StuckSA_Transaction_reg nL_reg nR_reg");
+    removableMemories.put("find", "bT_StuckSA_Copy bL_StuckSA_Memory bL_StuckSA_Copy bL_StuckSA_Transaction bR_StuckSA_Memory bR_StuckSA_Copy bR_StuckSA_Transaction lT_StuckSA_Copy lL_StuckSA_Memory lL_StuckSA_Copy lL_StuckSA_Transaction lR_StuckSA_Memory  lR_StuckSA_Copy lR_StuckSA_Transaction nL nR");
   }
 
   StuckDM createBranchStuck(String name)                                        // Create a branch Stuck
