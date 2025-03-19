@@ -123,7 +123,7 @@ if  (!-e q(/home/phil/))                                                        
  {system("cd $projectDir; bash j.sh BtreeDM");
  }
 
-my $ranges = eval readFile( "ranges.txt");                                      # Load statement ranges
+my $ranges = eval readFile "ranges.txt";                                        # Load statement ranges
 
 if (!$$ranges{statements})                                                      # Synthesize, place and route the verilog description
  {say STDERR dateTimeStamp, " Synthesize, place and route btreeBlock";
