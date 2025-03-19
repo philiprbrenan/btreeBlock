@@ -151,7 +151,7 @@ abstract class BtreeDM extends Test                                             
     nT = new Node("nT");
     nL = new Node("nL"); nC = nL;
     nR = new Node("nR");
-    removableMemories.put("find", "bT_StuckSA_Copy bL_StuckSA_Memory bL_StuckSA_Copy bL_StuckSA_Transaction bR_StuckSA_Memory bR_StuckSA_Copy bR_StuckSA_Transaction lT_StuckSA_Copy lL_StuckSA_Memory lL_StuckSA_Copy lL_StuckSA_Transaction lR_StuckSA_Memory  lR_StuckSA_Copy lR_StuckSA_Transaction nL nR");
+    removableMemories.put("find", " bT_StuckSA_Copy bL_StuckSA_Memory bL_StuckSA_Copy bL_StuckSA_Transaction bR_StuckSA_Memory bR_StuckSA_Copy bR_StuckSA_Transaction lT_StuckSA_Copy lL_StuckSA_Memory lL_StuckSA_Copy lL_StuckSA_Transaction lR_StuckSA_Memory  lR_StuckSA_Copy lR_StuckSA_Transaction nL nR ");
   }
 
   StuckDM createBranchStuck(String name)                                        // Create a branch Stuck
@@ -1896,6 +1896,8 @@ abstract class BtreeDM extends Test                                             
 
       compactCode();                                                            // Compact the code to make better use of the surface area of the chip
 
+      removeMemories();                                                         // Remove memories reported as not used from Vivado
+
       if      (github_actions) generateVerilog();
       else if (eachStatement)  eachStatement();
       else if (runVerilog)     generateVerilog();
@@ -1942,17 +1944,23 @@ abstract class BtreeDM extends Test                                             
      }
 
     boolean requiredMemory(MemoryLayoutDM m)                                    // Check memory is required for this project
-     {final String r = removableMemories.get(m.name);                           // Removable memories for this project
+     {final String r = removableMemories.get(project);                          // Removable memories for this project
       if (r == null) return true;                                               // No removable memorioes yet
-      return r.contains(project);                                               // Check whether memory is removable or not - their names do not overlap
+      return !r.contains(" "+m.name+" ");                                       // Check whether memory is removable or not
+     }
+
+    void removeMemories()                                                       // Remove memories reported as unneeded
+     {zz();
+      final Stack<MemoryLayoutDM> r = new Stack<>();                            // Memories that can be removed
+      for(MemoryLayoutDM m : P.memories) if (!requiredMemory(m)) r.push(m);     // Each memory not used by the program
+      for(MemoryLayoutDM m : r) P.memories.remove(m);
      }
 
     void declareMemories()                                                      // Declare memories
      {zz();
       final StringBuilder s = new StringBuilder();
       for(MemoryLayoutDM m : P.memories)                                        // Each memory used by the program
-       {if (!requiredMemory(m)) continue;                                       // Ignore memories marked as removable
-        s.append("  reg["+m.size()+"-1 : 0] "+m.name+";\n");                    // Declare the memory
+       {s.append("  reg["+m.size()+"-1 : 0] "+m.name+";\n");                    // Declare the memory
        }
       writeFile(declareMemory(), s);
      }
@@ -1960,8 +1968,7 @@ abstract class BtreeDM extends Test                                             
     void initializeMemories()                                                   // Initialize memories
      {final StringBuilder s = new StringBuilder();
       for(MemoryLayoutDM m : P.memories)                                        // Each memory declared by the program
-       {if (!requiredMemory(m)) continue;                                       // Ignore memories marked as removable
-        final int    N = m.size();
+       {final int    N = m.size();
         final StringBuilder S = new StringBuilder();
         for (int i = 0; i < N; i++) S.append(m.getBit(i) ? 1 : 0);
         removeAllButLastTrailingZero(S);
