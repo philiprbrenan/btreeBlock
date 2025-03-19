@@ -115,9 +115,12 @@ END
 # unlink $synthesis;
  }
 
+say STDERR dateTimeStamp, " Generate btreeBlock";                               # Title
+
+system("rm -rf /home/azureuser/btreeblock/verilog");                            # Remove previous verilog code and reports as we are abiout to regenerate them
+
 if  (!-e q(/home/phil/))                                                        # Create the verilog files if on azure
- {say STDERR dateTimeStamp, " Generate btreeBlock";
-  system("cd $projectDir; bash j.sh BtreeDM");
+ {system("cd $projectDir; bash j.sh BtreeDM");
  }
 
 my $ranges = eval readFile( "ranges.txt");                                      # Load statement ranges
