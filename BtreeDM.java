@@ -20,7 +20,8 @@ abstract class BtreeDM extends Test                                             
   final boolean              OpCodes = true;                                    // Refactor op codes
   final boolean           runVerilog = true;                                    // Refactor op codes
   final static boolean eachStatement = false;                                   // Isolate each statement to get per statement timing
-  final static TreeSet<VerilogCode.Range> ranges = new TreeSet<>();             // Record ranges in each project
+  final static TreeSet<VerilogCode.Range>       ranges = new TreeSet<>();       // Record ranges in each project
+  final static TreeMap<String,String>removableMemories = new TreeMap<>();       // Record memories that can be removed from each project as theya re not used
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -150,6 +151,7 @@ abstract class BtreeDM extends Test                                             
     nT = new Node("nT");
     nL = new Node("nL"); nC = nL;
     nR = new Node("nR");
+    removableMemories.put("find", "bT_StuckSA_Copy_reg bL_StuckSA_Memory_reg bL_StuckSA_Copy_reg bL_StuckSA_Transaction_reg bR_StuckSA_Memory_reg bR_StuckSA_Copy_reg bR_StuckSA_Transaction_reg lT_StuckSA_Copy_reg lL_StuckSA_Memory_reg lL_StuckSA_Copy_reg lL_StuckSA_Transaction_reg lR_StuckSA_Memory_reg  lR_StuckSA_Copy_reg lR_StuckSA_Transaction_reg nL_reg nR_reg");
   }
 
   StuckDM createBranchStuck(String name)                                        // Create a branch Stuck
@@ -1939,11 +1941,18 @@ abstract class BtreeDM extends Test                                             
       S.append(s.length() > 0 ? s : "0");
      }
 
+    boolean requiredMemory(MemoryLayoutDM m)                                    // Check memory is required for this project
+     {final String r = removableMemories.get(m.name);                           // Removable memories for this project
+      if (r == null) return true;                                               // No removable memorioes yet
+      return r.contains(project);                                               // Check whether memory is removable or not - their names do not overlap
+     }
+
     void declareMemories()                                                      // Declare memories
      {zz();
       final StringBuilder s = new StringBuilder();
       for(MemoryLayoutDM m : P.memories)                                        // Each memory used by the program
-       {s.append("  reg["+m.size()+"-1 : 0] "+m.name+";\n");                    // Declare the memory
+       {if (!requiredMemory(m)) continue;                                       // Ignore memories marked as removable
+        s.append("  reg["+m.size()+"-1 : 0] "+m.name+";\n");                    // Declare the memory
        }
       writeFile(declareMemory(), s);
      }
@@ -1951,7 +1960,8 @@ abstract class BtreeDM extends Test                                             
     void initializeMemories()                                                   // Initialize memories
      {final StringBuilder s = new StringBuilder();
       for(MemoryLayoutDM m : P.memories)                                        // Each memory declared by the program
-       {final int    N = m.size();
+       {if (!requiredMemory(m)) continue;                                       // Ignore memories marked as removable
+        final int    N = m.size();
         final StringBuilder S = new StringBuilder();
         for (int i = 0; i < N; i++) S.append(m.getBit(i) ? 1 : 0);
         removeAllButLastTrailingZero(S);
