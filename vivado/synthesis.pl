@@ -98,8 +98,8 @@ place_design -directive AltSpreadLogic_high
 write_checkpoint -force $place
 puts "[clock format [clock seconds] -format \"%H:%M:%S\"] place_design"
 
-route_design -directive Quick
-#route_design
+#route_design -directive Quick
+route_design
 write_checkpoint -force $route
 report_timing_summary    -file $timingRoute
 puts "[clock format [clock seconds] -format \"%H:%M:%S\"] route_design"
