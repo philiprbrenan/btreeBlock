@@ -483,7 +483,7 @@ abstract class StuckDM extends Test                                             
           if (f) Data .setInt(M.at(sData, i).setOff().getInt());                // Save data if this key matched
          }
        }
-      String v()
+      String v()                                                                // Uses a question mark so potentially slow
        {final StringBuilder v = new StringBuilder();                            // Verilog
         final int           N = maxSize();
 
