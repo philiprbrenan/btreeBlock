@@ -3759,7 +3759,7 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
    }
 
-  private static void test_verilogPut()                                         // Delete using generated verilog code
+  private static void test_verilogPut()                                         // Delete using generated verilog code.
    {z(); sayCurrentTestName();
     final BtreeDM t = allTreeOps();
     t.P.run(); t.P.clear();
