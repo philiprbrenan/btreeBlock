@@ -26,6 +26,11 @@ generate a [code](https://en.wikipedia.org/wiki/Computer_program) in [Verilog](h
 was compacted by reusing identical instructions and pipelined to reduce
 congestion. ![Roadmap](flowChart/DevelopmentFlowChart.png)
 
+The resulting [code](https://en.wikipedia.org/wiki/Computer_program) can be run on an [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array), see:
+
+https://github.com/philiprbrenan/btreeBlock/blob/main/images/first_light_doc_nano9K.jpg
+
+
 # Synthesis, Placement and Routing
 
 The logs of the successful synthesis, placement and routing of the individual
