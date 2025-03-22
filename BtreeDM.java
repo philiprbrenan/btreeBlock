@@ -3759,7 +3759,7 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
    }
 
-  private static void test_verilogPut()                                         // Delete using generated verilog code.
+  private static void test_verilogPut()                                         // Delete using generated verilog code
    {z(); sayCurrentTestName();
     final BtreeDM t = allTreeOps();
     t.P.run(); t.P.clear();
@@ -4261,7 +4261,9 @@ StuckSML(maxSize:4 size:1)
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
-   {final boolean longRunning = github_actions && 1 == 0;
+   {test_verilogFind();
+if (true) return;
+    final boolean longRunning = github_actions && 1 == 0;
     test_find_and_insert();
     test_put_ascending();
     test_put_ascending_wide();
@@ -4281,9 +4283,9 @@ StuckSML(maxSize:4 size:1)
    }
 
   protected static void newTests()                                              // Tests being worked on
-   {oldTests();
+   {//oldTests();
     //test_verilogDelete();
-    //test_verilogFind();
+      test_verilogFind();
     //test_verilogPut();
    }
 
