@@ -18,7 +18,7 @@ abstract class BtreeDM extends Test                                             
   final MemoryLayoutDM             T;                                           // The memory used to hold temporary variable used during a transaction on the btree
   final ProgramDM                  P = new ProgramDM();                         // Program in which to generate instructions
   final boolean              OpCodes = true;                                    // Refactor op codes
-  final boolean           runVerilog = true;                                    // Refactor op codes
+  final boolean           runVerilog = true;                                    // Run verilog tests alongside java tests and check they produce the same results
   final static boolean eachStatement = false;                                   // Isolate each statement to get per statement timing
   final static TreeSet<VerilogCode.Range>       ranges = new TreeSet<>();       // Record ranges in each project
   final static TreeMap<String,String>removableMemories = new TreeMap<>();       // Record memories that can be removed from each project as theya re not used
@@ -1860,6 +1860,7 @@ abstract class BtreeDM extends Test                                             
    {final String          project;                                              // Project name - used to generate file names
     final String           folder;                                              // Folder in which to place project
     final String        opCodeMap = "opCodeMap";                                // Name of op code map
+    final String           nano9k = "nano9k";                                   // Name of folder containing code for the GoWin Nano 9k
     final ProgramDM       program;                                              // Program associated with this tree
     final StringToNumbers     ops = new StringToNumbers();                      // Collapse identical instructions
     final String      blockIndent = " ".repeat(10);                             // Indentationm for Verilog case statements
@@ -1867,12 +1868,13 @@ abstract class BtreeDM extends Test                                             
 
     Integer         statements = null;                                          // Set if only one statement is to be generated
 
-    abstract int    Key     ();                                                 // Input key value
-    abstract int    Data    ();                                                 // Input data value
-    abstract int    data    ();                                                 // Expected output data value
-    abstract int    maxSteps();                                                 // Maximum number if execution steps
-    abstract int    expSteps();                                                 // Expected number of steps
-    abstract String expected();                                                 // Expected number of steps
+    abstract int     Key     ();                                                // Input key value
+    abstract Integer Data    ();                                                // Input data value if not null
+    abstract Integer found   ();                                                // Whether the key was found (1) or not (0) if not null
+    abstract Integer data    ();                                                // Expected output data value if not null
+    abstract int     maxSteps();                                                // Maximum number if execution steps
+    abstract int     expSteps();                                                // Expected number of steps
+    abstract String  expected();                                                // Expected number of steps
 
     String projectFolder()                                                      // Define the project folder
      {if  (statements == null)
@@ -1883,22 +1885,28 @@ abstract class BtreeDM extends Test                                             
        }
      }
 
-    String    sourceVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.ext);}
-    String      testVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.testExt);}
-    String    declareMemory() {return ""+Paths.get(projectFolder(), "includes", "declareMemory"   +Verilog.header);}
-    String initializeMemory() {return ""+Paths.get(projectFolder(), "includes", "initializeMemory"+Verilog.header);}
-    String    opCodeMapFile() {return ""+Paths.get(projectFolder(), "includes", opCodeMap         +Verilog.header);}
-    String        testsFile() {return ""+Paths.get(projectFolder(), "tests.txt");}
-    String        traceFile() {return ""+Paths.get(projectFolder(), "trace.txt");}
-    String    javaTraceFile() {return ""+Paths.get(projectFolder(), "traceJava.txt");}
+    String      sourceVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.ext);}
+    String        testVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.testExt);}
+    String      nano9kVerilog() {return ""+Paths.get(projectFolder(), nano9k,     project           +Verilog.ext);}
+    String    nano9kTestBench() {return ""+Paths.get(projectFolder(), nano9k,     project           +Verilog.testExt);}
+    String  nano9kConstraints() {return ""+Paths.get(projectFolder(), nano9k,     project           +Verilog.constraintsExt);}
+    String        nano9kBuild() {return ""+Paths.get(projectFolder(), nano9k,     project           +".pl");}
+    String      declareMemory() {return ""+Paths.get(projectFolder(), "includes", "declareMemory"   +Verilog.header);}
+    String   initializeMemory() {return ""+Paths.get(projectFolder(), "includes", "initializeMemory"+Verilog.header);}
+    String      opCodeMapFile() {return ""+Paths.get(projectFolder(), "includes", opCodeMap         +Verilog.header);}
+    String          testsFile() {return ""+Paths.get(projectFolder(), "tests.txt");}
+    String          traceFile() {return ""+Paths.get(projectFolder(), "trace.txt");}
+    String      javaTraceFile() {return ""+Paths.get(projectFolder(), "traceJava.txt");}
 
     VerilogCode(String Project, String Folder)                                  // Generate verilog code
      {zz();
       project = Project; folder = Folder; program = P;
-
       compactCode();                                                            // Compact the code to make better use of the surface area of the chip
 
       removeMemories();                                                         // Remove memories reported as not used from Vivado
+
+      T.at(Key).setInt(Key());                                                  // Key value
+      if (Data() != null) T.at(Data).setInt(Data());                            // Optional data value to insert into tree
 
       if      (github_actions) generateVerilog();
       else if (eachStatement)  eachStatement();
@@ -1996,75 +2004,9 @@ abstract class BtreeDM extends Test                                             
       for (int i = 0; i < N; i++) {statements = i; generateVerilog();}
      }
 
-    VerilogCode generateVerilog()                                               // Generate verilog
-     {zz();
 
-      makePath(projectFolder());                                                // Write files to the project folder
-
-      ops.genVerilog(opCodeMapFile(), opCodeMap);                               // Write op code map
-
-      declareMemories();
-      initializeMemories();
-
-      final StringBuilder s = new StringBuilder();                              // Generate code
-      s.append("""
-//-----------------------------------------------------------------------------
-// Database on a chip
-// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-01-07
-//------------------------------------------------------------------------------
-`timescale 10ps/1ps
-(* keep_hierarchy = "yes" *)
-module $project(reset, stop, clock, Key, Data, data, found);                    // Database on a chip
-  input                   reset;                                                // Restart the program run sequence when this goes high
-  input                   clock;                                                // Program counter clock
-  input [$bitsPerKey-1 :0]  Key;                                                // Input key
-  input [$bitsPerData-1:0] Data;                                                // Input data
-  output                   stop;                                                // Program has stopped when this goes high
-  output[$bitsPerData-1:0] data;                                                // Output data
-  output                  found;                                                // Whether the key was found on put, find delete
-
-  `include "includes/declareMemory.vh"                                          // Declare memory
-  `include "opCodeMap.vh"                                                       // Op code map gives step to instruction
-
-  integer  step;                                                                // Program counter
-  `ifndef SYNTHESIS
-    integer steps;                                                              // Number of steps executed
-    integer traceFile;                                                          // File to write trace to
-  `endif
-  reg   stopped;                                                                // Set when we stop
-  assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
-  assign found = T[$found_at];                                                  // Found the key
-  assign data  = T[$data_at+:$data_width];                                      // Data associated with key found
-
-  always @ (posedge clock) begin                                                // Execute next step in program
-    if (reset) begin                                                            // Reset
-      step     <= 0;
-     `ifndef SYNTHESIS
-        steps  <= 0;
-     `endif
-      stopped  <= 0;
-
-     `include "includes/initializeMemory.vh"                                    // Load memory
-      $initialize_opCodeMap();                                                  // Initialize op code map
-
-     `ifndef SYNTHESIS
-        traceFile = $fopen("$traceFile", "w");                                  // Open trace file
-        if (!traceFile) $fatal(1, "Cannot open trace file $traceFile");
-     `endif
-
-     `ifdef SYNTHESIS
-        T[$Key_at +:$Key_width ] <= Key;                                        // Load test key
-        T[$Data_at+:$Data_width] <= Data;                                       // Load test data
-     `endif
-    end
-    else begin                                                                  // Run
-     `ifndef SYNTHESIS
-        $display            ($format);                                          // Trace execution
-        $fdisplay(traceFile, $format);                                          // Trace execution in a file
-     `endif
-""");
-
-      if (OpCodes)                                                              // Reduce program size by refactoring op codes at the cost of one additional look up per instruction cycle. Also appears to reduce synthesis time by about 30% on Vivado and likewise reduces the number of FPGA cells.
+    void genOpCodes(StringBuilder s)                                            // Generate opciodes
+     {if (OpCodes)                                                              // Reduce program size by refactoring op codes at the cost of one additional look up per instruction cycle. Also appears to reduce synthesis time by about 30% on Vivado and likewise reduces the number of FPGA cells.
        {s.append("      case(opCodeMap[step])\n");                              // Case statements to select the code for the current instruction
 
         for(StringToNumbers.Order o : ops.outputOrder)                          // I shall say each instruction only once
@@ -2108,9 +2050,73 @@ module $project(reset, stop, clock, Key, Data, data, found);                    
            }
          }
        }
-      s.append("        default : begin stopped <= 1; /* end of execution */ end\n"); // Any invalid instruction address causes the program to halt
       s.append("""
+        default : begin stopped <= 1; /* end of execution */ end                // Any invalid instruction address causes the program to halt
       endcase
+""");
+     }
+
+    void generateVerilogCode()                                                  // Generate verilog code for standalone verification and for Vivado
+     {final StringBuilder s = new StringBuilder();                              // Generate code
+      s.append("""
+//-----------------------------------------------------------------------------
+// Database on a chip
+// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-01-07
+//------------------------------------------------------------------------------
+`timescale 10ps/1ps
+(* keep_hierarchy = "yes" *)
+module $project(reset, stop, clock, Key, Data, data, found);                    // Database on a chip
+  input                   reset;                                                // Restart the program run sequence when this goes high
+  input                   clock;                                                // Program counter clock
+  input [$bitsPerKey-1 :0]  Key;                                                // Input key
+  input [$bitsPerData-1:0] Data;                                                // Input data
+  output                   stop;                                                // Program has stopped when this goes high
+  output[$bitsPerData-1:0] data;                                                // Output data
+  output                  found;                                                // Whether the key was found on put, find delete
+
+  `include "includes/declareMemory.vh"                                          // Declare memory
+  `include "includes/opCodeMap.vh"                                              // Op code map gives step to instruction
+
+  integer  step;                                                                // Program counter
+  `ifndef SYNTHESIS                                                             // Synthesis is defined on Vivado which objects to $display statements
+    integer steps;                                                              // Number of steps executed
+    integer traceFile;                                                          // File to write trace to
+  `endif
+  reg   stopped;                                                                // Set when we stop
+  assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
+  assign found = T[$found_at];                                                  // Found the key
+  assign data  = T[$data_at+:$data_width];                                      // Data associated with key found
+
+  always @ (posedge clock) begin                                                // Execute next step in program
+    if (reset) begin                                                            // Reset
+      step     <= 0;
+     `ifndef SYNTHESIS
+        steps  <= 0;
+     `endif
+      stopped  <= 0;
+
+     `include "includes/initializeMemory.vh"                                    // Load memory
+      $initialize_opCodeMap();                                                  // Initialize op code map
+
+     `ifndef SYNTHESIS
+        traceFile = $fopen("$traceFile", "w");                                  // Open trace file
+        if (!traceFile) $fatal(1, "Cannot open trace file $traceFile");
+     `endif
+
+     `ifdef SYNTHESIS
+        T[$Key_at +:$Key_width ] <= Key;                                        // Load test key
+        T[$Data_at+:$Data_width] <= Data;                                       // Load test data
+     `endif
+    end
+    else begin                                                                  // Run
+     `ifndef SYNTHESIS
+        $display            ($format);                                          // Trace execution
+        $fdisplay(traceFile, $format);                                          // Trace execution in a file
+     `endif
+""");
+
+      genOpCodes(s);
+      s.append("""
 //    step = step + 1;
      `ifndef SYNTHESIS
         steps <= steps + 1;
@@ -2119,9 +2125,104 @@ module $project(reset, stop, clock, Key, Data, data, found);                    
   end // Always
 endmodule
 """);
+      writeFile(sourceVerilog(), editVariables(s));                             // Write verilog module
+     }
 
-      final StringBuilder t = new StringBuilder();                              // Test bench
-      t.append("""
+    void generateVerilogNano9k()                                                // Generate verilog code for Nano 9k
+     {final StringBuilder s = new StringBuilder();
+      s.append("""
+//-----------------------------------------------------------------------------
+// Database on a chip for nano 9k
+// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-01-07
+//------------------------------------------------------------------------------
+`timescale 10ps/1ps
+(* keep_hierarchy = "yes" *)
+module find(button1, stop, clock, Key, Data, data, found, led);                 // Database on a chip
+  input                     button1;                                            // Restart the program run sequence when this button is pushed
+  input                     clock;                                              // Program counter clock
+  input  [$bitsPerKey-1:0]  Key;                                                // Input key
+  input  [$bitsPerData-1:0] Data;                                               // Input data
+  output                    stop;                                               // Program has stopped when this goes high
+  output [$bitsPerData-1:0] data;                                               // Output data
+  output                    found;                                              // Whether the key was found on put, find delete
+  output [6-1:0]            led;
+
+  assign led = ~{data,found,stop};                                              // Show output on leds
+
+  wire reset;
+  assign reset = button1_state;                                                 // Button if button 1 is not beiong pushed
+
+  `include "../includes/declareMemory.vh"                                       // Declare memory
+  `include "../includes/opCodeMap.vh"                                           // Op code map gives step to instruction
+
+  integer  step;                                                                // Program counter
+  reg    stopped;                                                               // Set when we stop
+  assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
+  assign found = T[$found_at];                                                  // Found the key
+  assign data  = T[$data_at+:$data_width];                                      // Data associated with key found
+
+  reg [16-1:0] button1_count;                                                   // 16 bit integer used to debounce the button
+  reg button1_state;
+
+  initial begin                                                                 // It does not matter what state we start in as long as we start in some state
+    button1_count = 0;
+  end
+
+  always @(posedge clock) begin                                                 // Debounce button 1
+    if      (!button1 && button1_count > 0) button1_count <= button1_count - 1;
+    else if ( button1 && button1_count < 8) button1_count <= button1_count + 1;
+    button1_state <= button1_count     < 4;                                     // Button state == 0 when pushed and debounced
+  end
+
+  always @ (posedge clock) begin                                                // Execute next step in program
+    if (reset) begin                                                            // Reset as long as the button is not being pushed, run the program if it is being pushed
+      step     <= 0;
+      stopped  <= 0;
+
+     `include "../includes/initializeMemory.vh"                                 // Load memory
+      initialize_opCodeMap();                                                   // Initialize op code map
+//  0 000000  Reading left to right here but right to left on the buttons end with the button unpressed
+//  1 100010  The start state 100010 also matches
+//  2 011110
+//  3 011010
+//  4 010110
+//  5 010010
+//  6 001110
+//  7 001010
+//  8 000110
+//  9 000010
+// 10 000000
+
+      T[$Key_at +:$Key_width ] <= 4;                                            // Load test key
+      T[$Data_at+:$Data_width] <= Data;                                         // Load test data
+    end
+
+//             4                    |
+//             0                    |
+//             5                    |
+//             6                    |
+//      2             6    7        |
+//      5             6    6.1      |
+//      1             3    8        |
+//      4                  2        |
+//1,2=1  3,4=4  5,6=3  7=8    8,9=2 |
+
+    else begin                                                                  // Run
+      //$display("%2d  %2d  %2d  KeyP=%2d  KeyM=%2d  %2d  %2d  %b %2d  %b", step, opCodeMap[step], stop, Key, T[113+:5 ], found, data, led, T[     134/*child   */ +: 4], nT);
+""");
+      genOpCodes(s);
+
+      s.append("""
+    end // Execute
+  end // Always
+endmodule
+""");
+      writeFile(nano9kVerilog(), editVariables(s));                             // Write verilog for nano 9k
+     }
+
+    void generateVerilogTestBench()                                             // Generate verilog test bench for normal and Vivado versions
+     {final StringBuilder s = new StringBuilder();                              // Test bench
+      s.append("""
 //-----------------------------------------------------------------------------
 // Database on a chip test bench
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-01-07
@@ -2167,9 +2268,153 @@ module $project_tb;                                                             
   endtask
 endmodule
 """);
+      writeFile(testVerilog(), editVariables(s));                               // Write verilog test bench
+     }
 
-      writeFile(sourceVerilog(), editVariables(s));                             // Write verilog module
-      writeFile(testVerilog  (), editVariables(t));                             // Write verilog test bench
+    void generateVerilogTestBenchNano9K()                                       // Generate verilog test bench for Nano 9k using leds to veryify correct operation
+     {final StringBuilder s = new StringBuilder();
+      s.append("""
+//-----------------------------------------------------------------------------
+// Database on a chip test bench for nano 9k
+// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-03-21
+//------------------------------------------------------------------------------
+`timescale 10ps/1ps
+module find_tb;                                                                 // Test bench for database on a chip
+  reg                 button1;                                                  // Restart the program run sequence when this button is pushed
+  reg                   clock;                                                  // Program counter clock
+  reg [$bitsPerKey-1:0]   Key;                                                  // Input key
+  reg [$bitsPerData-1:0] Data;                                                  // Input data
+  reg                    stop;                                                  // Program has stopped when this goes high
+  reg                   found;                                                  // Whether the key was found on put, find delete
+  reg [$bitsPerData-1:0] data;                                                  // Output data
+  reg [6-1:0]             led;                                                  // leds
+
+  find a1                                                                       // Connect to the module
+   (.button1(button1),
+    .clock(clock),
+    .Key(Key),
+    .Data(Data),
+    .stop(stop),
+    .found(found),
+    .data(data),
+    .led(led));
+
+  integer step;
+
+  initial begin                                                                 // Test the module
+    Key = 3; button1 = 0;                                                       // Search key
+//  for(step = 0; step < 40000; step = step + 1) begin                          // Let the device reset
+    for(step = 0; step < 16; step = step + 1) begin                             // Let the device reset
+      clock = 0; #1;                                                            // Resets if button 1 not touched for a long time
+      clock = 1; #1;
+    end
+
+    button1 = 1;                                                                // Program runs while button 1 is pressed
+    $display("%d  %d  %d  %d  %d  %d", 0, stop, Key, found, data, led);
+
+    for(step = 0; step < 100 && !stop; step = step + 1) begin
+      clock = 0; #1; clock = 1; #1;
+      $display("%2d      %2d                    %2d  %2d  %6b", step, stop,          found, data, ~led);
+    end
+  end
+endmodule
+""");
+      writeFile(nano9kTestBench  (), editVariables(s));                         // Write verilog test bench for nano 9k
+     }
+
+    void generateVerilogConstraintsNano9K()                                     // Generate constraints for Nano 9k using leds to veryify correct operation
+     {final StringBuilder s = new StringBuilder();                              // Constraints for nano 9k
+      s.append("""
+IO_LOC "led[0]" 10;
+IO_LOC "led[1]" 11;
+IO_LOC "led[2]" 13;
+IO_LOC "led[3]" 14;
+IO_LOC "led[4]" 15;
+IO_LOC "led[5]" 16;
+IO_PORT "led[0]" PULL_MODE=NONE DRIVE=8;
+IO_PORT "led[1]" PULL_MODE=NONE DRIVE=8;
+IO_PORT "led[2]" PULL_MODE=NONE DRIVE=8;
+IO_PORT "led[3]" PULL_MODE=NONE DRIVE=8;
+IO_PORT "led[4]" PULL_MODE=NONE DRIVE=8;
+IO_PORT "led[5]" PULL_MODE=NONE DRIVE=8;
+IO_LOC  "clock" 52;
+IO_LOC  "button1" 4;
+IO_PORT "button1" PULL_MODE=UP;
+IO_LOC  "button2" 3;
+IO_PORT "button2" PULL_MODE=UP;
+""");
+      writeFile(nano9kConstraints(), editVariables(s));                         // Write constraints for nano 9k
+     }
+
+    void generateBuildNano9K()                                                  // Generate build commands for Nano 9k
+     {final StringBuilder s = new StringBuilder();
+      s.append("""
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/
+#-------------------------------------------------------------------------------
+# Find from Database On A Chip running on a Nano 9K
+# Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2025
+#-------------------------------------------------------------------------------
+use v5.38;
+use warnings FATAL => qw(all);
+use strict;
+use Data::Dump qw(dump);
+use Data::Table::Text qw(:all);
+
+my $project = q(find);
+my $verilog = fpe $project, q(v);
+my $cst     = fpe $project, q(xdc);
+my $bits    = fpe $project, q(fs);
+my $cable   = q(ft2232);
+my $device  = q(GW1NR-LV9QN88PC6/I5);
+my $pack    = q(GW1N-9C);
+
+my $reports = q(reports);
+my $build   = q(build);
+my $y       = fpe $reports, qw(yosys txt);
+my $n       = fpe $reports, qw(nextpnr-gowin txt);
+
+my $yj      = fpe $build,   qw(yosys   json);
+my $nj      = fpe $build,   qw(nextpnr json);
+my $pj      = fpe $build,   qw(pack    json);
+
+makePath($_) for $y, $yj;
+
+if (1)
+ {my $cmd = qq(yosys -p "read_verilog $verilog; synth_gowin -top $project -json $yj"    | tee $y);
+  say STDERR $cmd;
+  system($cmd);
+  die if $?;
+ }
+
+if (1)
+ {my $cmd = qq(nextpnr-gowin --json $yj  --write $nj --device "$device" --cst $cst 2>&1 | tee $n);
+  say STDERR $cmd;
+  system($cmd);
+  die if $?;
+ }
+
+system(qq(gowin_pack     -d $pack -o $bits $nj));
+system(qq(openFPGALoader -c $cable   $bits));
+""");
+      writeFile(nano9kBuild(), s);                                              // Write build file for Nano 9k
+     }
+
+    VerilogCode generateVerilog()                                               // Generate verilog
+     {zz();
+
+      makePath(projectFolder());                                                // Write files to the project folder
+
+      ops.genVerilog(opCodeMapFile(), opCodeMap);                               // Write op code map
+
+      declareMemories();
+      initializeMemories();
+
+      generateVerilogCode();                                                    // Generate code and test banches for various devices
+      generateVerilogNano9k();
+      generateVerilogTestBench();
+      generateVerilogTestBenchNano9K();
+      generateVerilogConstraintsNano9K();
+      generateBuildNano9K();
 
       if (statements == null)                                                   // All statements are in play so it is possible to execute the programs and compare their outputs to see if they are the same.
        {execJavaTest();                                                         // Execute the corresponding Java test
@@ -2184,8 +2429,9 @@ endmodule
       say(project, folder, Key());                                              // Identify the test
       P.run(javaTraceFile());                                                   // Run the Java version and trace it
 
-      //ok(P.steps, expSteps());                                                // Steps in Java code
-      ok(T.at(BtreeDM.this.data).getInt(), data());                             // Data associated with key from java code
+      ok(P.steps, expSteps()-1);                                                // Steps in Java code
+      if (found() != null) ok(T.at(found).getInt(), found());                   // Whether the data was found or not
+      if (data () != null) ok(T.at(data) .getInt(), data());                    // Data associated with key from java code
       if (debug) stop(""+thisBTree);                                            // Print tree if debugging
       if (expected() != null) ok(BtreeDM.this, expected());                     // Check resulting tree
       return this;
@@ -2224,7 +2470,7 @@ endmodule
       s = s.replace("$data_width",       ""+data.width);
       s = s.replace("$data",             ""+data());
       s = s.replace("$Key",              ""+Key());
-      s = s.replace("$Data",             ""+Data());
+      s = s.replace("$Data",             ""+(Data() != null ? Data() : 0));
       s = s.replace("$maxSteps",         ""+maxSteps());
       s = s.replace("$expSteps",         ""+expSteps());
       s = s.replace("$found_at",         ""+found.at);
@@ -3326,6 +3572,19 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_delete_random(random_large, 1000, null);
    }
 
+
+  void run_verilogFind(int Key, int Found, int Data, int ExpSteps)              // Test a find operation in Verilog
+   {VerilogCode v = new VerilogCode("find", "verilog")                          // Generate verilog now that memories have been initialized and the program written
+     {int     Key     () {return      Key;}                                     // Input key value
+      Integer Data    () {return     null;}                                     // Input data value
+      Integer found   () {return    Found;}                                     // Whether we should expect to find the key on a find operation
+      Integer data    () {return     Data;}                                     // Expected output data value
+      int     maxSteps() {return       40;}                                     // Maximum number of execution steps
+      int     expSteps() {return ExpSteps;}                                     // Expected number of steps
+      String  expected() {return null;}                                         // Expected tree if present
+     };
+   }
+
   private static void test_verilogFind()                                        // Find using generated verilog code
    {z();
     final BtreeDM t = allTreeOps();
@@ -3355,30 +3614,31 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
 
-    VerilogCode v = t.new VerilogCode("find", "verilog")                        // Generate verilog now that memories have been initialized and the program written
-     {int    Key     () {return    2;}                                          // Input key value
-      int    Data    () {return    2;}                                          // Input data value
-      int    data    () {return    7;}                                          // Expected output data value
-      int    maxSteps() {return 2000;}                                          // Maximum number if execution steps
-      int    expSteps() {return   21;}                                          // Expected number of steps
-      String expected() {return null;}                                          // Expected tree if present
-     };
-
-    ok(t.T.at(t.data).getInt(), 7);                                             // Data associated with key
+    t.run_verilogFind( 0, 0, 0, 21);
+    t.run_verilogFind( 1, 1, 8, 21);
+    t.run_verilogFind( 2, 1, 7, 21);
+    t.run_verilogFind( 3, 1, 6, 21);
+    t.run_verilogFind( 4, 1, 5, 21);
+    t.run_verilogFind( 5, 1, 4, 21);
+    t.run_verilogFind( 6, 1, 3, 21);
+    t.run_verilogFind( 7, 1, 2, 21);
+    t.run_verilogFind( 8, 1, 1, 21);
+    t.run_verilogFind( 9, 1, 0, 21);
+    t.run_verilogFind(10, 0, 0, 21);
    }
 
   private void runVerilogDeleteTest                                             // Run the java and verilog versions and compare the resulting memory traces
    (int Key, int data, int steps, String expected)
    {z();
-    T.at(this.Key).setInt(Key);                                                 // Sets memory directly not via an instruction
 
     VerilogCode v = new VerilogCode("delete", "verilog")                        // Generate verilog now that memories have beeninitialzied and the program written
-     {int    Key     () {return   Key;}                                         // Input key value
-      int    Data    () {return     3;}                                         // Input key value
-      int    data    () {return  data;}                                         // Expected output data value
-      int    maxSteps() {return  2000;}                                         // Maximum number if execution steps
-      int    expSteps() {return steps;}                                         // Expected number of steps
-      String expected() {return null;}                                          // Expected tree if present
+     {int     Key     () {return   Key;}                                        // Input key value
+      Integer Data    () {return     3;}                                        // Input key value
+      Integer found   () {return     1;}                                        // Whether we should expect to find the key on a find operation
+      Integer data    () {return  data;}                                        // Expected output data value
+      int     maxSteps() {return  2000;}                                        // Maximum number if execution steps
+      int     expSteps() {return steps;}                                        // Expected number of steps
+      String  expected() {return expected;}                                     // Expected tree if present
      };
    }
 
@@ -3418,9 +3678,9 @@ Line T       At      Wide       Size    Indices        Value   Name
                     6           |
       2    4             7      |
       5    5.1           6      |
-      1    3             7      |
-           4             2      |
-1,2=1  4=3    5,6=4  7=7  8,9=2 |
+      1    4             8      |
+           3             2      |
+1,2=1  4=4    5,6=3  7=8  8,9=2 |
 """);
     if (eachStatement) return;                                                  // Generate just one so vivado can generate timimg for it rather than executing it.
 
@@ -3431,25 +3691,25 @@ Line T       At      Wide       Size    Indices        Value   Name
              6           |
       4           7      |
       5           6      |
-      1           7      |
-      4           2      |
-1,2=1  5,6=4  7=7  8,9=2 |
+      1           8      |
+      3           2      |
+1,2=1  5,6=3  7=8  8,9=2 |
 """);
 
     t.runVerilogDeleteTest(2, 7, 327, """
     4      6      7        |
     0      0.1    0.2      |
-    1      4      7        |
+    1      3      8        |
                   2        |
-1=1  5,6=4    7=7    8,9=2 |
+1=1  5,6=3    7=8    8,9=2 |
 """);
 
     t.runVerilogDeleteTest(1, 8, 230, """
       6    7        |
       0    0.1      |
-      1    7        |
+      1    8        |
            2        |
-5,6=1  7=7    8,9=2 |
+5,6=1  7=8    8,9=2 |
 """);
 
     t.runVerilogDeleteTest(5, 4, 195, """
@@ -3484,19 +3744,15 @@ Line T       At      Wide       Size    Indices        Value   Name
   private void runVerilogPutTest                                                // Run the java and verilog versions and compare the resulting memory traces
    (int value, int steps, String expected)
    {z();
-    T.at(Key ).setInt(value);                                                   // Sets memory directly not via an instruction
-    T.at(Data).setInt(value);                                                   // Sets memory directly not via an instruction
     VerilogCode v = new VerilogCode("put", "verilog")                           // Generate verilog now that memories have been initialized and the program written
-     {int    Key     () {return value;}                                         // Input key value
-      int    Data    () {return     3;}                                         // Input data value
-      int    data    () {return     0;}                                         // Expected output data value
-      int    maxSteps() {return  2000;}                                         // Maximum number if execution steps
-      int    expSteps() {return steps;}                                         // Expected number of steps
-      String expected() {return null;}                                          // Expected tree if present
+     {int     Key     () {return value;}                                        // Input key value
+      Integer Data    () {return value;}                                        // Input data value
+      Integer found   () {return     0;}                                        // Whether we should expect to find the key on a find operation
+      Integer data    () {return     0;}                                        // Expected output data value
+      int     maxSteps() {return  2000;}                                        // Maximum number if execution steps
+      int     expSteps() {return steps;}                                        // Expected number of steps
+      String  expected() {return expected;}                                     // Expected tree if present
      };
-
-    ok(this, expected);
-    if (debug) stop(this);
    }
 
   private static void test_verilogPut()                                         // Delete using generated verilog code
@@ -3507,6 +3763,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.runVerilogPutTest(1, 25, """
 1=0 |
 """);
+
     if (eachStatement) return;                                                  // Generate just one so vivado can generate timimg for it rather than executing it.
 
     t.runVerilogPutTest(2, 25, """
