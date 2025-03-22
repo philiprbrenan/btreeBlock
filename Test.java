@@ -897,9 +897,9 @@ public class Test                                                               
         e.join();
         if (exitCode != 0)
          {stop(
-          "Command:", command,
-          "code   :", exitCode,
-          "stdout :", out,
+          "Command:", command,  "\n",
+          "code   :", exitCode, "\n",
+          "stdout :", out,      "\n",
           "stderr :", err);
          }
        }
