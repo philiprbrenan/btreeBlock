@@ -10,7 +10,7 @@ class StringToNumbers extends Test                                              
  {final TreeMap<String, TreeSet<Integer>> input = new TreeMap<>();              // Input string to integers
   final TreeSet<Order>                   output = new TreeSet<>();              // Output integers to string
   final Stack  <Order>              outputOrder = new Stack<>();                // Order as a stack
-  Integer min, max;                                                             // minimum and maximum vakues encountered
+  Integer min, max;                                                             // Minimum and maximum values encountered
 
 //D1 Construction                                                               // Construct the ordering of strings and numbers
 
