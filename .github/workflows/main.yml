@@ -1,4 +1,4 @@
-# Test 2025-03-22 at 22:43:42
+# Test 2025-03-22 at 23:03:46
 
 name: Test
 run-name: btreeBlock
@@ -31,6 +31,10 @@ jobs:
       uses: oracle-actions/setup-java@v1
       with:
         website: jdk.java.net
+
+    - name: Java release
+      run: |
+        java -version
 
     - name: Verilog install
       run: |
