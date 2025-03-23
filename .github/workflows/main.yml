@@ -1,4 +1,4 @@
-# Test 2025-03-22 at 23:05:31
+# Test 2025-03-23 at 00:08:35
 
 name: Test
 run-name: btreeBlock
@@ -39,6 +39,10 @@ jobs:
     - name: Verilog install
       run: |
         sudo apt install iverilog
+
+    - name: Verilog release
+      run: |
+        iverilog -v
 
     - name: Position files in package
       run: |
