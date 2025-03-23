@@ -8,7 +8,7 @@ package com.AppaApps.Silicon;                                                   
 // Stuck - get penultimate element. Use currentSize field directly instead of copy in it to a temporary variable
 // Use free in node to hold node number while allocated so that Node knows where to write it back to without being told
 // Set an updated field for when an existing key has its associated data updated by put
-// Start splitting lower down and merge only along split  path
+// Start splitting lower down and merge only along split path
 import java.util.*;
 import java.nio.file.*;
 
