@@ -1,4 +1,4 @@
-# Test 2025-03-23 at 00:11:02
+# Test 2025-03-23 at 00:13:04
 
 name: Test
 run-name: btreeBlock
@@ -42,7 +42,7 @@ jobs:
 
     - name: Verilog release
       run: |
-        iverilog -v
+        iverilog -V
 
     - name: Position files in package
       run: |
