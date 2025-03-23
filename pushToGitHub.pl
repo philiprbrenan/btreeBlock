@@ -168,8 +168,7 @@ END
 
   $y .= <<"END";                                                                # Upload generated files
     - name: Upload Artifact
-      if: matrix.task == 'BtreeDM'
-      if: always()
+      if: matrix.task == 'BtreeDM' && always()
       uses: actions/upload-artifact\@v4
       with:
         name: verilog
