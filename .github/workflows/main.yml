@@ -1,4 +1,4 @@
-# Test 2025-03-23 at 01:13:09
+# Test 2025-03-23 at 01:21:50
 
 name: Test
 run-name: btreeBlock
@@ -27,7 +27,7 @@ jobs:
       with:
         ref: 'main'
 
-    - name: 'JDK 22'
+    - name: 'JDK 24'
       uses: oracle-actions/setup-java@v1
       with:
         website: jdk.java.net
