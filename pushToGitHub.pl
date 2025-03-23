@@ -94,6 +94,7 @@ END
 if (1)                                                                          # Write workflow
  {my @j = map {fn $_}  grep {fn($_) !~ m(Able\Z)}                               # Java files to test do not include interfaces
           searchDirectoryTreesForMatchingFiles($home, qw(.java));               # Java files
+  @j = q(BtreeDM);
 
   my $d = dateTimeStamp;
   my $c = q(com/AppaApps/Silicon);                                              # Package to classes folder
@@ -166,14 +167,14 @@ END
 END
    }
 
-  $y .= <<"END";                                                                # Upload generated files
-    - name: Upload Artifact
-      if: matrix.task == 'BtreeDM' && always()
-      uses: actions/upload-artifact\@v4
-      with:
-        name: verilog
-        path: verilog/
-END
+#  $y .= <<"END";                                                                # Upload generated files
+#    - name: Upload Artifact
+#      if: matrix.task == 'BtreeDM' && always()
+#      uses: actions/upload-artifact\@v4
+#      with:
+#        name: verilog
+#        path: verilog/
+#END
 
   my $f = writeFileUsingSavedToken $user, $repo, $wf, $y;                       # Upload workflow
   lll "$f  Ubuntu work flow for $repo";
