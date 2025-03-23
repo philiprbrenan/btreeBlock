@@ -2443,9 +2443,6 @@ system(qq(openFPGALoader -c $cable   $bits));
      {zz();
       final StringBuilder s = new StringBuilder(editVariables("cd $projectFolder && iverilog $project.tb $project.v -Iincludes -g2012 -o $project && ./$project"));
       deleteFile(traceFile());
-say("AAAA", Key(), javaTraceFile(), traceFile());
-say("BBBB", readFile(javaTraceFile()));
-say("CCCC", readFile(traceFile()));
       final ExecCommand   x = new ExecCommand(s);
       final String        e = joinLines(readFile(javaTraceFile()));             // Read java output
       final String        g = joinLines(readFile(traceFile()));                 // Execute verilog
