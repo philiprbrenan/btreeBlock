@@ -165,6 +165,18 @@ END
 END
    }
 
+  $y .= <<"END";
+      - name: Zip Artifact
+        run: |
+          zip -r verilog.zip verilog/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact\@v4
+        with:
+          name: verilog
+          path: verilog.zip
+END
+
   my $f = writeFileUsingSavedToken $user, $repo, $wf, $y;                       # Upload workflow
   lll "$f  Ubuntu work flow for $repo";
  }
