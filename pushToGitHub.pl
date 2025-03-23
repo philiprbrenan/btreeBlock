@@ -167,14 +167,14 @@ END
 END
    }
 
-#  $y .= <<"END";                                                                # Upload generated files
-#    - name: Upload Artifact
-#      if: matrix.task == 'BtreeDM' && always()
-#      uses: actions/upload-artifact\@v4
-#      with:
-#        name: verilog
-#        path: verilog/
-#END
+  $y .= <<"END";                                                                # Upload generated files
+    - name: Upload Artifact
+      if: matrix.task == 'BtreeDM' && always()
+      uses: actions/upload-artifact\@v4
+      with:
+        name: verilog
+        path: verilog/
+END
 
   my $f = writeFileUsingSavedToken $user, $repo, $wf, $y;                       # Upload workflow
   lll "$f  Ubuntu work flow for $repo";
