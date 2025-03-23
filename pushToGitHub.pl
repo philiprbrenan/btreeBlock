@@ -142,7 +142,7 @@ jobs:
 
     - name: Verilog release
       run: |
-        iverilog -v
+        iverilog -V
 
     - name: Position files in package
       run: |
