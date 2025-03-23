@@ -3578,8 +3578,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   void run_verilogFind(int Key, int Found, int Data, int ExpSteps)              // Test a find operation in Verilog
-   {say("AAAA", Key);
-    VerilogCode v = new VerilogCode("find", "verilog")                          // Generate verilog now that memories have been initialized and the program written
+   {VerilogCode v = new VerilogCode("find", "verilog")                          // Generate verilog now that memories have been initialized and the program written
      {int     Key     () {return      Key;}                                     // Input key value
       Integer Data    () {return     null;}                                     // Input data value
       Integer found   () {return    Found;}                                     // Whether we should expect to find the key on a find operation
@@ -4262,8 +4261,7 @@ StuckSML(maxSize:4 size:1)
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
-   {test_verilogFind(); stop("");
-    final boolean longRunning = github_actions && 1 == 0;
+   {final boolean longRunning = github_actions && 1 == 0;
     test_find_and_insert();
     test_put_ascending();
     test_put_ascending_wide();
@@ -4285,7 +4283,7 @@ StuckSML(maxSize:4 size:1)
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
     //test_verilogDelete();
-    test_verilogFind();
+    //test_verilogFind();
     //test_verilogPut();
    }
 
