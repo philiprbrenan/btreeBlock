@@ -471,7 +471,7 @@ abstract class StuckDM extends Test                                             
      {void a()
        {final int N = maxSize();                                                // Maximum number of elements to search
         boolean found = false;
-        Found.setOff().setInt(0);                                               // Assume  we will not find the key
+        Found.setOff().setInt(0);                                               // Assume we will not find the key
         Index.setOff().setInt(0);
         Data .setOff().setInt(0);
 
