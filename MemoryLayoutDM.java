@@ -541,7 +541,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          }
        };
 
-      for(int i = nextPowerOfTwo(size); i > 0; i = i >> 1)                      // Copy in logarithmically descending blocks
+//    for(int i = nextPowerOfTwo(size); i > 0; i = i >> 1)                      // Copy in logarithmically descending blocks
+      for(int i = prevPowerOfTwo(size); i > 0; i = i >> 1)                      // Copy in logarithmically descending blocks
        {final int I = i;
         P.new I()
          {void a()
