@@ -3578,7 +3578,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   void run_verilogFind(int Key, int Found, int Data, int ExpSteps)              // Test a find operation in Verilog
-   {VerilogCode v = new VerilogCode("find", "verilog")                          // Generate verilog now that memories have been initialized and the program written
+   {say("AAAA", Key);
+    VerilogCode v = new VerilogCode("find", "verilog")                          // Generate verilog now that memories have been initialized and the program written
      {int     Key     () {return      Key;}                                     // Input key value
       Integer Data    () {return     null;}                                     // Input data value
       Integer found   () {return    Found;}                                     // Whether we should expect to find the key on a find operation
