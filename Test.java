@@ -19,7 +19,7 @@ import java.util.stream.*;
 //D2 Construct                                                                  // Develop and test a java program
 
 public class Test                                                               // Describe a chip and emulate its operation.
- {final static boolean github_actions = true ||                                          // Whether we are on a github
+ {final static boolean github_actions =                                         // Whether we are on a github
     "true".equals(System.getenv("GITHUB_ACTIONS"));
   final static long start = System.nanoTime();                                  // Start time
   final static Stack<String> sayThisOrStop = new Stack<>();                     // The next says should say this or else we should stop
