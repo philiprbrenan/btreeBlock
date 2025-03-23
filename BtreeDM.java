@@ -2443,6 +2443,9 @@ system(qq(openFPGALoader -c $cable   $bits));
      {zz();
       final StringBuilder s = new StringBuilder(editVariables("cd $projectFolder && iverilog $project.tb $project.v -Iincludes -g2012 -o $project && ./$project"));
       deleteFile(traceFile());
+say("AAAA", Key(), javaTraceFile(), traceFile());
+say("BBBB", readFile(javaTraceFile()));
+say("CCCC", readFile(traceFile()));
       final ExecCommand   x = new ExecCommand(s);
       final String        e = joinLines(readFile(javaTraceFile()));             // Read java output
       final String        g = joinLines(readFile(traceFile()));                 // Execute verilog
@@ -4261,7 +4264,8 @@ StuckSML(maxSize:4 size:1)
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
-   {final boolean longRunning = github_actions && 1 == 0;
+   {test_verilogFind(); stop("");
+    final boolean longRunning = github_actions && 1 == 0;
     test_find_and_insert();
     test_put_ascending();
     test_put_ascending_wide();
@@ -4281,9 +4285,9 @@ StuckSML(maxSize:4 size:1)
    }
 
   protected static void newTests()                                              // Tests being worked on
-   {oldTests();
+   {//oldTests();
     //test_verilogDelete();
-    //test_verilogFind();
+    test_verilogFind();
     //test_verilogPut();
    }
 
