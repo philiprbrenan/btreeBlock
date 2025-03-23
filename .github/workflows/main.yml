@@ -1,4 +1,4 @@
-# Test 2025-03-23 at 00:56:53
+# Test 2025-03-23 at 00:58:35
 
 name: Test
 run-name: btreeBlock
@@ -215,6 +215,7 @@ jobs:
         java -cp Classes com/AppaApps/Silicon/Verilog
 
     - name: Upload Artifact
+      if: matrix.task == 'BtreeDM'
       if: always()
       uses: actions/upload-artifact@v4
       with:
