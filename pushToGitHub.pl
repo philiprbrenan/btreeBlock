@@ -17,9 +17,9 @@ my $md5File = q(/home/phil/btreeBlock/.md5Sums);                                
 my $user    = q(philiprbrenan);                                                 # User
 my $repo    = q(btreeBlock);                                                    # Repo
 my $wf      = q(.github/workflows/main.yml);                                    # Work flow on Ubuntu
-my @ext     = qw(.html .java .jpg .md .pl .pdf .png .py .rpt .txt .xdc);        # Extensions of files to upload to github
-my @qflowExt= qw(.cel2 .gds2 .spi .tb .tcl .v);                                 # Qflow file extensions
-#  @ext     = qw(.java .md .pl .txt);                                           # Reduced set of files to upload to github
+my @ext     = qw(.html .java .jpg .md .pl .pdf .png .py .rpt .sdc .txt);        # Extensions of files to upload to github
+my $sc      = fpd $home, qw(siliconCompiler);                                   # Silicon compiler
+my @scExt   = qw(.gds .py .xdc);                                                # Silicon compiler extensions
 
 say STDERR timeStamp,  " push to github $repo";
 
@@ -30,8 +30,6 @@ push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              
         @files = grep {!m(/gowin/\w+/reports/)}   @files;
         @files = grep {!m(/logs/)}                @files;
 
-#say STDERR "AAAA\n", dump(\@files);
-
 if (1)                                                                          # Remove most of the verilog except the reports
  {my @f = @files; @files = ();
   for my $f(@f)
@@ -40,10 +38,10 @@ if (1)                                                                          
    }
  }
 
-if (0)
- {push my @qflow, searchDirectoryTreesForMatchingFiles($home, @qflowExt);       # Qflow Files to upload
-          @qflow = grep {m(/qflow/)} @qflow;
-  push @files, @qflow;
+if (1)
+ {push my @sc, searchDirectoryTreesForMatchingFiles($sc, @scExt);               # Silicon compiler files
+  my %s;
+  @files = grep {!$s{$_}++} @files, @sc;
  }
 
 @files = changedFiles $md5File, @files if 1;                                    # Filter out files that have not changed
@@ -94,7 +92,7 @@ END
 if (1)                                                                          # Write workflow
  {my @j = map {fn $_}  grep {fn($_) !~ m(Able\Z)}                               # Java files to test do not include interfaces
           searchDirectoryTreesForMatchingFiles($home, qw(.java));               # Java files
-  @j = q(BtreeDM);
+  @j = q(BtreeDM);                                                              # This will test all the stuff of current interest
 
   my $d = dateTimeStamp;
   my $c = q(com/AppaApps/Silicon);                                              # Package to classes folder
@@ -167,14 +165,14 @@ END
 END
    }
 
-  $y .= <<"END";                                                                # Upload generated files
-    - name: Upload Artifact
-      if: matrix.task == 'BtreeDM' && always()
-      uses: actions/upload-artifact\@v4
-      with:
-        name: verilog
-        path: verilog/
-END
+#  $y .= <<"END";                                                               # Upload generated files
+#    - name: Upload Artifact
+#      if: matrix.task == 'BtreeDM' && always()
+#      uses: actions/upload-artifact\@v4
+#      with:
+#        name: verilog
+#        path: verilog/
+#END
 
   my $f = writeFileUsingSavedToken $user, $repo, $wf, $y;                       # Upload workflow
   lll "$f  Ubuntu work flow for $repo";
