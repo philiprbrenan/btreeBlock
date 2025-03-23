@@ -471,7 +471,7 @@ abstract class StuckDM extends Test                                             
      {void a()
        {final int N = maxSize();                                                // Maximum number of elements to search
         boolean found = false;
-        Found.setOff().setInt(0);                                               // Assume we will not find the key
+        Found.setOff().setInt(0);                                               // Assume  we will not find the key
         Index.setOff().setInt(0);
         Data .setOff().setInt(0);
 
@@ -542,8 +542,8 @@ abstract class StuckDM extends Test                                             
        {final int N = maxSize();                                                // Maximum number of elements to search
         for (int i = 0; i < N; i++)                                             // Search
          {z();
-          final boolean e = i > 0 ? T.at(equalLeafKey,     i-1).setOff().getInt() > 0 : false; // Next    value
-          final boolean E =         T.at(equalLeafKey,     i  ).setOff().getInt() > 0;         // Current value
+          final boolean e = i > 0 ? T.at(equalLeafKey,     i-1).setOff().getInt() > 0 : false; // Previous value
+          final boolean E =         T.at(equalLeafKey,     i  ).setOff().getInt() > 0;         // Current  value
           final boolean v =         T.at(lessThanLeafSize, i  ).setOff().getInt() > 0;         // In range
           final int     r = !e && E && v ? 1 : 0;
           T.at(lessThanLeafSize, i).setInt(r);                                  // Need to preserve equalLeafKey unchanged to allow previous element to be referenced
@@ -591,26 +591,26 @@ abstract class StuckDM extends Test                                             
         v.append("/* searchFirstGreaterThanOrEqual3 */\n");
         if (Found != null)                                                      // Found
          {v.append(Found.verilogLoad()+" <= 0");
-          for (int i = 0; i < N; i++) v.append(" || "+T.at(equalLeafKey, i).verilogLoad() + " > 0");
+          for (int i = 0; i < N; i++) v.append(" || "+T.at(lessThanLeafSize, i).verilogLoad() + " > 0");
           v.append(";\n");
          }
 
         if (Index != null)                                                      // Index
          {v.append(Index.verilogLoad()+" <= ");
-          for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+i+" : ");
+          for (int i = 0; i < N; i++) v.append(T.at(lessThanLeafSize, i).verilogLoad() + " > 0 ? "+i+" : ");
           if (all) v.append(M.at(currentSize).verilogLoad() + ";\n");           // Normal index
           else     v.append(M.at(currentSize).verilogLoad() + " -1;\n");        // Index one back
          }
 
         if (Key != null)                                                        // Key
          {v.append(Key.verilogLoad()+" <= ");
-          for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+M.at(sKey, i).verilogLoad()+" : ");
+          for (int i = 0; i < N; i++) v.append(T.at(lessThanLeafSize, i).verilogLoad() + " > 0 ? "+M.at(sKey, i).verilogLoad()+" : ");
           v.append("0;\n");                                                     // Not found so it can be anything
          }
 
         if (Data != null)
          {v.append(Data.verilogLoad()+" <= ");                                  // Data
-          for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+M.at(sData, i).verilogLoad()+" : ");
+          for (int i = 0; i < N; i++) v.append(T.at(lessThanLeafSize, i).verilogLoad() + " > 0 ? "+M.at(sData, i).verilogLoad()+" : ");
           if (all) v.append(M.at(sData, M.at(currentSize)).verilogLoad() + ";\n");              // Normal address
           else     v.append(M.at(sData, M.at(currentSize)).verilogLoadAddr(false, -1) + ";\n"); // Address one back
          }
