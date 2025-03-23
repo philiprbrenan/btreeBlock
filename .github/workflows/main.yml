@@ -1,4 +1,4 @@
-# Test 2025-03-23 at 00:28:09
+# Test 2025-03-23 at 00:46:09
 
 name: Test
 run-name: btreeBlock
@@ -214,3 +214,12 @@ jobs:
       run: |
         java -cp Classes com/AppaApps/Silicon/Verilog
 
+      - name: Zip Artifact
+        run: |
+          zip -r verilog.zip verilog/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: verilog
+          path: verilog.zip
