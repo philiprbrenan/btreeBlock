@@ -475,7 +475,7 @@ abstract class StuckDM extends Test                                             
         Index.setOff().setInt(0);
         Data .setOff().setInt(0);
 
-        for (int i = 0; i < N; i++)                                             // Searc h
+        for (int i = 0; i < N; i++)                                             // Search
          {z();
           final boolean f = T.at(equalLeafKey, i).setOff().getInt() > 0;        // Whether this key is in range and is equal
           if (f) Found.setInt(1);                                               // Any key matched ?
