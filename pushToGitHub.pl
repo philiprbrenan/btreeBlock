@@ -3,6 +3,7 @@
 # Push Btree block code to GitHub
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2024
 #-------------------------------------------------------------------------------
+#die "Turned off"
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -24,8 +25,11 @@ say STDERR timeStamp,  " push to github $repo";
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
         @files = grep {!m(/\.|backups/|Classes/)} @files;                       # Remove files that do not need to be saved
-        @files = grep {!m(vivado/runs/)} @files;
-        @files = grep {!m(vivado/pins/)} @files;
+        @files = grep {!m(/vivado/runs/)}         @files;
+        @files = grep {!m(/vivado/pins/)}         @files;
+        @files = grep {!m(/gowin/\w+/reports/)}   @files;
+
+#say STDERR "AAAA\n", dump(\@files);
 
 if (1)                                                                          # Remove most of the verilog except the reports
  {my @f = @files; @files = ();
@@ -128,9 +132,17 @@ jobs:
       with:
         website: jdk.java.net
 
+    - name: Java release
+      run: |
+        java -version
+
     - name: Verilog install
       run: |
         sudo apt install iverilog
+
+    - name: Verilog release
+      run: |
+        iverilog -v
 
     - name: Position files in package
       run: |
