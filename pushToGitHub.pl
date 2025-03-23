@@ -129,7 +129,7 @@ jobs:
       with:
         ref: 'main'
 
-    - name: 'JDK 22'
+    - name: 'JDK 24'
       uses: oracle-actions/setup-java\@v1
       with:
         website: jdk.java.net
