@@ -4261,9 +4261,7 @@ StuckSML(maxSize:4 size:1)
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
-   {test_verilogFind();
-if (true) return;
-    final boolean longRunning = github_actions && 1 == 0;
+   {final boolean longRunning = github_actions && 1 == 0;
     test_find_and_insert();
     test_put_ascending();
     test_put_ascending_wide();
@@ -4283,9 +4281,9 @@ if (true) return;
    }
 
   protected static void newTests()                                              // Tests being worked on
-   {//oldTests();
+   {oldTests();
     //test_verilogDelete();
-      test_verilogFind();
+    //test_verilogFind();
     //test_verilogPut();
    }
 
