@@ -190,6 +190,14 @@ public class Test                                                               
     return -1;
    }
 
+  static int prevPowerOfTwo(int n)                                              // If this is a power of two return it, else return the previous power of two
+   {int p = 1;
+    if (n == 0) stop("No previous power of two for zero");
+    for (int i = 0; i < 32; ++i, p *= 2) if (p*2 > n) return p;
+    stop("Cannot find previous power of two for", n);
+    return -1;
+   }
+
   static int logTwo(int n)                                                      // Log 2 of containing power of 2
    {int p = 1;
     for (int i = 0; i < 32; ++i, p *= 2) if (p >= n) return i;
@@ -726,21 +734,23 @@ public class Test                                                               
 
   static int testsPassed = 0, testsFailed = 0;                                  // Number of tests passed and failed
 
-  static void ok(boolean b)                                                     // Check test results match expected results.
-   {if (b) {++testsPassed; return;}
+  static boolean ok(boolean b)                                                     // Check test results match expected results.
+   {if (b) {++testsPassed; return true;}
     testsFailed++;
     err(currentTestName(), "failed\n");
+    return false;
    }
 
-  static void ok(Object a, Object b)                                            // Check test results match expected results.
-   {if (a.toString().equals(b.toString())) {++testsPassed; return;}
+  static boolean ok(Object a, Object b)                                            // Check test results match expected results.
+   {if (a.toString().equals(b.toString())) {++testsPassed; return true;}
     final boolean n = b.toString().contains("\n");
     testsFailed++;
     if (n) err(currentTestName(), "Failed, got:\n"+a+"\n");
     else   err(a, "\ndoes not equal\n", b, "\nin", currentTestName());
+    return false;
    }
 
-  static void ok(String got, String expected)                                   // Confirm two strings match
+  static boolean ok(String got, String expected)                                   // Confirm two strings match
    {final String G = got, E = expected;
     final int lg = G.length(), le = E.length();
     final StringBuilder b = new StringBuilder();
@@ -779,42 +789,44 @@ public class Test                                                               
       if (e == '\n') {++l; c = 0;} else c++;
      }
 
-    if (matchesLen && matches) ++testsPassed; else {++testsFailed; err(b);}     // Show error location with a trace back so we know where the failure occurred
+    final boolean pass = matchesLen && matches;
+    if (pass) ++testsPassed; else {++testsFailed; err(b);}                      // Show error location with a trace back so we know where the failure occurred
+    return pass;
    }
 
-  static void ok(int margin, String got, String expected)                       // Confirm two strings match
+  static boolean ok(int margin, String got, String expected)                    // Confirm two strings match
    {final String G = differentiateLines(margin, got),
                  E = differentiateLines(margin, expected);
     if (!G.equals(E))
      {say("Got:\n"+G);
       say("Expected:\n"+E);
      }
-    ok(G, E);
+    return ok(G, E);
    }
 
-  static void ok(Integer G, Integer E)                                          // Check that two integers are equal
-   {if (false)                        {}
-    else if ( G == null && E == null) ++testsPassed;
-    else if ( G != null && E == null) {err(String.format("Expected null, got:", G)); ++testsFailed;}
-    else if ( G == null && E != null) {err(String.format("Got null, expected:", E)); ++testsFailed;}
-    else if (!G.equals(E))            {err(currentTestName(), G, "!=", E);           ++testsFailed;}
-    else ++testsPassed;
+  static boolean ok(Integer G, Integer E)                                          // Check that two integers are equal
+   {if (false)                        {                                                             return true;}
+    else if ( G == null && E == null) {                                              ++testsPassed; return true;}
+    else if ( G != null && E == null) {err(String.format("Expected null, got:", G)); ++testsFailed; return false;}
+    else if ( G == null && E != null) {err(String.format("Got null, expected:", E)); ++testsFailed; return false;}
+    else if (!G.equals(E))            {err(currentTestName(), G, "!=", E);           ++testsFailed; return false;}
+    else                              {                                              ++testsPassed; return true;}
    }
 
-  static void ok(Long    G, Long    E)                                          // Check that two longs are equal
-   {if (false)                        {}
-    else if ( G == null && E == null) ++testsPassed;
-    else if ( G != null && E == null) {err(String.format("Expected null, got:", G)); ++testsFailed;}
-    else if ( G == null && E != null) {err(String.format("Got null, expected:", E)); ++testsFailed;}
-    else if (!G.equals(E))            {err(currentTestName(), G, "!=", E);           ++testsFailed;}
-    else ++testsPassed;
+  static boolean ok(Long    G, Long    E)                                       // Check that two longs are equal
+   {if (false)                        {return false;}
+    else if ( G == null && E == null) {                                              ++testsPassed; return true;}
+    else if ( G != null && E == null) {err(String.format("Expected null, got:", G)); ++testsFailed; return false;}
+    else if ( G == null && E != null) {err(String.format("Got null, expected:", E)); ++testsFailed; return false;}
+    else if (!G.equals(E))            {err(currentTestName(), G, "!=", E);           ++testsFailed; return false;}
+    else                              {                                              ++testsPassed; return false;}
    }
 
-  static void ok(Integer[]G, String E)                                          // Check that two integer arrays are are equal
-   {ok(""+G, E);
+  static boolean ok(Integer[]G, String E)                                       // Check that two integer arrays are are equal
+   {return ok(""+G, E);
    }
 
-  static void ok(Integer[]G, Integer[]E)                                        // Check that two integer arrays are are equal
+  static boolean ok(Integer[]G, Integer[]E)                                     // Check that two integer arrays are are equal
    {final StringBuilder b = new StringBuilder();
     final int lg = G.length, le = E.length;
 
@@ -822,7 +834,7 @@ public class Test                                                               
      {err(currentTestName(), "Failed:",
        "mismatched length, got", lg, "expected", le, "got:\n"+G);
       ++testsFailed;
-      return;
+      return false;
      }
 
     int fails = 0, passes = 0;
@@ -837,6 +849,7 @@ public class Test                                                               
      }
     if (fails > 0) err(b);
     testsPassed += passes; testsFailed += fails;                                // Passes and fails
+    return fails > 0;
    }
 
   static void testSummary()                                                     // Print a summary of the testing
@@ -918,9 +931,22 @@ public class Test                                                               
     ok(logTwo(4), 2);
     ok(logTwo(5), 3);
     ok(logTwo(6), 3);
-    ok(logTwo(8), 3);
     ok(logTwo(7), 3);
+    ok(logTwo(8), 3);
     ok(logTwo(9), 4);
+   }
+
+  static void test_power_two()
+   {ok(nextPowerOfTwo(0),  1);
+    ok(nextPowerOfTwo(1),  1); ok(prevPowerOfTwo( 1), 1);
+    ok(nextPowerOfTwo(2),  2); ok(prevPowerOfTwo( 2), 2);
+    ok(nextPowerOfTwo(3),  4); ok(prevPowerOfTwo( 3), 2);
+    ok(nextPowerOfTwo(4),  4); ok(prevPowerOfTwo( 4), 4);
+    ok(nextPowerOfTwo(5),  8); ok(prevPowerOfTwo( 5), 4);
+    ok(nextPowerOfTwo(6),  8); ok(prevPowerOfTwo( 6), 4);
+    ok(nextPowerOfTwo(7),  8); ok(prevPowerOfTwo( 7), 4);
+    ok(nextPowerOfTwo(8),  8); ok(prevPowerOfTwo( 8), 8);
+    ok(nextPowerOfTwo(9), 16); ok(prevPowerOfTwo( 9), 8);
    }
 
   static void test_max_min()
@@ -1053,6 +1079,7 @@ BBBB
 
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_log_two();
+    test_power_two();
     test_max_min();
     test_string();
     test_longest_line();
@@ -1069,7 +1096,7 @@ BBBB
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_methodology();
+    test_power_two();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
