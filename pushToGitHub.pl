@@ -28,6 +28,7 @@ push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              
         @files = grep {!m(/vivado/runs/)}         @files;
         @files = grep {!m(/vivado/pins/)}         @files;
         @files = grep {!m(/gowin/\w+/reports/)}   @files;
+        @files = grep {!m(/logs/)}                @files;
 
 #say STDERR "AAAA\n", dump(\@files);
 
@@ -165,16 +166,13 @@ END
 END
    }
 
-  $y .= <<"END";
-    - name: Zip Artifact
-      run: |
-        zip -r verilog.zip verilog/
-
+  $y .= <<"END";                                                                # Upload generated files
     - name: Upload Artifact
+      if: always()
       uses: actions/upload-artifact\@v4
       with:
         name: verilog
-        path: verilog.zip
+        path: verilog/
 END
 
   my $f = writeFileUsingSavedToken $user, $repo, $wf, $y;                       # Upload workflow
