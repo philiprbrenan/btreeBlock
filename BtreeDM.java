@@ -327,7 +327,10 @@ abstract class BtreeDM extends Test                                             
     if (check)
      {P.new If (T.at(allocate))
        {void Else()
-         {P.new I() {void a() {stop("No more memory available");}};             // No more free nodes available
+         {P.new I()                                                             // No more free nodes available
+           {void   a() {stop("No more memory available");}
+            String v() {return "/* No more memory available */";}
+           };
          }
        };
      }
