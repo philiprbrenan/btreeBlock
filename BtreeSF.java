@@ -10,7 +10,7 @@ package com.AppaApps.Silicon;                                                   
 // Set an updated field for when an existing key has its associated data updated by put
 // Start splitting lower down and merge only along split path
 // Split free chain from nodes so that nodes can be indexed directly
-// Possibly buffer read/writes to mainmemory through N
+// Possibly buffer read/writes to main memory through N
 import java.util.*;
 import java.nio.file.*;
 
@@ -161,9 +161,6 @@ abstract class BtreeSF extends Test                                             
     nC.setLeaf();                                                               // Set the root as a leaf
     nC.saveRoot();                                                              // Write back into memory
 
-//  T.setIntInstruction(node_setLeaf, root);
-//  setLeaf();                                                                  // The root starts as a leaf
-
     removableMemories.put("find",   " bT_StuckSA_Copy bL_StuckSA_Memory bL_StuckSA_Copy bL_StuckSA_Transaction bR_StuckSA_Memory bR_StuckSA_Copy bR_StuckSA_Transaction lT_StuckSA_Copy lL_StuckSA_Memory lL_StuckSA_Copy lL_StuckSA_Transaction lR_StuckSA_Memory  lR_StuckSA_Copy lR_StuckSA_Transaction nL nR ");
     removableMemories.put("delete", " bL_StuckSA_Copy lL_StuckSA_Copy ");
     removableMemories.put("put",    " bL_StuckSA_Copy lL_StuckSA_Copy lR_StuckSA_Copy ");
@@ -236,12 +233,18 @@ abstract class BtreeSF extends Test                                             
     branchStuck.T.layout.layoutName = "branch";
 
     final Layout   l = Layout.layout();
+    final int      n = max(leafStuck.M.size(), branchStuck.M.size())            // Size of the data in the node
+                       + 1 + btree.bitsPerNext;
+    final int      p = nextPowerOfTwo(n) - n;                                   // Amount of padding - which might be zero
+    final Layout.Variable pad = p > 0 ? l.variable("pad", p) : null;            // Padding might be required
     leaf         = l.duplicate("leaf",         leafStuck.layout());
     branch       = l.duplicate("branch",       branchStuck.layout());
     branchOrLeaf = l.union    ("branchOrLeaf", leaf,   branch);
     isLeaf       = l.bit      ("isLeaf");
     free         = l.variable ("free",         btree.bitsPerNext);
-    node       = l.structure("node",         isLeaf, free, branchOrLeaf);
+    node         = pad == null ?
+                   l.structure("node",         isLeaf, free, branchOrLeaf):     // No padding required
+                   l.structure("node",         isLeaf, free, branchOrLeaf, pad);// Padding to the next power of two to make indexing of nodes easy
     nodeLayout   = l.compile();
     node_size    = l.get("branchOrLeaf.branch.currentSize");                    // Relies on size being in the same position and having the same size in branches and leaves
     return nodeLayout;
@@ -269,16 +272,22 @@ abstract class BtreeSF extends Test                                             
     return l;
    }
 
-  BtreePA btreePA()                                                             // Convert to an earlier version known to work correctly
-   {final BtreeSF d = this;
-    final BtreePA t = new BtreePA()
-     {int maxSize         () {return d.maxSize         () ;}
-      int maxKeysPerLeaf  () {return d.maxKeysPerLeaf  () ;}
-      int maxKeysPerBranch() {return d.maxKeysPerBranch() ;}
-      int bitsPerKey      () {return d.bitsPerKey      () ;}
-      int bitsPerData     () {return d.bitsPerData     () ;}
+  BtreePA btreePA()                                                             // Convert to an earlier version known to work correctly so we can print it without having to write and execute pribt code.
+   {final BtreeSF s = this;                                                     // Source
+    final BtreePA t = new BtreePA()                                             // Target
+     {int maxSize         () {return s.maxSize         () ;}
+      int maxKeysPerLeaf  () {return s.maxKeysPerLeaf  () ;}
+      int maxKeysPerBranch() {return s.maxKeysPerBranch() ;}
+      int bitsPerKey      () {return s.bitsPerKey      () ;}
+      int bitsPerData     () {return s.bitsPerData     () ;}
      };
-    t.M.memory().copy(d.F.memory(), d.M.memory());                              // The difference between BTreeDM and SF. I was listening to the Caves of Steel at the time.
+
+    t.M.memory().copy(s.F.memory());                                            // The difference between BTreeDM and SF. I was listening to the Caves of Steel at the time.
+    final int N = t.maxSize(), P = t.Node.width, Q = s.nodeLayout.size();
+    for (int i = 0, p = s.F.memory().size(), q = 0; i < N; i++, p += P, q += Q) // Copy all the nodes out of the source tree and place thme in the target
+     {t.M.memory().copy(p, s.M.memory(), q, P);
+     }
+
     return t;
    }
 
@@ -344,20 +353,18 @@ abstract class BtreeSF extends Test                                             
     if (check)
      {P.new If (T.at(allocate))
        {void Else()
-         {P.new I() {void a() {stop("No more memory available");}};             // No more free nodes available
+         {P.new I()
+           {void   a() {stop("No more memory available");}                      // No more free nodes available
+            String v() {return "/* No more memory available */";}
+           };
          }
        };
      }
     nC.loadNode(T.at(allocate));                                                // Load allocated node
     F.at(freeChainHead).move(nC.N.at(free));                                    // Second node on free list
-//  F.at(freeChainHead).move(M.at(bTree_free, T.at(allocate)));                 // Second node on free list
 
-//  tt(node_clear, allocate);
     nC.zero();                                                                  // Clear the node
     nC.saveNode(M.at(node, T.at(allocate)));                                    // Construct and clear the node
-//  clear(T.at(allocate));                                                      // Construct and clear the node
-//  tt(node_clear, allocate);
-//  clear(T.at(allocate));                                                      // Construct and clear the node
 //    maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                              // Number of nodes in use
    }
 
@@ -673,14 +680,6 @@ abstract class BtreeSF extends Test                                             
     return L.compile();
    }
 
-//private void setLeaf()                                                        // Set as leaf
-// {zz(); M.at(bTree_isLeaf, T.at(node_setLeaf))  .ones();
-// }
-//
-//private void setBranch()                                                      // Set as branch
-// {zz(); M.at(bTree_isLeaf, T.at(node_setBranch)).zero();
-// }
-
   private MemoryLayoutDM.At ifRootLeaf(Node n)                                  // A variable that indicates whether the root is a leaf
    {zz(); return n.N.at(isLeaf);
    }
@@ -697,8 +696,8 @@ abstract class BtreeSF extends Test                                             
     nC.loadNode(T.at(allocate));                                                // Load the allocated node
     nC.setLeaf();                                                               // Set as a leaf
     nC.saveNode(M.at(node, T.at(allocate)));                                    // Write back into memory
-//    setLeaf();
    }
+
   private void allocBranch()                                                    // Allocate branch
    {zz();
     allocate();
@@ -707,7 +706,6 @@ abstract class BtreeSF extends Test                                             
     nC.loadNode(T.at(allocate));                                                // Load the allocated node
     nC.setBranch();                                                             // Set as a branch
     nC.saveNode(M.at(node, T.at(allocate)));                                    // Write back into memory
-//  setBranch();
    }
 
   private void free(Layout.Variable node_free)                                  // Free a node to make it available for reuse
@@ -715,7 +713,6 @@ abstract class BtreeSF extends Test                                             
     nC.ones();                                                                  // Clear the node
     nC.N.at(free).move(F.at(freeChainHead));                                    // Chain this node in front of the last freed node
     nC.saveNode(M.at(node, T.at(node_free)));                                   // Save node
-//  M.at(bTree_free, T.at(node_free)).move(F.at(freeChainHead));                // Chain this node in front of the last freed node
 
     F.at(freeChainHead).move(T.at(node_free));                                  // Make this node the head of the free chain
    }
@@ -725,9 +722,7 @@ abstract class BtreeSF extends Test                                             
     bLeaf.firstElement();                                                       // Was lastElement but firstElement() is faster
     nC.loadNode(bLeaf.T.at(bLeaf.tData));
     nC.isLeaf(T.at(hasLeavesForChildren));
-//  T.at(hasLeavesForChildren).move(M.at(bTree_isLeaf, bLeaf.T.at(bLeaf.tData)));
    }
-
 
 //D2 Node                                                                       // Description of a node
 
@@ -1273,7 +1268,6 @@ abstract class BtreeSF extends Test                                             
        {final ProgramDM.Label Return = end;
         nT.loadRoot();
         nT.isLeaf(T.at(IsLeaf));
-      //T.at(IsLeaf).move(M.at(bTree_isLeaf, root));
         P.new If (T.at(IsLeaf))                                                 // Confirm we are on a branch
          {void Then()
            {T.at(stolenOrMerged).zero();
@@ -2084,7 +2078,6 @@ abstract class BtreeSF extends Test                                             
           final int N = I.size();
           if (N > 1)
            {final StringBuilder t = new StringBuilder();
-//          for(ProgramDM.I j : I) t.append(q+"    "+j.v()+j.traceComment() + "\n");
             for(ProgramDM.I j : I) t.append(q+"    "+j.v()+"\n");
             s.append(String.format("%s%5d : begin\n", p, i));
             s.append(t);
@@ -2092,7 +2085,6 @@ abstract class BtreeSF extends Test                                             
            }
           else if (N == 1)
            {final ProgramDM.I j = I.firstElement();
-//          final String t = j.v()+j.traceComment();
             final String t = j.v();
             s.append(String.format("%s%5d : begin %s end\n", p, i, t));         // Bracket instructions in this block with op code
            }
