@@ -725,7 +725,9 @@ abstract class BtreeSF extends Test                                             
   private void hasLeavesForChildren(StuckDM bLeaf)                              // The node has leaves for children
    {zz();
     bLeaf.firstElement();                                                       // Was lastElement but firstElement() is faster
-    T.at(hasLeavesForChildren).move(M.at(bTree_isLeaf, bLeaf.T.at(bLeaf.tData)));
+    nC.loadNode(bLeaf.T.at(bLeaf.tData));
+    nC.isLeaf(T.at(hasLeavesForChildren));
+//  T.at(hasLeavesForChildren).move(M.at(bTree_isLeaf, bLeaf.T.at(bLeaf.tData)));
    }
 
 
@@ -1255,7 +1257,9 @@ abstract class BtreeSF extends Test                                             
     P.new Block()
      {void code()
        {final ProgramDM.Label Return = end;
-        T.at(IsLeaf).move(M.at(bTree_isLeaf, root));
+        nT.loadRoot();
+        nT.isLeaf(T.at(IsLeaf));
+      //T.at(IsLeaf).move(M.at(bTree_isLeaf, root));
         P.new If (T.at(IsLeaf))                                                 // Confirm we are on a branch
          {void Then()
            {T.at(stolenOrMerged).zero();
@@ -1775,7 +1779,7 @@ abstract class BtreeSF extends Test                                             
      {void code()
        {final ProgramDM.Label Return = end;
         mergeRoot();
-        nT.loadRoot();
+//      nT.loadRoot();
 
         P.new Block()                                                           // Find and delete directly in root as a leaf
          {void code()
