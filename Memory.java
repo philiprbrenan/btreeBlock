@@ -84,7 +84,7 @@ class Memory extends Test                                                       
   void copy(Memory...sources)                                                   // Initialize this memory from a source memory by copying as many bits as possible into the start of the target memory from the source memory
    {zz();
     int t = 0;
-    for (int s = 0; s < sources.length; s++)                                     // Copy each source
+    for (int s = 0; s < sources.length; s++)                                    // Copy each source
      {final Memory source = sources[s];
       final int N = min(size() - t, source.size());                             // Amount to copy
       for(int i = 0; i < N; ++i)
@@ -102,6 +102,17 @@ class Memory extends Test                                                       
     for(int i = 0; i < N; ++i)
      {z();
       bits[i] = source.bits[offset+i];
+     }
+    writes += N; source.reads += N;
+   }
+
+  void copy(int targetOffset, Memory source, int sourceOffset, int Length)      // Initialize part of this memory from part of a source memory
+   {z();
+    final int N = min(size() - targetOffset, source.size()- sourceOffset, Length);
+
+    for(int i = 0; i < N; ++i)
+     {z();
+      bits[targetOffset + i] = source.bits[sourceOffset+i];
      }
     writes += N; source.reads += N;
    }
@@ -459,17 +470,19 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
   static void test_copy_memories()
    {z();
     Memory a = memory("aaa",  256);
-    Memory b = memory("bbb",  64);
-    Memory c = memory("ccc",  32);
+    Memory b = memory("bbb",  256);
+    Memory c = memory("ccc",  256);
     b.alternating(4);
     c.alternating(2);
-    a.copy(b, c);
-    stop(a);
+    a.copy(  4, b, 0,  64);
+    a.copy( 68, c, 0,  64);
+    a.copy(192, c, 0, 128);
+    //stop(a);
     ok(a, """
 Memory: aaa
       4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
 Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
-   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 cccc cccc f0f0 f0f0 f0f0 f0f0
+   0  cccc cccc cccc cccc 0000 0000 0000 000c cccc cccc cccc cccf 0f0f 0f0f 0f0f 0f00
 """);
    }
 
