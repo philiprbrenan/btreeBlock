@@ -2770,7 +2770,7 @@ system(qq(openFPGALoader -c $cable   $bits));
 MemoryLayout: Node
 Memory      : Node
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0       155                                      node
+   1 S        0       256                                      node
    2 B        0         1                                  1     isLeaf
    3 V        1         4                                  0     free
    4 U        5       150                                        branchOrLeaf
@@ -2794,6 +2794,7 @@ Line T       At      Wide       Size    Indices        Value   Name
   22 V      143         4               1                  0           data
   23 V      147         4               2                  0           data
   24 V      151         4               3                  0           data
+  25 V      155       101                                  0     pad
 """);
 
     t.T.at(t.Key) .setInt(2);
@@ -2807,7 +2808,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 MemoryLayout: Node
 Memory      : Node
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0       155                                      node
+   1 S        0       256                                      node
    2 B        0         1                                  1     isLeaf
    3 V        1         4                                  0     free
    4 U        5       150                                        branchOrLeaf
@@ -2831,6 +2832,7 @@ Line T       At      Wide       Size    Indices        Value   Name
   22 V      143         4               1                  0           data
   23 V      147         4               2                  0           data
   24 V      151         4               3                  0           data
+  25 V      155       101                                  0     pad
 """);
 
 
@@ -2845,7 +2847,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 MemoryLayout: Node
 Memory      : Node
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0       155                                      node
+   1 S        0       256                                      node
    2 B        0         1                                  1     isLeaf
    3 V        1         4                                  0     free
    4 U        5       150                                        branchOrLeaf
@@ -2869,6 +2871,7 @@ Line T       At      Wide       Size    Indices        Value   Name
   22 V      143         4               1                  0           data
   23 V      147         4               2                  0           data
   24 V      151         4               3                  0           data
+  25 V      155       101                                  0     pad
 """);
    }
 
@@ -4304,27 +4307,27 @@ StuckSML(maxSize:4 size:1)
     t.P.run(); t.P.clear();
     ok(t.F.at(t.freeChainHead), "F.freeList@0=1");
     ok(t.M.at(t.bTree_free, 0), "M.free[0]1=0");
-    ok(t.M.at(t.bTree_free, 1), "M.free[1]146=2");
-    ok(t.M.at(t.bTree_free, 2), "M.free[2]291=3");
-    ok(t.M.at(t.bTree_free, 3), "M.free[3]436=0");
+    ok(t.M.at(t.bTree_free, 1), "M.free[1]257=2");
+    ok(t.M.at(t.bTree_free, 2), "M.free[2]513=3");
+    ok(t.M.at(t.bTree_free, 3), "M.free[3]769=0");
 
     t.allocLeaf();
     t.P.run(); t.P.clear();
 
     ok(t.F.at(t.freeChainHead), "F.freeList@0=2");
     ok(t.M.at(t.bTree_free, 0), "M.free[0]1=0");
-    ok(t.M.at(t.bTree_free, 1), "M.free[1]146=0");
-    ok(t.M.at(t.bTree_free, 2), "M.free[2]291=3");
-    ok(t.M.at(t.bTree_free, 3), "M.free[3]436=0");
+    ok(t.M.at(t.bTree_free, 1), "M.free[1]257=0");
+    ok(t.M.at(t.bTree_free, 2), "M.free[2]513=3");
+    ok(t.M.at(t.bTree_free, 3), "M.free[3]769=0");
     ok(t.T.at(t.allocate),      "T.allocate@0=1");
 
     t.free(t.allocate);
     t.P.run(); t.P.clear();
     ok(t.F.at(t.freeChainHead), "F.freeList@0=1");
     ok(t.M.at(t.bTree_free, 0), "M.free[0]1=0");
-    ok(t.M.at(t.bTree_free, 1), "M.free[1]146=2");
-    ok(t.M.at(t.bTree_free, 2), "M.free[2]291=3");
-    ok(t.M.at(t.bTree_free, 3), "M.free[3]436=0");
+    ok(t.M.at(t.bTree_free, 1), "M.free[1]257=2");
+    ok(t.M.at(t.bTree_free, 2), "M.free[2]513=3");
+    ok(t.M.at(t.bTree_free, 3), "M.free[3]769=0");
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
@@ -4350,10 +4353,9 @@ StuckSML(maxSize:4 size:1)
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_verilogDelete();
-    test_verilogFind();
-    test_verilogPut();
-    //test_memory();
+    //test_verilogDelete();
+    //test_verilogFind();
+    //test_verilogPut();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
