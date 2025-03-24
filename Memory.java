@@ -81,14 +81,18 @@ class Memory extends Test                                                       
     if  (width < 1) stop("Width must be one or more, not:", width);
    }
 
-  void copy(Memory source)                                                      // Initialize this memory from a source memory by copying as many bits as possible into the start of the target memory from the source memory
+  void copy(Memory...sources)                                                   // Initialize this memory from a source memory by copying as many bits as possible into the start of the target memory from the source memory
    {zz();
-    final int N = min(size(), source.size());
-    for(int i = 0; i < N; ++i)
-     {z();
-      bits[i] = source.bits[i];
+    int t = 0;
+    for (int s = 0; s < sources.length; s++)                                     // Copy each source
+     {final Memory source = sources[s];
+      final int N = min(size() - t, source.size());                             // Amount to copy
+      for(int i = 0; i < N; ++i)
+       {z();
+        bits[t++] = source.bits[i];                                             // Copy bit by bit
+       }
+      writes += N; source.reads += N;
      }
-    writes += N; source.reads += N;
    }
 
   void copy(Memory source, int offset)                                          // Initialize this memory from a source memory by copying as many bits as possible into the start of the target memory from the indexed location in the source memory
@@ -452,6 +456,23 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 """);
    }
 
+  static void test_copy_memories()
+   {z();
+    Memory a = memory("aaa",  256);
+    Memory b = memory("bbb",  64);
+    Memory c = memory("ccc",  32);
+    b.alternating(4);
+    c.alternating(2);
+    a.copy(b, c);
+    stop(a);
+    ok(a, """
+Memory: aaa
+      4... 4... 4... 4... 3... 3... 3... 3... 2... 2... 2... 2... 1... 1... 1... 1...
+Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210
+   0  0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 cccc cccc f0f0 f0f0 f0f0 f0f0
+""");
+   }
+
   static void test_print()
    {z();
     Memory m = memory("aaa",  256);
@@ -478,12 +499,12 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
     test_all_zeros_and_ones();
     test_copy_memory();
     test_copy_source();
+    test_copy_memories();
     test_print();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_print();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
