@@ -66,9 +66,9 @@ class ProgramDM extends Test                                                    
        }
       i();                                                                      // Additional initialization
      }
-    void   a() {}                                                               // Action performed by instruction
+    void   a() {stop("No instruction definition\n"+traceBack);}                 // Action performed by instruction
     String n() {return "instruction";}                                          // Instruction name
-    String v() {return " /* NOT SET */";}                                       // Corresponding verilog
+    String v() {stop("No instruction definition:\n"+traceBack); return null;}   // Corresponding verilog
     void   i() {}                                                               // initialization for each instruction
 
     String traceComment() {return " /* " + traceBack.replaceAll("\n", " ") + " */";} // Traceback as a comment
