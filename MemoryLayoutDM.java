@@ -14,6 +14,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
   ProgramDM                P = new ProgramDM();                                 // Program containing generated code
   static int         numbers = 0;
   final  int          number = ++numbers;                                       // Number each memory layout
+  final Arrayed       array;                                                    // The memory layout represents an array the elements of which have a width equal to a power of two
 
 //D1 Construction                                                               // Construct a memory layout
 
@@ -26,16 +27,29 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
     final Layout.Array    A = layout.array   ("bytes", a, (size+N-1) / N);
     layout.compile();
     memory = new Memory(Name, size);
+    array  = new Arrayed();
    }
 
   MemoryLayoutDM(Layout Layout, String Name)                                    // Memory with an associated layout and a name so we can generate verilog from it
    {zz();
     name   = Name; layout = Layout;
     memory = new Memory(Name, layout.size());                                   // Create the associated memory
+    array  = new Arrayed();
    }
 
   public int compareTo(MemoryLayoutDM other)                                    // A progam might access several memory layouts
    {return Integer.compare(number, other.number);
+   }
+
+  class Arrayed                                                                 // Memory that represents an array of elements whose widths are equal to the power of two
+   {final boolean      array;                                                   // The memory layout represents an array
+    final boolean powerOfTwo;                                                   // The elements of the array are a power of two in size
+    final int          width;                                                   // The width of the elements of the array
+    Arrayed()
+     {array      = layout.top() instanceof Layout.Array;
+      width      = array ? layout.top().toArray().element.width : 0;
+      powerOfTwo = nextPowerOfTwo(width) == width;
+     }
    }
 
 //D1 Control                                                                    // Testing, control and integrity
@@ -1816,6 +1830,20 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
+  static void test_array_addressing()
+   {z();
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Structure s = l.structure("s", a, b);
+    Layout.Array     A = l.array    ("A", s, 8);
+    MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "test");
+
+    ok(m.array.array);
+    ok(m.array.width, 8);
+    ok(m.array.powerOfTwo);
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_get_set();
     test_boolean();
@@ -1833,11 +1861,12 @@ Line T       At      Wide       Size    Indices        Value   Name
 //  test_dump_verilog_ignore();
     test_copy_bits();
     test_copy_memory();
+    test_array_addressing();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
-    test_copy_memory();
+   {//oldTests();
+    test_array_addressing();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
