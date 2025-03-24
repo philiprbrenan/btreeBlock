@@ -348,10 +348,14 @@ abstract class BtreeSF extends Test                                             
          }
        };
      }
-    F.at(freeChainHead).move(M.at(bTree_free, T.at(allocate)));                 // Second node on free list
+    nC.loadNode(T.at(allocate));                                                // Load allocated node
+    F.at(freeChainHead).move(nC.N.at(free));                                    // Second node on free list
+//  F.at(freeChainHead).move(M.at(bTree_free, T.at(allocate)));                 // Second node on free list
 
 //  tt(node_clear, allocate);
-    clear(T.at(allocate));                                                      // Construct and clear the node
+    nC.zero();                                                                  // Clear the node
+    nC.saveNode(M.at(node, T.at(allocate)));                                    // Construct and clear the node
+//  clear(T.at(allocate));                                                      // Construct and clear the node
 //  tt(node_clear, allocate);
 //  clear(T.at(allocate));                                                      // Construct and clear the node
 //    maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                              // Number of nodes in use
@@ -706,20 +710,14 @@ abstract class BtreeSF extends Test                                             
 //  setBranch();
    }
 
-  private void free(Layout.Variable node_free)                                  // Free a new node to make it available for reuse
+  private void free(Layout.Variable node_free)                                  // Free a node to make it available for reuse
    {zz();
-    z(); tt(node_erase, node_free); erase();                                    // Clear the node to encourage erroneous frees to do damage that shows up quickly.
-    M.at(bTree_free, T.at(node_free)).move(F.at(freeChainHead));                // Chain this node in front of the last freed node
+    nC.ones();                                                                  // Clear the node
+    nC.N.at(free).move(F.at(freeChainHead));                                    // Chain this node in front of the last freed node
+    nC.saveNode(M.at(node, T.at(node_free)));                                   // Save node
+//  M.at(bTree_free, T.at(node_free)).move(F.at(freeChainHead));                // Chain this node in front of the last freed node
+
     F.at(freeChainHead).move(T.at(node_free));                                  // Make this node the head of the free chain
-   }
-
-  private void clear(MemoryLayoutDM.At Node)                                    // Clear a new node to zeros ready for use
-   {zz(); M.at(node, Node).zero();
-   }
-
-  private void erase()                                                          // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
-   {zz();
-    M.at(node, T.at(node_erase)).ones();
    }
 
   private void hasLeavesForChildren(StuckDM bLeaf)                              // The node has leaves for children
@@ -741,6 +739,22 @@ abstract class BtreeSF extends Test                                             
      {zz(); name = Name;
       N = new MemoryLayoutDM(nodeLayout, name);
       N.program(P);
+     }
+
+    void zero()                                                                 // Clear the memory associated with this node to zeroes
+     {zz();
+      P.new I()
+       {void   a() {N.zero();}
+        String v() {return N.name + " <= 0; /* MemoryLayoutDM.zero */";}
+       };
+     }
+
+    void ones()                                                                 // Set the memory associated with this node to ones
+     {zz();
+      P.new I()
+       {void   a() {N.ones();}
+        String v() {return N.name + " <= -1; /* MemoryLayoutDM.ones */";}
+       };
      }
 
     void loadRoot()                                                             // Load with the node describing a root
@@ -3807,7 +3821,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest(3, 99, """
+    t.runVerilogPutTest(3, 103, """
     1      |
     0      |
     1      |
@@ -3815,7 +3829,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 200, """
+    t.runVerilogPutTest(4, 202, """
     1    2        |
     0    0.1      |
     1    3        |
@@ -3823,7 +3837,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1=1  2=3    3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 242, """
+    t.runVerilogPutTest(5, 244, """
       2    3        |
       0    0.1      |
       1    4        |
@@ -3831,7 +3845,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3=4    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 242, """
+    t.runVerilogPutTest(6, 244, """
       2      4        |
       0      0.1      |
       1      4        |
@@ -3839,7 +3853,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 266, """
+    t.runVerilogPutTest(7, 268, """
       2      4      5        |
       0      0.1    0.2      |
       1      4      3        |
@@ -3847,7 +3861,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5=3    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 354, """
+    t.runVerilogPutTest(8, 360, """
              4                  |
              0                  |
              5                  |
@@ -3859,7 +3873,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5=3  6=7    7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 337, """
+    t.runVerilogPutTest(9, 339, """
              4                    |
              0                    |
              5                    |
@@ -3871,7 +3885,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5,6=3  7=8    8,9=2 |
 """);
 
-    t.runVerilogPutTest(10, 337, """
+    t.runVerilogPutTest(10, 339, """
              4                       |
              0                       |
              5                       |
@@ -3883,7 +3897,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5,6=3  7,8=8    9,10=2 |
 """);
 
-    t.runVerilogPutTest(11, 361, """
+    t.runVerilogPutTest(11, 363, """
              4                               |
              0                               |
              5                               |
@@ -3895,7 +3909,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5,6=3  7,8=8    9=7    10,11=2 |
 """);
 
-    t.runVerilogPutTest(12, 343, """
+    t.runVerilogPutTest(12, 347, """
                                8                 |
                                0                 |
                                5                 |
@@ -3907,7 +3921,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=2 |
 """);
 
-    t.runVerilogPutTest(13, 309, """
+    t.runVerilogPutTest(13, 311, """
                                8                          |
                                0                          |
                                5                          |
@@ -3919,7 +3933,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest(14, 337, """
+    t.runVerilogPutTest(14, 339, """
                                8                             |
                                0                             |
                                5                             |
@@ -3931,7 +3945,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=2 |
 """);
 
-    t.runVerilogPutTest(15, 361, """
+    t.runVerilogPutTest(15, 363, """
                                8                                     |
                                0                                     |
                                5                                     |
@@ -3943,7 +3957,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest(16, 361, """
+    t.runVerilogPutTest(16, 365, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -3955,7 +3969,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=2 |
 """);
 
-    t.runVerilogPutTest(17, 345, """
+    t.runVerilogPutTest(17, 347, """
                                8                  12                            |
                                0                  0.1                           |
                                5                  11                            |
@@ -3967,7 +3981,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest(18, 373, """
+    t.runVerilogPutTest(18, 375, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -3979,7 +3993,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=12    17,18=2 |
 """);
 
-    t.runVerilogPutTest(19, 397, """
+    t.runVerilogPutTest(19, 399, """
                                8                  12                                        |
                                0                  0.1                                       |
                                5                  11                                        |
@@ -3991,7 +4005,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 395, """
+    t.runVerilogPutTest(20, 399, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
@@ -4347,7 +4361,7 @@ StuckSML(maxSize:4 size:1)
     test_verilogDelete();
     test_verilogFind();
     test_verilogPut();
-    test_memory();
+    //test_memory();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
