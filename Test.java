@@ -127,6 +127,10 @@ public class Test                                                               
     return null;
    }
 
+  String ref(Object obj)                                                        // Print the address of an object
+   {return Integer.toHexString(System.identityHashCode(obj));
+   }
+
 //D2 Numeric routines                                                           // Numeric routines
 
   static int ifs(String n)                                                      // Integer from string
