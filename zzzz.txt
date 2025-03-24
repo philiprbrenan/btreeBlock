@@ -1,0 +1,37 @@
+put.v:56:   44        0 :  begin nT[0 +: 44] <= M[       0/*node    */ + 0 * 44 +: 44]; /* copy2 */ step <= step+1; end
+put.v:111:  44        11 : begin nT[0 +: 44] <= M[       0/*node    */ + T[     134/*child   */ +: 4] * 44 +: 44]; /* copy2 */ step <= step+1; end
+put.v:133:  44        20 : begin M[       0/*node    */ + T[     138/*leafFound       */ +: 4] * 44 +: 44] <= nT[0 +: 44]; /* MemoryLayoutDM.copy1 */ step <= step+1; end
+put.v:218:   4        48 : begin F[       0/*freeList*/ +: 4] <= M[       1/*free    */ + T[       0/*allocate*/ +: 4] * 44 +: 4]/* MemoryLayoutDM.move */; step <= step+1; end
+put.v:219:  44        49 : begin M[       0/*node    */ + T[       0/*allocate*/ +: 4] * 44 +: 44] <= 0; /* MemoryLayoutDM.zero */ step <= step+1; end
+put.v:222:   1        52 : begin M[       0/*isLeaf  */ + T[     158/*node_setBranch  */ +: 4] * 44 +: 1] <= 1'b1; /* MemoryLayoutDM.ones */ step <= step+1; end
+put.v:227:  44                nT[0 +: 44] <= M[       0/*node    */ + 0 * 44 +: 44]; /* copy2 */
+put.v:228:  44                nL[0 +: 44] <= M[       0/*node    */ + T[      79/*l       */ +: 4] * 44 +: 44]; /* copy2 */
+put.v:229:  44                nR[0 +: 44] <= M[       0/*node    */ + T[      83/*r       */ +: 4] * 44 +: 44]; /* copy2 */
+put.v:406:  44                M[       0/*node    */ + 0 * 44 +: 44] <= nT[0 +: 44]; /* MemoryLayoutDM.copy1 */
+put.v:407:  44                M[       0/*node    */ + T[      79/*l       */ +: 4] * 44 +: 44] <= nL[0 +: 44]; /* MemoryLayoutDM.copy1 */
+put.v:408:  44                M[       0/*node    */ + T[      83/*r       */ +: 4] * 44 +: 44] <= nR[0 +: 44]; /* MemoryLayoutDM.copy1 */
+put.v:413:   1        82 : begin M[       0/*isLeaf  */ + T[     158/*node_setBranch  */ +: 4] * 44 +: 1] <= 0; /* MemoryLayoutDM.zero */ step <= step+1; end
+put.v:633:  44       118 : begin if (M[       0/*isLeaf  */ + T[     134/*child   */ +: 4] * 44 +: 1] == 0) step <= 592;  else step <= step+1; end
+put.v:642:  44                nL[0 +: 44] <= M[       0/*node    */ + T[      79/*l       */ +: 4] * 44 +: 44]; /* copy2 */
+put.v:643:  44                nR[0 +: 44] <= M[       0/*node    */ + T[     178/*node_balance    */ +: 4] * 44 +: 44]; /* copy2 */
+put.v:829:  44                M[       0/*node    */ + T[      87/*splitParent     */ +: 4] * 44 +: 44] <= nT[0 +: 44]; /* MemoryLayoutDM.copy1 */
+put.v:830:  44                M[       0/*node    */ + T[      79/*l       */ +: 4] * 44 +: 44] <= nL[0 +: 44]; /* MemoryLayoutDM.copy1 */
+put.v:831:  44                M[       0/*node    */ + T[     178/*node_balance    */ +: 4] * 44 +: 44] <= nR[0 +: 44]; /* MemoryLayoutDM.copy1 */
+put.v:865:   1       152 : begin T[      91/*mergeable       */ +: 1] <= M[       0/*isLeaf  */ + 0 * 44 +: 1]/* MemoryLayoutDM.move */; step <= step+1; end
+put.v:878:   1       161 : begin T[      91/*mergeable       */ +: 1] <= M[       0/*isLeaf  */ + bT_StuckSA_Transaction[       6/*data    */ +: 4] * 44 +: 1]/* MemoryLayoutDM.move */; step <= step+1; end
+put.v:880:  44       163 : begin nL[0 +: 44] <= M[       0/*node    */ + T[      79/*l       */ +: 4] * 44 +: 44]; /* copy2 */ step <= step+1; end
+put.v:883:  44       166 : begin nR[0 +: 44] <= M[       0/*node    */ + T[      83/*r       */ +: 4] * 44 +: 44]; /* copy2 */ step <= step+1; end
+put.v:1137: 44       194 : begin M[       0/*node    */ + T[     170/*node_erase      */ +: 4] * 44 +: 44] <= 44'b11111111111111111111111111111111111111111111; /* MemoryLayoutDM.ones */ step <= step+1; end
+put.v:1138:  4       195 : begin M[       1/*free    */ + T[      79/*l       */ +: 4] * 44 +: 4] <= F[       0/*freeList*/ +: 4]/* MemoryLayoutDM.move */; step <= step+1; end
+put.v:1141:  4       198 : begin M[       1/*free    */ + T[      83/*r       */ +: 4] * 44 +: 4] <= F[       0/*freeList*/ +: 4]/* MemoryLayoutDM.move */; step <= step+1; end
+put.v:1144: 44       201 : begin M[       0/*node    */ + 0 * 44 +: 44] <= nT[0 +: 44]; /* MemoryLayoutDM.copy1 */ step <= step+1; end
+put.v:1442: 44       237 : begin nT[0 +: 44] <= M[       0/*node    */ + T[     130/*parent  */ +: 4] * 44 +: 44]; /* copy2 */ step <= step+1; end
+put.v:1467: 44                 nL[0 +: 44] <= M[       0/*node    */ + T[      79/*l       */ +: 4] * 44 +: 44]; /* copy2 */
+put.v:1468: 44                 nR[0 +: 44] <= M[       0/*node    */ + T[      83/*r       */ +: 4] * 44 +: 44]; /* copy2 */
+put.v:1605: 44       269 : begin M[       0/*node    */ + T[      83/*r       */ +: 4] * 44 +: 44] <= nR[0 +: 44]; /* MemoryLayoutDM.copy1 */ step <= step+1; end
+put.v:1856: 44      297 : begin M[       0/*node    */ + T[     178/*node_balance    */ +: 4] * 44 +: 44] <= nT[0 +: 44]; /* MemoryLayoutDM.copy1 */ step <= step+1; end
+put.v:1885: 44       313 : begin M[       0/*node    */ + T[      79/*l       */ +: 4] * 44 +: 44] <= nL[0 +: 44]; /* MemoryLayoutDM.copy1 */ step <= step+1; end
+put.v:1925: 44       331 : begin nL[0 +: 44] <= M[       0/*node    */ + T[     134/*child   */ +: 4] * 44 +: 44]; /* copy2 */ step <= step+1; end
+put.v:2080: 44                 M[       0/*node    */ + T[     130/*parent  */ +: 4] * 44 +: 44] <= nT[0 +: 44]; /* MemoryLayoutDM.copy1 */
+put.v:2081: 44                 M[       0/*node    */ + T[      79/*l       */ +: 4] * 44 +: 44] <= nL[0 +: 44]; /* MemoryLayoutDM.copy1 */
+put.v:2082: 44                 M[       0/*node    */ + T[     178/*node_balance    */ +: 4] * 44 +: 44] <= nR[0 +: 44]; /* MemoryLayoutDM.copy1 */
