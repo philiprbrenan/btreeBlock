@@ -92,7 +92,7 @@ END
 if (1)                                                                          # Write workflow
  {my @j = map {fn $_}  grep {fn($_) !~ m(Able\Z)}                               # Java files to test do not include interfaces
           searchDirectoryTreesForMatchingFiles($home, qw(.java));               # Java files
-  @j = q(BtreeDM);                                                              # This will test all the stuff of current interest
+  @j = qw(BtreeSF BtreeDM);                                                     # This will test all the stuff of current interest
 
   my $d = dateTimeStamp;
   my $c = q(com/AppaApps/Silicon);                                              # Package to classes folder
