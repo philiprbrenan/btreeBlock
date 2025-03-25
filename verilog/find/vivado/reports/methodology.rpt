@@ -1,11 +1,11 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Tue Mar 25 18:36:08 2025
+| Date         : Tue Mar 25 21:12:40 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_methodology -file /home/azureuser/btreeBlock/verilog/find/0/vivado/reports/methodology.rpt
 | Design       : find
-| Device       : xc7a50tcpg236-3
+| Device       : xc7z020clg484-3
 | Speed File   : -3
 | Design State : Synthesized
 ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -23,59 +23,94 @@ Table of Contents
           Floorplan: find
       Design limits: <entire design considered>
              Max checks: <unlimited>
-             Checks found: 8
-+-----------+----------+------------------------------------------------------+--------+
-| Rule      | Severity | Description                                          | Checks |
-+-----------+----------+------------------------------------------------------+--------+
-| TIMING-18 | Warning  | Missing input or output delay                        | 6      |
-| XDCC-4    | Warning  | User Clock constraint overwritten with the same name | 1      |
-| XDCC-8    | Warning  | User Clock constraint overwritten on the same source | 1      |
-+-----------+----------+------------------------------------------------------+--------+
+             Checks found: 12
++-----------+----------+------------------------------------------+--------+
+| Rule      | Severity | Description                              | Checks |
++-----------+----------+------------------------------------------+--------+
+| TIMING-15 | Warning  | Large hold violation                     | 2      |
+| XDCH-2    | Warning  | Same min and max delay values on IO port | 10     |
++-----------+----------+------------------------------------------+--------+
 
 2. REPORT DETAILS
 -----------------
-TIMING-18#1 Warning
-Missing input or output delay  
-An input delay is missing on Key[0] relative to the rising and/or falling clock edge(s) of clock.
+TIMING-15#1 Warning
+Large hold violation  
+There is a large clock skew of 2.021 ns between Key[2] (clocked by clock) and T_reg[115]/D (clocked by clock) that results in large hold timing violation(s) of -1.008 ns. Fixing large hold violations during routing might impact setup slack and result in more difficult timing closure
 Related violations: <none>
 
-TIMING-18#2 Warning
-Missing input or output delay  
-An input delay is missing on Key[1] relative to the rising and/or falling clock edge(s) of clock.
+TIMING-15#2 Warning
+Large hold violation  
+There is a large clock skew of 2.021 ns between Key[4] (clocked by clock) and T_reg[117]/D (clocked by clock) that results in large hold timing violation(s) of -1.025 ns. Fixing large hold violations during routing might impact setup slack and result in more difficult timing closure
 Related violations: <none>
 
-TIMING-18#3 Warning
-Missing input or output delay  
-An input delay is missing on Key[2] relative to the rising and/or falling clock edge(s) of clock.
+XDCH-2#1 Warning
+Same min and max delay values on IO port  
+The same input delay of 0.000 ns has been defined on port 'Data[0]' relative to clock clock for both max and min. Make sure this reflects the design intent.
+set_input_delay -clock clock -max 0.000 [get_ports -filter {DIRECTION == IN && NAME != "clock"}]
+/home/azureuser/btreeBlock/vivado/constraints/xc7z020clg484.xdc (Line: 4)
 Related violations: <none>
 
-TIMING-18#4 Warning
-Missing input or output delay  
-An input delay is missing on Key[3] relative to the rising and/or falling clock edge(s) of clock.
+XDCH-2#2 Warning
+Same min and max delay values on IO port  
+The same input delay of 0.000 ns has been defined on port 'Data[1]' relative to clock clock for both max and min. Make sure this reflects the design intent.
+set_input_delay -clock clock -max 0.000 [get_ports -filter {DIRECTION == IN && NAME != "clock"}]
+/home/azureuser/btreeBlock/vivado/constraints/xc7z020clg484.xdc (Line: 4)
 Related violations: <none>
 
-TIMING-18#5 Warning
-Missing input or output delay  
-An input delay is missing on Key[4] relative to the rising and/or falling clock edge(s) of clock.
+XDCH-2#3 Warning
+Same min and max delay values on IO port  
+The same input delay of 0.000 ns has been defined on port 'Data[2]' relative to clock clock for both max and min. Make sure this reflects the design intent.
+set_input_delay -clock clock -max 0.000 [get_ports -filter {DIRECTION == IN && NAME != "clock"}]
+/home/azureuser/btreeBlock/vivado/constraints/xc7z020clg484.xdc (Line: 4)
 Related violations: <none>
 
-TIMING-18#6 Warning
-Missing input or output delay  
-An input delay is missing on reset relative to the rising and/or falling clock edge(s) of clock.
+XDCH-2#4 Warning
+Same min and max delay values on IO port  
+The same input delay of 0.000 ns has been defined on port 'Data[3]' relative to clock clock for both max and min. Make sure this reflects the design intent.
+set_input_delay -clock clock -max 0.000 [get_ports -filter {DIRECTION == IN && NAME != "clock"}]
+/home/azureuser/btreeBlock/vivado/constraints/xc7z020clg484.xdc (Line: 4)
 Related violations: <none>
 
-XDCC-4#1 Warning
-User Clock constraint overwritten with the same name  
-A new clock constraint create_clock overrides a previous user clock constraint with the same name.
-New: create_clock -period 11.200 [get_ports clock] (Source: /home/azureuser/btreeBlock/vivado/constraints/xc7a50tcpg236.xdc (Line: 3))
-Previous: create_clock -period 10.000 [get_ports clock] (Source: /home/azureuser/btreeBlock/vivado/constraints/xc7a50tcpg236.xdc (Line: 2))
+XDCH-2#5 Warning
+Same min and max delay values on IO port  
+The same input delay of 0.000 ns has been defined on port 'Key[0]' relative to clock clock for both max and min. Make sure this reflects the design intent.
+set_input_delay -clock clock -max 0.000 [get_ports -filter {DIRECTION == IN && NAME != "clock"}]
+/home/azureuser/btreeBlock/vivado/constraints/xc7z020clg484.xdc (Line: 4)
 Related violations: <none>
 
-XDCC-8#1 Warning
-User Clock constraint overwritten on the same source  
-A new clock constraint create_clock overrides a previous user clock constraint defined on the same source.
-New: create_clock -period 11.200 [get_ports clock] (Source: /home/azureuser/btreeBlock/vivado/constraints/xc7a50tcpg236.xdc (Line: 3))
-Previous: create_clock -period 10.000 [get_ports clock] (Source: /home/azureuser/btreeBlock/vivado/constraints/xc7a50tcpg236.xdc (Line: 2))
+XDCH-2#6 Warning
+Same min and max delay values on IO port  
+The same input delay of 0.000 ns has been defined on port 'Key[1]' relative to clock clock for both max and min. Make sure this reflects the design intent.
+set_input_delay -clock clock -max 0.000 [get_ports -filter {DIRECTION == IN && NAME != "clock"}]
+/home/azureuser/btreeBlock/vivado/constraints/xc7z020clg484.xdc (Line: 4)
+Related violations: <none>
+
+XDCH-2#7 Warning
+Same min and max delay values on IO port  
+The same input delay of 0.000 ns has been defined on port 'Key[2]' relative to clock clock for both max and min. Make sure this reflects the design intent.
+set_input_delay -clock clock -max 0.000 [get_ports -filter {DIRECTION == IN && NAME != "clock"}]
+/home/azureuser/btreeBlock/vivado/constraints/xc7z020clg484.xdc (Line: 4)
+Related violations: <none>
+
+XDCH-2#8 Warning
+Same min and max delay values on IO port  
+The same input delay of 0.000 ns has been defined on port 'Key[3]' relative to clock clock for both max and min. Make sure this reflects the design intent.
+set_input_delay -clock clock -max 0.000 [get_ports -filter {DIRECTION == IN && NAME != "clock"}]
+/home/azureuser/btreeBlock/vivado/constraints/xc7z020clg484.xdc (Line: 4)
+Related violations: <none>
+
+XDCH-2#9 Warning
+Same min and max delay values on IO port  
+The same input delay of 0.000 ns has been defined on port 'Key[4]' relative to clock clock for both max and min. Make sure this reflects the design intent.
+set_input_delay -clock clock -max 0.000 [get_ports -filter {DIRECTION == IN && NAME != "clock"}]
+/home/azureuser/btreeBlock/vivado/constraints/xc7z020clg484.xdc (Line: 4)
+Related violations: <none>
+
+XDCH-2#10 Warning
+Same min and max delay values on IO port  
+The same input delay of 0.000 ns has been defined on port 'reset' relative to clock clock for both max and min. Make sure this reflects the design intent.
+set_input_delay -clock clock -max 0.000 [get_ports -filter {DIRECTION == IN && NAME != "clock"}]
+/home/azureuser/btreeBlock/vivado/constraints/xc7z020clg484.xdc (Line: 4)
 Related violations: <none>
 
 
