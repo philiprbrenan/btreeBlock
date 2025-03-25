@@ -19,7 +19,7 @@ my $repo    = q(btreeBlock);                                                    
 my $wf      = q(.github/workflows/main.yml);                                    # Work flow on Ubuntu
 my @ext     = qw(.html .java .jpg .md .pl .pdf .png .py .rpt .sdc .txt .xdc);   # Extensions of files to upload to github
 my $sc      = fpd $home, qw(siliconCompiler);                                   # Silicon compiler
-my @scExt   = qw(.gds .py .xdc);                                                # Silicon compiler extensions
+my @scExt   = qw(.gds .py .xdc .v);                                                # Silicon compiler extensions
 
 say STDERR timeStamp,  " push to github $repo";
 
