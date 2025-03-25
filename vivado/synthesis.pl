@@ -85,6 +85,8 @@ sub gen                                                                         
 read_verilog $verilog
 read_xdc     $constraints
 
+set_msg_config -id {Synth 8-7080} -suppress
+
 synth_design -name $design -top $design -part $part -include_dirs $includesDir -flatten_hierarchy none -no_timing_driven -directive AlternateRoutability
 write_checkpoint -force $synth
 puts "[clock format [clock seconds] -format \"%H:%M:%S\"] synth_design"
