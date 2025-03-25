@@ -1,11 +1,11 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Tue Mar 25 18:40:33 2025
+| Date         : Tue Mar 25 21:17:18 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_design_analysis -file /home/azureuser/btreeBlock/verilog/delete/3/vivado/reports/design_analysis.rpt
 | Design       : delete
-| Device       : xc7a50t
+| Device       : xc7z020
 | Design State : Synthesized
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -25,11 +25,11 @@ Table of Contents
 |      Characteristics      |                                                          Path #1                                                          |
 +---------------------------+---------------------------------------------------------------------------------------------------------------------------+
 | Requirement               | 11.200                                                                                                                    |
-| Path Delay                | 7.878                                                                                                                     |
-| Logic Delay               | 1.510(20%)                                                                                                                |
+| Path Delay                | 7.894                                                                                                                     |
+| Logic Delay               | 1.526(20%)                                                                                                                |
 | Net Delay                 | 6.368(80%)                                                                                                                |
 | Clock Skew                | -0.145                                                                                                                    |
-| Slack                     | 3.172                                                                                                                     |
+| Slack                     | 3.167                                                                                                                     |
 | Clock Uncertainty         | 0.035                                                                                                                     |
 | Clock Relationship        | Timed                                                                                                                     |
 | Clock Delay Group         | Same Clock                                                                                                                |
@@ -52,7 +52,7 @@ Table of Contents
 | Start Point Pin           | step_reg[3]/C                                                                                                             |
 | End Point Pin             | step_reg[8]/D                                                                                                             |
 +---------------------------+---------------------------------------------------------------------------------------------------------------------------+
-* Bounding box calculated as % of dimensions for the target device (188, 300)
+* Bounding box calculated as % of dimensions for the target device (308, 299)
 
 
 2. Logic Level Distribution
