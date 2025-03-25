@@ -2,8 +2,7 @@
 
 ## Create an Azure [spot](https://aws.amazon.com/ec2/spot/) instance
 
-Create an Azure [spot](https://aws.amazon.com/ec2/spot/) instance with at least 128GB hard drive and 16GB [memory](https://en.wikipedia.org/wiki/Computer_memory). 
-Update .ssh/config creating a host (perhaps ```aaa```) with the [IP address](https://en.wikipedia.org/wiki/IP_address) address on
+Create an Azure [spot](https://aws.amazon.com/ec2/spot/) instance with at least 128GB hard drive and 16GB [memory](https://en.wikipedia.org/wiki/Computer_memory). Update .ssh/config creating a host (perhaps ```aaa```) with the [IP address](https://en.wikipedia.org/wiki/IP_address) address on
 Azure with a convenient name to make access easier. Configure [Secure Shell](https://www.ssh.com/ssh) to allow x
 forwarding.
 
@@ -14,7 +13,7 @@ sudo apt update
 
 sudo apt install build-essential tcsh libssl-dev libx11-dev libboost-all-dev \
   libncurses5-dev x11-apps  libxext-dev libxrender-dev \
-  libxtst-dev openjdk-21-jdk-headlessÃ¢ÂÂ micro
+  libxtst-dev openjdk-21-jdk-headless micro
 ```
 
 ## AMD installer
@@ -37,8 +36,7 @@ Supply [login](https://en.wikipedia.org/wiki/Login) details for: (https://login.
 
 ## Clone GitHub
 
-### Update GitHub [Secure Shell](https://www.ssh.com/ssh) [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) 
-Copy ```Azure.pem``` on the local machine to the instance:
+### Update GitHub [Secure Shell](https://www.ssh.com/ssh) [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) Copy ```Azure.pem``` on the local machine to the instance:
 
 ```
 scp .ssh/Azure.pem aaa:.ssh/
@@ -59,7 +57,7 @@ Clone the [GitHub](https://github.com/philiprbrenan) repo: (https://github.com/p
 
 ```
 GIT_TRACE=1 GIT_CURL_VERBOSE=1  GIT_SSH_COMMAND="ssh -i .ssh/Azure.pem" git clone git@github.com:philiprbrenan/btreeBlock.git
-Ã¢ÂÂGIT_SSH_COMMAND="ssh -i ~/.ssh/Azure.pem" git pull
+GIT_SSH_COMMAND="ssh -i ~/.ssh/Azure.pem" git pull
 ```
 
 Install the following if they are not present:
@@ -103,7 +101,7 @@ Placing the following commands in your ```.bashrc`` file speeds up development o
 alias b='cd   ~/btreeBlock/'
 alias bv='cd  ~/btreeBlock/vivado'
 alias G= "grep -Iinr -P"
-alias g='git status; [Git](https://en.wikipedia.org/wiki/Git) add *; [Git](https://en.wikipedia.org/wiki/Git) commit -m aaa; [Git](https://en.wikipedia.org/wiki/Git) push --force'
+alias g='git status; [Git](https://en.wikipedia.org/wiki/Git) commit -m aaa; [Git](https://en.wikipedia.org/wiki/Git) push --force'
 alias gg='cd; sudo rm -r ~/btreeBlock/; [Git](https://en.wikipedia.org/wiki/Git) clone git@github.com:philiprbrenan/btreeBlock.git; cd ~/btreeBlock'
 alias m='micro'
 alias dv='cd  ~/btreeBlock/verilog/delete/vivado/reports'
