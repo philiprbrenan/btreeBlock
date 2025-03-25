@@ -25,13 +25,17 @@ class Memory extends Test                                                       
 
 //D1 Print                                                                      // Print memory
 
-  StringBuilder print()                                                         // Print a memory
+  StringBuilder print(int Start, int Length)                                    // Print a part of the memory
    {zz();
     final StringBuilder s = new StringBuilder();
-    final int N = bits.length;
-    for(int i = 0; i < N; i++) s.append(bits[i] ? "1" : "0");
+    for(int i = Start; i < Start+Length; i++) s.append(bits[i] ? "1" : "0");
     s.reverse();
     return s;
+   }
+
+  StringBuilder print()                                                         // Print all of memory
+   {zz();
+    return print(0, bits.length);
    }
 
   public String toString()                                                      // Print memory in hex
