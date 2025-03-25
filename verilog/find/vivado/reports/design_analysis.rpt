@@ -1,9 +1,9 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Wed Mar 19 03:46:34 2025
+| Date         : Tue Mar 25 18:36:01 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
-| Command      : report_design_analysis -file /home/azureuser/btreeBlock/verilog/find/2/vivado/reports/design_analysis.rpt
+| Command      : report_design_analysis -file /home/azureuser/btreeBlock/verilog/find/0/vivado/reports/design_analysis.rpt
 | Design       : find
 | Device       : xc7a50t
 | Design State : Synthesized
@@ -61,10 +61,10 @@ Table of Contents
 +-----------------+-------------+----+----+----+---+
 | End Point Clock | Requirement |  0 |  1 |  2 | 3 |
 +-----------------+-------------+----+----+----+---+
-| clock           | 11.200ns    | 38 | 85 | 32 | 5 |
+| clock           | 11.200ns    | 38 | 89 | 36 | 5 |
 +-----------------+-------------+----+----+----+---+
 * Columns represent the logic levels per end point clock
-** Distribution is for top worst 160 paths
+** Distribution is for top worst 168 paths
 
 
 3. Placer Final Level Congestion Reporting
