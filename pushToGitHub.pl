@@ -21,7 +21,7 @@ my @ext     = qw(.html .java .jpg .md .pl .pdf .png .py .rpt .sdc .txt .xdc);   
 my $sc      = fpd $home, qw(siliconCompiler);                                   # Silicon compiler
 my @scExt   = qw(.gds .py .xdc .v);                                                # Silicon compiler extensions
 
-#say STDERR timeStamp,  " push to github $repo";
+say STDERR timeStamp,  " push to github $repo";
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
         @files = grep {!m(/\.|backups/|Classes/)} @files;                       # Remove files that do not need to be saved
@@ -45,6 +45,7 @@ if (1)
  }
 
 @files = changedFiles $md5File, @files if 1;                                    # Filter out files that have not changed
+say STDERR "AAAA ", dump(\@files);
 
 if (!@files)                                                                    # No new files
  {say "Everything up to date";
