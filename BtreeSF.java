@@ -364,7 +364,7 @@ abstract class BtreeSF extends Test                                             
     F.at(freeChainHead).move(nC.N.at(free));                                    // Second node on free list
 
     nC.zero();                                                                  // Clear the node
-    nC.saveNode(M.at(node, T.at(allocate)));                                    // Construct and clear the node
+    nC.saveNode(T.at(allocate));                                                // Construct and clear the node
 //    maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                              // Number of nodes in use
    }
 
@@ -695,7 +695,7 @@ abstract class BtreeSF extends Test                                             
     tt(node_setLeaf,  allocate);
     nC.loadNode(T.at(allocate));                                                // Load the allocated node
     nC.setLeaf();                                                               // Set as a leaf
-    nC.saveNode(M.at(node, T.at(allocate)));                                    // Write back into memory
+    nC.saveNode(T.at(allocate));                                                // Write back into memory
    }
 
   private void allocBranch()                                                    // Allocate branch
@@ -705,14 +705,14 @@ abstract class BtreeSF extends Test                                             
     tt(node_setBranch, allocate);
     nC.loadNode(T.at(allocate));                                                // Load the allocated node
     nC.setBranch();                                                             // Set as a branch
-    nC.saveNode(M.at(node, T.at(allocate)));                                    // Write back into memory
+    nC.saveNode(T.at(allocate));                                                // Write back into memory
    }
 
   private void free(Layout.Variable node_free)                                  // Free a node to make it available for reuse
    {zz();
     nC.ones();                                                                  // Clear the node
     nC.N.at(free).move(F.at(freeChainHead));                                    // Chain this node in front of the last freed node
-    nC.saveNode(M.at(node, T.at(node_free)));                                   // Save node
+    nC.saveNode(T.at(node_free));                                               // Save node
 
     F.at(freeChainHead).move(T.at(node_free));                                  // Make this node the head of the free chain
    }
@@ -754,23 +754,27 @@ abstract class BtreeSF extends Test                                             
 
     void loadRoot()                                                             // Load with the node describing a root
      {zz();
-      final MemoryLayoutDM.At source = M.at(node, 0);                           // Node zero is always the root
-      N.copy(source);
+//      final MemoryLayoutDM.At source = M.at(node, 0);                           // Node zero is always the root
+//      N.copy(source);
+      N.loadFirstBlock(M);
      }
 
     void loadNode(MemoryLayoutDM.At at)                                         // Load with the node addressed by this variable
      {zz();
-      N.copy(M.at(node, at));
+      //N.copy(M.at(node, at));
+      N.loadBlock(M, at);
      }
 
     void saveRoot()                                                             // Save root
      {zz();
-      final MemoryLayoutDM.At target = M.at(node, 0);                           // Node zero is always the root
-      target.copy(N);
+//    final MemoryLayoutDM.At target = M.at(node, 0);                           // Node zero is always the root
+//    target.copy(N);
+      N.saveFirstBlock(M);
      }
 
     void saveNode(MemoryLayoutDM.At at)                                         // Save the node addressed by this variable
-     {zz(); at.copy(N);
+     {zz(); //at.copy(N);
+      N.saveBlock(M, at);
      }
 
     void loadRootStuck(StuckDM Stuck)                                           // Load a root stuck from main memory
@@ -816,7 +820,7 @@ abstract class BtreeSF extends Test                                             
     void saveStuck(StuckDM Stuck, Layout.Variable at)                           // Save a stuck into indexed main memory
      {zz();
       saveStuck(Stuck);
-      saveNode(M.at(node, T.at(at)));
+      saveNode(T.at(at));
      }
 
     void setLeaf()                                                              // Mark a node as a leaf
@@ -2012,7 +2016,13 @@ abstract class BtreeSF extends Test                                             
      {zz();
       final StringBuilder s = new StringBuilder();
       for(MemoryLayoutDM m : P.memories)                                        // Each memory used by the program
-       {s.append("  reg["+m.size()+"-1 : 0] "+m.name+";\n");                    // Declare the memory
+       {final MemoryLayoutDM.BlockArray a = m.block;
+       if (a.array)                                                             // Block memory
+         {s.append("  reg["+a.width+"-1 : 0] "+m.name+"["+a.size+"-1 : 0];\n"); // Declare the memory
+         }
+        else                                                                    // Bit memory
+         {s.append("  reg["+m.size()+"-1 : 0] "+m.name+";\n");                  // Declare the memory
+         }
        }
       writeFile(declareMemory(), s);
      }
@@ -2020,12 +2030,27 @@ abstract class BtreeSF extends Test                                             
     void initializeMemories()                                                   // Initialize memories
      {final StringBuilder s = new StringBuilder();
       for(MemoryLayoutDM m : P.memories)                                        // Each memory declared by the program
-       {final int    N = m.size();
-        final StringBuilder S = new StringBuilder();
-        for (int i = 0; i < N; i++) S.append(m.getBit(i) ? 1 : 0);
-        removeAllButLastTrailingZero(S);
-        S.reverse();
-        s.append("  "+m.name+" <= "+N+"'b"+S+";\n");                            // Initialize memory
+       {final MemoryLayoutDM.BlockArray a = m.block;
+        if (a.array)                                                            // Block memory
+         {final int L = a.size, W = a.width;
+          for   (int i = 0, p = 0; i < L; i++)
+           {final StringBuilder S = new StringBuilder();
+            for (int j = 0; j < W; j++, p++)
+             {S.append(m.getBit(p) ? 1 : 0);
+             }
+            removeAllButLastTrailingZero(S);
+            S.reverse();
+            s.append("  "+m.name+"["+i+"] <= "+W+"'b"+S+";\n");                 // Initialize memory
+           }
+         }
+        else                                                                    // Bit memory
+         {final StringBuilder S = new StringBuilder();
+          final int    N = m.size();
+          for (int i = 0; i < N; i++) S.append(m.getBit(i) ? 1 : 0);
+          removeAllButLastTrailingZero(S);
+          S.reverse();
+          s.append("  "+m.name+" <= "+N+"'b"+S+";\n");                          // Initialize memory
+         }
        }
       writeFile(initializeMemory(), s);
      }
@@ -2034,9 +2059,20 @@ abstract class BtreeSF extends Test                                             
      {final StringBuilder f = new StringBuilder("\"%4d  %4d ");
       final StringBuilder s = new StringBuilder("\", steps, step");
       for(MemoryLayoutDM m : P.memories)
-       {final String n = m.name();
-        f.append(" "+n+"=%b");
-        s.append(", "+m.name());
+       {final MemoryLayoutDM.BlockArray a = m.block;
+        if (a.blocked())
+         {final int N = 8;
+          for (int i = 0; i < a.size; i++)
+           {final String n = m.name()+"["+i+"]";
+            f.append(" "+n+"=%b");
+            s.append(", "+n);
+           }
+         }
+        else
+         {final String n = m.name();
+          f.append(" "+n+"=%b");
+          s.append(", "+m.name());
+         }
        }
       return ""+f+s;
      }
@@ -4227,7 +4263,7 @@ StuckSML(maxSize:2 size:2)
     n.setBranch();
     n.isLeaf(M.at(branchBit));
     n.saveStuck(l);
-    n.saveNode(t.M.at(t.node, M.at(index)));
+    n.saveNode(M.at(index));
     t.P.run(); t.P.clear();
     //stop(l);
 
@@ -4353,9 +4389,10 @@ StuckSML(maxSize:4 size:1)
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    //test_verilogDelete();
-    //test_verilogFind();
-    //test_verilogPut();
+    test_verilogDelete();
+    test_verilogFind();
+    test_verilogPut();
+    test_memory();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
