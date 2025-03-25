@@ -1,11 +1,11 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date             : Tue Mar 25 18:36:08 2025
+| Date             : Tue Mar 25 21:12:40 2025
 | Host             : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command          : report_power -file /home/azureuser/btreeBlock/verilog/find/0/vivado/reports/power.rpt
 | Design           : find
-| Device           : xc7a50tcpg236-3
+| Device           : xc7z020clg484-3
 | Design State     : synthesized
 | Grade            : extended
 | Process          : typical
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.072        |
+| Total On-Chip Power (W)  | 0.106        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
 | Dynamic (W)              | 0.002        |
-| Device Static (W)        | 0.070        |
-| Effective TJA (C/W)      | 5.0          |
-| Max Ambient (C)          | 99.6         |
-| Junction Temperature (C) | 25.4         |
+| Device Static (W)        | 0.104        |
+| Effective TJA (C/W)      | 11.5         |
+| Max Ambient (C)          | 98.8         |
+| Junction Temperature (C) | 26.2         |
 | Confidence Level         | Low          |
 | Setting File             | ---          |
 | Simulation Activity File | ---          |
@@ -54,14 +54,14 @@ Table of Contents
 +----------------+-----------+----------+-----------+-----------------+
 | Clocks         |     0.001 |        3 |       --- |             --- |
 | Slice Logic    |    <0.001 |      173 |       --- |             --- |
-|   LUT as Logic |    <0.001 |       62 |     32600 |            0.19 |
-|   Register     |    <0.001 |       91 |     65200 |            0.14 |
-|   CARRY4       |    <0.001 |        1 |      8150 |            0.01 |
+|   LUT as Logic |    <0.001 |       62 |     53200 |            0.12 |
+|   Register     |    <0.001 |       91 |    106400 |            0.09 |
+|   CARRY4       |    <0.001 |        1 |     13300 |           <0.01 |
 |   Others       |     0.000 |        2 |       --- |             --- |
 | Signals        |    <0.001 |      180 |       --- |             --- |
-| I/O            |    <0.001 |       13 |       106 |           12.26 |
-| Static Power   |     0.070 |          |           |                 |
-| Total          |     0.072 |          |           |                 |
+| I/O            |    <0.001 |       13 |       200 |            6.50 |
+| Static Power   |     0.104 |          |           |                 |
+| Total          |     0.106 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
 
 
@@ -71,8 +71,8 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     0.012 |       0.002 |      0.010 |       NA    | Unspecified | NA         |
-| Vccaux    |       1.800 |     0.013 |       0.000 |      0.013 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     0.009 |       0.002 |      0.007 |       NA    | Unspecified | NA         |
+| Vccaux    |       1.800 |     0.010 |       0.000 |      0.010 |       NA    | Unspecified | NA         |
 | Vcco33    |       3.300 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco18    |       1.800 |     0.001 |       0.000 |      0.001 |       NA    | Unspecified | NA         |
@@ -83,6 +83,13 @@ Table of Contents
 | Vccbram   |       1.000 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | MGTAVcc   |       1.000 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | MGTAVtt   |       1.200 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| MGTVccaux |       1.800 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| Vccpint   |       1.000 |     0.016 |       0.000 |      0.016 |       NA    | Unspecified | NA         |
+| Vccpaux   |       1.800 |     0.010 |       0.000 |      0.010 |       NA    | Unspecified | NA         |
+| Vccpll    |       1.800 |     0.003 |       0.000 |      0.003 |       NA    | Unspecified | NA         |
+| Vcco_ddr  |       1.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| Vcco_mio0 |       1.800 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| Vcco_mio1 |       1.800 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vccadc    |       1.800 |     0.020 |       0.000 |      0.020 |       NA    | Unspecified | NA         |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 
@@ -109,16 +116,16 @@ Table of Contents
 2.1 Environment
 ---------------
 
-+-----------------------+--------------------------+
-| Ambient Temp (C)      | 25.0                     |
-| ThetaJA (C/W)         | 5.0                      |
-| Airflow (LFM)         | 250                      |
-| Heat Sink             | medium (Medium Profile)  |
-| ThetaSA (C/W)         | 4.6                      |
-| Board Selection       | medium (10"x10")         |
-| # of Board Layers     | 12to15 (12 to 15 Layers) |
-| Board Temperature (C) | 25.0                     |
-+-----------------------+--------------------------+
++-----------------------+------------------------+
+| Ambient Temp (C)      | 25.0                   |
+| ThetaJA (C/W)         | 11.5                   |
+| Airflow (LFM)         | 250                    |
+| Heat Sink             | none                   |
+| ThetaSA (C/W)         | 0.0                    |
+| Board Selection       | medium (10"x10")       |
+| # of Board Layers     | 8to11 (8 to 11 Layers) |
+| Board Temperature (C) | 25.0                   |
++-----------------------+------------------------+
 
 
 2.2 Clock Constraints
