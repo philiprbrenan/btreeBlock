@@ -14,7 +14,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
   ProgramDM                P = new ProgramDM();                                 // Program containing generated code
   static int         numbers = 0;
   final  int          number = ++numbers;                                       // Number each memory layout
-  final Arrayed       array;                                                    // The memory layout represents an array the elements of which have a width equal to a power of two
+  final BlockArray    block;                                                    // The memory layout represents an array the elements of which have a width equal to a power of two
 
 //D1 Construction                                                               // Construct a memory layout
 
@@ -27,28 +27,33 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
     final Layout.Array    A = layout.array   ("bytes", a, (size+N-1) / N);
     layout.compile();
     memory = new Memory(Name, size);
-    array  = new Arrayed();
+    block  = new BlockArray();
    }
 
   MemoryLayoutDM(Layout Layout, String Name)                                    // Memory with an associated layout and a name so we can generate verilog from it
    {zz();
     name   = Name; layout = Layout;
     memory = new Memory(Name, layout.size());                                   // Create the associated memory
-    array  = new Arrayed();
+    block  = new BlockArray();
    }
 
   public int compareTo(MemoryLayoutDM other)                                    // A progam might access several memory layouts
    {return Integer.compare(number, other.number);
    }
 
-  class Arrayed                                                                 // Memory that represents an array of elements whose widths are equal to the power of two
+  class BlockArray                                                              // Memory that represents an array of elements whose widths are equal to the power of two and so the memory can be efficiently processed in blocks
    {final boolean      array;                                                   // The memory layout represents an array
     final boolean powerOfTwo;                                                   // The elements of the array are a power of two in size
     final int          width;                                                   // The width of the elements of the array
-    Arrayed()
+    final int           size;                                                   // Number of elements in the array
+    final int           log;                                                    // The log to base two of the width of the array elements
+    boolean         blocked() {return powerOfTwo;}                              // A blocked array
+    BlockArray()
      {array      = layout.top() instanceof Layout.Array;
       width      = array ? layout.top().toArray().element.width : 0;
+      size       = array ? layout.top().toArray().size : 1;
       powerOfTwo = nextPowerOfTwo(width) == width;
+      log        = logTwo(width);
      }
    }
 
@@ -177,10 +182,92 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
         for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
        }
       String v()
-       {return name()+"[0 +: "+N+"] <= "+source.verilogLoad()+"; /* copy2 */";
+       {return m.name()+"[0 +: "+N+"] <= "+source.verilogLoad()+"; /* copy2 */";
        }
       String n()
        {return "copy "+N+" bits from "+source+" to "+m.name;
+       }
+     };
+   }
+
+//D1 Blocked memory                                                             // Blocked access to memory
+
+  String verilogArrayElement(At at)                                             // Access an array element in an array whose elements are all a power of two in width
+   {return name()+"["+at.verilogLoad()+"] /* MemoryLayoutDM power 2 array access */";
+   }
+
+
+  void loadFirstBlock(final MemoryLayoutDM source)                              // Load the first block in the source memory into the target memory
+   {zz();
+    if (!source.block.array) stop("Source is not a blocked array");
+    final int T = size(), S = source.block.width;
+    if (S != T) stop("Source has block size of:", S, "but target has size:", T);
+    P.new I()
+     {void a()
+       {for(int i = 0; i < T; ++i) setBit(i, source.getBit(i));
+       }
+      String v()
+       {return name()+"[0+:"+S+"] <= "+source.name+"[0]; /* loadFirstBlock */";
+       }
+      String n()
+       {return "Load first block from: "+source.name+" into: "+name;
+       }
+     };
+   }
+
+  void saveFirstBlock(final MemoryLayoutDM target)                              // Save the first block in the source memory into the target memory
+   {zz();
+    if (!target.block.array) stop("Not a blocked array");
+    final int S = size(), T = target.block.width;
+    if (S != T) stop("Source has block size of:", S, "but target has size:", T);
+    P.new I()
+     {void a()
+       {for(int i = 0; i < T; ++i) target.setBit(i, getBit(i));
+       }
+      String v()
+       {return target.name()+"[0] <= "+name+"[0+:"+S+"]; /* saveFirstBlock */";
+       }
+      String n()
+       {return "Save name: "+name+" into the first block of: "+target.name;
+       }
+     };
+   }
+
+  void loadBlock(final MemoryLayoutDM source, final MemoryLayoutDM.At index)    // Load the indexed block in the source memory into the target memory
+   {zz();
+    if (!source.block.array) stop("Source is not a blocked array");
+    final int T = size(), S = source.block.width;
+    if (S != T) stop("Source has block size of:", S, "but target has size:", T);
+    P.new I()
+     {void a()
+       {index.setOff();
+        for(int i = 0; i < T; ++i) setBit(i, source.getBit(T*index.result + i));
+       }
+      String v()
+       {return name()+"[0+:"+T+"] <= "+source.name+"["+index.verilogLoad()+"]; /* loadBlock */";
+       }
+      String n()
+       {return "Load block from: "+source.name+" into: "+name;
+       }
+     };
+   }
+
+  void saveBlock(final MemoryLayoutDM target, final MemoryLayoutDM.At index)    // Save the indexed block in the source memory into the target memory
+   {zz();
+    if (!target.block.array) stop("Not a blocked array");
+    final int S = size(), T = target.block.width;
+    if (!target.block.array) stop("Not a blocked array");
+    if (S != T) stop("Source has block size of:", S, "but target has size:", T);
+    P.new I()
+     {void a()
+       {index.setOff();
+        for(int i = 0; i < T; ++i) target.setBit(T*index.result + i, getBit(i));
+       }
+      String v()
+       {return target.name()+"["+index.verilogLoad()+"] <= "+name+"[0+:"+T+"]; /* saveBlock */";
+       }
+      String n()
+       {return "Load block from: "+target.name+" into: "+name;
        }
      };
    }
@@ -585,7 +672,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
                          T = Target.ml().name();
 
             v.append("if (" +l+" >= "+I+") begin\n");
-            v.append("   "  +T+"["+t+" +: "  +I+"] <= "+S+"["+s+" +: "+I+"]; /* copy2 */\n");
+            v.append("   "  +T+"["+t+" +: "  +I+"] <= "+S+"["+s+" +: "+I+"]; /* at.copy2 */\n");
             v.append("   "  +l+" <= "+l+" - "+I+";\n");                         // These assigns have to be made immediately else each block has to be executed one after another to drive the length and pointers sequentially.
             v.append("   "  +s+" <= "+s+" + "+I+";\n");
             v.append("   "  +t+" <= "+t+" + "+I+";\n");
@@ -604,7 +691,12 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          {setOff();
           for(int i = 0; i < N; ++i)
            {final boolean b = Source.getBit(i);
-            setBit(i, b);
+            try
+             {setBit(i, b);
+             }
+            catch(Exception e)
+             {stop(e, traceBack);
+             }
            }
          }
         String v()
@@ -1836,12 +1928,141 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  a = l.variable ("a", 4);
     Layout.Variable  b = l.variable ("b", 4);
     Layout.Structure s = l.structure("s", a, b);
-    Layout.Array     A = l.array    ("A", s, 8);
-    MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "test");
+    Layout.Array     A = l.array    ("A", s, 6);
+    MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "array");
 
-    ok(m.array.array);
-    ok(m.array.width, 8);
-    ok(m.array.powerOfTwo);
+    Layout           L = Layout.layout();
+    Layout.Variable  i = L.variable ("i", 4);
+    MemoryLayoutDM   M = new MemoryLayoutDM(L.compile(), "index");
+
+    Layout           p = Layout.layout();
+    Layout.Variable  q = p.variable ("q", 8);
+    MemoryLayoutDM   Q = new MemoryLayoutDM(p.compile(), "block1");
+
+    Layout           x = Layout.layout();
+    Layout.Variable  y = x.variable ("y", 8);
+    MemoryLayoutDM   Y = new MemoryLayoutDM(x.compile(), "block2");
+    M.program(m.P);
+    Q.program(m.P);
+    Y.program(m.P);
+
+    ok(m.block.array);
+    ok(m.block.size,  6);
+    ok(m.block.width, 8);
+    ok(m.block.blocked());
+    ok(m.block.log, 3);
+
+    M.at(i).setInt(1);
+    ok(m.verilogArrayElement(M.at(i)), "array[index[       0/*i       */ +: 4]] /* MemoryLayoutDM power 2 array access */");
+
+    m.memory.alternating(4);
+    Q.loadFirstBlock(m);
+    m.P.run(); m.P.clear();
+    //stop(Q);
+    ok(Q, """
+MemoryLayout: block1
+Memory      : block1
+Line T       At      Wide       Size    Indices        Value   Name
+   1 V        0         8                                240   q
+""");
+
+    Q.memory.alternating(2);
+    Q.saveFirstBlock(m);
+    m.P.run(); m.P.clear();
+    //stop(m);
+    ok(m, """
+MemoryLayout: array
+Memory      : array
+Line T       At      Wide       Size    Indices        Value   Name
+   1 A        0        48          6                           A
+   2 S        0         8               0                        s
+   3 V        0         4               0                 12       a
+   4 V        4         4               0                 12       b
+   5 S        8         8               1                        s
+   6 V        8         4               1                  0       a
+   7 V       12         4               1                 15       b
+   8 S       16         8               2                        s
+   9 V       16         4               2                  0       a
+  10 V       20         4               2                 15       b
+  11 S       24         8               3                        s
+  12 V       24         4               3                  0       a
+  13 V       28         4               3                 15       b
+  14 S       32         8               4                        s
+  15 V       32         4               4                  0       a
+  16 V       36         4               4                 15       b
+  17 S       40         8               5                        s
+  18 V       40         4               5                  0       a
+  19 V       44         4               5                 15       b
+""");
+
+    M.setIntInstruction(i, 3);
+    Q.saveBlock(m, M.at(i));
+    m.P.run(); m.P.clear();
+    //stop(m);
+    ok(m, """
+MemoryLayout: array
+Memory      : array
+Line T       At      Wide       Size    Indices        Value   Name
+   1 A        0        48          6                           A
+   2 S        0         8               0                        s
+   3 V        0         4               0                 12       a
+   4 V        4         4               0                 12       b
+   5 S        8         8               1                        s
+   6 V        8         4               1                  0       a
+   7 V       12         4               1                 15       b
+   8 S       16         8               2                        s
+   9 V       16         4               2                  0       a
+  10 V       20         4               2                 15       b
+  11 S       24         8               3                        s
+  12 V       24         4               3                 12       a
+  13 V       28         4               3                 12       b
+  14 S       32         8               4                        s
+  15 V       32         4               4                  0       a
+  16 V       36         4               4                 15       b
+  17 S       40         8               5                        s
+  18 V       40         4               5                  0       a
+  19 V       44         4               5                 15       b
+""");
+
+    Y.loadBlock(m, M.at(i));
+    m.P.run(); m.P.clear();
+    //stop(Y);
+    ok(Y, """
+MemoryLayout: block2
+Memory      : block2
+Line T       At      Wide       Size    Indices        Value   Name
+   1 V        0         8                                204   y
+""");
+
+    M.setIntInstruction(i, 2);
+    Q.ones();
+    Q.saveBlock(m, M.at(i));
+    m.P.run(); m.P.clear();
+    //stop(m);
+    ok(m, """
+MemoryLayout: array
+Memory      : array
+Line T       At      Wide       Size    Indices        Value   Name
+   1 A        0        48          6                           A
+   2 S        0         8               0                        s
+   3 V        0         4               0                 12       a
+   4 V        4         4               0                 12       b
+   5 S        8         8               1                        s
+   6 V        8         4               1                  0       a
+   7 V       12         4               1                 15       b
+   8 S       16         8               2                        s
+   9 V       16         4               2                 15       a
+  10 V       20         4               2                 15       b
+  11 S       24         8               3                        s
+  12 V       24         4               3                 12       a
+  13 V       28         4               3                 12       b
+  14 S       32         8               4                        s
+  15 V       32         4               4                  0       a
+  16 V       36         4               4                 15       b
+  17 S       40         8               5                        s
+  18 V       40         4               5                  0       a
+  19 V       44         4               5                 15       b
+""");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
