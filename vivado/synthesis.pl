@@ -8,7 +8,8 @@ use Time::HiRes qw(time);
 # https://docs.amd.com/v/u/en-US/zynq-7000-product-selection-guide
 # Clock was k11 now C7
 my $statements    = 1;                                                          # Time statements individually if true else delete/find/put components
-my $part          = q(xc7a50tcpg236);                                           # 50K
+my $part          = q(xc7z020clg484);                                           # 85K
+#  $part          = q(xc7a50tcpg236);                                           # 50K
 #  $part          = q(xc7a200tffv1156-2);                                       # 150K
 #  $part          = q(xc7v2000tflg1925-1);                                      # 1 million
 #  $part          = q(xcvu440-flga2892-1-c);                                    # 5 million
