@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Wed Mar 19 04:04:58 2025
+| Date         : Tue Mar 25 18:52:08 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_design_analysis -file /home/azureuser/btreeBlock/verilog/put/1/vivado/reports/design_analysis.rpt
 | Design       : put
@@ -21,48 +21,48 @@ Table of Contents
 1. Setup Path Characteristics 1-1
 ---------------------------------
 
-+---------------------------+--------------------------------------------------------------------------------------------------------------------------------------+
-|      Characteristics      |                                                                Path #1                                                               |
-+---------------------------+--------------------------------------------------------------------------------------------------------------------------------------+
-| Requirement               | 11.200                                                                                                                               |
-| Path Delay                | 7.827                                                                                                                                |
-| Logic Delay               | 1.639(21%)                                                                                                                           |
-| Net Delay                 | 6.188(79%)                                                                                                                           |
-| Clock Skew                | -0.145                                                                                                                               |
-| Slack                     | 3.223                                                                                                                                |
-| Clock Uncertainty         | 0.035                                                                                                                                |
-| Clock Relationship        | Timed                                                                                                                                |
-| Clock Delay Group         | Same Clock                                                                                                                           |
-| Logic Levels              | 12                                                                                                                                   |
-| Routes                    | NA                                                                                                                                   |
-| Logical Path              | FDRE/C-(114)-LUT3-(1)-LUT6-(1)-LUT6-(10)-LUT6-(121)-LUT6-(1)-LUT6-(1)-LUT6-(65)-LUT3-(14)-LUT6-(1)-LUT6-(1)-LUT6-(1)-LUT5-(1)-FDRE/D |
-| Start Point Clock         | clock                                                                                                                                |
-| End Point Clock           | clock                                                                                                                                |
-| DSP Block                 | None                                                                                                                                 |
-| RAM Registers             | None-None                                                                                                                            |
-| IO Crossings              | 0                                                                                                                                    |
-| Config Crossings          | 0                                                                                                                                    |
-| SLR Crossings             | 0                                                                                                                                    |
-| PBlocks                   | 0                                                                                                                                    |
-| High Fanout               | 121                                                                                                                                  |
-| Dont Touch                | 0                                                                                                                                    |
-| Mark Debug                | 0                                                                                                                                    |
-| Start Point Pin Primitive | FDRE/C                                                                                                                               |
-| End Point Pin Primitive   | FDRE/D                                                                                                                               |
-| Start Point Pin           | step_reg[1]/C                                                                                                                        |
-| End Point Pin             | step_reg[1]/D                                                                                                                        |
-+---------------------------+--------------------------------------------------------------------------------------------------------------------------------------+
++---------------------------+-------------------------+
+|      Characteristics      |         Path #1         |
++---------------------------+-------------------------+
+| Requirement               | 11.200                  |
+| Path Delay                | 3.276                   |
+| Logic Delay               | 2.705(83%)              |
+| Net Delay                 | 0.571(17%)              |
+| Clock Skew                | -2.015                  |
+| Slack                     | 3.874                   |
+| Clock Uncertainty         | 0.035                   |
+| Clock Relationship        | Timed                   |
+| Clock Delay Group         | Same Clock              |
+| Logic Levels              | 1                       |
+| Routes                    | NA                      |
+| Logical Path              | FDRE/C-(1)-OBUF/data[1] |
+| Start Point Clock         | clock                   |
+| End Point Clock           | clock                   |
+| DSP Block                 | None                    |
+| RAM Registers             | None-None               |
+| IO Crossings              | 0                       |
+| Config Crossings          | 0                       |
+| SLR Crossings             | 0                       |
+| PBlocks                   | 0                       |
+| High Fanout               | 1                       |
+| Dont Touch                | 0                       |
+| Mark Debug                | 0                       |
+| Start Point Pin Primitive | FDRE/C                  |
+| End Point Pin Primitive   | data[1]                 |
+| Start Point Pin           | T_reg[29]/C             |
+| End Point Pin             | data[1]                 |
++---------------------------+-------------------------+
 * Bounding box calculated as % of dimensions for the target device (188, 300)
 
 
 2. Logic Level Distribution
 ---------------------------
 
-+-----------------+-------------+---+----+-----+----+----+----+----+
-| End Point Clock | Requirement | 1 |  8 |  9  | 10 | 11 | 12 | 13 |
-+-----------------+-------------+---+----+-----+----+----+----+----+
-| clock           | 11.200ns    | 5 | 99 | 795 | 41 | 42 |  9 |  9 |
-+-----------------+-------------+---+----+-----+----+----+----+----+
++-----------------+-------------+---+-----+-----+----+----+----+----+----+
+| End Point Clock | Requirement | 1 |  7  |  8  |  9 | 10 | 11 | 12 | 13 |
++-----------------+-------------+---+-----+-----+----+----+----+----+----+
+| clock           | 11.200ns    | 6 | 104 | 763 | 55 | 12 |  8 | 44 |  8 |
++-----------------+-------------+---+-----+-----+----+----+----+----+----+
 * Columns represent the logic levels per end point clock
 ** Distribution is for top worst 1000 paths
 
