@@ -130,8 +130,15 @@ class ProgramDM extends Test                                                    
    {zz();
     final StringBuilder S = new StringBuilder();
     for(MemoryLayoutDM m : memories)
-     {final StringBuilder s = m.memory().print();
-      S.append(m.name()+"="+s); S.append(" ");
+     {final MemoryLayoutDM.BlockArray a = m.block;
+      if (a.blocked())                                                          // Blocked array
+       {for (int i = 0; i < a.size; i++)
+         {S.append(m.name()+"["+i+"]="+m.memory().print(i*a.width, a.width)+" ");
+         }
+       }
+      else                                                                      // Bit array
+       {S.append(m.name()+"="+m.memory().print()+" ");
+       }
      }
     if (S.length() > 0) S.setLength(S.length() - 1);
     Trace.push(String.format("%4d  %4d  %s", steps, step, S));
@@ -148,7 +155,7 @@ class ProgramDM extends Test                                                    
     final int N = code.size();
     for (step = 0, steps = 0; step < N && steps < maxSteps && running; step++, steps++)
      {traceMemory();
-      for (I i : code.elementAt(step)) {currentInstruction =i; i.a();}          // Execute each instruction in the parallel block
+      for (I i : code.elementAt(step)) {currentInstruction = i; i.a();}         // Execute each instruction in the parallel block
      }
     traceMemory();
     if (steps >= maxSteps) stop("Out of steps: ", steps);
