@@ -1,11 +1,11 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Tue Mar 25 18:52:08 2025
+| Date         : Tue Mar 25 21:28:39 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_design_analysis -file /home/azureuser/btreeBlock/verilog/put/1/vivado/reports/design_analysis.rpt
 | Design       : put
-| Device       : xc7a50t
+| Device       : xc7z020
 | Design State : Synthesized
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -25,17 +25,17 @@ Table of Contents
 |      Characteristics      |         Path #1         |
 +---------------------------+-------------------------+
 | Requirement               | 11.200                  |
-| Path Delay                | 3.276                   |
-| Logic Delay               | 2.705(83%)              |
+| Path Delay                | 3.351                   |
+| Logic Delay               | 2.780(83%)              |
 | Net Delay                 | 0.571(17%)              |
-| Clock Skew                | -2.015                  |
-| Slack                     | 3.874                   |
+| Clock Skew                | -2.021                  |
+| Slack                     | 3.793                   |
 | Clock Uncertainty         | 0.035                   |
 | Clock Relationship        | Timed                   |
 | Clock Delay Group         | Same Clock              |
 | Logic Levels              | 1                       |
 | Routes                    | NA                      |
-| Logical Path              | FDRE/C-(1)-OBUF/data[1] |
+| Logical Path              | FDRE/C-(1)-OBUF/data[2] |
 | Start Point Clock         | clock                   |
 | End Point Clock           | clock                   |
 | DSP Block                 | None                    |
@@ -48,11 +48,11 @@ Table of Contents
 | Dont Touch                | 0                       |
 | Mark Debug                | 0                       |
 | Start Point Pin Primitive | FDRE/C                  |
-| End Point Pin Primitive   | data[1]                 |
-| Start Point Pin           | T_reg[29]/C             |
-| End Point Pin             | data[1]                 |
+| End Point Pin Primitive   | data[2]                 |
+| Start Point Pin           | T_reg[30]/C             |
+| End Point Pin             | data[2]                 |
 +---------------------------+-------------------------+
-* Bounding box calculated as % of dimensions for the target device (188, 300)
+* Bounding box calculated as % of dimensions for the target device (308, 299)
 
 
 2. Logic Level Distribution
