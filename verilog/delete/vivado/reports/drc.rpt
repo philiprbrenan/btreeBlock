@@ -1,11 +1,11 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Tue Mar 25 18:40:36 2025
+| Date         : Tue Mar 25 21:17:22 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_drc -file /home/azureuser/btreeBlock/verilog/delete/3/vivado/reports/drc.rpt
 | Design       : delete
-| Device       : xc7a50tcpg236-3
+| Device       : xc7z020clg484-3
 | Speed File   : -3
 | Design State : Synthesized
 ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -25,25 +25,17 @@ Table of Contents
            Ruledeck: default
              Max checks: <unlimited>
              Checks found: 1
-+----------+----------+-----------------------------------------------------+--------+
-| Rule     | Severity | Description                                         | Checks |
-+----------+----------+-----------------------------------------------------+--------+
-| CFGBVS-1 | Warning  | Missing CFGBVS and CONFIG_VOLTAGE Design Properties | 1      |
-+----------+----------+-----------------------------------------------------+--------+
++--------+----------+--------------------+--------+
+| Rule   | Severity | Description        | Checks |
++--------+----------+--------------------+--------+
+| ZPS7-1 | Warning  | PS7 block required | 1      |
++--------+----------+--------------------+--------+
 
 2. REPORT DETAILS
 -----------------
-CFGBVS-1#1 Warning
-Missing CFGBVS and CONFIG_VOLTAGE Design Properties  
-Neither the CFGBVS nor CONFIG_VOLTAGE voltage property is set in the current_design.  Configuration bank voltage select (CFGBVS) must be set to VCCO or GND, and CONFIG_VOLTAGE must be set to the correct configuration voltage, in order to determine the I/O voltage support for the pins in bank 0.  It is suggested to specify these either using the 'Edit Device Properties' function in the GUI or directly in the XDC file using the following syntax:
-
- set_property CFGBVS value1 [current_design]
- #where value1 is either VCCO or GND
-
- set_property CONFIG_VOLTAGE value2 [current_design]
- #where value2 is the voltage provided to configuration bank 0
-
-Refer to the device configuration user guide for more information.
+ZPS7-1#1 Warning
+PS7 block required  
+The PS7 cell must be used in this Zynq design in order to enable correct default configuration.
 Related violations: <none>
 
 
