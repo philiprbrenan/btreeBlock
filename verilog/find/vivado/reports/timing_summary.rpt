@@ -1,9 +1,9 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Wed Mar 19 03:46:39 2025
+| Date         : Tue Mar 25 18:36:08 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
-| Command      : report_timing_summary -file /home/azureuser/btreeBlock/verilog/find/2/vivado/reports/timing_summary.rpt
+| Command      : report_timing_summary -file /home/azureuser/btreeBlock/verilog/find/0/vivado/reports/timing_summary.rpt
 | Design       : find
 | Device       : 7a50t-cpg236
 | Speed File   : -3  PRODUCTION 1.23 2018-06-13
@@ -144,7 +144,7 @@ Table of Contents
 
     WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
     -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
-      3.874        0.000                      0                  160        0.124        0.000                      0                  160        5.100        0.000                       0                    88  
+      3.874        0.000                      0                  168        0.124        0.000                      0                  168        5.100        0.000                       0                    92  
 
 
 All user specified timing constraints are met.
@@ -167,7 +167,7 @@ clock  {0.000 5.600}      11.200          89.286
 
 Clock             WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
 -----             -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
-clock               3.874        0.000                      0                  160        0.124        0.000                      0                  160        5.100        0.000                       0                    88  
+clock               3.874        0.000                      0                  168        0.124        0.000                      0                  168        5.100        0.000                       0                    92  
 
 
 ------------------------------------------------------------------------------------------------
@@ -235,7 +235,7 @@ Slack (MET) :             3.874ns  (required time - arrival time)
     C15                  IBUF (Prop_ibuf_I_O)         0.784     0.784 r  clock_IBUF_inst/O
                          net (fo=1, unplaced)         0.571     1.355    clock_IBUF
                          BUFG (Prop_bufg_I_O)         0.076     1.431 r  clock_IBUF_BUFG_inst/O
-                         net (fo=87, unplaced)        0.584     2.015    clock_IBUF_BUFG
+                         net (fo=91, unplaced)        0.584     2.015    clock_IBUF_BUFG
                          FDRE                                         r  T_reg[29]/C
   -------------------------------------------------------------------    -------------------
                          FDRE (Prop_fdre_C_Q)         0.341     2.356 r  T_reg[29]/Q
@@ -284,7 +284,7 @@ Slack (MET) :             0.124ns  (arrival time - required time)
     C15                  IBUF (Prop_ibuf_I_O)         0.164     0.164 r  clock_IBUF_inst/O
                          net (fo=1, unplaced)         0.333     0.497    clock_IBUF
                          BUFG (Prop_bufg_I_O)         0.026     0.523 r  clock_IBUF_BUFG_inst/O
-                         net (fo=87, unplaced)        0.114     0.637    clock_IBUF_BUFG
+                         net (fo=91, unplaced)        0.114     0.637    clock_IBUF_BUFG
                          FDRE                                         r  lT_StuckSA_Memory_reg[18]/C
   -------------------------------------------------------------------    -------------------
                          FDRE (Prop_fdre_C_Q)         0.141     0.778 r  lT_StuckSA_Memory_reg[18]/Q
@@ -300,7 +300,7 @@ Slack (MET) :             0.124ns  (arrival time - required time)
     C15                  IBUF (Prop_ibuf_I_O)         0.353     0.353 r  clock_IBUF_inst/O
                          net (fo=1, unplaced)         0.351     0.704    clock_IBUF
                          BUFG (Prop_bufg_I_O)         0.029     0.733 r  clock_IBUF_BUFG_inst/O
-                         net (fo=87, unplaced)        0.259     0.992    clock_IBUF_BUFG
+                         net (fo=91, unplaced)        0.259     0.992    clock_IBUF_BUFG
                          FDRE                                         r  T_reg[29]/C
                          clock pessimism             -0.209     0.782    
                          FDRE (Hold_fdre_C_D)         0.091     0.873    T_reg[29]
