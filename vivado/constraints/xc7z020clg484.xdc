@@ -2,10 +2,11 @@
 create_clock -period 10   [get_ports clock]
 create_clock -period 11.2 [get_ports clock]
 
-set_input_delay  -clock clock -min   0 [lsearch -all -inline -not -exact [get_ports -filter {DIRECTION == IN}] "clock"]
-set_input_delay  -clock clock -max   2 [lsearch -all -inline -not -exact [get_ports -filter {DIRECTION == IN}] "clock"]
-set_output_delay -clock clock -min   0 [get_ports -filter {DIRECTION == OUT}]
-set_output_delay -clock clock -max   2 [get_ports -filter {DIRECTION == OUT}]
+set_input_delay  -clock clock -min 0 [get_ports -filter {DIRECTION == IN && NAME != "clock"}]
+set_input_delay  -clock clock -max 0 [get_ports -filter {DIRECTION == IN && NAME != "clock"}]
+
+set_output_delay -clock clock -min 0 [get_ports -filter {DIRECTION == OUT}]
+set_output_delay -clock clock -max 2 [get_ports -filter {DIRECTION == OUT}]
 
 set_property PACKAGE_PIN K19  [get_ports clock]
 set_property IOSTANDARD LVCMOS18 [get_ports clock]
