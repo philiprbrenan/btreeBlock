@@ -17,7 +17,7 @@ my $md5File = q(/home/phil/btreeBlock/.md5Sums);                                
 my $user    = q(philiprbrenan);                                                 # User
 my $repo    = q(btreeBlock);                                                    # Repo
 my $wf      = q(.github/workflows/main.yml);                                    # Work flow on Ubuntu
-my @ext     = qw(.html .java .jpg .md .pl .pdf .png .py .rpt .sdc .txt);        # Extensions of files to upload to github
+my @ext     = qw(.html .java .jpg .md .pl .pdf .png .py .rpt .sdc .txt .xdc);   # Extensions of files to upload to github
 my $sc      = fpd $home, qw(siliconCompiler);                                   # Silicon compiler
 my @scExt   = qw(.gds .py .xdc);                                                # Silicon compiler extensions
 
