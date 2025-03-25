@@ -1,11 +1,11 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date         : Tue Mar 25 18:40:29 2025
+| Date         : Tue Mar 25 21:17:14 2025
 | Host         : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_control_sets -file /home/azureuser/btreeBlock/verilog/delete/3/vivado/reports/control_sets.rpt
 | Design       : delete
-| Device       : xc7a50t
+| Device       : xc7z020
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
 Control Set Information
