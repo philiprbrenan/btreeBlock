@@ -40,12 +40,12 @@ if (1)                                                                          
 
 if (1)
  {push my @sc, searchDirectoryTreesForMatchingFiles($sc, @scExt);               # Silicon compiler files
+say STDERR "AAAA ", dump(\@sc);
   my %s;
   @files = grep {!$s{$_}++} @files, @sc;
  }
 
 @files = changedFiles $md5File, @files if 1;                                    # Filter out files that have not changed
-say STDERR "AAAA ", dump(\@files);
 
 if (!@files)                                                                    # No new files
  {say "Everything up to date";
