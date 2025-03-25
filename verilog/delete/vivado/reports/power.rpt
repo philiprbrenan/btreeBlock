@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-| Date             : Wed Mar 19 03:52:41 2025
+| Date             : Tue Mar 25 18:40:51 2025
 | Host             : vivado running 64-bit Ubuntu 24.04.1 LTS
 | Command          : report_power -file /home/azureuser/btreeBlock/verilog/delete/3/vivado/reports/power.rpt
 | Design           : delete
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.260        |
+| Total On-Chip Power (W)  | 0.224        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 0.189        |
+| Dynamic (W)              | 0.154        |
 | Device Static (W)        | 0.071        |
 | Effective TJA (C/W)      | 5.0          |
-| Max Ambient (C)          | 98.7         |
-| Junction Temperature (C) | 26.3         |
+| Max Ambient (C)          | 98.9         |
+| Junction Temperature (C) | 26.1         |
 | Confidence Level         | Low          |
 | Setting File             | ---          |
 | Simulation Activity File | ---          |
@@ -52,16 +52,16 @@ Table of Contents
 +----------------+-----------+----------+-----------+-----------------+
 | On-Chip        | Power (W) | Used     | Available | Utilization (%) |
 +----------------+-----------+----------+-----------+-----------------+
-| Clocks         |     0.015 |        3 |       --- |             --- |
-| Slice Logic    |     0.095 |    24500 |       --- |             --- |
-|   LUT as Logic |     0.095 |    20218 |     32600 |           62.02 |
-|   Register     |    <0.001 |     1570 |     65200 |            2.41 |
+| Clocks         |     0.014 |        3 |       --- |             --- |
+| Slice Logic    |     0.071 |    23147 |       --- |             --- |
+|   LUT as Logic |     0.071 |    18939 |     32600 |           58.10 |
+|   Register     |    <0.001 |     1551 |     65200 |            2.38 |
 |   CARRY4       |    <0.001 |        3 |      8150 |            0.04 |
 |   Others       |     0.000 |        2 |       --- |             --- |
-| Signals        |     0.079 |    24512 |       --- |             --- |
+| Signals        |     0.068 |    23159 |       --- |             --- |
 | I/O            |    <0.001 |       13 |       106 |           12.26 |
 | Static Power   |     0.071 |          |           |                 |
-| Total          |     0.260 |          |           |                 |
+| Total          |     0.224 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
 
 
@@ -71,7 +71,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     0.199 |       0.189 |      0.010 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     0.163 |       0.154 |      0.010 |       NA    | Unspecified | NA         |
 | Vccaux    |       1.800 |     0.013 |       0.000 |      0.013 |       NA    | Unspecified | NA         |
 | Vcco33    |       3.300 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -140,7 +140,7 @@ Table of Contents
 +--------+-----------+
 | Name   | Power (W) |
 +--------+-----------+
-| delete |     0.189 |
+| delete |     0.154 |
 +--------+-----------+
 
 
