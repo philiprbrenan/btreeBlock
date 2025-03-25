@@ -24,7 +24,6 @@ my @scExt   = qw(.gds .py .xdc .v);                                             
 #say STDERR timeStamp,  " push to github $repo";
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
-say STDERR "AAAA ", dump(\@files);
         @files = grep {!m(/\.|backups/|Classes/)} @files;                       # Remove files that do not need to be saved
         @files = grep {!m(/vivado/runs/)}         @files;
         @files = grep {!m(/vivado/pins/)}         @files;
