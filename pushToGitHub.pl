@@ -21,8 +21,7 @@ my @ext     = qw(.html .java .jpg .md .pl .pdf .png .py .rpt .sdc .txt .xdc);   
 my $sc      = fpd $home, qw(siliconCompiler);                                   # Silicon compiler
 my @scExt   = qw(.gds .py .xdc .v);                                                # Silicon compiler extensions
 
-say STDERR timeStamp,  " push to github $repo";
-
+#say STDERR timeStamp,  " push to github $repo";
 
 push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              # Files to upload
 say STDERR "AAAA ", dump(\@files);
