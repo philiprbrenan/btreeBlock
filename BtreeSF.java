@@ -1906,6 +1906,7 @@ abstract class BtreeSF extends Test                                             
     final String           folder;                                              // Folder in which to place project
     final String        opCodeMap = "opCodeMap";                                // Name of op code map
     final String           nano9k = "nano9k";                                   // Name of folder containing code for the GoWin Nano 9k
+    final String  siliconCompiler = "siliconCompiler";                          // Name of folder containing code for Silicon Compiler
     final ProgramDM       program;                                              // Program associated with this tree
     final StringToNumbers     ops = new StringToNumbers();                      // Collapse identical instructions
     final String      blockIndent = " ".repeat(10);                             // Indentationm for Verilog case statements
@@ -1931,18 +1932,20 @@ abstract class BtreeSF extends Test                                             
        }
      }
 
-    String      sourceVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.ext);}
-    String        testVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.testExt);}
-    String      nano9kVerilog() {return ""+Paths.get(projectFolder(), nano9k,     project           +Verilog.ext);}
-    String    nano9kTestBench() {return ""+Paths.get(projectFolder(), nano9k,     project           +Verilog.testExt);}
-    String  nano9kConstraints() {return ""+Paths.get(projectFolder(), nano9k,     project           +Verilog.constraintsExt);}
-    String        nano9kBuild() {return ""+Paths.get(projectFolder(), nano9k,     project           +".pl");}
-    String      declareMemory() {return ""+Paths.get(projectFolder(), "includes", "declareMemory"   +Verilog.header);}
-    String   initializeMemory() {return ""+Paths.get(projectFolder(), "includes", "initializeMemory"+Verilog.header);}
-    String      opCodeMapFile() {return ""+Paths.get(projectFolder(), "includes", opCodeMap         +Verilog.header);}
-    String          testsFile() {return ""+Paths.get(projectFolder(), "tests.txt");}
-    String          traceFile() {return ""+Paths.get(projectFolder(), "trace.txt");}
-    String      javaTraceFile() {return ""+Paths.get(projectFolder(), "traceJava.txt");}
+    String     sourceVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.ext);}
+    String       testVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.testExt);}
+    String     nano9kVerilog() {return ""+Paths.get(projectFolder(), nano9k,     project           +Verilog.ext);}
+    String   nano9kTestBench() {return ""+Paths.get(projectFolder(), nano9k,     project           +Verilog.testExt);}
+    String nano9kConstraints() {return ""+Paths.get(projectFolder(), nano9k,     project           +Verilog.constraintsExt);}
+    String       nano9kBuild() {return ""+Paths.get(projectFolder(), nano9k,     project           +".pl");}
+    String           scBuild() {return ""+Paths.get(projectFolder(), siliconCompiler, project      +".py");}
+    String     scConstraints() {return ""+Paths.get(projectFolder(), siliconCompiler, project      +".sdc");}
+    String     declareMemory() {return ""+Paths.get(projectFolder(), "includes", "declareMemory"   +Verilog.header);}
+    String  initializeMemory() {return ""+Paths.get(projectFolder(), "includes", "initializeMemory"+Verilog.header);}
+    String     opCodeMapFile() {return ""+Paths.get(projectFolder(), "includes", opCodeMap         +Verilog.header);}
+    String         testsFile() {return ""+Paths.get(projectFolder(), "tests.txt");}
+    String         traceFile() {return ""+Paths.get(projectFolder(), "trace.txt");}
+    String     javaTraceFile() {return ""+Paths.get(projectFolder(), "traceJava.txt");}
 
     VerilogCode(String Project, String Folder)                                  // Generate verilog code
      {zz();
@@ -2422,7 +2425,7 @@ IO_PORT "button2" PULL_MODE=UP;
       writeFile(nano9kConstraints(), editVariables(s));                         // Write constraints for nano 9k
      }
 
-    void generateBuildNano9K()                                                  // Generate build commands for Nano 9k
+    void generateBuildNano9K()                                                  // Generate build commands for Nano 9k fpga
      {final StringBuilder s = new StringBuilder();
       s.append("""
 #!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/
@@ -2475,6 +2478,33 @@ system(qq(openFPGALoader -c $cable   $bits));
       writeFile(nano9kBuild(), s);                                              // Write build file for Nano 9k
      }
 
+    void generateSiliconCompiler()                                              // Generate build commands for Silicon compiler to get an asic mask
+     {final StringBuilder s = new StringBuilder();
+      s.append("""
+#!/usr/bin/env python3
+
+from siliconcompiler import Chip                                                # import python package
+from siliconcompiler.targets import skywater130_demo
+
+if __name__ == "__main__":
+    chip = Chip('find')                                                         # Create chip object
+    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/nano9k/$project.v')            # Define list of source files
+    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.sdc') # Define list of source files
+    chip.clock('clock', period=100)                                             # Define clock speed of design
+    chip.use(skywater130_demo)                                                  # Load predefined technology and flow target
+    chip.set('option', 'remote', False)                                         # Run remote in the cloud
+    chip.run()                                                                  # Run compilation of design and target
+    chip.summary()
+""");
+      writeFile(scBuild(), editVariables(s));                                   // Write build file for silicon compiler
+
+      final StringBuilder c = new StringBuilder();
+      s.append("""
+create_clock -name clock -period 100 [get_ports {clock}]
+""");
+      writeFile(scConstraints(), editVariables(s));                             // Write constraints file for silicon compiler
+     }
+
     VerilogCode generateVerilog()                                               // Generate verilog
      {zz();
 
@@ -2491,6 +2521,7 @@ system(qq(openFPGALoader -c $cable   $bits));
       generateVerilogTestBenchNano9K();
       generateVerilogConstraintsNano9K();
       generateBuildNano9K();
+      generateSiliconCompiler();
 
       if (statements == null)                                                   // All statements are in play so it is possible to execute the programs and compare their outputs to see if they are the same.
        {if (execJavaTest().resultJava)                                          // Execute the corresponding Java test
@@ -4389,10 +4420,10 @@ StuckSML(maxSize:4 size:1)
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_verilogDelete();
+    //test_verilogDelete();
     test_verilogFind();
-    test_verilogPut();
-    test_memory();
+    //test_verilogPut();
+    //test_memory();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
