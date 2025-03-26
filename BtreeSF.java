@@ -2502,7 +2502,7 @@ if __name__ == "__main__":
       s.append("""
 create_clock -name clock -period 100 [get_ports {clock}]
 """);
-      writeFile(scConstraints(), editVariables(s));                             // Write constraints file for silicon compiler
+      writeFile(scConstraints(), editVariables(c));                             // Write constraints file for silicon compiler
      }
 
     VerilogCode generateVerilog()                                               // Generate verilog
