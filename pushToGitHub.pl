@@ -38,9 +38,8 @@ if (1)                                                                          
    }
  }
 
-if (1)
+if (0)
  {push my @sc, searchDirectoryTreesForMatchingFiles($sc, @scExt);               # Silicon compiler files
-say STDERR "AAAA ", dump(\@sc);
   my %s;
   @files = grep {!$s{$_}++} @files, @sc;
  }
