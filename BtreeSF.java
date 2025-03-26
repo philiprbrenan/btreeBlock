@@ -2499,7 +2499,7 @@ if __name__ == "__main__":
       writeFile(scBuild(), editVariables(s));                                   // Write build file for silicon compiler
 
       final StringBuilder c = new StringBuilder();
-      s.append("""
+      c.append("""
 create_clock -name clock -period 100 [get_ports {clock}]
 """);
       writeFile(scConstraints(), editVariables(c));                             // Write constraints file for silicon compiler
