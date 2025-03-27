@@ -2477,11 +2477,11 @@ from siliconcompiler import Chip                                                
 from siliconcompiler.targets import $processTechnology_demo
 
 if __name__ == "__main__":
-    chip = Chip('find')                                                         # Create chip object
+    chip = Chip('$project')                                                     # Create chip object
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/nano9k/$project.v')            # Define list of source files
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.sdc') # Define list of source files
     chip.clock('clock', period=100)                                             # Define clock speed of design
-    chip.use($processTechnology)                                                # Load predefined technology and flow target
+    chip.use($processTechnology_demo)                                           # Load predefined technology and flow target
     chip.set('option', 'remote', False)                                         # Run remote in the cloud
     chip.run()                                                                  # Run compilation of design and target
     chip.summary()
