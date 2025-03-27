@@ -129,7 +129,7 @@ if  (!-e q(/home/phil/))                                                        
 my $ranges = eval readFile "ranges.txt";                                        # Load statement ranges
 
 if (!$$ranges{statements})                                                      # Synthesize, place and route the verilog description
- {say STDERR dateTimeStamp, " Synthesize, place and route btreeBlock";
+ {say STDERR dateTimeStamp, " Synthesize, place and route btreeBlock on Vivado";
   gen(q(find)  , $$ranges{projects}{find}  [0]);
   gen(q(delete), $$ranges{projects}{delete}[0]);
   gen(q(put)   , $$ranges{projects}{put}   [0]);
