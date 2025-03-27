@@ -125,7 +125,7 @@ abstract class BtreeSF extends Test                                             
     T.at(maxKeysPerLeaf)  .setInt(maxKeysPerLeaf());
     T.at(maxKeysPerBranch).setInt(maxKeysPerBranch());
     T.at(two)             .setInt(2);
-    T.at(MaxDepth)        .setInt(maxDepth);                                    // Prevent runaway searches of the btree by limiting the number of levels to be searched
+//  T.at(MaxDepth)        .setInt(maxDepth);                                    // Prevent runaway searches of the btree by limiting the number of levels to be searched
 
     bSize        = //branchTransactions[Branch_Size       ];                    // Branch size
     bLeaf        = //branchTransactions[Branch_Leaf       ];                    // Check whether a node has leaves for children
@@ -434,13 +434,15 @@ abstract class BtreeSF extends Test                                             
   private Layout.Variable         leafFound;                                    // Leaf found by find
   private Layout.Variable    maxKeysPerLeaf;                                    // Maximum keys per leaf
   private Layout.Variable  maxKeysPerBranch;                                    // Maximum keys per branch
-  private Layout.Variable          MaxDepth;                                    // Maximum depth of a search
+//private Layout.Variable          MaxDepth;                                    // Maximum depth of a search
   private Layout.Variable               two;                                    // The value two
-  private Layout.Variable         findDepth;                                    // Current level being searched by find
-  private Layout.Variable          putDepth;                                    // Current level being traversed by put
-  private Layout.Variable       deleteDepth;                                    // Current level being traversed by delete
-  private Layout.Variable        mergeDepth;                                    // Current level being traversed by merge
+//private Layout.Variable         findDepth;                                    // Current level being searched by find
+//private Layout.Variable          putDepth;                                    // Current level being traversed by put
+//private Layout.Variable       deleteDepth;                                    // Current level being traversed by delete
+//private Layout.Variable        mergeDepth;                                    // Current level being traversed by merge
   private Layout.Variable        mergeIndex;                                    // Current index of node being merged across
+  private Layout.Variable          memoryIn;                                    // Pipelined input  into memory
+  private Layout.Variable         memoryOut;                                    // Pipelined output into memory
 
   private Layout.Variable  node_isLeaf;                                         // The node to be used to implicitly parameterize each method call
   private Layout.Variable  node_setLeaf;
@@ -541,12 +543,14 @@ abstract class BtreeSF extends Test                                             
                               maxKeysPerLeaf = L.variable ("maxKeysPerLeaf"                                , bitsPerSize);
                             maxKeysPerBranch = L.variable ("maxKeysPerBranch"                              , bitsPerSize);
                                          two = L.variable ("two"                                           , bitsPerSize);
-                                    MaxDepth = //L.variable ("maxDepth"                                      , bitsPerNext);
-                                   findDepth = //L.variable ("findDepth"                                     , bitsPerNext);
-                                    putDepth = //L.variable ("putDepth"                                      , bitsPerNext);
-                                 deleteDepth = //L.variable ("deleteDepth"                                   , bitsPerNext);
-                                  mergeDepth = L.variable ("mergeDepth"                                    , bitsPerNext);
+//                                  MaxDepth = //L.variable ("maxDepth"                                      , bitsPerNext);
+//                                 findDepth = //L.variable ("findDepth"                                     , bitsPerNext);
+//                                  putDepth = //L.variable ("putDepth"                                      , bitsPerNext);
+//                               deleteDepth = //L.variable ("deleteDepth"                                   , bitsPerNext);
+//                                mergeDepth = L.variable ("mergeDepth"                                    , bitsPerNext);
                                   mergeIndex = L.variable ("mergeIndex"                                    , bitsPerSize);
+                                    memoryIn = L.variable ("memoryIn"                                      , bitsPerNext);
+                                   memoryOut = L.variable ("memoryOut"                                     , bitsPerNext);
 
                                  node_isLeaf = //L.variable ("node_isLeaf"                                   , bitsPerNext);
                                 node_setLeaf = //L.variable ("node_setLeaf"                                  , bitsPerNext);
@@ -642,8 +646,10 @@ abstract class BtreeSF extends Test                                             
       //findDepth,
       //putDepth,
       //deleteDepth,
-      mergeDepth,
-      mergeIndex,
+      //mergeDepth,
+        mergeIndex,
+        memoryIn,
+        memoryOut,
       //node_isLeaf,
       //node_setLeaf,
       node_setBranch,
@@ -762,7 +768,8 @@ abstract class BtreeSF extends Test                                             
     void loadNode(MemoryLayoutDM.At at)                                         // Load with the node addressed by this variable
      {zz();
       //N.copy(M.at(node, at));
-      N.loadBlock(M, at);
+                     T.at(memoryIn).move(at);
+      N.loadBlock(M, T.at(memoryIn));
      }
 
     void saveRoot()                                                             // Save root
@@ -774,7 +781,8 @@ abstract class BtreeSF extends Test                                             
 
     void saveNode(MemoryLayoutDM.At at)                                         // Save the node addressed by this variable
      {zz(); //at.copy(N);
-      N.saveBlock(M, at);
+      T.at(memoryOut).move(at);
+      N.saveBlock(M, T.at(memoryOut));
      }
 
     void loadRootStuck(StuckDM Stuck)                                           // Load a root stuck from main memory
@@ -900,10 +908,9 @@ abstract class BtreeSF extends Test                                             
     allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
     allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
 
-    P.parallelStart();   nT.loadRootStuck(lT);                                  // Load root
-    P.parallelSection(); nL.loadStuck(lL, l);                                   // Clear left stuck
-    P.parallelSection(); nR.loadStuck(lR, r);                                   // Clear right stuck
-    P.parallelEnd();
+    nT.loadRootStuck(lT);                                                       // Load root
+    nL.loadStuck(lL, l);                                                        // Clear left stuck
+    nR.loadStuck(lR, r);                                                        // Clear right stuck
 
     lT.split(lL, lR);                                                           // Split root leaf into child leaves
 
@@ -938,11 +945,9 @@ abstract class BtreeSF extends Test                                             
     P.parallelEnd();
     bT.push();                                                                  // Insert right into root. This will be the top node and so ignored by search ... except last.
 
-    P.parallelStart();    nT.saveRootStuck(bT);
-    P.parallelSection();  nL.saveStuck(lL, l);
-    P.parallelSection();  nR.saveStuck(lR, r);
-    P.parallelEnd();
-
+    nT.saveRootStuck(bT);
+    nL.saveStuck(lL, l);
+    nR.saveStuck(lR, r);
    }
 
   private void splitBranchRoot()                                                // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
@@ -950,10 +955,9 @@ abstract class BtreeSF extends Test                                             
     allocBranch(); tt(l, allocBranch);                                          // New left branch
     allocBranch(); tt(r, allocBranch);                                          // New right branch
 
-    P.parallelStart();   nT.loadRootStuck(bT);                                  // Load root
-    P.parallelSection(); nL.loadStuck(bL, l);                                   // Clear left stuck
-    P.parallelSection(); nR.loadStuck(bR, r);                                   // Clear right stuck
-    P.parallelEnd();
+    nT.loadRootStuck(bT);                                                       // Load root
+    nL.loadStuck(bL, l);                                                        // Clear left stuck
+    nR.loadStuck(bR, r);                                                        // Clear right stuck
 
     bT.split(bL, bR);                                                           // Split the root as a branch
 
@@ -987,19 +991,17 @@ abstract class BtreeSF extends Test                                             
     P.parallelEnd();
     bT.push();                                                                  // Becomes top and so ignored by search ... except last
 
-    P.parallelStart();   nT.saveRootStuck(bT);
-    P.parallelSection(); nL.saveStuck(bL, l);
-    P.parallelSection(); nR.saveStuck(bR, r);
-    P.parallelEnd();
+    nT.saveRootStuck(bT);
+    nL.saveStuck(bL, l);
+    nR.saveStuck(bR, r);
    }
 
   private void splitLeaf()                                                      // Split a leaf which is not the root assuming the nT/bT ahave the full details of the parent and that the node to be split is indexed by node_splitLeaf
    {zz();
     allocLeaf(); tt(l, allocLeaf);                                              // New  split out leaf
 
-    P.parallelStart();   nL.loadStuck(lL, l);                                   // Clear the left stuck
-    P.parallelSection(); nR.loadStuck(lR, node_splitLeaf);                      // Load stuck on right to be split
-    P.parallelEnd();
+    nL.loadStuck(lL, l);                                                        // Clear the left stuck
+    nR.loadStuck(lR, node_splitLeaf);                                           // Load stuck on right to be split
 
     lR.splitLow(lL);                                                            // Split out the lower half
 
@@ -1024,19 +1026,17 @@ abstract class BtreeSF extends Test                                             
     P.parallelEnd();
     bT.insertElementAt();                                                       // Insert new key, next pair into parent
 
-    P.parallelStart();   nT.saveStuck(bT,  splitParent);
-    P.parallelSection(); nL.saveStuck(lL, l);
-    P.parallelSection(); nR.saveStuck(lR, node_splitLeaf);
-    P.parallelEnd();
+    nT.saveStuck(bT,  splitParent);
+    nL.saveStuck(lL, l);
+    nR.saveStuck(lR, node_splitLeaf);
    }
 
   private void splitBranch()                                                    // Split a branch which is not the root  assuming the nT/bT ahave the full details of the parent and that the node to be split is indexed by node_splitBranch
    {zz();
     allocBranch(); tt(l, allocBranch);
 
-    P.parallelStart();   nL.loadStuck(bL, l);                                   // Clear left stuck
-    P.parallelSection(); nR.loadStuck(bR, node_splitBranch);                    // Load right stuck to be split
-    P.parallelEnd();
+    nL.loadStuck(bL, l);                                                        // Clear left stuck
+    nR.loadStuck(bR, node_splitBranch);                                         // Load right stuck to be split
 
     bR.splitLow(bL);                                                            // Split right
     bL.zeroLastKey();
@@ -1047,10 +1047,9 @@ abstract class BtreeSF extends Test                                             
     P.parallelEnd();
     bT.insertElementAt();
 
-    P.parallelStart();   nT.saveStuck(bT, parent);
-    P.parallelSection(); nL.saveStuck(bL, l);
-    P.parallelSection(); nR.saveStuck(bR, node_splitBranch);
-    P.parallelEnd();
+    nT.saveStuck(bT, parent);
+    nL.saveStuck(bL, l);
+    nR.saveStuck(bR, node_splitBranch);
    }
 
   private void stealNotPossible(ProgramDM.Label end)                            // Cannot perform the requested steal
@@ -1087,9 +1086,8 @@ abstract class BtreeSF extends Test                                             
 
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
-           {P.parallelStart();    nL.loadLeafStuckAndSize(lL, l, nl);           // Address leaves on each side and get their size
-            P.parallelSection();  nR.loadLeafStuckAndSize(lR, r, nr);
-            P.parallelEnd();
+           {nL.loadLeafStuckAndSize(lL, l, nl);                                 // Address leaves on each side and get their size
+            nR.loadLeafStuckAndSize(lR, r, nr);
 
             T.at(nr).greaterThanOrEqual(T.at(maxKeysPerLeaf), T.at(stolenOrMerged));
             stealNotPossible(end);
@@ -1113,16 +1111,15 @@ abstract class BtreeSF extends Test                                             
             P.parallelEnd();
             bT.setElementAt();                                                  // Reduce key of parent of left
 
-            P.parallelStart();    nT.saveStuck(bT, node_stealFromLeft);         // Save parent branch and modified left and right leaves
-            P.parallelSection();  nL.saveStuck(lL, l);
-            P.parallelSection();  nR.saveStuck(lR, r);
-            P.parallelEnd();
+            nT.saveStuck(bT, node_stealFromLeft);                               // Save parent branch and modified left and right leaves
+            nL.saveStuck(lL, l);
+            nR.saveStuck(lR, r);
            }
           void Else()                                                           // Children are branches
            {z();
-            P.parallelStart();    nL.loadBranchStuckAndSize(bL, l, nl);
-            P.parallelSection();  nR.loadBranchStuckAndSize(bR, r, nr);
-            P.parallelEnd();
+            nL.loadBranchStuckAndSize(bL, l, nl);
+            nR.loadBranchStuckAndSize(bR, r, nr);
+
 
             T.at(nr).greaterThanOrEqual(T.at(maxKeysPerBranch), T.at(stolenOrMerged));
             stealNotPossible(end);
@@ -1158,10 +1155,9 @@ abstract class BtreeSF extends Test                                             
             P.parallelEnd();
             bT.setElementAt();                                                  // Reduce key of parent of left
 
-            P.parallelStart();    nT.saveStuck(bT, node_stealFromLeft);         // Save parent branch and modified left and right branches
-            P.parallelSection();  nL.saveStuck(bL, l);
-            P.parallelSection();  nR.saveStuck(bR, r);
-            P.parallelEnd();
+            nT.saveStuck(bT, node_stealFromLeft);                               // Save parent branch and modified left and right branches
+            nL.saveStuck(bL, l);
+            nR.saveStuck(bR, r);
            }
          };
         z(); T.at(stolenOrMerged).ones();
@@ -1196,9 +1192,8 @@ abstract class BtreeSF extends Test                                             
         P.new If(T.at(hasLeavesForChildren))                                    // Children are leaves
          {void Then()
            {z();
-            P.parallelStart();   nL.loadLeafStuckAndSize(lL, l, nl);
-            P.parallelSection(); nR.loadLeafStuckAndSize(lR, r, nr);
-            P.parallelEnd();
+            nL.loadLeafStuckAndSize(lL, l, nl);
+            nR.loadLeafStuckAndSize(lR, r, nr);
 
             T.at(nl).greaterThanOrEqual(T.at(maxKeysPerLeaf), T.at(stolenOrMerged));
             stealNotPossible(end);
@@ -1217,16 +1212,14 @@ abstract class BtreeSF extends Test                                             
             lL.push();                                                          // Increase left
             bT.setElementAt();                                                  // Swap key of parent
 
-            P.parallelStart();    nT.saveStuck(bT, node_stealFromRight);        // Save parent branch and modified left and right leaves
-            P.parallelSection();  nL.saveStuck(lL, l);
-            P.parallelSection();  nR.saveStuck(lR, r);
-            P.parallelEnd();
+            nT.saveStuck(bT, node_stealFromRight);                              // Save parent branch and modified left and right leaves
+            nL.saveStuck(lL, l);
+            nR.saveStuck(lR, r);
            }
           void Else()                                                           // Children are branches
            {z();
-            P.parallelStart();   nL.loadBranchStuckAndSize(bL, l, nl);
-            P.parallelSection(); nR.loadBranchStuckAndSize(bR, r, nr);
-            P.parallelEnd();
+            nL.loadBranchStuckAndSize(bL, l, nl);
+            nR.loadBranchStuckAndSize(bR, r, nr);
 
             T.at(nl).greaterThanOrEqual(T.at(maxKeysPerBranch), T.at(stolenOrMerged));
             stealNotPossible(end);
@@ -1252,10 +1245,9 @@ abstract class BtreeSF extends Test                                             
             P.parallelEnd();
             bT.setElementAt();                                                  // Swap key of parent
 
-            P.parallelStart();    nT.saveStuck(bT, node_stealFromRight);        // Save parent branch and modified left and right branches
-            P.parallelSection();  nL.saveStuck(bL, l);
-            P.parallelSection();  nR.saveStuck(bR, r);
-            P.parallelEnd();
+            nT.saveStuck(bT, node_stealFromRight);                              // Save parent branch and modified left and right branches
+            nL.saveStuck(bL, l);
+            nR.saveStuck(bR, r);
            }
          };
         z(); T.at(stolenOrMerged).ones();
@@ -1392,9 +1384,8 @@ abstract class BtreeSF extends Test                                             
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
            {z();
-            P.parallelStart();   nL.loadLeafStuckAndSize(lL, l, nl);
-            P.parallelSection(); nR.loadLeafStuckAndSize(lR, r, nr);
-            P.parallelEnd();
+            nL.loadLeafStuckAndSize(lL, l, nl);
+            nR.loadLeafStuckAndSize(lR, r, nr);
 
             P.new I()                                                           // Check that combined node would not be too big
              {void a()
@@ -1416,9 +1407,8 @@ abstract class BtreeSF extends Test                                             
            }
           void Else()                                                           // Children are branches
            {z();
-            P.parallelStart();   nL.loadBranchStuckAndSize(bL, l, nl);
-            P.parallelSection(); nR.loadBranchStuckAndSize(bR, r, nr);
-            P.parallelEnd();
+            nL.loadBranchStuckAndSize(bL, l, nl);
+            nR.loadBranchStuckAndSize(bR, r, nr);
 
             P.new I()                                                           // Check that combined node would not be too big
              {void a()
@@ -1482,9 +1472,8 @@ abstract class BtreeSF extends Test                                             
         hasLeavesForChildren(bT);
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
-           {P.parallelStart();    nL.loadLeafStuckAndSize(lL, l, nl);
-            P.parallelSection();  nR.loadLeafStuckAndSize(lR, r, nr);
-            P.parallelEnd();
+           {nL.loadLeafStuckAndSize(lL, l, nl);
+            nR.loadLeafStuckAndSize(lR, r, nr);
 
             P.new I()                                                           // Check that combined node would not be too big
              {void a()
@@ -1505,9 +1494,9 @@ abstract class BtreeSF extends Test                                             
             nL.saveStuck(lL, l);                                                // Save modified left branch
            }
           void Else()                                                           // Children are branches
-           {P.parallelStart();     nL.loadBranchStuckAndSize(bL, l, nl);
-            P.parallelSection();   nR.loadBranchStuckAndSize(bR, r, nr);
-            P.parallelEnd();
+           {nL.loadBranchStuckAndSize(bL, l, nl);
+            nR.loadBranchStuckAndSize(bR, r, nr);
+
 
             P.new I()                                                           // Check that combined node would not be too big
              {void a()
@@ -3727,17 +3716,17 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
 
-    t.run_verilogFind( 0, 0, 0, 21);
-    t.run_verilogFind( 1, 1, 8, 21);
-    t.run_verilogFind( 2, 1, 7, 21);
-    t.run_verilogFind( 3, 1, 6, 21);
-    t.run_verilogFind( 4, 1, 5, 21);
-    t.run_verilogFind( 5, 1, 4, 21);
-    t.run_verilogFind( 6, 1, 3, 21);
-    t.run_verilogFind( 7, 1, 2, 21);
-    t.run_verilogFind( 8, 1, 1, 21);
-    t.run_verilogFind( 9, 1, 0, 21);
-    t.run_verilogFind(10, 0, 0, 21);
+    t.run_verilogFind( 0, 0, 0, 23);
+    t.run_verilogFind( 1, 1, 8, 23);
+    t.run_verilogFind( 2, 1, 7, 23);
+    t.run_verilogFind( 3, 1, 6, 23);
+    t.run_verilogFind( 4, 1, 5, 23);
+    t.run_verilogFind( 5, 1, 4, 23);
+    t.run_verilogFind( 6, 1, 3, 23);
+    t.run_verilogFind( 7, 1, 2, 23);
+    t.run_verilogFind( 8, 1, 1, 23);
+    t.run_verilogFind( 9, 1, 0, 23);
+    t.run_verilogFind(10, 0, 0, 23);
    }
 
   private void runVerilogDeleteTest                                             // Run the java and verilog versions and compare the resulting memory traces
@@ -3784,7 +3773,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 402, """
+    t.runVerilogDeleteTest(3, 6, 481, """
                     6           |
                     0           |
                     5           |
@@ -3797,7 +3786,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
     if (eachStatement) return;                                                  // Generate just one so vivado can generate timimg for it rather than executing it.
 
-    t.runVerilogDeleteTest(4, 5, 286, """
+    t.runVerilogDeleteTest(4, 5, 332, """
              6           |
              0           |
              5           |
@@ -3809,7 +3798,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  5,6=3  7=8  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 335, """
+    t.runVerilogDeleteTest(2, 7, 389, """
     4      6      7        |
     0      0.1    0.2      |
     1      3      8        |
@@ -3817,7 +3806,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1=1  5,6=3    7=8    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 235, """
+    t.runVerilogDeleteTest(1, 8, 276, """
       6    7        |
       0    0.1      |
       1    8        |
@@ -3825,7 +3814,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 5,6=1  7=8    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 199, """
+    t.runVerilogDeleteTest(5, 4, 227, """
       7      |
       0      |
       1      |
@@ -3833,7 +3822,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(6, 3, 205, """
+    t.runVerilogDeleteTest(6, 3, 236, """
     7      |
     0      |
     1      |
@@ -3841,15 +3830,15 @@ Line T       At      Wide       Size    Indices        Value   Name
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 175, """
+    t.runVerilogDeleteTest(7, 2, 202, """
 8,9=0 |
 """);
 
-    t.runVerilogDeleteTest(8, 1, 26, """
+    t.runVerilogDeleteTest(8, 1, 28, """
 9=0 |
 """);
 
-    t.runVerilogDeleteTest(9, 0, 26, """
+    t.runVerilogDeleteTest(9, 0, 28, """
 =0 |
 """);
    }
@@ -3873,17 +3862,17 @@ Line T       At      Wide       Size    Indices        Value   Name
     final BtreeSF t = allTreeOps();
     t.P.run(); t.P.clear();
     t.put();
-    t.runVerilogPutTest(1, 25, """
+    t.runVerilogPutTest(1, 26, """
 1=0 |
 """);
 
     if (eachStatement) return;                                                  // Generate just one so vivado can generate timimg for it rather than executing it.
 
-    t.runVerilogPutTest(2, 25, """
+    t.runVerilogPutTest(2, 26, """
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest(3, 103, """
+    t.runVerilogPutTest(3, 125, """
     1      |
     0      |
     1      |
@@ -3891,7 +3880,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 202, """
+    t.runVerilogPutTest(4, 235, """
     1    2        |
     0    0.1      |
     1    3        |
@@ -3899,7 +3888,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1=1  2=3    3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 244, """
+    t.runVerilogPutTest(5, 286, """
       2    3        |
       0    0.1      |
       1    4        |
@@ -3907,7 +3896,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3=4    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 244, """
+    t.runVerilogPutTest(6, 286, """
       2      4        |
       0      0.1      |
       1      4        |
@@ -3915,7 +3904,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 268, """
+    t.runVerilogPutTest(7, 319, """
       2      4      5        |
       0      0.1    0.2      |
       1      4      3        |
@@ -3923,7 +3912,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5=3    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 360, """
+    t.runVerilogPutTest(8, 423, """
              4                  |
              0                  |
              5                  |
@@ -3935,7 +3924,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5=3  6=7    7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 339, """
+    t.runVerilogPutTest(9, 396, """
              4                    |
              0                    |
              5                    |
@@ -3947,7 +3936,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5,6=3  7=8    8,9=2 |
 """);
 
-    t.runVerilogPutTest(10, 339, """
+    t.runVerilogPutTest(10, 396, """
              4                       |
              0                       |
              5                       |
@@ -3959,7 +3948,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5,6=3  7,8=8    9,10=2 |
 """);
 
-    t.runVerilogPutTest(11, 363, """
+    t.runVerilogPutTest(11, 429, """
              4                               |
              0                               |
              5                               |
@@ -3971,7 +3960,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5,6=3  7,8=8    9=7    10,11=2 |
 """);
 
-    t.runVerilogPutTest(12, 347, """
+    t.runVerilogPutTest(12, 407, """
                                8                 |
                                0                 |
                                5                 |
@@ -3983,7 +3972,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=2 |
 """);
 
-    t.runVerilogPutTest(13, 311, """
+    t.runVerilogPutTest(13, 365, """
                                8                          |
                                0                          |
                                5                          |
@@ -3995,7 +3984,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest(14, 339, """
+    t.runVerilogPutTest(14, 396, """
                                8                             |
                                0                             |
                                5                             |
@@ -4007,7 +3996,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=2 |
 """);
 
-    t.runVerilogPutTest(15, 363, """
+    t.runVerilogPutTest(15, 429, """
                                8                                     |
                                0                                     |
                                5                                     |
@@ -4019,7 +4008,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest(16, 365, """
+    t.runVerilogPutTest(16, 434, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -4031,7 +4020,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=2 |
 """);
 
-    t.runVerilogPutTest(17, 347, """
+    t.runVerilogPutTest(17, 410, """
                                8                  12                            |
                                0                  0.1                           |
                                5                  11                            |
@@ -4043,7 +4032,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest(18, 375, """
+    t.runVerilogPutTest(18, 441, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -4055,7 +4044,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=12    17,18=2 |
 """);
 
-    t.runVerilogPutTest(19, 399, """
+    t.runVerilogPutTest(19, 474, """
                                8                  12                                        |
                                0                  0.1                                       |
                                5                  11                                        |
@@ -4067,7 +4056,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 399, """
+    t.runVerilogPutTest(20, 471, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
