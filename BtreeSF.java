@@ -4440,3 +4440,10 @@ StuckSML(maxSize:4 size:1)
      }
    }
  }
+// the retort courteous.
+// the quip modest.
+// the reply churlish
+// the reproof valiant
+// the countercheck quarrelsome
+// the lie circumstantial
+// the lie direct
