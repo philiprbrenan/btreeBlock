@@ -1,3 +1,5 @@
 {statements=>0, projects=>{
-  find=>[0, 15],
+  delete=>[3, 304],
+  find=>[0, 16],
+  put=>[1, 347],
 }}
