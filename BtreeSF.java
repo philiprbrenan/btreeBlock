@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// BtreeSF with separate free chain, pipelined free chain and isLeaf
+// BtreeDM with pipelined free chain and single access memory
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024-2025
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
@@ -9,8 +9,6 @@ package com.AppaApps.Silicon;                                                   
 // Use free in node to hold node number while allocated so that Node knows where to write it back to without being told
 // Set an updated field for when an existing key has its associated data updated by put
 // Start splitting lower down and merge only along split path
-// Split free chain from nodes so that nodes can be indexed directly
-// Possibly buffer read/writes to main memory through N
 import java.util.*;
 import java.nio.file.*;
 
@@ -25,7 +23,6 @@ abstract class BtreeSF extends Test                                             
   final static boolean eachStatement = false;                                   // Isolate each statement to get per statement timing
   final static TreeSet<VerilogCode.Range>       ranges = new TreeSet<>();       // Record ranges in each project
   final static TreeMap<String,String>removableMemories = new TreeMap<>();       // Record memories that can be removed from each project as theya re not used
-//final String     processTechnology = "gf12lp";                                // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
   final String     processTechnology = "freepdk45";                             // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
@@ -2508,10 +2505,12 @@ create_clock -name clock -period 100 [get_ports {clock}]
       generateVerilogCode();                                                    // Generate code and test banches for various devices
       generateVerilogNano9k();
       generateVerilogTestBench();
-      generateVerilogTestBenchNano9K();
-      generateVerilogConstraintsNano9K();
-      generateBuildNano9K();
       generateSiliconCompiler();
+      if (project.equalsIgnoreCase("find"))                                     // Only the find project will fit on the nano 9k
+       {generateVerilogTestBenchNano9K();
+        generateVerilogConstraintsNano9K();
+        generateBuildNano9K();
+       }
 
       if (statements == null)                                                   // All statements are in play so it is possible to execute the programs and compare their outputs to see if they are the same.
        {if (execJavaTest().resultJava)                                          // Execute the corresponding Java test
@@ -4425,7 +4424,7 @@ StuckSML(maxSize:4 size:1)
         coverageAnalysis                                                        // Used for printing
          (12,
          "BtreePA.java",
-         "BtreeSML.java",
+         "BtreeSFL.java",
          "MemoryLayout.java",
          "MemoryLayoutPA.java",
          "ProgramPA.java",
