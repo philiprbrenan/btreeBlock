@@ -25,7 +25,7 @@ abstract class BtreeSF extends Test                                             
   final static boolean eachStatement = false;                                   // Isolate each statement to get per statement timing
   final static TreeSet<VerilogCode.Range>       ranges = new TreeSet<>();       // Record ranges in each project
   final static TreeMap<String,String>removableMemories = new TreeMap<>();       // Record memories that can be removed from each project as theya re not used
-
+  final String     processTechnology = "gf12lp";                                // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -2480,7 +2480,7 @@ if __name__ == "__main__":
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/nano9k/$project.v')            # Define list of source files
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.sdc') # Define list of source files
     chip.clock('clock', period=100)                                             # Define clock speed of design
-    chip.use(skywater130_demo)                                                  # Load predefined technology and flow target
+    chip.use($processTechnology)                                                # Load predefined technology and flow target
     chip.set('option', 'remote', False)                                         # Run remote in the cloud
     chip.run()                                                                  # Run compilation of design and target
     chip.summary()
@@ -2573,6 +2573,7 @@ create_clock -name clock -period 100 [get_ports {clock}]
       s = s.replace("$found_at",         ""+found.at);
       s = s.replace("$format",           ""+memoryPrintFormat());
       s = s.replace("$initialize_opCodeMap","initialize_"+opCodeMap);           // Initialize op code map
+      s = s.replace("$processTechnology",   processTechnology);                 // Process technology used for building chips
 
       return s;
      }
