@@ -4270,7 +4270,7 @@ StuckSML(maxSize:2 size:2)
 """);
 
     final Layout                    L = new Layout();
-    final Layout.Variable   index = L.variable("index", 8);
+    final Layout.Variable   index = L.variable("index", 2);
     final Layout.Bit    branchBit = L.bit("branchBit");
     final Layout.Bit      leafBit = L.bit("leafBit");
     final Layout.Structure struct = L.structure("struct", index, branchBit, leafBit);
@@ -4291,16 +4291,16 @@ StuckSML(maxSize:2 size:2)
 StuckSML(maxSize:2 size:1)
   0 key:2 data:2
 """);
-    //stop(M);
 
+    //stop(M);
     ok(""+M, """
 MemoryLayout: M
 Memory      : M
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        10                                      struct
-   2 V        0         8                                  2     index
-   3 B        8         1                                  0     branchBit
-   4 B        9         1                                  1     leafBit
+   1 S        0         4                                      struct
+   2 V        0         2                                  2     index
+   3 B        2         1                                  0     branchBit
+   4 B        3         1                                  1     leafBit
 """);
 
     n.loadRootStuck(l);
@@ -4322,10 +4322,10 @@ StuckSML(maxSize:4 size:1)
 """);
 
     n.saveRootStuck(l);
-    t.T.setIntInstruction(t.index, 1);
-    n.saveStuck(l, t.index);
-    t.T.setIntInstruction(t.index, 2);
-    n.saveStuck(b, t.index);
+    t.T.setIntInstruction(t.memoryIn, 1);
+    n.saveStuck(l, t.memoryIn);
+    t.T.setIntInstruction(t.memoryIn, 2);
+    n.saveStuck(b, t.memoryIn);
     t.P.run(); t.P.clear();
 
     l.M.zero(); b.M.zero();
@@ -4338,10 +4338,10 @@ StuckSML(maxSize:2 size:0)
 StuckSML(maxSize:4 size:0)
 """);
 
-    t.T.setIntInstruction(t.index, 1);
-    n.loadStuck(l, t.index);
-    t.T.setIntInstruction(t.index, 2);
-    n.loadStuck(b, t.index);
+    t.T.setIntInstruction(t.memoryOut, 1);
+    n.loadStuck(l, t.memoryOut);
+    t.T.setIntInstruction(t.memoryOut, 2);
+    n.loadStuck(b, t.memoryOut);
     t.P.run(); t.P.clear();
 
     //stop(l);
@@ -4409,9 +4409,10 @@ StuckSML(maxSize:4 size:1)
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_verilogDelete();
-    test_verilogFind();
-    test_verilogPut();
+    //test_node();
+    //test_verilogDelete();
+    //test_verilogFind();
+    //test_verilogPut();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
