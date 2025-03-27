@@ -2206,7 +2206,7 @@ endmodule
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
 (* keep_hierarchy = "yes" *)
-module find(button1, stop, clock, Key, Data, data, found, led);                 // Database on a chip
+module $project(button1, stop, clock, Key, Data, data, found, led);             // Database on a chip
   input                     button1;                                            // Restart the program run sequence when this button is pushed
   input                     clock;                                              // Program counter clock
   input  [$bitsPerKey-1:0]  Key;                                                // Input key
@@ -2348,7 +2348,7 @@ endmodule
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-03-21
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
-module find_tb;                                                                 // Test bench for database on a chip
+module $project_tb;                                                             // Test bench for database on a chip
   reg                 button1;                                                  // Restart the program run sequence when this button is pushed
   reg                   clock;                                                  // Program counter clock
   reg [$bitsPerKey-1:0]   Key;                                                  // Input key
