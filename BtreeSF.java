@@ -25,7 +25,8 @@ abstract class BtreeSF extends Test                                             
   final static boolean eachStatement = false;                                   // Isolate each statement to get per statement timing
   final static TreeSet<VerilogCode.Range>       ranges = new TreeSet<>();       // Record ranges in each project
   final static TreeMap<String,String>removableMemories = new TreeMap<>();       // Record memories that can be removed from each project as theya re not used
-  final String     processTechnology = "gf12lp";                                // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
+//final String     processTechnology = "gf12lp";                                // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
+  final String     processTechnology = "freepdk45";                             // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -2473,7 +2474,7 @@ system(qq(openFPGALoader -c $cable   $bits));
 #!/usr/bin/env python3
 
 from siliconcompiler import Chip                                                # import python package
-from siliconcompiler.targets import skywater130_demo
+from siliconcompiler.targets import $processTechnology_demo
 
 if __name__ == "__main__":
     chip = Chip('find')                                                         # Create chip object
