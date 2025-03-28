@@ -46,13 +46,17 @@ components of [Database on a Chip](http://prb.appaapps.com/zesal/pitchdeck/pitch
 Open Road successfully compiles the ``find``, ``delete`` and ``put`` operations
 onto [freepdk-45nm](https://github.com/mflowgen/freepdk-45nm) [Silicon](https://en.wikipedia.org/wiki/Silicon) .  The following images show the layout of [Silicon](https://en.wikipedia.org/wiki/Silicon) for each operation:
 
-
- ![put   ](https://github.com/philiprbrenan/btreeBlock/blob/main/siliconCompiler/build/put/put.png),
+### Delete
 
  ![delete](https://github.com/philiprbrenan/btreeBlock/blob/main/siliconCompiler/build/delete/delete.png),
 
+### Find
+
  ![find  ](https://github.com/philiprbrenan/btreeBlock/blob/main/siliconCompiler/build/find/find.png).
 
+### Put
+
+ ![put   ](https://github.com/philiprbrenan/btreeBlock/blob/main/siliconCompiler/build/put/put.png),
 
 ## Gowin Tang Nano 9K
 
