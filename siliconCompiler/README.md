@@ -2,10 +2,9 @@
 
 Install Open Road Flow scripts as described on: https://openroad.readthedocs.io/en/latest/
 
-Change to folder: `btreeBlock/verilog/put/1/siliconCompiler/```
+Change to [folder](https://en.wikipedia.org/wiki/File_folder): `btreeBlock/verilog/put/1/siliconCompiler/```
 
 Run:
 
-```
-perl put.pl
+``` [Perl](http://www.perl.org/) put.pl
 ```
