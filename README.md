@@ -26,20 +26,36 @@ generate a [code](https://en.wikipedia.org/wiki/Computer_program) in [Verilog](h
 was compacted by reusing identical instructions and pipelined to reduce
 congestion. ![Roadmap](flowChart/DevelopmentFlowChart.png)
 
-The resulting [code](https://en.wikipedia.org/wiki/Computer_program) can be run on an [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array), see:
-
-![Nano 9k](https://github.com/philiprbrenan/btreeBlock/blob/main/images/first_light_doc_nano9K.jpg)
-
 # Synthesis, Placement and Routing
+
+## Vivado
 
 The logs of the successful synthesis, placement and routing of the individual
 components of [Database on a Chip](http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html) using [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) targeting an [Advanced Micro Devices XC7A50T0](https://www.amd.com/en/products/adaptive-socs-and-fpgas/fpga/artix-7.html#product-table) [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array) can be seen here:
 
+ [delete](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/delete/vivado/reports),
+
  [find  ](https://github.com/philiprbrenan/btreeBlock/tree/main/verilog/find/vivado/reports),
 
- [put   ](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/put/vivado/reports),
+ [put   ](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/put/vivado/reports).
 
- [delete](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/delete/vivado/reports).
+
+## OpenRoad
+
+Open Road successfully compiles the ``find``, ``delete`` and ``put`` operations
+onto freepdk [Silicon](https://en.wikipedia.org/wiki/Silicon). 
+ [put   ](https://github.com/philiprbrenan/btreeBlock/blob/main/siliconCompiler/build/put/put.png),
+
+ [delete](https://github.com/philiprbrenan/btreeBlock/blob/main/siliconCompiler/build/delete/delete.png),
+
+ [find  ](https://github.com/philiprbrenan/btreeBlock/blob/main/siliconCompiler/build/find/find.png).
+
+
+## Gowin Tang Nano 9K
+
+The ``find`` operation is small enough to be run on a Gowin Tang Nano 9K [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array), see:
+
+![Nano 9k](https://github.com/philiprbrenan/btreeBlock/blob/main/images/first_light_doc_nano9K.jpg)
 
 
 # Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) 
