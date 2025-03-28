@@ -2,7 +2,7 @@
 
 The ``Nano 9k`` is just large enough to run ``find``, but it is not big enough to run ``delete`` or ``put``.
 
-Change to [folder](https://en.wikipedia.org/wiki/File_folder): ```/home/phil/btreeBlock/verilog/find/1/nano9k/```
+Change to [folder](https://en.wikipedia.org/wiki/File_folder): ```btreeBlock/verilog/find/1/nano9k/```
 
 Plug the ``Nano 9K`` into a ``USB`` slot.  Observe that the ``LED``s flash.
 
