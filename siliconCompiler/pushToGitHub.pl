@@ -60,6 +60,8 @@ if (0)
 
 @files = map {$$_[1]} @files;                                                   # Local files
 
+push @files, fpe $home, qw(siliconCompiler README md);                          # Read me file is local
+
 say STDERR "Zip gsd files";
 
 for my $s(@files)                                                               # Zip gds files as they are big and zip well
@@ -71,7 +73,7 @@ for my $s(@files)                                                               
   $s = $z;
  }
 
-@files = changedFiles $shaFile, @files if 0;                                    # Changed local files
+@files = changedFiles $shaFile, @files if 1;                                    # Changed local files
 
 if (!@files)                                                                    # No new files
  {say "Everything up to date";
