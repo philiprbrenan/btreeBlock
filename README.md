@@ -47,11 +47,11 @@ Open Road successfully compiles the ``find``, ``delete`` and ``put`` operations
 onto [freepdk-45nm](https://github.com/mflowgen/freepdk-45nm) [Silicon](https://en.wikipedia.org/wiki/Silicon) .  The following images show the layout of [Silicon](https://en.wikipedia.org/wiki/Silicon) for each operation:
 
 
- [put   ](https://github.com/philiprbrenan/btreeBlock/blob/main/siliconCompiler/build/put/put.png),
+ ![put   ](https://github.com/philiprbrenan/btreeBlock/blob/main/siliconCompiler/build/put/put.png),
 
- [delete](https://github.com/philiprbrenan/btreeBlock/blob/main/siliconCompiler/build/delete/delete.png),
+ ![delete](https://github.com/philiprbrenan/btreeBlock/blob/main/siliconCompiler/build/delete/delete.png),
 
- [find  ](https://github.com/philiprbrenan/btreeBlock/blob/main/siliconCompiler/build/find/find.png).
+ ![find  ](https://github.com/philiprbrenan/btreeBlock/blob/main/siliconCompiler/build/find/find.png).
 
 
 ## Gowin Tang Nano 9K
