@@ -9,6 +9,8 @@ package com.AppaApps.Silicon;                                                   
 // Use free in node to hold node number while allocated so that Node knows where to write it back to without being told
 // Set an updated field for when an existing key has its associated data updated by put
 // Start splitting lower down and merge only along split path
+// Separate nano9k gen from silicon compiler gen
+// Try memory operations in parallel in class Node without getting congestion complaints from silicon compiler
 import java.util.*;
 import java.nio.file.*;
 
@@ -2247,31 +2249,10 @@ module $project(button1, stop, clock, Key, Data, data, found, led);             
 
      `include "../includes/initializeMemory.vh"                                 // Load memory
       initialize_opCodeMap();                                                   // Initialize op code map
-//  0 000000  Match left to right away from the power light:
-//  1 100010  The start state 100010 also matches
-//  2 011110
-//  3 011010
-//  4 010110
-//  5 010010
-//  6 001110
-//  7 001010
-//  8 000110
-//  9 000010
-// 10 000000
 
       T[$Key_at +:$Key_width ] <= $Key;                                         // Load test key
       T[$Data_at+:$Data_width] <= $Data;                                        // Load test data
     end
-
-//             4                    |
-//             0                    |
-//             5                    |
-//             6                    |
-//      2             6    7        |
-//      5             6    6.1      |
-//      1             3    8        |
-//      4                  2        |
-//1,2=1  3,4=4  5,6=3  7=8    8,9=2 |
 
     else begin                                                                  // Run
       //$display("%2d  %2d  %2d  KeyP=%2d  KeyM=%2d  %2d  %2d  %b %2d  %b", step, opCodeMap[step], stop, Key, T[113+:5 ], found, data, led, T[     134/*child   */ +: 4], nT);
@@ -2503,9 +2484,10 @@ create_clock -name clock -period 100 [get_ports {clock}]
       initializeMemories();
 
       generateVerilogCode();                                                    // Generate code and test banches for various devices
-      generateVerilogNano9k();
+      generateVerilogNano9k();                                                  // The nano9K code is reused by silicon compiler
       generateVerilogTestBench();
       generateSiliconCompiler();
+
       if (project.equalsIgnoreCase("find"))                                     // Only the find project will fit on the nano 9k
        {generateVerilogTestBenchNano9K();
         generateVerilogConstraintsNano9K();
