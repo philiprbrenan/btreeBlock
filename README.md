@@ -33,6 +33,7 @@ congestion. ![Roadmap](flowChart/DevelopmentFlowChart.png)
 The logs of the successful synthesis, placement and routing of the individual
 components of [Database on a Chip](http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html) using [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) targeting an [Advanced Micro Devices XC7A50T0](https://www.amd.com/en/products/adaptive-socs-and-fpgas/fpga/artix-7.html#product-table) [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array) can be seen here:
 
+
  [delete](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/delete/vivado/reports),
 
  [find  ](https://github.com/philiprbrenan/btreeBlock/tree/main/verilog/find/vivado/reports),
@@ -43,7 +44,9 @@ components of [Database on a Chip](http://prb.appaapps.com/zesal/pitchdeck/pitch
 ## OpenRoad
 
 Open Road successfully compiles the ``find``, ``delete`` and ``put`` operations
-onto freepdk [Silicon](https://en.wikipedia.org/wiki/Silicon). 
+onto [freepdk-45nm](https://github.com/mflowgen/freepdk-45nm) [Silicon](https://en.wikipedia.org/wiki/Silicon) .  The following images show the layout of [Silicon](https://en.wikipedia.org/wiki/Silicon) for each operation:
+
+
  [put   ](https://github.com/philiprbrenan/btreeBlock/blob/main/siliconCompiler/build/put/put.png),
 
  [delete](https://github.com/philiprbrenan/btreeBlock/blob/main/siliconCompiler/build/delete/delete.png),
