@@ -1,4 +1,4 @@
-# Test 2025-03-29 at 23:42:40
+# Test 2025-03-29 at 23:43:39
 
 name: Test
 run-name: btreeBlock
@@ -6,7 +6,7 @@ run-name: btreeBlock
 on:
   push:
     paths:
-      - '**/main.yml'
+      - '**/c.yml'
 jobs:
 
   test:
