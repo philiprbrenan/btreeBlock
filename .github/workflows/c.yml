@@ -1,4 +1,4 @@
-# Test 2025-03-29 at 23:41:11
+# Test 2025-03-29 at 23:42:40
 
 name: Test
 run-name: btreeBlock
@@ -22,6 +22,10 @@ jobs:
       run: |
         sudo apt gcc-riscv64-unknown-elf install libnewlib-dev
 
-    - name: Compile
+    - name: Test
+      run: |
+        gcc -fmax-errors=7 -Wall -Wextra -O0 -g3 -I. -o "stuck_test" /home/phil/btreeBlock/c/stuck_test.c && timeout 10s ./stuck_test
+
+    - name: Asm
       run: |
         cd c; riscv64-unknown-elf-gcc -S stuck.c -I. -I/usr/include/newlib/  -o stuck.asm
