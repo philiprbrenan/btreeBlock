@@ -1,0 +1,27 @@
+# Test 2025-03-29 at 23:41:11
+
+name: Test
+run-name: btreeBlock
+
+on:
+  push:
+    paths:
+      - '**/main.yml'
+jobs:
+
+  test:
+    permissions: write-all
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: 'main'
+
+    - name: Risc V
+      run: |
+        sudo apt gcc-riscv64-unknown-elf install libnewlib-dev
+
+    - name: Compile
+      run: |
+        cd c; riscv64-unknown-elf-gcc -S stuck.c -I. -I/usr/include/newlib/  -o stuck.asm
