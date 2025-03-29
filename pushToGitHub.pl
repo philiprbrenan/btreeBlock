@@ -67,7 +67,7 @@ jobs:
 
     - name: Risc V
       run: |
-        sudo apt gcc-riscv64-unknown-elf install libnewlib-dev
+        sudo apt install gcc-riscv64-unknown-elf libnewlib-dev
 
     - name: Test
       run: |
