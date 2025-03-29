@@ -35,7 +35,7 @@ abstract class Stuck extends Test                                               
   void     assertInNormal  (int i)  {z(); if (i < 0 || i >= size()) stop("Out of normal range",   i, "for size", size());}  // Check that the index would yield a valid element
   void     assertInExtended(int i)  {z(); if (i < 0 || i >  size()) stop("Out of extended range", i, "for size", size());}  // Check that the index would yield a valid element
 
-  class CheckOrder extends Limit                                                // Check that tall he keys are in order,
+  class CheckOrder extends Limit                                                // Check that all the keys are in order,
    {final boolean inOrder;                                                      // Keys are in order
     final int outOfOrder;                                                       // Index of first key out of order
     String name() {return "CheckOrder";}                                        // Name of limit
