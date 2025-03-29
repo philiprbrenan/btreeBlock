@@ -13,7 +13,7 @@ use feature qw(say current_sub);
 
 my $homeC   = q(/home/phil/btreeBlock/c/);                                      # Home folder for C code
 my $home    = q(/home/phil/btreeBlock/);                                        # Home folder
-my $md5File = q(/home/phil/btreeBlock/.shaSums);                                # Sha file sums for each known file to detect changes
+my $md5File = qq($homeC.shaSums);                                               # Sha file sums for each known file to detect changes
 my $user    = q(philiprbrenan);                                                 # User
 my $repo    = q(btreeBlock);                                                    # Repo
 my $wf      = q(.github/workflows/c.yml);                                       # Work flow on Ubuntu
