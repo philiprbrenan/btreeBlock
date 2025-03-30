@@ -2,10 +2,47 @@
 // Stuck tests.
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
 //------------------------------------------------------------------------------
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "stuck.c"
 
 int stuck_tests_passed = 0;
 int stuck_tests_failed = 0;
+
+//D1 Print                                                                      // Print a stuck
+
+char *stuck_print(Stuck *s)                                                     // Print a stuck
+ {char *C = malloc(4096), *c = C;
+  int N = stuck_size(s);
+  c += sprintf(c, "Stuck(maxSize:%d, size:%d)\n", stuck_maxSize, N);
+  for (int i = 0; i < N; i++)                                                   // Search
+   {c += sprintf(c, "  %2d key: %2d data:%2d\n", i, stuck_key(s, i), stuck_data(s, i));
+   }
+  *c = 0;
+  return C;
+ }
+
+void stuck_print_err(Stuck *s)                                                  // Print a stuck on stderr
+ {fprintf(stderr, "%s", stuck_print(s));
+ }
+
+char *stuck_print_result(stuck_Result r)                                        // Print the result of a stuck operation
+ {char *C = malloc(4096), *c = C;
+  c += sprintf(c, "search: %d\n", r.search);
+  c += sprintf(c, " found: %d\n", r.found);
+  c += sprintf(c, " index: %d\n", r.index);
+  c += sprintf(c, "   key: %d\n", r.key);
+  c += sprintf(c, "  data: %d\n", r.data);
+  *c = 0;
+  return C;
+ }
+
+void stuck_print_result_err(stuck_Result r)                                     // Print the result of a stuck operation
+ {fprintf(stderr, "%s", stuck_print_result(r));
+ }
+
+//D1 Tests                                                                      // Testing
 
 void stuck_ok(char *name, char *g, char *e)                                     // Test got versus expected
  {int c = strcmp(g, e);
