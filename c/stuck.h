@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------------
-// Stuck
+// Stuck definition
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
 //------------------------------------------------------------------------------
-#ifndef maxSize
+#ifndef [stuck_maxSize
   #define stuck_maxSize 20                                                      // The maximum number of entries in the stuck.
 #endif
 
@@ -15,7 +15,7 @@
 #endif
 
 typedef struct                                                                  // Definition of a stuck
- {stuck_keyType  keys[stuck_maxSize];                                           // Keys
+ {int currentSize;                                                              // Current size of the stuck
+  stuck_keyType  keys[stuck_maxSize];                                           // Keys
   stuck_dataType data[stuck_maxSize];                                           // Data
-  int currentSize;                                                              // Current size of the stuck
  } Stuck;
