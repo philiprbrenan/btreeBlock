@@ -66,6 +66,8 @@ jobs:
       with:
         ref: 'main'
 
+    - uses: philiprbrenan/AppaAppa_dtt_v1\@main
+
     - name: Risc V
       run: |
         sudo apt install gcc-riscv64-unknown-elf libnewlib-dev
