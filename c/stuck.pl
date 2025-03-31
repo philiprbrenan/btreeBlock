@@ -7,7 +7,6 @@ use v5.38;
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
-use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
 
 sub translate($name, $maxSize, $key, $data)                                     # Translate a generalized stuck into a leaf or a branch stuck
@@ -25,7 +24,7 @@ sub translate($name, $maxSize, $key, $data)                                     
 
   my $c = owf(fpe($name, q(c)), $s);
 
-  my $m = owf(fpe(qw(zzz c)), <<END);
+  my $m = owf(fpe(qw(zzz c)), <<END);                                           # Test the code
 #include "$c"
 int main() {return ${name}_tests();}
 END
