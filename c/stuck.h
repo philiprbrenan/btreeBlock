@@ -2,7 +2,7 @@
 // Stuck definition
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
 //------------------------------------------------------------------------------
-#ifndef [stuck_maxSize
+#ifndef stuck_maxSize
   #define stuck_maxSize 20                                                      // The maximum number of entries in the stuck.
 #endif
 
