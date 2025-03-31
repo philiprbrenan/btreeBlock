@@ -1,4 +1,4 @@
-# Test 2025-03-31 at 02:44:44
+# Test 2025-03-31 at 03:05:34
 
 name: Test
 run-name: btreeBlock
@@ -17,6 +17,8 @@ jobs:
     - uses: actions/checkout@v4
       with:
         ref: 'main'
+
+    - uses: philiprbrenan/AppaAppa_dtt_v1@main
 
     - name: Risc V
       run: |
