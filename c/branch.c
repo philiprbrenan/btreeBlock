@@ -422,9 +422,8 @@ void branch_test_set_element_at()
 "   3 key:  8 data: 4\n"
 );
  }
-#include <unistd.h>
 
-int main()                                                                      // Tests
+int branch_tests()                                                               // Tests
  {branch_test_push();
   branch_test_pop();
   branch_test_shift();
@@ -445,6 +444,5 @@ int main()                                                                      
     else if (          f > 0) {printf("FAILed %d, passed %d tests out of %d\n", f, p, n); return f;}
     else                      {printf("No tests run\n");                                  return 1;}
    }
-  _exit(0);
   return  0;
  }
