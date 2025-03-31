@@ -66,7 +66,10 @@ jobs:
       with:
         ref: 'main'
 
-    - uses: philiprbrenan/AppaAppa_dtt_v1\@main
+    -name Install C and dtt
+      run: |
+         sudo apt install build-essential
+         sudo cpan install -T Data::Table::Text GitHub::Crud
 
     - name: Risc V
       run: |
