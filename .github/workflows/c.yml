@@ -1,4 +1,4 @@
-# Test 2025-03-31 at 03:15:51
+# Test 2025-03-31 at 03:16:19
 
 name: Test
 run-name: btreeBlock
@@ -18,7 +18,7 @@ jobs:
       with:
         ref: 'main'
 
-    -name: Install C and dtt
+    - name: Install C and dtt
       run: |
          sudo apt install build-essential
          sudo cpan install -T Data::Table::Text GitHub::Crud
