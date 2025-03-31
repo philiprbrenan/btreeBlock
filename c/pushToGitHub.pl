@@ -66,7 +66,7 @@ jobs:
       with:
         ref: 'main'
 
-    -name Install C and dtt
+    -name: Install C and dtt
       run: |
          sudo apt install build-essential
          sudo cpan install -T Data::Table::Text GitHub::Crud
