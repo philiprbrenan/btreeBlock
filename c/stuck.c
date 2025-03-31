@@ -213,7 +213,7 @@ int stuck_tests_failed = 0;
 //D1 Print                                                                      // Print a stuck
 
 char *stuck_print(Stuck *s)                                                     // Print a stuck
- {char *C = malloc(4096), *c = C;
+ {char *C = (char *)malloc(4096), *c = C;
   int N = stuck_size(s);
   c += sprintf(c, "Stuck(maxSize:%d, size:%d)\n", stuck_maxSize, N);
   for (int i = 0; i < N; i++)                                                   // Search
