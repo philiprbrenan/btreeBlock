@@ -23,9 +23,15 @@ sub translate($name, $maxSize, $key, $data)                                     
 
   $s =~ s((Leaf.maxSize:)\d+)            ($1$maxSize)g;                         # Tests
 
-  owf(fpe($name, q(c)), $s);
-  system("gcc -fmax-errors=7 -Wall -Wextra -O0 -g3 -I. -o $name $name.c && timeout 10s ./$name");
-  unlink $name;
+  my $c = owf(fpe($name, q(c)), $s);
+
+  my $m = owf(fpe(qw(zzz c)), <<END);
+#include "$c"
+int main() {return ${name}_tests();}
+END
+
+  system("gcc -fmax-errors=7 -Wall -Wextra -O0 -g3 -I. -o $name $m && timeout 10s ./$name");
+  unlink $name, $m;
  }
 
 translate(qw(leaf),   8, q(int), q(char));
