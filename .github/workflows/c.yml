@@ -1,4 +1,4 @@
-# Test 2025-03-31 at 02:27:59
+# Test 2025-03-31 at 02:44:44
 
 name: Test
 run-name: btreeBlock
@@ -24,8 +24,8 @@ jobs:
 
     - name: Test
       run: |
-        #cd c; gcc -fmax-errors=7 -Wall -Wextra -O0 -g3 -I. -o "stuck_test" stuck_test.c && timeout 10s ./stuck_test
+        cd c; perl stuck.pl
 
     - name: Asm
       run: |
-        #cd c; riscv64-unknown-elf-gcc -S -I. -I/usr/include/newlib/  -o stuck.asm stuck.c
+        cd c; riscv64-unknown-elf-gcc -S -I. -I/usr/include/newlib/  -o stuck.asm stuck.c
