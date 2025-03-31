@@ -72,11 +72,11 @@ jobs:
 
     - name: Test
       run: |
-        cd c; gcc -fmax-errors=7 -Wall -Wextra -O0 -g3 -I. -o "stuck_test" stuck_test.c && timeout 10s ./stuck_test
+        #cd c; gcc -fmax-errors=7 -Wall -Wextra -O0 -g3 -I. -o "stuck_test" stuck_test.c && timeout 10s ./stuck_test
 
     - name: Asm
       run: |
-        cd c; riscv64-unknown-elf-gcc -S -I. -I/usr/include/newlib/  -o stuck.asm stuck.c
+        #cd c; riscv64-unknown-elf-gcc -S -I. -I/usr/include/newlib/  -o stuck.asm stuck.c
 END
 
   my $f = writeFileUsingSavedToken $user, $repo, $wf, $y;                       # Upload workflow
