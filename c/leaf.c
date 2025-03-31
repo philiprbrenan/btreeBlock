@@ -422,9 +422,8 @@ void leaf_test_set_element_at()
 "   3 key:  8 data: 4\n"
 );
  }
-#include <unistd.h>
 
-int main()                                                                      // Tests
+int leaf_tests()                                                               // Tests
  {leaf_test_push();
   leaf_test_pop();
   leaf_test_shift();
@@ -445,6 +444,5 @@ int main()                                                                      
     else if (          f > 0) {printf("FAILed %d, passed %d tests out of %d\n", f, p, n); return f;}
     else                      {printf("No tests run\n");                                  return 1;}
    }
-  _exit(0);
   return  0;
  }
