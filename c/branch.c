@@ -12,6 +12,10 @@
 #define branch_dataType int                                                      // The type of a data item in a stuck
 #endif
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 typedef struct                                                                  // Definition of a stuck
  {int currentSize;                                                              // Current size of the stuck
   branch_keyType  keys[branch_maxSize];                                           // Keys
@@ -214,9 +218,6 @@ Branch_Result branch_searchFirstGreaterThanOrEqualExceptLast(Branch *s, int Sear
  }
 
 // Tests
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 int branch_tests_passed = 0;
 int branch_tests_failed = 0;
@@ -254,6 +255,8 @@ void branch_print_result_err(Branch_Result r)                                   
  }
 
 //D1 Tests                                                                      // Testing
+
+#ifdef branch_runTests
 
 void branch_ok(const char *name, const char *g, const char *e)                   // Test got versus expected
  {int c = strcmp(g, e);
@@ -457,3 +460,4 @@ int branch_tests()                                                              
    }
   return  0;
  }
+#endif
