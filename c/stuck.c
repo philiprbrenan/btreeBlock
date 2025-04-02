@@ -2,9 +2,15 @@
 // Stuck
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
 //------------------------------------------------------------------------------
+#ifndef stuck_maxSize
 #define stuck_maxSize  20                                                       // The maximum number of entries in the stuck.
+#endif
+#ifndef stuck_keyType
 #define stuck_keyType  int                                                      // The type of a key
+#endif
+#ifndef stuck_dataType
 #define stuck_dataType int                                                      // The type of a data item in a stuck
+#endif
 
 typedef struct                                                                  // Definition of a stuck
  {int currentSize;                                                              // Current size of the stuck
@@ -13,6 +19,7 @@ typedef struct                                                                  
  } Stuck;
 
 int stuck_size   (Stuck *s) {return s->currentSize;}                            // The current number of key elements in the stuck
+int stuck_size1  (Stuck *s) {return s->currentSize-1;}                          // The current number of key elements in the stuck minus one whichmakes it suitable for describing a branch
 int stuck_isFull (Stuck *s) {return stuck_size(s) > stuck_maxSize;}             // Check the stuck is full
 int stuck_isEmpty(Stuck *s) {return stuck_size(s) == 0;}                        // Check the stuck is empty
 
@@ -189,7 +196,8 @@ Stuck_Result stuck_searchFirstGreaterThanOrEqual(Stuck *s, int Search)
 Stuck_Result stuck_searchFirstGreaterThanOrEqualExceptLast(Stuck *s, int Search)
  {Stuck_Result r = stuck_result();
   r.search = Search;
-  for (int i = 0, j = stuck_size(s)-1; i < j; i++)
+  int L = stuck_size(s)-1;
+  for (int i = 0, j = L; i < j; i++)
    {if (stuck_key(s, i) >= Search)
      {r.found = 1;
       r.index = i;
@@ -198,7 +206,10 @@ Stuck_Result stuck_searchFirstGreaterThanOrEqualExceptLast(Stuck *s, int Search)
       return r;
      }
    }
-  r.found = 0;
+  r.found = 1;
+  r.index = L;
+  r.key   = 0;
+  r.data  = stuck_data(s, L);
   return r;
  }
 
@@ -228,7 +239,7 @@ void stuck_print_err(Stuck *s)                                                  
  }
 
 char *stuck_print_result(Stuck_Result r)                                        // Print the result of a stuck operation
- {char *C = malloc(4096), *c = C;
+ {char *C = (char *)malloc(4096), *c = C;
   c += sprintf(c, "search: %d\n", r.search);
   c += sprintf(c, " found: %d\n", r.found);
   c += sprintf(c, " index: %d\n", r.index);
@@ -244,7 +255,7 @@ void stuck_print_result_err(Stuck_Result r)                                     
 
 //D1 Tests                                                                      // Testing
 
-void stuck_ok(char *name, char *g, char *e)                                     // Test got versus expected
+void stuck_ok(const char *name, const char *g, const char *e)                   // Test got versus expected
  {int c = strcmp(g, e);
   if (c == 0)
    {++stuck_tests_passed;
@@ -254,7 +265,7 @@ void stuck_ok(char *name, char *g, char *e)                                     
   printf("Test: %s failed\n", name);
  }
 
-void stuck_check_result_field(char *format, int got, int expected)
+void stuck_check_result_field(const char *format, int got, int expected)
  {if (expected >= 0 && got != expected)
    {stuck_tests_failed++;
     printf(format, got, expected);
@@ -275,7 +286,7 @@ void stuck_check_result(Stuck_Result r , int Search, int Found, int Index, int K
 //D0 Tests                                                                      // Test stuck
 
 Stuck *stuck_test_load()
- {Stuck *s = calloc(sizeof(Stuck), 1);
+ {Stuck *s = (Stuck *)calloc(sizeof(Stuck), 1);
 
   stuck_push(s, 2, 1);
   stuck_push(s, 4, 2);
@@ -404,7 +415,7 @@ void stuck_test_search_first_greater_than_or_equal_except_last()
  {Stuck *t = stuck_test_load();
   Stuck_Result s = stuck_searchFirstGreaterThanOrEqualExceptLast(t, 7);
   //stuck_print_result_err(s);
-  stuck_check_result(s, 7,0,0,0,0);
+  stuck_check_result(s, 7,1,3,0,4);
   Stuck_Result S = stuck_searchFirstGreaterThanOrEqualExceptLast(t, 5);
   //stuck_print_result_err(S);
   stuck_check_result(S, 5,1,2,6,3);
