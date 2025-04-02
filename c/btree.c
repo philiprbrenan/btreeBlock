@@ -619,6 +619,8 @@ void print_find_result(Find_Result r)                                           
       r.leaf, r.found, r.index, r.key, r.data);
  }
 
+Find_Result find(int Key) __attribute__((noinline));                            // Find the data associated with a key in the tree
+
 Find_Result find(int Key)                                                       // Find the data associated with a key in the tree
  {if (rootIsLeaf())                                                             // The root is a leaf
    {Leaf_Result f = leaf_search(leaf(0), Key);
@@ -685,6 +687,8 @@ FindAndInsert_Result findAndInsert(int Key, int Data)                           
  }
 
 //D1 Insertion                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
+
+void put(int Key, int Data) __attribute__((noinline));                          // Insert a key, data pair into the tree or update and existing key with a new datum
 
 void put(int Key, int Data)                                                     // Insert a key, data pair into the tree or update and existing key with a new datum
  {FindAndInsert_Result f = findAndInsert(Key, Data);                            // Try direct insertion with no modifications to the shape of the tree
@@ -754,6 +758,8 @@ FindAndDelete_Result findAndDelete(int Key)                                     
   leaf_removeElementAt(leaf(l), i);                                             // Remove the key, data pair from the leaf
   return findAndDelete_result(f, 1, kd.data);
  }
+
+FindAndDelete_Result delete(int Key)  __attribute__((noinline));                // Insert a key, data pair into the tree or update and existing key with a new datum
 
 FindAndDelete_Result delete(int Key)                                            // Insert a key, data pair into the tree or update and existing key with a new datum
  {mergeRoot();
@@ -911,7 +917,7 @@ void test_put_random_small()
   ok("test_put_random_small", g, e);
  }
 
-int tests()                                                                    // Tests
+int tests()                                                                     // Tests
  {test_put_ascending();
   test_put_descending();
   test_put_random_small();
