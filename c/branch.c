@@ -2,9 +2,15 @@
 // Branch
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
 //------------------------------------------------------------------------------
+#ifndef branch_maxSize
 #define branch_maxSize  20                                                       // The maximum number of entries in the stuck.
+#endif
+#ifndef branch_keyType
 #define branch_keyType  int                                                      // The type of a key
+#endif
+#ifndef branch_dataType
 #define branch_dataType int                                                      // The type of a data item in a stuck
+#endif
 
 typedef struct                                                                  // Definition of a stuck
  {int currentSize;                                                              // Current size of the stuck
@@ -13,6 +19,7 @@ typedef struct                                                                  
  } Branch;
 
 int branch_size   (Branch *s) {return s->currentSize;}                            // The current number of key elements in the stuck
+int branch_size1  (Branch *s) {return s->currentSize-1;}                          // The current number of key elements in the stuck minus one whichmakes it suitable for describing a branch
 int branch_isFull (Branch *s) {return branch_size(s) > branch_maxSize;}             // Check the stuck is full
 int branch_isEmpty(Branch *s) {return branch_size(s) == 0;}                        // Check the stuck is empty
 
@@ -189,7 +196,8 @@ Branch_Result branch_searchFirstGreaterThanOrEqual(Branch *s, int Search)
 Branch_Result branch_searchFirstGreaterThanOrEqualExceptLast(Branch *s, int Search)
  {Branch_Result r = branch_result();
   r.search = Search;
-  for (int i = 0, j = branch_size(s)-1; i < j; i++)
+  int L = branch_size(s)-1;
+  for (int i = 0, j = L; i < j; i++)
    {if (branch_key(s, i) >= Search)
      {r.found = 1;
       r.index = i;
@@ -198,7 +206,10 @@ Branch_Result branch_searchFirstGreaterThanOrEqualExceptLast(Branch *s, int Sear
       return r;
      }
    }
-  r.found = 0;
+  r.found = 1;
+  r.index = L;
+  r.key   = 0;
+  r.data  = branch_data(s, L);
   return r;
  }
 
@@ -213,7 +224,7 @@ int branch_tests_failed = 0;
 //D1 Print                                                                      // Print a stuck
 
 char *branch_print(Branch *s)                                                     // Print a stuck
- {char *C = malloc(4096), *c = C;
+ {char *C = (char *)malloc(4096), *c = C;
   int N = branch_size(s);
   c += sprintf(c, "Branch(maxSize:%d, size:%d)\n", branch_maxSize, N);
   for (int i = 0; i < N; i++)                                                   // Search
@@ -228,7 +239,7 @@ void branch_print_err(Branch *s)                                                
  }
 
 char *branch_print_result(Branch_Result r)                                        // Print the result of a stuck operation
- {char *C = malloc(4096), *c = C;
+ {char *C = (char *)malloc(4096), *c = C;
   c += sprintf(c, "search: %d\n", r.search);
   c += sprintf(c, " found: %d\n", r.found);
   c += sprintf(c, " index: %d\n", r.index);
@@ -244,7 +255,7 @@ void branch_print_result_err(Branch_Result r)                                   
 
 //D1 Tests                                                                      // Testing
 
-void branch_ok(char *name, char *g, char *e)                                     // Test got versus expected
+void branch_ok(const char *name, const char *g, const char *e)                   // Test got versus expected
  {int c = strcmp(g, e);
   if (c == 0)
    {++branch_tests_passed;
@@ -254,7 +265,7 @@ void branch_ok(char *name, char *g, char *e)                                    
   printf("Test: %s failed\n", name);
  }
 
-void branch_check_result_field(char *format, int got, int expected)
+void branch_check_result_field(const char *format, int got, int expected)
  {if (expected >= 0 && got != expected)
    {branch_tests_failed++;
     printf(format, got, expected);
@@ -275,7 +286,7 @@ void branch_check_result(Branch_Result r , int Search, int Found, int Index, int
 //D0 Tests                                                                      // Test stuck
 
 Branch *branch_test_load()
- {Branch *s = calloc(sizeof(Branch), 1);
+ {Branch *s = (Branch *)calloc(sizeof(Branch), 1);
 
   branch_push(s, 2, 1);
   branch_push(s, 4, 2);
@@ -404,7 +415,7 @@ void branch_test_search_first_greater_than_or_equal_except_last()
  {Branch *t = branch_test_load();
   Branch_Result s = branch_searchFirstGreaterThanOrEqualExceptLast(t, 7);
   //branch_print_result_err(s);
-  branch_check_result(s, 7,0,0,0,0);
+  branch_check_result(s, 7,1,3,0,4);
   Branch_Result S = branch_searchFirstGreaterThanOrEqualExceptLast(t, 5);
   //branch_print_result_err(S);
   branch_check_result(S, 5,1,2,6,3);
