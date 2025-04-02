@@ -12,6 +12,10 @@
 #define stuck_dataType int                                                      // The type of a data item in a stuck
 #endif
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 typedef struct                                                                  // Definition of a stuck
  {int currentSize;                                                              // Current size of the stuck
   stuck_keyType  keys[stuck_maxSize];                                           // Keys
@@ -214,9 +218,6 @@ Stuck_Result stuck_searchFirstGreaterThanOrEqualExceptLast(Stuck *s, int Search)
  }
 
 // Tests
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 int stuck_tests_passed = 0;
 int stuck_tests_failed = 0;
@@ -254,6 +255,8 @@ void stuck_print_result_err(Stuck_Result r)                                     
  }
 
 //D1 Tests                                                                      // Testing
+
+#ifdef stuck_runTests
 
 void stuck_ok(const char *name, const char *g, const char *e)                   // Test got versus expected
  {int c = strcmp(g, e);
@@ -457,3 +460,4 @@ int stuck_tests()                                                               
    }
   return  0;
  }
+#endif
