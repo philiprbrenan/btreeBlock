@@ -12,6 +12,10 @@
 #define leaf_dataType char                                                      // The type of a data item in a stuck
 #endif
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 typedef struct                                                                  // Definition of a stuck
  {int currentSize;                                                              // Current size of the stuck
   leaf_keyType  keys[leaf_maxSize];                                           // Keys
@@ -214,9 +218,6 @@ Leaf_Result leaf_searchFirstGreaterThanOrEqualExceptLast(Leaf *s, int Search)
  }
 
 // Tests
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 int leaf_tests_passed = 0;
 int leaf_tests_failed = 0;
@@ -254,6 +255,8 @@ void leaf_print_result_err(Leaf_Result r)                                     //
  }
 
 //D1 Tests                                                                      // Testing
+
+#ifdef leaf_runTests
 
 void leaf_ok(const char *name, const char *g, const char *e)                   // Test got versus expected
  {int c = strcmp(g, e);
@@ -457,3 +460,4 @@ int leaf_tests()                                                               /
    }
   return  0;
  }
+#endif
