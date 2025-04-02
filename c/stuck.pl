@@ -25,6 +25,8 @@ sub translate($name, $maxSize, $key, $data)                                     
   my $c = owf(fpe($name, q(c)), $s);
 
   my $m = owf(fpe(qw(zzz c)), <<END);                                           # Test the code
+
+#define ${name}_runTests
 #include "$c"
 int main() {return ${name}_tests();}
 END
