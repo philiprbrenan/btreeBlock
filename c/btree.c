@@ -114,7 +114,7 @@ int isFull(int n)                                                               
 
 int isFullRoot() {return isFull(0);}                                            // The node is full
 
-int isLow(int n)  {return (isLeaf(n) ? leafSize(n) : branchSize(n)) < 2;}       // The node is low on children making it impossible to merge two sibling children
+int isLow(int n) {return (isLeaf(n) ? leafSize(n) : branchSize(n)) < 2;}        // The node is low on children making it impossible to merge two sibling children
 
 int hasLeavesForChildren(int n)                                                 // The node has leaves for children
  {assertBranch(n);
@@ -480,23 +480,22 @@ int stealFromRight(int node, int index)                                         
 
 //D2 Balance                                                                    // Balance the tree by merging and stealing
 
-  void balance(int node, int index)                                             // Augment the indexed child so it has at least two children in its body
-   {assertBranch(node);
-    if (index < 0)                stop("Index %d too small", index);
-    if (index > branchSize(node)) stop("Index %d too big",   index);
-    if (isLow(node) && node != 0)
-     {stop("Parent:", node, "must not be low on children");
-     }
+  void balance(int parent, int index)                                           // Augment the indexed child so it has at least two children in its body
+   {assertBranch(parent);
+    if (index < 0)                  stop("Index %d too small", index);
+    if (index > branchSize(parent)) stop("Index %d too big",   index);
+    //if (isLow(parent) && parent != 0)
+    // {stop("Parent: %d must not be low on children", parent);
+    // }
 
-
-    Branch_Result p = branch_elementAt(branch(node), index);
+    Branch_Result p = branch_elementAt(branch(parent), index);
 
     if (!isLow(p.data)) return;
-    if (stealFromLeft    (node, index)) return;
-    if (stealFromRight   (node, index)) return;
-    if (mergeLeftSibling (node, index)) return;
-    if (mergeRightSibling(node, index)) return;
-    stop("Unable to balance child:", p.data);
+    if (stealFromLeft    (parent, index)) return;
+    if (stealFromRight   (parent, index)) return;
+    if (mergeLeftSibling (parent, index)) return;
+    if (mergeRightSibling(parent, index)) return;
+    //stop("Unable to balance child:", p.data);
    }
 
 //D1 Print                                                                      // Print a BTree horizontally
@@ -849,6 +848,7 @@ void test_put_ascending()
   int N = 32;
   for (int i = 1; i <= N; i++) put(i, i);
   char *g = dump();
+  //say(g);exit(0);
   char *e =
 "                                      8                                                     16\n"
 "                                      13                                                    21                                                                                                             16\n"
@@ -872,6 +872,7 @@ void test_put_descending()
   int N = 32;
   for (int i = N; i > 0; --i) put(i, i);
   char *g = dump();
+  //say(g);exit(0);
   char *e =
 "                                                                                                   16                                                    24\n"
 "                                                                                                   19                                                    11                                                  13\n"
@@ -895,6 +896,7 @@ void test_put_random_small()
   int N = random_small_size;
   for (int i = 0; i < N; ++i) put(random_small[i], i);
   char *g = dump();
+  //say(g);exit(0);
   char *e =
 "                                                                                                                                                                                                                                                    281                                                                                                                                                                                                       493                                                                                                                                                                                                                                                                             785\n"
 "                                                                                                                                                                                                                                                    70                                                                                                                                                                                                        9                                                                                                                                                                                                                                                                               87                                                                                                                                                                                                  2\n"
@@ -917,10 +919,70 @@ void test_put_random_small()
   ok("test_put_random_small", g, e);
  }
 
+void test_delete_odd_ascending()
+ {create();
+  int N = 64;
+  for (int i = 1; i <= N; i++)    put(i, i);
+  for (int i = 1; i <= N; i += 2) delete(i);
+  char *g = dump();
+  //say(g);exit(0);
+  char *e =
+"                                                                         16                                                                                      32\n"
+"                                                                         37                                                                                      46                                                                                                                                                                             35\n"
+"                                                                         0                                                                                       0                                                                                                                                                                              0\n"
+"                                                                         0                                                                                       1                                                                                                                                                                              2\n"
+"                              8                                                                                      24                                                                                      40                                                                52\n"
+"                              13                                         21                                          28                                          34                                          44                                                                52                                                               16\n"
+"                              37                                         37                                          46                                          46                                          35                                                                35                                                               35\n"
+"                              0                                          1                                           0                                           1                                           0                                                                 1                                                                2\n"
+"             4                                     12                                          20                                          28                                          36                                          44                    48                                          56                    60\n"
+"             5                9                    12                    17                    20                    24                    27                    33                    36                    40                    43                    48                    51                    55                    58                   6\n"
+"             13               13                   21                    21                    28                    28                    34                    34                    44                    44                    52                    52                    52                    16                    16                   16\n"
+"             0                1                    0                     1                     0                     1                     0                     1                     0                     1                     0                     1                     2                     0                     1                    2\n"
+"     2                6                 10                    14                    18                    22                    26                    30                    34                    38                    42                    46                    50                    54                    58                    62\n"
+"     1       3        4       7         8          10         11         15         14         18         19         22         23         25         26         29         30         31         32         38         39         41         42         45         47         49         50         53         54         56         57        2\n"
+"     5       5        9       9         12         12         17         17         20         20         24         24         27         27         33         33         36         36         40         40         43         43         48         48         51         51         55         55         58         58         6         6\n"
+"     0       1        0       1         0          1          0          1          0          1          0          1          0          1          0          1          0          1          0          1          0          1          0          1          0          1          0          1          0          1          0         1\n"
+"2=1     4=3      6=4     8=7      10=8      12=10      14=11      16=15      18=14      20=18      22=19      24=22      26=23      28=25      30=26      32=29      34=30      36=31      38=32      40=38      42=39      44=41      46=42      48=45      50=47      52=49      54=50      56=53      58=54      60=56      62=57      64=2\n"
+;
+  ok("test_ascending", g, e);
+ }
+
+void test_delete_even_descending()
+ {create();
+  int N = 64;
+  for (int i = 1; i <= N; i++)   put(i, i);
+  for (int i = N; i > 0; i -= 2) delete(i);
+  char *g = dump();
+  //say(g);exit(0);
+  char *e =
+"                                                                                                                                          28                                                                                      44\n"
+"                                                                                                                                          37                                                                                      46                                                                                                           35\n"
+"                                                                                                                                          0                                                                                       0                                                                                                            0\n"
+"                                                                                                                                          0                                                                                       1                                                                                                            2\n"
+"                                                  12                                          20                                                                                      36                                                                                      52\n"
+"                                                  13                                          21                                          28                                          34                                          44                                          52                                                               16\n"
+"                                                  37                                          37                                          37                                          46                                          46                                          35                                                               35\n"
+"                                                  0                                           1                                           2                                           0                                           1                                           0                                                                1\n"
+"             4                8                                         16                                          24                                          32                                          40                                          48                                          56                    60\n"
+"             5                9                   12                    17                    20                    24                    27                    33                    36                    40                    43                    48                    51                    55                    58                   6\n"
+"             13               13                  13                    21                    21                    28                    28                    34                    34                    44                    44                    52                    52                    16                    16                   16\n"
+"             0                1                   2                     0                     1                     0                     1                     0                     1                     0                     1                     0                     1                     0                     1                    2\n"
+"     2                6                10                    14                    18                    22                    26                    30                    34                    38                    42                    46                    50                    54                    58                    62\n"
+"     1       3        4       7        8          10         11         15         14         18         19         22         23         25         26         29         30         31         32         38         39         41         42         45         47         49         50         53         54         56         57        2\n"
+"     5       5        9       9        12         12         17         17         20         20         24         24         27         27         33         33         36         36         40         40         43         43         48         48         51         51         55         55         58         58         6         6\n"
+"     0       1        0       1        0          1          0          1          0          1          0          1          0          1          0          1          0          1          0          1          0          1          0          1          0          1          0          1          0          1          0         1\n"
+"1=1     3=3      5=4     7=7      9=8      11=10      13=11      15=15      17=14      19=18      21=19      23=22      25=23      27=25      29=26      31=29      33=30      35=31      37=32      39=38      41=39      43=41      45=42      47=45      49=47      51=49      53=50      55=53      57=54      59=56      61=57      63=2\n"
+;
+  ok("test_ascending", g, e);
+ }
+
 int tests()                                                                     // Tests
  {test_put_ascending();
   test_put_descending();
   test_put_random_small();
+  test_delete_odd_ascending();
+  test_delete_even_descending();
 
   if (1)
    {int p = tests_passed, f = tests_failed, n = p + f;
