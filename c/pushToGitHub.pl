@@ -17,7 +17,7 @@ my $md5File = qq($homeC.shaSums);                                               
 my $user    = q(philiprbrenan);                                                 # User
 my $repo    = q(btreeBlock);                                                    # Repo
 my $wf      = q(.github/workflows/c.yml);                                       # Work flow on Ubuntu
-my @ext     = qw(.c .h .md .pl);                                                # Extensions of files to upload to github
+my @ext     = qw(.c .h .java .md .pl);                                          # Extensions of files to upload to github
 
 say STDERR timeStamp,  " push C to github $repo";
 
@@ -85,7 +85,7 @@ jobs:
 
     - name: Asm
       run: |
-        cd c; riscv64-unknown-elf-gcc -S -I. -I/usr/include/newlib/  -o stuck.asm stuck.c
+        cd c; riscv64-unknown-elf-gcc -S -I. -I/usr/include/newlib/  -o btree.asm btree.c
 END
 
   my $f = writeFileUsingSavedToken $user, $repo, $wf, $y;                       # Upload workflow
