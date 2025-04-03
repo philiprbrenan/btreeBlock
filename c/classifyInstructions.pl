@@ -1,6 +1,6 @@
 #!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/                                                                  my $input =
 #-------------------------------------------------------------------------------
-# Classify the instructions in some assembler code
+# Translate RiscV assembler code verion of btree algoritm to java
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2025
 #-------------------------------------------------------------------------------
 use v5.38;
