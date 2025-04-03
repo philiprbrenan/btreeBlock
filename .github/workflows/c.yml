@@ -1,4 +1,4 @@
-# Test 2025-04-02 at 05:11:38
+# Test 2025-04-03 at 05:21:50
 
 name: Test
 run-name: btreeBlock
@@ -37,4 +37,4 @@ jobs:
 
     - name: Asm
       run: |
-        cd c; riscv64-unknown-elf-gcc -S -I. -I/usr/include/newlib/  -o stuck.asm stuck.c
+        cd c; riscv64-unknown-elf-gcc -S -I. -I/usr/include/newlib/  -o btree.asm btree.c
