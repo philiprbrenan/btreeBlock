@@ -22,44 +22,44 @@ typedef struct                                                                  
   branch_dataType data[branch_maxSize];                                           // Data
  } Branch;
 
-int branch_size   (Branch *s) {return s->currentSize;}                            // The current number of key elements in the stuck
-int branch_size1  (Branch *s) {return s->currentSize-1;}                          // The current number of key elements in the stuck minus one whichmakes it suitable for describing a branch
-int branch_isFull (Branch *s) {return branch_size(s) > branch_maxSize;}             // Check the stuck is full
-int branch_isEmpty(Branch *s) {return branch_size(s) == 0;}                        // Check the stuck is empty
+static inline int branch_size   (Branch *s) {return s->currentSize;}                            // The current number of key elements in the stuck
+static inline int branch_size1  (Branch *s) {return s->currentSize-1;}                          // The current number of key elements in the stuck minus one whichmakes it suitable for describing a branch
+static inline int branch_isFull (Branch *s) {return branch_size(s) > branch_maxSize;}             // Check the stuck is full
+static inline int branch_isEmpty(Branch *s) {return branch_size(s) == 0;}                        // Check the stuck is empty
 
 //D1 Memory                                                                     // Actions on memory of stuck
 
 branch_keyType  branch_key (Branch *s, int Index)              {return s->keys[Index];}
 branch_dataType branch_data(Branch *s, int Index)              {return s->data[Index];}
 
-void       branch_setKey  (Branch *s, int Index,  int Value)  {s->keys[Index] = Value;}
-void       branch_setData (Branch *s, int Index,  int Value)  {s->data[Index] = Value;}
-void       branch_copyKey (Branch *s, int Target, int Source) {s->keys[Target] = s->keys[Source];}
-void       branch_copyData(Branch *s, int Target, int Source) {s->data[Target] = s->data[Source];}
+static inline void       branch_setKey  (Branch *s, int Index,  int Value)  {s->keys[Index] = Value;}
+static inline void       branch_setData (Branch *s, int Index,  int Value)  {s->data[Index] = Value;}
+static inline void       branch_copyKey (Branch *s, int Target, int Source) {s->keys[Target] = s->keys[Source];}
+static inline void       branch_copyData(Branch *s, int Target, int Source) {s->data[Target] = s->data[Source];}
 
-void  branch_setKeyData(Branch *s, int Index, int Key, int Data)
+static inline void  branch_setKeyData(Branch *s, int Index, int Key, int Data)
  {branch_setKey (s, Index, Key);
   branch_setData(s, Index, Data);
  }
 
-void branch_copyKeyData(Branch *s, int Target, int Source)
+static inline void branch_copyKeyData(Branch *s, int Target, int Source)
  {branch_copyKey (s, Target, Source);
   branch_copyData(s, Target, Source);
  }
 
 //D1 Actions                                                                    // Place and remove data to/from stuck
 
-void branch_inc  (Branch *s) {s->currentSize++;}                                  // Increment the current size
-void branch_dec  (Branch *s) {s->currentSize--;}                                  // Decrement the current size
-void branch_clear(Branch *s) {s->currentSize = 0;}                                // Clear the stuck
+static inline void branch_inc  (Branch *s) {s->currentSize++;}                                  // Increment the current size
+static inline void branch_dec  (Branch *s) {s->currentSize--;}                                  // Decrement the current size
+static inline void branch_clear(Branch *s) {s->currentSize = 0;}                                // Clear the stuck
 
-void branch_push (Branch *s, int key, int data)                                   // Push an element onto the stuck
+static inline void  branch_push (Branch *s, int key, int data)                                   // Push an element onto the stuck
  {int n = branch_size(s);
   branch_setKeyData(s, n, key, data);
   branch_inc(s);
  }
 
-void branch_unshift(Branch *s, int key, int data)                                 // Unshift an element onto the stuck
+static inline void  branch_unshift(Branch *s, int key, int data)                                 // Unshift an element onto the stuck
  {for (int i = branch_size(s); i > 0; --i)                                       // Shift the stuck up one place
    {branch_copyKeyData(s, i, i-1);
    }
@@ -75,13 +75,13 @@ typedef struct
   branch_dataType data;                                                          // The retrieved data
  } Branch_Result;
 
-Branch_Result branch_result()
+static inline Branch_Result branch_result()
  {Branch_Result r;
   r.search = r.found = r.index = r.key = r.data = 0;
   return r;
  }
 
-Branch_Result branch_pop(Branch *s)
+static inline Branch_Result branch_pop(Branch *s)
  {Branch_Result r = branch_result();
   branch_dec(s);
   r.index = branch_size(s);
@@ -90,7 +90,7 @@ Branch_Result branch_pop(Branch *s)
   return r;
  }
 
-Branch_Result branch_shift(Branch *s)
+static inline Branch_Result branch_shift(Branch *s)
  {Branch_Result r = branch_result();
   r.key   = branch_key (s, 0);
   r.data  = branch_data(s, 0);
@@ -101,7 +101,7 @@ Branch_Result branch_shift(Branch *s)
   return r;
  }
 
-Branch_Result branch_elementAt(Branch *s, int Index)
+static inline Branch_Result branch_elementAt(Branch *s, int Index)
  {Branch_Result r = branch_result();
   r.index = Index;
   r.key   = branch_key (s, Index);
@@ -109,7 +109,7 @@ Branch_Result branch_elementAt(Branch *s, int Index)
   return r;
  }
 
-void branch_setElementAt(Branch *s, int key, int data, int Index)                 // Set an element either in range or one above the current range
+static inline void  branch_setElementAt(Branch *s, int key, int data, int Index)                 // Set an element either in range or one above the current range
  {if (Index == branch_size(s))                                                   // Extended range
    {branch_setKeyData(s, Index, key, data); branch_inc(s);
    }
@@ -118,7 +118,7 @@ void branch_setElementAt(Branch *s, int key, int data, int Index)               
    }
  }
 
-void branch_insertElementAt(Branch *s, int key, int data, int Index)              // Insert an element at the indicated location shifting all the remaining elements up one
+static inline void  branch_insertElementAt(Branch *s, int key, int data, int Index)              // Insert an element at the indicated location shifting all the remaining elements up one
  {for (int i = branch_size(s); i > Index; --i)
    {branch_copyKeyData(s, i, i-1);
    }
@@ -126,7 +126,7 @@ void branch_insertElementAt(Branch *s, int key, int data, int Index)            
   branch_inc(s);
  }
 
-Branch_Result branch_removeElementAt(Branch *s, int Index)                         // Remove the indicated element
+static inline Branch_Result branch_removeElementAt(Branch *s, int Index)                         // Remove the indicated element
  {Branch_Result r = branch_result();
   r.index = Index;
   r.key   = branch_key (s, Index);
@@ -138,7 +138,7 @@ Branch_Result branch_removeElementAt(Branch *s, int Index)                      
   return r;
  }
 
-Branch_Result branch_firstElement(Branch *s)
+static inline Branch_Result branch_firstElement(Branch *s)
  {Branch_Result r = branch_result();
 
   r.found = !branch_isEmpty(s);
@@ -150,7 +150,7 @@ Branch_Result branch_firstElement(Branch *s)
   return r;
  }
 
-Branch_Result branch_lastElement(Branch *s)
+static inline Branch_Result branch_lastElement(Branch *s)
  {Branch_Result r = branch_result();
 
   r.found = !branch_isEmpty(s);
@@ -165,7 +165,7 @@ Branch_Result branch_lastElement(Branch *s)
 
 //D1 Search                                                                     // Search a stuck.
 
-Branch_Result branch_search(Branch *s, int Search)                                 // Search for an element within all elements of the stuck
+static inline Branch_Result branch_search(Branch *s, int Search)                                 // Search for an element within all elements of the stuck
  {Branch_Result r = branch_result();
   r.key       = Search;
 
@@ -181,7 +181,7 @@ Branch_Result branch_search(Branch *s, int Search)                              
   return r;
  }
 
-Branch_Result branch_searchFirstGreaterThanOrEqual(Branch *s, int Search)
+static inline Branch_Result branch_searchFirstGreaterThanOrEqual(Branch *s, int Search)
  {Branch_Result r = branch_result();
   r.search = Search;
   for (int i = 0, j = branch_size(s); i < j; i++)
@@ -197,7 +197,7 @@ Branch_Result branch_searchFirstGreaterThanOrEqual(Branch *s, int Search)
   return r;
  }
 
-Branch_Result branch_searchFirstGreaterThanOrEqualExceptLast(Branch *s, int Search)
+static inline Branch_Result branch_searchFirstGreaterThanOrEqualExceptLast(Branch *s, int Search)
  {Branch_Result r = branch_result();
   r.search = Search;
   int L = branch_size(s)-1;
@@ -235,7 +235,7 @@ char *branch_print(Branch *s)                                                   
   return C;
  }
 
-void branch_print_err(Branch *s)                                                  // Print a stuck on stderr
+static inline void  branch_print_err(Branch *s)                                                  // Print a stuck on stderr
  {fprintf(stderr, "%s", branch_print(s));
  }
 
@@ -250,7 +250,7 @@ char *branch_print_result(Branch_Result r)                                      
   return C;
  }
 
-void branch_print_result_err(Branch_Result r)                                     // Print the result of a stuck operation
+static inline void  branch_print_result_err(Branch_Result r)                                     // Print the result of a stuck operation
  {fprintf(stderr, "%s", branch_print_result(r));
  }
 
@@ -258,7 +258,7 @@ void branch_print_result_err(Branch_Result r)                                   
 
 #ifdef branch_runTests
 
-void branch_ok(const char *name, const char *g, const char *e)                   // Test got versus expected
+static inline void  branch_ok(const char *name, const char *g, const char *e)                   // Test got versus expected
  {int c = strcmp(g, e);
   if (c == 0)
    {++branch_tests_passed;
@@ -268,7 +268,7 @@ void branch_ok(const char *name, const char *g, const char *e)                  
   printf("Test: %s failed\n", name);
  }
 
-void branch_check_result_field(const char *format, int got, int expected)
+static inline void  branch_check_result_field(const char *format, int got, int expected)
  {if (expected >= 0 && got != expected)
    {branch_tests_failed++;
     printf(format, got, expected);
@@ -278,7 +278,7 @@ void branch_check_result_field(const char *format, int got, int expected)
    }
  }
 
-void branch_check_result(Branch_Result r , int Search, int Found, int Index, int Key, int Data)  // Check a result
+static inline void  branch_check_result(Branch_Result r , int Search, int Found, int Index, int Key, int Data)  // Check a result
  {branch_check_result_field("Search got %2d, expected %2d\n", r.search, Search);
   branch_check_result_field("Found  got %2d, expected %2d\n", r.found,  Found);
   branch_check_result_field("Index  got %2d, expected %2d\n", r.index,  Index);
@@ -299,7 +299,7 @@ Branch *branch_test_load()
   return s;
  }
 
-void branch_test_push()
+static inline void  branch_test_push()
  {Branch *t = branch_test_load();
 
   //branch_print_err(t),
@@ -312,7 +312,7 @@ void branch_test_push()
 );
  }
 
-void branch_test_pop()
+static inline void  branch_test_pop()
  {Branch *t = branch_test_load();
 
   Branch_Result r  = branch_pop(t);
@@ -327,7 +327,7 @@ void branch_test_pop()
 );
  }
 
-void branch_test_shift()
+static inline void  branch_test_shift()
  {Branch       *t = branch_test_load();
   Branch_Result r = branch_shift(t);
   //branch_print_result_err(r);
@@ -342,7 +342,7 @@ void branch_test_shift()
 );
  }
 
-void branch_test_unshift()
+static inline void  branch_test_unshift()
  {Branch *t = branch_test_load();
   branch_unshift(t, 9, 8);
 
@@ -357,14 +357,14 @@ void branch_test_unshift()
 );
    }
 
-void branch_test_elementAt()
+static inline void  branch_test_elementAt()
  {Branch *t = branch_test_load();
   Branch_Result r  = branch_elementAt(t, 2);
   //branch_print_result_err(r);
   branch_check_result(r, 0,0,2,6,3);
  }
 
-void branch_test_insert_element_at()
+static inline void  branch_test_insert_element_at()
  {Branch *t = branch_test_load();
   branch_insertElementAt(t, 9, 8, 4);
   //branch_print_err(t);
@@ -378,7 +378,7 @@ void branch_test_insert_element_at()
 );
  }
 
-void branch_test_remove_element_at()
+static inline void  branch_test_remove_element_at()
  {Branch *t = branch_test_load();
   branch_removeElementAt(t, 2);
   //branch_print_err(t);
@@ -390,7 +390,7 @@ void branch_test_remove_element_at()
 );
  }
 
-void branch_test_first_last()
+static inline void  branch_test_first_last()
  {Branch *t = branch_test_load();
   Branch_Result f = branch_firstElement(t);
   Branch_Result l = branch_lastElement (t);
@@ -400,21 +400,21 @@ void branch_test_first_last()
   branch_check_result(l, 0,1,3,8,4);
  }
 
-void branch_test_search()
+static inline void  branch_test_search()
  {Branch *t = branch_test_load();
   Branch_Result s = branch_search(t, 6);
   //branch_print_result_err(s);
   branch_check_result(s, 0,1,2,6,3);
  }
 
-void branch_test_search_first_greater_than_or_equal()
+static inline void  branch_test_search_first_greater_than_or_equal()
  {Branch *t = branch_test_load();
   Branch_Result s = branch_searchFirstGreaterThanOrEqual(t, 7);
   //branch_print_result_err(s);
   branch_check_result(s, 7,1,3,8,4);
  }
 
-void branch_test_search_first_greater_than_or_equal_except_last()
+static inline void  branch_test_search_first_greater_than_or_equal_except_last()
  {Branch *t = branch_test_load();
   Branch_Result s = branch_searchFirstGreaterThanOrEqualExceptLast(t, 7);
   //branch_print_result_err(s);
@@ -424,7 +424,7 @@ void branch_test_search_first_greater_than_or_equal_except_last()
   branch_check_result(S, 5,1,2,6,3);
  }
 
-void branch_test_set_element_at()
+static inline void  branch_test_set_element_at()
  {Branch *t = branch_test_load();
   branch_setElementAt(t, 22, 33, 2);
   //branch_print_err(t);
