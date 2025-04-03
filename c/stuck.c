@@ -22,44 +22,44 @@ typedef struct                                                                  
   stuck_dataType data[stuck_maxSize];                                           // Data
  } Stuck;
 
-int stuck_size   (Stuck *s) {return s->currentSize;}                            // The current number of key elements in the stuck
-int stuck_size1  (Stuck *s) {return s->currentSize-1;}                          // The current number of key elements in the stuck minus one whichmakes it suitable for describing a branch
-int stuck_isFull (Stuck *s) {return stuck_size(s) > stuck_maxSize;}             // Check the stuck is full
-int stuck_isEmpty(Stuck *s) {return stuck_size(s) == 0;}                        // Check the stuck is empty
+static inline int stuck_size   (Stuck *s) {return s->currentSize;}                            // The current number of key elements in the stuck
+static inline int stuck_size1  (Stuck *s) {return s->currentSize-1;}                          // The current number of key elements in the stuck minus one whichmakes it suitable for describing a branch
+static inline int stuck_isFull (Stuck *s) {return stuck_size(s) > stuck_maxSize;}             // Check the stuck is full
+static inline int stuck_isEmpty(Stuck *s) {return stuck_size(s) == 0;}                        // Check the stuck is empty
 
 //D1 Memory                                                                     // Actions on memory of stuck
 
 stuck_keyType  stuck_key (Stuck *s, int Index)              {return s->keys[Index];}
 stuck_dataType stuck_data(Stuck *s, int Index)              {return s->data[Index];}
 
-void       stuck_setKey  (Stuck *s, int Index,  int Value)  {s->keys[Index] = Value;}
-void       stuck_setData (Stuck *s, int Index,  int Value)  {s->data[Index] = Value;}
-void       stuck_copyKey (Stuck *s, int Target, int Source) {s->keys[Target] = s->keys[Source];}
-void       stuck_copyData(Stuck *s, int Target, int Source) {s->data[Target] = s->data[Source];}
+static inline void       stuck_setKey  (Stuck *s, int Index,  int Value)  {s->keys[Index] = Value;}
+static inline void       stuck_setData (Stuck *s, int Index,  int Value)  {s->data[Index] = Value;}
+static inline void       stuck_copyKey (Stuck *s, int Target, int Source) {s->keys[Target] = s->keys[Source];}
+static inline void       stuck_copyData(Stuck *s, int Target, int Source) {s->data[Target] = s->data[Source];}
 
-void  stuck_setKeyData(Stuck *s, int Index, int Key, int Data)
+static inline void  stuck_setKeyData(Stuck *s, int Index, int Key, int Data)
  {stuck_setKey (s, Index, Key);
   stuck_setData(s, Index, Data);
  }
 
-void stuck_copyKeyData(Stuck *s, int Target, int Source)
+static inline void stuck_copyKeyData(Stuck *s, int Target, int Source)
  {stuck_copyKey (s, Target, Source);
   stuck_copyData(s, Target, Source);
  }
 
 //D1 Actions                                                                    // Place and remove data to/from stuck
 
-void stuck_inc  (Stuck *s) {s->currentSize++;}                                  // Increment the current size
-void stuck_dec  (Stuck *s) {s->currentSize--;}                                  // Decrement the current size
-void stuck_clear(Stuck *s) {s->currentSize = 0;}                                // Clear the stuck
+static inline void stuck_inc  (Stuck *s) {s->currentSize++;}                                  // Increment the current size
+static inline void stuck_dec  (Stuck *s) {s->currentSize--;}                                  // Decrement the current size
+static inline void stuck_clear(Stuck *s) {s->currentSize = 0;}                                // Clear the stuck
 
-void stuck_push (Stuck *s, int key, int data)                                   // Push an element onto the stuck
+static inline void  stuck_push (Stuck *s, int key, int data)                                   // Push an element onto the stuck
  {int n = stuck_size(s);
   stuck_setKeyData(s, n, key, data);
   stuck_inc(s);
  }
 
-void stuck_unshift(Stuck *s, int key, int data)                                 // Unshift an element onto the stuck
+static inline void  stuck_unshift(Stuck *s, int key, int data)                                 // Unshift an element onto the stuck
  {for (int i = stuck_size(s); i > 0; --i)                                       // Shift the stuck up one place
    {stuck_copyKeyData(s, i, i-1);
    }
@@ -75,13 +75,13 @@ typedef struct
   stuck_dataType data;                                                          // The retrieved data
  } Stuck_Result;
 
-Stuck_Result stuck_result()
+static inline Stuck_Result stuck_result()
  {Stuck_Result r;
   r.search = r.found = r.index = r.key = r.data = 0;
   return r;
  }
 
-Stuck_Result stuck_pop(Stuck *s)
+static inline Stuck_Result stuck_pop(Stuck *s)
  {Stuck_Result r = stuck_result();
   stuck_dec(s);
   r.index = stuck_size(s);
@@ -90,7 +90,7 @@ Stuck_Result stuck_pop(Stuck *s)
   return r;
  }
 
-Stuck_Result stuck_shift(Stuck *s)
+static inline Stuck_Result stuck_shift(Stuck *s)
  {Stuck_Result r = stuck_result();
   r.key   = stuck_key (s, 0);
   r.data  = stuck_data(s, 0);
@@ -101,7 +101,7 @@ Stuck_Result stuck_shift(Stuck *s)
   return r;
  }
 
-Stuck_Result stuck_elementAt(Stuck *s, int Index)
+static inline Stuck_Result stuck_elementAt(Stuck *s, int Index)
  {Stuck_Result r = stuck_result();
   r.index = Index;
   r.key   = stuck_key (s, Index);
@@ -109,7 +109,7 @@ Stuck_Result stuck_elementAt(Stuck *s, int Index)
   return r;
  }
 
-void stuck_setElementAt(Stuck *s, int key, int data, int Index)                 // Set an element either in range or one above the current range
+static inline void  stuck_setElementAt(Stuck *s, int key, int data, int Index)                 // Set an element either in range or one above the current range
  {if (Index == stuck_size(s))                                                   // Extended range
    {stuck_setKeyData(s, Index, key, data); stuck_inc(s);
    }
@@ -118,7 +118,7 @@ void stuck_setElementAt(Stuck *s, int key, int data, int Index)                 
    }
  }
 
-void stuck_insertElementAt(Stuck *s, int key, int data, int Index)              // Insert an element at the indicated location shifting all the remaining elements up one
+static inline void  stuck_insertElementAt(Stuck *s, int key, int data, int Index)              // Insert an element at the indicated location shifting all the remaining elements up one
  {for (int i = stuck_size(s); i > Index; --i)
    {stuck_copyKeyData(s, i, i-1);
    }
@@ -126,7 +126,7 @@ void stuck_insertElementAt(Stuck *s, int key, int data, int Index)              
   stuck_inc(s);
  }
 
-Stuck_Result stuck_removeElementAt(Stuck *s, int Index)                         // Remove the indicated element
+static inline Stuck_Result stuck_removeElementAt(Stuck *s, int Index)                         // Remove the indicated element
  {Stuck_Result r = stuck_result();
   r.index = Index;
   r.key   = stuck_key (s, Index);
@@ -138,7 +138,7 @@ Stuck_Result stuck_removeElementAt(Stuck *s, int Index)                         
   return r;
  }
 
-Stuck_Result stuck_firstElement(Stuck *s)
+static inline Stuck_Result stuck_firstElement(Stuck *s)
  {Stuck_Result r = stuck_result();
 
   r.found = !stuck_isEmpty(s);
@@ -150,7 +150,7 @@ Stuck_Result stuck_firstElement(Stuck *s)
   return r;
  }
 
-Stuck_Result stuck_lastElement(Stuck *s)
+static inline Stuck_Result stuck_lastElement(Stuck *s)
  {Stuck_Result r = stuck_result();
 
   r.found = !stuck_isEmpty(s);
@@ -165,7 +165,7 @@ Stuck_Result stuck_lastElement(Stuck *s)
 
 //D1 Search                                                                     // Search a stuck.
 
-Stuck_Result stuck_search(Stuck *s, int Search)                                 // Search for an element within all elements of the stuck
+static inline Stuck_Result stuck_search(Stuck *s, int Search)                                 // Search for an element within all elements of the stuck
  {Stuck_Result r = stuck_result();
   r.key       = Search;
 
@@ -181,7 +181,7 @@ Stuck_Result stuck_search(Stuck *s, int Search)                                 
   return r;
  }
 
-Stuck_Result stuck_searchFirstGreaterThanOrEqual(Stuck *s, int Search)
+static inline Stuck_Result stuck_searchFirstGreaterThanOrEqual(Stuck *s, int Search)
  {Stuck_Result r = stuck_result();
   r.search = Search;
   for (int i = 0, j = stuck_size(s); i < j; i++)
@@ -197,7 +197,7 @@ Stuck_Result stuck_searchFirstGreaterThanOrEqual(Stuck *s, int Search)
   return r;
  }
 
-Stuck_Result stuck_searchFirstGreaterThanOrEqualExceptLast(Stuck *s, int Search)
+static inline Stuck_Result stuck_searchFirstGreaterThanOrEqualExceptLast(Stuck *s, int Search)
  {Stuck_Result r = stuck_result();
   r.search = Search;
   int L = stuck_size(s)-1;
@@ -235,7 +235,7 @@ char *stuck_print(Stuck *s)                                                     
   return C;
  }
 
-void stuck_print_err(Stuck *s)                                                  // Print a stuck on stderr
+static inline void  stuck_print_err(Stuck *s)                                                  // Print a stuck on stderr
  {fprintf(stderr, "%s", stuck_print(s));
  }
 
@@ -250,7 +250,7 @@ char *stuck_print_result(Stuck_Result r)                                        
   return C;
  }
 
-void stuck_print_result_err(Stuck_Result r)                                     // Print the result of a stuck operation
+static inline void  stuck_print_result_err(Stuck_Result r)                                     // Print the result of a stuck operation
  {fprintf(stderr, "%s", stuck_print_result(r));
  }
 
@@ -258,7 +258,7 @@ void stuck_print_result_err(Stuck_Result r)                                     
 
 #ifdef stuck_runTests
 
-void stuck_ok(const char *name, const char *g, const char *e)                   // Test got versus expected
+static inline void  stuck_ok(const char *name, const char *g, const char *e)                   // Test got versus expected
  {int c = strcmp(g, e);
   if (c == 0)
    {++stuck_tests_passed;
@@ -268,7 +268,7 @@ void stuck_ok(const char *name, const char *g, const char *e)                   
   printf("Test: %s failed\n", name);
  }
 
-void stuck_check_result_field(const char *format, int got, int expected)
+static inline void  stuck_check_result_field(const char *format, int got, int expected)
  {if (expected >= 0 && got != expected)
    {stuck_tests_failed++;
     printf(format, got, expected);
@@ -278,7 +278,7 @@ void stuck_check_result_field(const char *format, int got, int expected)
    }
  }
 
-void stuck_check_result(Stuck_Result r , int Search, int Found, int Index, int Key, int Data)  // Check a result
+static inline void  stuck_check_result(Stuck_Result r , int Search, int Found, int Index, int Key, int Data)  // Check a result
  {stuck_check_result_field("Search got %2d, expected %2d\n", r.search, Search);
   stuck_check_result_field("Found  got %2d, expected %2d\n", r.found,  Found);
   stuck_check_result_field("Index  got %2d, expected %2d\n", r.index,  Index);
@@ -299,7 +299,7 @@ Stuck *stuck_test_load()
   return s;
  }
 
-void stuck_test_push()
+static inline void  stuck_test_push()
  {Stuck *t = stuck_test_load();
 
   //stuck_print_err(t),
@@ -312,7 +312,7 @@ void stuck_test_push()
 );
  }
 
-void stuck_test_pop()
+static inline void  stuck_test_pop()
  {Stuck *t = stuck_test_load();
 
   Stuck_Result r  = stuck_pop(t);
@@ -327,7 +327,7 @@ void stuck_test_pop()
 );
  }
 
-void stuck_test_shift()
+static inline void  stuck_test_shift()
  {Stuck       *t = stuck_test_load();
   Stuck_Result r = stuck_shift(t);
   //stuck_print_result_err(r);
@@ -342,7 +342,7 @@ void stuck_test_shift()
 );
  }
 
-void stuck_test_unshift()
+static inline void  stuck_test_unshift()
  {Stuck *t = stuck_test_load();
   stuck_unshift(t, 9, 8);
 
@@ -357,14 +357,14 @@ void stuck_test_unshift()
 );
    }
 
-void stuck_test_elementAt()
+static inline void  stuck_test_elementAt()
  {Stuck *t = stuck_test_load();
   Stuck_Result r  = stuck_elementAt(t, 2);
   //stuck_print_result_err(r);
   stuck_check_result(r, 0,0,2,6,3);
  }
 
-void stuck_test_insert_element_at()
+static inline void  stuck_test_insert_element_at()
  {Stuck *t = stuck_test_load();
   stuck_insertElementAt(t, 9, 8, 4);
   //stuck_print_err(t);
@@ -378,7 +378,7 @@ void stuck_test_insert_element_at()
 );
  }
 
-void stuck_test_remove_element_at()
+static inline void  stuck_test_remove_element_at()
  {Stuck *t = stuck_test_load();
   stuck_removeElementAt(t, 2);
   //stuck_print_err(t);
@@ -390,7 +390,7 @@ void stuck_test_remove_element_at()
 );
  }
 
-void stuck_test_first_last()
+static inline void  stuck_test_first_last()
  {Stuck *t = stuck_test_load();
   Stuck_Result f = stuck_firstElement(t);
   Stuck_Result l = stuck_lastElement (t);
@@ -400,21 +400,21 @@ void stuck_test_first_last()
   stuck_check_result(l, 0,1,3,8,4);
  }
 
-void stuck_test_search()
+static inline void  stuck_test_search()
  {Stuck *t = stuck_test_load();
   Stuck_Result s = stuck_search(t, 6);
   //stuck_print_result_err(s);
   stuck_check_result(s, 0,1,2,6,3);
  }
 
-void stuck_test_search_first_greater_than_or_equal()
+static inline void  stuck_test_search_first_greater_than_or_equal()
  {Stuck *t = stuck_test_load();
   Stuck_Result s = stuck_searchFirstGreaterThanOrEqual(t, 7);
   //stuck_print_result_err(s);
   stuck_check_result(s, 7,1,3,8,4);
  }
 
-void stuck_test_search_first_greater_than_or_equal_except_last()
+static inline void  stuck_test_search_first_greater_than_or_equal_except_last()
  {Stuck *t = stuck_test_load();
   Stuck_Result s = stuck_searchFirstGreaterThanOrEqualExceptLast(t, 7);
   //stuck_print_result_err(s);
@@ -424,7 +424,7 @@ void stuck_test_search_first_greater_than_or_equal_except_last()
   stuck_check_result(S, 5,1,2,6,3);
  }
 
-void stuck_test_set_element_at()
+static inline void  stuck_test_set_element_at()
  {Stuck *t = stuck_test_load();
   stuck_setElementAt(t, 22, 33, 2);
   //stuck_print_err(t);
