@@ -18,7 +18,7 @@
 #define linesPerTree (linesPerNode * maxDepth)                                  // Number of lines needed to print a tree
 // try removing_Result
 
-int debug = 1;                                                                  // Debugging when true
+int debug = 0;                                                                  // Debugging when true
 
 typedef struct                                                                  // Definition of a stuck
  {int free;                                                                     // Next element of free chain
@@ -36,10 +36,10 @@ typedef struct                                                                  
 
 Btree btree;                                                                    // The btree
 
-void merge(int Key);
-void clear(int n);
+static inline void  merge(int Key);
+static inline void  clear(int n);
 
-void initialize_free_chain()                                                    // Initialize free chain by putting all the nodes on the free chain except the root (which is permanently allocated at position 0) with the low nodes first to be allocated.
+static inline void  initialize_free_chain()                                     // Initialize free chain by putting all the nodes on the free chain except the root (which is permanently allocated at position 0) with the low nodes first to be allocated.
  {for (int i = number_of_nodes; i > 1; --i)
    {btree.nodes[i-2].free = i-1;
    }
@@ -47,13 +47,13 @@ void initialize_free_chain()                                                    
   btree.nodes[0].free = 0;                                                      // Not on the free chain
  }
 
-void create()                                                                   // Create an empty btree
+static inline void  create()                                                    // Create an empty btree
  {for (int i = 0; i < number_of_nodes; ++i) clear(i);
   initialize_free_chain();                                                      // Initialize free chain by putting all the nodes on the free chain except the root (which is permanently allocated at position 0) with the low nodes first to be allocated.
   btree.nodes[0].isLeaf = 1;                                                    // The root starts as a leaf
  }
 
-int allocate()                                                                  // Allocate a node
+static inline int allocate()                                                    // Allocate a node
  {int f = btree.free;                                                           // Last freed node
   if (f == 0) stop("No more memory available");                                 // No more free nodes available
   btree.free = btree.nodes[f].free;                                             // Second to last freed node becomes head of the free chain
@@ -62,19 +62,19 @@ int allocate()                                                                  
   return f;                                                                     // Return the node to be reused
  }
 
-int isLeaf    (int n) {return btree.nodes[n].isLeaf;}                           // A leaf if true
-int rootIsLeaf()      {return btree.nodes[0].isLeaf;}                           // The root is a leaf if true
-void   setLeaf(int n) {       btree.nodes[n].isLeaf = 1;}                       // Set as leaf
-void setBranch(int n) {       btree.nodes[n].isLeaf = 0;}                       // Set as branch
-void   setLeafRoot () {       btree.nodes[0].isLeaf = 1;}                       // Set root as leaf
-void setBranchRoot () {       btree.nodes[0].isLeaf = 0;}                       // Set root as branch
+static inline int isLeaf    (int n) {return btree.nodes[n].isLeaf;}             // A leaf if true
+static inline int rootIsLeaf()      {return btree.nodes[0].isLeaf;}             // The root is a leaf if true
+static inline void    setLeaf(int n) {       btree.nodes[n].isLeaf = 1;}        // Set as leaf
+static inline void  setBranch(int n) {       btree.nodes[n].isLeaf = 0;}        // Set as branch
+static inline void    setLeafRoot () {       btree.nodes[0].isLeaf = 1;}        // Set root as leaf
+static inline void  setBranchRoot () {       btree.nodes[0].isLeaf = 0;}        // Set root as branch
 
-void assertLeaf  (int n) {if (!isLeaf(n)) stop("Leaf required");}
-void assertBranch(int n) {if ( isLeaf(n)) stop("Branch required");}
-void assertLeafRoot   () {if (!isLeaf(0)) stop("Leaf required");}
-void assertBranchRoot () {if ( isLeaf(0)) stop("Branch required");}
+static inline void  assertLeaf  (int n) {if (!isLeaf(n)) stop("Leaf required");}
+static inline void  assertBranch(int n) {if ( isLeaf(n)) stop("Branch required");}
+static inline void  assertLeafRoot   () {if (!isLeaf(0)) stop("Leaf required");}
+static inline void  assertBranchRoot () {if ( isLeaf(0)) stop("Branch required");}
 
-void clear(int n)                                                               // Clear a new node to zeros ready for use
+static inline void  clear(int n)                                                // Clear a new node to zeros ready for use
  {char *p = (char *)&btree.nodes[n].branchOrLeaf;
   int   L = sizeof(Leaf);
   int   B = sizeof(Branch);
@@ -82,7 +82,7 @@ void clear(int n)                                                               
   for(int i = 0; i < N; ++i) *(p+i) = 0;                                        // Clear
  }
 
-void erase(int n)                                                               // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
+static inline void  erase(int n)                                                // Clear a new node to ones as this is likely to create invalid values that will be easily detected in the case of erroneous frees
  {char *p = (char *)&btree.nodes[n].branchOrLeaf;
   int   L = sizeof(Leaf);
   int   B = sizeof(Branch);
@@ -90,7 +90,7 @@ void erase(int n)                                                               
   for(int i = 0; i < N; ++i) *(p+i) = 1;                                        // Set
  }
 
-void freeNode(int n)                                                            // Free a new node to make it available for reuse
+static inline void  freeNode(int n)                                             // Free a new node to make it available for reuse
  {if (!n) stop("Cannot free root");                                             // The root is never freed
   erase(n);                                                                     // Clear the node to encourage erroneous frees to do damage that shows up quickly.
   int f = btree.free;                                                           // Last freed node from head of free chain
@@ -98,43 +98,43 @@ void freeNode(int n)                                                            
   btree.nodes[n].free = f;                                                       // Second to last freed node becomes head of the free chain
  }
 
-Leaf   *leaf  (int n) {assertLeaf  (n); return &btree.nodes[n].branchOrLeaf.leaf;}   // Leaf
-Branch *branch(int n) {assertBranch(n); return &btree.nodes[n].branchOrLeaf.branch;} // Branch
+static inline Leaf   *leaf  (int n) {assertLeaf  (n); return &btree.nodes[n].branchOrLeaf.leaf;}   // Leaf
+static inline Branch *branch(int n) {assertBranch(n); return &btree.nodes[n].branchOrLeaf.branch;} // Branch
 
-int leafSize  (int n) {assertLeaf  (n); return   leaf_size (leaf  (n));}        // Number of children in body of leaf
-int branchSize(int n) {assertBranch(n); return branch_size1(branch(n));}        // Number of children in body of branch taking top for granted as it is always there
+static inline int leafSize  (int n) {assertLeaf  (n); return   leaf_size (leaf  (n));}        // Number of children in body of leaf
+static inline int branchSize(int n) {assertBranch(n); return branch_size1(branch(n));}        // Number of children in body of branch taking top for granted as it is always there
 
-int splitLeafSize  () {return   leaf_maxSize  >> 1;}                            // The number of key, data pairs to split out of a leaf
-int splitBranchSize() {return branch_maxSize1 >> 1;}                            // The number of key, next pairs to split out of a branch
+static inline int splitLeafSize  () {return   leaf_maxSize  >> 1;}              // The number of key, data pairs to split out of a leaf
+static inline int splitBranchSize() {return branch_maxSize1 >> 1;}              // The number of key, next pairs to split out of a branch
 
-int isFull(int n)                                                               // The node is full
+static inline int isFull(int n)                                                 // The node is full
  {return isLeaf(n) ? leafSize  (n) >= leaf_maxSize  :
                      branchSize(n) >= branch_maxSize1;                          // Allow for top
  }
 
-int isFullRoot() {return isFull(0);}                                            // The node is full
+static inline int isFullRoot() {return isFull(0);}                              // The node is full
 
-int isLow(int n) {return (isLeaf(n) ? leafSize(n) : branchSize(n)) < 2;}        // The node is low on children making it impossible to merge two sibling children
+static inline int isLow(int n) {return (isLeaf(n) ? leafSize(n) : branchSize(n)) < 2;}        // The node is low on children making it impossible to merge two sibling children
 
-int hasLeavesForChildren(int n)                                                 // The node has leaves for children
+static inline int hasLeavesForChildren(int n)                                   // The node has leaves for children
  {assertBranch(n);
   Branch *b = branch(n);
   int     f = branch_firstElement(b).data;
   return isLeaf(f);
  }
 
-int top(int n)                                                                  // The top next element of a branch
+static inline int top(int n)                                                    // The top next element of a branch
  {assertBranch(n);
   Branch *b = branch(n);
   return branch_lastElement(b).data;
  }
 
-int allocLeaf()   {int n = allocate(); setLeaf  (n); return n;}                 // Allocate leaf
-int allocBranch() {int n = allocate(); setBranch(n); return n;}                 // Allocate branch
+static inline int allocLeaf()   {int n = allocate(); setLeaf  (n); return n;}   // Allocate leaf
+static inline int allocBranch() {int n = allocate(); setBranch(n); return n;}   // Allocate branch
 
 //D2 Split                                                                      // Split nodes in half to increase the number of nodes in the tree
 
-void splitLeafRoot()                                                            // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
+static inline void  splitLeafRoot()                                             // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
  {assertLeafRoot();
   if (!isFullRoot()) stop("Root is not full");
 
@@ -161,7 +161,7 @@ void splitLeafRoot()                                                            
   branch_push (branch(0), 0,  R);                                               // Insert right into root. This will be the top node and so ignored by search ... except last.
  }
 
-void splitBranchRoot()                                                          // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
+static inline void  splitBranchRoot()                                           // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
  {assertBranchRoot();
   if (!isFullRoot()) stop("Root is not full");
 
@@ -190,7 +190,7 @@ void splitBranchRoot()                                                          
   branch_push (p, 0,      R);                                                   // Becomes top and so ignored by search ... except last
  }
 
-void splitLeaf(int node, int parent, int index)                                 // Split a leaf which is not the root
+static inline void  splitLeaf(int node, int parent, int index)                  // Split a leaf which is not the root
  {assertLeaf(node);
   if (node == 0) stop("Cannot split root with this method");
   int S   = leafSize(node), I   = index;
@@ -215,7 +215,7 @@ void splitLeaf(int node, int parent, int index)                                 
    branch_insertElementAt(branch(p), splitKey, l, index);                       // Insert new key, next pair in parent
  }
 
-void splitBranch(int node, int parent, int index)                               // Split a branch which is not the root by splitting right to left
+static inline void  splitBranch(int node, int parent, int index)                               // Split a branch which is not the root by splitting right to left
  {assertBranch(node);
   int bs = branchSize(node), I = index, nd = node;
   int nif = !isFull(node), pif = isFull(parent);
@@ -241,7 +241,7 @@ void splitBranch(int node, int parent, int index)                               
   branch_insertElementAt(branch(p), split.key, l, index);
  }
 
-int stealFromLeft(int node, int index)                                          // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
+static inline int stealFromLeft(int node, int index)                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
  {assertBranch(node);
   if (index == 0) return 0;
   if (index < 0)                stop("Index %d too small", index);
@@ -284,7 +284,7 @@ int stealFromLeft(int node, int index)                                          
   return 1;
  }
 
-int stealFromRight(int node, int index)                                         // Steal from the right sibling of the indicated child if possible
+static inline int stealFromRight(int node, int index)                           // Steal from the right sibling of the indicated child if possible
  {assertBranch(node);
   if (index == branchSize(node)) return 0;
   if (index < 0)                 stop("Index %d too small", index);
@@ -324,277 +324,276 @@ int stealFromRight(int node, int index)                                         
 
 //D2 Merge                                                                      // Merge two nodes together and free the resulting free node
 
-  int mergeRoot()                                                               // Merge into the root
-   {if (rootIsLeaf() || branchSize(0) > 1) return 0;
+static inline int mergeRoot()                                                   // Merge into the root
+ {if (rootIsLeaf() || branchSize(0) > 1) return 0;
 
-    int p = 0;
-    int l = branch_firstElement(branch(p)).data;
-    int r = branch_lastElement (branch(p)).data;
+  int p = 0;
+  int l = branch_firstElement(branch(p)).data;
+  int r = branch_lastElement (branch(p)).data;
 
-    if (hasLeavesForChildren(p))                                                // Leaves
-     {if (leafSize(l) + leafSize(r) <= leaf_maxSize)
-       {clear(p);
-        int nl = leafSize(l);
-        for (int i = 0; i < nl; ++i)
-         {Leaf_Result f = leaf_shift(leaf(l));
-          leaf_push(leaf(p), f.key, f.data);
-         }
-        int nr = leafSize(r);
-        for (int i = 0; i < nr; ++i)
-         {Leaf_Result f = leaf_shift(leaf(r));
-          leaf_push(leaf(p), f.key, f.data);
-         }
-        setLeaf(p);
-        freeNode(l);
-        freeNode(r);
-        return 1;
-       }
-     }
-    else if (branchSize(l) + 1 + branchSize(r) <= branch_maxSize1)              // Branches
-     {Branch_Result pkn = branch_firstElement(branch(p));
-      clear(p);
-      int nl = branchSize(l);
+  if (hasLeavesForChildren(p))                                                  // Leaves
+   {if (leafSize(l) + leafSize(r) <= leaf_maxSize)
+     {clear(p);
+      int nl = leafSize(l);
       for (int i = 0; i < nl; ++i)
-       {Branch_Result f = branch_shift(branch(l));
-        branch_push(branch(p), f.key, f.data);
+       {Leaf_Result f = leaf_shift(leaf(l));
+        leaf_push(leaf(p), f.key, f.data);
        }
-      int data = branch_lastElement(branch(l)).data;
-      branch_push(branch(p), pkn.key, data);
-      int nr = branchSize(r);
+      int nr = leafSize(r);
       for (int i = 0; i < nr; ++i)
-       {Branch_Result f = branch_shift(branch(r));
-        branch_push(branch(p), f.key, f.data);
+       {Leaf_Result f = leaf_shift(leaf(r));
+        leaf_push(leaf(p), f.key, f.data);
        }
-      int Data = branch_lastElement(branch(r)).data;                            // Top next
-      branch_push(branch(p), 0, Data);                                          // Top so ignored by search ... except last
+      setLeaf(p);
       freeNode(l);
       freeNode(r);
       return 1;
      }
-    return 0;
    }
-
-  int mergeLeftSibling(int parent, int index)                                     // Merge the left sibling
-   {assertBranch(parent);
-    if (index == 0) return 0;
-    int bs = branchSize(parent);
-    const char * bss = "for branch of size:";
-    if (index < 0 ) stop("Index: %d too small%s%d", index, bss, bs);
-    if (index > bs) stop("Index: %d too big%s%d",   index, bss, bs);
-    if (bs    < 2 ) return 0;
-
-    Branch_Result L = branch_elementAt(branch(parent), index-1);
-    Branch_Result R = branch_elementAt(branch(parent), index-0);
-
-    if (hasLeavesForChildren(parent))                                             // Children are leaves
-     {int  l = L.data;
-      int  r = R.data;
-      int nl = leafSize(l);
-      int nr = leafSize(r);
-
-      if (nl + nr >= leaf_maxSize) return 0;                                    // Combined body would be too big
-
-      int N = leaf_size(leaf(l));                                               // Number of entries to remove
-      for (int i = 0; i < N; i++)                                               // Transfer left to right
-       {Leaf_Result q = leaf_pop(leaf(l));
-        leaf_insertElementAt(leaf(r), q.key, q.data, 0);
-       }
-      freeNode(l);                                                              // Free the empty left node
+  else if (branchSize(l) + 1 + branchSize(r) <= branch_maxSize1)                // Branches
+   {Branch_Result pkn = branch_firstElement(branch(p));
+    clear(p);
+    int nl = branchSize(l);
+    for (int i = 0; i < nl; ++i)
+     {Branch_Result f = branch_shift(branch(l));
+      branch_push(branch(p), f.key, f.data);
      }
-    else                                                                        // Children are branches
-     {int  l = L.data;
-      int  r = R.data;
-      int  nl = branchSize(l);
-      int  nr = branchSize(r);
-
-      if (nl + 1 + nr >= branch_maxSize1) return 0;                              // Merge not possible because there is not enough room for the combined result
-
-      int t = branch_elementAt(branch(parent), index-1).key;                    // Top key
-      Branch_Result le = branch_lastElement(branch(l));                         // Last element of left child
-      branch_insertElementAt(branch(r), t, le.data, 0);                         // Left top to right
-
-      branch_pop(branch(l));                                                    // Remove left top
-      int N = branchSize(l);                                                    // Number of entries to remove
-      for (int i = 0; i < N; i++)                                               // Transfer left to right
-       {Branch_Result q = branch_pop(branch(l));
-        branch_insertElementAt(branch(r), q.key, q.data, 0);
-       }
-      freeNode(l);                                                              // Free the empty left node
+    int data = branch_lastElement(branch(l)).data;
+    branch_push(branch(p), pkn.key, data);
+    int nr = branchSize(r);
+    for (int i = 0; i < nr; ++i)
+     {Branch_Result f = branch_shift(branch(r));
+      branch_push(branch(p), f.key, f.data);
      }
-    branch_removeElementAt(branch(parent), index-1);                            // Reduce parent on left
+    int Data = branch_lastElement(branch(r)).data;                              // Top next
+    branch_push(branch(p), 0, Data);                                            // Top so ignored by search ... except last
+    freeNode(l);
+    freeNode(r);
     return 1;
    }
+  return 0;
+ }
 
-  int mergeRightSibling(int parent, int index)                                    // Merge the right sibling
-   {assertBranch(parent);
-    int bs = branchSize(parent);
-    const char *bss = "for branch of size:";
-    if (index >= bs) return 0;
-    if (index <  0 ) stop("Index %d too small%s%d", index, bss, bs);
-    if (index >  bs) stop("Index %d too big%s%d",   index, bss, bs);
-    if (bs < 2) return 0;
+static inline int mergeLeftSibling(int parent, int index)                       // Merge the left sibling
+ {assertBranch(parent);
+  if (index == 0) return 0;
+  int bs = branchSize(parent);
+  const char * bss = "for branch of size:";
+  if (index < 0 ) stop("Index: %d too small%s%d", index, bss, bs);
+  if (index > bs) stop("Index: %d too big%s%d",   index, bss, bs);
+  if (bs    < 2 ) return 0;
 
-    Branch_Result L = branch_elementAt(branch(parent), index+0);
-    Branch_Result R = branch_elementAt(branch(parent), index+1);
+  Branch_Result L = branch_elementAt(branch(parent), index-1);
+  Branch_Result R = branch_elementAt(branch(parent), index-0);
 
-    if (hasLeavesForChildren(parent))                                           // Children are leaves
-     {int  l = L.data;
-      int  r = R.data;
-      int  nl = leafSize(l);
-      int  nr = leafSize(r);
+  if (hasLeavesForChildren(parent))                                             // Children are leaves
+   {int  l = L.data;
+    int  r = R.data;
+    int nl = leafSize(l);
+    int nr = leafSize(r);
 
-      if (nl + nr > leaf_maxSize) return 0;                                     // Combined body would be too big for one leaf
+    if (nl + nr >= leaf_maxSize) return 0;                                      // Combined body would be too big
 
-      int N = leaf_size(leaf(r));                                               // Number of entries to remove
-      for (int i = 0; i < N; i++)                                               // Transfer right to left
-       {Leaf_Result q = leaf_shift(leaf(r));
-        leaf_push(leaf(l), q.key, q.data);
-       }
-      freeNode(r);                                                              // Free the empty right node
+    int N = leaf_size(leaf(l));                                                 // Number of entries to remove
+    for (int i = 0; i < N; i++)                                                 // Transfer left to right
+     {Leaf_Result q = leaf_pop(leaf(l));
+      leaf_insertElementAt(leaf(r), q.key, q.data, 0);
      }
-    else                                                                        // Children are branches
-     {int  l = L.data;
-      int  r = R.data;
-      int  nl = branchSize(l);
-      int  nr = branchSize(r);
-
-      if (nl + 1 + nr >= branch_maxSize1) return 0;                              // Merge not possible because there is not enough room in a single branch
-      Branch_Result le = branch_lastElement(branch(l));                         // Last element of left child
-      Branch_Result ea = branch_elementAt(branch(parent), index);               // Parent dividing element
-      branch_setElementAt(branch(l), ea.key, le.data, nl);                      // Re-key left top
-
-      int N = branchSize(r);                                                    // Number of entries to remove
-      for (int i = 0; i < N; i++)                                               // Transfer right to left
-       {Branch_Result f = branch_shift(branch(r));
-        branch_push(branch(l), f.key, f.data);
-       }
-      freeNode(r);                                                              // Free the empty right node
-     }
-
-    Branch_Result pkn = branch_elementAt(branch(parent), index+1);              // One up from dividing point in parent
-    Branch_Result dkn = branch_elementAt(branch(parent), index);                // Dividing point in parent
-    branch_setElementAt(branch(parent), pkn.key, dkn.data, index);              // Install key of right sibling in this child
-    branch_removeElementAt(branch(parent), index+1);                            // Reduce parent on right
-    return 1;
+    freeNode(l);                                                                // Free the empty left node
    }
+  else                                                                          // Children are branches
+   {int  l = L.data;
+    int  r = R.data;
+    int  nl = branchSize(l);
+    int  nr = branchSize(r);
+
+    if (nl + 1 + nr >= branch_maxSize1) return 0;                               // Merge not possible because there is not enough room for the combined result
+
+    int t = branch_elementAt(branch(parent), index-1).key;                      // Top key
+    Branch_Result le = branch_lastElement(branch(l));                           // Last element of left child
+    branch_insertElementAt(branch(r), t, le.data, 0);                           // Left top to right
+
+    branch_pop(branch(l));                                                      // Remove left top
+    int N = branchSize(l);                                                      // Number of entries to remove
+    for (int i = 0; i < N; i++)                                                 // Transfer left to right
+     {Branch_Result q = branch_pop(branch(l));
+      branch_insertElementAt(branch(r), q.key, q.data, 0);
+     }
+    freeNode(l);                                                                // Free the empty left node
+   }
+  branch_removeElementAt(branch(parent), index-1);                              // Reduce parent on left
+  return 1;
+ }
+
+static inline int mergeRightSibling(int parent, int index)                      // Merge the right sibling
+ {assertBranch(parent);
+  int bs = branchSize(parent);
+  const char *bss = "for branch of size:";
+  if (index >= bs) return 0;
+  if (index <  0 ) stop("Index %d too small%s%d", index, bss, bs);
+  if (index >  bs) stop("Index %d too big%s%d",   index, bss, bs);
+  if (bs < 2) return 0;
+
+  Branch_Result L = branch_elementAt(branch(parent), index+0);
+  Branch_Result R = branch_elementAt(branch(parent), index+1);
+
+  if (hasLeavesForChildren(parent))                                             // Children are leaves
+   {int  l = L.data;
+    int  r = R.data;
+    int  nl = leafSize(l);
+    int  nr = leafSize(r);
+
+    if (nl + nr > leaf_maxSize) return 0;                                       // Combined body would be too big for one leaf
+
+    int N = leaf_size(leaf(r));                                                 // Number of entries to remove
+    for (int i = 0; i < N; i++)                                                 // Transfer right to left
+     {Leaf_Result q = leaf_shift(leaf(r));
+      leaf_push(leaf(l), q.key, q.data);
+     }
+    freeNode(r);                                                                // Free the empty right node
+   }
+  else                                                                          // Children are branches
+   {int  l = L.data;
+    int  r = R.data;
+    int  nl = branchSize(l);
+    int  nr = branchSize(r);
+
+    if (nl + 1 + nr >= branch_maxSize1) return 0;                               // Merge not possible because there is not enough room in a single branch
+    Branch_Result le = branch_lastElement(branch(l));                           // Last element of left child
+    Branch_Result ea = branch_elementAt(branch(parent), index);                 // Parent dividing element
+    branch_setElementAt(branch(l), ea.key, le.data, nl);                        // Re-key left top
+
+    int N = branchSize(r);                                                      // Number of entries to remove
+    for (int i = 0; i < N; i++)                                                 // Transfer right to left
+     {Branch_Result f = branch_shift(branch(r));
+      branch_push(branch(l), f.key, f.data);
+     }
+    freeNode(r);                                                                // Free the empty right node
+   }
+
+  Branch_Result pkn = branch_elementAt(branch(parent), index+1);                // One up from dividing point in parent
+  Branch_Result dkn = branch_elementAt(branch(parent), index);                  // Dividing point in parent
+  branch_setElementAt(branch(parent), pkn.key, dkn.data, index);                // Install key of right sibling in this child
+  branch_removeElementAt(branch(parent), index+1);                              // Reduce parent on right
+  return 1;
+ }
 
 //D2 Balance                                                                    // Balance the tree by merging and stealing
 
-  void balance(int parent, int index)                                           // Augment the indexed child so it has at least two children in its body
-   {assertBranch(parent);
-    if (index < 0)                  stop("Index %d too small", index);
-    if (index > branchSize(parent)) stop("Index %d too big",   index);
-    //if (isLow(parent) && parent != 0)
-    // {stop("Parent: %d must not be low on children", parent);
-    // }
+static inline void  balance(int parent, int index)                              // Augment the indexed child so it has at least two children in its body
+ {assertBranch(parent);
+  if (index < 0)                  stop("Index %d too small", index);
+  if (index > branchSize(parent)) stop("Index %d too big",   index);
+  //if (isLow(parent) && parent != 0)
+  // {stop("Parent: %d must not be low on children", parent);
+  // }
 
-    Branch_Result p = branch_elementAt(branch(parent), index);
+  Branch_Result p = branch_elementAt(branch(parent), index);
 
-    if (!isLow(p.data)) return;
-    if (stealFromLeft    (parent, index)) return;
-    if (stealFromRight   (parent, index)) return;
-    if (mergeLeftSibling (parent, index)) return;
-    if (mergeRightSibling(parent, index)) return;
-    //stop("Unable to balance child:", p.data);
-   }
+  if (!isLow(p.data)) return;
+  if (stealFromLeft    (parent, index)) return;
+  if (stealFromRight   (parent, index)) return;
+  if (mergeLeftSibling (parent, index)) return;
+  if (mergeRightSibling(parent, index)) return;
+  //stop("Unable to balance child:", p.data);
+ }
 
 //D1 Print                                                                      // Print a BTree horizontally
 
-  void padStrings(char **S)                                                     // Pad the strings at each level of the tree so we have a vertical face to continue with - a bit like Marc Brunel's tunneling shield
-   {int L = 0;
-    for (int i = 0; i < linesPerTree; ++i)                                      // Maximum advance so far
-     {int l = strlen(S[i]); if (l > L) L = l;
-     }
-    L += gutter;                                                                // Gutter between printed items
-    for (int i = 0; i < linesPerTree; ++i)                                      // Pasdd all strigns to maximum advance
-     {int l = strlen(S[i]);
-      for (int j = l; j < L; ++j) {S[i][j] = ' '; S[i][j+1] = 0;}
-     }
+static inline void  padStrings(char **S)                                        // Pad the strings at each level of the tree so we have a vertical face to continue with - a bit like Marc Brunel's tunneling shield
+ {int L = 0;
+  for (int i = 0; i < linesPerTree; ++i)                                        // Maximum advance so far
+   {int l = strlen(S[i]); if (l > L) L = l;
    }
-
-  void printLeaf(int node, char **S, int level)                                 // Print a leaf
-   {char *s = S[level];
-    int   L = leaf_size(leaf(node));
-    for (int i = 0; i < L; i++)                                                 // Each element in the leaf
-     {Leaf_Result r = leaf_elementAt(leaf(node), i);
-      sprintf(s + strlen(s), "%d ", r.key);
-     }
-    s[strlen(s)-1] = 0;
-    sprintf(s + strlen(s), "=%d ", node);
-    s[strlen(s)-1] = 0;
-    padStrings(S);
+  L += gutter;                                                                  // Gutter between printed items
+  for (int i = 0; i < linesPerTree; ++i)                                        // Pasdd all strigns to maximum advance
+   {int l = strlen(S[i]);
+    for (int j = l; j < L; ++j) {S[i][j] = ' '; S[i][j+1] = 0;}
    }
+ }
 
-  void printBranch(int node, char **S, int level)                               // Print a branch
-   {int   L = branchSize(node);
-    for (int i = 0; i < L; i++)                                                 // Each element in the branch
-     {Branch_Result r = branch_elementAt(branch(node), i);
-      if (isLeaf(r.data)) printLeaf(r.data, S, level+linesPerNode);
-      else              printBranch(r.data, S, level+linesPerNode);
-      sprintf(S[level+0] + strlen(S[level+0]), "%d", r.key);
-      sprintf(S[level+1] + strlen(S[level+1]), "%d", r.data);
-      sprintf(S[level+2] + strlen(S[level+2]), "%d", node);
-      sprintf(S[level+3] + strlen(S[level+3]), "%d", i);
-      padStrings(S);
-     }
-    //s[strlen(s)-1] = 0;
-    Branch_Result r = branch_elementAt(branch(node), L);
+static inline void  printLeaf(int node, char **S, int level)                    // Print a leaf
+ {char *s = S[level];
+  int   L = leaf_size(leaf(node));
+  for (int i = 0; i < L; i++)                                                   // Each element in the leaf
+   {Leaf_Result r = leaf_elementAt(leaf(node), i);
+    sprintf(s + strlen(s), "%d ", r.key);
+   }
+  s[strlen(s)-1] = 0;
+  sprintf(s + strlen(s), "=%d ", node);
+  s[strlen(s)-1] = 0;
+  padStrings(S);
+ }
+
+static inline void  printBranch(int node, char **S, int level)                  // Print a branch
+ {int   L = branchSize(node);
+  for (int i = 0; i < L; i++)                                                   // Each element in the branch
+   {Branch_Result r = branch_elementAt(branch(node), i);
     if (isLeaf(r.data)) printLeaf(r.data, S, level+linesPerNode);
     else              printBranch(r.data, S, level+linesPerNode);
+    sprintf(S[level+0] + strlen(S[level+0]), "%d", r.key);
     sprintf(S[level+1] + strlen(S[level+1]), "%d", r.data);
     sprintf(S[level+2] + strlen(S[level+2]), "%d", node);
-    sprintf(S[level+3] + strlen(S[level+3]), "%d", L);
-    //padStrings(S);
+    sprintf(S[level+3] + strlen(S[level+3]), "%d", i);
+    padStrings(S);
    }
+  //s[strlen(s)-1] = 0;
+  Branch_Result r = branch_elementAt(branch(node), L);
+  if (isLeaf(r.data)) printLeaf(r.data, S, level+linesPerNode);
+  else              printBranch(r.data, S, level+linesPerNode);
+  sprintf(S[level+1] + strlen(S[level+1]), "%d", r.data);
+  sprintf(S[level+2] + strlen(S[level+2]), "%d", node);
+  sprintf(S[level+3] + strlen(S[level+3]), "%d", L);
+  //padStrings(S);
+ }
 
-  char *printCollapsed(char **S)                                                // Collapse horizontal representation into a string
-   {int N = 0;
-    for (int i = 0; i < linesPerTree; ++i)                                      // Remove trailing blanks
-     {char *s = S[i];
-      for (char *p = s + strlen(s)-1; p >= s && *p == ' '; --p) *p = 0;
-      N +=strlen(s)+1;
+char *printCollapsed(char **S)                                                  // Collapse horizontal representation into a string
+ {int N = 0;
+  for (int i = 0; i < linesPerTree; ++i)                                        // Remove trailing blanks
+   {char *s = S[i];
+    for (char *p = s + strlen(s)-1; p >= s && *p == ' '; --p) *p = 0;
+    N +=strlen(s)+1;
+   }
+  char *t = (char *)calloc(N+1, 1);
+  for (int i = 0; i < linesPerTree; ++i)                                        // Concatenate line representing the tree
+   {char *s = S[i];
+    if (!strlen(s)) continue;
+    strcat(t, s);
+    strcat(t, "\n");
+   }
+  return t;                                                                     // Printed tree
+ }
+
+char *dump()                                                                    // Dump a tree horizontally
+ {char *S = calloc(stringLength, linesPerTree*linesPerNode);                    // A big buffer with room for several lines per node
+  char *T[linesPerTree];                                                        // Array of lines
+
+  for (int i = 0; i < linesPerTree; ++i) T[i] = S + i * stringLength;           // Array of lines in big buffer
+  if (rootIsLeaf()) printLeaf(0, T, 0); else printBranch(0, T, 0);              // Print tree
+  char *r = printCollapsed(T);                                                  // Collapse lines into text
+  free(S);                                                                      // Free lines
+  return r;                                                                     // Return text
+ }
+
+static inline void  print(const char *title)                                                   // Print the tree
+ {char *s = dump();
+  say("Tree: %s", title);
+  say(s);
+  free(s);
+ }
+
+static inline void  dumpTree(const char *s)                                                    // Dump the tree
+ {say("Tree: %s", s);
+  for (int i = 0; i < number_of_nodes; ++i)
+   {if (btree.nodes[i].free) continue;                                          // On free chain
+    if (isLeaf(i))
+     {say("Leaf  : %2d  %d %s", i, btree.nodes[i].free, leaf_print(leaf(i)));
      }
-    char *t = (char *)calloc(N+1, 1);
-    for (int i = 0; i < linesPerTree; ++i)                                      // Concatenate line representing the tree
-     {char *s = S[i];
-      if (!strlen(s)) continue;
-      strcat(t, s);
-      strcat(t, "\n");
-     }
-    return t;                                                                   // Printed tree
-   }
-
-  char *dump()                                                                  // Dump a tree horizontally
-   {char *S = calloc(stringLength, linesPerTree*linesPerNode);                  // A big buffer with room for several lines per node
-    char *T[linesPerTree];                                                      // Array of lines
-
-    for (int i = 0; i < linesPerTree; ++i) T[i] = S + i * stringLength;         // Array of lines in big buffer
-    if (rootIsLeaf()) printLeaf(0, T, 0); else printBranch(0, T, 0);            // Print tree
-    char *r = printCollapsed(T);                                                // Collapse lines into text
-    free(S);                                                                    // Free lines
-    return r;                                                                   // Return text
-   }
-
-  void print(const char *title)                                                 // Print the tree
-   {char *s = dump();
-    say("Tree: %s", title);
-    say(s);
-    free(s);
-   }
-
-  void dumpTree(const char *s)                                                  // Dump the tree
-   {say("Tree: %s", s);
-    for (int i = 0; i < number_of_nodes; ++i)
-     {if (btree.nodes[i].free) continue;                                        // On free chain
-      if (isLeaf(i))
-       {say("Leaf  : %2d  %d %s", i, btree.nodes[i].free, leaf_print(leaf(i)));
-       }
-      else
-       {say("Branch: %2d  %d %s", i, btree.nodes[i].free, branch_print(branch(i)));
-       }
+    else
+     {say("Branch: %2d  %d %s", i, btree.nodes[i].free, branch_print(branch(i)));
      }
    }
-
+ }
 
 //D1 Find                                                                       // Find the data associated with a key
 
@@ -613,12 +612,10 @@ Find_Result find_result(int Leaf, int Found, int Index, int Key, int Data)      
   return f;
  }
 
-void print_find_result(Find_Result r)                                           // Print result
+static inline void print_find_result(Find_Result r)                             // Print result
  {say("Find_Result leaf=%d,found=%d,index=%d,key=%d,data=%d",
       r.leaf, r.found, r.index, r.key, r.data);
  }
-
-Find_Result find(int Key) __attribute__((noinline));                            // Find the data associated with a key in the tree
 
 Find_Result find(int Key)                                                       // Find the data associated with a key in the tree
  {if (rootIsLeaf())                                                             // The root is a leaf
@@ -650,7 +647,7 @@ typedef struct                                                                  
   Find_Result found;
  } FindAndInsert_Result;
 
-void print_findAndInsert_result(FindAndInsert_Result r)                         // Print result
+static inline void  print_findAndInsert_result(FindAndInsert_Result r)                         // Print result
  {Find_Result f = r.found;
    say("FindAndInsert_Result success=%d,inserted=%d,leaf=%d,found=%d,index=%d,key=%d,data=%d",
       r.success, r.inserted, f.leaf, f.found, f.index, f.key, f.data);
@@ -687,9 +684,7 @@ FindAndInsert_Result findAndInsert(int Key, int Data)                           
 
 //D1 Insertion                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
 
-void put(int Key, int Data) __attribute__((noinline));                          // Insert a key, data pair into the tree or update and existing key with a new datum
-
-void put(int Key, int Data)                                                     // Insert a key, data pair into the tree or update and existing key with a new datum
+static inline void put(int Key, int Data)                                       // Insert a key, data pair into the tree or update and existing key with a new datum
  {FindAndInsert_Result f = findAndInsert(Key, Data);                            // Try direct insertion with no modifications to the shape of the tree
   if (f.success) return;                                                        // Inserted or updated successfully
 
@@ -758,8 +753,6 @@ FindAndDelete_Result findAndDelete(int Key)                                     
   return findAndDelete_result(f, 1, kd.data);
  }
 
-FindAndDelete_Result delete(int Key)  __attribute__((noinline));                // Insert a key, data pair into the tree or update and existing key with a new datum
-
 FindAndDelete_Result delete(int Key)                                            // Insert a key, data pair into the tree or update and existing key with a new datum
  {mergeRoot();
 
@@ -790,7 +783,7 @@ FindAndDelete_Result delete(int Key)                                            
 
 //D1 Merge                                                                      // Merge along the specified search path
 
-void merge(int Key)                                                             // Merge along the specified search path
+static inline void  merge(int Key)                                                             // Merge along the specified search path
  {mergeRoot();
   int p = 0;                                                                    // Start at root
 
@@ -799,9 +792,7 @@ void merge(int Key)                                                             
 
     for (int j = 0; j < branchSize(p); j++)                                     // Try merging each sibling pair which might change the size of the parent
      {if (mergeLeftSibling(p, j)) --j;                                          // A successful merge of the left  sibling reduces the current index and the upper limit
-//if (debug) print("BBBB2222");
       mergeRightSibling(p, j);                                                  // A successful merge of the right sibling maintains the current position but reduces the upper limit
-//if (debug) print("BBBB3333");
      }
 
     Branch_Result down =
