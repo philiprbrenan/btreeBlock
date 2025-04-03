@@ -9,7 +9,7 @@
 #include <memory.h>
 #include <string.h>
 #include <stdarg.h>
-#include <execinfo.h>
+//#include <execinfo.h>
 
 static void say(char *format, ...)                                              // Say something
  {va_list p;
@@ -30,12 +30,12 @@ static char *ssay(char *format, ...)                                            
   return result;
  }
 
-void printTraceback()                                                           // Print a traceback
- {void *array[32];
-  size_t size = backtrace(array, sizeof(array)/sizeof(*array));
-  backtrace_symbols_fd(array, size, 2);
-  exit(1);
-}
+//void printTraceback()                                                           // Print a traceback
+// {void *array[32];
+//  size_t size = backtrace(array, sizeof(array)/sizeof(*array));
+//  backtrace_symbols_fd(array, size, 2);
+//  exit(1);
+//}
 
 static void stop(char *format, ...)                                             // Stop after saying something
  {va_list p;
@@ -44,5 +44,6 @@ static void stop(char *format, ...)                                             
   assert(i > 0);
   va_end(p);
   fprintf(stderr, "\n");
-  printTraceback();
+//printTraceback();
+  exit(0);
  }
