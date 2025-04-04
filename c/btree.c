@@ -2,13 +2,17 @@
 // Node definition
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
 //------------------------------------------------------------------------------
+#undef  assert_checks                                                           // The assert checks significantly complicate the generated assembly, and we don't really need them since this is just a direct copy of the Java code, which is already known to work.
+
 #define branch_maxSize1 3                                                       // The maximum number of keys in a branch stuck - must be odd
 #define branch_maxSize (branch_maxSize1+1)                                      // The size of the branch stuck includes top which is always present
 #define leaf_maxSize    2                                                       // The maximum number of entries in a leafstuck - must be even.
 
 #include "branch.c"
 #include "leaf.c"
+#ifdef assert_checks
 #include "basics.c"
+#endif
 
 #define number_of_nodes 100                                                     // Number of nodes available for constructing a tree
 #define maxDepth         10                                                     // Maximum depth of a tree
@@ -16,7 +20,6 @@
 #define gutter            2                                                     // Gutter between printed items
 #define linesPerNode      4                                                     // Number of lines needed to print a node
 #define linesPerTree (linesPerNode * maxDepth)                                  // Number of lines needed to print a tree
-// try removing_Result
 
 int debug = 0;                                                                  // Debugging when true
 
@@ -55,7 +58,9 @@ static inline void  create()                                                    
 
 static inline int allocate()                                                    // Allocate a node
  {int f = btree.free;                                                           // Last freed node
+#ifdef assert_checks
   if (f == 0) stop("No more memory available");                                 // No more free nodes available
+#endif
   btree.free = btree.nodes[f].free;                                             // Second to last freed node becomes head of the free chain
   btree.nodes[f].free = 0;                                                      // Not on the free chain
   clear(f);                                                                     // Clear the node
@@ -69,10 +74,12 @@ static inline void  setBranch(int n) {       btree.nodes[n].isLeaf = 0;}        
 static inline void    setLeafRoot () {       btree.nodes[0].isLeaf = 1;}        // Set root as leaf
 static inline void  setBranchRoot () {       btree.nodes[0].isLeaf = 0;}        // Set root as branch
 
+#ifdef assert_checks
 static inline void  assertLeaf  (int n) {if (!isLeaf(n)) stop("Leaf required");}
 static inline void  assertBranch(int n) {if ( isLeaf(n)) stop("Branch required");}
 static inline void  assertLeafRoot   () {if (!isLeaf(0)) stop("Leaf required");}
 static inline void  assertBranchRoot () {if ( isLeaf(0)) stop("Branch required");}
+#endif
 
 static inline void  clear(int n)                                                // Clear a new node to zeros ready for use
  {char *p = (char *)&btree.nodes[n].branchOrLeaf;
@@ -91,18 +98,46 @@ static inline void  erase(int n)                                                
  }
 
 static inline void  freeNode(int n)                                             // Free a new node to make it available for reuse
- {if (!n) stop("Cannot free root");                                             // The root is never freed
+ {
+#ifdef assert_checks
+  if (!n) stop("Cannot free root");                                             // The root is never freed
+#endif
   erase(n);                                                                     // Clear the node to encourage erroneous frees to do damage that shows up quickly.
   int f = btree.free;                                                           // Last freed node from head of free chain
   btree.free = n;                                                               // Chain this node in front of the last freed node
-  btree.nodes[n].free = f;                                                       // Second to last freed node becomes head of the free chain
+  btree.nodes[n].free = f;                                                      // Second to last freed node becomes head of the free chain
  }
 
-static inline Leaf   *leaf  (int n) {assertLeaf  (n); return &btree.nodes[n].branchOrLeaf.leaf;}   // Leaf
-static inline Branch *branch(int n) {assertBranch(n); return &btree.nodes[n].branchOrLeaf.branch;} // Branch
+static inline Leaf *leaf(int n)                                                 // Leaf
+ {
+#ifdef assert_checks
+  assertLeaf  (n);
+#endif
+  return &btree.nodes[n].branchOrLeaf.leaf;
+ }
+static inline Branch *branch(int n)                                             // Branch
+ {
+#ifdef assert_checks
+  assertBranch(n);
+#endif
+  return &btree.nodes[n].branchOrLeaf.branch;
+ }
 
-static inline int leafSize  (int n) {assertLeaf  (n); return   leaf_size (leaf  (n));}        // Number of children in body of leaf
-static inline int branchSize(int n) {assertBranch(n); return branch_size1(branch(n));}        // Number of children in body of branch taking top for granted as it is always there
+static inline int leafSize  (int n)                                             // Number of children in body of leaf
+ {
+#ifdef assert_checks
+  assertLeaf  (n);
+#endif
+  return   leaf_size (leaf  (n));
+ }
+
+static inline int branchSize(int n)                                             // Number of children in body of branch taking top for granted as it is always there
+ {
+#ifdef assert_checks
+  assertBranch(n);
+#endif
+  return branch_size1(branch(n));
+ }
 
 static inline int splitLeafSize  () {return   leaf_maxSize  >> 1;}              // The number of key, data pairs to split out of a leaf
 static inline int splitBranchSize() {return branch_maxSize1 >> 1;}              // The number of key, next pairs to split out of a branch
@@ -117,14 +152,20 @@ static inline int isFullRoot() {return isFull(0);}                              
 static inline int isLow(int n) {return (isLeaf(n) ? leafSize(n) : branchSize(n)) < 2;}        // The node is low on children making it impossible to merge two sibling children
 
 static inline int hasLeavesForChildren(int n)                                   // The node has leaves for children
- {assertBranch(n);
+ {
+#ifdef assert_checks
+   assertBranch(n);
+#endif
   Branch *b = branch(n);
   int     f = branch_firstElement(b).data;
   return isLeaf(f);
  }
 
 static inline int top(int n)                                                    // The top next element of a branch
- {assertBranch(n);
+ {
+#ifdef assert_checks
+  assertBranch(n);
+#endif
   Branch *b = branch(n);
   return branch_lastElement(b).data;
  }
@@ -135,8 +176,11 @@ static inline int allocBranch() {int n = allocate(); setBranch(n); return n;}   
 //D2 Split                                                                      // Split nodes in half to increase the number of nodes in the tree
 
 static inline void  splitLeafRoot()                                             // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
- {assertLeafRoot();
+ {
+#ifdef assert_checks
+  assertLeafRoot();
   if (!isFullRoot()) stop("Root is not full");
+#endif
 
   int L = allocLeaf(); Leaf *l = leaf(L);                                       // New left leaf
   int R = allocLeaf(); Leaf *r = leaf(R);                                       // New right leaf
@@ -162,8 +206,11 @@ static inline void  splitLeafRoot()                                             
  }
 
 static inline void  splitBranchRoot()                                           // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
- {assertBranchRoot();
+ {
+#ifdef assert_checks
+  assertBranchRoot();
   if (!isFullRoot()) stop("Root is not full");
+#endif
 
   int L = allocBranch(); Branch *l = branch(L);                                 // New left branch
   int R = allocBranch(); Branch *r = branch(R);                                 // New right branch
@@ -191,7 +238,9 @@ static inline void  splitBranchRoot()                                           
  }
 
 static inline void  splitLeaf(int node, int parent, int index)                  // Split a leaf which is not the root
- {assertLeaf(node);
+ {
+#ifdef assert_checks
+  assertLeaf(node);
   if (node == 0) stop("Cannot split root with this method");
   int S   = leafSize(node), I   = index;
   int nif = !isFull (node), pif = isFull(parent);
@@ -199,6 +248,7 @@ static inline void  splitLeaf(int node, int parent, int index)                  
   if (pif)   stop("Parent: %d must not be full", parent);
   if (I < 0) stop("Index: %d too small",              I);
   if (I > S) stop("Index: %d too big for leaf with:", I, S);
+#endif
 
   int p = parent;                                                               // Parent
   int l = allocLeaf();                                                          // New  split out leaf
@@ -216,7 +266,9 @@ static inline void  splitLeaf(int node, int parent, int index)                  
  }
 
 static inline void  splitBranch(int node, int parent, int index)                               // Split a branch which is not the root by splitting right to left
- {assertBranch(node);
+ {
+#ifdef assert_checks
+  assertBranch(node);
   int bs = branchSize(node), I = index, nd = node;
   int nif = !isFull(node), pif = isFull(parent);
   if (nd == 0) stop("Cannot split root with this method");
@@ -225,6 +277,7 @@ static inline void  splitBranch(int node, int parent, int index)                
   if (I < 0)   stop("Index", I, "too small in node:", node);
   if (I > bs)  stop("Index", I, "too big for branch with:",
                           bs, "in node:", node);
+#endif
 
   int p = parent;
   int l = allocBranch();
@@ -242,10 +295,13 @@ static inline void  splitBranch(int node, int parent, int index)                
  }
 
 static inline int stealFromLeft(int node, int index)                            // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
- {assertBranch(node);
+ {
+#ifdef assert_checks
+  assertBranch(node);
   if (index == 0) return 0;
   if (index < 0)                stop("Index %d too small", index);
   if (index > branchSize(node)) stop("Index %d too big",   index);
+#endif
 
   int P = node;
   int l = branch_elementAt(branch(P), index-1).data;
@@ -285,10 +341,13 @@ static inline int stealFromLeft(int node, int index)                            
  }
 
 static inline int stealFromRight(int node, int index)                           // Steal from the right sibling of the indicated child if possible
- {assertBranch(node);
+ {
+#ifdef assert_checks
+  assertBranch(node);
   if (index == branchSize(node)) return 0;
   if (index < 0)                 stop("Index %d too small", index);
   if (index >= branchSize(node)) stop("Index %d too big",   index);
+#endif
 
   Branch_Result L = branch_elementAt(branch(node), index+0); int l = L.data;
   Branch_Result R = branch_elementAt(branch(node), index+1); int r = R.data;
@@ -375,14 +434,18 @@ static inline int mergeRoot()                                                   
  }
 
 static inline int mergeLeftSibling(int parent, int index)                       // Merge the left sibling
- {assertBranch(parent);
+ {
+#ifdef assert_checks
+  assertBranch(parent);
+#endif
   if (index == 0) return 0;
   int bs = branchSize(parent);
+#ifdef assert_checks
   const char * bss = "for branch of size:";
   if (index < 0 ) stop("Index: %d too small%s%d", index, bss, bs);
   if (index > bs) stop("Index: %d too big%s%d",   index, bss, bs);
+#endif
   if (bs    < 2 ) return 0;
-
   Branch_Result L = branch_elementAt(branch(parent), index-1);
   Branch_Result R = branch_elementAt(branch(parent), index-0);
 
@@ -426,12 +489,17 @@ static inline int mergeLeftSibling(int parent, int index)                       
  }
 
 static inline int mergeRightSibling(int parent, int index)                      // Merge the right sibling
- {assertBranch(parent);
+ {
+#ifdef assert_checks
+  assertBranch(parent);
+#endif
   int bs = branchSize(parent);
+#ifdef assert_checks
   const char *bss = "for branch of size:";
   if (index >= bs) return 0;
   if (index <  0 ) stop("Index %d too small%s%d", index, bss, bs);
   if (index >  bs) stop("Index %d too big%s%d",   index, bss, bs);
+#endif
   if (bs < 2) return 0;
 
   Branch_Result L = branch_elementAt(branch(parent), index+0);
@@ -481,9 +549,12 @@ static inline int mergeRightSibling(int parent, int index)                      
 //D2 Balance                                                                    // Balance the tree by merging and stealing
 
 static inline void  balance(int parent, int index)                              // Augment the indexed child so it has at least two children in its body
- {assertBranch(parent);
+ {
+#ifdef assert_checks
+  assertBranch(parent);
   if (index < 0)                  stop("Index %d too small", index);
   if (index > branchSize(parent)) stop("Index %d too big",   index);
+#endif
   //if (isLow(parent) && parent != 0)
   // {stop("Parent: %d must not be low on children", parent);
   // }
@@ -499,6 +570,7 @@ static inline void  balance(int parent, int index)                              
  }
 
 //D1 Print                                                                      // Print a BTree horizontally
+#ifdef assert_checks
 
 static inline void  padStrings(char **S)                                        // Pad the strings at each level of the tree so we have a vertical face to continue with - a bit like Marc Brunel's tunneling shield
  {int L = 0;
@@ -594,6 +666,7 @@ static inline void  dumpTree(const char *s)                                     
      }
    }
  }
+#endif
 
 //D1 Find                                                                       // Find the data associated with a key
 
@@ -605,17 +678,20 @@ typedef struct                                                                  
   int data;
  } Find_Result;
 
-Find_Result find_result(int Leaf, int Found, int Index, int Key, int Data)      // Find result
+static inline Find_Result find_result                                           // Find result
+ (int Leaf, int Found, int Index, int Key, int Data)
  {Find_Result f;
   f.leaf = Leaf;
   f.found = Found; f.index = Index; f.key = Key; f.data = Data;
   return f;
  }
 
+#ifdef assert_checks
 static inline void print_find_result(Find_Result r)                             // Print result
  {say("Find_Result leaf=%d,found=%d,index=%d,key=%d,data=%d",
       r.leaf, r.found, r.index, r.key, r.data);
  }
+#endif
 
 Find_Result find(int Key)                                                       // Find the data associated with a key in the tree
  {if (rootIsLeaf())                                                             // The root is a leaf
@@ -636,7 +712,9 @@ Find_Result find(int Key)                                                       
      }
     parent = n;                                                                 // Step down to lower branch
    }
+#ifdef assert_checks
   stop("Search did not terminate in a leaf");
+#endif
   Find_Result f = {0,0,0,0,0};
   return f;
  }
@@ -647,20 +725,22 @@ typedef struct                                                                  
   Find_Result found;
  } FindAndInsert_Result;
 
-static inline void  print_findAndInsert_result(FindAndInsert_Result r)                         // Print result
+#ifdef assert_checks
+static inline void  print_findAndInsert_result(FindAndInsert_Result r)          // Print result
  {Find_Result f = r.found;
    say("FindAndInsert_Result success=%d,inserted=%d,leaf=%d,found=%d,index=%d,key=%d,data=%d",
       r.success, r.inserted, f.leaf, f.found, f.index, f.key, f.data);
  }
+#endif
 
-FindAndInsert_Result findAndInsert_result                                       // Find result
+static inline FindAndInsert_Result findAndInsert_result                         // Find result
  (Find_Result f, int Success, int Inserted)
  {FindAndInsert_Result i;
   i.found = f; i.success= Success; i.inserted = Inserted;
   return i;
  }
 
-FindAndInsert_Result findAndInsert(int Key, int Data)                           // Find the leaf that should contain this key and insert or update it is possible
+static inline FindAndInsert_Result findAndInsert(int Key, int Data)             // Find the leaf that should contain this key and insert or update it is possible
  {Find_Result f = find(Key);                                                    // Find the leaf that should contain this key
 
   if (f.found)                                                                  // Found the key in the leaf so update it with the new data
@@ -684,7 +764,7 @@ FindAndInsert_Result findAndInsert(int Key, int Data)                           
 
 //D1 Insertion                                                                  // Insert a key, data pair into the tree or update and existing key with a new datum
 
-static inline void put(int Key, int Data)                                       // Insert a key, data pair into the tree or update and existing key with a new datum
+void put(int Key, int Data)                                                     // Insert a key, data pair into the tree or update and existing key with a new datum
  {FindAndInsert_Result f = findAndInsert(Key, Data);                            // Try direct insertion with no modifications to the shape of the tree
   if (f.success) return;                                                        // Inserted or updated successfully
 
@@ -725,7 +805,9 @@ static inline void put(int Key, int Data)                                       
      {p = q;
      }
    }
+#ifdef assert_checks
   stop("Fallen off the end of the tree");                                       // The tree must be missing a leaf
+#endif
  }
 
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
@@ -736,14 +818,14 @@ typedef struct                                                                  
   Find_Result found;
  } FindAndDelete_Result;
 
-FindAndDelete_Result findAndDelete_result                                       // Find result
+static inline FindAndDelete_Result findAndDelete_result                         // Find result
  (Find_Result f, int Success, int Data)
  {FindAndDelete_Result i;
   i.found = f; i.success= Success; i.data = Data;
   return i;
  }
 
-FindAndDelete_Result findAndDelete(int Key)                                     // Delete a key from the tree and returns its data if present without modifying the shape of tree
+static inline FindAndDelete_Result findAndDelete(int Key)                       // Delete a key from the tree and returns its data if present without modifying the shape of tree
  {Find_Result f = find(Key);                                                    // Find the key
   if (!f.found) return findAndDelete_result(f, 0, 0);                           // No such key
   int l = f.leaf;                                                               // The leaf that contains the key
@@ -776,7 +858,9 @@ FindAndDelete_Result delete(int Key)                                            
      }
     p = q;
    }
+#ifdef assert_checks
   stop("Fallen off the end of the tree");                                       // The tree must be missing a leaf
+#endif
   FindAndDelete_Result r = {0,0,{0,0,0,0,0}};
   return r;
  }
@@ -799,11 +883,13 @@ static inline void  merge(int Key)                                              
       branch_searchFirstGreaterThanOrEqualExceptLast(branch(p), Key);
     p = down.data;
    }
+#ifdef assert_checks
   stop("Fallen off the end of the tree");                                       // The tree must be missing a leaf
+#endif
  }
 
 //D1 Tests                                                                      // Build some trees and test them
-
+#ifdef assert_checks
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -986,3 +1072,4 @@ int tests()                                                                     
  }
 
 int main() {return tests();}
+#endif
