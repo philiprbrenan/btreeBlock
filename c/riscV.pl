@@ -51,142 +51,146 @@ sub translateRiscVToJava()                                                      
 
   system("riscv64-unknown-elf-gcc -S -I. -I/usr/include/newlib/ -o $asm $cpl"); # Compile source code for nbtree to produce RiscV code
 
-  my @l = readFile $asm;                                                        # Each line of assembler
+  my @la = readFile $asm;                                                       # Each line of assembler
+  my $in = 0;                                                                   # The number of each instruction
 
-  for my $l(@l)                                                                 # Each line of assembler
-   {last if $l =~ m(\Atests_passed:);                                           # Tests after this point
-    $l =~ s(\A\s+|\s+\Z) ()g;
-    $l =~ s([\t,])       ( )g;
-    $l =~ s(\bsext\.w\b) (sextw)g;
+  for my $la(@la)                                                               # Each line of assembler
+   {last if $la =~ m(\Atests_passed:);                                          # Tests after this point
+    $la =~ s(\A\s+|\s+\Z) ()g;
+    $la =~ s([\t,])       ( )g;
+    $la =~ s(\bsext\.w\b) (sextw)g;
 
-    if ($l =~ m(\A\.?((\w|\.)+):\Z)i)                                           # Label
+    if ($la =~ m(\A\.?((\w|\.)+):\Z)i)                                          # Label
      {push @L, $1;
       push @j, ll($1).qq{.set();};
       next;
      }
 
-    next  if $l =~ m(\A\.);                                                     # Directive
+    next  if $la =~ m(\A\.);                                                    # Directive
 
-    my @l = split /\s+/, $l;                                                    # Instruction
+    my @l = split /\s+/, $la;                                                   # Instruction
     my $op = shift @l;
-    $i{$l}++;                                                                   # Statistics
+    $i{$la}++;                                                                  # Statistics
     $t{$op}++;
 
     my ($t, $s1, $s2) = @l;                                                     # Parse instruction
+    my $j; my $x;                                                                      # Corresonding line of java
 
     if ($op =~ m(lui)i)                                                         # Lui
      {if    ($s1 =~ m(\A%hi\(_impure_ptr\)\Z)is)                                # Lui hi with no operand assume zero
-       {push @j, qq{$op($t, true, 0);            /* AAAA */};
+       {$j =  qq{$op($t, true, 0);};            $x = q(A);
        }
       elsif ($s1 =~ m(\A%hi\(\.?(\w+)\)\Z)is)                                   # Lui hi label
        {my $L = ll($1);
-        push @j, qq{$op($t, true, $L)            /* BBBB */;};
+        $j =  qq{$op($t, true, $L);};           $x = q(B);
        }
       elsif ($s1 =~ m(\A%hi\((.*?)\+(\d+)\)\Z)is)                               # Lui hi function + offset
        {my $L = ll($1);
-        push @j, qq{$op($t, true, $L, $2);       /* CCCC */};
+        $j =  qq{$op($t, true, $L, $2);};       $x = q(C);
        }
       elsif ($s1 =~ m(\A%hi\((.*?)\)\Z)is)                                      # Lui hi function
        {my $L = ll($1);
-        push @j, qq{$op($t, true, $L);           /* DDDD */};
+        $j =  qq{$op($t, true, $L);};           $x = q(D);
        }
       else
-       {push @j, qq{$op($t, $s1);                /* EEEE */};
+       {$j =  qq{$op($t, $s1);};                $x = q(E);
        }
      }
     elsif ($op =~ m(addi)i)                                                     # addi
      {if    ($s2 =~ m(\A%lo\(\.?(\w+)\)\Z)is)
        {my $L = ll($1);
-        push @j, qq{$op($t, $s1, false, $L);     /* IIII */};
+        $j =  qq{$op($t, $s1, false, $L);};     $x = q(F);
        }
       elsif ($s2 =~ m(\A%lo\((.*?)\+(\d+)\)\Z)is)
        {my $L = ll($1);
-        push @j, qq{$op($t, $s1, false, $L, $2); /* JJJJ */};
+        $j =  qq{$op($t, $s1, false, $L, $2);}; $x = q(G);
        }
       elsif ($s2 =~ m(\A%lo\((.*?)\)\Z)is)
        {my $L = ll($1);
-        push @j, qq{$op($t, $s1, false, $L);     /* KKKK */};
+        $j =  qq{$op($t, $s1, false, $L);};     $x = q(H);
        }
       else
-       {push @j, qq{$op($t, $s1, $s2);           /* LLLL */};
+       {$j =  qq{$op($t, $s1, $s2);};           $x = q(I);
        }
      }
     elsif ($op =~ m(ld)i)                                                       # Ld
      {if    ($s1 =~ m(\A%lo\(_impure_ptr\)\((\w+)\)\Z)is)
-       {push @j, qq{$op($t, false,  $1);         /* FFFF */};
+       {$j =  qq{$op($t, false,  $1);};         $x = q(J);
        }
       elsif ($s1 =~ m(\A-?(\d+)\((\w+)\)\Z)is)
-       {push @j, qq{$op($t, $2, $1);             /* GGGG */};
+       {$j =  qq{$op($t, $2, $1);};             $x = q(K);
        }
       else
-       {push @j, qq{$op($t, $s1);                /* HHHH */};
+       {$j =  qq{$op($t, $s1);};                $x = q(L);
        }
      }
     elsif ($op =~ m(sb|sbu|sw|sd)i)                                             # store
      {if    ($s1 =~ m(\A%lo\(\.?(\w+)\+(\d+)\)\((\w+)\)\Z)is)
        {my $L = ll($1);
-        push @j, qq{$op($t, false, $L, $2, $3);  /* MMMM */};
+        $j =  qq{$op($t, false, $L, $2, $3);};  $x = q(M);
        }
       elsif ($s1 =~ m(\A%lo\(\.?(\w+)\)\((\w+)\)\Z)is)
        {my $L = ll($1);
-        push @j, qq{$op($t, false, $L, $2);      /* NNNN */};
+        $j =  qq{$op($t, false, $L, $2);};      $x = q(N);
        }
       elsif  ($s1 =~ m/\A(-?\d+)\((\w+)\)\Z/is)
-       {push @j, qq{$op($t, $1, $2);             /* OOOO */};
+       {$j =  qq{$op($t, $1, $2);};             $x = q(O);
        }
       else
-       {push @j, qq/$op(/.join(",", @l).");      /* PPPP */";
+       {$j =  qq/$op(/.join(",", @l).");";      $x = q(P);
        }
      }
     elsif ($op =~ m(lb|lbu|lw|ld)i)                                             # load
      {if     ($s1 =~ m/\A%lo\((\w+)\+(\d+)\)\((\w+)\)\Z/is)
        {my $L = ll($1);
-        push @j, qq{$op($t, false, $L, $2, $3);  /* QQQQ */};
+        $j =  qq{$op($t, false, $L, $2, $3);}; $x = q(R);
        }
       elsif ($s1 =~ m/\A%lo\((\w+)\)\((\w+)\)\Z/is)
        {my $L = ll($1);
-        push @j, qq{$op($t, false, $L, $2);      /* RRRR */};
+        $j =  qq{$op($t, false, $L, $2);};     $x = q(S);
        }
       elsif     ($s1 =~ m/\A(-?\d+)\((\w+)\)\Z/is)
-       {push @j, qq{$op($t, $1, $2);             /* SSSS */};
+       {$j =  qq{$op($t, $1, $2);};            $x = q(T);
        }
       else
-       {push @j, qq/$op(/.join(",", @l).");      /* TTTT */";
+       {$j =  qq/$op(/.join(",", @l).");";     $x = q(U);
        }
      }
     elsif ($op =~ m(jr)i)                                                       # jr
-     {push @j, qq{$op($t);                       /* UUUU */};
+     {$j =  qq{$op($t);};                      $x = q(W);
      }
     elsif ($op =~ m(j)i)                                                        # j
      {my $L = ll($t =~ s(\A.) ()ir);
-      push @j, qq{$op($L);                       /* WWWW */};
+      $j =  qq{$op($L);};                      $x = q(X);
      }
     elsif ($op =~ m(call|tail)i)                                                # call
      {my $L = ll($t);
-      push @j, qq{$op($L);                      /* XXXX */};
+      $j =  qq{$op($L);};                      $x = q(Y);
      }
     elsif ($op =~ m(b(eq|ge|gt|le|lt|ne))i)                                     # branch
      {my $L = ll($s2 =~ s(\A.) ()ir);
-      push @j, qq{$op($t, $s1, $L);             /* YYYY */};
+      $j =  qq{$op($t, $s1, $L);};             $x = q(Z);
      }
     elsif ($op =~ m(seqz)i)                                                     # seqz
-     {push @j, qq{$op($t, $s1);                 /* YY11 */};
+     {$j =  qq{$op($t, $s1);};                 $x = q(a);
      }
     else
-     {push @j, qq/$op(/.join(",", @l).");        /* ZZZZ */";
+     {$j =  qq/$op(/.join(",", @l).");";       $x = q(b);
      }
+
+    push @j, sprintf "/* %4d %s */ %s", $in++, $x , $j;
    }
 
   say STDERR "Instr ", scalar keys %i;
   say STDERR "Ops   ", scalar keys %t;
 
   my @J;
-  push @J,  map {q(  ProgramDM.Label ).ll($_).qq( = P.new Label();)} @L;        # Put all the labels first
+  push @J,  map {q(  ProgramDM.Label ).ll($_).qq( = P.new Label("$_");)} @L;    # Put all the labels first
   push @J, "  void test_btree1() {";
-  push @J, qq(    $j[$_]) for 1..@j/2;
+  push @J, qq(    $j[$_]) for 0..@j/2;
   push @J, "   }";
   push @J, "  void test_btree2() {";
-  push @J, qq(    $j[$_]) for @j/2+1..$#j;
+  push @J, qq(    $j[$_]) for @j/2+1..@j-1;
   push @J, "   }";
 
   my $J = join "\n", @J;                                                        # The java code
@@ -201,3 +205,5 @@ translate(qw(branch), 8, q(int), q(int));
 translateRiscVToJava();                                                         # Embed the RiscV assembler in Java
 
 unlink $asm, $jsm, qw(branch.c leaf.c);                                         # Remove generated files
+
+system("javac -g -d /home/phil/btreeBlock/c/../Classes/ -cp /home/phil/btreeBlock/c/../Classes/ /home/phil/btreeBlock/c/RiscV.java && java -ea -cp /home/phil/btreeBlock/c/../Classes/ com.AppaApps.Silicon.RiscV");
