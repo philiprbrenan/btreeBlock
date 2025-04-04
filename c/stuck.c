@@ -219,11 +219,14 @@ static inline Stuck_Result stuck_searchFirstGreaterThanOrEqualExceptLast(Stuck *
 
 // Tests
 
+#ifdef assert_checks
 int stuck_tests_passed = 0;
 int stuck_tests_failed = 0;
+#endif
 
 //D1 Print                                                                      // Print a stuck
 
+#ifdef assert_checks
 char *stuck_print(Stuck *s)                                                     // Print a stuck
  {char *C = (char *)malloc(4096), *c = C;
   int N = stuck_size(s);
@@ -253,10 +256,11 @@ char *stuck_print_result(Stuck_Result r)                                        
 static inline void  stuck_print_result_err(Stuck_Result r)                                     // Print the result of a stuck operation
  {fprintf(stderr, "%s", stuck_print_result(r));
  }
+#endif
 
 //D1 Tests                                                                      // Testing
 
-#ifdef stuck_runTests
+#ifdef assert_checks
 
 static inline void  stuck_ok(const char *name, const char *g, const char *e)                   // Test got versus expected
  {int c = strcmp(g, e);
