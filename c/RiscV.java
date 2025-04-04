@@ -42,74 +42,77 @@ class RiscV extends Test                                                        
 
   final int    [] R = new int [32];                                             // Registers
   final byte   [] M = new byte[powerTwo(20)];                                   // Memory
-  final byte   [] S = new byte[powerTwo(20)];                                   // Stack
   final ProgramDM P = new ProgramDM();                                          // Program
 
-  void add  (int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] = R[s1] + R[s2];}};}
-  void addi (int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] = R[s1] +   s2; }};}
-  void addi (int t, int s1,     boolean s2, ProgramDM.Label s3)         {P.new I() {void a() {R[t] =  s2 ? s3.get()>>20 : s3.get();}};}
-  void addi (int t, int s1,     boolean s2, ProgramDM.Label s3, int s4) {P.new I() {void a() {R[t] = (s2 ? s3.get()>>20 : s3.get()) + R[s4];}};}
-  void addiw(int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] = R[s1] + R[s2];}};}
-  void addw (int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] = R[s1] +   s2;}};}
+  void add  (int t, int s1,     int     s2)                             {P.new I() {String v() {return "add  ";} void a() {R[t] = R[s1] + R[s2];}};}
+  void addi (int t, int s1,     int     s2)                             {P.new I() {String v() {return "addi ";} void a() {R[t] = R[s1] +   s2; }};}
+  void addi (int t, int s1,     boolean s2, ProgramDM.Label s3)         {P.new I() {String v() {return "addi ";} void a() {R[t] =  s2 ? s3.get()>>20 : s3.get();}};}
+  void addi (int t, int s1,     boolean s2, ProgramDM.Label s3, int s4) {P.new I() {String v() {return "addi ";} void a() {R[t] = (s2 ? s3.get()>>20 : s3.get()) + R[s4];}};}
+  void addw (int t, int s1,     int     s2)                             {P.new I() {String v() {return "addw ";} void a() {R[t] = R[s1] + R[s2];}};}
+  void addiw(int t, int s1,     int     s2)                             {P.new I() {String v() {return "addiw";} void a() {R[t] = R[s1] +   s2;}};}
 
-  void and  (int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] = R[s1] & R[s2];}};}
-  void andi (int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] = R[s1] &   s2;}};}
+  void and  (int t, int s1,     int     s2)                             {P.new I() {String v() {return "and  ";} void a() {R[t] = R[s1] & R[s2];}};}
+  void andi (int t, int s1,     int     s2)                             {P.new I() {String v() {return "andi ";} void a() {R[t] = R[s1] &   s2; }};}
 
-  void bleu (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {void a() {R[t] = R[s1] + s2.get();}};}
-  void bltu (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {void a() {R[t] = R[s1] + s2.get();}};}
-  void bgtu (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {void a() {R[t] = R[s1] + s2.get();}};}
-  void beq  (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {void a() {R[t] = R[s1] + s2.get();}};}
-  void bge  (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {void a() {R[t] = R[s1] + s2.get();}};}
-  void bgt  (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {void a() {R[t] = R[s1] + s2.get();}};}
-  void ble  (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {void a() {R[t] = R[s1] + s2.get();}};}
-  void blt  (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {void a() {R[t] = R[s1] + s2.get();}};}
-  void bne  (int t, int s1,     ProgramDM.Label s2)                     {}
+  void bleu (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {String v() {return "bleu ";} void a() {if (R[t] <= R[s1]) P.step = s2.get1();}};}
+  void bltu (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {String v() {return "bltu ";} void a() {if (R[t] <  R[s1]) P.step = s2.get1();}};}
+  void bgtu (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {String v() {return "bgtu ";} void a() {if (R[t] >  R[s1]) P.step = s2.get1();}};}
+  void beq  (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {String v() {return "beq  ";} void a() {if (R[t] == R[s1]) P.step = s2.get1();}};}
+  void bge  (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {String v() {return "bge  ";} void a() {if (R[t] >= R[s1]) P.step = s2.get1();}};}
+  void bgt  (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {String v() {return "bgt  ";} void a() {if (R[t] >  R[s1]) P.step = s2.get1();}};}
+  void ble  (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {String v() {return "ble  ";} void a() {if (R[t] <= R[s1]) P.step = s2.get1();}};}
+  void blt  (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {String v() {return "blt  ";} void a() {if (R[t] <  R[s1]) P.step = s2.get1();}};}
+  void bne  (int t, int s1,     ProgramDM.Label s2)                     {P.new I() {String v() {return "bne  ";} void a() {if (R[t] <  R[s1]) P.step = s2.get1();}};}
 
-  void call (ProgramDM.Label t)                                         {}
-  void j    (ProgramDM.Label t)                                         {}
-  void jr   (int t)                                                     {}
+  void call (ProgramDM.Label t)                                         {P.new I() {String v() {return "call ";} void a() {R[ra] = P.step+1; P.step = t.get1();}};}
+  void j    (ProgramDM.Label t)                                         {P.new I() {String v() {return "j    ";} void a() {P.step = t.get1();}};}
+  void jr   (int t)                                                     {P.new I() {String v() {return "jr   ";} void a() {P.step = R[t]-1;}};}
 
-  void lb   (int t, int     s1, int     s2)                             {P.new I() {void a() {R[t] =  M[s1  + R[s2]];}};}
-  void lbu  (int t, int     s1, int     s2)                             {P.new I() {void a() {R[t] =  R[s1] + R[s2]; }};}
-  void ld   (int t, boolean s1, int     s2)                             {P.new I() {void a() {R[t] =  s1 ? R[s2]>>20 : R[s2];}};}
-  void ld   (int t, int     s1, int     s2)                             {P.new I() {void a() {R[t] =  R[s1] + R[s2]; }};}
-  void li   (int t, int s1)                                             {P.new I() {void a() {R[t] =  R[s1] + R[s2]; }};}
-  void lw   (int t, int s1, int s2)                                     {P.new I() {void a() {R[t] =  R[s1] + R[s2]; }};}
-  void lw   (int t, boolean s1, ProgramDM.Label s2, int s3)             {P.new I() {void a() {R[t] =  s1 ? s2.get()>>20 : s2.get();     }};}
-  void lw   (int t, boolean s1, ProgramDM.Label s2, int s3, int s4)     {P.new I() {void a() {R[t] = (s1 ? s2.get()>>20 : s2.get())+R[s3]+s4; }};}
-  void lui  (int t, boolean s1, int     s2)                             {P.new I() {void a() {R[t] =  s1 ? s2>>20 : s2; }};}
-  void lui  (int t, boolean s1, ProgramDM.Label s2)                     {P.new I() {void a() {R[t] =  s1 ? s2.get()>>20 : s2.get(); }};}
-  void lui  (int t, boolean s1, ProgramDM.Label s2, int s3)             {P.new I() {void a() {R[t] = (s1 ? s2.get()>>20 : s2.get()) + R[s3]; }};}
-  void mul  (int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] =  R[s1] * R[s2]; }};}
-  void mulw (int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] =  R[s1] * R[s2]; }};}
-  void mv   (int t, int s1)                                             {P.new I() {void a() {R[t] =  R[s1];}         };}
-  void neg  (int t, int s1)                                             {P.new I() {void a() {R[t] = -R[s1];}        };}
-  void nop  ()                                                          {P.new I() {void a() {}};}
-  void or   (int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] =  R[s1] | R[s2]; }};}
-  void ori  (int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] =  R[s1] |   s2;}  };}
-  void ret  ()                                                          {P.new I() {void a() {}};}
-  void sb   (int t, int s1,     int     s2)                             {P.new I() {void a() {final int i =  s1 + R[s2]; M[t] = (byte)i;}};}
-  void sbu  (int t, int s1,     int     s2)                             {P.new I() {void a() {final int i =  s1 + R[s2]; M[t] = (byte)i;}};}
-  void sd   (int t, int s1,     int     s2)                             {P.new I() {void a() {final int i =  s1 + R[s2];                             M[t] = (byte) i; M[t+1] = (byte)(i >> Byte.SIZE); M[t+2] = (byte)(i >> (2*Byte.SIZE)); M[t+3] = (byte)(i >> (3 * Byte.SIZE)); M[t+4] = (byte) (i >> (4 * Byte.SIZE)); M[t+5] = (byte)(i >> (5 * Byte.SIZE)); M[t+6] = (byte)(i >> (6*Byte.SIZE)); M[t+7] = (byte)(i >> (7 * Byte.SIZE));}};}
-  void sd   (int t, boolean s1, ProgramDM.Label s2, int s3)             {P.new I() {void a() {final int i = (s1 ? s2.get()>>20 : s2.get())+R[s3];    M[t] = (byte) i; M[t+1] = (byte)(i >> Byte.SIZE); M[t+2] = (byte)(i >> (2*Byte.SIZE)); M[t+3] = (byte)(i >> (3 * Byte.SIZE)); M[t+4] = (byte) (i >> (4 * Byte.SIZE)); M[t+5] = (byte)(i >> (5 * Byte.SIZE)); M[t+6] = (byte)(i >> (6*Byte.SIZE)); M[t+7] = (byte)(i >> (7 * Byte.SIZE));}};}
-  void seqz (int t, int s1)                                             {P.new I() {void a() {R[t] =  R[s2] == 0 ? 1 : 0;   }};}
-  void sextw(int t, int s1)                                             {P.new I() {void a() {R[t] =  R[s1];                }};}
-  void sgt  (int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] =  R[s1] >   s2 ? 1 : 0; }};}
-  void slli (int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] =  R[s1] <<  s2;         }};}
-  void srli (int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] =  R[s1] >>  s2;         }};}
-  void srliw(int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] =  R[s1] + R[s2];        }};}
-  void sraiw(int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] =  R[s1] + R[s2];        }};}
-  void sub  (int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] =  R[s1] + R[s2];        }};}
-  void subw (int t, int s1,     int     s2)                             {P.new I() {void a() {R[t] =  R[s1] + R[s2];        }};}
-  void sw   (int t, int s1,     int     s2)                             {P.new I() {void a() {final int i =  s1 + R[s2];                             M[t] = (byte) i; M[t+1] = (byte)(i >> Byte.SIZE); M[t+2] = (byte)(i >> (2*Byte.SIZE)); M[t+3] = (byte)(i >> (3 * Byte.SIZE));}};}
-  void sw   (int t, boolean s1, ProgramDM.Label s2, int s3)             {P.new I() {void a() {final int i = (s1 ? s2.get()>>20 : s2.get())+R[s3];    M[t] = (byte) i; M[t+1] = (byte)(i >> Byte.SIZE); M[t+2] = (byte)(i >> (2*Byte.SIZE)); M[t+3] = (byte)(i >> (3 * Byte.SIZE));}};}
-  void sw   (int t, boolean s1, ProgramDM.Label s2, int s3, int s4)     {P.new I() {void a() {final int i = (s1 ? s2.get()>>20 : s2.get())+R[s3]+s4; M[t] = (byte) i; M[t+1] = (byte)(i >> Byte.SIZE); M[t+2] = (byte)(i >> (2*Byte.SIZE)); M[t+3] = (byte)(i >> (3 * Byte.SIZE));}};}
-  void tail (ProgramDM.Label t)                                         {P.new I() {void a() {}};}
+  void lb   (int t, int     s1, int     s2)                             {P.new I() {String v() {return "lb   ";} void a() {R[t] =  M[s1  + R[s2]];                         }};}
+  void lbu  (int t, int     s1, int     s2)                             {P.new I() {String v() {return "lbu  ";} void a() {R[t] =  M[s1  + R[s2]];                         }};}
+  void ld   (int t, boolean s1, int     s2)                             {P.new I() {String v() {return "ld   ";} void a() {R[t] =  s1 ? R[s2]>>20 : R[s2];                 }};}
+  void ld   (int t, int     s1, int     s2)                             {P.new I() {String v() {return "ld   ";} void a() {R[t] =  R[s1] +   s2;                           }};}
+  void li   (int t, int s1)                                             {P.new I() {String v() {return "li   ";} void a() {R[t] =    s1;                                   }};}
+  void lw   (int t, int s1, int s2)                                     {P.new I() {String v() {return "lw   ";} void a() {R[t] =    s1  + R[s2];                          }};}
+  void lw   (int t, boolean s1, ProgramDM.Label s2, int s3)             {P.new I() {String v() {return "lw   ";} void a() {R[t] =  s1 ? s2.get()>>20 : s2.get();           }};}
+  void lw   (int t, boolean s1, ProgramDM.Label s2, int s3, int s4)     {P.new I() {String v() {return "lw   ";} void a() {R[t] = (s1 ? s2.get()>>20 : s2.get())+R[s3]+s4; }};}
+  void lui  (int t, boolean s1, int     s2)                             {P.new I() {String v() {return "lui  ";} void a() {R[t] =  s1 ? s2>>20 : s2;                       }};}
+  void lui  (int t, boolean s1, ProgramDM.Label s2)                     {P.new I() {String v() {return "lui  ";} void a() {R[t] =  s1 ? s2.get()>>20 : s2.get();           }};}
+  void lui  (int t, boolean s1, ProgramDM.Label s2, int s3)             {P.new I() {String v() {return "lui  ";} void a() {R[t] = (s1 ? s2.get()>>20 : s2.get()) + R[s3];  }};}
+  void mul  (int t, int s1,     int     s2)                             {P.new I() {String v() {return "mul  ";} void a() {R[t] =  R[s1] * R[s2];                          }};}
+  void mulw (int t, int s1,     int     s2)                             {P.new I() {String v() {return "mulw ";} void a() {R[t] =  R[s1] * R[s2];                          }};}
+  void mv   (int t, int s1)                                             {P.new I() {String v() {return "mv   ";} void a() {R[t] =  R[s1];                                  }};}
+  void neg  (int t, int s1)                                             {P.new I() {String v() {return "neg  ";} void a() {R[t] = -R[s1];                                  }};}
+  void nop  ()                                                          {P.new I() {String v() {return "nop  ";} void a() {}};}
+  void or   (int t, int s1,     int     s2)                             {P.new I() {String v() {return "or   ";} void a() {R[t] =  R[s1] | R[s2];                          }};}
+  void ori  (int t, int s1,     int     s2)                             {P.new I() {String v() {return "ori  ";} void a() {R[t] =  R[s1] |   s2;                           }};}
+  void ret  ()                                                          {P.new I() {String v() {return "ret  ";} void a() {P.step = R[ra];}};}
+  void sb   (int t, int s1,     int     s2)                             {P.new I() {String v() {return "sb   ";} void a() {final int i =  s1 + R[s2]; M[t] = (byte)i;      }};}
+  void sbu  (int t, int s1,     int     s2)                             {P.new I() {String v() {return "sbu  ";} void a() {final int i =  s1 + R[s2]; M[t] = (byte)i;      }};}
+  void sd   (int t, int s1,     int     s2)                             {P.new I() {String v() {return "sd   ";} void a() {final int i =  s1 + R[s2];                             M[t] = (byte) i; M[t+1] = (byte)(i >> Byte.SIZE); M[t+2] = (byte)(i >> (2*Byte.SIZE)); M[t+3] = (byte)(i >> (3 * Byte.SIZE)); M[t+4] = (byte) (i >> (4 * Byte.SIZE)); M[t+5] = (byte)(i >> (5 * Byte.SIZE)); M[t+6] = (byte)(i >> (6*Byte.SIZE)); M[t+7] = (byte)(i >> (7 * Byte.SIZE));}};}
+  void sd   (int t, boolean s1, ProgramDM.Label s2, int s3)             {P.new I() {String v() {return "sd   ";} void a() {final int i = (s1 ? s2.get()>>20 : s2.get())+R[s3];    M[t] = (byte) i; M[t+1] = (byte)(i >> Byte.SIZE); M[t+2] = (byte)(i >> (2*Byte.SIZE)); M[t+3] = (byte)(i >> (3 * Byte.SIZE)); M[t+4] = (byte) (i >> (4 * Byte.SIZE)); M[t+5] = (byte)(i >> (5 * Byte.SIZE)); M[t+6] = (byte)(i >> (6*Byte.SIZE)); M[t+7] = (byte)(i >> (7 * Byte.SIZE));}};}
+  void seqz (int t, int s1)                                             {P.new I() {String v() {return "seqz ";} void a() {R[t] =  R[s2] == 0 ? 1 : 0;                     }};}
+  void sextw(int t, int s1)                                             {P.new I() {String v() {return "sextw";} void a() {R[t] =  R[s1];                                  }};}
+  void sgt  (int t, int s1,     int     s2)                             {P.new I() {String v() {return "sgt  ";} void a() {R[t] =  R[s1] >   s2 ? 1 : 0;                   }};}
+  void slli (int t, int s1,     int     s2)                             {P.new I() {String v() {return "slli ";} void a() {R[t] =  R[s1] <<  s2;                           }};}
+  void srli (int t, int s1,     int     s2)                             {P.new I() {String v() {return "srli ";} void a() {R[t] =  R[s1] >>  s2;                           }};}
+  void srliw(int t, int s1,     int     s2)                             {P.new I() {String v() {return "srliw";} void a() {R[t] =  R[s1] + R[s2];                          }};}
+  void sraiw(int t, int s1,     int     s2)                             {P.new I() {String v() {return "sraiw";} void a() {R[t] =  R[s1] + R[s2];                          }};}
+  void sub  (int t, int s1,     int     s2)                             {P.new I() {String v() {return "sub  ";} void a() {R[t] =  R[s1] + R[s2];                          }};}
+  void subw (int t, int s1,     int     s2)                             {P.new I() {String v() {return "subw ";} void a() {R[t] =  R[s1] + R[s2];                          }};}
+  void sw   (int t, int s1,     int     s2)                             {P.new I() {String v() {return "sw   ";} void a() {final int i =  s1 + R[s2];                             M[t] = (byte) i; M[t+1] = (byte)(i >> Byte.SIZE); M[t+2] = (byte)(i >> (2*Byte.SIZE)); M[t+3] = (byte)(i >> (3 * Byte.SIZE));}};}
+  void sw   (int t, boolean s1, ProgramDM.Label s2, int s3)             {P.new I() {String v() {return "sw   ";} void a() {final int i = (s1 ? s2.get()>>20 : s2.get())+R[s3];    M[t] = (byte) i; M[t+1] = (byte)(i >> Byte.SIZE); M[t+2] = (byte)(i >> (2*Byte.SIZE)); M[t+3] = (byte)(i >> (3 * Byte.SIZE));}};}
+  void sw   (int t, boolean s1, ProgramDM.Label s2, int s3, int s4)     {P.new I() {String v() {return "sw   ";} void a() {final int i = (s1 ? s2.get()>>20 : s2.get())+R[s3]+s4; M[t] = (byte) i; M[t+1] = (byte)(i >> Byte.SIZE); M[t+2] = (byte)(i >> (2*Byte.SIZE)); M[t+3] = (byte)(i >> (3 * Byte.SIZE));}};}
+  void tail (ProgramDM.Label t)                                         {P.new I() {String v() {return "tail ";} void a() {}};}
+
+  RiscV()
+   {R[sp] = M.length;                                                           // Set the stack pointer
+   }
 
 //D0 Tests                                                                      // Testing
 
-  final static int[]random_small = {27, 442, 545, 317, 511, 578, 391, 993, 858, 586, 472, 906, 658, 704, 882, 246, 261, 501, 354, 903, 854, 279, 526, 686, 987, 403, 401, 989, 650, 576, 436, 560, 806, 554, 422, 298, 425, 912, 503, 611, 135, 447, 344, 338, 39, 804, 976, 186, 234, 106, 667, 494, 690, 480, 288, 151, 773, 769, 260, 809, 438, 237, 516, 29, 376, 72, 946, 103, 961, 55, 358, 232, 229, 90, 155, 657, 681, 43, 907, 564, 377, 615, 612, 157, 922, 272, 490, 679, 830, 839, 437, 826, 577, 937, 884, 13, 96, 273, 1, 188};
-  final static int[]random_large = {5918,5624,2514,4291,1791,5109,7993,60,1345,2705,5849,1034,2085,4208,4590,7740,9367,6582,4178,5578,1120,378,7120,8646,5112,4903,1482,8005,3801,5439,4534,9524,6111,204,5459,248,4284,8037,5369,7334,3384,5193,2847,1660,5605,7371,3430,1786,1216,4282,2146,1969,7236,2187,136,2726,9480,5,4515,6082,969,5017,7809,9321,3826,9179,5781,3351,4819,4545,8607,4146,6682,1043,2890,2964,7472,9405,4348,8333,2915,9674,7225,4743,995,1321,3885,6061,9958,3901,4710,4185,4776,5070,8892,8506,6988,2317,9342,3764,9859,4724,5195,673,359,9740,2089,9942,3749,9208,1,7446,7023,5496,4206,3272,3527,8593,809,3149,4173,9605,9021,5120,5265,7121,8667,6911,4717,2535,2743,1289,1494,3788,6380,9366,2732,1501,8543,8013,5612,2393,7041,3350,3204,288,7213,1741,1238,9830,6722,4687,6758,8067,4443,5013,5374,6986,282,6762,192,340,5075,6970,7723,5913,1060,1641,1495,5738,1618,157,6891,173,7535,4952,9166,8950,8680,1974,5466,2383,3387,3392,2188,3140,6806,3131,6237,6249,7952,1114,9017,4285,7193,3191,3763,9087,7284,9170,6116,3717,6695,6538,6165,6449,8960,2897,6814,3283,6600,6151,4624,3992,5860,9557,1884,5585,2966,1061,6414,2431,9543,6654,7417,2617,878,8848,8241,3790,3370,8768,1694,9875,9882,8802,7072,3772,2689,5301,7921,7774,1614,494,2338,8638,4161,4523,5709,4305,17,9626,843,9284,3492,7755,5525,4423,9718,2237,7401,2686,8751,1585,5919,9444,3271,1490,7004,5980,3904,370,5930,6304,7737,93,5941,9079,4968,9266,262,2766,4999,2450,9518,5137,8405,483,8840,2231,700,8049,8823,9811,9378,3811,8074,153,1940,1998,4354,7830,7086,6132,9967,5680,448,1976,4101,7839,3122,4379,9296,4881,1246,4334,9457,5401,1945,9548,8290,1184,3464,132,2458,7704,1056,7554,6203,2270,6070,4889,7369,1676,485,3648,357,1912,9661,4246,1576,1836,4521,7667,6907,2098,8825,7404,4019,8284,3710,7202,7050,9870,3348,3624,9224,6601,7897,6288,3713,932,5596,353,2615,3273,833,1446,8624,2489,3872,486,1091,2493,4157,3611,6570,7107,9153,4543,9504,4746,1342,9737,3247,8984,3640,5698,7814,307,8775,1150,4330,3059,5784,2370,5248,4806,6107,9700,231,3566,5627,3957,5317,5415,8119,2588,9440,2961,9786,4769,466,5411,3080,7623,5031,2378,9286,4801,797,1527,2325,847,6341,5310,1926,9481,2115,2165,5255,5465,5561,3606,7673,7443,7243,8447,2348,7925,6447,8311,6729,4441,7763,8107,267,8135,9194,6775,3883,9639,612,5024,1351,7557,9241,5181,2239,8002,5446,747,166,325,9925,3820,9531,5163,3545,558,7103,7658,5670,8323,4821,6263,7982,59,3700,1082,4474,4353,8637,9558,5191,842,5925,6455,4092,9929,9961,290,3523,6290,7787,8266,7986,7269,6408,3620,406,5964,7289,1620,6726,1257,1993,7006,5545,2913,5093,5066,3019,7081,6760,6779,7061,9051,8852,8118,2340,6596,4594,9708,8430,8659,8920,9268,5431,9203,2823,1427,2203,6422,6193,5214,9566,8791,4964,7575,4350,56,2227,8545,5646,3089,2204,4081,487,8496,2258,4336,6955,3452,556,8602,8251,8569,8636,9430,1025,9459,7137,8392,3553,5945,9414,3078,1688,5480,327,8117,2289,2195,8564,9423,103,7724,3091,8548,7298,5279,6042,2855,3286,3542,9361,420,7020,4112,5320,5366,6379,114,9174,9744,592,5346,3985,3174,5157,9890,1605,3082,8099,4346,7256,8670,5687,6613,6620,1458,1045,7917,2980,2399,1433,3315,4084,178,7056,2132,2728,4421,9195,4181,6017,6229,2945,4627,2809,8816,6737,18,8981,3813,8890,5304,3789,6959,7476,1856,4197,6944,9578,5915,3060,9932,3463,67,7393,9857,5822,3187,501,653,8453,3691,9736,6845,1365,9645,4120,2157,8471,4436,6435,2758,7591,9805,7142,7612,4891,7342,5764,8683,8365,2967,6947,441,2116,6612,1399,7585,972,6548,5481,7733,7209,222,5903,6161,9172,9628,7348,1588,5992,6094,7176,4214,8702,2987,74,8486,9788,7164,5788,8535,8422,6826,1800,8965,4965,565,5609,4686,2556,9324,5000,9809,1994,4737,63,8992,4783,2536,4462,8868,6346,5553,3980,2670,1601,4272,8725,4698,7333,7826,9233,4198,1997,1687,4851,62,7893,8149,8015,341,2230,1280,5559,9756,3761,7834,6805,9287,4622,5748,2320,1958,9129,9649,1644,4323,5096,9490,7529,6444,7478,7044,9525,7713,234,7553,9099,9885,7135,6493,9793,6268,8363,2267,9157,9451,1438,9292,1637,3739,695,1090,4731,4549,5171,5975,7347,5192,5243,1084,2216,9860,3318,5594,5790,1107,220,9397,3378,1353,4498,6497,5442,7929,7377,9541,9871,9895,6742,9146,9409,292,6278,50,5288,2217,4923,6790,4730,9240,3006,3547,9347,7863,4275,3287,2673,7485,1915,9837,2931,3918,635,9131,1197,6250,3853,4303,790,5548,9993,3702,2446,3862,9652,4432,973,41,3507,8585,2444,1633,956,5789,1523,8657,4869,8580,8474,7093,7812,2549,7363,9315,6731,1130,7645,7018,7852,362,1636,2905,8006,4040,6643,8052,7021,3665,8383,715,1876,2783,3065,604,4566,8761,7911,1983,3836,5547,8495,8144,1950,2537,8575,640,8730,8303,1454,8165,6647,4762,909,9449,8640,9253,7293,8767,3004,4623,6862,8994,2520,1215,6299,8414,2576,6148,1510,313,3693,9843,8757,5774,8871,8061,8832,5573,5275,9452,1248,228,9749,2730};
+//  final static int[]random_small = {27, 442, 545, 317, 511, 578, 391, 993, 858, 586, 472, 906, 658, 704, 882, 246, 261, 501, 354, 903, 854, 279, 526, 686, 987, 403, 401, 989, 650, 576, 436, 560, 806, 554, 422, 298, 425, 912, 503, 611, 135, 447, 344, 338, 39, 804, 976, 186, 234, 106, 667, 494, 690, 480, 288, 151, 773, 769, 260, 809, 438, 237, 516, 29, 376, 72, 946, 103, 961, 55, 358, 232, 229, 90, 155, 657, 681, 43, 907, 564, 377, 615, 612, 157, 922, 272, 490, 679, 830, 839, 437, 826, 577, 937, 884, 13, 96, 273, 1, 188};
+//  final static int[]random_large = {5918,5624,2514,4291,1791,5109,7993,60,1345,2705,5849,1034,2085,4208,4590,7740,9367,6582,4178,5578,1120,378,7120,8646,5112,4903,1482,8005,3801,5439,4534,9524,6111,204,5459,248,4284,8037,5369,7334,3384,5193,2847,1660,5605,7371,3430,1786,1216,4282,2146,1969,7236,2187,136,2726,9480,5,4515,6082,969,5017,7809,9321,3826,9179,5781,3351,4819,4545,8607,4146,6682,1043,2890,2964,7472,9405,4348,8333,2915,9674,7225,4743,995,1321,3885,6061,9958,3901,4710,4185,4776,5070,8892,8506,6988,2317,9342,3764,9859,4724,5195,673,359,9740,2089,9942,3749,9208,1,7446,7023,5496,4206,3272,3527,8593,809,3149,4173,9605,9021,5120,5265,7121,8667,6911,4717,2535,2743,1289,1494,3788,6380,9366,2732,1501,8543,8013,5612,2393,7041,3350,3204,288,7213,1741,1238,9830,6722,4687,6758,8067,4443,5013,5374,6986,282,6762,192,340,5075,6970,7723,5913,1060,1641,1495,5738,1618,157,6891,173,7535,4952,9166,8950,8680,1974,5466,2383,3387,3392,2188,3140,6806,3131,6237,6249,7952,1114,9017,4285,7193,3191,3763,9087,7284,9170,6116,3717,6695,6538,6165,6449,8960,2897,6814,3283,6600,6151,4624,3992,5860,9557,1884,5585,2966,1061,6414,2431,9543,6654,7417,2617,878,8848,8241,3790,3370,8768,1694,9875,9882,8802,7072,3772,2689,5301,7921,7774,1614,494,2338,8638,4161,4523,5709,4305,17,9626,843,9284,3492,7755,5525,4423,9718,2237,7401,2686,8751,1585,5919,9444,3271,1490,7004,5980,3904,370,5930,6304,7737,93,5941,9079,4968,9266,262,2766,4999,2450,9518,5137,8405,483,8840,2231,700,8049,8823,9811,9378,3811,8074,153,1940,1998,4354,7830,7086,6132,9967,5680,448,1976,4101,7839,3122,4379,9296,4881,1246,4334,9457,5401,1945,9548,8290,1184,3464,132,2458,7704,1056,7554,6203,2270,6070,4889,7369,1676,485,3648,357,1912,9661,4246,1576,1836,4521,7667,6907,2098,8825,7404,4019,8284,3710,7202,7050,9870,3348,3624,9224,6601,7897,6288,3713,932,5596,353,2615,3273,833,1446,8624,2489,3872,486,1091,2493,4157,3611,6570,7107,9153,4543,9504,4746,1342,9737,3247,8984,3640,5698,7814,307,8775,1150,4330,3059,5784,2370,5248,4806,6107,9700,231,3566,5627,3957,5317,5415,8119,2588,9440,2961,9786,4769,466,5411,3080,7623,5031,2378,9286,4801,797,1527,2325,847,6341,5310,1926,9481,2115,2165,5255,5465,5561,3606,7673,7443,7243,8447,2348,7925,6447,8311,6729,4441,7763,8107,267,8135,9194,6775,3883,9639,612,5024,1351,7557,9241,5181,2239,8002,5446,747,166,325,9925,3820,9531,5163,3545,558,7103,7658,5670,8323,4821,6263,7982,59,3700,1082,4474,4353,8637,9558,5191,842,5925,6455,4092,9929,9961,290,3523,6290,7787,8266,7986,7269,6408,3620,406,5964,7289,1620,6726,1257,1993,7006,5545,2913,5093,5066,3019,7081,6760,6779,7061,9051,8852,8118,2340,6596,4594,9708,8430,8659,8920,9268,5431,9203,2823,1427,2203,6422,6193,5214,9566,8791,4964,7575,4350,56,2227,8545,5646,3089,2204,4081,487,8496,2258,4336,6955,3452,556,8602,8251,8569,8636,9430,1025,9459,7137,8392,3553,5945,9414,3078,1688,5480,327,8117,2289,2195,8564,9423,103,7724,3091,8548,7298,5279,6042,2855,3286,3542,9361,420,7020,4112,5320,5366,6379,114,9174,9744,592,5346,3985,3174,5157,9890,1605,3082,8099,4346,7256,8670,5687,6613,6620,1458,1045,7917,2980,2399,1433,3315,4084,178,7056,2132,2728,4421,9195,4181,6017,6229,2945,4627,2809,8816,6737,18,8981,3813,8890,5304,3789,6959,7476,1856,4197,6944,9578,5915,3060,9932,3463,67,7393,9857,5822,3187,501,653,8453,3691,9736,6845,1365,9645,4120,2157,8471,4436,6435,2758,7591,9805,7142,7612,4891,7342,5764,8683,8365,2967,6947,441,2116,6612,1399,7585,972,6548,5481,7733,7209,222,5903,6161,9172,9628,7348,1588,5992,6094,7176,4214,8702,2987,74,8486,9788,7164,5788,8535,8422,6826,1800,8965,4965,565,5609,4686,2556,9324,5000,9809,1994,4737,63,8992,4783,2536,4462,8868,6346,5553,3980,2670,1601,4272,8725,4698,7333,7826,9233,4198,1997,1687,4851,62,7893,8149,8015,341,2230,1280,5559,9756,3761,7834,6805,9287,4622,5748,2320,1958,9129,9649,1644,4323,5096,9490,7529,6444,7478,7044,9525,7713,234,7553,9099,9885,7135,6493,9793,6268,8363,2267,9157,9451,1438,9292,1637,3739,695,1090,4731,4549,5171,5975,7347,5192,5243,1084,2216,9860,3318,5594,5790,1107,220,9397,3378,1353,4498,6497,5442,7929,7377,9541,9871,9895,6742,9146,9409,292,6278,50,5288,2217,4923,6790,4730,9240,3006,3547,9347,7863,4275,3287,2673,7485,1915,9837,2931,3918,635,9131,1197,6250,3853,4303,790,5548,9993,3702,2446,3862,9652,4432,973,41,3507,8585,2444,1633,956,5789,1523,8657,4869,8580,8474,7093,7812,2549,7363,9315,6731,1130,7645,7018,7852,362,1636,2905,8006,4040,6643,8052,7021,3665,8383,715,1876,2783,3065,604,4566,8761,7911,1983,3836,5547,8495,8144,1950,2537,8575,640,8730,8303,1454,8165,6647,4762,909,9449,8640,9253,7293,8767,3004,4623,6862,8994,2520,1215,6299,8414,2576,6148,1510,313,3693,9843,8757,5774,8871,8061,8832,5573,5275,9452,1248,228,9749,2730};
 
 // Generated by Classify instructions
 
@@ -117,7 +120,14 @@ class RiscV extends Test                                                        
    {RiscV r = new RiscV();
     r.test_btree1();
     r.test_btree2();
-    say("AAAA", r.P.code.size());
+    r.P.start = r.$put.get();
+    r.R[r.ra] = -1;                                                             // Return address
+    r.R[r.a0] =  1;                                                             // Key
+    r.R[r.a1] =  1;                                                             // Data
+    r.R[r.sp] = r.M.length;                                                     // Stack pointer
+    r.P.debug = true;
+    r.P.maxSteps = 160;
+    r.P.run();
    }
   ProgramDM.Label $branch_size = P.new Label();
   ProgramDM.Label $branch_size1 = P.new Label();
@@ -353,4789 +363,4790 @@ class RiscV extends Test                                                        
   ProgramDM.Label $L303 = P.new Label();
   ProgramDM.Label $L294 = P.new Label();
   void test_btree1() {
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    ld(a5, s0, 24);             /* GGGG */
-    lw(a5, 0, a5);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    $branch_size.set();
+    /*    0 I */ addi(sp, sp, -32);
+    /*    1 O */ sd(s0, 24, sp);
+    /*    2 I */ addi(s0, sp, 32);
+    /*    3 O */ sd(a0, -24, s0);
+    /*    4 K */ ld(a5, s0, 24);
+    /*    5 T */ lw(a5, 0, a5);
+    /*    6 b */ mv(a0,a5);
+    /*    7 K */ ld(s0, sp, 24);
+    /*    8 I */ addi(sp, sp, 32);
+    /*    9 W */ jr(ra);
     $branch_size1.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    ld(a5, s0, 24);             /* GGGG */
-    lw(a5, 0, a5);             /* SSSS */
-    addiw(a5, a5, -1);           /* LLLL */
-    sextw(a5,a5);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*   10 I */ addi(sp, sp, -32);
+    /*   11 O */ sd(s0, 24, sp);
+    /*   12 I */ addi(s0, sp, 32);
+    /*   13 O */ sd(a0, -24, s0);
+    /*   14 K */ ld(a5, s0, 24);
+    /*   15 T */ lw(a5, 0, a5);
+    /*   16 I */ addiw(a5, a5, -1);
+    /*   17 b */ sextw(a5,a5);
+    /*   18 b */ mv(a0,a5);
+    /*   19 K */ ld(s0, sp, 24);
+    /*   20 I */ addi(sp, sp, 32);
+    /*   21 W */ jr(ra);
     $branch_isEmpty.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(ra, 24, sp);             /* OOOO */
-    sd(s0, 16, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    ld(a0, s0, 24);             /* GGGG */
-    call($branch_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    seqz(a5, a5);                 /* YY11 */
-    andi(a5,a5,0xff);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 24);             /* GGGG */
-    ld(s0, sp, 16);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*   22 I */ addi(sp, sp, -32);
+    /*   23 O */ sd(ra, 24, sp);
+    /*   24 O */ sd(s0, 16, sp);
+    /*   25 I */ addi(s0, sp, 32);
+    /*   26 O */ sd(a0, -24, s0);
+    /*   27 K */ ld(a0, s0, 24);
+    /*   28 Y */ call($branch_size);
+    /*   29 b */ mv(a5,a0);
+    /*   30 a */ seqz(a5, a5);
+    /*   31 b */ andi(a5,a5,0xff);
+    /*   32 b */ sextw(a5,a5);
+    /*   33 b */ mv(a0,a5);
+    /*   34 K */ ld(ra, sp, 24);
+    /*   35 K */ ld(s0, sp, 16);
+    /*   36 I */ addi(sp, sp, 32);
+    /*   37 W */ jr(ra);
     $branch_key.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    ld(a4, s0, 24);             /* GGGG */
-    lw(a5, -28, s0);             /* SSSS */
-    slli(a5,a5,2);        /* ZZZZ */
-    add(a5,a4,a5);        /* ZZZZ */
-    lw(a5, 4, a5);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*   38 I */ addi(sp, sp, -32);
+    /*   39 O */ sd(s0, 24, sp);
+    /*   40 I */ addi(s0, sp, 32);
+    /*   41 O */ sd(a0, -24, s0);
+    /*   42 b */ mv(a5,a1);
+    /*   43 O */ sw(a5, -28, s0);
+    /*   44 K */ ld(a4, s0, 24);
+    /*   45 T */ lw(a5, -28, s0);
+    /*   46 b */ slli(a5,a5,2);
+    /*   47 b */ add(a5,a4,a5);
+    /*   48 T */ lw(a5, 4, a5);
+    /*   49 b */ mv(a0,a5);
+    /*   50 K */ ld(s0, sp, 24);
+    /*   51 I */ addi(sp, sp, 32);
+    /*   52 W */ jr(ra);
     $branch_data.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    ld(a4, s0, 24);             /* GGGG */
-    lw(a5, -28, s0);             /* SSSS */
-    addi(a5, a5, 4);           /* LLLL */
-    slli(a5,a5,2);        /* ZZZZ */
-    add(a5,a4,a5);        /* ZZZZ */
-    lw(a5, 4, a5);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*   53 I */ addi(sp, sp, -32);
+    /*   54 O */ sd(s0, 24, sp);
+    /*   55 I */ addi(s0, sp, 32);
+    /*   56 O */ sd(a0, -24, s0);
+    /*   57 b */ mv(a5,a1);
+    /*   58 O */ sw(a5, -28, s0);
+    /*   59 K */ ld(a4, s0, 24);
+    /*   60 T */ lw(a5, -28, s0);
+    /*   61 I */ addi(a5, a5, 4);
+    /*   62 b */ slli(a5,a5,2);
+    /*   63 b */ add(a5,a4,a5);
+    /*   64 T */ lw(a5, 4, a5);
+    /*   65 b */ mv(a0,a5);
+    /*   66 K */ ld(s0, sp, 24);
+    /*   67 I */ addi(sp, sp, 32);
+    /*   68 W */ jr(ra);
     $branch_setKey.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a2);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    ld(a4, s0, 24);             /* GGGG */
-    lw(a5, -28, s0);             /* SSSS */
-    slli(a5,a5,2);        /* ZZZZ */
-    add(a5,a4,a5);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    sw(a4, 4, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*   69 I */ addi(sp, sp, -32);
+    /*   70 O */ sd(s0, 24, sp);
+    /*   71 I */ addi(s0, sp, 32);
+    /*   72 O */ sd(a0, -24, s0);
+    /*   73 b */ mv(a5,a1);
+    /*   74 b */ mv(a4,a2);
+    /*   75 O */ sw(a5, -28, s0);
+    /*   76 b */ mv(a5,a4);
+    /*   77 O */ sw(a5, -32, s0);
+    /*   78 K */ ld(a4, s0, 24);
+    /*   79 T */ lw(a5, -28, s0);
+    /*   80 b */ slli(a5,a5,2);
+    /*   81 b */ add(a5,a4,a5);
+    /*   82 T */ lw(a4, -32, s0);
+    /*   83 O */ sw(a4, 4, a5);
+    /*   84 b */ nop();
+    /*   85 K */ ld(s0, sp, 24);
+    /*   86 I */ addi(sp, sp, 32);
+    /*   87 W */ jr(ra);
     $branch_setData.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a2);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    ld(a4, s0, 24);             /* GGGG */
-    lw(a5, -28, s0);             /* SSSS */
-    addi(a5, a5, 4);           /* LLLL */
-    slli(a5,a5,2);        /* ZZZZ */
-    add(a5,a4,a5);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    sw(a4, 4, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*   88 I */ addi(sp, sp, -32);
+    /*   89 O */ sd(s0, 24, sp);
+    /*   90 I */ addi(s0, sp, 32);
+    /*   91 O */ sd(a0, -24, s0);
+    /*   92 b */ mv(a5,a1);
+    /*   93 b */ mv(a4,a2);
+    /*   94 O */ sw(a5, -28, s0);
+    /*   95 b */ mv(a5,a4);
+    /*   96 O */ sw(a5, -32, s0);
+    /*   97 K */ ld(a4, s0, 24);
+    /*   98 T */ lw(a5, -28, s0);
+    /*   99 I */ addi(a5, a5, 4);
+    /*  100 b */ slli(a5,a5,2);
+    /*  101 b */ add(a5,a4,a5);
+    /*  102 T */ lw(a4, -32, s0);
+    /*  103 O */ sw(a4, 4, a5);
+    /*  104 b */ nop();
+    /*  105 K */ ld(s0, sp, 24);
+    /*  106 I */ addi(sp, sp, 32);
+    /*  107 W */ jr(ra);
     $branch_copyKey.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a2);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    ld(a4, s0, 24);             /* GGGG */
-    lw(a5, -32, s0);             /* SSSS */
-    slli(a5,a5,2);        /* ZZZZ */
-    add(a5,a4,a5);        /* ZZZZ */
-    lw(a4, 4, a5);             /* SSSS */
-    ld(a3, s0, 24);             /* GGGG */
-    lw(a5, -28, s0);             /* SSSS */
-    slli(a5,a5,2);        /* ZZZZ */
-    add(a5,a3,a5);        /* ZZZZ */
-    sw(a4, 4, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  108 I */ addi(sp, sp, -32);
+    /*  109 O */ sd(s0, 24, sp);
+    /*  110 I */ addi(s0, sp, 32);
+    /*  111 O */ sd(a0, -24, s0);
+    /*  112 b */ mv(a5,a1);
+    /*  113 b */ mv(a4,a2);
+    /*  114 O */ sw(a5, -28, s0);
+    /*  115 b */ mv(a5,a4);
+    /*  116 O */ sw(a5, -32, s0);
+    /*  117 K */ ld(a4, s0, 24);
+    /*  118 T */ lw(a5, -32, s0);
+    /*  119 b */ slli(a5,a5,2);
+    /*  120 b */ add(a5,a4,a5);
+    /*  121 T */ lw(a4, 4, a5);
+    /*  122 K */ ld(a3, s0, 24);
+    /*  123 T */ lw(a5, -28, s0);
+    /*  124 b */ slli(a5,a5,2);
+    /*  125 b */ add(a5,a3,a5);
+    /*  126 O */ sw(a4, 4, a5);
+    /*  127 b */ nop();
+    /*  128 K */ ld(s0, sp, 24);
+    /*  129 I */ addi(sp, sp, 32);
+    /*  130 W */ jr(ra);
     $branch_copyData.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a2);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    ld(a4, s0, 24);             /* GGGG */
-    lw(a5, -32, s0);             /* SSSS */
-    addi(a5, a5, 4);           /* LLLL */
-    slli(a5,a5,2);        /* ZZZZ */
-    add(a5,a4,a5);        /* ZZZZ */
-    lw(a4, 4, a5);             /* SSSS */
-    ld(a3, s0, 24);             /* GGGG */
-    lw(a5, -28, s0);             /* SSSS */
-    addi(a5, a5, 4);           /* LLLL */
-    slli(a5,a5,2);        /* ZZZZ */
-    add(a5,a3,a5);        /* ZZZZ */
-    sw(a4, 4, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  131 I */ addi(sp, sp, -32);
+    /*  132 O */ sd(s0, 24, sp);
+    /*  133 I */ addi(s0, sp, 32);
+    /*  134 O */ sd(a0, -24, s0);
+    /*  135 b */ mv(a5,a1);
+    /*  136 b */ mv(a4,a2);
+    /*  137 O */ sw(a5, -28, s0);
+    /*  138 b */ mv(a5,a4);
+    /*  139 O */ sw(a5, -32, s0);
+    /*  140 K */ ld(a4, s0, 24);
+    /*  141 T */ lw(a5, -32, s0);
+    /*  142 I */ addi(a5, a5, 4);
+    /*  143 b */ slli(a5,a5,2);
+    /*  144 b */ add(a5,a4,a5);
+    /*  145 T */ lw(a4, 4, a5);
+    /*  146 K */ ld(a3, s0, 24);
+    /*  147 T */ lw(a5, -28, s0);
+    /*  148 I */ addi(a5, a5, 4);
+    /*  149 b */ slli(a5,a5,2);
+    /*  150 b */ add(a5,a3,a5);
+    /*  151 O */ sw(a4, 4, a5);
+    /*  152 b */ nop();
+    /*  153 K */ ld(s0, sp, 24);
+    /*  154 I */ addi(sp, sp, 32);
+    /*  155 W */ jr(ra);
     $branch_setKeyData.set();
-    addi(sp, sp, -48);           /* LLLL */
-    sd(ra, 40, sp);             /* OOOO */
-    sd(s0, 32, sp);             /* OOOO */
-    addi(s0, sp, 48);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a3);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    mv(a5,a2);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a4, -32, s0);             /* SSSS */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 24);             /* GGGG */
-    call($branch_setKey);                      /* XXXX */
-    lw(a4, -36, s0);             /* SSSS */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 24);             /* GGGG */
-    call($branch_setData);                      /* XXXX */
-    nop();        /* ZZZZ */
-    ld(ra, sp, 40);             /* GGGG */
-    ld(s0, sp, 32);             /* GGGG */
-    addi(sp, sp, 48);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  156 I */ addi(sp, sp, -48);
+    /*  157 O */ sd(ra, 40, sp);
+    /*  158 O */ sd(s0, 32, sp);
+    /*  159 I */ addi(s0, sp, 48);
+    /*  160 O */ sd(a0, -24, s0);
+    /*  161 b */ mv(a5,a1);
+    /*  162 b */ mv(a4,a3);
+    /*  163 O */ sw(a5, -28, s0);
+    /*  164 b */ mv(a5,a2);
+    /*  165 O */ sw(a5, -32, s0);
+    /*  166 b */ mv(a5,a4);
+    /*  167 O */ sw(a5, -36, s0);
+    /*  168 T */ lw(a4, -32, s0);
+    /*  169 T */ lw(a5, -28, s0);
+    /*  170 b */ mv(a2,a4);
+    /*  171 b */ mv(a1,a5);
+    /*  172 K */ ld(a0, s0, 24);
+    /*  173 Y */ call($branch_setKey);
+    /*  174 T */ lw(a4, -36, s0);
+    /*  175 T */ lw(a5, -28, s0);
+    /*  176 b */ mv(a2,a4);
+    /*  177 b */ mv(a1,a5);
+    /*  178 K */ ld(a0, s0, 24);
+    /*  179 Y */ call($branch_setData);
+    /*  180 b */ nop();
+    /*  181 K */ ld(ra, sp, 40);
+    /*  182 K */ ld(s0, sp, 32);
+    /*  183 I */ addi(sp, sp, 48);
+    /*  184 W */ jr(ra);
     $branch_copyKeyData.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(ra, 24, sp);             /* OOOO */
-    sd(s0, 16, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a2);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a4, -32, s0);             /* SSSS */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 24);             /* GGGG */
-    call($branch_copyKey);                      /* XXXX */
-    lw(a4, -32, s0);             /* SSSS */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 24);             /* GGGG */
-    call($branch_copyData);                      /* XXXX */
-    nop();        /* ZZZZ */
-    ld(ra, sp, 24);             /* GGGG */
-    ld(s0, sp, 16);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  185 I */ addi(sp, sp, -32);
+    /*  186 O */ sd(ra, 24, sp);
+    /*  187 O */ sd(s0, 16, sp);
+    /*  188 I */ addi(s0, sp, 32);
+    /*  189 O */ sd(a0, -24, s0);
+    /*  190 b */ mv(a5,a1);
+    /*  191 b */ mv(a4,a2);
+    /*  192 O */ sw(a5, -28, s0);
+    /*  193 b */ mv(a5,a4);
+    /*  194 O */ sw(a5, -32, s0);
+    /*  195 T */ lw(a4, -32, s0);
+    /*  196 T */ lw(a5, -28, s0);
+    /*  197 b */ mv(a2,a4);
+    /*  198 b */ mv(a1,a5);
+    /*  199 K */ ld(a0, s0, 24);
+    /*  200 Y */ call($branch_copyKey);
+    /*  201 T */ lw(a4, -32, s0);
+    /*  202 T */ lw(a5, -28, s0);
+    /*  203 b */ mv(a2,a4);
+    /*  204 b */ mv(a1,a5);
+    /*  205 K */ ld(a0, s0, 24);
+    /*  206 Y */ call($branch_copyData);
+    /*  207 b */ nop();
+    /*  208 K */ ld(ra, sp, 24);
+    /*  209 K */ ld(s0, sp, 16);
+    /*  210 I */ addi(sp, sp, 32);
+    /*  211 W */ jr(ra);
     $branch_inc.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    ld(a5, s0, 24);             /* GGGG */
-    lw(a5, 0, a5);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    ld(a5, s0, 24);             /* GGGG */
-    sw(a4, 0, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  212 I */ addi(sp, sp, -32);
+    /*  213 O */ sd(s0, 24, sp);
+    /*  214 I */ addi(s0, sp, 32);
+    /*  215 O */ sd(a0, -24, s0);
+    /*  216 K */ ld(a5, s0, 24);
+    /*  217 T */ lw(a5, 0, a5);
+    /*  218 I */ addiw(a5, a5, 1);
+    /*  219 b */ sextw(a4,a5);
+    /*  220 K */ ld(a5, s0, 24);
+    /*  221 O */ sw(a4, 0, a5);
+    /*  222 b */ nop();
+    /*  223 K */ ld(s0, sp, 24);
+    /*  224 I */ addi(sp, sp, 32);
+    /*  225 W */ jr(ra);
     $branch_dec.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    ld(a5, s0, 24);             /* GGGG */
-    lw(a5, 0, a5);             /* SSSS */
-    addiw(a5, a5, -1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    ld(a5, s0, 24);             /* GGGG */
-    sw(a4, 0, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  226 I */ addi(sp, sp, -32);
+    /*  227 O */ sd(s0, 24, sp);
+    /*  228 I */ addi(s0, sp, 32);
+    /*  229 O */ sd(a0, -24, s0);
+    /*  230 K */ ld(a5, s0, 24);
+    /*  231 T */ lw(a5, 0, a5);
+    /*  232 I */ addiw(a5, a5, -1);
+    /*  233 b */ sextw(a4,a5);
+    /*  234 K */ ld(a5, s0, 24);
+    /*  235 O */ sw(a4, 0, a5);
+    /*  236 b */ nop();
+    /*  237 K */ ld(s0, sp, 24);
+    /*  238 I */ addi(sp, sp, 32);
+    /*  239 W */ jr(ra);
     $branch_clear.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    ld(a5, s0, 24);             /* GGGG */
-    sw(zero, 0, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  240 I */ addi(sp, sp, -32);
+    /*  241 O */ sd(s0, 24, sp);
+    /*  242 I */ addi(s0, sp, 32);
+    /*  243 O */ sd(a0, -24, s0);
+    /*  244 K */ ld(a5, s0, 24);
+    /*  245 O */ sw(zero, 0, a5);
+    /*  246 b */ nop();
+    /*  247 K */ ld(s0, sp, 24);
+    /*  248 I */ addi(sp, sp, 32);
+    /*  249 W */ jr(ra);
     $branch_push.set();
-    addi(sp, sp, -48);           /* LLLL */
-    sd(ra, 40, sp);             /* OOOO */
-    sd(s0, 32, sp);             /* OOOO */
-    addi(s0, sp, 48);           /* LLLL */
-    sd(a0, -40, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a2);        /* ZZZZ */
-    sw(a5, -44, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -48, s0);             /* OOOO */
-    ld(a0, s0, 40);             /* GGGG */
-    call($branch_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a3, -48, s0);             /* SSSS */
-    lw(a4, -44, s0);             /* SSSS */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 40);             /* GGGG */
-    call($branch_setKeyData);                      /* XXXX */
-    ld(a0, s0, 40);             /* GGGG */
-    call($branch_inc);                      /* XXXX */
-    nop();        /* ZZZZ */
-    ld(ra, sp, 40);             /* GGGG */
-    ld(s0, sp, 32);             /* GGGG */
-    addi(sp, sp, 48);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  250 I */ addi(sp, sp, -48);
+    /*  251 O */ sd(ra, 40, sp);
+    /*  252 O */ sd(s0, 32, sp);
+    /*  253 I */ addi(s0, sp, 48);
+    /*  254 O */ sd(a0, -40, s0);
+    /*  255 b */ mv(a5,a1);
+    /*  256 b */ mv(a4,a2);
+    /*  257 O */ sw(a5, -44, s0);
+    /*  258 b */ mv(a5,a4);
+    /*  259 O */ sw(a5, -48, s0);
+    /*  260 K */ ld(a0, s0, 40);
+    /*  261 Y */ call($branch_size);
+    /*  262 b */ mv(a5,a0);
+    /*  263 O */ sw(a5, -20, s0);
+    /*  264 T */ lw(a3, -48, s0);
+    /*  265 T */ lw(a4, -44, s0);
+    /*  266 T */ lw(a5, -20, s0);
+    /*  267 b */ mv(a2,a4);
+    /*  268 b */ mv(a1,a5);
+    /*  269 K */ ld(a0, s0, 40);
+    /*  270 Y */ call($branch_setKeyData);
+    /*  271 K */ ld(a0, s0, 40);
+    /*  272 Y */ call($branch_inc);
+    /*  273 b */ nop();
+    /*  274 K */ ld(ra, sp, 40);
+    /*  275 K */ ld(s0, sp, 32);
+    /*  276 I */ addi(sp, sp, 48);
+    /*  277 W */ jr(ra);
     $branch_result.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(s0, 56, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sw(zero, -24, s0);             /* OOOO */
-    lw(a5, -24, s0);             /* SSSS */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a5, -32, s0);             /* SSSS */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a5, -36, s0);             /* SSSS */
-    sw(a5, -40, s0);             /* OOOO */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -28, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -24, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(s0, sp, 56);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  278 I */ addi(sp, sp, -64);
+    /*  279 O */ sd(s0, 56, sp);
+    /*  280 I */ addi(s0, sp, 64);
+    /*  281 O */ sd(a0, -56, s0);
+    /*  282 O */ sw(zero, -24, s0);
+    /*  283 T */ lw(a5, -24, s0);
+    /*  284 O */ sw(a5, -28, s0);
+    /*  285 T */ lw(a5, -28, s0);
+    /*  286 O */ sw(a5, -32, s0);
+    /*  287 T */ lw(a5, -32, s0);
+    /*  288 O */ sw(a5, -36, s0);
+    /*  289 T */ lw(a5, -36, s0);
+    /*  290 O */ sw(a5, -40, s0);
+    /*  291 K */ ld(a5, s0, 56);
+    /*  292 T */ lw(a4, -40, s0);
+    /*  293 b */ mv(a0,a4);
+    /*  294 T */ lw(a4, -36, s0);
+    /*  295 b */ mv(a1,a4);
+    /*  296 T */ lw(a4, -32, s0);
+    /*  297 b */ mv(a2,a4);
+    /*  298 T */ lw(a4, -28, s0);
+    /*  299 b */ mv(a3,a4);
+    /*  300 T */ lw(a4, -24, s0);
+    /*  301 O */ sw(a0, 0, a5);
+    /*  302 O */ sw(a1, 4, a5);
+    /*  303 O */ sw(a2, 8, a5);
+    /*  304 O */ sw(a3, 12, a5);
+    /*  305 O */ sw(a4, 16, a5);
+    /*  306 K */ ld(a0, s0, 56);
+    /*  307 K */ ld(s0, sp, 56);
+    /*  308 I */ addi(sp, sp, 64);
+    /*  309 W */ jr(ra);
     $branch_pop.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(ra, 56, sp);             /* OOOO */
-    sd(s0, 48, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sd(a1, -64, s0);             /* OOOO */
-    addi(a5, s0, -40);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_result);                      /* XXXX */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_dec);                      /* XXXX */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -24, s0);             /* OOOO */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -28, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -24, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(ra, sp, 56);             /* GGGG */
-    ld(s0, sp, 48);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  310 I */ addi(sp, sp, -64);
+    /*  311 O */ sd(ra, 56, sp);
+    /*  312 O */ sd(s0, 48, sp);
+    /*  313 I */ addi(s0, sp, 64);
+    /*  314 O */ sd(a0, -56, s0);
+    /*  315 O */ sd(a1, -64, s0);
+    /*  316 I */ addi(a5, s0, -40);
+    /*  317 b */ mv(a0,a5);
+    /*  318 Y */ call($branch_result);
+    /*  319 K */ ld(a0, s0, 64);
+    /*  320 Y */ call($branch_dec);
+    /*  321 K */ ld(a0, s0, 64);
+    /*  322 Y */ call($branch_size);
+    /*  323 b */ mv(a5,a0);
+    /*  324 O */ sw(a5, -32, s0);
+    /*  325 T */ lw(a5, -32, s0);
+    /*  326 b */ mv(a1,a5);
+    /*  327 K */ ld(a0, s0, 64);
+    /*  328 Y */ call($branch_key);
+    /*  329 b */ mv(a5,a0);
+    /*  330 O */ sw(a5, -28, s0);
+    /*  331 T */ lw(a5, -32, s0);
+    /*  332 b */ mv(a1,a5);
+    /*  333 K */ ld(a0, s0, 64);
+    /*  334 Y */ call($branch_data);
+    /*  335 b */ mv(a5,a0);
+    /*  336 O */ sw(a5, -24, s0);
+    /*  337 K */ ld(a5, s0, 56);
+    /*  338 T */ lw(a4, -40, s0);
+    /*  339 b */ mv(a0,a4);
+    /*  340 T */ lw(a4, -36, s0);
+    /*  341 b */ mv(a1,a4);
+    /*  342 T */ lw(a4, -32, s0);
+    /*  343 b */ mv(a2,a4);
+    /*  344 T */ lw(a4, -28, s0);
+    /*  345 b */ mv(a3,a4);
+    /*  346 T */ lw(a4, -24, s0);
+    /*  347 O */ sw(a0, 0, a5);
+    /*  348 O */ sw(a1, 4, a5);
+    /*  349 O */ sw(a2, 8, a5);
+    /*  350 O */ sw(a3, 12, a5);
+    /*  351 O */ sw(a4, 16, a5);
+    /*  352 K */ ld(a0, s0, 56);
+    /*  353 K */ ld(ra, sp, 56);
+    /*  354 K */ ld(s0, sp, 48);
+    /*  355 I */ addi(sp, sp, 64);
+    /*  356 W */ jr(ra);
     $branch_shift.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(ra, 56, sp);             /* OOOO */
-    sd(s0, 48, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sd(a1, -64, s0);             /* OOOO */
-    addi(a5, s0, -48);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_result);                      /* XXXX */
-    li(a1,0);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    li(a1,0);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    sw(zero, -20, s0);             /* OOOO */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    addiw(a5, a5, -1);           /* LLLL */
-    sw(a5, -24, s0);             /* OOOO */
-    j($L26);                       /* WWWW */
+    /*  357 I */ addi(sp, sp, -64);
+    /*  358 O */ sd(ra, 56, sp);
+    /*  359 O */ sd(s0, 48, sp);
+    /*  360 I */ addi(s0, sp, 64);
+    /*  361 O */ sd(a0, -56, s0);
+    /*  362 O */ sd(a1, -64, s0);
+    /*  363 I */ addi(a5, s0, -48);
+    /*  364 b */ mv(a0,a5);
+    /*  365 Y */ call($branch_result);
+    /*  366 b */ li(a1,0);
+    /*  367 K */ ld(a0, s0, 64);
+    /*  368 Y */ call($branch_key);
+    /*  369 b */ mv(a5,a0);
+    /*  370 O */ sw(a5, -36, s0);
+    /*  371 b */ li(a1,0);
+    /*  372 K */ ld(a0, s0, 64);
+    /*  373 Y */ call($branch_data);
+    /*  374 b */ mv(a5,a0);
+    /*  375 O */ sw(a5, -32, s0);
+    /*  376 O */ sw(zero, -20, s0);
+    /*  377 K */ ld(a0, s0, 64);
+    /*  378 Y */ call($branch_size);
+    /*  379 b */ mv(a5,a0);
+    /*  380 I */ addiw(a5, a5, -1);
+    /*  381 O */ sw(a5, -24, s0);
+    /*  382 X */ j($L26);
     $L27.set();
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_copyKeyData);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /*  383 T */ lw(a5, -20, s0);
+    /*  384 I */ addiw(a5, a5, 1);
+    /*  385 b */ sextw(a4,a5);
+    /*  386 T */ lw(a5, -20, s0);
+    /*  387 b */ mv(a2,a4);
+    /*  388 b */ mv(a1,a5);
+    /*  389 K */ ld(a0, s0, 64);
+    /*  390 Y */ call($branch_copyKeyData);
+    /*  391 T */ lw(a5, -20, s0);
+    /*  392 I */ addiw(a5, a5, 1);
+    /*  393 O */ sw(a5, -20, s0);
     $L26.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -24, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L27);             /* YYYY */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_dec);                      /* XXXX */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -48, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(ra, sp, 56);             /* GGGG */
-    ld(s0, sp, 48);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  394 T */ lw(a5, -20, s0);
+    /*  395 b */ mv(a4,a5);
+    /*  396 T */ lw(a5, -24, s0);
+    /*  397 b */ sextw(a4,a4);
+    /*  398 b */ sextw(a5,a5);
+    /*  399 Z */ blt(a4, a5, $L27);
+    /*  400 K */ ld(a0, s0, 64);
+    /*  401 Y */ call($branch_dec);
+    /*  402 K */ ld(a5, s0, 56);
+    /*  403 T */ lw(a4, -48, s0);
+    /*  404 b */ mv(a0,a4);
+    /*  405 T */ lw(a4, -44, s0);
+    /*  406 b */ mv(a1,a4);
+    /*  407 T */ lw(a4, -40, s0);
+    /*  408 b */ mv(a2,a4);
+    /*  409 T */ lw(a4, -36, s0);
+    /*  410 b */ mv(a3,a4);
+    /*  411 T */ lw(a4, -32, s0);
+    /*  412 O */ sw(a0, 0, a5);
+    /*  413 O */ sw(a1, 4, a5);
+    /*  414 O */ sw(a2, 8, a5);
+    /*  415 O */ sw(a3, 12, a5);
+    /*  416 O */ sw(a4, 16, a5);
+    /*  417 K */ ld(a0, s0, 56);
+    /*  418 K */ ld(ra, sp, 56);
+    /*  419 K */ ld(s0, sp, 48);
+    /*  420 I */ addi(sp, sp, 64);
+    /*  421 W */ jr(ra);
     $branch_elementAt.set();
-    addi(sp, sp, -80);           /* LLLL */
-    sd(ra, 72, sp);             /* OOOO */
-    sd(s0, 64, sp);             /* OOOO */
-    addi(s0, sp, 80);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sd(a1, -64, s0);             /* OOOO */
-    mv(a5,a2);        /* ZZZZ */
-    sw(a5, -68, s0);             /* OOOO */
-    addi(a5, s0, -40);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_result);                      /* XXXX */
-    lw(a5, -68, s0);             /* SSSS */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a5, -68, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -68, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -24, s0);             /* OOOO */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -28, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -24, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(ra, sp, 72);             /* GGGG */
-    ld(s0, sp, 64);             /* GGGG */
-    addi(sp, sp, 80);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  422 I */ addi(sp, sp, -80);
+    /*  423 O */ sd(ra, 72, sp);
+    /*  424 O */ sd(s0, 64, sp);
+    /*  425 I */ addi(s0, sp, 80);
+    /*  426 O */ sd(a0, -56, s0);
+    /*  427 O */ sd(a1, -64, s0);
+    /*  428 b */ mv(a5,a2);
+    /*  429 O */ sw(a5, -68, s0);
+    /*  430 I */ addi(a5, s0, -40);
+    /*  431 b */ mv(a0,a5);
+    /*  432 Y */ call($branch_result);
+    /*  433 T */ lw(a5, -68, s0);
+    /*  434 O */ sw(a5, -32, s0);
+    /*  435 T */ lw(a5, -68, s0);
+    /*  436 b */ mv(a1,a5);
+    /*  437 K */ ld(a0, s0, 64);
+    /*  438 Y */ call($branch_key);
+    /*  439 b */ mv(a5,a0);
+    /*  440 O */ sw(a5, -28, s0);
+    /*  441 T */ lw(a5, -68, s0);
+    /*  442 b */ mv(a1,a5);
+    /*  443 K */ ld(a0, s0, 64);
+    /*  444 Y */ call($branch_data);
+    /*  445 b */ mv(a5,a0);
+    /*  446 O */ sw(a5, -24, s0);
+    /*  447 K */ ld(a5, s0, 56);
+    /*  448 T */ lw(a4, -40, s0);
+    /*  449 b */ mv(a0,a4);
+    /*  450 T */ lw(a4, -36, s0);
+    /*  451 b */ mv(a1,a4);
+    /*  452 T */ lw(a4, -32, s0);
+    /*  453 b */ mv(a2,a4);
+    /*  454 T */ lw(a4, -28, s0);
+    /*  455 b */ mv(a3,a4);
+    /*  456 T */ lw(a4, -24, s0);
+    /*  457 O */ sw(a0, 0, a5);
+    /*  458 O */ sw(a1, 4, a5);
+    /*  459 O */ sw(a2, 8, a5);
+    /*  460 O */ sw(a3, 12, a5);
+    /*  461 O */ sw(a4, 16, a5);
+    /*  462 K */ ld(a0, s0, 56);
+    /*  463 K */ ld(ra, sp, 72);
+    /*  464 K */ ld(s0, sp, 64);
+    /*  465 I */ addi(sp, sp, 80);
+    /*  466 W */ jr(ra);
     $branch_setElementAt.set();
-    addi(sp, sp, -48);           /* LLLL */
-    sd(ra, 40, sp);             /* OOOO */
-    sd(s0, 32, sp);             /* OOOO */
-    addi(s0, sp, 48);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a3);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    mv(a5,a2);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    ld(a0, s0, 24);             /* GGGG */
-    call($branch_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -36, s0);             /* SSSS */
-    sextw(a5,a5);        /* ZZZZ */
-    bne(a5, a4, $L32);             /* YYYY */
-    lw(a3, -32, s0);             /* SSSS */
-    lw(a4, -28, s0);             /* SSSS */
-    lw(a5, -36, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 24);             /* GGGG */
-    call($branch_setKeyData);                      /* XXXX */
-    ld(a0, s0, 24);             /* GGGG */
-    call($branch_inc);                      /* XXXX */
-    j($L34);                       /* WWWW */
+    /*  467 I */ addi(sp, sp, -48);
+    /*  468 O */ sd(ra, 40, sp);
+    /*  469 O */ sd(s0, 32, sp);
+    /*  470 I */ addi(s0, sp, 48);
+    /*  471 O */ sd(a0, -24, s0);
+    /*  472 b */ mv(a5,a1);
+    /*  473 b */ mv(a4,a3);
+    /*  474 O */ sw(a5, -28, s0);
+    /*  475 b */ mv(a5,a2);
+    /*  476 O */ sw(a5, -32, s0);
+    /*  477 b */ mv(a5,a4);
+    /*  478 O */ sw(a5, -36, s0);
+    /*  479 K */ ld(a0, s0, 24);
+    /*  480 Y */ call($branch_size);
+    /*  481 b */ mv(a5,a0);
+    /*  482 b */ mv(a4,a5);
+    /*  483 T */ lw(a5, -36, s0);
+    /*  484 b */ sextw(a5,a5);
+    /*  485 Z */ bne(a5, a4, $L32);
+    /*  486 T */ lw(a3, -32, s0);
+    /*  487 T */ lw(a4, -28, s0);
+    /*  488 T */ lw(a5, -36, s0);
+    /*  489 b */ mv(a2,a4);
+    /*  490 b */ mv(a1,a5);
+    /*  491 K */ ld(a0, s0, 24);
+    /*  492 Y */ call($branch_setKeyData);
+    /*  493 K */ ld(a0, s0, 24);
+    /*  494 Y */ call($branch_inc);
+    /*  495 X */ j($L34);
     $L32.set();
-    lw(a3, -32, s0);             /* SSSS */
-    lw(a4, -28, s0);             /* SSSS */
-    lw(a5, -36, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 24);             /* GGGG */
-    call($branch_setKeyData);                      /* XXXX */
+    /*  496 T */ lw(a3, -32, s0);
+    /*  497 T */ lw(a4, -28, s0);
+    /*  498 T */ lw(a5, -36, s0);
+    /*  499 b */ mv(a2,a4);
+    /*  500 b */ mv(a1,a5);
+    /*  501 K */ ld(a0, s0, 24);
+    /*  502 Y */ call($branch_setKeyData);
     $L34.set();
-    nop();        /* ZZZZ */
-    ld(ra, sp, 40);             /* GGGG */
-    ld(s0, sp, 32);             /* GGGG */
-    addi(sp, sp, 48);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  503 b */ nop();
+    /*  504 K */ ld(ra, sp, 40);
+    /*  505 K */ ld(s0, sp, 32);
+    /*  506 I */ addi(sp, sp, 48);
+    /*  507 W */ jr(ra);
     $branch_insertElementAt.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(ra, 56, sp);             /* OOOO */
-    sd(s0, 48, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    sd(a0, -40, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a3);        /* ZZZZ */
-    sw(a5, -44, s0);             /* OOOO */
-    mv(a5,a2);        /* ZZZZ */
-    sw(a5, -48, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -52, s0);             /* OOOO */
-    ld(a0, s0, 40);             /* GGGG */
-    call($branch_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -20, s0);             /* OOOO */
-    j($L36);                       /* WWWW */
+    /*  508 I */ addi(sp, sp, -64);
+    /*  509 O */ sd(ra, 56, sp);
+    /*  510 O */ sd(s0, 48, sp);
+    /*  511 I */ addi(s0, sp, 64);
+    /*  512 O */ sd(a0, -40, s0);
+    /*  513 b */ mv(a5,a1);
+    /*  514 b */ mv(a4,a3);
+    /*  515 O */ sw(a5, -44, s0);
+    /*  516 b */ mv(a5,a2);
+    /*  517 O */ sw(a5, -48, s0);
+    /*  518 b */ mv(a5,a4);
+    /*  519 O */ sw(a5, -52, s0);
+    /*  520 K */ ld(a0, s0, 40);
+    /*  521 Y */ call($branch_size);
+    /*  522 b */ mv(a5,a0);
+    /*  523 O */ sw(a5, -20, s0);
+    /*  524 X */ j($L36);
     $L37.set();
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, -1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 40);             /* GGGG */
-    call($branch_copyKeyData);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, -1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /*  525 T */ lw(a5, -20, s0);
+    /*  526 I */ addiw(a5, a5, -1);
+    /*  527 b */ sextw(a4,a5);
+    /*  528 T */ lw(a5, -20, s0);
+    /*  529 b */ mv(a2,a4);
+    /*  530 b */ mv(a1,a5);
+    /*  531 K */ ld(a0, s0, 40);
+    /*  532 Y */ call($branch_copyKeyData);
+    /*  533 T */ lw(a5, -20, s0);
+    /*  534 I */ addiw(a5, a5, -1);
+    /*  535 O */ sw(a5, -20, s0);
     $L36.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -52, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    bgt(a4, a5, $L37);             /* YYYY */
-    lw(a3, -48, s0);             /* SSSS */
-    lw(a4, -44, s0);             /* SSSS */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 40);             /* GGGG */
-    call($branch_setKeyData);                      /* XXXX */
-    ld(a0, s0, 40);             /* GGGG */
-    call($branch_inc);                      /* XXXX */
-    nop();        /* ZZZZ */
-    ld(ra, sp, 56);             /* GGGG */
-    ld(s0, sp, 48);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  536 T */ lw(a5, -20, s0);
+    /*  537 b */ mv(a4,a5);
+    /*  538 T */ lw(a5, -52, s0);
+    /*  539 b */ sextw(a4,a4);
+    /*  540 b */ sextw(a5,a5);
+    /*  541 Z */ bgt(a4, a5, $L37);
+    /*  542 T */ lw(a3, -48, s0);
+    /*  543 T */ lw(a4, -44, s0);
+    /*  544 T */ lw(a5, -52, s0);
+    /*  545 b */ mv(a2,a4);
+    /*  546 b */ mv(a1,a5);
+    /*  547 K */ ld(a0, s0, 40);
+    /*  548 Y */ call($branch_setKeyData);
+    /*  549 K */ ld(a0, s0, 40);
+    /*  550 Y */ call($branch_inc);
+    /*  551 b */ nop();
+    /*  552 K */ ld(ra, sp, 56);
+    /*  553 K */ ld(s0, sp, 48);
+    /*  554 I */ addi(sp, sp, 64);
+    /*  555 W */ jr(ra);
     $branch_removeElementAt.set();
-    addi(sp, sp, -80);           /* LLLL */
-    sd(ra, 72, sp);             /* OOOO */
-    sd(s0, 64, sp);             /* OOOO */
-    addi(s0, sp, 80);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sd(a1, -64, s0);             /* OOOO */
-    mv(a5,a2);        /* ZZZZ */
-    sw(a5, -68, s0);             /* OOOO */
-    addi(a5, s0, -48);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_result);                      /* XXXX */
-    lw(a5, -68, s0);             /* SSSS */
-    sw(a5, -40, s0);             /* OOOO */
-    lw(a5, -68, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a5, -68, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a5, -68, s0);             /* SSSS */
-    sw(a5, -20, s0);             /* OOOO */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    addiw(a5, a5, -1);           /* LLLL */
-    sw(a5, -24, s0);             /* OOOO */
-    j($L39);                       /* WWWW */
+    /*  556 I */ addi(sp, sp, -80);
+    /*  557 O */ sd(ra, 72, sp);
+    /*  558 O */ sd(s0, 64, sp);
+    /*  559 I */ addi(s0, sp, 80);
+    /*  560 O */ sd(a0, -56, s0);
+    /*  561 O */ sd(a1, -64, s0);
+    /*  562 b */ mv(a5,a2);
+    /*  563 O */ sw(a5, -68, s0);
+    /*  564 I */ addi(a5, s0, -48);
+    /*  565 b */ mv(a0,a5);
+    /*  566 Y */ call($branch_result);
+    /*  567 T */ lw(a5, -68, s0);
+    /*  568 O */ sw(a5, -40, s0);
+    /*  569 T */ lw(a5, -68, s0);
+    /*  570 b */ mv(a1,a5);
+    /*  571 K */ ld(a0, s0, 64);
+    /*  572 Y */ call($branch_key);
+    /*  573 b */ mv(a5,a0);
+    /*  574 O */ sw(a5, -36, s0);
+    /*  575 T */ lw(a5, -68, s0);
+    /*  576 b */ mv(a1,a5);
+    /*  577 K */ ld(a0, s0, 64);
+    /*  578 Y */ call($branch_data);
+    /*  579 b */ mv(a5,a0);
+    /*  580 O */ sw(a5, -32, s0);
+    /*  581 T */ lw(a5, -68, s0);
+    /*  582 O */ sw(a5, -20, s0);
+    /*  583 K */ ld(a0, s0, 64);
+    /*  584 Y */ call($branch_size);
+    /*  585 b */ mv(a5,a0);
+    /*  586 I */ addiw(a5, a5, -1);
+    /*  587 O */ sw(a5, -24, s0);
+    /*  588 X */ j($L39);
     $L40.set();
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_copyKeyData);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /*  589 T */ lw(a5, -20, s0);
+    /*  590 I */ addiw(a5, a5, 1);
+    /*  591 b */ sextw(a4,a5);
+    /*  592 T */ lw(a5, -20, s0);
+    /*  593 b */ mv(a2,a4);
+    /*  594 b */ mv(a1,a5);
+    /*  595 K */ ld(a0, s0, 64);
+    /*  596 Y */ call($branch_copyKeyData);
+    /*  597 T */ lw(a5, -20, s0);
+    /*  598 I */ addiw(a5, a5, 1);
+    /*  599 O */ sw(a5, -20, s0);
     $L39.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -24, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L40);             /* YYYY */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_dec);                      /* XXXX */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -48, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(ra, sp, 72);             /* GGGG */
-    ld(s0, sp, 64);             /* GGGG */
-    addi(sp, sp, 80);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  600 T */ lw(a5, -20, s0);
+    /*  601 b */ mv(a4,a5);
+    /*  602 T */ lw(a5, -24, s0);
+    /*  603 b */ sextw(a4,a4);
+    /*  604 b */ sextw(a5,a5);
+    /*  605 Z */ blt(a4, a5, $L40);
+    /*  606 K */ ld(a0, s0, 64);
+    /*  607 Y */ call($branch_dec);
+    /*  608 K */ ld(a5, s0, 56);
+    /*  609 T */ lw(a4, -48, s0);
+    /*  610 b */ mv(a0,a4);
+    /*  611 T */ lw(a4, -44, s0);
+    /*  612 b */ mv(a1,a4);
+    /*  613 T */ lw(a4, -40, s0);
+    /*  614 b */ mv(a2,a4);
+    /*  615 T */ lw(a4, -36, s0);
+    /*  616 b */ mv(a3,a4);
+    /*  617 T */ lw(a4, -32, s0);
+    /*  618 O */ sw(a0, 0, a5);
+    /*  619 O */ sw(a1, 4, a5);
+    /*  620 O */ sw(a2, 8, a5);
+    /*  621 O */ sw(a3, 12, a5);
+    /*  622 O */ sw(a4, 16, a5);
+    /*  623 K */ ld(a0, s0, 56);
+    /*  624 K */ ld(ra, sp, 72);
+    /*  625 K */ ld(s0, sp, 64);
+    /*  626 I */ addi(sp, sp, 80);
+    /*  627 W */ jr(ra);
     $branch_firstElement.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(ra, 56, sp);             /* OOOO */
-    sd(s0, 48, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sd(a1, -64, s0);             /* OOOO */
-    addi(a5, s0, -40);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_result);                      /* XXXX */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_isEmpty);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    seqz(a5, a5);                 /* YY11 */
-    andi(a5,a5,0xff);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a5, -36, s0);             /* SSSS */
-    beq(a5, zero, $L43);             /* YYYY */
-    sw(zero, -32, s0);             /* OOOO */
-    li(a1,0);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    li(a1,0);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -24, s0);             /* OOOO */
+    /*  628 I */ addi(sp, sp, -64);
+    /*  629 O */ sd(ra, 56, sp);
+    /*  630 O */ sd(s0, 48, sp);
+    /*  631 I */ addi(s0, sp, 64);
+    /*  632 O */ sd(a0, -56, s0);
+    /*  633 O */ sd(a1, -64, s0);
+    /*  634 I */ addi(a5, s0, -40);
+    /*  635 b */ mv(a0,a5);
+    /*  636 Y */ call($branch_result);
+    /*  637 K */ ld(a0, s0, 64);
+    /*  638 Y */ call($branch_isEmpty);
+    /*  639 b */ mv(a5,a0);
+    /*  640 a */ seqz(a5, a5);
+    /*  641 b */ andi(a5,a5,0xff);
+    /*  642 b */ sextw(a5,a5);
+    /*  643 O */ sw(a5, -36, s0);
+    /*  644 T */ lw(a5, -36, s0);
+    /*  645 Z */ beq(a5, zero, $L43);
+    /*  646 O */ sw(zero, -32, s0);
+    /*  647 b */ li(a1,0);
+    /*  648 K */ ld(a0, s0, 64);
+    /*  649 Y */ call($branch_key);
+    /*  650 b */ mv(a5,a0);
+    /*  651 O */ sw(a5, -28, s0);
+    /*  652 b */ li(a1,0);
+    /*  653 K */ ld(a0, s0, 64);
+    /*  654 Y */ call($branch_data);
+    /*  655 b */ mv(a5,a0);
+    /*  656 O */ sw(a5, -24, s0);
     $L43.set();
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -28, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -24, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(ra, sp, 56);             /* GGGG */
-    ld(s0, sp, 48);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  657 K */ ld(a5, s0, 56);
+    /*  658 T */ lw(a4, -40, s0);
+    /*  659 b */ mv(a0,a4);
+    /*  660 T */ lw(a4, -36, s0);
+    /*  661 b */ mv(a1,a4);
+    /*  662 T */ lw(a4, -32, s0);
+    /*  663 b */ mv(a2,a4);
+    /*  664 T */ lw(a4, -28, s0);
+    /*  665 b */ mv(a3,a4);
+    /*  666 T */ lw(a4, -24, s0);
+    /*  667 O */ sw(a0, 0, a5);
+    /*  668 O */ sw(a1, 4, a5);
+    /*  669 O */ sw(a2, 8, a5);
+    /*  670 O */ sw(a3, 12, a5);
+    /*  671 O */ sw(a4, 16, a5);
+    /*  672 K */ ld(a0, s0, 56);
+    /*  673 K */ ld(ra, sp, 56);
+    /*  674 K */ ld(s0, sp, 48);
+    /*  675 I */ addi(sp, sp, 64);
+    /*  676 W */ jr(ra);
     $branch_lastElement.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(ra, 56, sp);             /* OOOO */
-    sd(s0, 48, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sd(a1, -64, s0);             /* OOOO */
-    addi(a5, s0, -40);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_result);                      /* XXXX */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_isEmpty);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    seqz(a5, a5);                 /* YY11 */
-    andi(a5,a5,0xff);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    addiw(a5, a5, -1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a5, -36, s0);             /* SSSS */
-    beq(a5, zero, $L46);             /* YYYY */
-    lw(a5, -20, s0);             /* SSSS */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -24, s0);             /* OOOO */
+    /*  677 I */ addi(sp, sp, -64);
+    /*  678 O */ sd(ra, 56, sp);
+    /*  679 O */ sd(s0, 48, sp);
+    /*  680 I */ addi(s0, sp, 64);
+    /*  681 O */ sd(a0, -56, s0);
+    /*  682 O */ sd(a1, -64, s0);
+    /*  683 I */ addi(a5, s0, -40);
+    /*  684 b */ mv(a0,a5);
+    /*  685 Y */ call($branch_result);
+    /*  686 K */ ld(a0, s0, 64);
+    /*  687 Y */ call($branch_isEmpty);
+    /*  688 b */ mv(a5,a0);
+    /*  689 a */ seqz(a5, a5);
+    /*  690 b */ andi(a5,a5,0xff);
+    /*  691 b */ sextw(a5,a5);
+    /*  692 O */ sw(a5, -36, s0);
+    /*  693 K */ ld(a0, s0, 64);
+    /*  694 Y */ call($branch_size);
+    /*  695 b */ mv(a5,a0);
+    /*  696 I */ addiw(a5, a5, -1);
+    /*  697 O */ sw(a5, -20, s0);
+    /*  698 T */ lw(a5, -36, s0);
+    /*  699 Z */ beq(a5, zero, $L46);
+    /*  700 T */ lw(a5, -20, s0);
+    /*  701 O */ sw(a5, -32, s0);
+    /*  702 T */ lw(a5, -20, s0);
+    /*  703 b */ mv(a1,a5);
+    /*  704 K */ ld(a0, s0, 64);
+    /*  705 Y */ call($branch_key);
+    /*  706 b */ mv(a5,a0);
+    /*  707 O */ sw(a5, -28, s0);
+    /*  708 T */ lw(a5, -20, s0);
+    /*  709 b */ mv(a1,a5);
+    /*  710 K */ ld(a0, s0, 64);
+    /*  711 Y */ call($branch_data);
+    /*  712 b */ mv(a5,a0);
+    /*  713 O */ sw(a5, -24, s0);
     $L46.set();
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -28, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -24, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(ra, sp, 56);             /* GGGG */
-    ld(s0, sp, 48);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  714 K */ ld(a5, s0, 56);
+    /*  715 T */ lw(a4, -40, s0);
+    /*  716 b */ mv(a0,a4);
+    /*  717 T */ lw(a4, -36, s0);
+    /*  718 b */ mv(a1,a4);
+    /*  719 T */ lw(a4, -32, s0);
+    /*  720 b */ mv(a2,a4);
+    /*  721 T */ lw(a4, -28, s0);
+    /*  722 b */ mv(a3,a4);
+    /*  723 T */ lw(a4, -24, s0);
+    /*  724 O */ sw(a0, 0, a5);
+    /*  725 O */ sw(a1, 4, a5);
+    /*  726 O */ sw(a2, 8, a5);
+    /*  727 O */ sw(a3, 12, a5);
+    /*  728 O */ sw(a4, 16, a5);
+    /*  729 K */ ld(a0, s0, 56);
+    /*  730 K */ ld(ra, sp, 56);
+    /*  731 K */ ld(s0, sp, 48);
+    /*  732 I */ addi(sp, sp, 64);
+    /*  733 W */ jr(ra);
     $branch_searchFirstGreaterThanOrEqualExceptLast.set();
-    addi(sp, sp, -80);           /* LLLL */
-    sd(ra, 72, sp);             /* OOOO */
-    sd(s0, 64, sp);             /* OOOO */
-    addi(s0, sp, 80);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sd(a1, -64, s0);             /* OOOO */
-    mv(a5,a2);        /* ZZZZ */
-    sw(a5, -68, s0);             /* OOOO */
-    addi(a5, s0, -48);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_result);                      /* XXXX */
-    lw(a5, -68, s0);             /* SSSS */
-    sw(a5, -48, s0);             /* OOOO */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    addiw(a5, a5, -1);           /* LLLL */
-    sw(a5, -24, s0);             /* OOOO */
-    sw(zero, -20, s0);             /* OOOO */
-    lw(a5, -24, s0);             /* SSSS */
-    sw(a5, -28, s0);             /* OOOO */
-    j($L49);                       /* WWWW */
+    /*  734 I */ addi(sp, sp, -80);
+    /*  735 O */ sd(ra, 72, sp);
+    /*  736 O */ sd(s0, 64, sp);
+    /*  737 I */ addi(s0, sp, 80);
+    /*  738 O */ sd(a0, -56, s0);
+    /*  739 O */ sd(a1, -64, s0);
+    /*  740 b */ mv(a5,a2);
+    /*  741 O */ sw(a5, -68, s0);
+    /*  742 I */ addi(a5, s0, -48);
+    /*  743 b */ mv(a0,a5);
+    /*  744 Y */ call($branch_result);
+    /*  745 T */ lw(a5, -68, s0);
+    /*  746 O */ sw(a5, -48, s0);
+    /*  747 K */ ld(a0, s0, 64);
+    /*  748 Y */ call($branch_size);
+    /*  749 b */ mv(a5,a0);
+    /*  750 I */ addiw(a5, a5, -1);
+    /*  751 O */ sw(a5, -24, s0);
+    /*  752 O */ sw(zero, -20, s0);
+    /*  753 T */ lw(a5, -24, s0);
+    /*  754 O */ sw(a5, -28, s0);
+    /*  755 X */ j($L49);
     $L52.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -68, s0);             /* SSSS */
-    sextw(a5,a5);        /* ZZZZ */
-    bgt(a5, a4, $L50);             /* YYYY */
-    li(a5,1);        /* ZZZZ */
-    sw(a5, -44, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    sw(a5, -40, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -48, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    j($L53);                       /* WWWW */
+    /*  756 T */ lw(a5, -20, s0);
+    /*  757 b */ mv(a1,a5);
+    /*  758 K */ ld(a0, s0, 64);
+    /*  759 Y */ call($branch_key);
+    /*  760 b */ mv(a5,a0);
+    /*  761 b */ mv(a4,a5);
+    /*  762 T */ lw(a5, -68, s0);
+    /*  763 b */ sextw(a5,a5);
+    /*  764 Z */ bgt(a5, a4, $L50);
+    /*  765 b */ li(a5,1);
+    /*  766 O */ sw(a5, -44, s0);
+    /*  767 T */ lw(a5, -20, s0);
+    /*  768 O */ sw(a5, -40, s0);
+    /*  769 T */ lw(a5, -20, s0);
+    /*  770 b */ mv(a1,a5);
+    /*  771 K */ ld(a0, s0, 64);
+    /*  772 Y */ call($branch_key);
+    /*  773 b */ mv(a5,a0);
+    /*  774 O */ sw(a5, -36, s0);
+    /*  775 T */ lw(a5, -20, s0);
+    /*  776 b */ mv(a1,a5);
+    /*  777 K */ ld(a0, s0, 64);
+    /*  778 Y */ call($branch_data);
+    /*  779 b */ mv(a5,a0);
+    /*  780 O */ sw(a5, -32, s0);
+    /*  781 K */ ld(a5, s0, 56);
+    /*  782 T */ lw(a4, -48, s0);
+    /*  783 b */ mv(a0,a4);
+    /*  784 T */ lw(a4, -44, s0);
+    /*  785 b */ mv(a1,a4);
+    /*  786 T */ lw(a4, -40, s0);
+    /*  787 b */ mv(a2,a4);
+    /*  788 T */ lw(a4, -36, s0);
+    /*  789 b */ mv(a3,a4);
+    /*  790 T */ lw(a4, -32, s0);
+    /*  791 O */ sw(a0, 0, a5);
+    /*  792 O */ sw(a1, 4, a5);
+    /*  793 O */ sw(a2, 8, a5);
+    /*  794 O */ sw(a3, 12, a5);
+    /*  795 O */ sw(a4, 16, a5);
+    /*  796 X */ j($L53);
     $L50.set();
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /*  797 T */ lw(a5, -20, s0);
+    /*  798 I */ addiw(a5, a5, 1);
+    /*  799 O */ sw(a5, -20, s0);
     $L49.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -28, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L52);             /* YYYY */
-    li(a5,1);        /* ZZZZ */
-    sw(a5, -44, s0);             /* OOOO */
-    lw(a5, -24, s0);             /* SSSS */
-    sw(a5, -40, s0);             /* OOOO */
-    sw(zero, -36, s0);             /* OOOO */
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -48, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
+    /*  800 T */ lw(a5, -20, s0);
+    /*  801 b */ mv(a4,a5);
+    /*  802 T */ lw(a5, -28, s0);
+    /*  803 b */ sextw(a4,a4);
+    /*  804 b */ sextw(a5,a5);
+    /*  805 Z */ blt(a4, a5, $L52);
+    /*  806 b */ li(a5,1);
+    /*  807 O */ sw(a5, -44, s0);
+    /*  808 T */ lw(a5, -24, s0);
+    /*  809 O */ sw(a5, -40, s0);
+    /*  810 O */ sw(zero, -36, s0);
+    /*  811 T */ lw(a5, -24, s0);
+    /*  812 b */ mv(a1,a5);
+    /*  813 K */ ld(a0, s0, 64);
+    /*  814 Y */ call($branch_data);
+    /*  815 b */ mv(a5,a0);
+    /*  816 O */ sw(a5, -32, s0);
+    /*  817 K */ ld(a5, s0, 56);
+    /*  818 T */ lw(a4, -48, s0);
+    /*  819 b */ mv(a0,a4);
+    /*  820 T */ lw(a4, -44, s0);
+    /*  821 b */ mv(a1,a4);
+    /*  822 T */ lw(a4, -40, s0);
+    /*  823 b */ mv(a2,a4);
+    /*  824 T */ lw(a4, -36, s0);
+    /*  825 b */ mv(a3,a4);
+    /*  826 T */ lw(a4, -32, s0);
+    /*  827 O */ sw(a0, 0, a5);
+    /*  828 O */ sw(a1, 4, a5);
+    /*  829 O */ sw(a2, 8, a5);
+    /*  830 O */ sw(a3, 12, a5);
+    /*  831 O */ sw(a4, 16, a5);
     $L53.set();
-    ld(a0, s0, 56);             /* GGGG */
-    ld(ra, sp, 72);             /* GGGG */
-    ld(s0, sp, 64);             /* GGGG */
-    addi(sp, sp, 80);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  832 K */ ld(a0, s0, 56);
+    /*  833 K */ ld(ra, sp, 72);
+    /*  834 K */ ld(s0, sp, 64);
+    /*  835 I */ addi(sp, sp, 80);
+    /*  836 W */ jr(ra);
     $leaf_size.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    ld(a5, s0, 24);             /* GGGG */
-    lw(a5, 0, a5);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  837 I */ addi(sp, sp, -32);
+    /*  838 O */ sd(s0, 24, sp);
+    /*  839 I */ addi(s0, sp, 32);
+    /*  840 O */ sd(a0, -24, s0);
+    /*  841 K */ ld(a5, s0, 24);
+    /*  842 T */ lw(a5, 0, a5);
+    /*  843 b */ mv(a0,a5);
+    /*  844 K */ ld(s0, sp, 24);
+    /*  845 I */ addi(sp, sp, 32);
+    /*  846 W */ jr(ra);
     $leaf_isEmpty.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(ra, 24, sp);             /* OOOO */
-    sd(s0, 16, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    ld(a0, s0, 24);             /* GGGG */
-    call($leaf_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    seqz(a5, a5);                 /* YY11 */
-    andi(a5,a5,0xff);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 24);             /* GGGG */
-    ld(s0, sp, 16);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  847 I */ addi(sp, sp, -32);
+    /*  848 O */ sd(ra, 24, sp);
+    /*  849 O */ sd(s0, 16, sp);
+    /*  850 I */ addi(s0, sp, 32);
+    /*  851 O */ sd(a0, -24, s0);
+    /*  852 K */ ld(a0, s0, 24);
+    /*  853 Y */ call($leaf_size);
+    /*  854 b */ mv(a5,a0);
+    /*  855 a */ seqz(a5, a5);
+    /*  856 b */ andi(a5,a5,0xff);
+    /*  857 b */ sextw(a5,a5);
+    /*  858 b */ mv(a0,a5);
+    /*  859 K */ ld(ra, sp, 24);
+    /*  860 K */ ld(s0, sp, 16);
+    /*  861 I */ addi(sp, sp, 32);
+    /*  862 W */ jr(ra);
     $leaf_key.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    ld(a4, s0, 24);             /* GGGG */
-    lw(a5, -28, s0);             /* SSSS */
-    slli(a5,a5,2);        /* ZZZZ */
-    add(a5,a4,a5);        /* ZZZZ */
-    lw(a5, 4, a5);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  863 I */ addi(sp, sp, -32);
+    /*  864 O */ sd(s0, 24, sp);
+    /*  865 I */ addi(s0, sp, 32);
+    /*  866 O */ sd(a0, -24, s0);
+    /*  867 b */ mv(a5,a1);
+    /*  868 O */ sw(a5, -28, s0);
+    /*  869 K */ ld(a4, s0, 24);
+    /*  870 T */ lw(a5, -28, s0);
+    /*  871 b */ slli(a5,a5,2);
+    /*  872 b */ add(a5,a4,a5);
+    /*  873 T */ lw(a5, 4, a5);
+    /*  874 b */ mv(a0,a5);
+    /*  875 K */ ld(s0, sp, 24);
+    /*  876 I */ addi(sp, sp, 32);
+    /*  877 W */ jr(ra);
     $leaf_data.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    ld(a4, s0, 24);             /* GGGG */
-    lw(a5, -28, s0);             /* SSSS */
-    add(a5,a4,a5);        /* ZZZZ */
-    lbu(a5, 12, a5);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  878 I */ addi(sp, sp, -32);
+    /*  879 O */ sd(s0, 24, sp);
+    /*  880 I */ addi(s0, sp, 32);
+    /*  881 O */ sd(a0, -24, s0);
+    /*  882 b */ mv(a5,a1);
+    /*  883 O */ sw(a5, -28, s0);
+    /*  884 K */ ld(a4, s0, 24);
+    /*  885 T */ lw(a5, -28, s0);
+    /*  886 b */ add(a5,a4,a5);
+    /*  887 T */ lbu(a5, 12, a5);
+    /*  888 b */ mv(a0,a5);
+    /*  889 K */ ld(s0, sp, 24);
+    /*  890 I */ addi(sp, sp, 32);
+    /*  891 W */ jr(ra);
     $leaf_setKey.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a2);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    ld(a4, s0, 24);             /* GGGG */
-    lw(a5, -28, s0);             /* SSSS */
-    slli(a5,a5,2);        /* ZZZZ */
-    add(a5,a4,a5);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    sw(a4, 4, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  892 I */ addi(sp, sp, -32);
+    /*  893 O */ sd(s0, 24, sp);
+    /*  894 I */ addi(s0, sp, 32);
+    /*  895 O */ sd(a0, -24, s0);
+    /*  896 b */ mv(a5,a1);
+    /*  897 b */ mv(a4,a2);
+    /*  898 O */ sw(a5, -28, s0);
+    /*  899 b */ mv(a5,a4);
+    /*  900 O */ sw(a5, -32, s0);
+    /*  901 K */ ld(a4, s0, 24);
+    /*  902 T */ lw(a5, -28, s0);
+    /*  903 b */ slli(a5,a5,2);
+    /*  904 b */ add(a5,a4,a5);
+    /*  905 T */ lw(a4, -32, s0);
+    /*  906 O */ sw(a4, 4, a5);
+    /*  907 b */ nop();
+    /*  908 K */ ld(s0, sp, 24);
+    /*  909 I */ addi(sp, sp, 32);
+    /*  910 W */ jr(ra);
     $leaf_setData.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a2);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a5, -32, s0);             /* SSSS */
-    andi(a4,a5,0xff);        /* ZZZZ */
-    ld(a3, s0, 24);             /* GGGG */
-    lw(a5, -28, s0);             /* SSSS */
-    add(a5,a3,a5);        /* ZZZZ */
-    sb(a4, 12, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  911 I */ addi(sp, sp, -32);
+    /*  912 O */ sd(s0, 24, sp);
+    /*  913 I */ addi(s0, sp, 32);
+    /*  914 O */ sd(a0, -24, s0);
+    /*  915 b */ mv(a5,a1);
+    /*  916 b */ mv(a4,a2);
+    /*  917 O */ sw(a5, -28, s0);
+    /*  918 b */ mv(a5,a4);
+    /*  919 O */ sw(a5, -32, s0);
+    /*  920 T */ lw(a5, -32, s0);
+    /*  921 b */ andi(a4,a5,0xff);
+    /*  922 K */ ld(a3, s0, 24);
+    /*  923 T */ lw(a5, -28, s0);
+    /*  924 b */ add(a5,a3,a5);
+    /*  925 O */ sb(a4, 12, a5);
+    /*  926 b */ nop();
+    /*  927 K */ ld(s0, sp, 24);
+    /*  928 I */ addi(sp, sp, 32);
+    /*  929 W */ jr(ra);
     $leaf_copyKey.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a2);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    ld(a4, s0, 24);             /* GGGG */
-    lw(a5, -32, s0);             /* SSSS */
-    slli(a5,a5,2);        /* ZZZZ */
-    add(a5,a4,a5);        /* ZZZZ */
-    lw(a4, 4, a5);             /* SSSS */
-    ld(a3, s0, 24);             /* GGGG */
-    lw(a5, -28, s0);             /* SSSS */
-    slli(a5,a5,2);        /* ZZZZ */
-    add(a5,a3,a5);        /* ZZZZ */
-    sw(a4, 4, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  930 I */ addi(sp, sp, -32);
+    /*  931 O */ sd(s0, 24, sp);
+    /*  932 I */ addi(s0, sp, 32);
+    /*  933 O */ sd(a0, -24, s0);
+    /*  934 b */ mv(a5,a1);
+    /*  935 b */ mv(a4,a2);
+    /*  936 O */ sw(a5, -28, s0);
+    /*  937 b */ mv(a5,a4);
+    /*  938 O */ sw(a5, -32, s0);
+    /*  939 K */ ld(a4, s0, 24);
+    /*  940 T */ lw(a5, -32, s0);
+    /*  941 b */ slli(a5,a5,2);
+    /*  942 b */ add(a5,a4,a5);
+    /*  943 T */ lw(a4, 4, a5);
+    /*  944 K */ ld(a3, s0, 24);
+    /*  945 T */ lw(a5, -28, s0);
+    /*  946 b */ slli(a5,a5,2);
+    /*  947 b */ add(a5,a3,a5);
+    /*  948 O */ sw(a4, 4, a5);
+    /*  949 b */ nop();
+    /*  950 K */ ld(s0, sp, 24);
+    /*  951 I */ addi(sp, sp, 32);
+    /*  952 W */ jr(ra);
     $leaf_copyData.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a2);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    ld(a4, s0, 24);             /* GGGG */
-    lw(a5, -32, s0);             /* SSSS */
-    add(a5,a4,a5);        /* ZZZZ */
-    lbu(a4, 12, a5);             /* SSSS */
-    ld(a3, s0, 24);             /* GGGG */
-    lw(a5, -28, s0);             /* SSSS */
-    add(a5,a3,a5);        /* ZZZZ */
-    sb(a4, 12, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  953 I */ addi(sp, sp, -32);
+    /*  954 O */ sd(s0, 24, sp);
+    /*  955 I */ addi(s0, sp, 32);
+    /*  956 O */ sd(a0, -24, s0);
+    /*  957 b */ mv(a5,a1);
+    /*  958 b */ mv(a4,a2);
+    /*  959 O */ sw(a5, -28, s0);
+    /*  960 b */ mv(a5,a4);
+    /*  961 O */ sw(a5, -32, s0);
+    /*  962 K */ ld(a4, s0, 24);
+    /*  963 T */ lw(a5, -32, s0);
+    /*  964 b */ add(a5,a4,a5);
+    /*  965 T */ lbu(a4, 12, a5);
+    /*  966 K */ ld(a3, s0, 24);
+    /*  967 T */ lw(a5, -28, s0);
+    /*  968 b */ add(a5,a3,a5);
+    /*  969 O */ sb(a4, 12, a5);
+    /*  970 b */ nop();
+    /*  971 K */ ld(s0, sp, 24);
+    /*  972 I */ addi(sp, sp, 32);
+    /*  973 W */ jr(ra);
     $leaf_setKeyData.set();
-    addi(sp, sp, -48);           /* LLLL */
-    sd(ra, 40, sp);             /* OOOO */
-    sd(s0, 32, sp);             /* OOOO */
-    addi(s0, sp, 48);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a3);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    mv(a5,a2);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a4, -32, s0);             /* SSSS */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 24);             /* GGGG */
-    call($leaf_setKey);                      /* XXXX */
-    lw(a4, -36, s0);             /* SSSS */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 24);             /* GGGG */
-    call($leaf_setData);                      /* XXXX */
-    nop();        /* ZZZZ */
-    ld(ra, sp, 40);             /* GGGG */
-    ld(s0, sp, 32);             /* GGGG */
-    addi(sp, sp, 48);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /*  974 I */ addi(sp, sp, -48);
+    /*  975 O */ sd(ra, 40, sp);
+    /*  976 O */ sd(s0, 32, sp);
+    /*  977 I */ addi(s0, sp, 48);
+    /*  978 O */ sd(a0, -24, s0);
+    /*  979 b */ mv(a5,a1);
+    /*  980 b */ mv(a4,a3);
+    /*  981 O */ sw(a5, -28, s0);
+    /*  982 b */ mv(a5,a2);
+    /*  983 O */ sw(a5, -32, s0);
+    /*  984 b */ mv(a5,a4);
+    /*  985 O */ sw(a5, -36, s0);
+    /*  986 T */ lw(a4, -32, s0);
+    /*  987 T */ lw(a5, -28, s0);
+    /*  988 b */ mv(a2,a4);
+    /*  989 b */ mv(a1,a5);
+    /*  990 K */ ld(a0, s0, 24);
+    /*  991 Y */ call($leaf_setKey);
+    /*  992 T */ lw(a4, -36, s0);
+    /*  993 T */ lw(a5, -28, s0);
+    /*  994 b */ mv(a2,a4);
+    /*  995 b */ mv(a1,a5);
+    /*  996 K */ ld(a0, s0, 24);
+    /*  997 Y */ call($leaf_setData);
+    /*  998 b */ nop();
+    /*  999 K */ ld(ra, sp, 40);
+    /* 1000 K */ ld(s0, sp, 32);
+    /* 1001 I */ addi(sp, sp, 48);
+    /* 1002 W */ jr(ra);
     $leaf_copyKeyData.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(ra, 24, sp);             /* OOOO */
-    sd(s0, 16, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a2);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a4, -32, s0);             /* SSSS */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 24);             /* GGGG */
-    call($leaf_copyKey);                      /* XXXX */
-    lw(a4, -32, s0);             /* SSSS */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 24);             /* GGGG */
-    call($leaf_copyData);                      /* XXXX */
-    nop();        /* ZZZZ */
-    ld(ra, sp, 24);             /* GGGG */
-    ld(s0, sp, 16);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1003 I */ addi(sp, sp, -32);
+    /* 1004 O */ sd(ra, 24, sp);
+    /* 1005 O */ sd(s0, 16, sp);
+    /* 1006 I */ addi(s0, sp, 32);
+    /* 1007 O */ sd(a0, -24, s0);
+    /* 1008 b */ mv(a5,a1);
+    /* 1009 b */ mv(a4,a2);
+    /* 1010 O */ sw(a5, -28, s0);
+    /* 1011 b */ mv(a5,a4);
+    /* 1012 O */ sw(a5, -32, s0);
+    /* 1013 T */ lw(a4, -32, s0);
+    /* 1014 T */ lw(a5, -28, s0);
+    /* 1015 b */ mv(a2,a4);
+    /* 1016 b */ mv(a1,a5);
+    /* 1017 K */ ld(a0, s0, 24);
+    /* 1018 Y */ call($leaf_copyKey);
+    /* 1019 T */ lw(a4, -32, s0);
+    /* 1020 T */ lw(a5, -28, s0);
+    /* 1021 b */ mv(a2,a4);
+    /* 1022 b */ mv(a1,a5);
+    /* 1023 K */ ld(a0, s0, 24);
+    /* 1024 Y */ call($leaf_copyData);
+    /* 1025 b */ nop();
+    /* 1026 K */ ld(ra, sp, 24);
+    /* 1027 K */ ld(s0, sp, 16);
+    /* 1028 I */ addi(sp, sp, 32);
+    /* 1029 W */ jr(ra);
     $leaf_inc.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    ld(a5, s0, 24);             /* GGGG */
-    lw(a5, 0, a5);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    ld(a5, s0, 24);             /* GGGG */
-    sw(a4, 0, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1030 I */ addi(sp, sp, -32);
+    /* 1031 O */ sd(s0, 24, sp);
+    /* 1032 I */ addi(s0, sp, 32);
+    /* 1033 O */ sd(a0, -24, s0);
+    /* 1034 K */ ld(a5, s0, 24);
+    /* 1035 T */ lw(a5, 0, a5);
+    /* 1036 I */ addiw(a5, a5, 1);
+    /* 1037 b */ sextw(a4,a5);
+    /* 1038 K */ ld(a5, s0, 24);
+    /* 1039 O */ sw(a4, 0, a5);
+    /* 1040 b */ nop();
+    /* 1041 K */ ld(s0, sp, 24);
+    /* 1042 I */ addi(sp, sp, 32);
+    /* 1043 W */ jr(ra);
     $leaf_dec.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    ld(a5, s0, 24);             /* GGGG */
-    lw(a5, 0, a5);             /* SSSS */
-    addiw(a5, a5, -1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    ld(a5, s0, 24);             /* GGGG */
-    sw(a4, 0, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1044 I */ addi(sp, sp, -32);
+    /* 1045 O */ sd(s0, 24, sp);
+    /* 1046 I */ addi(s0, sp, 32);
+    /* 1047 O */ sd(a0, -24, s0);
+    /* 1048 K */ ld(a5, s0, 24);
+    /* 1049 T */ lw(a5, 0, a5);
+    /* 1050 I */ addiw(a5, a5, -1);
+    /* 1051 b */ sextw(a4,a5);
+    /* 1052 K */ ld(a5, s0, 24);
+    /* 1053 O */ sw(a4, 0, a5);
+    /* 1054 b */ nop();
+    /* 1055 K */ ld(s0, sp, 24);
+    /* 1056 I */ addi(sp, sp, 32);
+    /* 1057 W */ jr(ra);
     $leaf_push.set();
-    addi(sp, sp, -48);           /* LLLL */
-    sd(ra, 40, sp);             /* OOOO */
-    sd(s0, 32, sp);             /* OOOO */
-    addi(s0, sp, 48);           /* LLLL */
-    sd(a0, -40, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a2);        /* ZZZZ */
-    sw(a5, -44, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -48, s0);             /* OOOO */
-    ld(a0, s0, 40);             /* GGGG */
-    call($leaf_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a3, -48, s0);             /* SSSS */
-    lw(a4, -44, s0);             /* SSSS */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 40);             /* GGGG */
-    call($leaf_setKeyData);                      /* XXXX */
-    ld(a0, s0, 40);             /* GGGG */
-    call($leaf_inc);                      /* XXXX */
-    nop();        /* ZZZZ */
-    ld(ra, sp, 40);             /* GGGG */
-    ld(s0, sp, 32);             /* GGGG */
-    addi(sp, sp, 48);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1058 I */ addi(sp, sp, -48);
+    /* 1059 O */ sd(ra, 40, sp);
+    /* 1060 O */ sd(s0, 32, sp);
+    /* 1061 I */ addi(s0, sp, 48);
+    /* 1062 O */ sd(a0, -40, s0);
+    /* 1063 b */ mv(a5,a1);
+    /* 1064 b */ mv(a4,a2);
+    /* 1065 O */ sw(a5, -44, s0);
+    /* 1066 b */ mv(a5,a4);
+    /* 1067 O */ sw(a5, -48, s0);
+    /* 1068 K */ ld(a0, s0, 40);
+    /* 1069 Y */ call($leaf_size);
+    /* 1070 b */ mv(a5,a0);
+    /* 1071 O */ sw(a5, -20, s0);
+    /* 1072 T */ lw(a3, -48, s0);
+    /* 1073 T */ lw(a4, -44, s0);
+    /* 1074 T */ lw(a5, -20, s0);
+    /* 1075 b */ mv(a2,a4);
+    /* 1076 b */ mv(a1,a5);
+    /* 1077 K */ ld(a0, s0, 40);
+    /* 1078 Y */ call($leaf_setKeyData);
+    /* 1079 K */ ld(a0, s0, 40);
+    /* 1080 Y */ call($leaf_inc);
+    /* 1081 b */ nop();
+    /* 1082 K */ ld(ra, sp, 40);
+    /* 1083 K */ ld(s0, sp, 32);
+    /* 1084 I */ addi(sp, sp, 48);
+    /* 1085 W */ jr(ra);
     $leaf_result.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(s0, 56, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sb(zero, -24, s0);             /* OOOO */
-    sw(zero, -28, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a5, -32, s0);             /* SSSS */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a5, -36, s0);             /* SSSS */
-    sw(a5, -40, s0);             /* OOOO */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -28, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -24, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(s0, sp, 56);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1086 I */ addi(sp, sp, -64);
+    /* 1087 O */ sd(s0, 56, sp);
+    /* 1088 I */ addi(s0, sp, 64);
+    /* 1089 O */ sd(a0, -56, s0);
+    /* 1090 O */ sb(zero, -24, s0);
+    /* 1091 O */ sw(zero, -28, s0);
+    /* 1092 T */ lw(a5, -28, s0);
+    /* 1093 O */ sw(a5, -32, s0);
+    /* 1094 T */ lw(a5, -32, s0);
+    /* 1095 O */ sw(a5, -36, s0);
+    /* 1096 T */ lw(a5, -36, s0);
+    /* 1097 O */ sw(a5, -40, s0);
+    /* 1098 K */ ld(a5, s0, 56);
+    /* 1099 T */ lw(a4, -40, s0);
+    /* 1100 b */ mv(a0,a4);
+    /* 1101 T */ lw(a4, -36, s0);
+    /* 1102 b */ mv(a1,a4);
+    /* 1103 T */ lw(a4, -32, s0);
+    /* 1104 b */ mv(a2,a4);
+    /* 1105 T */ lw(a4, -28, s0);
+    /* 1106 b */ mv(a3,a4);
+    /* 1107 T */ lw(a4, -24, s0);
+    /* 1108 O */ sw(a0, 0, a5);
+    /* 1109 O */ sw(a1, 4, a5);
+    /* 1110 O */ sw(a2, 8, a5);
+    /* 1111 O */ sw(a3, 12, a5);
+    /* 1112 O */ sw(a4, 16, a5);
+    /* 1113 K */ ld(a0, s0, 56);
+    /* 1114 K */ ld(s0, sp, 56);
+    /* 1115 I */ addi(sp, sp, 64);
+    /* 1116 W */ jr(ra);
     $leaf_pop.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(ra, 56, sp);             /* OOOO */
-    sd(s0, 48, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sd(a1, -64, s0);             /* OOOO */
-    addi(a5, s0, -40);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_result);                      /* XXXX */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_dec);                      /* XXXX */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sb(a5, -24, s0);             /* OOOO */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -28, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -24, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(ra, sp, 56);             /* GGGG */
-    ld(s0, sp, 48);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1117 I */ addi(sp, sp, -64);
+    /* 1118 O */ sd(ra, 56, sp);
+    /* 1119 O */ sd(s0, 48, sp);
+    /* 1120 I */ addi(s0, sp, 64);
+    /* 1121 O */ sd(a0, -56, s0);
+    /* 1122 O */ sd(a1, -64, s0);
+    /* 1123 I */ addi(a5, s0, -40);
+    /* 1124 b */ mv(a0,a5);
+    /* 1125 Y */ call($leaf_result);
+    /* 1126 K */ ld(a0, s0, 64);
+    /* 1127 Y */ call($leaf_dec);
+    /* 1128 K */ ld(a0, s0, 64);
+    /* 1129 Y */ call($leaf_size);
+    /* 1130 b */ mv(a5,a0);
+    /* 1131 O */ sw(a5, -32, s0);
+    /* 1132 T */ lw(a5, -32, s0);
+    /* 1133 b */ mv(a1,a5);
+    /* 1134 K */ ld(a0, s0, 64);
+    /* 1135 Y */ call($leaf_key);
+    /* 1136 b */ mv(a5,a0);
+    /* 1137 O */ sw(a5, -28, s0);
+    /* 1138 T */ lw(a5, -32, s0);
+    /* 1139 b */ mv(a1,a5);
+    /* 1140 K */ ld(a0, s0, 64);
+    /* 1141 Y */ call($leaf_data);
+    /* 1142 b */ mv(a5,a0);
+    /* 1143 O */ sb(a5, -24, s0);
+    /* 1144 K */ ld(a5, s0, 56);
+    /* 1145 T */ lw(a4, -40, s0);
+    /* 1146 b */ mv(a0,a4);
+    /* 1147 T */ lw(a4, -36, s0);
+    /* 1148 b */ mv(a1,a4);
+    /* 1149 T */ lw(a4, -32, s0);
+    /* 1150 b */ mv(a2,a4);
+    /* 1151 T */ lw(a4, -28, s0);
+    /* 1152 b */ mv(a3,a4);
+    /* 1153 T */ lw(a4, -24, s0);
+    /* 1154 O */ sw(a0, 0, a5);
+    /* 1155 O */ sw(a1, 4, a5);
+    /* 1156 O */ sw(a2, 8, a5);
+    /* 1157 O */ sw(a3, 12, a5);
+    /* 1158 O */ sw(a4, 16, a5);
+    /* 1159 K */ ld(a0, s0, 56);
+    /* 1160 K */ ld(ra, sp, 56);
+    /* 1161 K */ ld(s0, sp, 48);
+    /* 1162 I */ addi(sp, sp, 64);
+    /* 1163 W */ jr(ra);
     $leaf_shift.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(ra, 56, sp);             /* OOOO */
-    sd(s0, 48, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sd(a1, -64, s0);             /* OOOO */
-    addi(a5, s0, -48);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_result);                      /* XXXX */
-    li(a1,0);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    li(a1,0);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sb(a5, -32, s0);             /* OOOO */
-    sw(zero, -20, s0);             /* OOOO */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    addiw(a5, a5, -1);           /* LLLL */
-    sw(a5, -24, s0);             /* OOOO */
-    j($L76);                       /* WWWW */
+    /* 1164 I */ addi(sp, sp, -64);
+    /* 1165 O */ sd(ra, 56, sp);
+    /* 1166 O */ sd(s0, 48, sp);
+    /* 1167 I */ addi(s0, sp, 64);
+    /* 1168 O */ sd(a0, -56, s0);
+    /* 1169 O */ sd(a1, -64, s0);
+    /* 1170 I */ addi(a5, s0, -48);
+    /* 1171 b */ mv(a0,a5);
+    /* 1172 Y */ call($leaf_result);
+    /* 1173 b */ li(a1,0);
+    /* 1174 K */ ld(a0, s0, 64);
+    /* 1175 Y */ call($leaf_key);
+    /* 1176 b */ mv(a5,a0);
+    /* 1177 O */ sw(a5, -36, s0);
+    /* 1178 b */ li(a1,0);
+    /* 1179 K */ ld(a0, s0, 64);
+    /* 1180 Y */ call($leaf_data);
+    /* 1181 b */ mv(a5,a0);
+    /* 1182 O */ sb(a5, -32, s0);
+    /* 1183 O */ sw(zero, -20, s0);
+    /* 1184 K */ ld(a0, s0, 64);
+    /* 1185 Y */ call($leaf_size);
+    /* 1186 b */ mv(a5,a0);
+    /* 1187 I */ addiw(a5, a5, -1);
+    /* 1188 O */ sw(a5, -24, s0);
+    /* 1189 X */ j($L76);
     $L77.set();
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_copyKeyData);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /* 1190 T */ lw(a5, -20, s0);
+    /* 1191 I */ addiw(a5, a5, 1);
+    /* 1192 b */ sextw(a4,a5);
+    /* 1193 T */ lw(a5, -20, s0);
+    /* 1194 b */ mv(a2,a4);
+    /* 1195 b */ mv(a1,a5);
+    /* 1196 K */ ld(a0, s0, 64);
+    /* 1197 Y */ call($leaf_copyKeyData);
+    /* 1198 T */ lw(a5, -20, s0);
+    /* 1199 I */ addiw(a5, a5, 1);
+    /* 1200 O */ sw(a5, -20, s0);
     $L76.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -24, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L77);             /* YYYY */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_dec);                      /* XXXX */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -48, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(ra, sp, 56);             /* GGGG */
-    ld(s0, sp, 48);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1201 T */ lw(a5, -20, s0);
+    /* 1202 b */ mv(a4,a5);
+    /* 1203 T */ lw(a5, -24, s0);
+    /* 1204 b */ sextw(a4,a4);
+    /* 1205 b */ sextw(a5,a5);
+    /* 1206 Z */ blt(a4, a5, $L77);
+    /* 1207 K */ ld(a0, s0, 64);
+    /* 1208 Y */ call($leaf_dec);
+    /* 1209 K */ ld(a5, s0, 56);
+    /* 1210 T */ lw(a4, -48, s0);
+    /* 1211 b */ mv(a0,a4);
+    /* 1212 T */ lw(a4, -44, s0);
+    /* 1213 b */ mv(a1,a4);
+    /* 1214 T */ lw(a4, -40, s0);
+    /* 1215 b */ mv(a2,a4);
+    /* 1216 T */ lw(a4, -36, s0);
+    /* 1217 b */ mv(a3,a4);
+    /* 1218 T */ lw(a4, -32, s0);
+    /* 1219 O */ sw(a0, 0, a5);
+    /* 1220 O */ sw(a1, 4, a5);
+    /* 1221 O */ sw(a2, 8, a5);
+    /* 1222 O */ sw(a3, 12, a5);
+    /* 1223 O */ sw(a4, 16, a5);
+    /* 1224 K */ ld(a0, s0, 56);
+    /* 1225 K */ ld(ra, sp, 56);
+    /* 1226 K */ ld(s0, sp, 48);
+    /* 1227 I */ addi(sp, sp, 64);
+    /* 1228 W */ jr(ra);
     $leaf_elementAt.set();
-    addi(sp, sp, -80);           /* LLLL */
-    sd(ra, 72, sp);             /* OOOO */
-    sd(s0, 64, sp);             /* OOOO */
-    addi(s0, sp, 80);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sd(a1, -64, s0);             /* OOOO */
-    mv(a5,a2);        /* ZZZZ */
-    sw(a5, -68, s0);             /* OOOO */
-    addi(a5, s0, -40);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_result);                      /* XXXX */
-    lw(a5, -68, s0);             /* SSSS */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a5, -68, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -68, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sb(a5, -24, s0);             /* OOOO */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -28, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -24, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(ra, sp, 72);             /* GGGG */
-    ld(s0, sp, 64);             /* GGGG */
-    addi(sp, sp, 80);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1229 I */ addi(sp, sp, -80);
+    /* 1230 O */ sd(ra, 72, sp);
+    /* 1231 O */ sd(s0, 64, sp);
+    /* 1232 I */ addi(s0, sp, 80);
+    /* 1233 O */ sd(a0, -56, s0);
+    /* 1234 O */ sd(a1, -64, s0);
+    /* 1235 b */ mv(a5,a2);
+    /* 1236 O */ sw(a5, -68, s0);
+    /* 1237 I */ addi(a5, s0, -40);
+    /* 1238 b */ mv(a0,a5);
+    /* 1239 Y */ call($leaf_result);
+    /* 1240 T */ lw(a5, -68, s0);
+    /* 1241 O */ sw(a5, -32, s0);
+    /* 1242 T */ lw(a5, -68, s0);
+    /* 1243 b */ mv(a1,a5);
+    /* 1244 K */ ld(a0, s0, 64);
+    /* 1245 Y */ call($leaf_key);
+    /* 1246 b */ mv(a5,a0);
+    /* 1247 O */ sw(a5, -28, s0);
+    /* 1248 T */ lw(a5, -68, s0);
+    /* 1249 b */ mv(a1,a5);
+    /* 1250 K */ ld(a0, s0, 64);
+    /* 1251 Y */ call($leaf_data);
+    /* 1252 b */ mv(a5,a0);
+    /* 1253 O */ sb(a5, -24, s0);
+    /* 1254 K */ ld(a5, s0, 56);
+    /* 1255 T */ lw(a4, -40, s0);
+    /* 1256 b */ mv(a0,a4);
+    /* 1257 T */ lw(a4, -36, s0);
+    /* 1258 b */ mv(a1,a4);
+    /* 1259 T */ lw(a4, -32, s0);
+    /* 1260 b */ mv(a2,a4);
+    /* 1261 T */ lw(a4, -28, s0);
+    /* 1262 b */ mv(a3,a4);
+    /* 1263 T */ lw(a4, -24, s0);
+    /* 1264 O */ sw(a0, 0, a5);
+    /* 1265 O */ sw(a1, 4, a5);
+    /* 1266 O */ sw(a2, 8, a5);
+    /* 1267 O */ sw(a3, 12, a5);
+    /* 1268 O */ sw(a4, 16, a5);
+    /* 1269 K */ ld(a0, s0, 56);
+    /* 1270 K */ ld(ra, sp, 72);
+    /* 1271 K */ ld(s0, sp, 64);
+    /* 1272 I */ addi(sp, sp, 80);
+    /* 1273 W */ jr(ra);
     $leaf_setElementAt.set();
-    addi(sp, sp, -48);           /* LLLL */
-    sd(ra, 40, sp);             /* OOOO */
-    sd(s0, 32, sp);             /* OOOO */
-    addi(s0, sp, 48);           /* LLLL */
-    sd(a0, -24, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a3);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    mv(a5,a2);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    ld(a0, s0, 24);             /* GGGG */
-    call($leaf_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -36, s0);             /* SSSS */
-    sextw(a5,a5);        /* ZZZZ */
-    bne(a5, a4, $L82);             /* YYYY */
-    lw(a3, -32, s0);             /* SSSS */
-    lw(a4, -28, s0);             /* SSSS */
-    lw(a5, -36, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 24);             /* GGGG */
-    call($leaf_setKeyData);                      /* XXXX */
-    ld(a0, s0, 24);             /* GGGG */
-    call($leaf_inc);                      /* XXXX */
-    j($L84);                       /* WWWW */
+    /* 1274 I */ addi(sp, sp, -48);
+    /* 1275 O */ sd(ra, 40, sp);
+    /* 1276 O */ sd(s0, 32, sp);
+    /* 1277 I */ addi(s0, sp, 48);
+    /* 1278 O */ sd(a0, -24, s0);
+    /* 1279 b */ mv(a5,a1);
+    /* 1280 b */ mv(a4,a3);
+    /* 1281 O */ sw(a5, -28, s0);
+    /* 1282 b */ mv(a5,a2);
+    /* 1283 O */ sw(a5, -32, s0);
+    /* 1284 b */ mv(a5,a4);
+    /* 1285 O */ sw(a5, -36, s0);
+    /* 1286 K */ ld(a0, s0, 24);
+    /* 1287 Y */ call($leaf_size);
+    /* 1288 b */ mv(a5,a0);
+    /* 1289 b */ mv(a4,a5);
+    /* 1290 T */ lw(a5, -36, s0);
+    /* 1291 b */ sextw(a5,a5);
+    /* 1292 Z */ bne(a5, a4, $L82);
+    /* 1293 T */ lw(a3, -32, s0);
+    /* 1294 T */ lw(a4, -28, s0);
+    /* 1295 T */ lw(a5, -36, s0);
+    /* 1296 b */ mv(a2,a4);
+    /* 1297 b */ mv(a1,a5);
+    /* 1298 K */ ld(a0, s0, 24);
+    /* 1299 Y */ call($leaf_setKeyData);
+    /* 1300 K */ ld(a0, s0, 24);
+    /* 1301 Y */ call($leaf_inc);
+    /* 1302 X */ j($L84);
     $L82.set();
-    lw(a3, -32, s0);             /* SSSS */
-    lw(a4, -28, s0);             /* SSSS */
-    lw(a5, -36, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 24);             /* GGGG */
-    call($leaf_setKeyData);                      /* XXXX */
+    /* 1303 T */ lw(a3, -32, s0);
+    /* 1304 T */ lw(a4, -28, s0);
+    /* 1305 T */ lw(a5, -36, s0);
+    /* 1306 b */ mv(a2,a4);
+    /* 1307 b */ mv(a1,a5);
+    /* 1308 K */ ld(a0, s0, 24);
+    /* 1309 Y */ call($leaf_setKeyData);
     $L84.set();
-    nop();        /* ZZZZ */
-    ld(ra, sp, 40);             /* GGGG */
-    ld(s0, sp, 32);             /* GGGG */
-    addi(sp, sp, 48);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1310 b */ nop();
+    /* 1311 K */ ld(ra, sp, 40);
+    /* 1312 K */ ld(s0, sp, 32);
+    /* 1313 I */ addi(sp, sp, 48);
+    /* 1314 W */ jr(ra);
     $leaf_insertElementAt.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(ra, 56, sp);             /* OOOO */
-    sd(s0, 48, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    sd(a0, -40, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a3);        /* ZZZZ */
-    sw(a5, -44, s0);             /* OOOO */
-    mv(a5,a2);        /* ZZZZ */
-    sw(a5, -48, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -52, s0);             /* OOOO */
-    ld(a0, s0, 40);             /* GGGG */
-    call($leaf_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -20, s0);             /* OOOO */
-    j($L86);                       /* WWWW */
+    /* 1315 I */ addi(sp, sp, -64);
+    /* 1316 O */ sd(ra, 56, sp);
+    /* 1317 O */ sd(s0, 48, sp);
+    /* 1318 I */ addi(s0, sp, 64);
+    /* 1319 O */ sd(a0, -40, s0);
+    /* 1320 b */ mv(a5,a1);
+    /* 1321 b */ mv(a4,a3);
+    /* 1322 O */ sw(a5, -44, s0);
+    /* 1323 b */ mv(a5,a2);
+    /* 1324 O */ sw(a5, -48, s0);
+    /* 1325 b */ mv(a5,a4);
+    /* 1326 O */ sw(a5, -52, s0);
+    /* 1327 K */ ld(a0, s0, 40);
+    /* 1328 Y */ call($leaf_size);
+    /* 1329 b */ mv(a5,a0);
+    /* 1330 O */ sw(a5, -20, s0);
+    /* 1331 X */ j($L86);
     $L87.set();
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, -1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 40);             /* GGGG */
-    call($leaf_copyKeyData);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, -1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /* 1332 T */ lw(a5, -20, s0);
+    /* 1333 I */ addiw(a5, a5, -1);
+    /* 1334 b */ sextw(a4,a5);
+    /* 1335 T */ lw(a5, -20, s0);
+    /* 1336 b */ mv(a2,a4);
+    /* 1337 b */ mv(a1,a5);
+    /* 1338 K */ ld(a0, s0, 40);
+    /* 1339 Y */ call($leaf_copyKeyData);
+    /* 1340 T */ lw(a5, -20, s0);
+    /* 1341 I */ addiw(a5, a5, -1);
+    /* 1342 O */ sw(a5, -20, s0);
     $L86.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -52, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    bgt(a4, a5, $L87);             /* YYYY */
-    lw(a3, -48, s0);             /* SSSS */
-    lw(a4, -44, s0);             /* SSSS */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 40);             /* GGGG */
-    call($leaf_setKeyData);                      /* XXXX */
-    ld(a0, s0, 40);             /* GGGG */
-    call($leaf_inc);                      /* XXXX */
-    nop();        /* ZZZZ */
-    ld(ra, sp, 56);             /* GGGG */
-    ld(s0, sp, 48);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1343 T */ lw(a5, -20, s0);
+    /* 1344 b */ mv(a4,a5);
+    /* 1345 T */ lw(a5, -52, s0);
+    /* 1346 b */ sextw(a4,a4);
+    /* 1347 b */ sextw(a5,a5);
+    /* 1348 Z */ bgt(a4, a5, $L87);
+    /* 1349 T */ lw(a3, -48, s0);
+    /* 1350 T */ lw(a4, -44, s0);
+    /* 1351 T */ lw(a5, -52, s0);
+    /* 1352 b */ mv(a2,a4);
+    /* 1353 b */ mv(a1,a5);
+    /* 1354 K */ ld(a0, s0, 40);
+    /* 1355 Y */ call($leaf_setKeyData);
+    /* 1356 K */ ld(a0, s0, 40);
+    /* 1357 Y */ call($leaf_inc);
+    /* 1358 b */ nop();
+    /* 1359 K */ ld(ra, sp, 56);
+    /* 1360 K */ ld(s0, sp, 48);
+    /* 1361 I */ addi(sp, sp, 64);
+    /* 1362 W */ jr(ra);
     $leaf_removeElementAt.set();
-    addi(sp, sp, -80);           /* LLLL */
-    sd(ra, 72, sp);             /* OOOO */
-    sd(s0, 64, sp);             /* OOOO */
-    addi(s0, sp, 80);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sd(a1, -64, s0);             /* OOOO */
-    mv(a5,a2);        /* ZZZZ */
-    sw(a5, -68, s0);             /* OOOO */
-    addi(a5, s0, -48);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_result);                      /* XXXX */
-    lw(a5, -68, s0);             /* SSSS */
-    sw(a5, -40, s0);             /* OOOO */
-    lw(a5, -68, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a5, -68, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sb(a5, -32, s0);             /* OOOO */
-    lw(a5, -68, s0);             /* SSSS */
-    sw(a5, -20, s0);             /* OOOO */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    addiw(a5, a5, -1);           /* LLLL */
-    sw(a5, -24, s0);             /* OOOO */
-    j($L89);                       /* WWWW */
+    /* 1363 I */ addi(sp, sp, -80);
+    /* 1364 O */ sd(ra, 72, sp);
+    /* 1365 O */ sd(s0, 64, sp);
+    /* 1366 I */ addi(s0, sp, 80);
+    /* 1367 O */ sd(a0, -56, s0);
+    /* 1368 O */ sd(a1, -64, s0);
+    /* 1369 b */ mv(a5,a2);
+    /* 1370 O */ sw(a5, -68, s0);
+    /* 1371 I */ addi(a5, s0, -48);
+    /* 1372 b */ mv(a0,a5);
+    /* 1373 Y */ call($leaf_result);
+    /* 1374 T */ lw(a5, -68, s0);
+    /* 1375 O */ sw(a5, -40, s0);
+    /* 1376 T */ lw(a5, -68, s0);
+    /* 1377 b */ mv(a1,a5);
+    /* 1378 K */ ld(a0, s0, 64);
+    /* 1379 Y */ call($leaf_key);
+    /* 1380 b */ mv(a5,a0);
+    /* 1381 O */ sw(a5, -36, s0);
+    /* 1382 T */ lw(a5, -68, s0);
+    /* 1383 b */ mv(a1,a5);
+    /* 1384 K */ ld(a0, s0, 64);
+    /* 1385 Y */ call($leaf_data);
+    /* 1386 b */ mv(a5,a0);
+    /* 1387 O */ sb(a5, -32, s0);
+    /* 1388 T */ lw(a5, -68, s0);
+    /* 1389 O */ sw(a5, -20, s0);
+    /* 1390 K */ ld(a0, s0, 64);
+    /* 1391 Y */ call($leaf_size);
+    /* 1392 b */ mv(a5,a0);
+    /* 1393 I */ addiw(a5, a5, -1);
+    /* 1394 O */ sw(a5, -24, s0);
+    /* 1395 X */ j($L89);
     $L90.set();
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_copyKeyData);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /* 1396 T */ lw(a5, -20, s0);
+    /* 1397 I */ addiw(a5, a5, 1);
+    /* 1398 b */ sextw(a4,a5);
+    /* 1399 T */ lw(a5, -20, s0);
+    /* 1400 b */ mv(a2,a4);
+    /* 1401 b */ mv(a1,a5);
+    /* 1402 K */ ld(a0, s0, 64);
+    /* 1403 Y */ call($leaf_copyKeyData);
+    /* 1404 T */ lw(a5, -20, s0);
+    /* 1405 I */ addiw(a5, a5, 1);
+    /* 1406 O */ sw(a5, -20, s0);
     $L89.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -24, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L90);             /* YYYY */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_dec);                      /* XXXX */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -48, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(ra, sp, 72);             /* GGGG */
-    ld(s0, sp, 64);             /* GGGG */
-    addi(sp, sp, 80);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1407 T */ lw(a5, -20, s0);
+    /* 1408 b */ mv(a4,a5);
+    /* 1409 T */ lw(a5, -24, s0);
+    /* 1410 b */ sextw(a4,a4);
+    /* 1411 b */ sextw(a5,a5);
+    /* 1412 Z */ blt(a4, a5, $L90);
+    /* 1413 K */ ld(a0, s0, 64);
+    /* 1414 Y */ call($leaf_dec);
+    /* 1415 K */ ld(a5, s0, 56);
+    /* 1416 T */ lw(a4, -48, s0);
+    /* 1417 b */ mv(a0,a4);
+    /* 1418 T */ lw(a4, -44, s0);
+    /* 1419 b */ mv(a1,a4);
+    /* 1420 T */ lw(a4, -40, s0);
+    /* 1421 b */ mv(a2,a4);
+    /* 1422 T */ lw(a4, -36, s0);
+    /* 1423 b */ mv(a3,a4);
+    /* 1424 T */ lw(a4, -32, s0);
+    /* 1425 O */ sw(a0, 0, a5);
+    /* 1426 O */ sw(a1, 4, a5);
+    /* 1427 O */ sw(a2, 8, a5);
+    /* 1428 O */ sw(a3, 12, a5);
+    /* 1429 O */ sw(a4, 16, a5);
+    /* 1430 K */ ld(a0, s0, 56);
+    /* 1431 K */ ld(ra, sp, 72);
+    /* 1432 K */ ld(s0, sp, 64);
+    /* 1433 I */ addi(sp, sp, 80);
+    /* 1434 W */ jr(ra);
     $leaf_firstElement.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(ra, 56, sp);             /* OOOO */
-    sd(s0, 48, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sd(a1, -64, s0);             /* OOOO */
-    addi(a5, s0, -40);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_result);                      /* XXXX */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_isEmpty);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    seqz(a5, a5);                 /* YY11 */
-    andi(a5,a5,0xff);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a5, -36, s0);             /* SSSS */
-    beq(a5, zero, $L93);             /* YYYY */
-    sw(zero, -32, s0);             /* OOOO */
-    li(a1,0);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    li(a1,0);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sb(a5, -24, s0);             /* OOOO */
+    /* 1435 I */ addi(sp, sp, -64);
+    /* 1436 O */ sd(ra, 56, sp);
+    /* 1437 O */ sd(s0, 48, sp);
+    /* 1438 I */ addi(s0, sp, 64);
+    /* 1439 O */ sd(a0, -56, s0);
+    /* 1440 O */ sd(a1, -64, s0);
+    /* 1441 I */ addi(a5, s0, -40);
+    /* 1442 b */ mv(a0,a5);
+    /* 1443 Y */ call($leaf_result);
+    /* 1444 K */ ld(a0, s0, 64);
+    /* 1445 Y */ call($leaf_isEmpty);
+    /* 1446 b */ mv(a5,a0);
+    /* 1447 a */ seqz(a5, a5);
+    /* 1448 b */ andi(a5,a5,0xff);
+    /* 1449 b */ sextw(a5,a5);
+    /* 1450 O */ sw(a5, -36, s0);
+    /* 1451 T */ lw(a5, -36, s0);
+    /* 1452 Z */ beq(a5, zero, $L93);
+    /* 1453 O */ sw(zero, -32, s0);
+    /* 1454 b */ li(a1,0);
+    /* 1455 K */ ld(a0, s0, 64);
+    /* 1456 Y */ call($leaf_key);
+    /* 1457 b */ mv(a5,a0);
+    /* 1458 O */ sw(a5, -28, s0);
+    /* 1459 b */ li(a1,0);
+    /* 1460 K */ ld(a0, s0, 64);
+    /* 1461 Y */ call($leaf_data);
+    /* 1462 b */ mv(a5,a0);
+    /* 1463 O */ sb(a5, -24, s0);
     $L93.set();
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -28, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -24, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(ra, sp, 56);             /* GGGG */
-    ld(s0, sp, 48);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1464 K */ ld(a5, s0, 56);
+    /* 1465 T */ lw(a4, -40, s0);
+    /* 1466 b */ mv(a0,a4);
+    /* 1467 T */ lw(a4, -36, s0);
+    /* 1468 b */ mv(a1,a4);
+    /* 1469 T */ lw(a4, -32, s0);
+    /* 1470 b */ mv(a2,a4);
+    /* 1471 T */ lw(a4, -28, s0);
+    /* 1472 b */ mv(a3,a4);
+    /* 1473 T */ lw(a4, -24, s0);
+    /* 1474 O */ sw(a0, 0, a5);
+    /* 1475 O */ sw(a1, 4, a5);
+    /* 1476 O */ sw(a2, 8, a5);
+    /* 1477 O */ sw(a3, 12, a5);
+    /* 1478 O */ sw(a4, 16, a5);
+    /* 1479 K */ ld(a0, s0, 56);
+    /* 1480 K */ ld(ra, sp, 56);
+    /* 1481 K */ ld(s0, sp, 48);
+    /* 1482 I */ addi(sp, sp, 64);
+    /* 1483 W */ jr(ra);
     $leaf_lastElement.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(ra, 56, sp);             /* OOOO */
-    sd(s0, 48, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sd(a1, -64, s0);             /* OOOO */
-    addi(a5, s0, -40);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_result);                      /* XXXX */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_isEmpty);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    seqz(a5, a5);                 /* YY11 */
-    andi(a5,a5,0xff);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    addiw(a5, a5, -1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a5, -36, s0);             /* SSSS */
-    beq(a5, zero, $L96);             /* YYYY */
-    lw(a5, -20, s0);             /* SSSS */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sb(a5, -24, s0);             /* OOOO */
+    /* 1484 I */ addi(sp, sp, -64);
+    /* 1485 O */ sd(ra, 56, sp);
+    /* 1486 O */ sd(s0, 48, sp);
+    /* 1487 I */ addi(s0, sp, 64);
+    /* 1488 O */ sd(a0, -56, s0);
+    /* 1489 O */ sd(a1, -64, s0);
+    /* 1490 I */ addi(a5, s0, -40);
+    /* 1491 b */ mv(a0,a5);
+    /* 1492 Y */ call($leaf_result);
+    /* 1493 K */ ld(a0, s0, 64);
+    /* 1494 Y */ call($leaf_isEmpty);
+    /* 1495 b */ mv(a5,a0);
+    /* 1496 a */ seqz(a5, a5);
+    /* 1497 b */ andi(a5,a5,0xff);
+    /* 1498 b */ sextw(a5,a5);
+    /* 1499 O */ sw(a5, -36, s0);
+    /* 1500 K */ ld(a0, s0, 64);
+    /* 1501 Y */ call($leaf_size);
+    /* 1502 b */ mv(a5,a0);
+    /* 1503 I */ addiw(a5, a5, -1);
+    /* 1504 O */ sw(a5, -20, s0);
+    /* 1505 T */ lw(a5, -36, s0);
+    /* 1506 Z */ beq(a5, zero, $L96);
+    /* 1507 T */ lw(a5, -20, s0);
+    /* 1508 O */ sw(a5, -32, s0);
+    /* 1509 T */ lw(a5, -20, s0);
+    /* 1510 b */ mv(a1,a5);
+    /* 1511 K */ ld(a0, s0, 64);
+    /* 1512 Y */ call($leaf_key);
+    /* 1513 b */ mv(a5,a0);
+    /* 1514 O */ sw(a5, -28, s0);
+    /* 1515 T */ lw(a5, -20, s0);
+    /* 1516 b */ mv(a1,a5);
+    /* 1517 K */ ld(a0, s0, 64);
+    /* 1518 Y */ call($leaf_data);
+    /* 1519 b */ mv(a5,a0);
+    /* 1520 O */ sb(a5, -24, s0);
     $L96.set();
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -28, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -24, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(ra, sp, 56);             /* GGGG */
-    ld(s0, sp, 48);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1521 K */ ld(a5, s0, 56);
+    /* 1522 T */ lw(a4, -40, s0);
+    /* 1523 b */ mv(a0,a4);
+    /* 1524 T */ lw(a4, -36, s0);
+    /* 1525 b */ mv(a1,a4);
+    /* 1526 T */ lw(a4, -32, s0);
+    /* 1527 b */ mv(a2,a4);
+    /* 1528 T */ lw(a4, -28, s0);
+    /* 1529 b */ mv(a3,a4);
+    /* 1530 T */ lw(a4, -24, s0);
+    /* 1531 O */ sw(a0, 0, a5);
+    /* 1532 O */ sw(a1, 4, a5);
+    /* 1533 O */ sw(a2, 8, a5);
+    /* 1534 O */ sw(a3, 12, a5);
+    /* 1535 O */ sw(a4, 16, a5);
+    /* 1536 K */ ld(a0, s0, 56);
+    /* 1537 K */ ld(ra, sp, 56);
+    /* 1538 K */ ld(s0, sp, 48);
+    /* 1539 I */ addi(sp, sp, 64);
+    /* 1540 W */ jr(ra);
     $leaf_search.set();
-    addi(sp, sp, -80);           /* LLLL */
-    sd(ra, 72, sp);             /* OOOO */
-    sd(s0, 64, sp);             /* OOOO */
-    addi(s0, sp, 80);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sd(a1, -64, s0);             /* OOOO */
-    mv(a5,a2);        /* ZZZZ */
-    sw(a5, -68, s0);             /* OOOO */
-    addi(a5, s0, -48);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_result);                      /* XXXX */
-    lw(a5, -68, s0);             /* SSSS */
-    sw(a5, -36, s0);             /* OOOO */
-    sw(zero, -20, s0);             /* OOOO */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -24, s0);             /* OOOO */
-    j($L99);                       /* WWWW */
+    /* 1541 I */ addi(sp, sp, -80);
+    /* 1542 O */ sd(ra, 72, sp);
+    /* 1543 O */ sd(s0, 64, sp);
+    /* 1544 I */ addi(s0, sp, 80);
+    /* 1545 O */ sd(a0, -56, s0);
+    /* 1546 O */ sd(a1, -64, s0);
+    /* 1547 b */ mv(a5,a2);
+    /* 1548 O */ sw(a5, -68, s0);
+    /* 1549 I */ addi(a5, s0, -48);
+    /* 1550 b */ mv(a0,a5);
+    /* 1551 Y */ call($leaf_result);
+    /* 1552 T */ lw(a5, -68, s0);
+    /* 1553 O */ sw(a5, -36, s0);
+    /* 1554 O */ sw(zero, -20, s0);
+    /* 1555 K */ ld(a0, s0, 64);
+    /* 1556 Y */ call($leaf_size);
+    /* 1557 b */ mv(a5,a0);
+    /* 1558 O */ sw(a5, -24, s0);
+    /* 1559 X */ j($L99);
     $L102.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -68, s0);             /* SSSS */
-    sextw(a5,a5);        /* ZZZZ */
-    bne(a5, a4, $L100);             /* YYYY */
-    li(a5,1);        /* ZZZZ */
-    sw(a5, -44, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    sw(a5, -40, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sb(a5, -32, s0);             /* OOOO */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -48, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    j($L103);                       /* WWWW */
+    /* 1560 T */ lw(a5, -20, s0);
+    /* 1561 b */ mv(a1,a5);
+    /* 1562 K */ ld(a0, s0, 64);
+    /* 1563 Y */ call($leaf_key);
+    /* 1564 b */ mv(a5,a0);
+    /* 1565 b */ mv(a4,a5);
+    /* 1566 T */ lw(a5, -68, s0);
+    /* 1567 b */ sextw(a5,a5);
+    /* 1568 Z */ bne(a5, a4, $L100);
+    /* 1569 b */ li(a5,1);
+    /* 1570 O */ sw(a5, -44, s0);
+    /* 1571 T */ lw(a5, -20, s0);
+    /* 1572 O */ sw(a5, -40, s0);
+    /* 1573 T */ lw(a5, -20, s0);
+    /* 1574 b */ mv(a1,a5);
+    /* 1575 K */ ld(a0, s0, 64);
+    /* 1576 Y */ call($leaf_data);
+    /* 1577 b */ mv(a5,a0);
+    /* 1578 O */ sb(a5, -32, s0);
+    /* 1579 K */ ld(a5, s0, 56);
+    /* 1580 T */ lw(a4, -48, s0);
+    /* 1581 b */ mv(a0,a4);
+    /* 1582 T */ lw(a4, -44, s0);
+    /* 1583 b */ mv(a1,a4);
+    /* 1584 T */ lw(a4, -40, s0);
+    /* 1585 b */ mv(a2,a4);
+    /* 1586 T */ lw(a4, -36, s0);
+    /* 1587 b */ mv(a3,a4);
+    /* 1588 T */ lw(a4, -32, s0);
+    /* 1589 O */ sw(a0, 0, a5);
+    /* 1590 O */ sw(a1, 4, a5);
+    /* 1591 O */ sw(a2, 8, a5);
+    /* 1592 O */ sw(a3, 12, a5);
+    /* 1593 O */ sw(a4, 16, a5);
+    /* 1594 X */ j($L103);
     $L100.set();
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /* 1595 T */ lw(a5, -20, s0);
+    /* 1596 I */ addiw(a5, a5, 1);
+    /* 1597 O */ sw(a5, -20, s0);
     $L99.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -24, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L102);             /* YYYY */
-    sw(zero, -44, s0);             /* OOOO */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -48, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
+    /* 1598 T */ lw(a5, -20, s0);
+    /* 1599 b */ mv(a4,a5);
+    /* 1600 T */ lw(a5, -24, s0);
+    /* 1601 b */ sextw(a4,a4);
+    /* 1602 b */ sextw(a5,a5);
+    /* 1603 Z */ blt(a4, a5, $L102);
+    /* 1604 O */ sw(zero, -44, s0);
+    /* 1605 K */ ld(a5, s0, 56);
+    /* 1606 T */ lw(a4, -48, s0);
+    /* 1607 b */ mv(a0,a4);
+    /* 1608 T */ lw(a4, -44, s0);
+    /* 1609 b */ mv(a1,a4);
+    /* 1610 T */ lw(a4, -40, s0);
+    /* 1611 b */ mv(a2,a4);
+    /* 1612 T */ lw(a4, -36, s0);
+    /* 1613 b */ mv(a3,a4);
+    /* 1614 T */ lw(a4, -32, s0);
+    /* 1615 O */ sw(a0, 0, a5);
+    /* 1616 O */ sw(a1, 4, a5);
+    /* 1617 O */ sw(a2, 8, a5);
+    /* 1618 O */ sw(a3, 12, a5);
+    /* 1619 O */ sw(a4, 16, a5);
     $L103.set();
-    ld(a0, s0, 56);             /* GGGG */
-    ld(ra, sp, 72);             /* GGGG */
-    ld(s0, sp, 64);             /* GGGG */
-    addi(sp, sp, 80);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1620 K */ ld(a0, s0, 56);
+    /* 1621 K */ ld(ra, sp, 72);
+    /* 1622 K */ ld(s0, sp, 64);
+    /* 1623 I */ addi(sp, sp, 80);
+    /* 1624 W */ jr(ra);
     $leaf_searchFirstGreaterThanOrEqual.set();
-    addi(sp, sp, -80);           /* LLLL */
-    sd(ra, 72, sp);             /* OOOO */
-    sd(s0, 64, sp);             /* OOOO */
-    addi(s0, sp, 80);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    sd(a1, -64, s0);             /* OOOO */
-    mv(a5,a2);        /* ZZZZ */
-    sw(a5, -68, s0);             /* OOOO */
-    addi(a5, s0, -48);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_result);                      /* XXXX */
-    lw(a5, -68, s0);             /* SSSS */
-    sw(a5, -48, s0);             /* OOOO */
-    sw(zero, -20, s0);             /* OOOO */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -24, s0);             /* OOOO */
-    j($L105);                       /* WWWW */
+    /* 1625 I */ addi(sp, sp, -80);
+    /* 1626 O */ sd(ra, 72, sp);
+    /* 1627 O */ sd(s0, 64, sp);
+    /* 1628 I */ addi(s0, sp, 80);
+    /* 1629 O */ sd(a0, -56, s0);
+    /* 1630 O */ sd(a1, -64, s0);
+    /* 1631 b */ mv(a5,a2);
+    /* 1632 O */ sw(a5, -68, s0);
+    /* 1633 I */ addi(a5, s0, -48);
+    /* 1634 b */ mv(a0,a5);
+    /* 1635 Y */ call($leaf_result);
+    /* 1636 T */ lw(a5, -68, s0);
+    /* 1637 O */ sw(a5, -48, s0);
+    /* 1638 O */ sw(zero, -20, s0);
+    /* 1639 K */ ld(a0, s0, 64);
+    /* 1640 Y */ call($leaf_size);
+    /* 1641 b */ mv(a5,a0);
+    /* 1642 O */ sw(a5, -24, s0);
+    /* 1643 X */ j($L105);
     $L108.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -68, s0);             /* SSSS */
-    sextw(a5,a5);        /* ZZZZ */
-    bgt(a5, a4, $L106);             /* YYYY */
-    li(a5,1);        /* ZZZZ */
-    sw(a5, -44, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    sw(a5, -40, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_key);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($leaf_data);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sb(a5, -32, s0);             /* OOOO */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -48, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    j($L109);                       /* WWWW */
+    /* 1644 T */ lw(a5, -20, s0);
+    /* 1645 b */ mv(a1,a5);
+    /* 1646 K */ ld(a0, s0, 64);
+    /* 1647 Y */ call($leaf_key);
+    /* 1648 b */ mv(a5,a0);
+    /* 1649 b */ mv(a4,a5);
+    /* 1650 T */ lw(a5, -68, s0);
+    /* 1651 b */ sextw(a5,a5);
+    /* 1652 Z */ bgt(a5, a4, $L106);
+    /* 1653 b */ li(a5,1);
+    /* 1654 O */ sw(a5, -44, s0);
+    /* 1655 T */ lw(a5, -20, s0);
+    /* 1656 O */ sw(a5, -40, s0);
+    /* 1657 T */ lw(a5, -20, s0);
+    /* 1658 b */ mv(a1,a5);
+    /* 1659 K */ ld(a0, s0, 64);
+    /* 1660 Y */ call($leaf_key);
+    /* 1661 b */ mv(a5,a0);
+    /* 1662 O */ sw(a5, -36, s0);
+    /* 1663 T */ lw(a5, -20, s0);
+    /* 1664 b */ mv(a1,a5);
+    /* 1665 K */ ld(a0, s0, 64);
+    /* 1666 Y */ call($leaf_data);
+    /* 1667 b */ mv(a5,a0);
+    /* 1668 O */ sb(a5, -32, s0);
+    /* 1669 K */ ld(a5, s0, 56);
+    /* 1670 T */ lw(a4, -48, s0);
+    /* 1671 b */ mv(a0,a4);
+    /* 1672 T */ lw(a4, -44, s0);
+    /* 1673 b */ mv(a1,a4);
+    /* 1674 T */ lw(a4, -40, s0);
+    /* 1675 b */ mv(a2,a4);
+    /* 1676 T */ lw(a4, -36, s0);
+    /* 1677 b */ mv(a3,a4);
+    /* 1678 T */ lw(a4, -32, s0);
+    /* 1679 O */ sw(a0, 0, a5);
+    /* 1680 O */ sw(a1, 4, a5);
+    /* 1681 O */ sw(a2, 8, a5);
+    /* 1682 O */ sw(a3, 12, a5);
+    /* 1683 O */ sw(a4, 16, a5);
+    /* 1684 X */ j($L109);
     $L106.set();
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /* 1685 T */ lw(a5, -20, s0);
+    /* 1686 I */ addiw(a5, a5, 1);
+    /* 1687 O */ sw(a5, -20, s0);
     $L105.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -24, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L108);             /* YYYY */
-    sw(zero, -44, s0);             /* OOOO */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -48, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
+    /* 1688 T */ lw(a5, -20, s0);
+    /* 1689 b */ mv(a4,a5);
+    /* 1690 T */ lw(a5, -24, s0);
+    /* 1691 b */ sextw(a4,a4);
+    /* 1692 b */ sextw(a5,a5);
+    /* 1693 Z */ blt(a4, a5, $L108);
+    /* 1694 O */ sw(zero, -44, s0);
+    /* 1695 K */ ld(a5, s0, 56);
+    /* 1696 T */ lw(a4, -48, s0);
+    /* 1697 b */ mv(a0,a4);
+    /* 1698 T */ lw(a4, -44, s0);
+    /* 1699 b */ mv(a1,a4);
+    /* 1700 T */ lw(a4, -40, s0);
+    /* 1701 b */ mv(a2,a4);
+    /* 1702 T */ lw(a4, -36, s0);
+    /* 1703 b */ mv(a3,a4);
+    /* 1704 T */ lw(a4, -32, s0);
+    /* 1705 O */ sw(a0, 0, a5);
+    /* 1706 O */ sw(a1, 4, a5);
+    /* 1707 O */ sw(a2, 8, a5);
+    /* 1708 O */ sw(a3, 12, a5);
+    /* 1709 O */ sw(a4, 16, a5);
     $L109.set();
-    ld(a0, s0, 56);             /* GGGG */
-    ld(ra, sp, 72);             /* GGGG */
-    ld(s0, sp, 64);             /* GGGG */
-    addi(sp, sp, 80);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1710 K */ ld(a0, s0, 56);
+    /* 1711 K */ ld(ra, sp, 72);
+    /* 1712 K */ ld(s0, sp, 64);
+    /* 1713 I */ addi(sp, sp, 80);
+    /* 1714 W */ jr(ra);
     $debug.set();
     $btree.set();
     $allocate.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(ra, 24, sp);             /* OOOO */
-    sd(s0, 16, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a5, a5, false, $btree);     /* IIII */
-    lw(a5, 0, a5);             /* SSSS */
-    sw(a5, -20, s0);             /* OOOO */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a4, a5, false, $btree);     /* IIII */
-    lw(a3, -20, s0);             /* SSSS */
-    li(a5,44);        /* ZZZZ */
-    mul(a5,a3,a5);        /* ZZZZ */
-    add(a5,a4,a5);        /* ZZZZ */
-    lw(a4, 4, a5);             /* SSSS */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a5, a5, false, $btree);     /* IIII */
-    sw(a4, 0, a5);             /* OOOO */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a4, a5, false, $btree);     /* IIII */
-    lw(a3, -20, s0);             /* SSSS */
-    li(a5,44);        /* ZZZZ */
-    mul(a5,a3,a5);        /* ZZZZ */
-    add(a5,a4,a5);        /* ZZZZ */
-    sw(zero, 4, a5);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($clear);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 24);             /* GGGG */
-    ld(s0, sp, 16);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1715 I */ addi(sp, sp, -32);
+    /* 1716 O */ sd(ra, 24, sp);
+    /* 1717 O */ sd(s0, 16, sp);
+    /* 1718 I */ addi(s0, sp, 32);
+    /* 1719 B */ lui(a5, true, $btree);
+    /* 1720 F */ addi(a5, a5, false, $btree);
+    /* 1721 T */ lw(a5, 0, a5);
+    /* 1722 O */ sw(a5, -20, s0);
+    /* 1723 B */ lui(a5, true, $btree);
+    /* 1724 F */ addi(a4, a5, false, $btree);
+    /* 1725 T */ lw(a3, -20, s0);
+    /* 1726 b */ li(a5,44);
+    /* 1727 b */ mul(a5,a3,a5);
+    /* 1728 b */ add(a5,a4,a5);
+    /* 1729 T */ lw(a4, 4, a5);
+    /* 1730 B */ lui(a5, true, $btree);
+    /* 1731 F */ addi(a5, a5, false, $btree);
+    /* 1732 O */ sw(a4, 0, a5);
+    /* 1733 B */ lui(a5, true, $btree);
+    /* 1734 F */ addi(a4, a5, false, $btree);
+    /* 1735 T */ lw(a3, -20, s0);
+    /* 1736 b */ li(a5,44);
+    /* 1737 b */ mul(a5,a3,a5);
+    /* 1738 b */ add(a5,a4,a5);
+    /* 1739 O */ sw(zero, 4, a5);
+    /* 1740 T */ lw(a5, -20, s0);
+    /* 1741 b */ mv(a0,a5);
+    /* 1742 Y */ call($clear);
+    /* 1743 T */ lw(a5, -20, s0);
+    /* 1744 b */ mv(a0,a5);
+    /* 1745 K */ ld(ra, sp, 24);
+    /* 1746 K */ ld(s0, sp, 16);
+    /* 1747 I */ addi(sp, sp, 32);
+    /* 1748 W */ jr(ra);
     $isLeaf.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -20, s0);             /* OOOO */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a4, a5, false, $btree);     /* IIII */
-    lw(a3, -20, s0);             /* SSSS */
-    li(a5,44);        /* ZZZZ */
-    mul(a5,a3,a5);        /* ZZZZ */
-    add(a5,a4,a5);        /* ZZZZ */
-    lw(a5, 8, a5);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1749 I */ addi(sp, sp, -32);
+    /* 1750 O */ sd(s0, 24, sp);
+    /* 1751 I */ addi(s0, sp, 32);
+    /* 1752 b */ mv(a5,a0);
+    /* 1753 O */ sw(a5, -20, s0);
+    /* 1754 B */ lui(a5, true, $btree);
+    /* 1755 F */ addi(a4, a5, false, $btree);
+    /* 1756 T */ lw(a3, -20, s0);
+    /* 1757 b */ li(a5,44);
+    /* 1758 b */ mul(a5,a3,a5);
+    /* 1759 b */ add(a5,a4,a5);
+    /* 1760 T */ lw(a5, 8, a5);
+    /* 1761 b */ mv(a0,a5);
+    /* 1762 K */ ld(s0, sp, 24);
+    /* 1763 I */ addi(sp, sp, 32);
+    /* 1764 W */ jr(ra);
     $rootIsLeaf.set();
-    addi(sp, sp, -16);           /* LLLL */
-    sd(s0, 8, sp);             /* OOOO */
-    addi(s0, sp, 16);           /* LLLL */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a5, a5, false, $btree);     /* IIII */
-    lw(a5, 8, a5);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    ld(s0, sp, 8);             /* GGGG */
-    addi(sp, sp, 16);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1765 I */ addi(sp, sp, -16);
+    /* 1766 O */ sd(s0, 8, sp);
+    /* 1767 I */ addi(s0, sp, 16);
+    /* 1768 B */ lui(a5, true, $btree);
+    /* 1769 F */ addi(a5, a5, false, $btree);
+    /* 1770 T */ lw(a5, 8, a5);
+    /* 1771 b */ mv(a0,a5);
+    /* 1772 K */ ld(s0, sp, 8);
+    /* 1773 I */ addi(sp, sp, 16);
+    /* 1774 W */ jr(ra);
     $setLeaf.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -20, s0);             /* OOOO */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a4, a5, false, $btree);     /* IIII */
-    lw(a3, -20, s0);             /* SSSS */
-    li(a5,44);        /* ZZZZ */
-    mul(a5,a3,a5);        /* ZZZZ */
-    add(a5,a4,a5);        /* ZZZZ */
-    li(a4,1);        /* ZZZZ */
-    sw(a4, 8, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1775 I */ addi(sp, sp, -32);
+    /* 1776 O */ sd(s0, 24, sp);
+    /* 1777 I */ addi(s0, sp, 32);
+    /* 1778 b */ mv(a5,a0);
+    /* 1779 O */ sw(a5, -20, s0);
+    /* 1780 B */ lui(a5, true, $btree);
+    /* 1781 F */ addi(a4, a5, false, $btree);
+    /* 1782 T */ lw(a3, -20, s0);
+    /* 1783 b */ li(a5,44);
+    /* 1784 b */ mul(a5,a3,a5);
+    /* 1785 b */ add(a5,a4,a5);
+    /* 1786 b */ li(a4,1);
+    /* 1787 O */ sw(a4, 8, a5);
+    /* 1788 b */ nop();
+    /* 1789 K */ ld(s0, sp, 24);
+    /* 1790 I */ addi(sp, sp, 32);
+    /* 1791 W */ jr(ra);
     $setBranch.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -20, s0);             /* OOOO */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a4, a5, false, $btree);     /* IIII */
-    lw(a3, -20, s0);             /* SSSS */
-    li(a5,44);        /* ZZZZ */
-    mul(a5,a3,a5);        /* ZZZZ */
-    add(a5,a4,a5);        /* ZZZZ */
-    sw(zero, 8, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1792 I */ addi(sp, sp, -32);
+    /* 1793 O */ sd(s0, 24, sp);
+    /* 1794 I */ addi(s0, sp, 32);
+    /* 1795 b */ mv(a5,a0);
+    /* 1796 O */ sw(a5, -20, s0);
+    /* 1797 B */ lui(a5, true, $btree);
+    /* 1798 F */ addi(a4, a5, false, $btree);
+    /* 1799 T */ lw(a3, -20, s0);
+    /* 1800 b */ li(a5,44);
+    /* 1801 b */ mul(a5,a3,a5);
+    /* 1802 b */ add(a5,a4,a5);
+    /* 1803 O */ sw(zero, 8, a5);
+    /* 1804 b */ nop();
+    /* 1805 K */ ld(s0, sp, 24);
+    /* 1806 I */ addi(sp, sp, 32);
+    /* 1807 W */ jr(ra);
     $setBranchRoot.set();
-    addi(sp, sp, -16);           /* LLLL */
-    sd(s0, 8, sp);             /* OOOO */
-    addi(s0, sp, 16);           /* LLLL */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a5, a5, false, $btree);     /* IIII */
-    sw(zero, 8, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 8);             /* GGGG */
-    addi(sp, sp, 16);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1808 I */ addi(sp, sp, -16);
+    /* 1809 O */ sd(s0, 8, sp);
+    /* 1810 I */ addi(s0, sp, 16);
+    /* 1811 B */ lui(a5, true, $btree);
+    /* 1812 F */ addi(a5, a5, false, $btree);
+    /* 1813 O */ sw(zero, 8, a5);
+    /* 1814 b */ nop();
+    /* 1815 K */ ld(s0, sp, 8);
+    /* 1816 I */ addi(sp, sp, 16);
+    /* 1817 W */ jr(ra);
     $clear.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(s0, 56, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -52, s0);             /* OOOO */
-    lw(a4, -52, s0);             /* SSSS */
-    li(a5,44);        /* ZZZZ */
-    mul(a4,a4,a5);        /* ZZZZ */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a5, a5, false, $btree);     /* IIII */
-    add(a5,a4,a5);        /* ZZZZ */
-    addi(a5, a5, 12);           /* LLLL */
-    sd(a5, -32, s0);             /* OOOO */
-    li(a5,16);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    li(a5,36);        /* ZZZZ */
-    sw(a5, -40, s0);             /* OOOO */
-    lw(a5, -36, s0);             /* SSSS */
-    mv(a2,a5);        /* ZZZZ */
-    lw(a5, -40, s0);             /* SSSS */
-    sextw(a3,a5);        /* ZZZZ */
-    sextw(a4,a2);        /* ZZZZ */
-    bge(a3, a4, $L120);             /* YYYY */
-    mv(a5,a2);        /* ZZZZ */
+    /* 1818 I */ addi(sp, sp, -64);
+    /* 1819 O */ sd(s0, 56, sp);
+    /* 1820 I */ addi(s0, sp, 64);
+    /* 1821 b */ mv(a5,a0);
+    /* 1822 O */ sw(a5, -52, s0);
+    /* 1823 T */ lw(a4, -52, s0);
+    /* 1824 b */ li(a5,44);
+    /* 1825 b */ mul(a4,a4,a5);
+    /* 1826 B */ lui(a5, true, $btree);
+    /* 1827 F */ addi(a5, a5, false, $btree);
+    /* 1828 b */ add(a5,a4,a5);
+    /* 1829 I */ addi(a5, a5, 12);
+    /* 1830 O */ sd(a5, -32, s0);
+    /* 1831 b */ li(a5,16);
+    /* 1832 O */ sw(a5, -36, s0);
+    /* 1833 b */ li(a5,36);
+    /* 1834 O */ sw(a5, -40, s0);
+    /* 1835 T */ lw(a5, -36, s0);
+    /* 1836 b */ mv(a2,a5);
+    /* 1837 T */ lw(a5, -40, s0);
+    /* 1838 b */ sextw(a3,a5);
+    /* 1839 b */ sextw(a4,a2);
+    /* 1840 Z */ bge(a3, a4, $L120);
+    /* 1841 b */ mv(a5,a2);
     $L120.set();
-    sw(a5, -44, s0);             /* OOOO */
-    sw(zero, -20, s0);             /* OOOO */
-    j($L121);                       /* WWWW */
+    /* 1842 O */ sw(a5, -44, s0);
+    /* 1843 O */ sw(zero, -20, s0);
+    /* 1844 X */ j($L121);
     $L122.set();
-    lw(a5, -20, s0);             /* SSSS */
-    ld(a4, s0, 32);             /* GGGG */
-    add(a5,a4,a5);        /* ZZZZ */
-    sb(zero, 0, a5);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /* 1845 T */ lw(a5, -20, s0);
+    /* 1846 K */ ld(a4, s0, 32);
+    /* 1847 b */ add(a5,a4,a5);
+    /* 1848 O */ sb(zero, 0, a5);
+    /* 1849 T */ lw(a5, -20, s0);
+    /* 1850 I */ addiw(a5, a5, 1);
+    /* 1851 O */ sw(a5, -20, s0);
     $L121.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -44, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L122);             /* YYYY */
-    nop();        /* ZZZZ */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 56);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1852 T */ lw(a5, -20, s0);
+    /* 1853 b */ mv(a4,a5);
+    /* 1854 T */ lw(a5, -44, s0);
+    /* 1855 b */ sextw(a4,a4);
+    /* 1856 b */ sextw(a5,a5);
+    /* 1857 Z */ blt(a4, a5, $L122);
+    /* 1858 b */ nop();
+    /* 1859 b */ nop();
+    /* 1860 K */ ld(s0, sp, 56);
+    /* 1861 I */ addi(sp, sp, 64);
+    /* 1862 W */ jr(ra);
     $erase.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(s0, 56, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -52, s0);             /* OOOO */
-    lw(a4, -52, s0);             /* SSSS */
-    li(a5,44);        /* ZZZZ */
-    mul(a4,a4,a5);        /* ZZZZ */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a5, a5, false, $btree);     /* IIII */
-    add(a5,a4,a5);        /* ZZZZ */
-    addi(a5, a5, 12);           /* LLLL */
-    sd(a5, -32, s0);             /* OOOO */
-    li(a5,16);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    li(a5,36);        /* ZZZZ */
-    sw(a5, -40, s0);             /* OOOO */
-    lw(a5, -36, s0);             /* SSSS */
-    mv(a2,a5);        /* ZZZZ */
-    lw(a5, -40, s0);             /* SSSS */
-    sextw(a3,a5);        /* ZZZZ */
-    sextw(a4,a2);        /* ZZZZ */
-    bge(a3, a4, $L124);             /* YYYY */
-    mv(a5,a2);        /* ZZZZ */
+    /* 1863 I */ addi(sp, sp, -64);
+    /* 1864 O */ sd(s0, 56, sp);
+    /* 1865 I */ addi(s0, sp, 64);
+    /* 1866 b */ mv(a5,a0);
+    /* 1867 O */ sw(a5, -52, s0);
+    /* 1868 T */ lw(a4, -52, s0);
+    /* 1869 b */ li(a5,44);
+    /* 1870 b */ mul(a4,a4,a5);
+    /* 1871 B */ lui(a5, true, $btree);
+    /* 1872 F */ addi(a5, a5, false, $btree);
+    /* 1873 b */ add(a5,a4,a5);
+    /* 1874 I */ addi(a5, a5, 12);
+    /* 1875 O */ sd(a5, -32, s0);
+    /* 1876 b */ li(a5,16);
+    /* 1877 O */ sw(a5, -36, s0);
+    /* 1878 b */ li(a5,36);
+    /* 1879 O */ sw(a5, -40, s0);
+    /* 1880 T */ lw(a5, -36, s0);
+    /* 1881 b */ mv(a2,a5);
+    /* 1882 T */ lw(a5, -40, s0);
+    /* 1883 b */ sextw(a3,a5);
+    /* 1884 b */ sextw(a4,a2);
+    /* 1885 Z */ bge(a3, a4, $L124);
+    /* 1886 b */ mv(a5,a2);
     $L124.set();
-    sw(a5, -44, s0);             /* OOOO */
-    sw(zero, -20, s0);             /* OOOO */
-    j($L125);                       /* WWWW */
+    /* 1887 O */ sw(a5, -44, s0);
+    /* 1888 O */ sw(zero, -20, s0);
+    /* 1889 X */ j($L125);
     $L126.set();
-    lw(a5, -20, s0);             /* SSSS */
-    ld(a4, s0, 32);             /* GGGG */
-    add(a5,a4,a5);        /* ZZZZ */
-    li(a4,1);        /* ZZZZ */
-    sb(a4, 0, a5);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /* 1890 T */ lw(a5, -20, s0);
+    /* 1891 K */ ld(a4, s0, 32);
+    /* 1892 b */ add(a5,a4,a5);
+    /* 1893 b */ li(a4,1);
+    /* 1894 O */ sb(a4, 0, a5);
+    /* 1895 T */ lw(a5, -20, s0);
+    /* 1896 I */ addiw(a5, a5, 1);
+    /* 1897 O */ sw(a5, -20, s0);
     $L125.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -44, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L126);             /* YYYY */
-    nop();        /* ZZZZ */
-    nop();        /* ZZZZ */
-    ld(s0, sp, 56);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1898 T */ lw(a5, -20, s0);
+    /* 1899 b */ mv(a4,a5);
+    /* 1900 T */ lw(a5, -44, s0);
+    /* 1901 b */ sextw(a4,a4);
+    /* 1902 b */ sextw(a5,a5);
+    /* 1903 Z */ blt(a4, a5, $L126);
+    /* 1904 b */ nop();
+    /* 1905 b */ nop();
+    /* 1906 K */ ld(s0, sp, 56);
+    /* 1907 I */ addi(sp, sp, 64);
+    /* 1908 W */ jr(ra);
     $freeNode.set();
-    addi(sp, sp, -48);           /* LLLL */
-    sd(ra, 40, sp);             /* OOOO */
-    sd(s0, 32, sp);             /* OOOO */
-    addi(s0, sp, 48);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a5, -36, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($erase);                      /* XXXX */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a5, a5, false, $btree);     /* IIII */
-    lw(a5, 0, a5);             /* SSSS */
-    sw(a5, -20, s0);             /* OOOO */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a5, a5, false, $btree);     /* IIII */
-    lw(a4, -36, s0);             /* SSSS */
-    sw(a4, 0, a5);             /* OOOO */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a4, a5, false, $btree);     /* IIII */
-    lw(a3, -36, s0);             /* SSSS */
-    li(a5,44);        /* ZZZZ */
-    mul(a5,a3,a5);        /* ZZZZ */
-    add(a5,a4,a5);        /* ZZZZ */
-    lw(a4, -20, s0);             /* SSSS */
-    sw(a4, 4, a5);             /* OOOO */
-    nop();        /* ZZZZ */
-    ld(ra, sp, 40);             /* GGGG */
-    ld(s0, sp, 32);             /* GGGG */
-    addi(sp, sp, 48);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1909 I */ addi(sp, sp, -48);
+    /* 1910 O */ sd(ra, 40, sp);
+    /* 1911 O */ sd(s0, 32, sp);
+    /* 1912 I */ addi(s0, sp, 48);
+    /* 1913 b */ mv(a5,a0);
+    /* 1914 O */ sw(a5, -36, s0);
+    /* 1915 T */ lw(a5, -36, s0);
+    /* 1916 b */ mv(a0,a5);
+    /* 1917 Y */ call($erase);
+    /* 1918 B */ lui(a5, true, $btree);
+    /* 1919 F */ addi(a5, a5, false, $btree);
+    /* 1920 T */ lw(a5, 0, a5);
+    /* 1921 O */ sw(a5, -20, s0);
+    /* 1922 B */ lui(a5, true, $btree);
+    /* 1923 F */ addi(a5, a5, false, $btree);
+    /* 1924 T */ lw(a4, -36, s0);
+    /* 1925 O */ sw(a4, 0, a5);
+    /* 1926 B */ lui(a5, true, $btree);
+    /* 1927 F */ addi(a4, a5, false, $btree);
+    /* 1928 T */ lw(a3, -36, s0);
+    /* 1929 b */ li(a5,44);
+    /* 1930 b */ mul(a5,a3,a5);
+    /* 1931 b */ add(a5,a4,a5);
+    /* 1932 T */ lw(a4, -20, s0);
+    /* 1933 O */ sw(a4, 4, a5);
+    /* 1934 b */ nop();
+    /* 1935 K */ ld(ra, sp, 40);
+    /* 1936 K */ ld(s0, sp, 32);
+    /* 1937 I */ addi(sp, sp, 48);
+    /* 1938 W */ jr(ra);
     $leaf.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a4, -20, s0);             /* SSSS */
-    li(a5,44);        /* ZZZZ */
-    mul(a4,a4,a5);        /* ZZZZ */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a5, a5, false, $btree);     /* IIII */
-    add(a5,a4,a5);        /* ZZZZ */
-    addi(a5, a5, 12);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1939 I */ addi(sp, sp, -32);
+    /* 1940 O */ sd(s0, 24, sp);
+    /* 1941 I */ addi(s0, sp, 32);
+    /* 1942 b */ mv(a5,a0);
+    /* 1943 O */ sw(a5, -20, s0);
+    /* 1944 T */ lw(a4, -20, s0);
+    /* 1945 b */ li(a5,44);
+    /* 1946 b */ mul(a4,a4,a5);
+    /* 1947 B */ lui(a5, true, $btree);
+    /* 1948 F */ addi(a5, a5, false, $btree);
+    /* 1949 b */ add(a5,a4,a5);
+    /* 1950 I */ addi(a5, a5, 12);
+    /* 1951 b */ mv(a0,a5);
+    /* 1952 K */ ld(s0, sp, 24);
+    /* 1953 I */ addi(sp, sp, 32);
+    /* 1954 W */ jr(ra);
     $branch.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(s0, 24, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a4, -20, s0);             /* SSSS */
-    li(a5,44);        /* ZZZZ */
-    mul(a4,a4,a5);        /* ZZZZ */
-    lui(a5, true, $btree)            /* BBBB */;
-    addi(a5, a5, false, $btree);     /* IIII */
-    add(a5,a4,a5);        /* ZZZZ */
-    addi(a5, a5, 12);           /* LLLL */
-    mv(a0,a5);        /* ZZZZ */
-    ld(s0, sp, 24);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1955 I */ addi(sp, sp, -32);
+    /* 1956 O */ sd(s0, 24, sp);
+    /* 1957 I */ addi(s0, sp, 32);
+    /* 1958 b */ mv(a5,a0);
+    /* 1959 O */ sw(a5, -20, s0);
+    /* 1960 T */ lw(a4, -20, s0);
+    /* 1961 b */ li(a5,44);
+    /* 1962 b */ mul(a4,a4,a5);
+    /* 1963 B */ lui(a5, true, $btree);
+    /* 1964 F */ addi(a5, a5, false, $btree);
+    /* 1965 b */ add(a5,a4,a5);
+    /* 1966 I */ addi(a5, a5, 12);
+    /* 1967 b */ mv(a0,a5);
+    /* 1968 K */ ld(s0, sp, 24);
+    /* 1969 I */ addi(sp, sp, 32);
+    /* 1970 W */ jr(ra);
     $leafSize.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(ra, 24, sp);             /* OOOO */
-    sd(s0, 16, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 24);             /* GGGG */
-    ld(s0, sp, 16);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1971 I */ addi(sp, sp, -32);
+    /* 1972 O */ sd(ra, 24, sp);
+    /* 1973 O */ sd(s0, 16, sp);
+    /* 1974 I */ addi(s0, sp, 32);
+    /* 1975 b */ mv(a5,a0);
+    /* 1976 O */ sw(a5, -20, s0);
+    /* 1977 T */ lw(a5, -20, s0);
+    /* 1978 b */ mv(a0,a5);
+    /* 1979 Y */ call($leaf);
+    /* 1980 b */ mv(a5,a0);
+    /* 1981 b */ mv(a0,a5);
+    /* 1982 Y */ call($leaf_size);
+    /* 1983 b */ mv(a5,a0);
+    /* 1984 b */ mv(a0,a5);
+    /* 1985 K */ ld(ra, sp, 24);
+    /* 1986 K */ ld(s0, sp, 16);
+    /* 1987 I */ addi(sp, sp, 32);
+    /* 1988 W */ jr(ra);
     $branchSize.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(ra, 24, sp);             /* OOOO */
-    sd(s0, 16, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_size1);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 24);             /* GGGG */
-    ld(s0, sp, 16);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 1989 I */ addi(sp, sp, -32);
+    /* 1990 O */ sd(ra, 24, sp);
+    /* 1991 O */ sd(s0, 16, sp);
+    /* 1992 I */ addi(s0, sp, 32);
+    /* 1993 b */ mv(a5,a0);
+    /* 1994 O */ sw(a5, -20, s0);
+    /* 1995 T */ lw(a5, -20, s0);
+    /* 1996 b */ mv(a0,a5);
+    /* 1997 Y */ call($branch);
+    /* 1998 b */ mv(a5,a0);
+    /* 1999 b */ mv(a0,a5);
+    /* 2000 Y */ call($branch_size1);
+    /* 2001 b */ mv(a5,a0);
+    /* 2002 b */ mv(a0,a5);
+    /* 2003 K */ ld(ra, sp, 24);
+    /* 2004 K */ ld(s0, sp, 16);
+    /* 2005 I */ addi(sp, sp, 32);
+    /* 2006 W */ jr(ra);
     $splitLeafSize.set();
-    addi(sp, sp, -16);           /* LLLL */
-    sd(s0, 8, sp);             /* OOOO */
-    addi(s0, sp, 16);           /* LLLL */
-    li(a5,1);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    ld(s0, sp, 8);             /* GGGG */
-    addi(sp, sp, 16);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 2007 I */ addi(sp, sp, -16);
+    /* 2008 O */ sd(s0, 8, sp);
+    /* 2009 I */ addi(s0, sp, 16);
+    /* 2010 b */ li(a5,1);
+    /* 2011 b */ mv(a0,a5);
+    /* 2012 K */ ld(s0, sp, 8);
+    /* 2013 I */ addi(sp, sp, 16);
+    /* 2014 W */ jr(ra);
     $splitBranchSize.set();
-    addi(sp, sp, -16);           /* LLLL */
-    sd(s0, 8, sp);             /* OOOO */
-    addi(s0, sp, 16);           /* LLLL */
-    li(a5,1);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    ld(s0, sp, 8);             /* GGGG */
-    addi(sp, sp, 16);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 2015 I */ addi(sp, sp, -16);
+    /* 2016 O */ sd(s0, 8, sp);
+    /* 2017 I */ addi(s0, sp, 16);
+    /* 2018 b */ li(a5,1);
+    /* 2019 b */ mv(a0,a5);
+    /* 2020 K */ ld(s0, sp, 8);
+    /* 2021 I */ addi(sp, sp, 16);
+    /* 2022 W */ jr(ra);
     $isFull.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(ra, 24, sp);             /* OOOO */
-    sd(s0, 16, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($isLeaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L141);             /* YYYY */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    li(a5,1);        /* ZZZZ */
-    sgt(a5,a4,a5);        /* ZZZZ */
-    andi(a5,a5,0xff);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    j($L142);                       /* WWWW */
+    /* 2023 I */ addi(sp, sp, -32);
+    /* 2024 O */ sd(ra, 24, sp);
+    /* 2025 O */ sd(s0, 16, sp);
+    /* 2026 I */ addi(s0, sp, 32);
+    /* 2027 b */ mv(a5,a0);
+    /* 2028 O */ sw(a5, -20, s0);
+    /* 2029 T */ lw(a5, -20, s0);
+    /* 2030 b */ mv(a0,a5);
+    /* 2031 Y */ call($isLeaf);
+    /* 2032 b */ mv(a5,a0);
+    /* 2033 Z */ beq(a5, zero, $L141);
+    /* 2034 T */ lw(a5, -20, s0);
+    /* 2035 b */ mv(a0,a5);
+    /* 2036 Y */ call($leafSize);
+    /* 2037 b */ mv(a5,a0);
+    /* 2038 b */ mv(a4,a5);
+    /* 2039 b */ li(a5,1);
+    /* 2040 b */ sgt(a5,a4,a5);
+    /* 2041 b */ andi(a5,a5,0xff);
+    /* 2042 b */ sextw(a5,a5);
+    /* 2043 X */ j($L142);
     $L141.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    li(a5,2);        /* ZZZZ */
-    sgt(a5,a4,a5);        /* ZZZZ */
-    andi(a5,a5,0xff);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
+    /* 2044 T */ lw(a5, -20, s0);
+    /* 2045 b */ mv(a0,a5);
+    /* 2046 Y */ call($branchSize);
+    /* 2047 b */ mv(a5,a0);
+    /* 2048 b */ mv(a4,a5);
+    /* 2049 b */ li(a5,2);
+    /* 2050 b */ sgt(a5,a4,a5);
+    /* 2051 b */ andi(a5,a5,0xff);
+    /* 2052 b */ sextw(a5,a5);
     $L142.set();
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 24);             /* GGGG */
-    ld(s0, sp, 16);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 2053 b */ mv(a0,a5);
+    /* 2054 K */ ld(ra, sp, 24);
+    /* 2055 K */ ld(s0, sp, 16);
+    /* 2056 I */ addi(sp, sp, 32);
+    /* 2057 W */ jr(ra);
     $isFullRoot.set();
-    addi(sp, sp, -16);           /* LLLL */
-    sd(ra, 8, sp);             /* OOOO */
-    sd(s0, 0, sp);             /* OOOO */
-    addi(s0, sp, 16);           /* LLLL */
-    li(a0,0);        /* ZZZZ */
-    call($isFull);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 8);             /* GGGG */
-    ld(s0, sp, 0);             /* GGGG */
-    addi(sp, sp, 16);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 2058 I */ addi(sp, sp, -16);
+    /* 2059 O */ sd(ra, 8, sp);
+    /* 2060 O */ sd(s0, 0, sp);
+    /* 2061 I */ addi(s0, sp, 16);
+    /* 2062 b */ li(a0,0);
+    /* 2063 Y */ call($isFull);
+    /* 2064 b */ mv(a5,a0);
+    /* 2065 b */ mv(a0,a5);
+    /* 2066 K */ ld(ra, sp, 8);
+    /* 2067 K */ ld(s0, sp, 0);
+    /* 2068 I */ addi(sp, sp, 16);
+    /* 2069 W */ jr(ra);
     $isLow.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(ra, 24, sp);             /* OOOO */
-    sd(s0, 16, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($isLeaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L147);             /* YYYY */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    li(a5,1);        /* ZZZZ */
-    sgt(a5,a4,a5);        /* ZZZZ */
-    seqz(a5, a5);                 /* YY11 */
-    andi(a5,a5,0xff);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    j($L148);                       /* WWWW */
+    /* 2070 I */ addi(sp, sp, -32);
+    /* 2071 O */ sd(ra, 24, sp);
+    /* 2072 O */ sd(s0, 16, sp);
+    /* 2073 I */ addi(s0, sp, 32);
+    /* 2074 b */ mv(a5,a0);
+    /* 2075 O */ sw(a5, -20, s0);
+    /* 2076 T */ lw(a5, -20, s0);
+    /* 2077 b */ mv(a0,a5);
+    /* 2078 Y */ call($isLeaf);
+    /* 2079 b */ mv(a5,a0);
+    /* 2080 Z */ beq(a5, zero, $L147);
+    /* 2081 T */ lw(a5, -20, s0);
+    /* 2082 b */ mv(a0,a5);
+    /* 2083 Y */ call($leafSize);
+    /* 2084 b */ mv(a5,a0);
+    /* 2085 b */ mv(a4,a5);
+    /* 2086 b */ li(a5,1);
+    /* 2087 b */ sgt(a5,a4,a5);
+    /* 2088 a */ seqz(a5, a5);
+    /* 2089 b */ andi(a5,a5,0xff);
+    /* 2090 b */ sextw(a5,a5);
+    /* 2091 X */ j($L148);
     $L147.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    li(a5,1);        /* ZZZZ */
-    sgt(a5,a4,a5);        /* ZZZZ */
-    seqz(a5, a5);                 /* YY11 */
-    andi(a5,a5,0xff);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
+    /* 2092 T */ lw(a5, -20, s0);
+    /* 2093 b */ mv(a0,a5);
+    /* 2094 Y */ call($branchSize);
+    /* 2095 b */ mv(a5,a0);
+    /* 2096 b */ mv(a4,a5);
+    /* 2097 b */ li(a5,1);
+    /* 2098 b */ sgt(a5,a4,a5);
+    /* 2099 a */ seqz(a5, a5);
+    /* 2100 b */ andi(a5,a5,0xff);
+    /* 2101 b */ sextw(a5,a5);
     $L148.set();
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 24);             /* GGGG */
-    ld(s0, sp, 16);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 2102 b */ mv(a0,a5);
+    /* 2103 K */ ld(ra, sp, 24);
+    /* 2104 K */ ld(s0, sp, 16);
+    /* 2105 I */ addi(sp, sp, 32);
+    /* 2106 W */ jr(ra);
     $hasLeavesForChildren.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(ra, 56, sp);             /* OOOO */
-    sd(s0, 48, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -52, s0);             /* OOOO */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    sd(a0, -24, s0);             /* OOOO */
-    addi(a5, s0, -48);           /* LLLL */
-    ld(a1, s0, 24);             /* GGGG */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_firstElement);                      /* XXXX */
-    lw(a5, -32, s0);             /* SSSS */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($isLeaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 56);             /* GGGG */
-    ld(s0, sp, 48);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 2107 I */ addi(sp, sp, -64);
+    /* 2108 O */ sd(ra, 56, sp);
+    /* 2109 O */ sd(s0, 48, sp);
+    /* 2110 I */ addi(s0, sp, 64);
+    /* 2111 b */ mv(a5,a0);
+    /* 2112 O */ sw(a5, -52, s0);
+    /* 2113 T */ lw(a5, -52, s0);
+    /* 2114 b */ mv(a0,a5);
+    /* 2115 Y */ call($branch);
+    /* 2116 O */ sd(a0, -24, s0);
+    /* 2117 I */ addi(a5, s0, -48);
+    /* 2118 K */ ld(a1, s0, 24);
+    /* 2119 b */ mv(a0,a5);
+    /* 2120 Y */ call($branch_firstElement);
+    /* 2121 T */ lw(a5, -32, s0);
+    /* 2122 O */ sw(a5, -28, s0);
+    /* 2123 T */ lw(a5, -28, s0);
+    /* 2124 b */ mv(a0,a5);
+    /* 2125 Y */ call($isLeaf);
+    /* 2126 b */ mv(a5,a0);
+    /* 2127 b */ mv(a0,a5);
+    /* 2128 K */ ld(ra, sp, 56);
+    /* 2129 K */ ld(s0, sp, 48);
+    /* 2130 I */ addi(sp, sp, 64);
+    /* 2131 W */ jr(ra);
     $allocLeaf.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(ra, 24, sp);             /* OOOO */
-    sd(s0, 16, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    call($allocate);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($setLeaf);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 24);             /* GGGG */
-    ld(s0, sp, 16);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 2132 I */ addi(sp, sp, -32);
+    /* 2133 O */ sd(ra, 24, sp);
+    /* 2134 O */ sd(s0, 16, sp);
+    /* 2135 I */ addi(s0, sp, 32);
+    /* 2136 Y */ call($allocate);
+    /* 2137 b */ mv(a5,a0);
+    /* 2138 O */ sw(a5, -20, s0);
+    /* 2139 T */ lw(a5, -20, s0);
+    /* 2140 b */ mv(a0,a5);
+    /* 2141 Y */ call($setLeaf);
+    /* 2142 T */ lw(a5, -20, s0);
+    /* 2143 b */ mv(a0,a5);
+    /* 2144 K */ ld(ra, sp, 24);
+    /* 2145 K */ ld(s0, sp, 16);
+    /* 2146 I */ addi(sp, sp, 32);
+    /* 2147 W */ jr(ra);
     $allocBranch.set();
-    addi(sp, sp, -32);           /* LLLL */
-    sd(ra, 24, sp);             /* OOOO */
-    sd(s0, 16, sp);             /* OOOO */
-    addi(s0, sp, 32);           /* LLLL */
-    call($allocate);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($setBranch);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 24);             /* GGGG */
-    ld(s0, sp, 16);             /* GGGG */
-    addi(sp, sp, 32);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 2148 I */ addi(sp, sp, -32);
+    /* 2149 O */ sd(ra, 24, sp);
+    /* 2150 O */ sd(s0, 16, sp);
+    /* 2151 I */ addi(s0, sp, 32);
+    /* 2152 Y */ call($allocate);
+    /* 2153 b */ mv(a5,a0);
+    /* 2154 O */ sw(a5, -20, s0);
+    /* 2155 T */ lw(a5, -20, s0);
+    /* 2156 b */ mv(a0,a5);
+    /* 2157 Y */ call($setBranch);
+    /* 2158 T */ lw(a5, -20, s0);
+    /* 2159 b */ mv(a0,a5);
+    /* 2160 K */ ld(ra, sp, 24);
+    /* 2161 K */ ld(s0, sp, 16);
+    /* 2162 I */ addi(sp, sp, 32);
+    /* 2163 W */ jr(ra);
     $splitLeafRoot.set();
-    addi(sp, sp, -176);           /* LLLL */
-    sd(ra, 168, sp);             /* OOOO */
-    sd(s0, 160, sp);             /* OOOO */
-    addi(s0, sp, 176);           /* LLLL */
-    call($allocLeaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    sd(a0, -40, s0);             /* OOOO */
-    call($allocLeaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -44, s0);             /* OOOO */
-    lw(a5, -44, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    sd(a0, -56, s0);             /* OOOO */
-    li(a0,0);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    sd(a0, -64, s0);             /* OOOO */
-    call($splitLeafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -68, s0);             /* OOOO */
-    sw(zero, -20, s0);             /* OOOO */
-    j($L157);                       /* WWWW */
+    /* 2164 I */ addi(sp, sp, -176);
+    /* 2165 O */ sd(ra, 168, sp);
+    /* 2166 O */ sd(s0, 160, sp);
+    /* 2167 I */ addi(s0, sp, 176);
+    /* 2168 Y */ call($allocLeaf);
+    /* 2169 b */ mv(a5,a0);
+    /* 2170 O */ sw(a5, -28, s0);
+    /* 2171 T */ lw(a5, -28, s0);
+    /* 2172 b */ mv(a0,a5);
+    /* 2173 Y */ call($leaf);
+    /* 2174 O */ sd(a0, -40, s0);
+    /* 2175 Y */ call($allocLeaf);
+    /* 2176 b */ mv(a5,a0);
+    /* 2177 O */ sw(a5, -44, s0);
+    /* 2178 T */ lw(a5, -44, s0);
+    /* 2179 b */ mv(a0,a5);
+    /* 2180 Y */ call($leaf);
+    /* 2181 O */ sd(a0, -56, s0);
+    /* 2182 b */ li(a0,0);
+    /* 2183 Y */ call($leaf);
+    /* 2184 O */ sd(a0, -64, s0);
+    /* 2185 Y */ call($splitLeafSize);
+    /* 2186 b */ mv(a5,a0);
+    /* 2187 O */ sw(a5, -68, s0);
+    /* 2188 O */ sw(zero, -20, s0);
+    /* 2189 X */ j($L157);
     $L158.set();
-    addi(a5, s0, -152);           /* LLLL */
-    ld(a1, s0, 64);             /* GGGG */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_shift);                      /* XXXX */
-    lw(a5, -140, s0);             /* SSSS */
-    lbu(a4, -136, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 40);             /* GGGG */
-    call($leaf_push);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /* 2190 I */ addi(a5, s0, -152);
+    /* 2191 K */ ld(a1, s0, 64);
+    /* 2192 b */ mv(a0,a5);
+    /* 2193 Y */ call($leaf_shift);
+    /* 2194 T */ lw(a5, -140, s0);
+    /* 2195 T */ lbu(a4, -136, s0);
+    /* 2196 b */ sextw(a4,a4);
+    /* 2197 b */ mv(a2,a4);
+    /* 2198 b */ mv(a1,a5);
+    /* 2199 K */ ld(a0, s0, 40);
+    /* 2200 Y */ call($leaf_push);
+    /* 2201 T */ lw(a5, -20, s0);
+    /* 2202 I */ addiw(a5, a5, 1);
+    /* 2203 O */ sw(a5, -20, s0);
     $L157.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -68, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L158);             /* YYYY */
-    sw(zero, -24, s0);             /* OOOO */
-    j($L159);                       /* WWWW */
+    /* 2204 T */ lw(a5, -20, s0);
+    /* 2205 b */ mv(a4,a5);
+    /* 2206 T */ lw(a5, -68, s0);
+    /* 2207 b */ sextw(a4,a4);
+    /* 2208 b */ sextw(a5,a5);
+    /* 2209 Z */ blt(a4, a5, $L158);
+    /* 2210 O */ sw(zero, -24, s0);
+    /* 2211 X */ j($L159);
     $L160.set();
-    addi(a5, s0, -176);           /* LLLL */
-    ld(a1, s0, 64);             /* GGGG */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_shift);                      /* XXXX */
-    lw(a5, -164, s0);             /* SSSS */
-    lbu(a4, -160, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 56);             /* GGGG */
-    call($leaf_push);                      /* XXXX */
-    lw(a5, -24, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -24, s0);             /* OOOO */
+    /* 2212 I */ addi(a5, s0, -176);
+    /* 2213 K */ ld(a1, s0, 64);
+    /* 2214 b */ mv(a0,a5);
+    /* 2215 Y */ call($leaf_shift);
+    /* 2216 T */ lw(a5, -164, s0);
+    /* 2217 T */ lbu(a4, -160, s0);
+    /* 2218 b */ sextw(a4,a4);
+    /* 2219 b */ mv(a2,a4);
+    /* 2220 b */ mv(a1,a5);
+    /* 2221 K */ ld(a0, s0, 56);
+    /* 2222 Y */ call($leaf_push);
+    /* 2223 T */ lw(a5, -24, s0);
+    /* 2224 I */ addiw(a5, a5, 1);
+    /* 2225 O */ sw(a5, -24, s0);
     $L159.set();
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -68, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L160);             /* YYYY */
-    addi(a5, s0, -128);           /* LLLL */
-    ld(a1, s0, 56);             /* GGGG */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_firstElement);                      /* XXXX */
-    lw(a5, -116, s0);             /* SSSS */
-    sw(a5, -72, s0);             /* OOOO */
-    addi(a5, s0, -104);           /* LLLL */
-    ld(a1, s0, 40);             /* GGGG */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_lastElement);                      /* XXXX */
-    lw(a5, -92, s0);             /* SSSS */
-    sw(a5, -76, s0);             /* OOOO */
-    lw(a5, -76, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -72, s0);             /* SSSS */
-    addw(a5,a4,a5);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    srliw(a4,a5,31);        /* ZZZZ */
-    addw(a5,a4,a5);        /* ZZZZ */
-    sraiw(a5,a5,1);        /* ZZZZ */
-    sw(a5, -80, s0);             /* OOOO */
-    call($setBranchRoot);                      /* XXXX */
-    li(a0,0);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_clear);                      /* XXXX */
-    li(a0,0);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a4, -28, s0);             /* SSSS */
-    lw(a5, -80, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a3);        /* ZZZZ */
-    call($branch_push);                      /* XXXX */
-    li(a0,0);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    lw(a5, -44, s0);             /* SSSS */
-    mv(a2,a5);        /* ZZZZ */
+    /* 2226 T */ lw(a5, -24, s0);
+    /* 2227 b */ mv(a4,a5);
+    /* 2228 T */ lw(a5, -68, s0);
+    /* 2229 b */ sextw(a4,a4);
+    /* 2230 b */ sextw(a5,a5);
+    /* 2231 Z */ blt(a4, a5, $L160);
+    /* 2232 I */ addi(a5, s0, -128);
+    /* 2233 K */ ld(a1, s0, 56);
+    /* 2234 b */ mv(a0,a5);
+    /* 2235 Y */ call($leaf_firstElement);
+    /* 2236 T */ lw(a5, -116, s0);
+    /* 2237 O */ sw(a5, -72, s0);
+    /* 2238 I */ addi(a5, s0, -104);
+    /* 2239 K */ ld(a1, s0, 40);
+    /* 2240 b */ mv(a0,a5);
+    /* 2241 Y */ call($leaf_lastElement);
+    /* 2242 T */ lw(a5, -92, s0);
+    /* 2243 O */ sw(a5, -76, s0);
+    /* 2244 T */ lw(a5, -76, s0);
+    /* 2245 b */ mv(a4,a5);
+    /* 2246 T */ lw(a5, -72, s0);
+    /* 2247 b */ addw(a5,a4,a5);
+    /* 2248 b */ sextw(a5,a5);
+    /* 2249 b */ srliw(a4,a5,31);
+    /* 2250 b */ addw(a5,a4,a5);
+    /* 2251 b */ sraiw(a5,a5,1);
+    /* 2252 O */ sw(a5, -80, s0);
+    /* 2253 Y */ call($setBranchRoot);
+    /* 2254 b */ li(a0,0);
+    /* 2255 Y */ call($branch);
+    /* 2256 b */ mv(a5,a0);
+    /* 2257 b */ mv(a0,a5);
+    /* 2258 Y */ call($branch_clear);
+    /* 2259 b */ li(a0,0);
+    /* 2260 Y */ call($branch);
+    /* 2261 b */ mv(a3,a0);
+    /* 2262 T */ lw(a4, -28, s0);
+    /* 2263 T */ lw(a5, -80, s0);
+    /* 2264 b */ mv(a2,a4);
+    /* 2265 b */ mv(a1,a5);
+    /* 2266 b */ mv(a0,a3);
+    /* 2267 Y */ call($branch_push);
+    /* 2268 b */ li(a0,0);
+    /* 2269 Y */ call($branch);
+    /* 2270 b */ mv(a4,a0);
+    /* 2271 T */ lw(a5, -44, s0);
+    /* 2272 b */ mv(a2,a5);
    }
   void test_btree2() {
-    li(a1,0);        /* ZZZZ */
-    mv(a0,a4);        /* ZZZZ */
-    call($branch_push);                      /* XXXX */
-    nop();        /* ZZZZ */
-    ld(ra, sp, 168);             /* GGGG */
-    ld(s0, sp, 160);             /* GGGG */
-    addi(sp, sp, 176);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 2273 b */ li(a1,0);
+    /* 2274 b */ mv(a0,a4);
+    /* 2275 Y */ call($branch_push);
+    /* 2276 b */ nop();
+    /* 2277 K */ ld(ra, sp, 168);
+    /* 2278 K */ ld(s0, sp, 160);
+    /* 2279 I */ addi(sp, sp, 176);
+    /* 2280 W */ jr(ra);
     $splitBranchRoot.set();
-    addi(sp, sp, -160);           /* LLLL */
-    sd(ra, 152, sp);             /* OOOO */
-    sd(s0, 144, sp);             /* OOOO */
-    addi(s0, sp, 160);           /* LLLL */
-    call($allocBranch);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    sd(a0, -40, s0);             /* OOOO */
-    call($allocBranch);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -44, s0);             /* OOOO */
-    lw(a5, -44, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    sd(a0, -56, s0);             /* OOOO */
-    li(a0,0);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    sd(a0, -64, s0);             /* OOOO */
-    call($splitBranchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -68, s0);             /* OOOO */
-    sw(zero, -20, s0);             /* OOOO */
-    j($L162);                       /* WWWW */
+    /* 2281 I */ addi(sp, sp, -160);
+    /* 2282 O */ sd(ra, 152, sp);
+    /* 2283 O */ sd(s0, 144, sp);
+    /* 2284 I */ addi(s0, sp, 160);
+    /* 2285 Y */ call($allocBranch);
+    /* 2286 b */ mv(a5,a0);
+    /* 2287 O */ sw(a5, -28, s0);
+    /* 2288 T */ lw(a5, -28, s0);
+    /* 2289 b */ mv(a0,a5);
+    /* 2290 Y */ call($branch);
+    /* 2291 O */ sd(a0, -40, s0);
+    /* 2292 Y */ call($allocBranch);
+    /* 2293 b */ mv(a5,a0);
+    /* 2294 O */ sw(a5, -44, s0);
+    /* 2295 T */ lw(a5, -44, s0);
+    /* 2296 b */ mv(a0,a5);
+    /* 2297 Y */ call($branch);
+    /* 2298 O */ sd(a0, -56, s0);
+    /* 2299 b */ li(a0,0);
+    /* 2300 Y */ call($branch);
+    /* 2301 O */ sd(a0, -64, s0);
+    /* 2302 Y */ call($splitBranchSize);
+    /* 2303 b */ mv(a5,a0);
+    /* 2304 O */ sw(a5, -68, s0);
+    /* 2305 O */ sw(zero, -20, s0);
+    /* 2306 X */ j($L162);
     $L163.set();
-    addi(a5, s0, -136);           /* LLLL */
-    ld(a1, s0, 64);             /* GGGG */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_shift);                      /* XXXX */
-    lw(a5, -124, s0);             /* SSSS */
-    lw(a4, -120, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 40);             /* GGGG */
-    call($branch_push);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /* 2307 I */ addi(a5, s0, -136);
+    /* 2308 K */ ld(a1, s0, 64);
+    /* 2309 b */ mv(a0,a5);
+    /* 2310 Y */ call($branch_shift);
+    /* 2311 T */ lw(a5, -124, s0);
+    /* 2312 T */ lw(a4, -120, s0);
+    /* 2313 b */ mv(a2,a4);
+    /* 2314 b */ mv(a1,a5);
+    /* 2315 K */ ld(a0, s0, 40);
+    /* 2316 Y */ call($branch_push);
+    /* 2317 T */ lw(a5, -20, s0);
+    /* 2318 I */ addiw(a5, a5, 1);
+    /* 2319 O */ sw(a5, -20, s0);
     $L162.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -68, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L163);             /* YYYY */
-    addi(a5, s0, -88);           /* LLLL */
-    ld(a1, s0, 64);             /* GGGG */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_shift);                      /* XXXX */
-    lw(a5, -72, s0);             /* SSSS */
-    mv(a2,a5);        /* ZZZZ */
-    li(a1,0);        /* ZZZZ */
-    ld(a0, s0, 40);             /* GGGG */
-    call($branch_push);                      /* XXXX */
-    sw(zero, -24, s0);             /* OOOO */
-    j($L164);                       /* WWWW */
+    /* 2320 T */ lw(a5, -20, s0);
+    /* 2321 b */ mv(a4,a5);
+    /* 2322 T */ lw(a5, -68, s0);
+    /* 2323 b */ sextw(a4,a4);
+    /* 2324 b */ sextw(a5,a5);
+    /* 2325 Z */ blt(a4, a5, $L163);
+    /* 2326 I */ addi(a5, s0, -88);
+    /* 2327 K */ ld(a1, s0, 64);
+    /* 2328 b */ mv(a0,a5);
+    /* 2329 Y */ call($branch_shift);
+    /* 2330 T */ lw(a5, -72, s0);
+    /* 2331 b */ mv(a2,a5);
+    /* 2332 b */ li(a1,0);
+    /* 2333 K */ ld(a0, s0, 40);
+    /* 2334 Y */ call($branch_push);
+    /* 2335 O */ sw(zero, -24, s0);
+    /* 2336 X */ j($L164);
     $L165.set();
-    addi(a5, s0, -160);           /* LLLL */
-    ld(a1, s0, 64);             /* GGGG */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_shift);                      /* XXXX */
-    lw(a5, -148, s0);             /* SSSS */
-    lw(a4, -144, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 56);             /* GGGG */
-    call($branch_push);                      /* XXXX */
-    lw(a5, -24, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -24, s0);             /* OOOO */
+    /* 2337 I */ addi(a5, s0, -160);
+    /* 2338 K */ ld(a1, s0, 64);
+    /* 2339 b */ mv(a0,a5);
+    /* 2340 Y */ call($branch_shift);
+    /* 2341 T */ lw(a5, -148, s0);
+    /* 2342 T */ lw(a4, -144, s0);
+    /* 2343 b */ mv(a2,a4);
+    /* 2344 b */ mv(a1,a5);
+    /* 2345 K */ ld(a0, s0, 56);
+    /* 2346 Y */ call($branch_push);
+    /* 2347 T */ lw(a5, -24, s0);
+    /* 2348 I */ addiw(a5, a5, 1);
+    /* 2349 O */ sw(a5, -24, s0);
     $L164.set();
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -68, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L165);             /* YYYY */
-    addi(a5, s0, -112);           /* LLLL */
-    ld(a1, s0, 64);             /* GGGG */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_shift);                      /* XXXX */
-    lw(a5, -96, s0);             /* SSSS */
-    mv(a2,a5);        /* ZZZZ */
-    li(a1,0);        /* ZZZZ */
-    ld(a0, s0, 56);             /* GGGG */
-    call($branch_push);                      /* XXXX */
-    li(a0,0);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_clear);                      /* XXXX */
-    lw(a5, -76, s0);             /* SSSS */
-    lw(a4, -28, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_push);                      /* XXXX */
-    lw(a5, -44, s0);             /* SSSS */
-    mv(a2,a5);        /* ZZZZ */
-    li(a1,0);        /* ZZZZ */
-    ld(a0, s0, 64);             /* GGGG */
-    call($branch_push);                      /* XXXX */
-    nop();        /* ZZZZ */
-    ld(ra, sp, 152);             /* GGGG */
-    ld(s0, sp, 144);             /* GGGG */
-    addi(sp, sp, 160);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 2350 T */ lw(a5, -24, s0);
+    /* 2351 b */ mv(a4,a5);
+    /* 2352 T */ lw(a5, -68, s0);
+    /* 2353 b */ sextw(a4,a4);
+    /* 2354 b */ sextw(a5,a5);
+    /* 2355 Z */ blt(a4, a5, $L165);
+    /* 2356 I */ addi(a5, s0, -112);
+    /* 2357 K */ ld(a1, s0, 64);
+    /* 2358 b */ mv(a0,a5);
+    /* 2359 Y */ call($branch_shift);
+    /* 2360 T */ lw(a5, -96, s0);
+    /* 2361 b */ mv(a2,a5);
+    /* 2362 b */ li(a1,0);
+    /* 2363 K */ ld(a0, s0, 56);
+    /* 2364 Y */ call($branch_push);
+    /* 2365 b */ li(a0,0);
+    /* 2366 Y */ call($branch);
+    /* 2367 b */ mv(a5,a0);
+    /* 2368 b */ mv(a0,a5);
+    /* 2369 Y */ call($branch_clear);
+    /* 2370 T */ lw(a5, -76, s0);
+    /* 2371 T */ lw(a4, -28, s0);
+    /* 2372 b */ mv(a2,a4);
+    /* 2373 b */ mv(a1,a5);
+    /* 2374 K */ ld(a0, s0, 64);
+    /* 2375 Y */ call($branch_push);
+    /* 2376 T */ lw(a5, -44, s0);
+    /* 2377 b */ mv(a2,a5);
+    /* 2378 b */ li(a1,0);
+    /* 2379 K */ ld(a0, s0, 64);
+    /* 2380 Y */ call($branch_push);
+    /* 2381 b */ nop();
+    /* 2382 K */ ld(ra, sp, 152);
+    /* 2383 K */ ld(s0, sp, 144);
+    /* 2384 I */ addi(sp, sp, 160);
+    /* 2385 W */ jr(ra);
     $splitLeaf.set();
-    addi(sp, sp, -144);           /* LLLL */
-    sd(ra, 136, sp);             /* OOOO */
-    sd(s0, 128, sp);             /* OOOO */
-    addi(s0, sp, 144);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a3,a1);        /* ZZZZ */
-    mv(a4,a2);        /* ZZZZ */
-    sw(a5, -132, s0);             /* OOOO */
-    mv(a5,a3);        /* ZZZZ */
-    sw(a5, -136, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -140, s0);             /* OOOO */
-    lw(a5, -136, s0);             /* SSSS */
-    sw(a5, -24, s0);             /* OOOO */
-    call($allocLeaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -132, s0);             /* SSSS */
-    sw(a5, -32, s0);             /* OOOO */
-    call($splitLeafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    sw(zero, -20, s0);             /* OOOO */
-    j($L167);                       /* WWWW */
+    /* 2386 I */ addi(sp, sp, -144);
+    /* 2387 O */ sd(ra, 136, sp);
+    /* 2388 O */ sd(s0, 128, sp);
+    /* 2389 I */ addi(s0, sp, 144);
+    /* 2390 b */ mv(a5,a0);
+    /* 2391 b */ mv(a3,a1);
+    /* 2392 b */ mv(a4,a2);
+    /* 2393 O */ sw(a5, -132, s0);
+    /* 2394 b */ mv(a5,a3);
+    /* 2395 O */ sw(a5, -136, s0);
+    /* 2396 b */ mv(a5,a4);
+    /* 2397 O */ sw(a5, -140, s0);
+    /* 2398 T */ lw(a5, -136, s0);
+    /* 2399 O */ sw(a5, -24, s0);
+    /* 2400 Y */ call($allocLeaf);
+    /* 2401 b */ mv(a5,a0);
+    /* 2402 O */ sw(a5, -28, s0);
+    /* 2403 T */ lw(a5, -132, s0);
+    /* 2404 O */ sw(a5, -32, s0);
+    /* 2405 Y */ call($splitLeafSize);
+    /* 2406 b */ mv(a5,a0);
+    /* 2407 O */ sw(a5, -36, s0);
+    /* 2408 O */ sw(zero, -20, s0);
+    /* 2409 X */ j($L167);
     $L168.set();
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -120);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_shift);                      /* XXXX */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -108, s0);             /* SSSS */
-    lbu(a4, -104, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a3);        /* ZZZZ */
-    call($leaf_push);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /* 2410 T */ lw(a5, -32, s0);
+    /* 2411 b */ mv(a0,a5);
+    /* 2412 Y */ call($leaf);
+    /* 2413 b */ mv(a4,a0);
+    /* 2414 I */ addi(a5, s0, -120);
+    /* 2415 b */ mv(a1,a4);
+    /* 2416 b */ mv(a0,a5);
+    /* 2417 Y */ call($leaf_shift);
+    /* 2418 T */ lw(a5, -28, s0);
+    /* 2419 b */ mv(a0,a5);
+    /* 2420 Y */ call($leaf);
+    /* 2421 b */ mv(a3,a0);
+    /* 2422 T */ lw(a5, -108, s0);
+    /* 2423 T */ lbu(a4, -104, s0);
+    /* 2424 b */ sextw(a4,a4);
+    /* 2425 b */ mv(a2,a4);
+    /* 2426 b */ mv(a1,a5);
+    /* 2427 b */ mv(a0,a3);
+    /* 2428 Y */ call($leaf_push);
+    /* 2429 T */ lw(a5, -20, s0);
+    /* 2430 I */ addiw(a5, a5, 1);
+    /* 2431 O */ sw(a5, -20, s0);
     $L167.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -36, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L168);             /* YYYY */
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -96);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_firstElement);                      /* XXXX */
-    lw(a5, -84, s0);             /* SSSS */
-    sw(a5, -40, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -72);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_lastElement);                      /* XXXX */
-    lw(a5, -60, s0);             /* SSSS */
-    sw(a5, -44, s0);             /* OOOO */
-    lw(a5, -40, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -44, s0);             /* SSSS */
-    addw(a5,a4,a5);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    srliw(a4,a5,31);        /* ZZZZ */
-    addw(a5,a4,a5);        /* ZZZZ */
-    sraiw(a5,a5,1);        /* ZZZZ */
-    sw(a5, -48, s0);             /* OOOO */
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    lw(a3, -140, s0);             /* SSSS */
-    lw(a4, -28, s0);             /* SSSS */
-    lw(a5, -48, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($branch_insertElementAt);                      /* XXXX */
-    nop();        /* ZZZZ */
-    ld(ra, sp, 136);             /* GGGG */
-    ld(s0, sp, 128);             /* GGGG */
-    addi(sp, sp, 144);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 2432 T */ lw(a5, -20, s0);
+    /* 2433 b */ mv(a4,a5);
+    /* 2434 T */ lw(a5, -36, s0);
+    /* 2435 b */ sextw(a4,a4);
+    /* 2436 b */ sextw(a5,a5);
+    /* 2437 Z */ blt(a4, a5, $L168);
+    /* 2438 T */ lw(a5, -32, s0);
+    /* 2439 b */ mv(a0,a5);
+    /* 2440 Y */ call($leaf);
+    /* 2441 b */ mv(a4,a0);
+    /* 2442 I */ addi(a5, s0, -96);
+    /* 2443 b */ mv(a1,a4);
+    /* 2444 b */ mv(a0,a5);
+    /* 2445 Y */ call($leaf_firstElement);
+    /* 2446 T */ lw(a5, -84, s0);
+    /* 2447 O */ sw(a5, -40, s0);
+    /* 2448 T */ lw(a5, -28, s0);
+    /* 2449 b */ mv(a0,a5);
+    /* 2450 Y */ call($leaf);
+    /* 2451 b */ mv(a4,a0);
+    /* 2452 I */ addi(a5, s0, -72);
+    /* 2453 b */ mv(a1,a4);
+    /* 2454 b */ mv(a0,a5);
+    /* 2455 Y */ call($leaf_lastElement);
+    /* 2456 T */ lw(a5, -60, s0);
+    /* 2457 O */ sw(a5, -44, s0);
+    /* 2458 T */ lw(a5, -40, s0);
+    /* 2459 b */ mv(a4,a5);
+    /* 2460 T */ lw(a5, -44, s0);
+    /* 2461 b */ addw(a5,a4,a5);
+    /* 2462 b */ sextw(a5,a5);
+    /* 2463 b */ srliw(a4,a5,31);
+    /* 2464 b */ addw(a5,a4,a5);
+    /* 2465 b */ sraiw(a5,a5,1);
+    /* 2466 O */ sw(a5, -48, s0);
+    /* 2467 T */ lw(a5, -24, s0);
+    /* 2468 b */ mv(a0,a5);
+    /* 2469 Y */ call($branch);
+    /* 2470 T */ lw(a3, -140, s0);
+    /* 2471 T */ lw(a4, -28, s0);
+    /* 2472 T */ lw(a5, -48, s0);
+    /* 2473 b */ mv(a2,a4);
+    /* 2474 b */ mv(a1,a5);
+    /* 2475 Y */ call($branch_insertElementAt);
+    /* 2476 b */ nop();
+    /* 2477 K */ ld(ra, sp, 136);
+    /* 2478 K */ ld(s0, sp, 128);
+    /* 2479 I */ addi(sp, sp, 144);
+    /* 2480 W */ jr(ra);
     $splitBranch.set();
-    addi(sp, sp, -96);           /* LLLL */
-    sd(ra, 88, sp);             /* OOOO */
-    sd(s0, 80, sp);             /* OOOO */
-    addi(s0, sp, 96);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a3,a1);        /* ZZZZ */
-    mv(a4,a2);        /* ZZZZ */
-    sw(a5, -84, s0);             /* OOOO */
-    mv(a5,a3);        /* ZZZZ */
-    sw(a5, -88, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -92, s0);             /* OOOO */
-    lw(a5, -88, s0);             /* SSSS */
-    sw(a5, -24, s0);             /* OOOO */
-    call($allocBranch);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -84, s0);             /* SSSS */
-    sw(a5, -32, s0);             /* OOOO */
-    call($splitBranchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    sw(zero, -20, s0);             /* OOOO */
-    j($L170);                       /* WWWW */
+    /* 2481 I */ addi(sp, sp, -96);
+    /* 2482 O */ sd(ra, 88, sp);
+    /* 2483 O */ sd(s0, 80, sp);
+    /* 2484 I */ addi(s0, sp, 96);
+    /* 2485 b */ mv(a5,a0);
+    /* 2486 b */ mv(a3,a1);
+    /* 2487 b */ mv(a4,a2);
+    /* 2488 O */ sw(a5, -84, s0);
+    /* 2489 b */ mv(a5,a3);
+    /* 2490 O */ sw(a5, -88, s0);
+    /* 2491 b */ mv(a5,a4);
+    /* 2492 O */ sw(a5, -92, s0);
+    /* 2493 T */ lw(a5, -88, s0);
+    /* 2494 O */ sw(a5, -24, s0);
+    /* 2495 Y */ call($allocBranch);
+    /* 2496 b */ mv(a5,a0);
+    /* 2497 O */ sw(a5, -28, s0);
+    /* 2498 T */ lw(a5, -84, s0);
+    /* 2499 O */ sw(a5, -32, s0);
+    /* 2500 Y */ call($splitBranchSize);
+    /* 2501 b */ mv(a5,a0);
+    /* 2502 O */ sw(a5, -36, s0);
+    /* 2503 O */ sw(zero, -20, s0);
+    /* 2504 X */ j($L170);
     $L171.set();
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -80);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_shift);                      /* XXXX */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -68, s0);             /* SSSS */
-    lw(a4, -64, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a3);        /* ZZZZ */
-    call($branch_push);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /* 2505 T */ lw(a5, -32, s0);
+    /* 2506 b */ mv(a0,a5);
+    /* 2507 Y */ call($branch);
+    /* 2508 b */ mv(a4,a0);
+    /* 2509 I */ addi(a5, s0, -80);
+    /* 2510 b */ mv(a1,a4);
+    /* 2511 b */ mv(a0,a5);
+    /* 2512 Y */ call($branch_shift);
+    /* 2513 T */ lw(a5, -28, s0);
+    /* 2514 b */ mv(a0,a5);
+    /* 2515 Y */ call($branch);
+    /* 2516 b */ mv(a3,a0);
+    /* 2517 T */ lw(a5, -68, s0);
+    /* 2518 T */ lw(a4, -64, s0);
+    /* 2519 b */ mv(a2,a4);
+    /* 2520 b */ mv(a1,a5);
+    /* 2521 b */ mv(a0,a3);
+    /* 2522 Y */ call($branch_push);
+    /* 2523 T */ lw(a5, -20, s0);
+    /* 2524 I */ addiw(a5, a5, 1);
+    /* 2525 O */ sw(a5, -20, s0);
     $L170.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -36, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L171);             /* YYYY */
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -56);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_shift);                      /* XXXX */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    lw(a5, -40, s0);             /* SSSS */
-    mv(a2,a5);        /* ZZZZ */
-    li(a1,0);        /* ZZZZ */
-    mv(a0,a4);        /* ZZZZ */
-    call($branch_push);                      /* XXXX */
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    lw(a5, -44, s0);             /* SSSS */
-    lw(a3, -92, s0);             /* SSSS */
-    lw(a4, -28, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($branch_insertElementAt);                      /* XXXX */
-    nop();        /* ZZZZ */
-    ld(ra, sp, 88);             /* GGGG */
-    ld(s0, sp, 80);             /* GGGG */
-    addi(sp, sp, 96);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 2526 T */ lw(a5, -20, s0);
+    /* 2527 b */ mv(a4,a5);
+    /* 2528 T */ lw(a5, -36, s0);
+    /* 2529 b */ sextw(a4,a4);
+    /* 2530 b */ sextw(a5,a5);
+    /* 2531 Z */ blt(a4, a5, $L171);
+    /* 2532 T */ lw(a5, -32, s0);
+    /* 2533 b */ mv(a0,a5);
+    /* 2534 Y */ call($branch);
+    /* 2535 b */ mv(a4,a0);
+    /* 2536 I */ addi(a5, s0, -56);
+    /* 2537 b */ mv(a1,a4);
+    /* 2538 b */ mv(a0,a5);
+    /* 2539 Y */ call($branch_shift);
+    /* 2540 T */ lw(a5, -28, s0);
+    /* 2541 b */ mv(a0,a5);
+    /* 2542 Y */ call($branch);
+    /* 2543 b */ mv(a4,a0);
+    /* 2544 T */ lw(a5, -40, s0);
+    /* 2545 b */ mv(a2,a5);
+    /* 2546 b */ li(a1,0);
+    /* 2547 b */ mv(a0,a4);
+    /* 2548 Y */ call($branch_push);
+    /* 2549 T */ lw(a5, -24, s0);
+    /* 2550 b */ mv(a0,a5);
+    /* 2551 Y */ call($branch);
+    /* 2552 T */ lw(a5, -44, s0);
+    /* 2553 T */ lw(a3, -92, s0);
+    /* 2554 T */ lw(a4, -28, s0);
+    /* 2555 b */ mv(a2,a4);
+    /* 2556 b */ mv(a1,a5);
+    /* 2557 Y */ call($branch_insertElementAt);
+    /* 2558 b */ nop();
+    /* 2559 K */ ld(ra, sp, 88);
+    /* 2560 K */ ld(s0, sp, 80);
+    /* 2561 I */ addi(sp, sp, 96);
+    /* 2562 W */ jr(ra);
     $stealFromLeft.set();
-    addi(sp, sp, -320);           /* LLLL */
-    sd(ra, 312, sp);             /* OOOO */
-    sd(s0, 304, sp);             /* OOOO */
-    addi(s0, sp, 320);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a1);        /* ZZZZ */
-    sw(a5, -276, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -280, s0);             /* OOOO */
-    lw(a5, -276, s0);             /* SSSS */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -280, s0);             /* SSSS */
-    addiw(a5, a5, -1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    addi(a5, s0, -200);           /* LLLL */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_elementAt);                      /* XXXX */
-    lw(a5, -184, s0);             /* SSSS */
-    sw(a5, -24, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -176);           /* LLLL */
-    lw(a4, -280, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_elementAt);                      /* XXXX */
-    lw(a5, -160, s0);             /* SSSS */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -276, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($hasLeavesForChildren);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L173);             /* YYYY */
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -52, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -56, s0);             /* OOOO */
-    lw(a5, -56, s0);             /* SSSS */
-    sextw(a4,a5);        /* ZZZZ */
-    li(a5,1);        /* ZZZZ */
-    ble(a4, a5, $L174);             /* YYYY */
-    li(a5,0);        /* ZZZZ */
-    j($L178);                       /* WWWW */
+    /* 2563 I */ addi(sp, sp, -320);
+    /* 2564 O */ sd(ra, 312, sp);
+    /* 2565 O */ sd(s0, 304, sp);
+    /* 2566 I */ addi(s0, sp, 320);
+    /* 2567 b */ mv(a5,a0);
+    /* 2568 b */ mv(a4,a1);
+    /* 2569 O */ sw(a5, -276, s0);
+    /* 2570 b */ mv(a5,a4);
+    /* 2571 O */ sw(a5, -280, s0);
+    /* 2572 T */ lw(a5, -276, s0);
+    /* 2573 O */ sw(a5, -20, s0);
+    /* 2574 T */ lw(a5, -20, s0);
+    /* 2575 b */ mv(a0,a5);
+    /* 2576 Y */ call($branch);
+    /* 2577 b */ mv(a3,a0);
+    /* 2578 T */ lw(a5, -280, s0);
+    /* 2579 I */ addiw(a5, a5, -1);
+    /* 2580 b */ sextw(a4,a5);
+    /* 2581 I */ addi(a5, s0, -200);
+    /* 2582 b */ mv(a2,a4);
+    /* 2583 b */ mv(a1,a3);
+    /* 2584 b */ mv(a0,a5);
+    /* 2585 Y */ call($branch_elementAt);
+    /* 2586 T */ lw(a5, -184, s0);
+    /* 2587 O */ sw(a5, -24, s0);
+    /* 2588 T */ lw(a5, -20, s0);
+    /* 2589 b */ mv(a0,a5);
+    /* 2590 Y */ call($branch);
+    /* 2591 b */ mv(a3,a0);
+    /* 2592 I */ addi(a5, s0, -176);
+    /* 2593 T */ lw(a4, -280, s0);
+    /* 2594 b */ mv(a2,a4);
+    /* 2595 b */ mv(a1,a3);
+    /* 2596 b */ mv(a0,a5);
+    /* 2597 Y */ call($branch_elementAt);
+    /* 2598 T */ lw(a5, -160, s0);
+    /* 2599 O */ sw(a5, -28, s0);
+    /* 2600 T */ lw(a5, -276, s0);
+    /* 2601 b */ mv(a0,a5);
+    /* 2602 Y */ call($hasLeavesForChildren);
+    /* 2603 b */ mv(a5,a0);
+    /* 2604 Z */ beq(a5, zero, $L173);
+    /* 2605 T */ lw(a5, -24, s0);
+    /* 2606 b */ mv(a0,a5);
+    /* 2607 Y */ call($leafSize);
+    /* 2608 b */ mv(a5,a0);
+    /* 2609 O */ sw(a5, -52, s0);
+    /* 2610 T */ lw(a5, -28, s0);
+    /* 2611 b */ mv(a0,a5);
+    /* 2612 Y */ call($leafSize);
+    /* 2613 b */ mv(a5,a0);
+    /* 2614 O */ sw(a5, -56, s0);
+    /* 2615 T */ lw(a5, -56, s0);
+    /* 2616 b */ sextw(a4,a5);
+    /* 2617 b */ li(a5,1);
+    /* 2618 Z */ ble(a4, a5, $L174);
+    /* 2619 b */ li(a5,0);
+    /* 2620 X */ j($L178);
     $L174.set();
-    lw(a5, -52, s0);             /* SSSS */
-    sextw(a4,a5);        /* ZZZZ */
-    li(a5,1);        /* ZZZZ */
-    bgt(a4, a5, $L176);             /* YYYY */
-    li(a5,0);        /* ZZZZ */
-    j($L178);                       /* WWWW */
+    /* 2621 T */ lw(a5, -52, s0);
+    /* 2622 b */ sextw(a4,a5);
+    /* 2623 b */ li(a5,1);
+    /* 2624 Z */ bgt(a4, a5, $L176);
+    /* 2625 b */ li(a5,0);
+    /* 2626 X */ j($L178);
     $L176.set();
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -224);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_lastElement);                      /* XXXX */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    lw(a5, -212, s0);             /* SSSS */
-    lbu(a4, -208, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    li(a3,0);        /* ZZZZ */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($leaf_insertElementAt);                      /* XXXX */
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -320);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_pop);                      /* XXXX */
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -52, s0);             /* SSSS */
-    addiw(a5, a5, -2);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    addi(a5, s0, -152);           /* LLLL */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_elementAt);                      /* XXXX */
-    lw(a5, -140, s0);             /* SSSS */
-    sw(a5, -60, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    lw(a5, -280, s0);             /* SSSS */
-    addiw(a5, a5, -1);           /* LLLL */
-    sextw(a3,a5);        /* ZZZZ */
-    lw(a4, -24, s0);             /* SSSS */
-    lw(a5, -60, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($branch_setElementAt);                      /* XXXX */
-    j($L177);                       /* WWWW */
+    /* 2627 T */ lw(a5, -24, s0);
+    /* 2628 b */ mv(a0,a5);
+    /* 2629 Y */ call($leaf);
+    /* 2630 b */ mv(a4,a0);
+    /* 2631 I */ addi(a5, s0, -224);
+    /* 2632 b */ mv(a1,a4);
+    /* 2633 b */ mv(a0,a5);
+    /* 2634 Y */ call($leaf_lastElement);
+    /* 2635 T */ lw(a5, -28, s0);
+    /* 2636 b */ mv(a0,a5);
+    /* 2637 Y */ call($leaf);
+    /* 2638 T */ lw(a5, -212, s0);
+    /* 2639 T */ lbu(a4, -208, s0);
+    /* 2640 b */ sextw(a4,a4);
+    /* 2641 b */ li(a3,0);
+    /* 2642 b */ mv(a2,a4);
+    /* 2643 b */ mv(a1,a5);
+    /* 2644 Y */ call($leaf_insertElementAt);
+    /* 2645 T */ lw(a5, -24, s0);
+    /* 2646 b */ mv(a0,a5);
+    /* 2647 Y */ call($leaf);
+    /* 2648 b */ mv(a4,a0);
+    /* 2649 I */ addi(a5, s0, -320);
+    /* 2650 b */ mv(a1,a4);
+    /* 2651 b */ mv(a0,a5);
+    /* 2652 Y */ call($leaf_pop);
+    /* 2653 T */ lw(a5, -24, s0);
+    /* 2654 b */ mv(a0,a5);
+    /* 2655 Y */ call($leaf);
+    /* 2656 b */ mv(a3,a0);
+    /* 2657 T */ lw(a5, -52, s0);
+    /* 2658 I */ addiw(a5, a5, -2);
+    /* 2659 b */ sextw(a4,a5);
+    /* 2660 I */ addi(a5, s0, -152);
+    /* 2661 b */ mv(a2,a4);
+    /* 2662 b */ mv(a1,a3);
+    /* 2663 b */ mv(a0,a5);
+    /* 2664 Y */ call($leaf_elementAt);
+    /* 2665 T */ lw(a5, -140, s0);
+    /* 2666 O */ sw(a5, -60, s0);
+    /* 2667 T */ lw(a5, -20, s0);
+    /* 2668 b */ mv(a0,a5);
+    /* 2669 Y */ call($branch);
+    /* 2670 T */ lw(a5, -280, s0);
+    /* 2671 I */ addiw(a5, a5, -1);
+    /* 2672 b */ sextw(a3,a5);
+    /* 2673 T */ lw(a4, -24, s0);
+    /* 2674 T */ lw(a5, -60, s0);
+    /* 2675 b */ mv(a2,a4);
+    /* 2676 b */ mv(a1,a5);
+    /* 2677 Y */ call($branch_setElementAt);
+    /* 2678 X */ j($L177);
     $L173.set();
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a5, -36, s0);             /* SSSS */
-    sextw(a4,a5);        /* ZZZZ */
-    li(a5,2);        /* ZZZZ */
-    ble(a4, a5, $L179);             /* YYYY */
-    li(a5,0);        /* ZZZZ */
-    j($L178);                       /* WWWW */
+    /* 2679 T */ lw(a5, -24, s0);
+    /* 2680 b */ mv(a0,a5);
+    /* 2681 Y */ call($branchSize);
+    /* 2682 b */ mv(a5,a0);
+    /* 2683 O */ sw(a5, -32, s0);
+    /* 2684 T */ lw(a5, -28, s0);
+    /* 2685 b */ mv(a0,a5);
+    /* 2686 Y */ call($branchSize);
+    /* 2687 b */ mv(a5,a0);
+    /* 2688 O */ sw(a5, -36, s0);
+    /* 2689 T */ lw(a5, -36, s0);
+    /* 2690 b */ sextw(a4,a5);
+    /* 2691 b */ li(a5,2);
+    /* 2692 Z */ ble(a4, a5, $L179);
+    /* 2693 b */ li(a5,0);
+    /* 2694 X */ j($L178);
     $L179.set();
-    lw(a5, -32, s0);             /* SSSS */
-    sextw(a4,a5);        /* ZZZZ */
-    li(a5,1);        /* ZZZZ */
-    bgt(a4, a5, $L181);             /* YYYY */
-    li(a5,0);        /* ZZZZ */
-    j($L178);                       /* WWWW */
+    /* 2695 T */ lw(a5, -32, s0);
+    /* 2696 b */ sextw(a4,a5);
+    /* 2697 b */ li(a5,1);
+    /* 2698 Z */ bgt(a4, a5, $L181);
+    /* 2699 b */ li(a5,0);
+    /* 2700 X */ j($L178);
     $L181.set();
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -248);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_lastElement);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -128);           /* LLLL */
-    lw(a4, -280, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_elementAt);                      /* XXXX */
-    lw(a5, -116, s0);             /* SSSS */
-    sw(a5, -40, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    lw(a4, -232, s0);             /* SSSS */
-    lw(a5, -40, s0);             /* SSSS */
-    li(a3,0);        /* ZZZZ */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($branch_insertElementAt);                      /* XXXX */
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -320);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_pop);                      /* XXXX */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -272);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_firstElement);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -280, s0);             /* SSSS */
-    addiw(a5, a5, -1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    addi(a5, s0, -104);           /* LLLL */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_elementAt);                      /* XXXX */
-    lw(a5, -92, s0);             /* SSSS */
-    sw(a5, -44, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    lw(a4, -256, s0);             /* SSSS */
-    lw(a5, -44, s0);             /* SSSS */
-    li(a3,0);        /* ZZZZ */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($branch_setElementAt);                      /* XXXX */
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -80);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_lastElement);                      /* XXXX */
-    lw(a5, -68, s0);             /* SSSS */
-    sw(a5, -48, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    lw(a5, -280, s0);             /* SSSS */
-    addiw(a5, a5, -1);           /* LLLL */
-    sextw(a3,a5);        /* ZZZZ */
-    lw(a4, -24, s0);             /* SSSS */
-    lw(a5, -48, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($branch_setElementAt);                      /* XXXX */
+    /* 2701 T */ lw(a5, -24, s0);
+    /* 2702 b */ mv(a0,a5);
+    /* 2703 Y */ call($branch);
+    /* 2704 b */ mv(a4,a0);
+    /* 2705 I */ addi(a5, s0, -248);
+    /* 2706 b */ mv(a1,a4);
+    /* 2707 b */ mv(a0,a5);
+    /* 2708 Y */ call($branch_lastElement);
+    /* 2709 T */ lw(a5, -20, s0);
+    /* 2710 b */ mv(a0,a5);
+    /* 2711 Y */ call($branch);
+    /* 2712 b */ mv(a3,a0);
+    /* 2713 I */ addi(a5, s0, -128);
+    /* 2714 T */ lw(a4, -280, s0);
+    /* 2715 b */ mv(a2,a4);
+    /* 2716 b */ mv(a1,a3);
+    /* 2717 b */ mv(a0,a5);
+    /* 2718 Y */ call($branch_elementAt);
+    /* 2719 T */ lw(a5, -116, s0);
+    /* 2720 O */ sw(a5, -40, s0);
+    /* 2721 T */ lw(a5, -28, s0);
+    /* 2722 b */ mv(a0,a5);
+    /* 2723 Y */ call($branch);
+    /* 2724 T */ lw(a4, -232, s0);
+    /* 2725 T */ lw(a5, -40, s0);
+    /* 2726 b */ li(a3,0);
+    /* 2727 b */ mv(a2,a4);
+    /* 2728 b */ mv(a1,a5);
+    /* 2729 Y */ call($branch_insertElementAt);
+    /* 2730 T */ lw(a5, -24, s0);
+    /* 2731 b */ mv(a0,a5);
+    /* 2732 Y */ call($branch);
+    /* 2733 b */ mv(a4,a0);
+    /* 2734 I */ addi(a5, s0, -320);
+    /* 2735 b */ mv(a1,a4);
+    /* 2736 b */ mv(a0,a5);
+    /* 2737 Y */ call($branch_pop);
+    /* 2738 T */ lw(a5, -28, s0);
+    /* 2739 b */ mv(a0,a5);
+    /* 2740 Y */ call($branch);
+    /* 2741 b */ mv(a4,a0);
+    /* 2742 I */ addi(a5, s0, -272);
+    /* 2743 b */ mv(a1,a4);
+    /* 2744 b */ mv(a0,a5);
+    /* 2745 Y */ call($branch_firstElement);
+    /* 2746 T */ lw(a5, -20, s0);
+    /* 2747 b */ mv(a0,a5);
+    /* 2748 Y */ call($branch);
+    /* 2749 b */ mv(a3,a0);
+    /* 2750 T */ lw(a5, -280, s0);
+    /* 2751 I */ addiw(a5, a5, -1);
+    /* 2752 b */ sextw(a4,a5);
+    /* 2753 I */ addi(a5, s0, -104);
+    /* 2754 b */ mv(a2,a4);
+    /* 2755 b */ mv(a1,a3);
+    /* 2756 b */ mv(a0,a5);
+    /* 2757 Y */ call($branch_elementAt);
+    /* 2758 T */ lw(a5, -92, s0);
+    /* 2759 O */ sw(a5, -44, s0);
+    /* 2760 T */ lw(a5, -28, s0);
+    /* 2761 b */ mv(a0,a5);
+    /* 2762 Y */ call($branch);
+    /* 2763 T */ lw(a4, -256, s0);
+    /* 2764 T */ lw(a5, -44, s0);
+    /* 2765 b */ li(a3,0);
+    /* 2766 b */ mv(a2,a4);
+    /* 2767 b */ mv(a1,a5);
+    /* 2768 Y */ call($branch_setElementAt);
+    /* 2769 T */ lw(a5, -24, s0);
+    /* 2770 b */ mv(a0,a5);
+    /* 2771 Y */ call($branch);
+    /* 2772 b */ mv(a4,a0);
+    /* 2773 I */ addi(a5, s0, -80);
+    /* 2774 b */ mv(a1,a4);
+    /* 2775 b */ mv(a0,a5);
+    /* 2776 Y */ call($branch_lastElement);
+    /* 2777 T */ lw(a5, -68, s0);
+    /* 2778 O */ sw(a5, -48, s0);
+    /* 2779 T */ lw(a5, -20, s0);
+    /* 2780 b */ mv(a0,a5);
+    /* 2781 Y */ call($branch);
+    /* 2782 T */ lw(a5, -280, s0);
+    /* 2783 I */ addiw(a5, a5, -1);
+    /* 2784 b */ sextw(a3,a5);
+    /* 2785 T */ lw(a4, -24, s0);
+    /* 2786 T */ lw(a5, -48, s0);
+    /* 2787 b */ mv(a2,a4);
+    /* 2788 b */ mv(a1,a5);
+    /* 2789 Y */ call($branch_setElementAt);
     $L177.set();
-    li(a5,1);        /* ZZZZ */
+    /* 2790 b */ li(a5,1);
     $L178.set();
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 312);             /* GGGG */
-    ld(s0, sp, 304);             /* GGGG */
-    addi(sp, sp, 320);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 2791 b */ mv(a0,a5);
+    /* 2792 K */ ld(ra, sp, 312);
+    /* 2793 K */ ld(s0, sp, 304);
+    /* 2794 I */ addi(sp, sp, 320);
+    /* 2795 W */ jr(ra);
     $stealFromRight.set();
-    addi(sp, sp, -208);           /* LLLL */
-    sd(ra, 200, sp);             /* OOOO */
-    sd(s0, 192, sp);             /* OOOO */
-    addi(s0, sp, 208);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a1);        /* ZZZZ */
-    sw(a5, -164, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -168, s0);             /* OOOO */
-    lw(a5, -164, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -64);           /* LLLL */
-    lw(a4, -168, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_elementAt);                      /* XXXX */
-    lw(a5, -48, s0);             /* SSSS */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a5, -164, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -168, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    addi(a5, s0, -88);           /* LLLL */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_elementAt);                      /* XXXX */
-    lw(a5, -72, s0);             /* SSSS */
-    sw(a5, -24, s0);             /* OOOO */
-    lw(a5, -164, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($hasLeavesForChildren);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L183);             /* YYYY */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -40, s0);             /* OOOO */
-    lw(a5, -36, s0);             /* SSSS */
-    sextw(a4,a5);        /* ZZZZ */
-    li(a5,1);        /* ZZZZ */
-    ble(a4, a5, $L184);             /* YYYY */
-    li(a5,0);        /* ZZZZ */
-    j($L192);                       /* WWWW */
+    /* 2796 I */ addi(sp, sp, -208);
+    /* 2797 O */ sd(ra, 200, sp);
+    /* 2798 O */ sd(s0, 192, sp);
+    /* 2799 I */ addi(s0, sp, 208);
+    /* 2800 b */ mv(a5,a0);
+    /* 2801 b */ mv(a4,a1);
+    /* 2802 O */ sw(a5, -164, s0);
+    /* 2803 b */ mv(a5,a4);
+    /* 2804 O */ sw(a5, -168, s0);
+    /* 2805 T */ lw(a5, -164, s0);
+    /* 2806 b */ mv(a0,a5);
+    /* 2807 Y */ call($branch);
+    /* 2808 b */ mv(a3,a0);
+    /* 2809 I */ addi(a5, s0, -64);
+    /* 2810 T */ lw(a4, -168, s0);
+    /* 2811 b */ mv(a2,a4);
+    /* 2812 b */ mv(a1,a3);
+    /* 2813 b */ mv(a0,a5);
+    /* 2814 Y */ call($branch_elementAt);
+    /* 2815 T */ lw(a5, -48, s0);
+    /* 2816 O */ sw(a5, -20, s0);
+    /* 2817 T */ lw(a5, -164, s0);
+    /* 2818 b */ mv(a0,a5);
+    /* 2819 Y */ call($branch);
+    /* 2820 b */ mv(a3,a0);
+    /* 2821 T */ lw(a5, -168, s0);
+    /* 2822 I */ addiw(a5, a5, 1);
+    /* 2823 b */ sextw(a4,a5);
+    /* 2824 I */ addi(a5, s0, -88);
+    /* 2825 b */ mv(a2,a4);
+    /* 2826 b */ mv(a1,a3);
+    /* 2827 b */ mv(a0,a5);
+    /* 2828 Y */ call($branch_elementAt);
+    /* 2829 T */ lw(a5, -72, s0);
+    /* 2830 O */ sw(a5, -24, s0);
+    /* 2831 T */ lw(a5, -164, s0);
+    /* 2832 b */ mv(a0,a5);
+    /* 2833 Y */ call($hasLeavesForChildren);
+    /* 2834 b */ mv(a5,a0);
+    /* 2835 Z */ beq(a5, zero, $L183);
+    /* 2836 T */ lw(a5, -20, s0);
+    /* 2837 b */ mv(a0,a5);
+    /* 2838 Y */ call($leafSize);
+    /* 2839 b */ mv(a5,a0);
+    /* 2840 O */ sw(a5, -36, s0);
+    /* 2841 T */ lw(a5, -24, s0);
+    /* 2842 b */ mv(a0,a5);
+    /* 2843 Y */ call($leafSize);
+    /* 2844 b */ mv(a5,a0);
+    /* 2845 O */ sw(a5, -40, s0);
+    /* 2846 T */ lw(a5, -36, s0);
+    /* 2847 b */ sextw(a4,a5);
+    /* 2848 b */ li(a5,1);
+    /* 2849 Z */ ble(a4, a5, $L184);
+    /* 2850 b */ li(a5,0);
+    /* 2851 X */ j($L192);
     $L184.set();
-    lw(a5, -40, s0);             /* SSSS */
-    sextw(a4,a5);        /* ZZZZ */
-    li(a5,1);        /* ZZZZ */
-    bgt(a4, a5, $L186);             /* YYYY */
-    li(a5,0);        /* ZZZZ */
-    j($L192);                       /* WWWW */
+    /* 2852 T */ lw(a5, -40, s0);
+    /* 2853 b */ sextw(a4,a5);
+    /* 2854 b */ li(a5,1);
+    /* 2855 Z */ bgt(a4, a5, $L186);
+    /* 2856 b */ li(a5,0);
+    /* 2857 X */ j($L192);
     $L186.set();
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -112);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_firstElement);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -100, s0);             /* SSSS */
-    lbu(a4, -96, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a3);        /* ZZZZ */
-    call($leaf_push);                      /* XXXX */
-    lw(a5, -164, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    lw(a5, -100, s0);             /* SSSS */
-    lw(a3, -168, s0);             /* SSSS */
-    lw(a4, -20, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($branch_setElementAt);                      /* XXXX */
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -208);           /* LLLL */
-    li(a2,0);        /* ZZZZ */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_removeElementAt);                      /* XXXX */
-    j($L187);                       /* WWWW */
+    /* 2858 T */ lw(a5, -24, s0);
+    /* 2859 b */ mv(a0,a5);
+    /* 2860 Y */ call($leaf);
+    /* 2861 b */ mv(a4,a0);
+    /* 2862 I */ addi(a5, s0, -112);
+    /* 2863 b */ mv(a1,a4);
+    /* 2864 b */ mv(a0,a5);
+    /* 2865 Y */ call($leaf_firstElement);
+    /* 2866 T */ lw(a5, -20, s0);
+    /* 2867 b */ mv(a0,a5);
+    /* 2868 Y */ call($leaf);
+    /* 2869 b */ mv(a3,a0);
+    /* 2870 T */ lw(a5, -100, s0);
+    /* 2871 T */ lbu(a4, -96, s0);
+    /* 2872 b */ sextw(a4,a4);
+    /* 2873 b */ mv(a2,a4);
+    /* 2874 b */ mv(a1,a5);
+    /* 2875 b */ mv(a0,a3);
+    /* 2876 Y */ call($leaf_push);
+    /* 2877 T */ lw(a5, -164, s0);
+    /* 2878 b */ mv(a0,a5);
+    /* 2879 Y */ call($branch);
+    /* 2880 T */ lw(a5, -100, s0);
+    /* 2881 T */ lw(a3, -168, s0);
+    /* 2882 T */ lw(a4, -20, s0);
+    /* 2883 b */ mv(a2,a4);
+    /* 2884 b */ mv(a1,a5);
+    /* 2885 Y */ call($branch_setElementAt);
+    /* 2886 T */ lw(a5, -24, s0);
+    /* 2887 b */ mv(a0,a5);
+    /* 2888 Y */ call($leaf);
+    /* 2889 b */ mv(a4,a0);
+    /* 2890 I */ addi(a5, s0, -208);
+    /* 2891 b */ li(a2,0);
+    /* 2892 b */ mv(a1,a4);
+    /* 2893 b */ mv(a0,a5);
+    /* 2894 Y */ call($leaf_removeElementAt);
+    /* 2895 X */ j($L187);
     $L183.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    sextw(a4,a5);        /* ZZZZ */
-    li(a5,2);        /* ZZZZ */
-    ble(a4, a5, $L189);             /* YYYY */
-    li(a5,0);        /* ZZZZ */
-    j($L192);                       /* WWWW */
+    /* 2896 T */ lw(a5, -20, s0);
+    /* 2897 b */ mv(a0,a5);
+    /* 2898 Y */ call($branchSize);
+    /* 2899 b */ mv(a5,a0);
+    /* 2900 O */ sw(a5, -28, s0);
+    /* 2901 T */ lw(a5, -24, s0);
+    /* 2902 b */ mv(a0,a5);
+    /* 2903 Y */ call($branchSize);
+    /* 2904 b */ mv(a5,a0);
+    /* 2905 O */ sw(a5, -32, s0);
+    /* 2906 T */ lw(a5, -28, s0);
+    /* 2907 b */ sextw(a4,a5);
+    /* 2908 b */ li(a5,2);
+    /* 2909 Z */ ble(a4, a5, $L189);
+    /* 2910 b */ li(a5,0);
+    /* 2911 X */ j($L192);
     $L189.set();
-    lw(a5, -32, s0);             /* SSSS */
-    sextw(a4,a5);        /* ZZZZ */
-    li(a5,1);        /* ZZZZ */
-    bgt(a4, a5, $L191);             /* YYYY */
-    li(a5,0);        /* ZZZZ */
-    j($L192);                       /* WWWW */
+    /* 2912 T */ lw(a5, -32, s0);
+    /* 2913 b */ sextw(a4,a5);
+    /* 2914 b */ li(a5,1);
+    /* 2915 Z */ bgt(a4, a5, $L191);
+    /* 2916 b */ li(a5,0);
+    /* 2917 X */ j($L192);
     $L191.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -136);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_lastElement);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    lw(a5, -52, s0);             /* SSSS */
-    lw(a4, -120, s0);             /* SSSS */
-    lw(a3, -28, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($branch_setElementAt);                      /* XXXX */
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -160);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_firstElement);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    lw(a5, -144, s0);             /* SSSS */
-    mv(a2,a5);        /* ZZZZ */
-    li(a1,0);        /* ZZZZ */
-    mv(a0,a4);        /* ZZZZ */
-    call($branch_push);                      /* XXXX */
-    lw(a5, -164, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    lw(a5, -148, s0);             /* SSSS */
-    lw(a3, -168, s0);             /* SSSS */
-    lw(a4, -20, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($branch_setElementAt);                      /* XXXX */
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -208);           /* LLLL */
-    li(a2,0);        /* ZZZZ */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_removeElementAt);                      /* XXXX */
+    /* 2918 T */ lw(a5, -20, s0);
+    /* 2919 b */ mv(a0,a5);
+    /* 2920 Y */ call($branch);
+    /* 2921 b */ mv(a4,a0);
+    /* 2922 I */ addi(a5, s0, -136);
+    /* 2923 b */ mv(a1,a4);
+    /* 2924 b */ mv(a0,a5);
+    /* 2925 Y */ call($branch_lastElement);
+    /* 2926 T */ lw(a5, -20, s0);
+    /* 2927 b */ mv(a0,a5);
+    /* 2928 Y */ call($branch);
+    /* 2929 T */ lw(a5, -52, s0);
+    /* 2930 T */ lw(a4, -120, s0);
+    /* 2931 T */ lw(a3, -28, s0);
+    /* 2932 b */ mv(a2,a4);
+    /* 2933 b */ mv(a1,a5);
+    /* 2934 Y */ call($branch_setElementAt);
+    /* 2935 T */ lw(a5, -24, s0);
+    /* 2936 b */ mv(a0,a5);
+    /* 2937 Y */ call($branch);
+    /* 2938 b */ mv(a4,a0);
+    /* 2939 I */ addi(a5, s0, -160);
+    /* 2940 b */ mv(a1,a4);
+    /* 2941 b */ mv(a0,a5);
+    /* 2942 Y */ call($branch_firstElement);
+    /* 2943 T */ lw(a5, -20, s0);
+    /* 2944 b */ mv(a0,a5);
+    /* 2945 Y */ call($branch);
+    /* 2946 b */ mv(a4,a0);
+    /* 2947 T */ lw(a5, -144, s0);
+    /* 2948 b */ mv(a2,a5);
+    /* 2949 b */ li(a1,0);
+    /* 2950 b */ mv(a0,a4);
+    /* 2951 Y */ call($branch_push);
+    /* 2952 T */ lw(a5, -164, s0);
+    /* 2953 b */ mv(a0,a5);
+    /* 2954 Y */ call($branch);
+    /* 2955 T */ lw(a5, -148, s0);
+    /* 2956 T */ lw(a3, -168, s0);
+    /* 2957 T */ lw(a4, -20, s0);
+    /* 2958 b */ mv(a2,a4);
+    /* 2959 b */ mv(a1,a5);
+    /* 2960 Y */ call($branch_setElementAt);
+    /* 2961 T */ lw(a5, -24, s0);
+    /* 2962 b */ mv(a0,a5);
+    /* 2963 Y */ call($branch);
+    /* 2964 b */ mv(a4,a0);
+    /* 2965 I */ addi(a5, s0, -208);
+    /* 2966 b */ li(a2,0);
+    /* 2967 b */ mv(a1,a4);
+    /* 2968 b */ mv(a0,a5);
+    /* 2969 Y */ call($branch_removeElementAt);
     $L187.set();
-    li(a5,1);        /* ZZZZ */
+    /* 2970 b */ li(a5,1);
     $L192.set();
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 200);             /* GGGG */
-    ld(s0, sp, 192);             /* GGGG */
-    addi(sp, sp, 208);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 2971 b */ mv(a0,a5);
+    /* 2972 K */ ld(ra, sp, 200);
+    /* 2973 K */ ld(s0, sp, 192);
+    /* 2974 I */ addi(sp, sp, 208);
+    /* 2975 W */ jr(ra);
     $mergeRoot.set();
-    addi(sp, sp, -304);           /* LLLL */
-    sd(ra, 296, sp);             /* OOOO */
-    sd(s0, 288, sp);             /* OOOO */
-    sd(s1, 280, sp);             /* OOOO */
-    addi(s0, sp, 304);           /* LLLL */
-    call($rootIsLeaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    bne(a5, zero, $L194);             /* YYYY */
-    li(a0,0);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    li(a5,1);        /* ZZZZ */
-    ble(a4, a5, $L195);             /* YYYY */
+    /* 2976 I */ addi(sp, sp, -304);
+    /* 2977 O */ sd(ra, 296, sp);
+    /* 2978 O */ sd(s0, 288, sp);
+    /* 2979 O */ sd(s1, 280, sp);
+    /* 2980 I */ addi(s0, sp, 304);
+    /* 2981 Y */ call($rootIsLeaf);
+    /* 2982 b */ mv(a5,a0);
+    /* 2983 Z */ bne(a5, zero, $L194);
+    /* 2984 b */ li(a0,0);
+    /* 2985 Y */ call($branchSize);
+    /* 2986 b */ mv(a5,a0);
+    /* 2987 b */ mv(a4,a5);
+    /* 2988 b */ li(a5,1);
+    /* 2989 Z */ ble(a4, a5, $L195);
     $L194.set();
-    li(a5,0);        /* ZZZZ */
-    j($L196);                       /* WWWW */
+    /* 2990 b */ li(a5,0);
+    /* 2991 X */ j($L196);
     $L195.set();
-    sw(zero, -52, s0);             /* OOOO */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -176);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_firstElement);                      /* XXXX */
-    lw(a5, -160, s0);             /* SSSS */
-    sw(a5, -56, s0);             /* OOOO */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -152);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_lastElement);                      /* XXXX */
-    lw(a5, -136, s0);             /* SSSS */
-    sw(a5, -60, s0);             /* OOOO */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($hasLeavesForChildren);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L197);             /* YYYY */
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(s1,a5);        /* ZZZZ */
-    lw(a5, -60, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    addw(a5,s1,a5);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    li(a5,2);        /* ZZZZ */
-    bgt(a4, a5, $L198);             /* YYYY */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($clear);                      /* XXXX */
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -80, s0);             /* OOOO */
-    sw(zero, -36, s0);             /* OOOO */
-    j($L199);                       /* WWWW */
+    /* 2992 O */ sw(zero, -52, s0);
+    /* 2993 T */ lw(a5, -52, s0);
+    /* 2994 b */ mv(a0,a5);
+    /* 2995 Y */ call($branch);
+    /* 2996 b */ mv(a4,a0);
+    /* 2997 I */ addi(a5, s0, -176);
+    /* 2998 b */ mv(a1,a4);
+    /* 2999 b */ mv(a0,a5);
+    /* 3000 Y */ call($branch_firstElement);
+    /* 3001 T */ lw(a5, -160, s0);
+    /* 3002 O */ sw(a5, -56, s0);
+    /* 3003 T */ lw(a5, -52, s0);
+    /* 3004 b */ mv(a0,a5);
+    /* 3005 Y */ call($branch);
+    /* 3006 b */ mv(a4,a0);
+    /* 3007 I */ addi(a5, s0, -152);
+    /* 3008 b */ mv(a1,a4);
+    /* 3009 b */ mv(a0,a5);
+    /* 3010 Y */ call($branch_lastElement);
+    /* 3011 T */ lw(a5, -136, s0);
+    /* 3012 O */ sw(a5, -60, s0);
+    /* 3013 T */ lw(a5, -52, s0);
+    /* 3014 b */ mv(a0,a5);
+    /* 3015 Y */ call($hasLeavesForChildren);
+    /* 3016 b */ mv(a5,a0);
+    /* 3017 Z */ beq(a5, zero, $L197);
+    /* 3018 T */ lw(a5, -56, s0);
+    /* 3019 b */ mv(a0,a5);
+    /* 3020 Y */ call($leafSize);
+    /* 3021 b */ mv(a5,a0);
+    /* 3022 b */ mv(s1,a5);
+    /* 3023 T */ lw(a5, -60, s0);
+    /* 3024 b */ mv(a0,a5);
+    /* 3025 Y */ call($leafSize);
+    /* 3026 b */ mv(a5,a0);
+    /* 3027 b */ addw(a5,s1,a5);
+    /* 3028 b */ sextw(a5,a5);
+    /* 3029 b */ mv(a4,a5);
+    /* 3030 b */ li(a5,2);
+    /* 3031 Z */ bgt(a4, a5, $L198);
+    /* 3032 T */ lw(a5, -52, s0);
+    /* 3033 b */ mv(a0,a5);
+    /* 3034 Y */ call($clear);
+    /* 3035 T */ lw(a5, -56, s0);
+    /* 3036 b */ mv(a0,a5);
+    /* 3037 Y */ call($leafSize);
+    /* 3038 b */ mv(a5,a0);
+    /* 3039 O */ sw(a5, -80, s0);
+    /* 3040 O */ sw(zero, -36, s0);
+    /* 3041 X */ j($L199);
     $L200.set();
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -200);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_shift);                      /* XXXX */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -188, s0);             /* SSSS */
-    lbu(a4, -184, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a3);        /* ZZZZ */
-    call($leaf_push);                      /* XXXX */
-    lw(a5, -36, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -36, s0);             /* OOOO */
+    /* 3042 T */ lw(a5, -56, s0);
+    /* 3043 b */ mv(a0,a5);
+    /* 3044 Y */ call($leaf);
+    /* 3045 b */ mv(a4,a0);
+    /* 3046 I */ addi(a5, s0, -200);
+    /* 3047 b */ mv(a1,a4);
+    /* 3048 b */ mv(a0,a5);
+    /* 3049 Y */ call($leaf_shift);
+    /* 3050 T */ lw(a5, -52, s0);
+    /* 3051 b */ mv(a0,a5);
+    /* 3052 Y */ call($leaf);
+    /* 3053 b */ mv(a3,a0);
+    /* 3054 T */ lw(a5, -188, s0);
+    /* 3055 T */ lbu(a4, -184, s0);
+    /* 3056 b */ sextw(a4,a4);
+    /* 3057 b */ mv(a2,a4);
+    /* 3058 b */ mv(a1,a5);
+    /* 3059 b */ mv(a0,a3);
+    /* 3060 Y */ call($leaf_push);
+    /* 3061 T */ lw(a5, -36, s0);
+    /* 3062 I */ addiw(a5, a5, 1);
+    /* 3063 O */ sw(a5, -36, s0);
     $L199.set();
-    lw(a5, -36, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -80, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L200);             /* YYYY */
-    lw(a5, -60, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -84, s0);             /* OOOO */
-    sw(zero, -40, s0);             /* OOOO */
-    j($L201);                       /* WWWW */
+    /* 3064 T */ lw(a5, -36, s0);
+    /* 3065 b */ mv(a4,a5);
+    /* 3066 T */ lw(a5, -80, s0);
+    /* 3067 b */ sextw(a4,a4);
+    /* 3068 b */ sextw(a5,a5);
+    /* 3069 Z */ blt(a4, a5, $L200);
+    /* 3070 T */ lw(a5, -60, s0);
+    /* 3071 b */ mv(a0,a5);
+    /* 3072 Y */ call($leafSize);
+    /* 3073 b */ mv(a5,a0);
+    /* 3074 O */ sw(a5, -84, s0);
+    /* 3075 O */ sw(zero, -40, s0);
+    /* 3076 X */ j($L201);
     $L202.set();
-    lw(a5, -60, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -224);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_shift);                      /* XXXX */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -212, s0);             /* SSSS */
-    lbu(a4, -208, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a3);        /* ZZZZ */
-    call($leaf_push);                      /* XXXX */
-    lw(a5, -40, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -40, s0);             /* OOOO */
+    /* 3077 T */ lw(a5, -60, s0);
+    /* 3078 b */ mv(a0,a5);
+    /* 3079 Y */ call($leaf);
+    /* 3080 b */ mv(a4,a0);
+    /* 3081 I */ addi(a5, s0, -224);
+    /* 3082 b */ mv(a1,a4);
+    /* 3083 b */ mv(a0,a5);
+    /* 3084 Y */ call($leaf_shift);
+    /* 3085 T */ lw(a5, -52, s0);
+    /* 3086 b */ mv(a0,a5);
+    /* 3087 Y */ call($leaf);
+    /* 3088 b */ mv(a3,a0);
+    /* 3089 T */ lw(a5, -212, s0);
+    /* 3090 T */ lbu(a4, -208, s0);
+    /* 3091 b */ sextw(a4,a4);
+    /* 3092 b */ mv(a2,a4);
+    /* 3093 b */ mv(a1,a5);
+    /* 3094 b */ mv(a0,a3);
+    /* 3095 Y */ call($leaf_push);
+    /* 3096 T */ lw(a5, -40, s0);
+    /* 3097 I */ addiw(a5, a5, 1);
+    /* 3098 O */ sw(a5, -40, s0);
     $L201.set();
-    lw(a5, -40, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -84, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L202);             /* YYYY */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($setLeaf);                      /* XXXX */
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($freeNode);                      /* XXXX */
-    lw(a5, -60, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($freeNode);                      /* XXXX */
-    li(a5,1);        /* ZZZZ */
-    j($L196);                       /* WWWW */
+    /* 3099 T */ lw(a5, -40, s0);
+    /* 3100 b */ mv(a4,a5);
+    /* 3101 T */ lw(a5, -84, s0);
+    /* 3102 b */ sextw(a4,a4);
+    /* 3103 b */ sextw(a5,a5);
+    /* 3104 Z */ blt(a4, a5, $L202);
+    /* 3105 T */ lw(a5, -52, s0);
+    /* 3106 b */ mv(a0,a5);
+    /* 3107 Y */ call($setLeaf);
+    /* 3108 T */ lw(a5, -56, s0);
+    /* 3109 b */ mv(a0,a5);
+    /* 3110 Y */ call($freeNode);
+    /* 3111 T */ lw(a5, -60, s0);
+    /* 3112 b */ mv(a0,a5);
+    /* 3113 Y */ call($freeNode);
+    /* 3114 b */ li(a5,1);
+    /* 3115 X */ j($L196);
     $L197.set();
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    addiw(a5, a5, 1);           /* LLLL */
-    sextw(s1,a5);        /* ZZZZ */
-    lw(a5, -60, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    addw(a5,s1,a5);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    li(a5,3);        /* ZZZZ */
-    bgt(a4, a5, $L198);             /* YYYY */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -248);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_firstElement);                      /* XXXX */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($clear);                      /* XXXX */
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -64, s0);             /* OOOO */
-    sw(zero, -44, s0);             /* OOOO */
-    j($L203);                       /* WWWW */
+    /* 3116 T */ lw(a5, -56, s0);
+    /* 3117 b */ mv(a0,a5);
+    /* 3118 Y */ call($branchSize);
+    /* 3119 b */ mv(a5,a0);
+    /* 3120 I */ addiw(a5, a5, 1);
+    /* 3121 b */ sextw(s1,a5);
+    /* 3122 T */ lw(a5, -60, s0);
+    /* 3123 b */ mv(a0,a5);
+    /* 3124 Y */ call($branchSize);
+    /* 3125 b */ mv(a5,a0);
+    /* 3126 b */ addw(a5,s1,a5);
+    /* 3127 b */ sextw(a5,a5);
+    /* 3128 b */ mv(a4,a5);
+    /* 3129 b */ li(a5,3);
+    /* 3130 Z */ bgt(a4, a5, $L198);
+    /* 3131 T */ lw(a5, -52, s0);
+    /* 3132 b */ mv(a0,a5);
+    /* 3133 Y */ call($branch);
+    /* 3134 b */ mv(a4,a0);
+    /* 3135 I */ addi(a5, s0, -248);
+    /* 3136 b */ mv(a1,a4);
+    /* 3137 b */ mv(a0,a5);
+    /* 3138 Y */ call($branch_firstElement);
+    /* 3139 T */ lw(a5, -52, s0);
+    /* 3140 b */ mv(a0,a5);
+    /* 3141 Y */ call($clear);
+    /* 3142 T */ lw(a5, -56, s0);
+    /* 3143 b */ mv(a0,a5);
+    /* 3144 Y */ call($branchSize);
+    /* 3145 b */ mv(a5,a0);
+    /* 3146 O */ sw(a5, -64, s0);
+    /* 3147 O */ sw(zero, -44, s0);
+    /* 3148 X */ j($L203);
     $L204.set();
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -272);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_shift);                      /* XXXX */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -260, s0);             /* SSSS */
-    lw(a4, -256, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a3);        /* ZZZZ */
-    call($branch_push);                      /* XXXX */
-    lw(a5, -44, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -44, s0);             /* OOOO */
+    /* 3149 T */ lw(a5, -56, s0);
+    /* 3150 b */ mv(a0,a5);
+    /* 3151 Y */ call($branch);
+    /* 3152 b */ mv(a4,a0);
+    /* 3153 I */ addi(a5, s0, -272);
+    /* 3154 b */ mv(a1,a4);
+    /* 3155 b */ mv(a0,a5);
+    /* 3156 Y */ call($branch_shift);
+    /* 3157 T */ lw(a5, -52, s0);
+    /* 3158 b */ mv(a0,a5);
+    /* 3159 Y */ call($branch);
+    /* 3160 b */ mv(a3,a0);
+    /* 3161 T */ lw(a5, -260, s0);
+    /* 3162 T */ lw(a4, -256, s0);
+    /* 3163 b */ mv(a2,a4);
+    /* 3164 b */ mv(a1,a5);
+    /* 3165 b */ mv(a0,a3);
+    /* 3166 Y */ call($branch_push);
+    /* 3167 T */ lw(a5, -44, s0);
+    /* 3168 I */ addiw(a5, a5, 1);
+    /* 3169 O */ sw(a5, -44, s0);
     $L203.set();
-    lw(a5, -44, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -64, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L204);             /* YYYY */
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -128);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_lastElement);                      /* XXXX */
-    lw(a5, -112, s0);             /* SSSS */
-    sw(a5, -68, s0);             /* OOOO */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -236, s0);             /* SSSS */
-    lw(a4, -68, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a3);        /* ZZZZ */
-    call($branch_push);                      /* XXXX */
-    lw(a5, -60, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -72, s0);             /* OOOO */
-    sw(zero, -48, s0);             /* OOOO */
-    j($L205);                       /* WWWW */
+    /* 3170 T */ lw(a5, -44, s0);
+    /* 3171 b */ mv(a4,a5);
+    /* 3172 T */ lw(a5, -64, s0);
+    /* 3173 b */ sextw(a4,a4);
+    /* 3174 b */ sextw(a5,a5);
+    /* 3175 Z */ blt(a4, a5, $L204);
+    /* 3176 T */ lw(a5, -56, s0);
+    /* 3177 b */ mv(a0,a5);
+    /* 3178 Y */ call($branch);
+    /* 3179 b */ mv(a4,a0);
+    /* 3180 I */ addi(a5, s0, -128);
+    /* 3181 b */ mv(a1,a4);
+    /* 3182 b */ mv(a0,a5);
+    /* 3183 Y */ call($branch_lastElement);
+    /* 3184 T */ lw(a5, -112, s0);
+    /* 3185 O */ sw(a5, -68, s0);
+    /* 3186 T */ lw(a5, -52, s0);
+    /* 3187 b */ mv(a0,a5);
+    /* 3188 Y */ call($branch);
+    /* 3189 b */ mv(a3,a0);
+    /* 3190 T */ lw(a5, -236, s0);
+    /* 3191 T */ lw(a4, -68, s0);
+    /* 3192 b */ mv(a2,a4);
+    /* 3193 b */ mv(a1,a5);
+    /* 3194 b */ mv(a0,a3);
+    /* 3195 Y */ call($branch_push);
+    /* 3196 T */ lw(a5, -60, s0);
+    /* 3197 b */ mv(a0,a5);
+    /* 3198 Y */ call($branchSize);
+    /* 3199 b */ mv(a5,a0);
+    /* 3200 O */ sw(a5, -72, s0);
+    /* 3201 O */ sw(zero, -48, s0);
+    /* 3202 X */ j($L205);
     $L206.set();
-    lw(a5, -60, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -296);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_shift);                      /* XXXX */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -284, s0);             /* SSSS */
-    lw(a4, -280, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a3);        /* ZZZZ */
-    call($branch_push);                      /* XXXX */
-    lw(a5, -48, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -48, s0);             /* OOOO */
+    /* 3203 T */ lw(a5, -60, s0);
+    /* 3204 b */ mv(a0,a5);
+    /* 3205 Y */ call($branch);
+    /* 3206 b */ mv(a4,a0);
+    /* 3207 I */ addi(a5, s0, -296);
+    /* 3208 b */ mv(a1,a4);
+    /* 3209 b */ mv(a0,a5);
+    /* 3210 Y */ call($branch_shift);
+    /* 3211 T */ lw(a5, -52, s0);
+    /* 3212 b */ mv(a0,a5);
+    /* 3213 Y */ call($branch);
+    /* 3214 b */ mv(a3,a0);
+    /* 3215 T */ lw(a5, -284, s0);
+    /* 3216 T */ lw(a4, -280, s0);
+    /* 3217 b */ mv(a2,a4);
+    /* 3218 b */ mv(a1,a5);
+    /* 3219 b */ mv(a0,a3);
+    /* 3220 Y */ call($branch_push);
+    /* 3221 T */ lw(a5, -48, s0);
+    /* 3222 I */ addiw(a5, a5, 1);
+    /* 3223 O */ sw(a5, -48, s0);
     $L205.set();
-    lw(a5, -48, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -72, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L206);             /* YYYY */
-    lw(a5, -60, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -104);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_lastElement);                      /* XXXX */
-    lw(a5, -88, s0);             /* SSSS */
-    sw(a5, -76, s0);             /* OOOO */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    lw(a5, -76, s0);             /* SSSS */
-    mv(a2,a5);        /* ZZZZ */
-    li(a1,0);        /* ZZZZ */
-    mv(a0,a4);        /* ZZZZ */
-    call($branch_push);                      /* XXXX */
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($freeNode);                      /* XXXX */
-    lw(a5, -60, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($freeNode);                      /* XXXX */
-    li(a5,1);        /* ZZZZ */
-    j($L196);                       /* WWWW */
+    /* 3224 T */ lw(a5, -48, s0);
+    /* 3225 b */ mv(a4,a5);
+    /* 3226 T */ lw(a5, -72, s0);
+    /* 3227 b */ sextw(a4,a4);
+    /* 3228 b */ sextw(a5,a5);
+    /* 3229 Z */ blt(a4, a5, $L206);
+    /* 3230 T */ lw(a5, -60, s0);
+    /* 3231 b */ mv(a0,a5);
+    /* 3232 Y */ call($branch);
+    /* 3233 b */ mv(a4,a0);
+    /* 3234 I */ addi(a5, s0, -104);
+    /* 3235 b */ mv(a1,a4);
+    /* 3236 b */ mv(a0,a5);
+    /* 3237 Y */ call($branch_lastElement);
+    /* 3238 T */ lw(a5, -88, s0);
+    /* 3239 O */ sw(a5, -76, s0);
+    /* 3240 T */ lw(a5, -52, s0);
+    /* 3241 b */ mv(a0,a5);
+    /* 3242 Y */ call($branch);
+    /* 3243 b */ mv(a4,a0);
+    /* 3244 T */ lw(a5, -76, s0);
+    /* 3245 b */ mv(a2,a5);
+    /* 3246 b */ li(a1,0);
+    /* 3247 b */ mv(a0,a4);
+    /* 3248 Y */ call($branch_push);
+    /* 3249 T */ lw(a5, -56, s0);
+    /* 3250 b */ mv(a0,a5);
+    /* 3251 Y */ call($freeNode);
+    /* 3252 T */ lw(a5, -60, s0);
+    /* 3253 b */ mv(a0,a5);
+    /* 3254 Y */ call($freeNode);
+    /* 3255 b */ li(a5,1);
+    /* 3256 X */ j($L196);
     $L198.set();
-    li(a5,0);        /* ZZZZ */
+    /* 3257 b */ li(a5,0);
     $L196.set();
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 296);             /* GGGG */
-    ld(s0, sp, 288);             /* GGGG */
-    ld(s1, sp, 280);             /* GGGG */
-    addi(sp, sp, 304);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 3258 b */ mv(a0,a5);
+    /* 3259 K */ ld(ra, sp, 296);
+    /* 3260 K */ ld(s0, sp, 288);
+    /* 3261 K */ ld(s1, sp, 280);
+    /* 3262 I */ addi(sp, sp, 304);
+    /* 3263 W */ jr(ra);
     $mergeLeftSibling.set();
-    addi(sp, sp, -272);           /* LLLL */
-    sd(ra, 264, sp);             /* OOOO */
-    sd(s0, 256, sp);             /* OOOO */
-    addi(s0, sp, 272);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a1);        /* ZZZZ */
-    sw(a5, -228, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -232, s0);             /* OOOO */
-    lw(a5, -232, s0);             /* SSSS */
-    sextw(a5,a5);        /* ZZZZ */
-    bne(a5, zero, $L208);             /* YYYY */
-    li(a5,0);        /* ZZZZ */
-    j($L220);                       /* WWWW */
+    /* 3264 I */ addi(sp, sp, -272);
+    /* 3265 O */ sd(ra, 264, sp);
+    /* 3266 O */ sd(s0, 256, sp);
+    /* 3267 I */ addi(s0, sp, 272);
+    /* 3268 b */ mv(a5,a0);
+    /* 3269 b */ mv(a4,a1);
+    /* 3270 O */ sw(a5, -228, s0);
+    /* 3271 b */ mv(a5,a4);
+    /* 3272 O */ sw(a5, -232, s0);
+    /* 3273 T */ lw(a5, -232, s0);
+    /* 3274 b */ sextw(a5,a5);
+    /* 3275 Z */ bne(a5, zero, $L208);
+    /* 3276 b */ li(a5,0);
+    /* 3277 X */ j($L220);
     $L208.set();
-    lw(a5, -228, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    sextw(a4,a5);        /* ZZZZ */
-    li(a5,1);        /* ZZZZ */
-    bgt(a4, a5, $L210);             /* YYYY */
-    li(a5,0);        /* ZZZZ */
-    j($L220);                       /* WWWW */
+    /* 3278 T */ lw(a5, -228, s0);
+    /* 3279 b */ mv(a0,a5);
+    /* 3280 Y */ call($branchSize);
+    /* 3281 b */ mv(a5,a0);
+    /* 3282 O */ sw(a5, -28, s0);
+    /* 3283 T */ lw(a5, -28, s0);
+    /* 3284 b */ sextw(a4,a5);
+    /* 3285 b */ li(a5,1);
+    /* 3286 Z */ bgt(a4, a5, $L210);
+    /* 3287 b */ li(a5,0);
+    /* 3288 X */ j($L220);
     $L210.set();
-    lw(a5, -228, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -232, s0);             /* SSSS */
-    addiw(a5, a5, -1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    addi(a5, s0, -120);           /* LLLL */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_elementAt);                      /* XXXX */
-    lw(a5, -228, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -144);           /* LLLL */
-    lw(a4, -232, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_elementAt);                      /* XXXX */
-    lw(a5, -228, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($hasLeavesForChildren);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L211);             /* YYYY */
-    lw(a5, -104, s0);             /* SSSS */
-    sw(a5, -56, s0);             /* OOOO */
-    lw(a5, -128, s0);             /* SSSS */
-    sw(a5, -60, s0);             /* OOOO */
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -64, s0);             /* OOOO */
-    lw(a5, -60, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -68, s0);             /* OOOO */
-    lw(a5, -64, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -68, s0);             /* SSSS */
-    addw(a5,a4,a5);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    li(a5,1);        /* ZZZZ */
-    ble(a4, a5, $L212);             /* YYYY */
-    li(a5,0);        /* ZZZZ */
-    j($L220);                       /* WWWW */
+    /* 3289 T */ lw(a5, -228, s0);
+    /* 3290 b */ mv(a0,a5);
+    /* 3291 Y */ call($branch);
+    /* 3292 b */ mv(a3,a0);
+    /* 3293 T */ lw(a5, -232, s0);
+    /* 3294 I */ addiw(a5, a5, -1);
+    /* 3295 b */ sextw(a4,a5);
+    /* 3296 I */ addi(a5, s0, -120);
+    /* 3297 b */ mv(a2,a4);
+    /* 3298 b */ mv(a1,a3);
+    /* 3299 b */ mv(a0,a5);
+    /* 3300 Y */ call($branch_elementAt);
+    /* 3301 T */ lw(a5, -228, s0);
+    /* 3302 b */ mv(a0,a5);
+    /* 3303 Y */ call($branch);
+    /* 3304 b */ mv(a3,a0);
+    /* 3305 I */ addi(a5, s0, -144);
+    /* 3306 T */ lw(a4, -232, s0);
+    /* 3307 b */ mv(a2,a4);
+    /* 3308 b */ mv(a1,a3);
+    /* 3309 b */ mv(a0,a5);
+    /* 3310 Y */ call($branch_elementAt);
+    /* 3311 T */ lw(a5, -228, s0);
+    /* 3312 b */ mv(a0,a5);
+    /* 3313 Y */ call($hasLeavesForChildren);
+    /* 3314 b */ mv(a5,a0);
+    /* 3315 Z */ beq(a5, zero, $L211);
+    /* 3316 T */ lw(a5, -104, s0);
+    /* 3317 O */ sw(a5, -56, s0);
+    /* 3318 T */ lw(a5, -128, s0);
+    /* 3319 O */ sw(a5, -60, s0);
+    /* 3320 T */ lw(a5, -56, s0);
+    /* 3321 b */ mv(a0,a5);
+    /* 3322 Y */ call($leafSize);
+    /* 3323 b */ mv(a5,a0);
+    /* 3324 O */ sw(a5, -64, s0);
+    /* 3325 T */ lw(a5, -60, s0);
+    /* 3326 b */ mv(a0,a5);
+    /* 3327 Y */ call($leafSize);
+    /* 3328 b */ mv(a5,a0);
+    /* 3329 O */ sw(a5, -68, s0);
+    /* 3330 T */ lw(a5, -64, s0);
+    /* 3331 b */ mv(a4,a5);
+    /* 3332 T */ lw(a5, -68, s0);
+    /* 3333 b */ addw(a5,a4,a5);
+    /* 3334 b */ sextw(a5,a5);
+    /* 3335 b */ mv(a4,a5);
+    /* 3336 b */ li(a5,1);
+    /* 3337 Z */ ble(a4, a5, $L212);
+    /* 3338 b */ li(a5,0);
+    /* 3339 X */ j($L220);
     $L212.set();
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -72, s0);             /* OOOO */
-    sw(zero, -20, s0);             /* OOOO */
-    j($L213);                       /* WWWW */
+    /* 3340 T */ lw(a5, -56, s0);
+    /* 3341 b */ mv(a0,a5);
+    /* 3342 Y */ call($leaf);
+    /* 3343 b */ mv(a5,a0);
+    /* 3344 b */ mv(a0,a5);
+    /* 3345 Y */ call($leaf_size);
+    /* 3346 b */ mv(a5,a0);
+    /* 3347 O */ sw(a5, -72, s0);
+    /* 3348 O */ sw(zero, -20, s0);
+    /* 3349 X */ j($L213);
     $L214.set();
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -168);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_pop);                      /* XXXX */
-    lw(a5, -60, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    lw(a5, -156, s0);             /* SSSS */
-    lbu(a4, -152, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    li(a3,0);        /* ZZZZ */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($leaf_insertElementAt);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /* 3350 T */ lw(a5, -56, s0);
+    /* 3351 b */ mv(a0,a5);
+    /* 3352 Y */ call($leaf);
+    /* 3353 b */ mv(a4,a0);
+    /* 3354 I */ addi(a5, s0, -168);
+    /* 3355 b */ mv(a1,a4);
+    /* 3356 b */ mv(a0,a5);
+    /* 3357 Y */ call($leaf_pop);
+    /* 3358 T */ lw(a5, -60, s0);
+    /* 3359 b */ mv(a0,a5);
+    /* 3360 Y */ call($leaf);
+    /* 3361 T */ lw(a5, -156, s0);
+    /* 3362 T */ lbu(a4, -152, s0);
+    /* 3363 b */ sextw(a4,a4);
+    /* 3364 b */ li(a3,0);
+    /* 3365 b */ mv(a2,a4);
+    /* 3366 b */ mv(a1,a5);
+    /* 3367 Y */ call($leaf_insertElementAt);
+    /* 3368 T */ lw(a5, -20, s0);
+    /* 3369 I */ addiw(a5, a5, 1);
+    /* 3370 O */ sw(a5, -20, s0);
     $L213.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -72, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L214);             /* YYYY */
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($freeNode);                      /* XXXX */
-    j($L215);                       /* WWWW */
+    /* 3371 T */ lw(a5, -20, s0);
+    /* 3372 b */ mv(a4,a5);
+    /* 3373 T */ lw(a5, -72, s0);
+    /* 3374 b */ sextw(a4,a4);
+    /* 3375 b */ sextw(a5,a5);
+    /* 3376 Z */ blt(a4, a5, $L214);
+    /* 3377 T */ lw(a5, -56, s0);
+    /* 3378 b */ mv(a0,a5);
+    /* 3379 Y */ call($freeNode);
+    /* 3380 X */ j($L215);
     $L211.set();
-    lw(a5, -104, s0);             /* SSSS */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a5, -128, s0);             /* SSSS */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -40, s0);             /* OOOO */
-    lw(a5, -36, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -44, s0);             /* OOOO */
-    lw(a5, -40, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sextw(a5,a5);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    addw(a5,a4,a5);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    li(a5,2);        /* ZZZZ */
-    ble(a4, a5, $L216);             /* YYYY */
-    li(a5,0);        /* ZZZZ */
-    j($L220);                       /* WWWW */
+    /* 3381 T */ lw(a5, -104, s0);
+    /* 3382 O */ sw(a5, -32, s0);
+    /* 3383 T */ lw(a5, -128, s0);
+    /* 3384 O */ sw(a5, -36, s0);
+    /* 3385 T */ lw(a5, -32, s0);
+    /* 3386 b */ mv(a0,a5);
+    /* 3387 Y */ call($branchSize);
+    /* 3388 b */ mv(a5,a0);
+    /* 3389 O */ sw(a5, -40, s0);
+    /* 3390 T */ lw(a5, -36, s0);
+    /* 3391 b */ mv(a0,a5);
+    /* 3392 Y */ call($branchSize);
+    /* 3393 b */ mv(a5,a0);
+    /* 3394 O */ sw(a5, -44, s0);
+    /* 3395 T */ lw(a5, -40, s0);
+    /* 3396 I */ addiw(a5, a5, 1);
+    /* 3397 b */ sextw(a5,a5);
+    /* 3398 T */ lw(a4, -44, s0);
+    /* 3399 b */ addw(a5,a4,a5);
+    /* 3400 b */ sextw(a5,a5);
+    /* 3401 b */ mv(a4,a5);
+    /* 3402 b */ li(a5,2);
+    /* 3403 Z */ ble(a4, a5, $L216);
+    /* 3404 b */ li(a5,0);
+    /* 3405 X */ j($L220);
     $L216.set();
-    lw(a5, -228, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -232, s0);             /* SSSS */
-    addiw(a5, a5, -1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    addi(a5, s0, -96);           /* LLLL */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_elementAt);                      /* XXXX */
-    lw(a5, -84, s0);             /* SSSS */
-    sw(a5, -48, s0);             /* OOOO */
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -192);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_lastElement);                      /* XXXX */
-    lw(a5, -36, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    lw(a4, -176, s0);             /* SSSS */
-    lw(a5, -48, s0);             /* SSSS */
-    li(a3,0);        /* ZZZZ */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($branch_insertElementAt);                      /* XXXX */
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -272);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_pop);                      /* XXXX */
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -52, s0);             /* OOOO */
-    sw(zero, -24, s0);             /* OOOO */
-    j($L218);                       /* WWWW */
+    /* 3406 T */ lw(a5, -228, s0);
+    /* 3407 b */ mv(a0,a5);
+    /* 3408 Y */ call($branch);
+    /* 3409 b */ mv(a3,a0);
+    /* 3410 T */ lw(a5, -232, s0);
+    /* 3411 I */ addiw(a5, a5, -1);
+    /* 3412 b */ sextw(a4,a5);
+    /* 3413 I */ addi(a5, s0, -96);
+    /* 3414 b */ mv(a2,a4);
+    /* 3415 b */ mv(a1,a3);
+    /* 3416 b */ mv(a0,a5);
+    /* 3417 Y */ call($branch_elementAt);
+    /* 3418 T */ lw(a5, -84, s0);
+    /* 3419 O */ sw(a5, -48, s0);
+    /* 3420 T */ lw(a5, -32, s0);
+    /* 3421 b */ mv(a0,a5);
+    /* 3422 Y */ call($branch);
+    /* 3423 b */ mv(a4,a0);
+    /* 3424 I */ addi(a5, s0, -192);
+    /* 3425 b */ mv(a1,a4);
+    /* 3426 b */ mv(a0,a5);
+    /* 3427 Y */ call($branch_lastElement);
+    /* 3428 T */ lw(a5, -36, s0);
+    /* 3429 b */ mv(a0,a5);
+    /* 3430 Y */ call($branch);
+    /* 3431 T */ lw(a4, -176, s0);
+    /* 3432 T */ lw(a5, -48, s0);
+    /* 3433 b */ li(a3,0);
+    /* 3434 b */ mv(a2,a4);
+    /* 3435 b */ mv(a1,a5);
+    /* 3436 Y */ call($branch_insertElementAt);
+    /* 3437 T */ lw(a5, -32, s0);
+    /* 3438 b */ mv(a0,a5);
+    /* 3439 Y */ call($branch);
+    /* 3440 b */ mv(a4,a0);
+    /* 3441 I */ addi(a5, s0, -272);
+    /* 3442 b */ mv(a1,a4);
+    /* 3443 b */ mv(a0,a5);
+    /* 3444 Y */ call($branch_pop);
+    /* 3445 T */ lw(a5, -32, s0);
+    /* 3446 b */ mv(a0,a5);
+    /* 3447 Y */ call($branchSize);
+    /* 3448 b */ mv(a5,a0);
+    /* 3449 O */ sw(a5, -52, s0);
+    /* 3450 O */ sw(zero, -24, s0);
+    /* 3451 X */ j($L218);
     $L219.set();
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -216);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_pop);                      /* XXXX */
-    lw(a5, -36, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    lw(a5, -204, s0);             /* SSSS */
-    lw(a4, -200, s0);             /* SSSS */
-    li(a3,0);        /* ZZZZ */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($branch_insertElementAt);                      /* XXXX */
-    lw(a5, -24, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -24, s0);             /* OOOO */
+    /* 3452 T */ lw(a5, -32, s0);
+    /* 3453 b */ mv(a0,a5);
+    /* 3454 Y */ call($branch);
+    /* 3455 b */ mv(a4,a0);
+    /* 3456 I */ addi(a5, s0, -216);
+    /* 3457 b */ mv(a1,a4);
+    /* 3458 b */ mv(a0,a5);
+    /* 3459 Y */ call($branch_pop);
+    /* 3460 T */ lw(a5, -36, s0);
+    /* 3461 b */ mv(a0,a5);
+    /* 3462 Y */ call($branch);
+    /* 3463 T */ lw(a5, -204, s0);
+    /* 3464 T */ lw(a4, -200, s0);
+    /* 3465 b */ li(a3,0);
+    /* 3466 b */ mv(a2,a4);
+    /* 3467 b */ mv(a1,a5);
+    /* 3468 Y */ call($branch_insertElementAt);
+    /* 3469 T */ lw(a5, -24, s0);
+    /* 3470 I */ addiw(a5, a5, 1);
+    /* 3471 O */ sw(a5, -24, s0);
     $L218.set();
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -52, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L219);             /* YYYY */
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($freeNode);                      /* XXXX */
+    /* 3472 T */ lw(a5, -24, s0);
+    /* 3473 b */ mv(a4,a5);
+    /* 3474 T */ lw(a5, -52, s0);
+    /* 3475 b */ sextw(a4,a4);
+    /* 3476 b */ sextw(a5,a5);
+    /* 3477 Z */ blt(a4, a5, $L219);
+    /* 3478 T */ lw(a5, -32, s0);
+    /* 3479 b */ mv(a0,a5);
+    /* 3480 Y */ call($freeNode);
     $L215.set();
-    lw(a5, -228, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -232, s0);             /* SSSS */
-    addiw(a5, a5, -1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    addi(a5, s0, -272);           /* LLLL */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_removeElementAt);                      /* XXXX */
-    li(a5,1);        /* ZZZZ */
+    /* 3481 T */ lw(a5, -228, s0);
+    /* 3482 b */ mv(a0,a5);
+    /* 3483 Y */ call($branch);
+    /* 3484 b */ mv(a3,a0);
+    /* 3485 T */ lw(a5, -232, s0);
+    /* 3486 I */ addiw(a5, a5, -1);
+    /* 3487 b */ sextw(a4,a5);
+    /* 3488 I */ addi(a5, s0, -272);
+    /* 3489 b */ mv(a2,a4);
+    /* 3490 b */ mv(a1,a3);
+    /* 3491 b */ mv(a0,a5);
+    /* 3492 Y */ call($branch_removeElementAt);
+    /* 3493 b */ li(a5,1);
     $L220.set();
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 264);             /* GGGG */
-    ld(s0, sp, 256);             /* GGGG */
-    addi(sp, sp, 272);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 3494 b */ mv(a0,a5);
+    /* 3495 K */ ld(ra, sp, 264);
+    /* 3496 K */ ld(s0, sp, 256);
+    /* 3497 I */ addi(sp, sp, 272);
+    /* 3498 W */ jr(ra);
     $mergeRightSibling.set();
-    addi(sp, sp, -304);           /* LLLL */
-    sd(ra, 296, sp);             /* OOOO */
-    sd(s0, 288, sp);             /* OOOO */
-    addi(s0, sp, 304);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a1);        /* ZZZZ */
-    sw(a5, -260, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -264, s0);             /* OOOO */
-    lw(a5, -260, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    sextw(a4,a5);        /* ZZZZ */
-    li(a5,1);        /* ZZZZ */
-    bgt(a4, a5, $L222);             /* YYYY */
-    li(a5,0);        /* ZZZZ */
-    j($L233);                       /* WWWW */
+    /* 3499 I */ addi(sp, sp, -304);
+    /* 3500 O */ sd(ra, 296, sp);
+    /* 3501 O */ sd(s0, 288, sp);
+    /* 3502 I */ addi(s0, sp, 304);
+    /* 3503 b */ mv(a5,a0);
+    /* 3504 b */ mv(a4,a1);
+    /* 3505 O */ sw(a5, -260, s0);
+    /* 3506 b */ mv(a5,a4);
+    /* 3507 O */ sw(a5, -264, s0);
+    /* 3508 T */ lw(a5, -260, s0);
+    /* 3509 b */ mv(a0,a5);
+    /* 3510 Y */ call($branchSize);
+    /* 3511 b */ mv(a5,a0);
+    /* 3512 O */ sw(a5, -28, s0);
+    /* 3513 T */ lw(a5, -28, s0);
+    /* 3514 b */ sextw(a4,a5);
+    /* 3515 b */ li(a5,1);
+    /* 3516 Z */ bgt(a4, a5, $L222);
+    /* 3517 b */ li(a5,0);
+    /* 3518 X */ j($L233);
     $L222.set();
-    lw(a5, -260, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -88);           /* LLLL */
-    lw(a4, -264, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_elementAt);                      /* XXXX */
-    lw(a5, -260, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -264, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    addi(a5, s0, -112);           /* LLLL */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_elementAt);                      /* XXXX */
-    lw(a5, -260, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($hasLeavesForChildren);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L224);             /* YYYY */
-    lw(a5, -72, s0);             /* SSSS */
-    sw(a5, -52, s0);             /* OOOO */
-    lw(a5, -96, s0);             /* SSSS */
-    sw(a5, -56, s0);             /* OOOO */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -60, s0);             /* OOOO */
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leafSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -64, s0);             /* OOOO */
-    lw(a5, -60, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -64, s0);             /* SSSS */
-    addw(a5,a4,a5);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    li(a5,2);        /* ZZZZ */
-    ble(a4, a5, $L225);             /* YYYY */
-    li(a5,0);        /* ZZZZ */
-    j($L233);                       /* WWWW */
+    /* 3519 T */ lw(a5, -260, s0);
+    /* 3520 b */ mv(a0,a5);
+    /* 3521 Y */ call($branch);
+    /* 3522 b */ mv(a3,a0);
+    /* 3523 I */ addi(a5, s0, -88);
+    /* 3524 T */ lw(a4, -264, s0);
+    /* 3525 b */ mv(a2,a4);
+    /* 3526 b */ mv(a1,a3);
+    /* 3527 b */ mv(a0,a5);
+    /* 3528 Y */ call($branch_elementAt);
+    /* 3529 T */ lw(a5, -260, s0);
+    /* 3530 b */ mv(a0,a5);
+    /* 3531 Y */ call($branch);
+    /* 3532 b */ mv(a3,a0);
+    /* 3533 T */ lw(a5, -264, s0);
+    /* 3534 I */ addiw(a5, a5, 1);
+    /* 3535 b */ sextw(a4,a5);
+    /* 3536 I */ addi(a5, s0, -112);
+    /* 3537 b */ mv(a2,a4);
+    /* 3538 b */ mv(a1,a3);
+    /* 3539 b */ mv(a0,a5);
+    /* 3540 Y */ call($branch_elementAt);
+    /* 3541 T */ lw(a5, -260, s0);
+    /* 3542 b */ mv(a0,a5);
+    /* 3543 Y */ call($hasLeavesForChildren);
+    /* 3544 b */ mv(a5,a0);
+    /* 3545 Z */ beq(a5, zero, $L224);
+    /* 3546 T */ lw(a5, -72, s0);
+    /* 3547 O */ sw(a5, -52, s0);
+    /* 3548 T */ lw(a5, -96, s0);
+    /* 3549 O */ sw(a5, -56, s0);
+    /* 3550 T */ lw(a5, -52, s0);
+    /* 3551 b */ mv(a0,a5);
+    /* 3552 Y */ call($leafSize);
+    /* 3553 b */ mv(a5,a0);
+    /* 3554 O */ sw(a5, -60, s0);
+    /* 3555 T */ lw(a5, -56, s0);
+    /* 3556 b */ mv(a0,a5);
+    /* 3557 Y */ call($leafSize);
+    /* 3558 b */ mv(a5,a0);
+    /* 3559 O */ sw(a5, -64, s0);
+    /* 3560 T */ lw(a5, -60, s0);
+    /* 3561 b */ mv(a4,a5);
+    /* 3562 T */ lw(a5, -64, s0);
+    /* 3563 b */ addw(a5,a4,a5);
+    /* 3564 b */ sextw(a5,a5);
+    /* 3565 b */ mv(a4,a5);
+    /* 3566 b */ li(a5,2);
+    /* 3567 Z */ ble(a4, a5, $L225);
+    /* 3568 b */ li(a5,0);
+    /* 3569 X */ j($L233);
     $L225.set();
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_size);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -68, s0);             /* OOOO */
-    sw(zero, -20, s0);             /* OOOO */
-    j($L226);                       /* WWWW */
+    /* 3570 T */ lw(a5, -56, s0);
+    /* 3571 b */ mv(a0,a5);
+    /* 3572 Y */ call($leaf);
+    /* 3573 b */ mv(a5,a0);
+    /* 3574 b */ mv(a0,a5);
+    /* 3575 Y */ call($leaf_size);
+    /* 3576 b */ mv(a5,a0);
+    /* 3577 O */ sw(a5, -68, s0);
+    /* 3578 O */ sw(zero, -20, s0);
+    /* 3579 X */ j($L226);
     $L227.set();
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -184);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_shift);                      /* XXXX */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -172, s0);             /* SSSS */
-    lbu(a4, -168, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a3);        /* ZZZZ */
-    call($leaf_push);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -20, s0);             /* OOOO */
+    /* 3580 T */ lw(a5, -56, s0);
+    /* 3581 b */ mv(a0,a5);
+    /* 3582 Y */ call($leaf);
+    /* 3583 b */ mv(a4,a0);
+    /* 3584 I */ addi(a5, s0, -184);
+    /* 3585 b */ mv(a1,a4);
+    /* 3586 b */ mv(a0,a5);
+    /* 3587 Y */ call($leaf_shift);
+    /* 3588 T */ lw(a5, -52, s0);
+    /* 3589 b */ mv(a0,a5);
+    /* 3590 Y */ call($leaf);
+    /* 3591 b */ mv(a3,a0);
+    /* 3592 T */ lw(a5, -172, s0);
+    /* 3593 T */ lbu(a4, -168, s0);
+    /* 3594 b */ sextw(a4,a4);
+    /* 3595 b */ mv(a2,a4);
+    /* 3596 b */ mv(a1,a5);
+    /* 3597 b */ mv(a0,a3);
+    /* 3598 Y */ call($leaf_push);
+    /* 3599 T */ lw(a5, -20, s0);
+    /* 3600 I */ addiw(a5, a5, 1);
+    /* 3601 O */ sw(a5, -20, s0);
     $L226.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -68, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L227);             /* YYYY */
-    lw(a5, -56, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($freeNode);                      /* XXXX */
-    j($L228);                       /* WWWW */
+    /* 3602 T */ lw(a5, -20, s0);
+    /* 3603 b */ mv(a4,a5);
+    /* 3604 T */ lw(a5, -68, s0);
+    /* 3605 b */ sextw(a4,a4);
+    /* 3606 b */ sextw(a5,a5);
+    /* 3607 Z */ blt(a4, a5, $L227);
+    /* 3608 T */ lw(a5, -56, s0);
+    /* 3609 b */ mv(a0,a5);
+    /* 3610 Y */ call($freeNode);
+    /* 3611 X */ j($L228);
     $L224.set();
-    lw(a5, -72, s0);             /* SSSS */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a5, -96, s0);             /* SSSS */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -40, s0);             /* OOOO */
-    lw(a5, -36, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -44, s0);             /* OOOO */
-    lw(a5, -40, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sextw(a5,a5);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    addw(a5,a4,a5);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    li(a5,2);        /* ZZZZ */
-    ble(a4, a5, $L229);             /* YYYY */
-    li(a5,0);        /* ZZZZ */
-    j($L233);                       /* WWWW */
+    /* 3612 T */ lw(a5, -72, s0);
+    /* 3613 O */ sw(a5, -32, s0);
+    /* 3614 T */ lw(a5, -96, s0);
+    /* 3615 O */ sw(a5, -36, s0);
+    /* 3616 T */ lw(a5, -32, s0);
+    /* 3617 b */ mv(a0,a5);
+    /* 3618 Y */ call($branchSize);
+    /* 3619 b */ mv(a5,a0);
+    /* 3620 O */ sw(a5, -40, s0);
+    /* 3621 T */ lw(a5, -36, s0);
+    /* 3622 b */ mv(a0,a5);
+    /* 3623 Y */ call($branchSize);
+    /* 3624 b */ mv(a5,a0);
+    /* 3625 O */ sw(a5, -44, s0);
+    /* 3626 T */ lw(a5, -40, s0);
+    /* 3627 I */ addiw(a5, a5, 1);
+    /* 3628 b */ sextw(a5,a5);
+    /* 3629 T */ lw(a4, -44, s0);
+    /* 3630 b */ addw(a5,a4,a5);
+    /* 3631 b */ sextw(a5,a5);
+    /* 3632 b */ mv(a4,a5);
+    /* 3633 b */ li(a5,2);
+    /* 3634 Z */ ble(a4, a5, $L229);
+    /* 3635 b */ li(a5,0);
+    /* 3636 X */ j($L233);
     $L229.set();
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -208);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_lastElement);                      /* XXXX */
-    lw(a5, -260, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -232);           /* LLLL */
-    lw(a4, -264, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_elementAt);                      /* XXXX */
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    lw(a5, -220, s0);             /* SSSS */
-    lw(a4, -192, s0);             /* SSSS */
-    lw(a3, -40, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($branch_setElementAt);                      /* XXXX */
-    lw(a5, -36, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -48, s0);             /* OOOO */
-    sw(zero, -24, s0);             /* OOOO */
-    j($L231);                       /* WWWW */
+    /* 3637 T */ lw(a5, -32, s0);
+    /* 3638 b */ mv(a0,a5);
+    /* 3639 Y */ call($branch);
+    /* 3640 b */ mv(a4,a0);
+    /* 3641 I */ addi(a5, s0, -208);
+    /* 3642 b */ mv(a1,a4);
+    /* 3643 b */ mv(a0,a5);
+    /* 3644 Y */ call($branch_lastElement);
+    /* 3645 T */ lw(a5, -260, s0);
+    /* 3646 b */ mv(a0,a5);
+    /* 3647 Y */ call($branch);
+    /* 3648 b */ mv(a3,a0);
+    /* 3649 I */ addi(a5, s0, -232);
+    /* 3650 T */ lw(a4, -264, s0);
+    /* 3651 b */ mv(a2,a4);
+    /* 3652 b */ mv(a1,a3);
+    /* 3653 b */ mv(a0,a5);
+    /* 3654 Y */ call($branch_elementAt);
+    /* 3655 T */ lw(a5, -32, s0);
+    /* 3656 b */ mv(a0,a5);
+    /* 3657 Y */ call($branch);
+    /* 3658 T */ lw(a5, -220, s0);
+    /* 3659 T */ lw(a4, -192, s0);
+    /* 3660 T */ lw(a3, -40, s0);
+    /* 3661 b */ mv(a2,a4);
+    /* 3662 b */ mv(a1,a5);
+    /* 3663 Y */ call($branch_setElementAt);
+    /* 3664 T */ lw(a5, -36, s0);
+    /* 3665 b */ mv(a0,a5);
+    /* 3666 Y */ call($branchSize);
+    /* 3667 b */ mv(a5,a0);
+    /* 3668 O */ sw(a5, -48, s0);
+    /* 3669 O */ sw(zero, -24, s0);
+    /* 3670 X */ j($L231);
     $L232.set();
-    lw(a5, -36, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a4,a0);        /* ZZZZ */
-    addi(a5, s0, -256);           /* LLLL */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_shift);                      /* XXXX */
-    lw(a5, -32, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -244, s0);             /* SSSS */
-    lw(a4, -240, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a3);        /* ZZZZ */
-    call($branch_push);                      /* XXXX */
-    lw(a5, -24, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -24, s0);             /* OOOO */
+    /* 3671 T */ lw(a5, -36, s0);
+    /* 3672 b */ mv(a0,a5);
+    /* 3673 Y */ call($branch);
+    /* 3674 b */ mv(a4,a0);
+    /* 3675 I */ addi(a5, s0, -256);
+    /* 3676 b */ mv(a1,a4);
+    /* 3677 b */ mv(a0,a5);
+    /* 3678 Y */ call($branch_shift);
+    /* 3679 T */ lw(a5, -32, s0);
+    /* 3680 b */ mv(a0,a5);
+    /* 3681 Y */ call($branch);
+    /* 3682 b */ mv(a3,a0);
+    /* 3683 T */ lw(a5, -244, s0);
+    /* 3684 T */ lw(a4, -240, s0);
+    /* 3685 b */ mv(a2,a4);
+    /* 3686 b */ mv(a1,a5);
+    /* 3687 b */ mv(a0,a3);
+    /* 3688 Y */ call($branch_push);
+    /* 3689 T */ lw(a5, -24, s0);
+    /* 3690 I */ addiw(a5, a5, 1);
+    /* 3691 O */ sw(a5, -24, s0);
     $L231.set();
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -48, s0);             /* SSSS */
-    sextw(a4,a4);        /* ZZZZ */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a4, a5, $L232);             /* YYYY */
-    lw(a5, -36, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($freeNode);                      /* XXXX */
+    /* 3692 T */ lw(a5, -24, s0);
+    /* 3693 b */ mv(a4,a5);
+    /* 3694 T */ lw(a5, -48, s0);
+    /* 3695 b */ sextw(a4,a4);
+    /* 3696 b */ sextw(a5,a5);
+    /* 3697 Z */ blt(a4, a5, $L232);
+    /* 3698 T */ lw(a5, -36, s0);
+    /* 3699 b */ mv(a0,a5);
+    /* 3700 Y */ call($freeNode);
     $L228.set();
-    lw(a5, -260, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -264, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    addi(a5, s0, -136);           /* LLLL */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_elementAt);                      /* XXXX */
-    lw(a5, -260, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -160);           /* LLLL */
-    lw(a4, -264, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_elementAt);                      /* XXXX */
-    lw(a5, -260, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    lw(a5, -124, s0);             /* SSSS */
-    lw(a4, -144, s0);             /* SSSS */
-    lw(a3, -264, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($branch_setElementAt);                      /* XXXX */
-    lw(a5, -260, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a5, -264, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sextw(a4,a5);        /* ZZZZ */
-    addi(a5, s0, -304);           /* LLLL */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_removeElementAt);                      /* XXXX */
-    li(a5,1);        /* ZZZZ */
+    /* 3701 T */ lw(a5, -260, s0);
+    /* 3702 b */ mv(a0,a5);
+    /* 3703 Y */ call($branch);
+    /* 3704 b */ mv(a3,a0);
+    /* 3705 T */ lw(a5, -264, s0);
+    /* 3706 I */ addiw(a5, a5, 1);
+    /* 3707 b */ sextw(a4,a5);
+    /* 3708 I */ addi(a5, s0, -136);
+    /* 3709 b */ mv(a2,a4);
+    /* 3710 b */ mv(a1,a3);
+    /* 3711 b */ mv(a0,a5);
+    /* 3712 Y */ call($branch_elementAt);
+    /* 3713 T */ lw(a5, -260, s0);
+    /* 3714 b */ mv(a0,a5);
+    /* 3715 Y */ call($branch);
+    /* 3716 b */ mv(a3,a0);
+    /* 3717 I */ addi(a5, s0, -160);
+    /* 3718 T */ lw(a4, -264, s0);
+    /* 3719 b */ mv(a2,a4);
+    /* 3720 b */ mv(a1,a3);
+    /* 3721 b */ mv(a0,a5);
+    /* 3722 Y */ call($branch_elementAt);
+    /* 3723 T */ lw(a5, -260, s0);
+    /* 3724 b */ mv(a0,a5);
+    /* 3725 Y */ call($branch);
+    /* 3726 T */ lw(a5, -124, s0);
+    /* 3727 T */ lw(a4, -144, s0);
+    /* 3728 T */ lw(a3, -264, s0);
+    /* 3729 b */ mv(a2,a4);
+    /* 3730 b */ mv(a1,a5);
+    /* 3731 Y */ call($branch_setElementAt);
+    /* 3732 T */ lw(a5, -260, s0);
+    /* 3733 b */ mv(a0,a5);
+    /* 3734 Y */ call($branch);
+    /* 3735 b */ mv(a3,a0);
+    /* 3736 T */ lw(a5, -264, s0);
+    /* 3737 I */ addiw(a5, a5, 1);
+    /* 3738 b */ sextw(a4,a5);
+    /* 3739 I */ addi(a5, s0, -304);
+    /* 3740 b */ mv(a2,a4);
+    /* 3741 b */ mv(a1,a3);
+    /* 3742 b */ mv(a0,a5);
+    /* 3743 Y */ call($branch_removeElementAt);
+    /* 3744 b */ li(a5,1);
     $L233.set();
-    mv(a0,a5);        /* ZZZZ */
-    ld(ra, sp, 296);             /* GGGG */
-    ld(s0, sp, 288);             /* GGGG */
-    addi(sp, sp, 304);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 3745 b */ mv(a0,a5);
+    /* 3746 K */ ld(ra, sp, 296);
+    /* 3747 K */ ld(s0, sp, 288);
+    /* 3748 I */ addi(sp, sp, 304);
+    /* 3749 W */ jr(ra);
     $balance.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(ra, 56, sp);             /* OOOO */
-    sd(s0, 48, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a1);        /* ZZZZ */
-    sw(a5, -52, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -56, s0);             /* OOOO */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -40);           /* LLLL */
-    lw(a4, -56, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_elementAt);                      /* XXXX */
-    lw(a5, -24, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($isLow);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L242);             /* YYYY */
-    lw(a4, -56, s0);             /* SSSS */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($stealFromLeft);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    bne(a5, zero, $L243);             /* YYYY */
-    lw(a4, -56, s0);             /* SSSS */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($stealFromRight);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    bne(a5, zero, $L244);             /* YYYY */
-    lw(a4, -56, s0);             /* SSSS */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($mergeLeftSibling);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    bne(a5, zero, $L245);             /* YYYY */
-    lw(a4, -56, s0);             /* SSSS */
-    lw(a5, -52, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($mergeRightSibling);                      /* XXXX */
-    j($L234);                       /* WWWW */
+    /* 3750 I */ addi(sp, sp, -64);
+    /* 3751 O */ sd(ra, 56, sp);
+    /* 3752 O */ sd(s0, 48, sp);
+    /* 3753 I */ addi(s0, sp, 64);
+    /* 3754 b */ mv(a5,a0);
+    /* 3755 b */ mv(a4,a1);
+    /* 3756 O */ sw(a5, -52, s0);
+    /* 3757 b */ mv(a5,a4);
+    /* 3758 O */ sw(a5, -56, s0);
+    /* 3759 T */ lw(a5, -52, s0);
+    /* 3760 b */ mv(a0,a5);
+    /* 3761 Y */ call($branch);
+    /* 3762 b */ mv(a3,a0);
+    /* 3763 I */ addi(a5, s0, -40);
+    /* 3764 T */ lw(a4, -56, s0);
+    /* 3765 b */ mv(a2,a4);
+    /* 3766 b */ mv(a1,a3);
+    /* 3767 b */ mv(a0,a5);
+    /* 3768 Y */ call($branch_elementAt);
+    /* 3769 T */ lw(a5, -24, s0);
+    /* 3770 b */ mv(a0,a5);
+    /* 3771 Y */ call($isLow);
+    /* 3772 b */ mv(a5,a0);
+    /* 3773 Z */ beq(a5, zero, $L242);
+    /* 3774 T */ lw(a4, -56, s0);
+    /* 3775 T */ lw(a5, -52, s0);
+    /* 3776 b */ mv(a1,a4);
+    /* 3777 b */ mv(a0,a5);
+    /* 3778 Y */ call($stealFromLeft);
+    /* 3779 b */ mv(a5,a0);
+    /* 3780 Z */ bne(a5, zero, $L243);
+    /* 3781 T */ lw(a4, -56, s0);
+    /* 3782 T */ lw(a5, -52, s0);
+    /* 3783 b */ mv(a1,a4);
+    /* 3784 b */ mv(a0,a5);
+    /* 3785 Y */ call($stealFromRight);
+    /* 3786 b */ mv(a5,a0);
+    /* 3787 Z */ bne(a5, zero, $L244);
+    /* 3788 T */ lw(a4, -56, s0);
+    /* 3789 T */ lw(a5, -52, s0);
+    /* 3790 b */ mv(a1,a4);
+    /* 3791 b */ mv(a0,a5);
+    /* 3792 Y */ call($mergeLeftSibling);
+    /* 3793 b */ mv(a5,a0);
+    /* 3794 Z */ bne(a5, zero, $L245);
+    /* 3795 T */ lw(a4, -56, s0);
+    /* 3796 T */ lw(a5, -52, s0);
+    /* 3797 b */ mv(a1,a4);
+    /* 3798 b */ mv(a0,a5);
+    /* 3799 Y */ call($mergeRightSibling);
+    /* 3800 X */ j($L234);
     $L242.set();
-    nop();        /* ZZZZ */
-    j($L234);                       /* WWWW */
+    /* 3801 b */ nop();
+    /* 3802 X */ j($L234);
     $L243.set();
-    nop();        /* ZZZZ */
-    j($L234);                       /* WWWW */
+    /* 3803 b */ nop();
+    /* 3804 X */ j($L234);
     $L244.set();
-    nop();        /* ZZZZ */
-    j($L234);                       /* WWWW */
+    /* 3805 b */ nop();
+    /* 3806 X */ j($L234);
     $L245.set();
-    nop();        /* ZZZZ */
+    /* 3807 b */ nop();
     $L234.set();
-    ld(ra, sp, 56);             /* GGGG */
-    ld(s0, sp, 48);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 3808 K */ ld(ra, sp, 56);
+    /* 3809 K */ ld(s0, sp, 48);
+    /* 3810 I */ addi(sp, sp, 64);
+    /* 3811 W */ jr(ra);
     $find_result.set();
-    addi(sp, sp, -80);           /* LLLL */
-    sd(s0, 72, sp);             /* OOOO */
-    addi(s0, sp, 80);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    mv(a0,a1);        /* ZZZZ */
-    mv(a1,a2);        /* ZZZZ */
-    mv(a2,a3);        /* ZZZZ */
-    mv(a3,a4);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -60, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    sw(a5, -64, s0);             /* OOOO */
-    mv(a5,a2);        /* ZZZZ */
-    sw(a5, -68, s0);             /* OOOO */
-    mv(a5,a3);        /* ZZZZ */
-    sw(a5, -72, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -76, s0);             /* OOOO */
-    lw(a5, -60, s0);             /* SSSS */
-    sw(a5, -40, s0);             /* OOOO */
-    lw(a5, -64, s0);             /* SSSS */
-    sw(a5, -36, s0);             /* OOOO */
-    lw(a5, -68, s0);             /* SSSS */
-    sw(a5, -32, s0);             /* OOOO */
-    lw(a5, -72, s0);             /* SSSS */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -76, s0);             /* SSSS */
-    sw(a5, -24, s0);             /* OOOO */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -28, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -24, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(s0, sp, 72);             /* GGGG */
-    addi(sp, sp, 80);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 3812 I */ addi(sp, sp, -80);
+    /* 3813 O */ sd(s0, 72, sp);
+    /* 3814 I */ addi(s0, sp, 80);
+    /* 3815 O */ sd(a0, -56, s0);
+    /* 3816 b */ mv(a0,a1);
+    /* 3817 b */ mv(a1,a2);
+    /* 3818 b */ mv(a2,a3);
+    /* 3819 b */ mv(a3,a4);
+    /* 3820 b */ mv(a4,a5);
+    /* 3821 b */ mv(a5,a0);
+    /* 3822 O */ sw(a5, -60, s0);
+    /* 3823 b */ mv(a5,a1);
+    /* 3824 O */ sw(a5, -64, s0);
+    /* 3825 b */ mv(a5,a2);
+    /* 3826 O */ sw(a5, -68, s0);
+    /* 3827 b */ mv(a5,a3);
+    /* 3828 O */ sw(a5, -72, s0);
+    /* 3829 b */ mv(a5,a4);
+    /* 3830 O */ sw(a5, -76, s0);
+    /* 3831 T */ lw(a5, -60, s0);
+    /* 3832 O */ sw(a5, -40, s0);
+    /* 3833 T */ lw(a5, -64, s0);
+    /* 3834 O */ sw(a5, -36, s0);
+    /* 3835 T */ lw(a5, -68, s0);
+    /* 3836 O */ sw(a5, -32, s0);
+    /* 3837 T */ lw(a5, -72, s0);
+    /* 3838 O */ sw(a5, -28, s0);
+    /* 3839 T */ lw(a5, -76, s0);
+    /* 3840 O */ sw(a5, -24, s0);
+    /* 3841 K */ ld(a5, s0, 56);
+    /* 3842 T */ lw(a4, -40, s0);
+    /* 3843 b */ mv(a0,a4);
+    /* 3844 T */ lw(a4, -36, s0);
+    /* 3845 b */ mv(a1,a4);
+    /* 3846 T */ lw(a4, -32, s0);
+    /* 3847 b */ mv(a2,a4);
+    /* 3848 T */ lw(a4, -28, s0);
+    /* 3849 b */ mv(a3,a4);
+    /* 3850 T */ lw(a4, -24, s0);
+    /* 3851 O */ sw(a0, 0, a5);
+    /* 3852 O */ sw(a1, 4, a5);
+    /* 3853 O */ sw(a2, 8, a5);
+    /* 3854 O */ sw(a3, 12, a5);
+    /* 3855 O */ sw(a4, 16, a5);
+    /* 3856 K */ ld(a0, s0, 56);
+    /* 3857 K */ ld(s0, sp, 72);
+    /* 3858 I */ addi(sp, sp, 80);
+    /* 3859 W */ jr(ra);
     $find.set();
-    addi(sp, sp, -144);           /* LLLL */
-    sd(ra, 136, sp);             /* OOOO */
-    sd(s0, 128, sp);             /* OOOO */
-    addi(s0, sp, 144);           /* LLLL */
-    sd(a0, -136, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    sw(a5, -140, s0);             /* OOOO */
-    call($rootIsLeaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L249);             /* YYYY */
-    li(a0,0);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -72);           /* LLLL */
-    lw(a4, -140, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_search);                      /* XXXX */
-    lw(a2, -68, s0);             /* SSSS */
-    lw(a3, -64, s0);             /* SSSS */
-    lbu(a5, -56, s0);             /* SSSS */
-    sextw(a5,a5);        /* ZZZZ */
-    ld(a0, s0, 136);             /* GGGG */
-    lw(a4, -140, s0);             /* SSSS */
-    li(a1,0);        /* ZZZZ */
-    call($find_result);                      /* XXXX */
-    j($L254);                       /* WWWW */
+    /* 3860 I */ addi(sp, sp, -144);
+    /* 3861 O */ sd(ra, 136, sp);
+    /* 3862 O */ sd(s0, 128, sp);
+    /* 3863 I */ addi(s0, sp, 144);
+    /* 3864 O */ sd(a0, -136, s0);
+    /* 3865 b */ mv(a5,a1);
+    /* 3866 O */ sw(a5, -140, s0);
+    /* 3867 Y */ call($rootIsLeaf);
+    /* 3868 b */ mv(a5,a0);
+    /* 3869 Z */ beq(a5, zero, $L249);
+    /* 3870 b */ li(a0,0);
+    /* 3871 Y */ call($leaf);
+    /* 3872 b */ mv(a3,a0);
+    /* 3873 I */ addi(a5, s0, -72);
+    /* 3874 T */ lw(a4, -140, s0);
+    /* 3875 b */ mv(a2,a4);
+    /* 3876 b */ mv(a1,a3);
+    /* 3877 b */ mv(a0,a5);
+    /* 3878 Y */ call($leaf_search);
+    /* 3879 T */ lw(a2, -68, s0);
+    /* 3880 T */ lw(a3, -64, s0);
+    /* 3881 T */ lbu(a5, -56, s0);
+    /* 3882 b */ sextw(a5,a5);
+    /* 3883 K */ ld(a0, s0, 136);
+    /* 3884 T */ lw(a4, -140, s0);
+    /* 3885 b */ li(a1,0);
+    /* 3886 Y */ call($find_result);
+    /* 3887 X */ j($L254);
     $L249.set();
-    sw(zero, -20, s0);             /* OOOO */
-    sw(zero, -24, s0);             /* OOOO */
-    j($L251);                       /* WWWW */
+    /* 3888 O */ sw(zero, -20, s0);
+    /* 3889 O */ sw(zero, -24, s0);
+    /* 3890 X */ j($L251);
     $L253.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -96);           /* LLLL */
-    lw(a4, -140, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_searchFirstGreaterThanOrEqualExceptLast);                      /* XXXX */
-    lw(a5, -80, s0);             /* SSSS */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($isLeaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L252);             /* YYYY */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -120);           /* LLLL */
-    lw(a4, -140, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_search);                      /* XXXX */
-    lw(a2, -116, s0);             /* SSSS */
-    lw(a3, -112, s0);             /* SSSS */
-    lbu(a5, -104, s0);             /* SSSS */
-    sextw(a5,a5);        /* ZZZZ */
-    ld(a0, s0, 136);             /* GGGG */
-    lw(a4, -140, s0);             /* SSSS */
-    lw(a1, -28, s0);             /* SSSS */
-    call($find_result);                      /* XXXX */
-    j($L254);                       /* WWWW */
+    /* 3891 T */ lw(a5, -20, s0);
+    /* 3892 b */ mv(a0,a5);
+    /* 3893 Y */ call($branch);
+    /* 3894 b */ mv(a3,a0);
+    /* 3895 I */ addi(a5, s0, -96);
+    /* 3896 T */ lw(a4, -140, s0);
+    /* 3897 b */ mv(a2,a4);
+    /* 3898 b */ mv(a1,a3);
+    /* 3899 b */ mv(a0,a5);
+    /* 3900 Y */ call($branch_searchFirstGreaterThanOrEqualExceptLast);
+    /* 3901 T */ lw(a5, -80, s0);
+    /* 3902 O */ sw(a5, -28, s0);
+    /* 3903 T */ lw(a5, -28, s0);
+    /* 3904 b */ mv(a0,a5);
+    /* 3905 Y */ call($isLeaf);
+    /* 3906 b */ mv(a5,a0);
+    /* 3907 Z */ beq(a5, zero, $L252);
+    /* 3908 T */ lw(a5, -28, s0);
+    /* 3909 b */ mv(a0,a5);
+    /* 3910 Y */ call($leaf);
+    /* 3911 b */ mv(a3,a0);
+    /* 3912 I */ addi(a5, s0, -120);
+    /* 3913 T */ lw(a4, -140, s0);
+    /* 3914 b */ mv(a2,a4);
+    /* 3915 b */ mv(a1,a3);
+    /* 3916 b */ mv(a0,a5);
+    /* 3917 Y */ call($leaf_search);
+    /* 3918 T */ lw(a2, -116, s0);
+    /* 3919 T */ lw(a3, -112, s0);
+    /* 3920 T */ lbu(a5, -104, s0);
+    /* 3921 b */ sextw(a5,a5);
+    /* 3922 K */ ld(a0, s0, 136);
+    /* 3923 T */ lw(a4, -140, s0);
+    /* 3924 T */ lw(a1, -28, s0);
+    /* 3925 Y */ call($find_result);
+    /* 3926 X */ j($L254);
     $L252.set();
-    lw(a5, -28, s0);             /* SSSS */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a5, -24, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -24, s0);             /* OOOO */
+    /* 3927 T */ lw(a5, -28, s0);
+    /* 3928 O */ sw(a5, -20, s0);
+    /* 3929 T */ lw(a5, -24, s0);
+    /* 3930 I */ addiw(a5, a5, 1);
+    /* 3931 O */ sw(a5, -24, s0);
     $L251.set();
-    lw(a5, -24, s0);             /* SSSS */
-    sextw(a4,a5);        /* ZZZZ */
-    li(a5,9);        /* ZZZZ */
-    ble(a4, a5, $L253);             /* YYYY */
-    sw(zero, -48, s0);             /* OOOO */
-    sw(zero, -44, s0);             /* OOOO */
-    sw(zero, -40, s0);             /* OOOO */
-    sw(zero, -36, s0);             /* OOOO */
-    sw(zero, -32, s0);             /* OOOO */
-    ld(a5, s0, 136);             /* GGGG */
-    lw(a4, -48, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    sw(a0, 0, a5);             /* OOOO */
-    sw(a1, 4, a5);             /* OOOO */
-    sw(a2, 8, a5);             /* OOOO */
-    sw(a3, 12, a5);             /* OOOO */
-    sw(a4, 16, a5);             /* OOOO */
+    /* 3932 T */ lw(a5, -24, s0);
+    /* 3933 b */ sextw(a4,a5);
+    /* 3934 b */ li(a5,9);
+    /* 3935 Z */ ble(a4, a5, $L253);
+    /* 3936 O */ sw(zero, -48, s0);
+    /* 3937 O */ sw(zero, -44, s0);
+    /* 3938 O */ sw(zero, -40, s0);
+    /* 3939 O */ sw(zero, -36, s0);
+    /* 3940 O */ sw(zero, -32, s0);
+    /* 3941 K */ ld(a5, s0, 136);
+    /* 3942 T */ lw(a4, -48, s0);
+    /* 3943 b */ mv(a0,a4);
+    /* 3944 T */ lw(a4, -44, s0);
+    /* 3945 b */ mv(a1,a4);
+    /* 3946 T */ lw(a4, -40, s0);
+    /* 3947 b */ mv(a2,a4);
+    /* 3948 T */ lw(a4, -36, s0);
+    /* 3949 b */ mv(a3,a4);
+    /* 3950 T */ lw(a4, -32, s0);
+    /* 3951 O */ sw(a0, 0, a5);
+    /* 3952 O */ sw(a1, 4, a5);
+    /* 3953 O */ sw(a2, 8, a5);
+    /* 3954 O */ sw(a3, 12, a5);
+    /* 3955 O */ sw(a4, 16, a5);
     $L254.set();
-    ld(a0, s0, 136);             /* GGGG */
-    ld(ra, sp, 136);             /* GGGG */
-    ld(s0, sp, 128);             /* GGGG */
-    addi(sp, sp, 144);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 3956 K */ ld(a0, s0, 136);
+    /* 3957 K */ ld(ra, sp, 136);
+    /* 3958 K */ ld(s0, sp, 128);
+    /* 3959 I */ addi(sp, sp, 144);
+    /* 3960 W */ jr(ra);
     $findAndInsert_result.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(s0, 56, sp);             /* OOOO */
-    sd(s1, 48, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    mv(s1,a1);        /* ZZZZ */
-    mv(a5,a2);        /* ZZZZ */
-    mv(a4,a3);        /* ZZZZ */
-    sw(a5, -60, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -64, s0);             /* OOOO */
-    lw(a5, 0, s1);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    lw(a5, 4, s1);             /* SSSS */
-    mv(a2,a5);        /* ZZZZ */
-    lw(a5, 8, s1);             /* SSSS */
-    mv(a3,a5);        /* ZZZZ */
-    lw(a5, 12, s1);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, 16, s1);             /* SSSS */
-    sw(a1, -40, s0);             /* OOOO */
-    sw(a2, -36, s0);             /* OOOO */
-    sw(a3, -32, s0);             /* OOOO */
-    sw(a4, -28, s0);             /* OOOO */
-    sw(a5, -24, s0);             /* OOOO */
-    lw(a5, -60, s0);             /* SSSS */
-    sw(a5, -48, s0);             /* OOOO */
-    lw(a5, -64, s0);             /* SSSS */
-    sw(a5, -44, s0);             /* OOOO */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -48, s0);             /* SSSS */
-    mv(a7,a4);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    mv(a6,a4);        /* ZZZZ */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -28, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -24, s0);             /* SSSS */
-    sw(a7, 0, a5);             /* OOOO */
-    sw(a6, 4, a5);             /* OOOO */
-    sw(a0, 8, a5);             /* OOOO */
-    sw(a1, 12, a5);             /* OOOO */
-    sw(a2, 16, a5);             /* OOOO */
-    sw(a3, 20, a5);             /* OOOO */
-    sw(a4, 24, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(s0, sp, 56);             /* GGGG */
-    ld(s1, sp, 48);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 3961 I */ addi(sp, sp, -64);
+    /* 3962 O */ sd(s0, 56, sp);
+    /* 3963 O */ sd(s1, 48, sp);
+    /* 3964 I */ addi(s0, sp, 64);
+    /* 3965 O */ sd(a0, -56, s0);
+    /* 3966 b */ mv(s1,a1);
+    /* 3967 b */ mv(a5,a2);
+    /* 3968 b */ mv(a4,a3);
+    /* 3969 O */ sw(a5, -60, s0);
+    /* 3970 b */ mv(a5,a4);
+    /* 3971 O */ sw(a5, -64, s0);
+    /* 3972 T */ lw(a5, 0, s1);
+    /* 3973 b */ mv(a1,a5);
+    /* 3974 T */ lw(a5, 4, s1);
+    /* 3975 b */ mv(a2,a5);
+    /* 3976 T */ lw(a5, 8, s1);
+    /* 3977 b */ mv(a3,a5);
+    /* 3978 T */ lw(a5, 12, s1);
+    /* 3979 b */ mv(a4,a5);
+    /* 3980 T */ lw(a5, 16, s1);
+    /* 3981 O */ sw(a1, -40, s0);
+    /* 3982 O */ sw(a2, -36, s0);
+    /* 3983 O */ sw(a3, -32, s0);
+    /* 3984 O */ sw(a4, -28, s0);
+    /* 3985 O */ sw(a5, -24, s0);
+    /* 3986 T */ lw(a5, -60, s0);
+    /* 3987 O */ sw(a5, -48, s0);
+    /* 3988 T */ lw(a5, -64, s0);
+    /* 3989 O */ sw(a5, -44, s0);
+    /* 3990 K */ ld(a5, s0, 56);
+    /* 3991 T */ lw(a4, -48, s0);
+    /* 3992 b */ mv(a7,a4);
+    /* 3993 T */ lw(a4, -44, s0);
+    /* 3994 b */ mv(a6,a4);
+    /* 3995 T */ lw(a4, -40, s0);
+    /* 3996 b */ mv(a0,a4);
+    /* 3997 T */ lw(a4, -36, s0);
+    /* 3998 b */ mv(a1,a4);
+    /* 3999 T */ lw(a4, -32, s0);
+    /* 4000 b */ mv(a2,a4);
+    /* 4001 T */ lw(a4, -28, s0);
+    /* 4002 b */ mv(a3,a4);
+    /* 4003 T */ lw(a4, -24, s0);
+    /* 4004 O */ sw(a7, 0, a5);
+    /* 4005 O */ sw(a6, 4, a5);
+    /* 4006 O */ sw(a0, 8, a5);
+    /* 4007 O */ sw(a1, 12, a5);
+    /* 4008 O */ sw(a2, 16, a5);
+    /* 4009 O */ sw(a3, 20, a5);
+    /* 4010 O */ sw(a4, 24, a5);
+    /* 4011 K */ ld(a0, s0, 56);
+    /* 4012 K */ ld(s0, sp, 56);
+    /* 4013 K */ ld(s1, sp, 48);
+    /* 4014 I */ addi(sp, sp, 64);
+    /* 4015 W */ jr(ra);
     $findAndInsert.set();
-    addi(sp, sp, -112);           /* LLLL */
-    sd(ra, 104, sp);             /* OOOO */
-    sd(s0, 96, sp);             /* OOOO */
-    addi(s0, sp, 112);           /* LLLL */
-    sd(a0, -72, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    mv(a4,a2);        /* ZZZZ */
-    sw(a5, -76, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -80, s0);             /* OOOO */
-    addi(a5, s0, -40);           /* LLLL */
-    lw(a4, -76, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($find);                      /* XXXX */
-    lw(a5, -36, s0);             /* SSSS */
-    beq(a5, zero, $L258);             /* YYYY */
-    lw(a5, -40, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    lw(a3, -32, s0);             /* SSSS */
-    lw(a4, -80, s0);             /* SSSS */
-    lw(a5, -76, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($leaf_setElementAt);                      /* XXXX */
-    ld(a4, s0, 72);             /* GGGG */
-    ld(a5, s0, 40);             /* GGGG */
-    sd(a5, -112, s0);             /* OOOO */
-    ld(a5, s0, 32);             /* GGGG */
-    sd(a5, -104, s0);             /* OOOO */
-    lw(a5, -24, s0);             /* SSSS */
-    sw(a5, -96, s0);             /* OOOO */
-    addi(a5, s0, -112);           /* LLLL */
-    li(a3,0);        /* ZZZZ */
-    li(a2,1);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a4);        /* ZZZZ */
-    call($findAndInsert_result);                      /* XXXX */
-    j($L263);                       /* WWWW */
+    /* 4016 I */ addi(sp, sp, -112);
+    /* 4017 O */ sd(ra, 104, sp);
+    /* 4018 O */ sd(s0, 96, sp);
+    /* 4019 I */ addi(s0, sp, 112);
+    /* 4020 O */ sd(a0, -72, s0);
+    /* 4021 b */ mv(a5,a1);
+    /* 4022 b */ mv(a4,a2);
+    /* 4023 O */ sw(a5, -76, s0);
+    /* 4024 b */ mv(a5,a4);
+    /* 4025 O */ sw(a5, -80, s0);
+    /* 4026 I */ addi(a5, s0, -40);
+    /* 4027 T */ lw(a4, -76, s0);
+    /* 4028 b */ mv(a1,a4);
+    /* 4029 b */ mv(a0,a5);
+    /* 4030 Y */ call($find);
+    /* 4031 T */ lw(a5, -36, s0);
+    /* 4032 Z */ beq(a5, zero, $L258);
+    /* 4033 T */ lw(a5, -40, s0);
+    /* 4034 b */ mv(a0,a5);
+    /* 4035 Y */ call($leaf);
+    /* 4036 T */ lw(a3, -32, s0);
+    /* 4037 T */ lw(a4, -80, s0);
+    /* 4038 T */ lw(a5, -76, s0);
+    /* 4039 b */ mv(a2,a4);
+    /* 4040 b */ mv(a1,a5);
+    /* 4041 Y */ call($leaf_setElementAt);
+    /* 4042 K */ ld(a4, s0, 72);
+    /* 4043 K */ ld(a5, s0, 40);
+    /* 4044 O */ sd(a5, -112, s0);
+    /* 4045 K */ ld(a5, s0, 32);
+    /* 4046 O */ sd(a5, -104, s0);
+    /* 4047 T */ lw(a5, -24, s0);
+    /* 4048 O */ sw(a5, -96, s0);
+    /* 4049 I */ addi(a5, s0, -112);
+    /* 4050 b */ li(a3,0);
+    /* 4051 b */ li(a2,1);
+    /* 4052 b */ mv(a1,a5);
+    /* 4053 b */ mv(a0,a4);
+    /* 4054 Y */ call($findAndInsert_result);
+    /* 4055 X */ j($L263);
     $L258.set();
-    lw(a5, -40, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($isFull);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    bne(a5, zero, $L260);             /* YYYY */
-    lw(a5, -40, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -64);           /* LLLL */
-    lw(a4, -76, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_searchFirstGreaterThanOrEqual);                      /* XXXX */
-    lw(a5, -60, s0);             /* SSSS */
-    beq(a5, zero, $L261);             /* YYYY */
-    lw(a5, -40, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    lw(a3, -32, s0);             /* SSSS */
-    lw(a4, -80, s0);             /* SSSS */
-    lw(a5, -76, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    call($leaf_insertElementAt);                      /* XXXX */
-    j($L262);                       /* WWWW */
+    /* 4056 T */ lw(a5, -40, s0);
+    /* 4057 b */ mv(a0,a5);
+    /* 4058 Y */ call($isFull);
+    /* 4059 b */ mv(a5,a0);
+    /* 4060 Z */ bne(a5, zero, $L260);
+    /* 4061 T */ lw(a5, -40, s0);
+    /* 4062 b */ mv(a0,a5);
+    /* 4063 Y */ call($leaf);
+    /* 4064 b */ mv(a3,a0);
+    /* 4065 I */ addi(a5, s0, -64);
+    /* 4066 T */ lw(a4, -76, s0);
+    /* 4067 b */ mv(a2,a4);
+    /* 4068 b */ mv(a1,a3);
+    /* 4069 b */ mv(a0,a5);
+    /* 4070 Y */ call($leaf_searchFirstGreaterThanOrEqual);
+    /* 4071 T */ lw(a5, -60, s0);
+    /* 4072 Z */ beq(a5, zero, $L261);
+    /* 4073 T */ lw(a5, -40, s0);
+    /* 4074 b */ mv(a0,a5);
+    /* 4075 Y */ call($leaf);
+    /* 4076 T */ lw(a3, -32, s0);
+    /* 4077 T */ lw(a4, -80, s0);
+    /* 4078 T */ lw(a5, -76, s0);
+    /* 4079 b */ mv(a2,a4);
+    /* 4080 b */ mv(a1,a5);
+    /* 4081 Y */ call($leaf_insertElementAt);
+    /* 4082 X */ j($L262);
     $L261.set();
-    lw(a5, -40, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    lw(a4, -80, s0);             /* SSSS */
-    lw(a5, -76, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a3);        /* ZZZZ */
-    call($leaf_push);                      /* XXXX */
+    /* 4083 T */ lw(a5, -40, s0);
+    /* 4084 b */ mv(a0,a5);
+    /* 4085 Y */ call($leaf);
+    /* 4086 b */ mv(a3,a0);
+    /* 4087 T */ lw(a4, -80, s0);
+    /* 4088 T */ lw(a5, -76, s0);
+    /* 4089 b */ mv(a2,a4);
+    /* 4090 b */ mv(a1,a5);
+    /* 4091 b */ mv(a0,a3);
+    /* 4092 Y */ call($leaf_push);
     $L262.set();
-    ld(a4, s0, 72);             /* GGGG */
-    ld(a5, s0, 40);             /* GGGG */
-    sd(a5, -112, s0);             /* OOOO */
-    ld(a5, s0, 32);             /* GGGG */
-    sd(a5, -104, s0);             /* OOOO */
-    lw(a5, -24, s0);             /* SSSS */
-    sw(a5, -96, s0);             /* OOOO */
-    addi(a5, s0, -112);           /* LLLL */
-    li(a3,1);        /* ZZZZ */
-    li(a2,1);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a4);        /* ZZZZ */
-    call($findAndInsert_result);                      /* XXXX */
-    j($L263);                       /* WWWW */
+    /* 4093 K */ ld(a4, s0, 72);
+    /* 4094 K */ ld(a5, s0, 40);
+    /* 4095 O */ sd(a5, -112, s0);
+    /* 4096 K */ ld(a5, s0, 32);
+    /* 4097 O */ sd(a5, -104, s0);
+    /* 4098 T */ lw(a5, -24, s0);
+    /* 4099 O */ sw(a5, -96, s0);
+    /* 4100 I */ addi(a5, s0, -112);
+    /* 4101 b */ li(a3,1);
+    /* 4102 b */ li(a2,1);
+    /* 4103 b */ mv(a1,a5);
+    /* 4104 b */ mv(a0,a4);
+    /* 4105 Y */ call($findAndInsert_result);
+    /* 4106 X */ j($L263);
     $L260.set();
-    ld(a4, s0, 72);             /* GGGG */
-    ld(a5, s0, 40);             /* GGGG */
-    sd(a5, -112, s0);             /* OOOO */
-    ld(a5, s0, 32);             /* GGGG */
-    sd(a5, -104, s0);             /* OOOO */
-    lw(a5, -24, s0);             /* SSSS */
-    sw(a5, -96, s0);             /* OOOO */
-    addi(a5, s0, -112);           /* LLLL */
-    li(a3,0);        /* ZZZZ */
-    li(a2,0);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a4);        /* ZZZZ */
-    call($findAndInsert_result);                      /* XXXX */
+    /* 4107 K */ ld(a4, s0, 72);
+    /* 4108 K */ ld(a5, s0, 40);
+    /* 4109 O */ sd(a5, -112, s0);
+    /* 4110 K */ ld(a5, s0, 32);
+    /* 4111 O */ sd(a5, -104, s0);
+    /* 4112 T */ lw(a5, -24, s0);
+    /* 4113 O */ sw(a5, -96, s0);
+    /* 4114 I */ addi(a5, s0, -112);
+    /* 4115 b */ li(a3,0);
+    /* 4116 b */ li(a2,0);
+    /* 4117 b */ mv(a1,a5);
+    /* 4118 b */ mv(a0,a4);
+    /* 4119 Y */ call($findAndInsert_result);
     $L263.set();
-    ld(a0, s0, 72);             /* GGGG */
-    ld(ra, sp, 104);             /* GGGG */
-    ld(s0, sp, 96);             /* GGGG */
-    addi(sp, sp, 112);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 4120 K */ ld(a0, s0, 72);
+    /* 4121 K */ ld(ra, sp, 104);
+    /* 4122 K */ ld(s0, sp, 96);
+    /* 4123 I */ addi(sp, sp, 112);
+    /* 4124 W */ jr(ra);
     $put.set();
-    addi(sp, sp, -192);           /* LLLL */
-    sd(ra, 184, sp);             /* OOOO */
-    sd(s0, 176, sp);             /* OOOO */
-    addi(s0, sp, 192);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a1);        /* ZZZZ */
-    sw(a5, -148, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -152, s0);             /* OOOO */
-    addi(a5, s0, -56);           /* LLLL */
-    lw(a3, -152, s0);             /* SSSS */
-    lw(a4, -148, s0);             /* SSSS */
-    mv(a2,a3);        /* ZZZZ */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($findAndInsert);                      /* XXXX */
-    lw(a5, -56, s0);             /* SSSS */
-    bne(a5, zero, $L279);             /* YYYY */
-    call($isFullRoot);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L267);             /* YYYY */
-    call($rootIsLeaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L268);             /* YYYY */
-    call($splitLeafRoot);                      /* XXXX */
-    j($L269);                       /* WWWW */
+    /* 4125 I */ addi(sp, sp, -192);
+    /* 4126 O */ sd(ra, 184, sp);
+    /* 4127 O */ sd(s0, 176, sp);
+    /* 4128 I */ addi(s0, sp, 192);
+    /* 4129 b */ mv(a5,a0);
+    /* 4130 b */ mv(a4,a1);
+    /* 4131 O */ sw(a5, -148, s0);
+    /* 4132 b */ mv(a5,a4);
+    /* 4133 O */ sw(a5, -152, s0);
+    /* 4134 I */ addi(a5, s0, -56);
+    /* 4135 T */ lw(a3, -152, s0);
+    /* 4136 T */ lw(a4, -148, s0);
+    /* 4137 b */ mv(a2,a3);
+    /* 4138 b */ mv(a1,a4);
+    /* 4139 b */ mv(a0,a5);
+    /* 4140 Y */ call($findAndInsert);
+    /* 4141 T */ lw(a5, -56, s0);
+    /* 4142 Z */ bne(a5, zero, $L279);
+    /* 4143 Y */ call($isFullRoot);
+    /* 4144 b */ mv(a5,a0);
+    /* 4145 Z */ beq(a5, zero, $L267);
+    /* 4146 Y */ call($rootIsLeaf);
+    /* 4147 b */ mv(a5,a0);
+    /* 4148 Z */ beq(a5, zero, $L268);
+    /* 4149 Y */ call($splitLeafRoot);
+    /* 4150 X */ j($L269);
     $L268.set();
-    call($splitBranchRoot);                      /* XXXX */
+    /* 4151 Y */ call($splitBranchRoot);
     $L269.set();
-    addi(a5, s0, -88);           /* LLLL */
-    lw(a3, -152, s0);             /* SSSS */
-    lw(a4, -148, s0);             /* SSSS */
-    mv(a2,a3);        /* ZZZZ */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($findAndInsert);                      /* XXXX */
-    lw(a5, -88, s0);             /* SSSS */
-    bne(a5, zero, $L280);             /* YYYY */
+    /* 4152 I */ addi(a5, s0, -88);
+    /* 4153 T */ lw(a3, -152, s0);
+    /* 4154 T */ lw(a4, -148, s0);
+    /* 4155 b */ mv(a2,a3);
+    /* 4156 b */ mv(a1,a4);
+    /* 4157 b */ mv(a0,a5);
+    /* 4158 Y */ call($findAndInsert);
+    /* 4159 T */ lw(a5, -88, s0);
+    /* 4160 Z */ bne(a5, zero, $L280);
     $L267.set();
-    sw(zero, -20, s0);             /* OOOO */
-    sw(zero, -24, s0);             /* OOOO */
-    j($L272);                       /* WWWW */
+    /* 4161 O */ sw(zero, -20, s0);
+    /* 4162 O */ sw(zero, -24, s0);
+    /* 4163 X */ j($L272);
     $L276.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -112);           /* LLLL */
-    lw(a4, -148, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_searchFirstGreaterThanOrEqualExceptLast);                      /* XXXX */
-    lw(a5, -96, s0);             /* SSSS */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($isLeaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L273);             /* YYYY */
-    lw(a3, -104, s0);             /* SSSS */
-    lw(a4, -20, s0);             /* SSSS */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a2,a3);        /* ZZZZ */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($splitLeaf);                      /* XXXX */
-    addi(a5, s0, -192);           /* LLLL */
-    lw(a3, -152, s0);             /* SSSS */
-    lw(a4, -148, s0);             /* SSSS */
-    mv(a2,a3);        /* ZZZZ */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($findAndInsert);                      /* XXXX */
-    lw(a5, -148, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($merge);                      /* XXXX */
-    j($L264);                       /* WWWW */
+    /* 4164 T */ lw(a5, -20, s0);
+    /* 4165 b */ mv(a0,a5);
+    /* 4166 Y */ call($branch);
+    /* 4167 b */ mv(a3,a0);
+    /* 4168 I */ addi(a5, s0, -112);
+    /* 4169 T */ lw(a4, -148, s0);
+    /* 4170 b */ mv(a2,a4);
+    /* 4171 b */ mv(a1,a3);
+    /* 4172 b */ mv(a0,a5);
+    /* 4173 Y */ call($branch_searchFirstGreaterThanOrEqualExceptLast);
+    /* 4174 T */ lw(a5, -96, s0);
+    /* 4175 O */ sw(a5, -28, s0);
+    /* 4176 T */ lw(a5, -28, s0);
+    /* 4177 b */ mv(a0,a5);
+    /* 4178 Y */ call($isLeaf);
+    /* 4179 b */ mv(a5,a0);
+    /* 4180 Z */ beq(a5, zero, $L273);
+    /* 4181 T */ lw(a3, -104, s0);
+    /* 4182 T */ lw(a4, -20, s0);
+    /* 4183 T */ lw(a5, -28, s0);
+    /* 4184 b */ mv(a2,a3);
+    /* 4185 b */ mv(a1,a4);
+    /* 4186 b */ mv(a0,a5);
+    /* 4187 Y */ call($splitLeaf);
+    /* 4188 I */ addi(a5, s0, -192);
+    /* 4189 T */ lw(a3, -152, s0);
+    /* 4190 T */ lw(a4, -148, s0);
+    /* 4191 b */ mv(a2,a3);
+    /* 4192 b */ mv(a1,a4);
+    /* 4193 b */ mv(a0,a5);
+    /* 4194 Y */ call($findAndInsert);
+    /* 4195 T */ lw(a5, -148, s0);
+    /* 4196 b */ mv(a0,a5);
+    /* 4197 Y */ call($merge);
+    /* 4198 X */ j($L264);
     $L273.set();
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($isFull);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L274);             /* YYYY */
-    lw(a3, -104, s0);             /* SSSS */
-    lw(a4, -20, s0);             /* SSSS */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a2,a3);        /* ZZZZ */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($splitBranch);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -136);           /* LLLL */
-    lw(a4, -148, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_searchFirstGreaterThanOrEqualExceptLast);                      /* XXXX */
-    lw(a5, -120, s0);             /* SSSS */
-    sw(a5, -20, s0);             /* OOOO */
-    j($L278);                       /* WWWW */
+    /* 4199 T */ lw(a5, -28, s0);
+    /* 4200 b */ mv(a0,a5);
+    /* 4201 Y */ call($isFull);
+    /* 4202 b */ mv(a5,a0);
+    /* 4203 Z */ beq(a5, zero, $L274);
+    /* 4204 T */ lw(a3, -104, s0);
+    /* 4205 T */ lw(a4, -20, s0);
+    /* 4206 T */ lw(a5, -28, s0);
+    /* 4207 b */ mv(a2,a3);
+    /* 4208 b */ mv(a1,a4);
+    /* 4209 b */ mv(a0,a5);
+    /* 4210 Y */ call($splitBranch);
+    /* 4211 T */ lw(a5, -20, s0);
+    /* 4212 b */ mv(a0,a5);
+    /* 4213 Y */ call($branch);
+    /* 4214 b */ mv(a3,a0);
+    /* 4215 I */ addi(a5, s0, -136);
+    /* 4216 T */ lw(a4, -148, s0);
+    /* 4217 b */ mv(a2,a4);
+    /* 4218 b */ mv(a1,a3);
+    /* 4219 b */ mv(a0,a5);
+    /* 4220 Y */ call($branch_searchFirstGreaterThanOrEqualExceptLast);
+    /* 4221 T */ lw(a5, -120, s0);
+    /* 4222 O */ sw(a5, -20, s0);
+    /* 4223 X */ j($L278);
     $L274.set();
-    lw(a5, -28, s0);             /* SSSS */
-    sw(a5, -20, s0);             /* OOOO */
+    /* 4224 T */ lw(a5, -28, s0);
+    /* 4225 O */ sw(a5, -20, s0);
     $L278.set();
-    lw(a5, -24, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -24, s0);             /* OOOO */
+    /* 4226 T */ lw(a5, -24, s0);
+    /* 4227 I */ addiw(a5, a5, 1);
+    /* 4228 O */ sw(a5, -24, s0);
     $L272.set();
-    lw(a5, -24, s0);             /* SSSS */
-    sextw(a4,a5);        /* ZZZZ */
-    li(a5,9);        /* ZZZZ */
-    ble(a4, a5, $L276);             /* YYYY */
-    j($L264);                       /* WWWW */
+    /* 4229 T */ lw(a5, -24, s0);
+    /* 4230 b */ sextw(a4,a5);
+    /* 4231 b */ li(a5,9);
+    /* 4232 Z */ ble(a4, a5, $L276);
+    /* 4233 X */ j($L264);
     $L279.set();
-    nop();        /* ZZZZ */
-    j($L264);                       /* WWWW */
+    /* 4234 b */ nop();
+    /* 4235 X */ j($L264);
     $L280.set();
-    nop();        /* ZZZZ */
+    /* 4236 b */ nop();
     $L264.set();
-    ld(ra, sp, 184);             /* GGGG */
-    ld(s0, sp, 176);             /* GGGG */
-    addi(sp, sp, 192);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 4237 K */ ld(ra, sp, 184);
+    /* 4238 K */ ld(s0, sp, 176);
+    /* 4239 I */ addi(sp, sp, 192);
+    /* 4240 W */ jr(ra);
     $findAndDelete_result.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(s0, 56, sp);             /* OOOO */
-    sd(s1, 48, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    sd(a0, -56, s0);             /* OOOO */
-    mv(s1,a1);        /* ZZZZ */
-    mv(a5,a2);        /* ZZZZ */
-    mv(a4,a3);        /* ZZZZ */
-    sw(a5, -60, s0);             /* OOOO */
-    mv(a5,a4);        /* ZZZZ */
-    sw(a5, -64, s0);             /* OOOO */
-    lw(a5, 0, s1);             /* SSSS */
-    mv(a1,a5);        /* ZZZZ */
-    lw(a5, 4, s1);             /* SSSS */
-    mv(a2,a5);        /* ZZZZ */
-    lw(a5, 8, s1);             /* SSSS */
-    mv(a3,a5);        /* ZZZZ */
-    lw(a5, 12, s1);             /* SSSS */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, 16, s1);             /* SSSS */
-    sw(a1, -40, s0);             /* OOOO */
-    sw(a2, -36, s0);             /* OOOO */
-    sw(a3, -32, s0);             /* OOOO */
-    sw(a4, -28, s0);             /* OOOO */
-    sw(a5, -24, s0);             /* OOOO */
-    lw(a5, -60, s0);             /* SSSS */
-    sw(a5, -48, s0);             /* OOOO */
-    lw(a5, -64, s0);             /* SSSS */
-    sw(a5, -44, s0);             /* OOOO */
-    ld(a5, s0, 56);             /* GGGG */
-    lw(a4, -48, s0);             /* SSSS */
-    mv(a7,a4);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    mv(a6,a4);        /* ZZZZ */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -28, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -24, s0);             /* SSSS */
-    sw(a7, 0, a5);             /* OOOO */
-    sw(a6, 4, a5);             /* OOOO */
-    sw(a0, 8, a5);             /* OOOO */
-    sw(a1, 12, a5);             /* OOOO */
-    sw(a2, 16, a5);             /* OOOO */
-    sw(a3, 20, a5);             /* OOOO */
-    sw(a4, 24, a5);             /* OOOO */
-    ld(a0, s0, 56);             /* GGGG */
-    ld(s0, sp, 56);             /* GGGG */
-    ld(s1, sp, 48);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 4241 I */ addi(sp, sp, -64);
+    /* 4242 O */ sd(s0, 56, sp);
+    /* 4243 O */ sd(s1, 48, sp);
+    /* 4244 I */ addi(s0, sp, 64);
+    /* 4245 O */ sd(a0, -56, s0);
+    /* 4246 b */ mv(s1,a1);
+    /* 4247 b */ mv(a5,a2);
+    /* 4248 b */ mv(a4,a3);
+    /* 4249 O */ sw(a5, -60, s0);
+    /* 4250 b */ mv(a5,a4);
+    /* 4251 O */ sw(a5, -64, s0);
+    /* 4252 T */ lw(a5, 0, s1);
+    /* 4253 b */ mv(a1,a5);
+    /* 4254 T */ lw(a5, 4, s1);
+    /* 4255 b */ mv(a2,a5);
+    /* 4256 T */ lw(a5, 8, s1);
+    /* 4257 b */ mv(a3,a5);
+    /* 4258 T */ lw(a5, 12, s1);
+    /* 4259 b */ mv(a4,a5);
+    /* 4260 T */ lw(a5, 16, s1);
+    /* 4261 O */ sw(a1, -40, s0);
+    /* 4262 O */ sw(a2, -36, s0);
+    /* 4263 O */ sw(a3, -32, s0);
+    /* 4264 O */ sw(a4, -28, s0);
+    /* 4265 O */ sw(a5, -24, s0);
+    /* 4266 T */ lw(a5, -60, s0);
+    /* 4267 O */ sw(a5, -48, s0);
+    /* 4268 T */ lw(a5, -64, s0);
+    /* 4269 O */ sw(a5, -44, s0);
+    /* 4270 K */ ld(a5, s0, 56);
+    /* 4271 T */ lw(a4, -48, s0);
+    /* 4272 b */ mv(a7,a4);
+    /* 4273 T */ lw(a4, -44, s0);
+    /* 4274 b */ mv(a6,a4);
+    /* 4275 T */ lw(a4, -40, s0);
+    /* 4276 b */ mv(a0,a4);
+    /* 4277 T */ lw(a4, -36, s0);
+    /* 4278 b */ mv(a1,a4);
+    /* 4279 T */ lw(a4, -32, s0);
+    /* 4280 b */ mv(a2,a4);
+    /* 4281 T */ lw(a4, -28, s0);
+    /* 4282 b */ mv(a3,a4);
+    /* 4283 T */ lw(a4, -24, s0);
+    /* 4284 O */ sw(a7, 0, a5);
+    /* 4285 O */ sw(a6, 4, a5);
+    /* 4286 O */ sw(a0, 8, a5);
+    /* 4287 O */ sw(a1, 12, a5);
+    /* 4288 O */ sw(a2, 16, a5);
+    /* 4289 O */ sw(a3, 20, a5);
+    /* 4290 O */ sw(a4, 24, a5);
+    /* 4291 K */ ld(a0, s0, 56);
+    /* 4292 K */ ld(s0, sp, 56);
+    /* 4293 K */ ld(s1, sp, 48);
+    /* 4294 I */ addi(sp, sp, 64);
+    /* 4295 W */ jr(ra);
     $findAndDelete.set();
-    addi(sp, sp, -128);           /* LLLL */
-    sd(ra, 120, sp);             /* OOOO */
-    sd(s0, 112, sp);             /* OOOO */
-    addi(s0, sp, 128);           /* LLLL */
-    sd(a0, -88, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    sw(a5, -92, s0);             /* OOOO */
-    addi(a5, s0, -48);           /* LLLL */
-    lw(a4, -92, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($find);                      /* XXXX */
-    lw(a5, -44, s0);             /* SSSS */
-    bne(a5, zero, $L284);             /* YYYY */
-    ld(a4, s0, 88);             /* GGGG */
-    ld(a5, s0, 48);             /* GGGG */
-    sd(a5, -128, s0);             /* OOOO */
-    ld(a5, s0, 40);             /* GGGG */
-    sd(a5, -120, s0);             /* OOOO */
-    lw(a5, -32, s0);             /* SSSS */
-    sw(a5, -112, s0);             /* OOOO */
-    addi(a5, s0, -128);           /* LLLL */
-    li(a3,0);        /* ZZZZ */
-    li(a2,0);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a4);        /* ZZZZ */
-    call($findAndDelete_result);                      /* XXXX */
-    j($L286);                       /* WWWW */
+    /* 4296 I */ addi(sp, sp, -128);
+    /* 4297 O */ sd(ra, 120, sp);
+    /* 4298 O */ sd(s0, 112, sp);
+    /* 4299 I */ addi(s0, sp, 128);
+    /* 4300 O */ sd(a0, -88, s0);
+    /* 4301 b */ mv(a5,a1);
+    /* 4302 O */ sw(a5, -92, s0);
+    /* 4303 I */ addi(a5, s0, -48);
+    /* 4304 T */ lw(a4, -92, s0);
+    /* 4305 b */ mv(a1,a4);
+    /* 4306 b */ mv(a0,a5);
+    /* 4307 Y */ call($find);
+    /* 4308 T */ lw(a5, -44, s0);
+    /* 4309 Z */ bne(a5, zero, $L284);
+    /* 4310 K */ ld(a4, s0, 88);
+    /* 4311 K */ ld(a5, s0, 48);
+    /* 4312 O */ sd(a5, -128, s0);
+    /* 4313 K */ ld(a5, s0, 40);
+    /* 4314 O */ sd(a5, -120, s0);
+    /* 4315 T */ lw(a5, -32, s0);
+    /* 4316 O */ sw(a5, -112, s0);
+    /* 4317 I */ addi(a5, s0, -128);
+    /* 4318 b */ li(a3,0);
+    /* 4319 b */ li(a2,0);
+    /* 4320 b */ mv(a1,a5);
+    /* 4321 b */ mv(a0,a4);
+    /* 4322 Y */ call($findAndDelete_result);
+    /* 4323 X */ j($L286);
     $L284.set();
-    lw(a5, -48, s0);             /* SSSS */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a5, -40, s0);             /* SSSS */
-    sw(a5, -24, s0);             /* OOOO */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -72);           /* LLLL */
-    lw(a4, -24, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_elementAt);                      /* XXXX */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -128);           /* LLLL */
-    lw(a4, -24, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($leaf_removeElementAt);                      /* XXXX */
-    lbu(a5, -56, s0);             /* SSSS */
-    sextw(a3,a5);        /* ZZZZ */
-    ld(a4, s0, 88);             /* GGGG */
-    ld(a5, s0, 48);             /* GGGG */
-    sd(a5, -128, s0);             /* OOOO */
-    ld(a5, s0, 40);             /* GGGG */
-    sd(a5, -120, s0);             /* OOOO */
-    lw(a5, -32, s0);             /* SSSS */
-    sw(a5, -112, s0);             /* OOOO */
-    addi(a5, s0, -128);           /* LLLL */
-    li(a2,1);        /* ZZZZ */
-    mv(a1,a5);        /* ZZZZ */
-    mv(a0,a4);        /* ZZZZ */
-    call($findAndDelete_result);                      /* XXXX */
+    /* 4324 T */ lw(a5, -48, s0);
+    /* 4325 O */ sw(a5, -20, s0);
+    /* 4326 T */ lw(a5, -40, s0);
+    /* 4327 O */ sw(a5, -24, s0);
+    /* 4328 T */ lw(a5, -20, s0);
+    /* 4329 b */ mv(a0,a5);
+    /* 4330 Y */ call($leaf);
+    /* 4331 b */ mv(a3,a0);
+    /* 4332 I */ addi(a5, s0, -72);
+    /* 4333 T */ lw(a4, -24, s0);
+    /* 4334 b */ mv(a2,a4);
+    /* 4335 b */ mv(a1,a3);
+    /* 4336 b */ mv(a0,a5);
+    /* 4337 Y */ call($leaf_elementAt);
+    /* 4338 T */ lw(a5, -20, s0);
+    /* 4339 b */ mv(a0,a5);
+    /* 4340 Y */ call($leaf);
+    /* 4341 b */ mv(a3,a0);
+    /* 4342 I */ addi(a5, s0, -128);
+    /* 4343 T */ lw(a4, -24, s0);
+    /* 4344 b */ mv(a2,a4);
+    /* 4345 b */ mv(a1,a3);
+    /* 4346 b */ mv(a0,a5);
+    /* 4347 Y */ call($leaf_removeElementAt);
+    /* 4348 T */ lbu(a5, -56, s0);
+    /* 4349 b */ sextw(a3,a5);
+    /* 4350 K */ ld(a4, s0, 88);
+    /* 4351 K */ ld(a5, s0, 48);
+    /* 4352 O */ sd(a5, -128, s0);
+    /* 4353 K */ ld(a5, s0, 40);
+    /* 4354 O */ sd(a5, -120, s0);
+    /* 4355 T */ lw(a5, -32, s0);
+    /* 4356 O */ sw(a5, -112, s0);
+    /* 4357 I */ addi(a5, s0, -128);
+    /* 4358 b */ li(a2,1);
+    /* 4359 b */ mv(a1,a5);
+    /* 4360 b */ mv(a0,a4);
+    /* 4361 Y */ call($findAndDelete_result);
     $L286.set();
-    ld(a0, s0, 88);             /* GGGG */
-    ld(ra, sp, 120);             /* GGGG */
-    ld(s0, sp, 112);             /* GGGG */
-    addi(sp, sp, 128);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 4362 K */ ld(a0, s0, 88);
+    /* 4363 K */ ld(ra, sp, 120);
+    /* 4364 K */ ld(s0, sp, 112);
+    /* 4365 I */ addi(sp, sp, 128);
+    /* 4366 W */ jr(ra);
     $delete.set();
-    addi(sp, sp, -128);           /* LLLL */
-    sd(ra, 120, sp);             /* OOOO */
-    sd(s0, 112, sp);             /* OOOO */
-    addi(s0, sp, 128);           /* LLLL */
-    sd(a0, -120, s0);             /* OOOO */
-    mv(a5,a1);        /* ZZZZ */
-    sw(a5, -124, s0);             /* OOOO */
-    call($mergeRoot);                      /* XXXX */
-    call($rootIsLeaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L288);             /* YYYY */
-    ld(a5, s0, 120);             /* GGGG */
-    lw(a4, -124, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($findAndDelete);                      /* XXXX */
-    j($L287);                       /* WWWW */
+    /* 4367 I */ addi(sp, sp, -128);
+    /* 4368 O */ sd(ra, 120, sp);
+    /* 4369 O */ sd(s0, 112, sp);
+    /* 4370 I */ addi(s0, sp, 128);
+    /* 4371 O */ sd(a0, -120, s0);
+    /* 4372 b */ mv(a5,a1);
+    /* 4373 O */ sw(a5, -124, s0);
+    /* 4374 Y */ call($mergeRoot);
+    /* 4375 Y */ call($rootIsLeaf);
+    /* 4376 b */ mv(a5,a0);
+    /* 4377 Z */ beq(a5, zero, $L288);
+    /* 4378 K */ ld(a5, s0, 120);
+    /* 4379 T */ lw(a4, -124, s0);
+    /* 4380 b */ mv(a1,a4);
+    /* 4381 b */ mv(a0,a5);
+    /* 4382 Y */ call($findAndDelete);
+    /* 4383 X */ j($L287);
     $L288.set();
-    sw(zero, -20, s0);             /* OOOO */
-    sw(zero, -24, s0);             /* OOOO */
-    j($L290);                       /* WWWW */
+    /* 4384 O */ sw(zero, -20, s0);
+    /* 4385 O */ sw(zero, -24, s0);
+    /* 4386 X */ j($L290);
     $L292.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -80);           /* LLLL */
-    lw(a4, -124, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_searchFirstGreaterThanOrEqualExceptLast);                      /* XXXX */
-    lw(a4, -72, s0);             /* SSSS */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($balance);                      /* XXXX */
-    lw(a5, -64, s0);             /* SSSS */
-    sw(a5, -28, s0);             /* OOOO */
-    lw(a5, -28, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($isLeaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L291);             /* YYYY */
-    addi(a5, s0, -112);           /* LLLL */
-    lw(a4, -124, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($findAndDelete);                      /* XXXX */
-    lw(a5, -124, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($merge);                      /* XXXX */
-    ld(a5, s0, 120);             /* GGGG */
-    lw(a4, -112, s0);             /* SSSS */
-    mv(a7,a4);        /* ZZZZ */
-    lw(a4, -108, s0);             /* SSSS */
-    mv(a6,a4);        /* ZZZZ */
-    lw(a4, -104, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -100, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -96, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -92, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -88, s0);             /* SSSS */
-    sw(a7, 0, a5);             /* OOOO */
-    sw(a6, 4, a5);             /* OOOO */
-    sw(a0, 8, a5);             /* OOOO */
-    sw(a1, 12, a5);             /* OOOO */
-    sw(a2, 16, a5);             /* OOOO */
-    sw(a3, 20, a5);             /* OOOO */
-    sw(a4, 24, a5);             /* OOOO */
-    j($L287);                       /* WWWW */
+    /* 4387 T */ lw(a5, -20, s0);
+    /* 4388 b */ mv(a0,a5);
+    /* 4389 Y */ call($branch);
+    /* 4390 b */ mv(a3,a0);
+    /* 4391 I */ addi(a5, s0, -80);
+    /* 4392 T */ lw(a4, -124, s0);
+    /* 4393 b */ mv(a2,a4);
+    /* 4394 b */ mv(a1,a3);
+    /* 4395 b */ mv(a0,a5);
+    /* 4396 Y */ call($branch_searchFirstGreaterThanOrEqualExceptLast);
+    /* 4397 T */ lw(a4, -72, s0);
+    /* 4398 T */ lw(a5, -20, s0);
+    /* 4399 b */ mv(a1,a4);
+    /* 4400 b */ mv(a0,a5);
+    /* 4401 Y */ call($balance);
+    /* 4402 T */ lw(a5, -64, s0);
+    /* 4403 O */ sw(a5, -28, s0);
+    /* 4404 T */ lw(a5, -28, s0);
+    /* 4405 b */ mv(a0,a5);
+    /* 4406 Y */ call($isLeaf);
+    /* 4407 b */ mv(a5,a0);
+    /* 4408 Z */ beq(a5, zero, $L291);
+    /* 4409 I */ addi(a5, s0, -112);
+    /* 4410 T */ lw(a4, -124, s0);
+    /* 4411 b */ mv(a1,a4);
+    /* 4412 b */ mv(a0,a5);
+    /* 4413 Y */ call($findAndDelete);
+    /* 4414 T */ lw(a5, -124, s0);
+    /* 4415 b */ mv(a0,a5);
+    /* 4416 Y */ call($merge);
+    /* 4417 K */ ld(a5, s0, 120);
+    /* 4418 T */ lw(a4, -112, s0);
+    /* 4419 b */ mv(a7,a4);
+    /* 4420 T */ lw(a4, -108, s0);
+    /* 4421 b */ mv(a6,a4);
+    /* 4422 T */ lw(a4, -104, s0);
+    /* 4423 b */ mv(a0,a4);
+    /* 4424 T */ lw(a4, -100, s0);
+    /* 4425 b */ mv(a1,a4);
+    /* 4426 T */ lw(a4, -96, s0);
+    /* 4427 b */ mv(a2,a4);
+    /* 4428 T */ lw(a4, -92, s0);
+    /* 4429 b */ mv(a3,a4);
+    /* 4430 T */ lw(a4, -88, s0);
+    /* 4431 O */ sw(a7, 0, a5);
+    /* 4432 O */ sw(a6, 4, a5);
+    /* 4433 O */ sw(a0, 8, a5);
+    /* 4434 O */ sw(a1, 12, a5);
+    /* 4435 O */ sw(a2, 16, a5);
+    /* 4436 O */ sw(a3, 20, a5);
+    /* 4437 O */ sw(a4, 24, a5);
+    /* 4438 X */ j($L287);
     $L291.set();
-    lw(a5, -28, s0);             /* SSSS */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a5, -24, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -24, s0);             /* OOOO */
+    /* 4439 T */ lw(a5, -28, s0);
+    /* 4440 O */ sw(a5, -20, s0);
+    /* 4441 T */ lw(a5, -24, s0);
+    /* 4442 I */ addiw(a5, a5, 1);
+    /* 4443 O */ sw(a5, -24, s0);
     $L290.set();
-    lw(a5, -24, s0);             /* SSSS */
-    sextw(a4,a5);        /* ZZZZ */
-    li(a5,9);        /* ZZZZ */
-    ble(a4, a5, $L292);             /* YYYY */
-    sw(zero, -56, s0);             /* OOOO */
-    sw(zero, -52, s0);             /* OOOO */
-    sw(zero, -48, s0);             /* OOOO */
-    sw(zero, -44, s0);             /* OOOO */
-    sw(zero, -40, s0);             /* OOOO */
-    sw(zero, -36, s0);             /* OOOO */
-    sw(zero, -32, s0);             /* OOOO */
-    ld(a5, s0, 120);             /* GGGG */
-    lw(a4, -56, s0);             /* SSSS */
-    mv(a7,a4);        /* ZZZZ */
-    lw(a4, -52, s0);             /* SSSS */
-    mv(a6,a4);        /* ZZZZ */
-    lw(a4, -48, s0);             /* SSSS */
-    mv(a0,a4);        /* ZZZZ */
-    lw(a4, -44, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    lw(a4, -40, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    lw(a4, -36, s0);             /* SSSS */
-    mv(a3,a4);        /* ZZZZ */
-    lw(a4, -32, s0);             /* SSSS */
-    sw(a7, 0, a5);             /* OOOO */
-    sw(a6, 4, a5);             /* OOOO */
-    sw(a0, 8, a5);             /* OOOO */
-    sw(a1, 12, a5);             /* OOOO */
-    sw(a2, 16, a5);             /* OOOO */
-    sw(a3, 20, a5);             /* OOOO */
-    sw(a4, 24, a5);             /* OOOO */
+    /* 4444 T */ lw(a5, -24, s0);
+    /* 4445 b */ sextw(a4,a5);
+    /* 4446 b */ li(a5,9);
+    /* 4447 Z */ ble(a4, a5, $L292);
+    /* 4448 O */ sw(zero, -56, s0);
+    /* 4449 O */ sw(zero, -52, s0);
+    /* 4450 O */ sw(zero, -48, s0);
+    /* 4451 O */ sw(zero, -44, s0);
+    /* 4452 O */ sw(zero, -40, s0);
+    /* 4453 O */ sw(zero, -36, s0);
+    /* 4454 O */ sw(zero, -32, s0);
+    /* 4455 K */ ld(a5, s0, 120);
+    /* 4456 T */ lw(a4, -56, s0);
+    /* 4457 b */ mv(a7,a4);
+    /* 4458 T */ lw(a4, -52, s0);
+    /* 4459 b */ mv(a6,a4);
+    /* 4460 T */ lw(a4, -48, s0);
+    /* 4461 b */ mv(a0,a4);
+    /* 4462 T */ lw(a4, -44, s0);
+    /* 4463 b */ mv(a1,a4);
+    /* 4464 T */ lw(a4, -40, s0);
+    /* 4465 b */ mv(a2,a4);
+    /* 4466 T */ lw(a4, -36, s0);
+    /* 4467 b */ mv(a3,a4);
+    /* 4468 T */ lw(a4, -32, s0);
+    /* 4469 O */ sw(a7, 0, a5);
+    /* 4470 O */ sw(a6, 4, a5);
+    /* 4471 O */ sw(a0, 8, a5);
+    /* 4472 O */ sw(a1, 12, a5);
+    /* 4473 O */ sw(a2, 16, a5);
+    /* 4474 O */ sw(a3, 20, a5);
+    /* 4475 O */ sw(a4, 24, a5);
     $L287.set();
-    ld(a0, s0, 120);             /* GGGG */
-    ld(ra, sp, 120);             /* GGGG */
-    ld(s0, sp, 112);             /* GGGG */
-    addi(sp, sp, 128);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 4476 K */ ld(a0, s0, 120);
+    /* 4477 K */ ld(ra, sp, 120);
+    /* 4478 K */ ld(s0, sp, 112);
+    /* 4479 I */ addi(sp, sp, 128);
+    /* 4480 W */ jr(ra);
     $merge.set();
-    addi(sp, sp, -64);           /* LLLL */
-    sd(ra, 56, sp);             /* OOOO */
-    sd(s0, 48, sp);             /* OOOO */
-    addi(s0, sp, 64);           /* LLLL */
-    mv(a5,a0);        /* ZZZZ */
-    sw(a5, -52, s0);             /* OOOO */
-    call($mergeRoot);                      /* XXXX */
-    sw(zero, -20, s0);             /* OOOO */
-    sw(zero, -24, s0);             /* OOOO */
-    j($L295);                       /* WWWW */
+    /* 4481 I */ addi(sp, sp, -64);
+    /* 4482 O */ sd(ra, 56, sp);
+    /* 4483 O */ sd(s0, 48, sp);
+    /* 4484 I */ addi(s0, sp, 64);
+    /* 4485 b */ mv(a5,a0);
+    /* 4486 O */ sw(a5, -52, s0);
+    /* 4487 Y */ call($mergeRoot);
+    /* 4488 O */ sw(zero, -20, s0);
+    /* 4489 O */ sw(zero, -24, s0);
+    /* 4490 X */ j($L295);
     $L302.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($isLeaf);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    bne(a5, zero, $L303);             /* YYYY */
-    sw(zero, -28, s0);             /* OOOO */
-    j($L298);                       /* WWWW */
+    /* 4491 T */ lw(a5, -20, s0);
+    /* 4492 b */ mv(a0,a5);
+    /* 4493 Y */ call($isLeaf);
+    /* 4494 b */ mv(a5,a0);
+    /* 4495 Z */ bne(a5, zero, $L303);
+    /* 4496 O */ sw(zero, -28, s0);
+    /* 4497 X */ j($L298);
     $L300.set();
-    lw(a4, -28, s0);             /* SSSS */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($mergeLeftSibling);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    beq(a5, zero, $L299);             /* YYYY */
-    lw(a5, -28, s0);             /* SSSS */
-    addiw(a5, a5, -1);           /* LLLL */
-    sw(a5, -28, s0);             /* OOOO */
+    /* 4498 T */ lw(a4, -28, s0);
+    /* 4499 T */ lw(a5, -20, s0);
+    /* 4500 b */ mv(a1,a4);
+    /* 4501 b */ mv(a0,a5);
+    /* 4502 Y */ call($mergeLeftSibling);
+    /* 4503 b */ mv(a5,a0);
+    /* 4504 Z */ beq(a5, zero, $L299);
+    /* 4505 T */ lw(a5, -28, s0);
+    /* 4506 I */ addiw(a5, a5, -1);
+    /* 4507 O */ sw(a5, -28, s0);
     $L299.set();
-    lw(a4, -28, s0);             /* SSSS */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a1,a4);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($mergeRightSibling);                      /* XXXX */
-    lw(a5, -28, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -28, s0);             /* OOOO */
+    /* 4508 T */ lw(a4, -28, s0);
+    /* 4509 T */ lw(a5, -20, s0);
+    /* 4510 b */ mv(a1,a4);
+    /* 4511 b */ mv(a0,a5);
+    /* 4512 Y */ call($mergeRightSibling);
+    /* 4513 T */ lw(a5, -28, s0);
+    /* 4514 I */ addiw(a5, a5, 1);
+    /* 4515 O */ sw(a5, -28, s0);
     $L298.set();
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branchSize);                      /* XXXX */
-    mv(a5,a0);        /* ZZZZ */
-    mv(a4,a5);        /* ZZZZ */
-    lw(a5, -28, s0);             /* SSSS */
-    sextw(a5,a5);        /* ZZZZ */
-    blt(a5, a4, $L300);             /* YYYY */
-    lw(a5, -20, s0);             /* SSSS */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch);                      /* XXXX */
-    mv(a3,a0);        /* ZZZZ */
-    addi(a5, s0, -48);           /* LLLL */
-    lw(a4, -52, s0);             /* SSSS */
-    mv(a2,a4);        /* ZZZZ */
-    mv(a1,a3);        /* ZZZZ */
-    mv(a0,a5);        /* ZZZZ */
-    call($branch_searchFirstGreaterThanOrEqualExceptLast);                      /* XXXX */
-    lw(a5, -32, s0);             /* SSSS */
-    sw(a5, -20, s0);             /* OOOO */
-    lw(a5, -24, s0);             /* SSSS */
-    addiw(a5, a5, 1);           /* LLLL */
-    sw(a5, -24, s0);             /* OOOO */
+    /* 4516 T */ lw(a5, -20, s0);
+    /* 4517 b */ mv(a0,a5);
+    /* 4518 Y */ call($branchSize);
+    /* 4519 b */ mv(a5,a0);
+    /* 4520 b */ mv(a4,a5);
+    /* 4521 T */ lw(a5, -28, s0);
+    /* 4522 b */ sextw(a5,a5);
+    /* 4523 Z */ blt(a5, a4, $L300);
+    /* 4524 T */ lw(a5, -20, s0);
+    /* 4525 b */ mv(a0,a5);
+    /* 4526 Y */ call($branch);
+    /* 4527 b */ mv(a3,a0);
+    /* 4528 I */ addi(a5, s0, -48);
+    /* 4529 T */ lw(a4, -52, s0);
+    /* 4530 b */ mv(a2,a4);
+    /* 4531 b */ mv(a1,a3);
+    /* 4532 b */ mv(a0,a5);
+    /* 4533 Y */ call($branch_searchFirstGreaterThanOrEqualExceptLast);
+    /* 4534 T */ lw(a5, -32, s0);
+    /* 4535 O */ sw(a5, -20, s0);
+    /* 4536 T */ lw(a5, -24, s0);
+    /* 4537 I */ addiw(a5, a5, 1);
+    /* 4538 O */ sw(a5, -24, s0);
     $L295.set();
-    lw(a5, -24, s0);             /* SSSS */
-    sextw(a4,a5);        /* ZZZZ */
-    li(a5,9);        /* ZZZZ */
-    ble(a4, a5, $L302);             /* YYYY */
-    j($L294);                       /* WWWW */
+    /* 4539 T */ lw(a5, -24, s0);
+    /* 4540 b */ sextw(a4,a5);
+    /* 4541 b */ li(a5,9);
+    /* 4542 Z */ ble(a4, a5, $L302);
+    /* 4543 X */ j($L294);
     $L303.set();
-    nop();        /* ZZZZ */
+    /* 4544 b */ nop();
     $L294.set();
-    ld(ra, sp, 56);             /* GGGG */
-    ld(s0, sp, 48);             /* GGGG */
-    addi(sp, sp, 64);           /* LLLL */
-    jr(ra);                       /* UUUU */
+    /* 4545 K */ ld(ra, sp, 56);
+    /* 4546 K */ ld(s0, sp, 48);
+    /* 4547 I */ addi(sp, sp, 64);
+    /* 4548 W */ jr(ra);
    }
   static void oldTests()                                                        // Tests thought to be in good shar.
    {test_btree();
