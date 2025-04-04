@@ -75,17 +75,9 @@ jobs:
       run: |
         sudo apt install gcc-riscv64-unknown-elf libnewlib-dev
 
-    - name: Stuck
-      run: |
-        cd c; perl stuck.pl
-
     - name: btree
       run: |
-        cd c; gcc -fmax-errors=7 -fno-omit-frame-pointer -Wall -Wextra -Wno-unused-function -O0 -g3 -rdynamic -I. -o "btree" btree.c && timeout 10s ./btree
-
-    - name: Asm
-      run: |
-        cd c; riscv64-unknown-elf-gcc -S -I. -I/usr/include/newlib/  -o btree.asm btree.c
+        cd c; perl riscV.pl
 END
 
   my $f = writeFileUsingSavedToken $user, $repo, $wf, $y;                       # Upload workflow
