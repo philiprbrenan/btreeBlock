@@ -206,4 +206,4 @@ translateRiscVToJava();                                                         
 
 unlink $asm, $jsm, qw(branch.c leaf.c);                                         # Remove generated files
 
-system("javac -g -d /home/phil/btreeBlock/c/../Classes/ -cp /home/phil/btreeBlock/c/../Classes/ /home/phil/btreeBlock/c/RiscV.java && java -ea -cp /home/phil/btreeBlock/c/../Classes/ com.AppaApps.Silicon.RiscV");
+system("javac -g -d ../Classes/ -cp ../Classes/ RiscV.java && java -ea -cp ../Classes/ com.AppaApps.Silicon.RiscV");
