@@ -196,8 +196,8 @@ sub translateRiscVToJava()                                                      
   my $J = join "\n", @J;                                                        # The java code
 
   my $s = readFile $jpl;                                                        # Java skeleton
-  $s =~ s(\nRiscV\n) ($J)is;
-  owf($Jpl, join "\n", $s);
+  $s =~ s(\n//RiscV\n) ($J)is;                                                  # Insert generated program
+  owf($Jpl, join "\n", $s);                                                     # Save generated program
  }
 
 translate(qw(leaf),   8, q(int), q(char));                                      # Leaf and branch stucks which do not need to be the same
