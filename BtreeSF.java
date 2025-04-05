@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// BtreeDM with pipelined free chain and single access memory
+// BtreeDM with pipelined free chain and single access memory.
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024-2025
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
