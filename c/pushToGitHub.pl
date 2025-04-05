@@ -84,11 +84,7 @@ jobs:
       run: |
         sudo apt install gcc-riscv64-unknown-elf libnewlib-dev
 
-    - name: java
-      run: |
-        bash j.sh BtreeSF
-
-    - name: asm
+    - name: Asm
       run: |
         cd c; perl riscV.pl
 END
