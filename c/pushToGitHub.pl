@@ -66,6 +66,15 @@ jobs:
       with:
         ref: 'main'
 
+    - name: 'JDK 24'
+      uses: oracle-actions/setup-java\@v1
+      with:
+        website: jdk.java.net
+
+    - name: Java release
+      run: |
+        java -version
+
     - name: Install C and dtt
       run: |
          sudo apt install build-essential
