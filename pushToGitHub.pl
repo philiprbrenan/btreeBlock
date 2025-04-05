@@ -150,11 +150,11 @@ jobs:
     - name: Position files in package
       run: |
         mkdir -p $c
-        cp `find .  -name "*.java" | grep -v '/c/'` $c
+        cp *.java $c
 
-    - name: Compile
+    - name: Java
       run: |
-        javac -g -d Classes -cp Classes `find $c -name "*.java"`
+        javac -g -d Classes -cp Classes $c/*.java
 END
 
   for my $j(@j)                                                                 # Java files
