@@ -1,4 +1,4 @@
-# Test 2025-04-05 at 05:06:46
+# Test 2025-04-05 at 05:10:28
 
 name: Test
 run-name: btreeBlock
@@ -47,11 +47,11 @@ jobs:
     - name: Position files in package
       run: |
         mkdir -p com/AppaApps/Silicon
-        cp `find .  -name "*.java" | grep -v '/c/'` com/AppaApps/Silicon
+        cp *.java com/AppaApps/Silicon
 
-    - name: Compile
+    - name: Java
       run: |
-        javac -g -d Classes -cp Classes `find com/AppaApps/Silicon -name "*.java"`
+        javac -g -d Classes -cp Classes com/AppaApps/Silicon/*.java
 
     - name: Test BtreeSF
       if: matrix.task == 'BtreeSF'
