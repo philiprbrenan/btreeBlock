@@ -11,13 +11,13 @@ class ProgramDM extends Test                                                    
   int            currentCode =  0;                                              // Point at which we are currently adding instructions to the program. Instructions can run in parallel so the current point is not always at the end as it is with non parallel instruction execution
   final Stack<Parallel> currentParallel = new Stack<>();                        // Start and end of current parallel range
   I       currentInstruction;                                                   // The currently executing instruction
-  final int         maxSteps = 100_000;                                         // Maximum number of steps permitted while running the program
+  int               maxSteps = 100_000;                                         // Maximum number of steps permitted while running the program
   int                   step = 0;                                               // Execution step
   int                  steps = 0;                                               // Execution steps
+  int                  start = 0;                                               // Step to start at
   boolean              debug = false;                                           // Debug code if true
   boolean            running = false;                                           // Executing if true
   Stack<Label>        labels = new Stack<>();                                   // Labels for some instructions
-  Memory         traceMemory;                                                   // Labels for some instructions
   final Stack<String>  Trace = new Stack<>();                                   // Trace execution steps
   static int         numbers = 0;                                               // Program numbers
   final  int          number = ++numbers;                                       // Program number
@@ -39,8 +39,12 @@ class ProgramDM extends Test                                                    
 
   class Label                                                                   // Label definition
    {int instruction;                                                            // The instruction location to which this labels applies
-    Label()    {zz(); set(); labels.push(this);}                                // A label assigned to an instruction location
-    void set() {zz(); instruction = code.size();}                               // Reassign the label to an instruction
+    final String name;                                                          // An optional name for the label to assist in debugging
+    Label()         {zz(); set(); labels.push(this); name = null;}              // A label assigned to an instruction location
+    Label(String n) {zz(); set(); labels.push(this); name = n;;}                // A label assigned to an instruction location with a name
+    void set()      {zz(); instruction = code.size();}                          // Reassign the label to an instruction
+    int  get()      {zz(); return instruction;}                                 // Address of instruction
+    int  get1()     {zz(); return instruction-1;}                               // Address of previous instruction - useful in branch instructions because the program counter will be incremented in the execution loop
    }
 
   class I implements Comparable<I>                                              // Instruction definition
@@ -144,6 +148,8 @@ class ProgramDM extends Test                                                    
     Trace.push(String.format("%4d  %4d  %s", steps, step, S));
    }
 
+  void traceInstruction(I i) {}                                                 // Trace instruction
+
   void run(String traceFile)                                                    // Run the program tracing to the named file
    {zz();
     if (currentParallel.size() > 0)                                             // Check all parallel sections have been closed
@@ -153,9 +159,21 @@ class ProgramDM extends Test                                                    
     Trace.clear();
     running = true;
     final int N = code.size();
-    for (step = 0, steps = 0; step < N && steps < maxSteps && running; step++, steps++)
+    for (step = start, steps = 0; step >= 0 && step < N && steps < maxSteps && running; step++, steps++)
      {traceMemory();
-      for (I i : code.elementAt(step)) {currentInstruction = i; i.a();}         // Execute each instruction in the parallel block
+      for (I i : code.elementAt(step))                                          // Execute each instruction in the parallel block
+       {currentInstruction = i;
+        traceInstruction(i);
+        try
+         {i.a();
+         }
+        catch(Exception E)
+         {say("Exception at step:", step, "after:", steps, "steps.");
+          say(i.traceBack);
+          say(E);
+          step = N;
+         }
+       }
      }
     traceMemory();
     if (steps >= maxSteps) stop("Out of steps: ", steps);
