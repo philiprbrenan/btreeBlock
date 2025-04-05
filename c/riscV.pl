@@ -206,5 +206,5 @@ translateRiscVToJava();                                                         
 
 unlink $asm, $jsm, qw(branch.c leaf.c);                                         # Remove generated files
 
-makePath(q(Classes);
-system("javac -g -d Classes/ -cp Classes/ ../Test.java RiscV.java && java -ea -cp Classes/ com.AppaApps.Silicon.RiscV");
+makePath(q(Classes));
+system("javac -g -d Classes/ -cp Classes/ ../Test.java ../ProgramDM.java RiscV.java && java -ea -cp Classes/ com.AppaApps.Silicon.RiscV");
