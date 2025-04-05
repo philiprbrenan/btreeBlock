@@ -738,14 +738,14 @@ public class Test                                                               
 
   static int testsPassed = 0, testsFailed = 0;                                  // Number of tests passed and failed
 
-  static boolean ok(boolean b)                                                     // Check test results match expected results.
+  static boolean ok(boolean b)                                                  // Check test results match expected results.
    {if (b) {++testsPassed; return true;}
     testsFailed++;
     err(currentTestName(), "failed\n");
     return false;
    }
 
-  static boolean ok(Object a, Object b)                                            // Check test results match expected results.
+  static boolean ok(Object a, Object b)                                         // Check test results match expected results.
    {if (a.toString().equals(b.toString())) {++testsPassed; return true;}
     final boolean n = b.toString().contains("\n");
     testsFailed++;
@@ -754,7 +754,7 @@ public class Test                                                               
     return false;
    }
 
-  static boolean ok(String got, String expected)                                   // Confirm two strings match
+  static boolean ok(String got, String expected)                                // Confirm two strings match
    {final String G = got, E = expected;
     final int lg = G.length(), le = E.length();
     final StringBuilder b = new StringBuilder();
