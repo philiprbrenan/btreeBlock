@@ -1,4 +1,4 @@
-# Test 2025-04-05 at 05:00:39
+# Test 2025-04-05 at 05:14:56
 
 name: Test
 run-name: btreeBlock
@@ -36,10 +36,6 @@ jobs:
       run: |
         sudo apt install gcc-riscv64-unknown-elf libnewlib-dev
 
-    - name: java
-      run: |
-        bash j.sh BtreeSF
-
-    - name: asm
+    - name: Asm
       run: |
         cd c; perl riscV.pl
