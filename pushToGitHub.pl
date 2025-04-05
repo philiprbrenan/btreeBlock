@@ -19,7 +19,7 @@ my $repo    = q(btreeBlock);                                                    
 my $wf      = q(.github/workflows/main.yml);                                    # Work flow on Ubuntu
 my @ext     = qw(.html .java .jpg .md .pl .pdf .png .py .rpt .sdc .txt .xdc);   # Extensions of files to upload to github
 my $sc      = fpd $home, qw(siliconCompiler);                                   # Silicon compiler
-my @scExt   = qw(.gds .py .xdc .v);                                                # Silicon compiler extensions
+my @scExt   = qw(.gds .py .xdc .v);                                             # Silicon compiler extensions
 
 say STDERR timeStamp,  " push to github $repo";
 
@@ -93,6 +93,7 @@ END
 
 if (1)                                                                          # Write workflow
  {my @j = map {fn $_}  grep {fn($_) !~ m(Able\Z)}                               # Java files to test do not include interfaces
+          grep {!m(/c/)}                                                        # Excluding the java files in the C folder
           searchDirectoryTreesForMatchingFiles($home, qw(.java));               # Java files
   @j = qw(BtreeSF BtreeDM);                                                     # This will test all the stuff of current interest
 
