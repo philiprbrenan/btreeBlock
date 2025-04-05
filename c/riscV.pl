@@ -9,11 +9,11 @@ use strict;
 use Carp;
 use Data::Table::Text qw(:all);
 
-my $jpl = q(/home/phil/btreeBlock/c/riscV.java);                                # Input java skeleton
-my $Jpl = q(/home/phil/btreeBlock/c/RiscV.java);                                # Output java
-my $asm = q(/home/phil/btreeBlock/c/btree.asm);                                 # Code to classify
-my $jsm = q(/home/phil/btreeBlock/c/btree.jasm);                                # Java assembler
-my $cpl = q(/home/phil/btreeBlock/c/btree.c);                                   # Btree  algorithm in C so we can convert ot to RiscV assember using gcc
+my $jpl = q(riscV.java);                                                        # Input java skeleton
+my $Jpl = q(RiscV.java);                                                        # Output java
+my $asm = q(btree.asm);                                                         # Code to classify
+my $jsm = q(btree.jasm);                                                        # Java assembler
+my $cpl = q(btree.c);                                                           # Btree  algorithm in C so we can convert ot to RiscV assember using gcc
 
 sub translate($name, $maxSize, $key, $data)                                     # Translate a generalized stuck into a leaf or a branch stuck
  {my $s = readFile q(stuck.c);                                                  # Read the source code
