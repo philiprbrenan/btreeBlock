@@ -50,7 +50,7 @@ static inline void  initialize_free_chain()                                     
   btree.nodes[0].free = 0;                                                      // Not on the free chain
  }
 
-static inline void  create()                                                    // Create an empty btree
+void  create()                                                                  // Create an empty btree
  {for (int i = 0; i < number_of_nodes; ++i) clear(i);
   initialize_free_chain();                                                      // Initialize free chain by putting all the nodes on the free chain except the root (which is permanently allocated at position 0) with the low nodes first to be allocated.
   btree.nodes[0].isLeaf = 1;                                                    // The root starts as a leaf
