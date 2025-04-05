@@ -150,7 +150,7 @@ jobs:
     - name: Position files in package
       run: |
         mkdir -p $c
-        cp `find .  -name "*.java"` $c
+        cp `find .  -name "*.java" | grep -v '/c/'` $c
 
     - name: Compile
       run: |
