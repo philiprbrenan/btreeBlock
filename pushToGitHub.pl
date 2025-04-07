@@ -30,6 +30,7 @@ push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              
         @files = grep {!m(/gowin/\w+/reports/)}   @files;
         @files = grep {!m(/logs/)}                @files;
         @files = grep {!m(/c/)}                   @files;
+        @files = grep {!m(/bam/)}                 @files;
         @files = grep {!m(/zzz/)}                 @files;
 
 if (1)                                                                          # Remove most of the verilog except the reports
