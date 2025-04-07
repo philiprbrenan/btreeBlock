@@ -21,17 +21,26 @@ See this [action](https://github.com/philiprbrenan/btreeBlock/blob/main/.github/
 
 # Roadmap
 
+# The custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) 
 I implemented the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [Java](https://en.wikipedia.org/wiki/Java_(programming_language)), then successively reduced the [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) [code](https://en.wikipedia.org/wiki/Computer_program) until it looked just like [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program), at which point it was easy to
-generate a [code](https://en.wikipedia.org/wiki/Computer_program) in [Verilog](https://en.wikipedia.org/wiki/Verilog) to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program).  The resulting design
+generate a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) in [Verilog](https://en.wikipedia.org/wiki/Verilog) to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program).  The resulting design
 was compacted by reusing identical instructions and pipelined to reduce
 congestion. ![Roadmap](flowChart/DevelopmentFlowChart.png)
+
+This produced a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) with an instruction set custom designed to facilitate the
+**put**, **find** and **delete** operations on a [B-Tree](https://en.wikipedia.org/wiki/B-tree) .
+
+# The generic [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) 
+I am now implementing the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm on a generic risc soft [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) so that
+the performance of the generic [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) versus the performance of the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) can be compared by running them both on the same [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array) to see which
+implementation is faster and which uses less power.
 
 # Synthesis, Placement and Routing
 
 ## Vivado
 
 The logs of the successful synthesis, placement and routing of the individual
-components of [Database on a Chip](http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html) using [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) targeting an [Advanced Micro Devices XC7A50T](https://www.amd.com/en/products/adaptive-socs-and-fpgas/fpga/artix-7.html#product-table) [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array) can be seen here:
+components of the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) for [Database on a Chip](http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html) using [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) targeting an [Advanced Micro Devices XC7A50T](https://www.amd.com/en/products/adaptive-socs-and-fpgas/fpga/artix-7.html#product-table) [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array) can be seen here:
 
 
  [delete](https://github.com/philiprbrenan/btreeBlock/blob/main/verilog/delete/vivado/reports),
@@ -44,7 +53,8 @@ components of [Database on a Chip](http://prb.appaapps.com/zesal/pitchdeck/pitch
 ## OpenRoad
 
 Open Road successfully compiles the ``find``, ``delete`` and ``put`` operations
-onto [freepdk-45nm](https://github.com/mflowgen/freepdk-45nm) [Silicon](https://en.wikipedia.org/wiki/Silicon) .  The following images show the layout of [Silicon](https://en.wikipedia.org/wiki/Silicon) for each operation:
+implemented by the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) onto [freepdk-45nm](https://github.com/mflowgen/freepdk-45nm) [Silicon](https://en.wikipedia.org/wiki/Silicon) .  The following images
+show the layout of [Silicon](https://en.wikipedia.org/wiki/Silicon) for each operation:
 
 ### Put
 
