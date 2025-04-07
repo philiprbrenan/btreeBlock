@@ -27,8 +27,8 @@ generate a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) in [Veri
 was compacted by reusing identical instructions and pipelined to reduce
 congestion. ![Roadmap](flowChart/DevelopmentFlowChart.png)
 
-This produced a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) with an instruction set custom designed to facilitate the
-**put**, **find** and **delete** operations on a [B-Tree](https://en.wikipedia.org/wiki/B-tree) .
+This produced a custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) with an instruction set specifically designed to
+facilitate the **put**, **find** and **delete** operations on a [B-Tree](https://en.wikipedia.org/wiki/B-tree) .
 
 # The generic [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) 
 I am now implementing the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm on a generic risc soft [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) so that
