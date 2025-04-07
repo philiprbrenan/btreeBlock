@@ -6,8 +6,8 @@ package com.AppaApps.Silicon;                                                   
 
 import java.util.*;
 
-abstract class LayoutBam extends Test                                              // Layout the array used by the basic array machine
- {int size = 0;
+abstract class LayoutBam extends Test                                           // Layout the array used by the basic array machine
+ {int size = 0;                                                                 // The size of the memory used by the basic array machine
   final Stack         <Array> order  = new Stack<>();                           // The order in which the arrays were defined
   final TreeMap<String,Array> arrays = new TreeMap<>();                         // A number of different sized arrays concatenated to make one array
   final int[]memory;                                                            // The concatenation of all the arrays
@@ -15,7 +15,7 @@ abstract class LayoutBam extends Test                                           
   class Array
    {final String name;
     final int[]dimensions;
-    final int base;                                                             // Base position of this array
+    int base;                                                                   // Base position of this array
     final int length;                                                           // Total number of elements in this array
 
     Array(String Name, int...Dimensions)                                        // Array definition within the basic array machine
@@ -33,6 +33,19 @@ abstract class LayoutBam extends Test                                           
       order.push(this);                                                         // The definition order
       arrays.put(name, this);                                                   // Make the array accessible by name
      }
+   }
+
+  Array array(String Name, int...Dimensions)                                    // Array definition within the basic array machine
+   {return new Array(Name, Dimensions);
+   }
+
+  Array overlay(String Name, int...Dimensions)                                  // Overlay this definition over the previous one
+   {if (order.size() == 0) stop("No previous array to overlay");                // Nothing to overlay
+    final Array p = order.lastElement();                                        // Previous array which we will overlay
+    final Array q = array(Name, Dimensions);                                    // New array
+    q.base = p.base;                                                            // Overlay on previous array
+    size   = size - p.length + max(p.length, q.length);                         // Account for overall size
+    return q;                                                                   // Return overlay
    }
 
   void load() {}                                                                // Override this method to define the layout
@@ -88,6 +101,35 @@ abstract class LayoutBam extends Test                                           
       default -> memory[s.base+lookUpIndex(s, 1, i[0])*s.dimensions[0]+lookUpIndex(s, 0, i[1])];
      };
    }
+
+  void clear(int Value, String target, String...Indices)                        // Clear the indicated part of the specified array to the the specified value
+   {final Array t   = get(target);
+    final String[]i = Indices;
+
+    final int I = i.length;
+    final int T = t.dimensions.length;
+    if (I > T) stop("Too many dimensions:", I, ">", T, "for array:", target);
+
+    if (I == 0)                                                                 // Clear entire array
+     {for (int j = 0; j < t.length; j++) memory[t.base + j] = Value;
+      return;
+     }
+
+    if ((I == 1 && T == 1) || (I == 2 && T == 2))                               // Clear single element of one or two dimensional array
+     {set(0, target, Indices);
+      return;
+     }
+
+    if (I == 1 && T == 2)                                                       // Clear indicated sub array
+     {final int l = t.dimensions[0];                                            // Size of sub array
+      final int p = l * lookUpIndex(t, 1, i[0]);                                // Start of sub array
+      for (int j = 0; j < l; j++) memory[t.base+ p + j] = 0;                    // Clear sub array in two dimensional array
+      return;
+     }
+   }
+
+  void zero(String source, String...Indices) {clear( 0, source, Indices);}      // Zero the indicated part of the specified array
+  void ones(String source, String...Indices) {clear(-1, source, Indices);}      // Set the indicated part of the specified array to all ones
 
   void move(String target, String source, String...Indices)                     // Copy the indexed source field to the indexed target fields
    {final Array t = get(target), s = get(source);
@@ -187,16 +229,16 @@ abstract class LayoutBam extends Test                                           
 
 //D0 Tests                                                                      // Testing
 
-  static LayoutBam test_layout()                                                   // A test layout
+  static LayoutBam test_layout()                                                // A test layout
    {return new LayoutBam()
      {void load()
-       {new Array("i");
-        new Array("j");
-        new Array("k");
-        new Array("a", 4);
-        new Array("b", 6);
-        new Array("A", 2, 4);
-        new Array("B", 4, 3);
+       {array("i");
+        array("j");
+        array("k");
+        array("a", 4);
+        array("b", 6);
+        array("A", 2, 4);
+        array("B", 4, 3);
        }
      };
    }
@@ -319,12 +361,94 @@ abstract class LayoutBam extends Test                                           
              ok(l.get("B", "k", "j"), 10);
    }
 
+  static LayoutBam test_overlay()                                               // A test layout  with overlays
+   {final int M = 4, N = 3;
+     final LayoutBam l = new LayoutBam()
+     {void load()
+       {array("i");
+        array("j");
+        array("k");
+        array("a", M*N);
+        overlay("b", M, N);
+       }
+     };
+
+    for (int i = 0; i < M*N; i++)
+     {l.set(i, "i");
+      l.set(i, "a", "i");
+     }
+
+    for   (int i = 0; i < M; i++)
+     {for (int j = 0; j < N; j++)
+       {l.set(i, "i");
+        l.set(j, "j");
+        ok(l.get("b", "i", "j"), i*N+j);
+       }
+     }
+    return l;
+   }
+
+  static void test_clear()
+   {final int M = 4, N = 3;
+     final LayoutBam l = new LayoutBam()
+     {void load()
+       {array("i");
+        array("j");
+        array("k");
+        array("a", M);
+        array("b", M, N);
+       }
+     };
+
+    for (int i = 0; i < M; i++)
+     {l.set(i, "i");
+      l.set(i, "a", "i");
+     }
+
+    for   (int i = 0; i < M; i++)
+     {for (int j = 0; j < N; j++)
+       {l.set(i, "i");
+        l.set(j, "j");
+        l.set(i*N+j, "b", "i", "j");
+       }
+     }
+    //stop(l);
+    l.clear(3, "j");
+    l.clear(4, "a", "j");
+    l.clear(2, "i");
+    l.clear(5, "b", "i");
+    //stop(l);
+    ok(""+l, """
+   0     0                  2  i -
+   1     1                  3  j -
+   2     2                  0  k -
+   3     3           0      0  a -
+   4     3           1      1  a |
+   5     3           2      2  a |
+   6     3           3      0  a |
+   7     7     0     0      0  b -
+   8     7     0     1      1  b |
+   9     7     0     2      2  b |
+  10     7     1     0      3  b +
+  11     7     1     1      4  b |
+  12     7     1     2      5  b |
+  13     7     2     0      0  b +
+  14     7     2     1      0  b |
+  15     7     2     2      0  b |
+  16     7     3     0      9  b +
+  17     7     3     1     10  b |
+  18     7     3     2     11  b |
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_set();
     test_get();
     test_move();
     test_compare();
     test_add();
+    test_overlay();
+    test_clear();
    }
 
   static void newTests()                                                        // Tests being worked on
