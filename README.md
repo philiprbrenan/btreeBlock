@@ -70,7 +70,7 @@ show the layout of [Silicon](https://en.wikipedia.org/wiki/Silicon) for each ope
 
 ## Gowin Tang Nano 9K
 
-The ``find`` operation is small enough to be run on a Gowin Tang Nano 9K [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array), see:
+The ``find`` operation of [the](https://en.wikipedia.org/wiki/The)  custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) is small enough to be run on a Gowin Tang Nano 9K [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array), see:
 
 ![Nano 9k](https://github.com/philiprbrenan/btreeBlock/blob/main/images/first_light_doc_nano9K.jpg)
 
@@ -78,7 +78,7 @@ The ``find`` operation is small enough to be run on a Gowin Tang Nano 9K [Field 
 # Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) 
 For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)): 
 ```
-   BtreePA t = new BtreePA()
+   BtreeSF t = new BtreeSF()
      {int maxSize         () {return  8;}
       int maxKeysPerLeaf  () {return  2;}
       int maxKeysPerBranch() {return  3;}
@@ -86,52 +86,6 @@ For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)):
       int bitsPerData     () {return  4;}
      };
 ```
- [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) Synthesis uses the following resources to implement the **find**
-operation.
-
-```
-INFO: [Synth 8-6157] synthesizing module 'find' [/home/azureuser/btreeBlock/verilog/find/2/find.v:6]
-+------+---------+-------+------+
-|      |Instance |Module |Cells |
-+------+---------+-------+------+
-|1     |top      |       |   532|
-+------+---------+-------+------+
----------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:00:30 ; elapsed = 00:00:32 . Memory (MB): peak = 2154.945 ; gain = 721.441 ;
----------------------------------------------------------------------------------
-Synthesis finished with 0 errors, 0 critical warnings and 53 warnings.
-```
- [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) Synthesis uses the following resources to implement the **put**
-operation.
-
-```
-INFO: [Synth 8-6157] synthesizing module 'put' [/home/azureuser/btreeBlock/verilog/put/2/put.v:6]
-+------+---------+-------+-------+
-|      |Instance |Module |Cells  |
-+------+---------+-------+-------+
-|1     |top      |       | 148348|
-+------+---------+-------+-------+
----------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:24:57 ; elapsed = 00:25:45 . Memory (MB): peak = 3180.359 ; gain = 1746.855 ;
----------------------------------------------------------------------------------
-Synthesis finished with 0 errors, 0 critical warnings and 80 warnings.
-```
- [Vivado](https://en.wikipedia.org/wiki/Xilinx_Vivado) Synthesis uses the following resources to implement the **delete**
-operation.
-
-```
-INFO: [Synth 8-6157] synthesizing module 'delete' [/home/azureuser/btreeBlock/verilog/delete/2/delete.v:6]
-+------+---------+-------+-------+
-|      |Instance |Module |Cells  |
-+------+---------+-------+-------+
-|1     |top      |       | 119947|
-+------+---------+-------+-------+
----------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:19:27 ; elapsed = 00:20:11 . Memory (MB): peak = 3132.988 ; gain = 1699.551 ;
----------------------------------------------------------------------------------
-Synthesis finished with 0 errors, 0 critical warnings and 55 warnings.
-```
-
 
 The [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)) being searched looks like this:
 
