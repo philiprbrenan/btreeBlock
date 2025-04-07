@@ -35,13 +35,6 @@ abstract class LayoutBam extends Test                                           
      }
    }
 
-  String[]reverse(String[]a)                                                    // Reverse an array
-   {final int N = a.length;
-    final String[]A = new String[N];
-    for (int i = 0; i < N; i++) A[N-1-i] = a[i];
-    return A;
-   }
-
   void load() {}                                                                // Override this method to define the layout
 
   LayoutBam()                                                                   // Create a layout
@@ -62,7 +55,7 @@ abstract class LayoutBam extends Test                                           
      }
     final int v = memory[I.base];                                               // The value of the index
     if (v < 0) stop("Index:", Index, "is negative");
-    if (v >= Array.dimensions[Dimension]) stop("Index:", Index, "value", v, "is greater than dimension["+Dimension+"] with extent:", Array.dimensions[Dimension]);
+    if (v >= Array.dimensions[Dimension]) stop("Index:", Index, "value", v, "is greater than dimension["+Dimension+"] with extent:", Array.dimensions[Dimension], "in array:", Array.name);
     return v;
    }
 
@@ -72,7 +65,7 @@ abstract class LayoutBam extends Test                                           
 
     final int I = i.length;
     final int T = t.dimensions.length;
-    if (T != I) stop("Wrong number of dimensions", T, "!=", I);                 // Check we have the right number of indices
+    if (T != I) stop("Wrong number of dimensions:", T, "!=", I, "for array:", target);
 
     final int v = switch(T)
      {case  0 -> memory[t.base]                                                                 = Value;
@@ -81,34 +74,91 @@ abstract class LayoutBam extends Test                                           
      };
    }
 
-  int get(String target, String...Indices)                                      // Get the value of an array element
-   {final Array t   = get(target);
+  int get(String source, String...Indices)                                      // Get the value of an array element
+   {final Array s   = get(source);
     final String[]i = Indices;
 
     final int I = i.length;
-    final int T = t.dimensions.length;
-    if (T != I) stop("Wrong number of dimensions", T, "!=", I);                 // Check we have the right number of indices
+    final int S = s.dimensions.length;
+    if (S != I) stop("Wrong number of dimensions:", S, "!=", I, "for array:", source);
 
-    return switch(T)
-     {case  0 -> memory[t.base];
-      case  1 -> memory[t.base+lookUpIndex(t, 0, i[0])];
-      default -> memory[t.base+lookUpIndex(t, 1, i[1])*t.dimensions[0]+lookUpIndex(t, 0, i[0])];
+    return switch(S)
+     {case  0 -> memory[s.base];
+      case  1 -> memory[s.base+lookUpIndex(s, 0, i[0])];
+      default -> memory[s.base+lookUpIndex(s, 1, i[0])*s.dimensions[0]+lookUpIndex(s, 0, i[1])];
      };
    }
 
   void move(String target, String source, String...Indices)                     // Copy the indexed source field to the indexed target fields
-   {final Array t   = get(target), s = get(source);
+   {final Array t = get(target), s = get(source);
 
     final int I = Indices.length;
     final int T = t.dimensions.length, S = s.dimensions.length;
-    if (T + S != I) stop("Wrong number of dimensions", T, "+", S, "!=", I);     // Check we have the right number of indices
+    if (T + S != I) stop("Wrong number of dimensions:", T, "+", S, "!=", I, "for arrays:", target+",", source);
 
-    final String[]ti = new String[T];
+    final String[]ti = new String[T];                                           // Assign indices
     final String[]si = new String[S];
-    for (int i = 0; i < T; i++) ti[i]   = Indices[T-i-i];
-    for (int i = T; i < I; i++) si[i-T] = Indices[I-1-i];
+    for (int i = 0; i < T; i++) ti[i]   = Indices[i];
+    for (int i = T; i < I; i++) si[i-T] = Indices[i];
 
     set(get(source, si), target, ti);
+   }
+
+  int compareImmediate(int immediate, String source, String...Indices)          // Compare the indexed source field to the immediate value returning -1 if source is less that target, 0 if equal otherwise +1
+   {final Array s = get(source);
+
+    final int I = Indices.length;
+    final int S = s.dimensions.length;
+    if (S != I) stop("Wrong number of dimensions:", S, "!=", I, "for array:", source);
+
+    final int a = immediate;
+    final int b = get(source, Indices);
+    return Integer.valueOf(b).compareTo(Integer.valueOf(a));
+   }
+
+  int compare(String target, String source, String...Indices)                   // Compare the indexed source field to the indexed target field returning -1 if source is less that target, 0 if equal otherwise +1
+   {final Array t = get(target), s = get(source);
+
+    final int I = Indices.length;
+    final int T = t.dimensions.length, S = s.dimensions.length;
+    if (T + S != I) stop("Wrong number of dimensions:", T, "+", S, "!=", I);     // Check we have the right number of indices
+
+    final String[]ti = new String[T];                                           // Assign indices
+    final String[]si = new String[S];
+    for (int i = 0; i < T; i++) ti[i]   = Indices[i];
+    for (int i = T; i < I; i++) si[i-T] = Indices[i];
+
+    final int a = get(source, si);
+    final int b = get(target, ti);
+    return Integer.valueOf(b).compareTo(Integer.valueOf(a));
+   }
+
+  void addImmediate(int immediate, String source, String...Indices)             // Add a constant value to the source field
+   {final Array s = get(source);
+
+    final int I = Indices.length;
+    final int S = s.dimensions.length;
+    if (S != I) stop("Wrong number of dimensions:", S, "!=", I, "for array:", source);
+
+    final int a =  get(source, Indices);
+    set(immediate + a, source, Indices);
+   }
+
+  void add(String target, String source, String...Indices)                      // Add the source to the target replacing the target
+   {final Array t = get(target), s = get(source);
+
+    final int I = Indices.length;
+    final int T = t.dimensions.length, S = s.dimensions.length;
+    if (T + S != I) stop("Wrong number of dimensions:", T, "+", S, "!=", I);    // Check we have the right number of indices
+
+    final String[]ti = new String[T];                                           // Assign indices
+    final String[]si = new String[S];
+    for (int i = 0; i < T; i++) ti[i]   = Indices[i];
+    for (int i = T; i < I; i++) si[i-T] = Indices[i];
+
+    final int a = get(source, si);
+    final int b = get(target, ti);
+    set(a+b, target, ti);
    }
 
   public String toString()                                                      // Print layout
@@ -201,13 +251,84 @@ abstract class LayoutBam extends Test                                           
     return l;
    }
 
+  static void test_get()
+   {LayoutBam l = test_set();
+    ok(l.get("B", "k", "i"), 8);
+    ok(l.get("B", "j", "j"), 9);
+   }
+
+  static LayoutBam test_move()
+   {LayoutBam l = test_set();
+    l.move("B", "a", "k", "i", "i");
+    l.move("B", "a", "k", "j", "j");
+    //stop(l);
+    ok(""+l, """
+   0     0                  1  i -
+   1     1                  2  j -
+   2     2                  3  k -
+   3     3           0      0  a -
+   4     3           1      4  a |
+   5     3           2      5  a |
+   6     3           3      0  a |
+   7     7           0      0  b -
+   8     7           1      0  b |
+   9     7           2      0  b |
+  10     7           3      0  b |
+  11     7           4      0  b |
+  12     7           5      0  b |
+  13    13     0     0      0  A -
+  14    13     0     1      0  A |
+  15    13     0     2      0  A |
+  16    13     0     3      0  A |
+  17    13     1     0      0  A +
+  18    13     1     1      0  A |
+  19    13     1     2      7  A |
+  20    13     1     3      6  A |
+  21    21     0     0      0  B -
+  22    21     0     1      0  B |
+  23    21     0     2      0  B |
+  24    21     1     0      0  B +
+  25    21     1     1      0  B |
+  26    21     1     2      0  B |
+  27    21     2     0      0  B +
+  28    21     2     1      0  B |
+  29    21     2     2      9  B |
+  30    21     3     0      0  B +
+  31    21     3     1      4  B |
+  32    21     3     2      5  B |
+""");
+    return l;
+   }
+
+  static void test_compare()
+   {LayoutBam l = test_move();
+    ok(l.compareImmediate(4, "B", "k", "j"), +1);
+    ok(l.compareImmediate(5, "B", "k", "j"),  0);
+    ok(l.compareImmediate(6, "B", "k", "j"), -1);
+    ok(l.compare("B", "B", "k", "j", "k", "i"), +1);
+    ok(l.compare("B", "B", "k", "j", "j", "j"), -1);
+    ok(l.compare("B", "a", "k", "j", "j"),       0);
+   }
+
+  static void test_add()
+   {LayoutBam l = test_move();
+
+    l.addImmediate(1, "B", "k", "i");
+             ok(l.get("B", "k", "i"),  5);
+    l.add       ("B", "B", "k", "j", "k", "i");
+             ok(l.get("B", "k", "j"), 10);
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
-   {
+   {test_set();
+    test_get();
+    test_move();
+    test_compare();
+    test_add();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_set();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
