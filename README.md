@@ -77,7 +77,7 @@ The ``find`` operation of [the](https://en.wikipedia.org/wiki/The)  custom [CPU]
 In the image, the power light is the LED at the bottom, then reading up the
 first **4** leds from the power LED having values **8**, **4**, **2**, **1**
 are signalling that the [data](https://en.wikipedia.org/wiki/Data) associated with [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) **5** is **4** or in binary
-**P 0100**10.
+**P 0100F**0 wher **F** is powered on showing that the [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) was found in the [B-Tree](https://en.wikipedia.org/wiki/B-tree) .
 
 # Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) 
 For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)): 
