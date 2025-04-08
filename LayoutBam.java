@@ -55,18 +55,24 @@ abstract class LayoutBam extends Test                                           
     memory = new int[size];                                                     // Create the memeory for the basic array machine
    }
 
-  Array get(String Name)                                                        // Get an array by name or complain if the name is invalid
+  private Array get(String Name)                                                // Get an array by name or complain if the name is invalid
    {final Array A = arrays.get(Name);
     if (A == null) stop("No such array as", Name);
     return A;
    }
 
   int lookUpIndex(Array Array, int Dimension, String Index)                     // Look up an index which will be used in the specified dimension of the specified array
-   {final Array I = get(Index);                                                 // Hopefully the index is a field
-    if (I.dimensions.length > 0)                                                // Complain if the index is not a field
-     {stop("Index:", Index, "cannot itself be be an indexed array element");
+   {int v;                                                                      // The value of the index
+    try
+     {v = Integer.parseInt(Index);                                              // The integer has been supplied directly as a string that we can parse
      }
-    final int v = memory[I.base];                                               // The value of the index
+    catch (NumberFormatException e)                                             // The index is a reference to an array
+     {final Array I = get(Index);                                               // Hopefully the index is a field - a zero dimensional array
+      if (I.dimensions.length > 0)                                              // Complain if the index is not a field
+       {stop("Index:", Index, "cannot itself be be an indexed array element");
+       }
+      v = memory[I.base];                                                       // The value of the index
+     }
     if (v < 0) stop("Index:", Index, "is negative");
     if (v >= Array.dimensions[Dimension]) stop("Index:", Index, "value", v, "is greater than dimension["+Dimension+"] with extent:", Array.dimensions[Dimension], "in array:", Array.name);
     return v;
@@ -85,6 +91,14 @@ abstract class LayoutBam extends Test                                           
       case  1 -> memory[t.base+lookUpIndex(t, 0, i[0])]                                         = Value;
       default -> memory[t.base+lookUpIndex(t, 1, i[0])*t.dimensions[0]+lookUpIndex(t, 0, i[1])] = Value;
      };
+   }
+
+  void set(String target, int...values)                                         // Load an array
+   {final Array t = get(target);
+    final int   N = values.length;
+    if (N > t.length) stop("Too many initializers for array:", t.name, "with length", t.length);
+
+    for (int i = 0; i < N; i++) memory[t.base+i] = values[i];
    }
 
   int get(String source, String...Indices)                                      // Get the value of an array element
@@ -352,6 +366,16 @@ abstract class LayoutBam extends Test                                           
     ok(l.compare("B", "a", "k", "j", "j"),       0);
    }
 
+  static void test_compare_int()                                                // Encode some indices directly instead of indirectly
+   {LayoutBam l = test_move();
+    ok(l.compareImmediate(4, "B",    "3",  "j"), +1);
+    ok(l.compareImmediate(5, "B",    "3",  "j"),  0);
+    ok(l.compareImmediate(6, "B",    "3",  "j"), -1);
+    ok(l.compare("B", "B", "3", "j", "3",  "i"), +1);
+    ok(l.compare("B", "B", "3", "j", "j", "j"), -1);
+    ok(l.compare("B", "a", "3", "j", "j"),       0);
+   }
+
   static void test_add()
    {LayoutBam l = test_move();
 
@@ -441,11 +465,38 @@ abstract class LayoutBam extends Test                                           
 """);
    }
 
+  static void test_initialize()
+   {final LayoutBam l = new LayoutBam()
+     {void load()
+       {array("a");
+        array("b", 2);
+        array("c", 2, 3);
+       }
+     };
+
+    l.set("a", 1);
+    l.set("b", 1, 2);
+    l.set("c", 11, 12, 13, 21, 22, 23);
+    //stop(l);
+    ok(""+l, """
+   0     0                  1  a -
+   1     1           0      1  b -
+   2     1           1      2  b |
+   3     3     0     0     11  c -
+   4     3     0     1     12  c |
+   5     3     0     2     13  c |
+   6     3     1     0     21  c +
+   7     3     1     1     22  c |
+   8     3     1     2     23  c |
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_set();
     test_get();
     test_move();
     test_compare();
+    test_compare_int();
     test_add();
     test_overlay();
     test_clear();
@@ -453,6 +504,7 @@ abstract class LayoutBam extends Test                                           
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    test_initialize();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
