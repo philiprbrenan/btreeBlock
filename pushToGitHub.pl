@@ -96,7 +96,7 @@ if (1)                                                                          
  {my @j = map {fn $_}  grep {fn($_) !~ m(Able\Z)}                               # Java files to test do not include interfaces
           grep {!m(/c/)}                                                        # Excluding the java files in the C folder
           searchDirectoryTreesForMatchingFiles($home, qw(.java));               # Java files
-  @j = qw(BtreeSF BtreeDM);                                                     # This will test all the stuff of current interest
+  @j = qw(BtreeSF BtreeDM BtreeBam);                                                     # This will test all the stuff of current interest
 
   my $d = dateTimeStamp;
   my $c = q(com/AppaApps/Silicon);                                              # Package to classes folder
