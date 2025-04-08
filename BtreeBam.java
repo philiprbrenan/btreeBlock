@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Btree on the Basic Array Machine for performance comparision with BtreeSF
+// Btree on the Basic Array Machine for performance comparision with BtreeSF.
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
