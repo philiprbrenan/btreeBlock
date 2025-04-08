@@ -74,6 +74,10 @@ The ``find`` operation of [the](https://en.wikipedia.org/wiki/The)  custom [CPU]
 
 ![Nano 9k](https://github.com/philiprbrenan/btreeBlock/blob/main/images/first_light_doc_nano9K.jpg)
 
+In the image, the power light is the LED at the bottom, then reading up from
+the power LED from the high order bits to the low order bits, the LEDs are
+signalling that the [data](https://en.wikipedia.org/wiki/Data) associated with [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) **4** is **5** or in binary
+**001001**.
 
 # Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) 
 For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)): 
