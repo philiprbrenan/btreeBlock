@@ -822,14 +822,14 @@ class Btree extends Test                                                        
        {z();
         final Node.FindFirstGreaterThanOrEqualInLeaf f =
           leaf().new FindFirstGreaterThanOrEqualInLeaf(Key);
-        if (f.found)
+//        if (f.found)
          {z();
           leaf().keyData.insertElementAt(new KeyData(Key, Data), f.first);
          }
-        else                                                                    // No matching key so put at end
-         {z();
-          leaf().keyData.push(new KeyData(Key, Data));
-         }
+//        else                                                                    // No matching key so put at end
+//         {z();
+//          leaf().keyData.push(new KeyData(Key, Data));
+//         }
         success = true;
         return;
        }
