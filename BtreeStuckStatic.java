@@ -833,14 +833,14 @@ class BtreeStuckStatic extends Test                                             
        {z();
         final Node.FindFirstGreaterThanOrEqualInLeaf f =
           leaf().findFirstGreaterThanOrEqualInLeaf1(Key);
-        if (f.found)                                                            // Overwrite existing key
-         {z();
+//        if (f.found)                                                            // Overwrite existing key
+//         {z();
           leaf().keyData.insertElementAt(Key, Data, f.first);
-         }
-        else                                                                    // Insert into position
-         {z();
-          leaf().keyData.push(Key, Data);
-         }
+//         }
+//        else                                                                    // Insert into position
+//         {z();
+//          leaf().keyData.push(Key, Data);
+//         }
         success = true;
         return this;
        }
