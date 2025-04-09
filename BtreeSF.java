@@ -1657,7 +1657,7 @@ abstract class BtreeSF extends Test                                             
                {z();
                 P.parallelStart();    lEqual.T.at(lEqual.tKey ).move(T.at(Key));
                 P.parallelSection();  lEqual.T.at(lEqual.tData).move(T.at(Data));
-                P.parallelSection(); T.at(inserted).zero();
+                P.parallelSection(); T.at(inserted).ones();
                 P.parallelEnd();
 
                 lEqual.insertElementAt();
@@ -4396,6 +4396,7 @@ StuckSML(maxSize:4 size:1)
     test_verilogDelete();
     test_verilogFind();
     test_verilogPut();
+    test_find_and_insert();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
