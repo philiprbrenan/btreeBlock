@@ -547,7 +547,7 @@ class BtreeBam extends Test                                                     
     return ""+t;                                                                // Printed tree
    }
 
-  String dump()                                                                 // Dump a tree horizontally
+  String print()                                                                 // Dump a tree horizontally
    {L.save();
     final int N = linesPerTree*linesPerNode;                                    // A big buffer with room for several lines per node
     final StringBuilder [] S = new StringBuilder[N];                            // A big buffer with room for several lines per node
@@ -558,7 +558,7 @@ class BtreeBam extends Test                                                     
    }
 
   void print(String title)                                                      // Print the tree
-   {final String s = dump();
+   {final String s = print();
     say("Tree: %s", title);
     say(s);
    }
@@ -1204,8 +1204,8 @@ Stuck(size:3)
    {final BtreeBam b = new BtreeBam(2, 3, 29);
     int N = 32;
     for (int i = 1; i <= N; i++) b.put(i, i);
-    //stop(b.dump());
-    ok(b.dump(), """
+    //stop(b.print());
+    ok(b.print(), """
                                                                                                   16                                                                                                                     +
                                                                                                   17                                                                                                                     21
                                                                                                   0                                                                                                                      0
@@ -1226,8 +1226,8 @@ Stuck(size:3)
    {final BtreeBam b = new BtreeBam(2, 3, 29);
     int N = 32;
     for (int i = N; i > 0; i--) b.put(i, i);
-    //stop(b.dump());
-    ok(b.dump(), """
+    //stop(b.print());
+    ok(b.print(), """
                                                                                                            16                                                                                                               +
                                                                                                            9                                                                                                                22
                                                                                                            0                                                                                                                0
@@ -1251,8 +1251,8 @@ Stuck(size:3)
    {final BtreeBam b = new BtreeBam(2, 3, 100);
     int N = random_small.length;
     for (int i = 0; i < N; ++i) b.put(random_small[i], i);
-    //stop(b.dump());
-    ok(b.dump(), """
+    //stop(b.print());
+    ok(b.print(), """
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 493                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               +
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 60
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 0
@@ -1278,8 +1278,8 @@ Stuck(size:3)
     int N = 32;
     for (int i = 1; i <= N; i++)    b.put(i, i);
     for (int i = 1; i <= N; i += 2) b.delete(i);
-    //stop(b.dump());
-    ok(b.dump(), """
+    //stop(b.print());
+    ok(b.print(), """
                                               16                            24                            +
                                               5                             16                            23
                                               0                             0                             0
@@ -1297,8 +1297,8 @@ Stuck(size:3)
     int N = 32;
     for (int i = 1; i <= N; i++)   b.put(i, i);
     for (int i = N; i > 0; i -= 2) b.delete(i);
-    //stop(b.dump());
-    ok(b.dump(), """
+    //stop(b.print());
+    ok(b.print(), """
                    8                         16                                                          +
                    5                         11                                                          16
                    0                         0                                                           0
@@ -1325,8 +1325,8 @@ Stuck(size:3)
          }
        }
      }
-    //stop(b.dump());
-    ok(b.dump(), """
+    //stop(b.print());
+    ok(b.print(), """
                    6                                  17                                        40                                           +
                    5                                  11                                        23                                           33
                    0                                  0                                         0                                            0
