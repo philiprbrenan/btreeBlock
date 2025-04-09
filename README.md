@@ -440,8 +440,8 @@ the the multiples of each prime number from an initial set of integers.
 In this example, with **N** set to **64**, the initial set of integers was
 successfully reduced to a set of primes by deleting the multiples of each
 prime. A [B-Tree](https://en.wikipedia.org/wiki/B-tree) was used to hold the initial set of integers **1..64**. Deleting
-the multiples of each prime produces:
-
+the multiples of each prime produces leaves behind the primes as the leaves
+upon the [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)): 
 ```
              6                        17                               40                                 |
              0                        0.1                              0.2                                |
