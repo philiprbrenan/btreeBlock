@@ -19,20 +19,17 @@ http://prb.appaapps.com/zesal/pitchdeck/pitchDeck.html
 
 See this [action](https://github.com/philiprbrenan/btreeBlock/blob/main/.github/workflows/main.yml).
 
-# Roadmap
-
-# The custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) 
-I implemented the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm in [Java](https://en.wikipedia.org/wiki/Java_(programming_language)), then successively reduced the [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) [code](https://en.wikipedia.org/wiki/Computer_program) until it looked just like [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program), at which point it was easy to
-generate a [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) in [Verilog](https://en.wikipedia.org/wiki/Verilog) to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program).  The resulting design
-was compacted by reusing identical instructions and pipelined to reduce
+# Roadmap: custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) vs generic [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) 
+The [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm has been implemented in normal [Java](https://en.wikipedia.org/wiki/Java_(programming_language)), then successively
+reduced until it looked just like [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program), at which point it was easy to
+generate a custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) in [Verilog](https://en.wikipedia.org/wiki/Verilog) to execute the [assembler](https://en.wikipedia.org/wiki/Assembly_language#Assembler) [code](https://en.wikipedia.org/wiki/Computer_program).  The resulting
+design was compacted by reusing identical instructions and pipelined to reduce
 congestion. ![Roadmap](flowChart/DevelopmentFlowChart.png)
 
 This produced a custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) with an instruction set specifically designed to
 facilitate the **put**, **find** and **delete** operations on a [B-Tree](https://en.wikipedia.org/wiki/B-tree) .
 
-# The generic [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) 
-I am now implementing the [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm on a generic risc soft [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) so that
-the performance of the generic [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) versus the performance of the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) can be compared by running them both on the same [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array) to see which
+The same  [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm is now being implemented on a generic [reduced instruction set computer](https://en.wikipedia.org/wiki/Reduced_instruction_set_computer) soft [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) so that the performance of the generic [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) versus the performance of the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) can be compared by running them both on the same [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array) to see which
 implementation is faster and which uses less power.
 
 # Synthesis, Placement and Routing
