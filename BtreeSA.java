@@ -1716,19 +1716,19 @@ abstract class BtreeSA extends Test                                             
       tt(search, Key);
       tt(node_findFirstGreaterThanOrEqualInLeaf, leafFound);
       findFirstGreaterThanOrEqualInLeaf();
-      if (T.at(found).isOnes())                                                 // Overwrite existing key
-       {z();
+//      if (T.at(found).isOnes())                                                 // Overwrite existing key
+//       {z();
         lT.T.at(lT.tKey ).move(T.at(Key));
         lT.T.at(lT.tData).move(T.at(Data));
         lT.T.at(lT.index).move(T.at(first));
         lT.insertElementAt();
-       }
-      else                                                                      // Insert into position
-       {z();
-        lT.T.at(lT.tKey ).move(T.at(Key));
-        lT.T.at(lT.tData).move(T.at(Data));
-        lT.push();
-       }
+//       }
+//      else                                                                      // Insert into position
+//       {z();
+//        lT.T.at(lT.tKey ).move(T.at(Key));
+//        lT.T.at(lT.tData).move(T.at(Data));
+//        lT.push();
+//       }
       T.at(success).ones();
       tt(findAndInsert, leafFound);
       return;
