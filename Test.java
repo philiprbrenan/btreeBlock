@@ -414,7 +414,8 @@ public class Test                                                               
     return e.containsKey(line);                                                 // Whether this line in this file was executed
    }
 
-  final static String coverageAnalysisSubStart = "zz();";                       // A string indicating the start of a subroutine
+//final static String coverageAnalysisSubStart = "zz();";                       // A string indicating the start of a subroutine - smethod entries only
+  final static String coverageAnalysisSubStart = "z();";                        // Any labelled statament
 
   static void coverageAnalysis(int top, String...Ignore)                        // Coverage analysis: unexecuted lines and top lines most frequently executed over all files encountered in a Geany clickable format.
    {final TreeMap<String,TreeSet<Integer>> notExecuted      = new TreeMap<>();  // File, lines not executed
