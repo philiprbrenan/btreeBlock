@@ -11,7 +11,8 @@ dot.node('BSP',  'BtreeSP\ntransactional')
 dot.node('BSA',  'BtreeSA\ntransaction in bit memory');
 dot.node('BPA',  'BtreePA\npseudo assembler');
 dot.node('BDM',  'BtreeDM\nroutable Verilog');
-dot.node('RVL',  'The Btree algorithm in Routable Verilog', fontcolor='darkgreen', style='bold', fontsize='20')
+dot.node('RVL',  'The Btree algorithm in Routable Verilog\nThe CUSTOM cpu', fontcolor='darkgreen', style='bold', fontsize='20')
+dot.node('BAM',  'The Btree algorithm\non a basic array machine\nThe GENERIC cpu',      fontcolor='blue', style='bold', fontsize='20')
 
 dot.node('S',    'Stuck\nfixed key/value stack in normal Java')
 dot.node('SS',   'StuckStatic\nreduced use of new')
@@ -32,6 +33,7 @@ dot.edge('BSP',  'BSA')
 dot.edge('BSA',  'BPA')
 dot.edge('BPA',  'BDM')
 dot.edge('BDM',  'RVL')
+dot.edge('B',    'BAM')
 
 dot.edge('S',    'SS')
 dot.edge('SS',   'SSML')
