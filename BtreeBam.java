@@ -355,7 +355,7 @@ class BtreeBam extends Test                                                     
         return true;
        }
      }
-    else if (branchSize(l) + 1 + branchSize(r) <= maxKeysPerBranch - 1)         // Branches
+    else if (branchSize(l) + 1 + branchSize(r) <= maxKeysPerBranch)         // Branches
      {setStuck(p); stuck_firstElement(); final int pkn = getKey();
       stuck_clear();
       int nl = branchSize(l);
@@ -383,7 +383,7 @@ class BtreeBam extends Test                                                     
    {final int P = parent;
     if (index == 0) return false;
     int bs = branchSize(P);
-    //if (bs < 2) return false;
+    if (index >= bs) return false;
 
     setStuck(P);
     setIndex(index-1); stuck_elementAt(); final int l = getData();
@@ -406,14 +406,14 @@ class BtreeBam extends Test                                                     
      {final int nl = branchSize(l);
       final int nr = branchSize(r);
 
-      if (nl + 1 + nr >= maxKeysPerBranch-1) return false;                      // Merge not possible because there is not enough room for the combined result
+      if (nl + 1 + nr > maxKeysPerBranch) return false;                      // Merge not possible because there is not enough room for the combined result
 
       setStuck(P); setIndex(index-1); stuck_elementAt(); final int t = getKey();// Top key
       setStuck(l); stuck_lastElement();                                         // Last element of left child
       setStuck(r); setKey(t); stuck_unshift();                                  // Left top to right
 
       setStuck(l); stuck_pop();                                                 // Remove left top
-      int N = branchSize(l);                                                    // Number of entries to remove
+      int N = branchSize(l)+1;                                                    // Number of entries to remove
       for (int i = 0; i < N; i++)                                               // Transfer left to right
        {setStuck(l); stuck_pop();
         setStuck(r); stuck_unshift();
@@ -428,7 +428,7 @@ class BtreeBam extends Test                                                     
    {final int P = parent;
     setStuck(P);
     final int bs = stuck_size()-1;
-    if (index >= bs) return false;
+    if (index >= bs) return false;                                              // No right sibling
     //if (bs < 2) return false;
 
     setStuck(parent);
@@ -452,13 +452,12 @@ class BtreeBam extends Test                                                     
      {final int nl = branchSize(l);
       final int nr = branchSize(r);
 
-      if (nl + 1 + nr >= maxKeysPerBranch-1) return false;                      // Merge not possible because there is not enough room in a single branch
+      if (nl + 1 + nr >  maxKeysPerBranch) return false;                      // Merge not possible because there is not enough room in a single branch
       setStuck(l); stuck_lastElement(); final int ld = getData();               // Last element of left child
       setStuck(parent); setIndex(index); stuck_elementAt();                     // Parent dividing element
       setStuck(l); setData(ld); setIndex(nl); stuck_setElementAt();             // Re-key left top
 
-      final int N = branchSize(r);                                              // Number of entries to remove
-      for (int i = 0; i < N; i++)                                               // Transfer right to left
+      for (int i = 0; i < nr+1; i++)                                               // Transfer right to left
        {setStuck(r); stuck_shift();
         setStuck(l); stuck_push();
        }
@@ -526,6 +525,7 @@ class BtreeBam extends Test                                                     
     final int k = getKey(), d = getData();
     if (isLeaf(d)) printLeaf(d, S, level+linesPerNode);
     else         printBranch(d, S, level+linesPerNode);
+    S[level+0].append("+");
     S[level+1].append(String.format("%d", d));
     S[level+2].append(String.format("%d", node));
     S[level+3].append(String.format("%d", L));
@@ -676,7 +676,6 @@ class BtreeBam extends Test                                                     
         setStuck(p); setKey(Key);
         stuck_searchFirstGreaterThanOrEqualExceptLast();
         p = getData();
-
        }
       else
        {p = q;
@@ -725,7 +724,6 @@ class BtreeBam extends Test                                                     
       stuck_searchFirstGreaterThanOrEqualExceptLast();
 
       final int q = getData();
-
       if (isLeaf(q))                                                            // Reached a leaf
        {findAndDelete(Key);
         merge(Key);
@@ -745,7 +743,7 @@ class BtreeBam extends Test                                                     
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
      {if (isLeaf(p)) return;
 
-      for (int j = 0; j < branchSize(p); j++)                                   // Try merging each sibling pair which might change the size of the parent
+      for (int j = 0; j < branchSize(p)+1; j++)                                   // Try merging each sibling pair which might change the size of the parent
        {if (mergeLeftSibling(p, j)) --j;                                        // A successful merge of the left  sibling reduces the current index and the upper limit
         mergeRightSibling(p, j);                                                // A successful merge of the right sibling maintains the current position but reduces the upper limit
        }
@@ -1208,19 +1206,19 @@ Stuck(size:3)
     for (int i = 1; i <= N; i++) b.put(i, i);
     //stop(b.dump());
     ok(b.dump(), """
-                                          8                                                         16
-                                          13                                                        21                                                                                                                     14
-                                          0                                                         0                                                                                                                      0
-                                          0                                                         1                                                                                                                      2
-                   4                                                  12                                                          20                            24                            28
-                   5                      9                           12                            17                            20                            24                            27                           6
-                   13                     13                          21                            21                            14                            14                            14                           14
-                   0                      1                           0                             1                             0                             1                             2                            3
-        2                      6                       10                            14                            18                            22                            26                            30
-        1          3           4          7            8              10             11             15             16             18             19             22             23             25             26            2
-        5          5           9          9            12             12             17             17             20             20             24             24             27             27             6             6
-        0          1           0          1            0              1              0              1              0              1              0              1              0              1              0             1
-1 2=1      3 4=3       5 6=4      7 8=7       9 10=8       11 12=10       13 14=11       15 16=15       17 18=16       19 20=18       21 22=19       23 24=22       25 26=23       27 28=25       29 30=26       31 32=2
+                                                                                                  16                                                                                                                     +
+                                                                                                  17                                                                                                                     21
+                                                                                                  0                                                                                                                      0
+                                                                                                  0                                                                                                                      1
+                                         8                                                        +                                                           24                            28                           +
+                                         5                                                        11                                                          16                            23                           6
+                                         17                                                       17                                                          21                            21                           21
+                                         0                                                        1                                                           0                             1                            2
+        2          4          6          +            10             12            14             +              18             20             22             +              26             +              30            +
+        1          3          4          7            8              10            9              12             13             15             14             19             18             22             20            2
+        5          5          5          5            11             11            11             11             16             16             16             16             23             23             6             6
+        0          1          2          3            0              1             2              3              0              1              2              3              0              1              0             1
+1 2=1      3 4=3      5 6=4      7 8=7       9 10=8       11 12=10       13 14=9       15 16=12       17 18=13       19 20=15       21 22=14       23 24=19       25 26=18       27 28=22       29 30=20       31 32=2
 """);
    }
 
@@ -1230,19 +1228,19 @@ Stuck(size:3)
     for (int i = N; i > 0; i--) b.put(i, i);
     //stop(b.dump());
     ok(b.dump(), """
-                                                                                                           16                                                        24
-                                                                                                           19                                                        11                                                      14
-                                                                                                           0                                                         0                                                       0
-                                                                                                           0                                                         1                                                       2
-                      4                         8                            12                                                          20                                                      28
-                      27                        24                           20                            17                            12                          9                           5                           6
-                      19                        19                           19                            19                            11                          11                          14                          14
-                      0                         1                            2                             3                             0                           1                           0                           1
-         2                         6                          10                            14                            18                           22                          26                          30
-         28           25           23           21            22             18             16             13             15             10            8             7             4             3             2             1
-         27           27           24           24            20             20             17             17             12             12            9             9             5             5             6             6
-         0            1            0            1             0              1              0              1              0              1             0             1             0             1             0             1
-1 2=28       3 4=25       5 6=23       7 8=21       9 10=22       11 12=18       13 14=16       15 16=13       17 18=15       19 20=10       21 22=8       23 24=7       25 26=4       27 28=3       29 30=2       31 32=1
+                                                                                                           16                                                                                                               +
+                                                                                                           9                                                                                                                22
+                                                                                                           0                                                                                                                0
+                                                                                                           0                                                                                                                1
+                      4                         8                                                          +                                                        24                                                      +
+                      23                        21                                                         16                                                       11                                                      5
+                      9                         9                                                          9                                                        22                                                      22
+                      0                         1                                                          2                                                        0                                                       1
+         2            +            6            +             10             12             14             +             18             20            22            +             26            28            30            +
+         24           17           20           18            19             15             13             12            6              10            8             7             4             3             2             1
+         23           23           21           21            16             16             16             16            11             11            11            11            5             5             5             5
+         0            1            0            1             0              1              2              3             0              1             2             3             0             1             2             3
+1 2=24       3 4=17       5 6=20       7 8=18       9 10=19       11 12=15       13 14=13       15 16=12       17 18=6       19 20=10       21 22=8       23 24=7       25 26=4       27 28=3       29 30=2       31 32=1
 """);
    }
 
@@ -1255,27 +1253,23 @@ Stuck(size:3)
     for (int i = 0; i < N; ++i) b.put(random_small[i], i);
     //stop(b.dump());
     ok(b.dump(), """
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                493
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                90                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               91
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                0
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                1
-                                                                                                                                                                                                                                                         281                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      785
-                                                                                                                                                                                                                                                         70                                                                                                                                                                                                                     38                                                                                                                                                                                                                                                                                                87                                                                                                                                                                                                             39
-                                                                                                                                                                                                                                                         90                                                                                                                                                                                                                     90                                                                                                                                                                                                                                                                                                91                                                                                                                                                                                                             91
-                                                                                                                                                                                                                                                         0                                                                                                                                                                                                                      1                                                                                                                                                                                                                                                                                                 0                                                                                                                                                                                                              1
-                                                                                                                                                     190                                                                                                                                                                                     379                                                                                                                                                                                                                               561                                                                                                                                                                                                                                                                                     882
-                                                                                                                                                     53                                                                                                  35                                                                                  36                                                                                                                                 15                                                                                             50                                                                                                                                                                                                 26                                                                                   85                                                                                                                        16
-                                                                                                                                                     70                                                                                                  70                                                                                  38                                                                                                                                 38                                                                                             87                                                                                                                                                                                                 87                                                                                   39                                                                                                                        39
-                                                                                                                                                     0                                                                                                   1                                                                                   0                                                                                                                                  1                                                                                              0                                                                                                                                                                                                  1                                                                                    0                                                                                                                         1
-                         33                         55                                          120                                                                                                    253                                                                              335                                                                                 416                                               439                                                                                                               528                                                                              598                             622                                                             681                                                                                               830                                                                                                         949
-                         94                         71                                          60                                                   44                                                67                                                34                             65                                                   13                             30                                                80                                                5                                                               48                             20                                                88                              46                                                              54                                               10                                               83                                  24                                                                      42                                                6
-                         53                         53                                          53                                                   53                                                35                                                35                             36                                                   36                             15                                                15                                                15                                                              50                             50                                                26                              26                                                              26                                               26                                               85                                  85                                                                      16                                                16
-                         0                          1                                           2                                                    3                                                 0                                                 1                              0                                                    1                              0                                                 1                                                 2                                                               0                              1                                                 0                               1                                                               2                                                3                                                0                                   1                                                                       0                                                 1
-          20                            47                      72             96                                 153               160                                233           235                                 270               275                             307                            349               365                            397                                429               437                             457           476                                 502           506               518                         552                            570               577                                 613                         654               662           674                                 695           738                                807           819                                856                                 904               909               929                                 981           988
-          95             92             75          64          62             93               72                73                45               9                 69            68                58                56                41            14                52           3                 40                66               1             23               8                 32                84            31                37            81                28                49            21                59            17            12               4             89                77                27                78            11            47                74            82                22                51            55               7                 57            86               2                 29                19                76                33                79                18                63            43                25
-          94             94             71          71          60             60               60                44                44               44                67            67                67                34                34            34                65           65                13                13               13            30               30                80                80            80                5             5                 5                 48            48                48            48            20               20            88                88                88                46            46            54                54            54                54                10            10               10                83            83               83                24                24                42                42                42                42                6             6                 6
-          0              1              0           1           0              1                2                 0                 1                2                 0             1                 2                 0                 1             2                 0            1                 0                 1                2             0                1                 0                 1             2                 0             1                 2                 0             1                 2             3             0                1             0                 1                 2                 0             1             0                 1             2                 3                 0             1                2                 0             1                2                 0                 1                 0                 1                 2                 3                 0             1                 2
-1 13=95       27 29=92       39 43=75       55=64       72=62       90 96=93       103 106=72        135 151=73        155 157=45        186 188=9        229 232=69        234=68        237 246=58        260 261=56        272 273=41        279=14        288 298=52        317=3        338 344=40        354 358=66        376 377=1        391=23        401 403=8        422 425=32        436 437=84        438=31        442 447=37        472=81        480 490=28        494 501=49        503=21        511 516=59        526=17        545=12        554 560=4        564=89        576 577=77        578 586=27        611 612=78        615=11        650=47        657 658=74        667=82        679 681=22        686 690=51        704=55        769 773=7        804 806=57        809=86        826 830=2        839 854=29        858 882=19        884 903=76        906 907=33        912 922=79        937 946=18        961 976=63        987=43        989 993=25
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                493                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               +
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 60
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 0
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 1
+                                                                                                                                                      190                                                                                                                                                                                     379                                                                                                                               +                                                                                                                                                                                622                                                                                                                                                                                                    882                                                                                                                       +
+                                                                                                                                                      44                                                                                                                                                                                      61                                                                                                                                32                                                                                                                                                                               72                                                                                                                                                                                                     69                                                                                                                        2
+                                                                                                                                                      6                                                                                                                                                                                       6                                                                                                                                 6                                                                                                                                                                                60                                                                                                                                                                                                     60                                                                                                                        60
+                                                                                                                                                      0                                                                                                                                                                                       1                                                                                                                                 2                                                                                                                                                                                0                                                                                                                                                                                                      1                                                                                                                         2
+                         33                         55                                          120                                                   +                                                 253                                               281                            335                                                  +                              416                                               439                                              +                                                               528                            561                                               598                             +                                                               681                                              785                                               830                                 +                                                                       949                                               +
+                         88                         63                                          9                                                     42                                                65                                                38                             12                                                   35                             80                                                13                                               30                                                              48                             73                                                82                              16                                                              52                                               10                                                79                                  24                                                                      37                                                39
+                         44                         44                                          44                                                    44                                                61                                                61                             61                                                   61                             32                                                32                                               32                                                              72                             72                                                72                              72                                                              69                                               69                                                69                                  69                                                                      2                                                 2
+                         0                          1                                           2                                                     3                                                 0                                                 1                              2                                                    3                              0                                                 1                                                2                                                               0                              1                                                 2                               3                                                               0                                                1                                                 2                                   3                                                                       0                                                 1
+          20             +              47          +           72             96               +                 153               160               +                 233           235               +                 270               275           +                 307          +                 349               365              +             397              +                 429               437           +                457           476               +                 502           506               518           +             552              +             570               577               +                 613           +             654               662           674               +                 695           738              +                 807           819               +                 856               +                 904               909               929               +                 981           988               +
+          89             85             56          62          59             86               67                68                43                41                34            66                47                54                87            14                50           3                 36                64               1             23               8                 15                81            31               5             78                28                49            21                57            17            29               4             84                74                27                75            11            45                70            77                22                46            53               7                 55            83                26                20                19                71                33                76                18                51            40                25
+          88             88             63          63          9              9                9                 42                42                42                65            65                65                38                38            38                12           12                35                35               35            80               80                13                13            13               30            30                30                48            48                48            48            73               73            82                82                82                16            16            52                52            52                52                10            10               10                79            79                79                24                24                37                37                37                37                39            39                39
+          0              1              0           1           0              1                2                 0                 1                 2                 0             1                 2                 0                 1             2                 0            1                 0                 1                2             0                1                 0                 1             2                0             1                 2                 0             1                 2             3             0                1             0                 1                 2                 0             1             0                 1             2                 3                 0             1                2                 0             1                 2                 0                 1                 0                 1                 2                 3                 0             1                 2
+1 13=89       27 29=85       39 43=56       55=62       72=59       90 96=86       103 106=67        135 151=68        155 157=43        186 188=41        229 232=34        234=66        237 246=47        260 261=54        272 273=87        279=14        288 298=50        317=3        338 344=36        354 358=64        376 377=1        391=23        401 403=8        422 425=15        436 437=81        438=31        442 447=5        472=78        480 490=28        494 501=49        503=21        511 516=57        526=17        545=29        554 560=4        564=84        576 577=74        578 586=27        611 612=75        615=11        650=45        657 658=70        667=77        679 681=22        686 690=46        704=53        769 773=7        804 806=55        809=83        826 830=26        839 854=20        858 882=19        884 903=71        906 907=33        912 922=76        937 946=18        961 976=51        987=40        989 993=25
 """);
    }
 
@@ -1286,18 +1280,15 @@ Stuck(size:3)
     for (int i = 1; i <= N; i += 2) b.delete(i);
     //stop(b.dump());
     ok(b.dump(), """
-                    8                            24
-                    13                           21                            14
-                    0                            0                             0
-                    0                            1                             2
-        4                         20                            28
-        5           9             12             24             27             6
-        13          13            21             21             14             14
-        0           1             0              1              0              1
-        1           4             8              19             23             26
-        5           9             12             24             27             6
-        0           0             0              0              0              0
-2 4=1       6 8=4       10 12=8       22 24=19       26 28=23       30 32=26
+                                              16                            24                            +
+                                              5                             16                            23
+                                              0                             0                             0
+                                              0                             1                             2
+        4          8            12            +              20             +              28             +
+        1          4            8             9              13             14             18             20
+        5          5            5             5              16             16             23             23
+        0          1            2             3              0              1              0              1
+2 4=1      6 8=4      10 12=8       14 16=9       18 20=13       22 24=14       26 28=18       30 32=20
 """);
    }
 
@@ -1308,18 +1299,43 @@ Stuck(size:3)
     for (int i = N; i > 0; i -= 2) b.delete(i);
     //stop(b.dump());
     ok(b.dump(), """
-                    8                           16
-                    13                          21                            14
-                    0                           0                             0
-                    0                           1                             2
-        4                        12                            20
-        5           9            12             17             20             24
-        13          13           21             21             14             14
-        0           1            0              1              0              1
-        1           4            8              11             16             19
-        5           9            12             17             20             24
-        0           0            0              0              0              0
-1 3=1       5 7=4       9 11=8       13 15=11       17 19=16       21 23=19
+                   8                         16                                                          +
+                   5                         11                                                          16
+                   0                         0                                                           0
+                   0                         1                                                           2
+        4          +           12            +              20             24             28             +
+        1          4           8             9              13             14             18             20
+        5          5           11            11             16             16             16             16
+        0          1           0             1              0              1              2              3
+1 3=1      5 7=4      9 11=8       13 15=9       17 19=13       21 23=14       25 27=18       29 31=20
+""");
+   }
+
+  static void test_primes()
+   {final BtreeBam b = new BtreeBam(2, 3, 100);
+    int N = 64;
+    for (int i = 1; i <= N; i++)
+     {b.put(i, i);
+     }
+    for (int i = 2; i <= N; i++)
+     {b.find(i);
+      if (b.getFound() > 0)
+       {for (int j = 2*i; j <= N; j += i)
+         {b.delete(j);
+         }
+       }
+     }
+    //stop(b.dump());
+    ok(b.dump(), """
+                   6                                  17                                        40                                           +
+                   5                                  11                                        23                                           33
+                   0                                  0                                         0                                            0
+                   0                                  1                                         2                                            3
+        2          +        8             16          +           19             29             +              43             53             +
+        1          3        7             8           13          14             18             26             29             35             21
+        5          5        11            11          11          23             23             23             33             33             33
+        0          1        0             1           2           0              1              2              0              1              2
+1 2=1      3 5=3      7=7       11 13=8       17=13       19=14       23 29=18       31 37=26       41 43=29       47 53=35       59 61=21
 """);
    }
 
@@ -1342,10 +1358,12 @@ Stuck(size:3)
     test_put_random_small();
     test_delete_odd_ascending();
     test_delete_even_descending();
+    test_primes();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
+    //test_primes();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
