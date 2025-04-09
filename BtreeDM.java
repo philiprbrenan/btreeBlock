@@ -3978,7 +3978,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   private static void test_node()
-   {z();
+   {z(); sayCurrentTestName();
     final int N = 3;
     final BtreeDM t = new BtreeDM()
      {int maxSize         () {return  3;}
@@ -4265,6 +4265,81 @@ StuckSML(maxSize:4 size:1)
 """);
    }
 
+  private static void test_delete_odd_ascending()
+   {final int N = 64;
+    z(); sayCurrentTestName();
+    final BtreeDM t = BtreeDM(2, 3, 48);
+    t.P.run(); t.P.clear();
+
+    t.put();
+    for(int i = 1; i <= 64; ++i)
+     {t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(i);
+      t.P.run();
+     }
+    t.P.clear();
+
+    t.delete();
+    for(int i = 1; i <= N; i += 2)
+     {t.T.at(t.Key ).setInt(i);
+      t.P.run();
+     }
+    //stop(t);
+    t.ok("""
+                                                         24                                                                                                                      |
+                                                         0                                                                                                                       |
+                                                         17                                                                                                                      |
+                                                         42                                                                                                                      |
+                                   16                                                                    40                                              56                      |
+                                   17                                                                    42                                              42.1                    |
+                                   5                                                                     23                                              33                      |
+                                   16                                                                                                                    6                       |
+      4      8          12                    20                    28         32           36                      44         48           52                        60         |
+      5      5.1        5.2                   16                    23         23.1         23.2                    33         33.1         33.2                      6          |
+      1      4          8                     13                    18         20           25                      29         31           35                        39         |
+                        9                     14                                            26                                              36                        21         |
+2,4=1  6,8=4    10,12=8    14,16=9   18,20=13   22,24=14   26,28=18   30,32=20     34,36=25     38,40=26   42,44=29   46,48=31     50,52=35     54,56=36     58,60=39   62,64=21 |
+""");
+    // stop("maximumNodes used", t.maxNodeUsed); // 12
+   }
+
+  private static void test_delete_even_descending()
+   {final int N = 64;
+    z(); sayCurrentTestName();
+    final BtreeDM t = BtreeDM(2, 3, 48);
+    t.P.run(); t.P.clear();
+
+    t.put();
+    for(int i = N; i > 0; i--)
+     {t.T.at(t.Key ).setInt(i);
+      t.P.run();
+     }
+    t.P.clear();
+
+    t.delete();
+    for(int i = N; i > 0; i -= 2)
+     {t.T.at(t.Key ).setInt(i);
+      t.P.run();
+     }
+    //stop(t);
+    t.ok("""
+                                                                                                               40                                                                |
+                                                                                                               0                                                                 |
+                                                                                                               39                                                                |
+                                                                                                               29                                                                |
+                8                    16                                                32                                            48                                          |
+                39                   39.1                                              39.2                                          29                                          |
+                42                   38                                                22                                            16                                          |
+                                                                                       23                                            11                                          |
+       4                  12                      20         24           28                        36                    44                   52        56          60          |
+       42                 38                      22         22.1         22.2                      23                    16                   11        11.1        11.2        |
+       45                 40                      26         31           30                        14                    19                   6         8           4           |
+       41                 35                                              25                        20                    13                                         2           |
+1,3=45   5,7=41   9,11=40   13,15=35     17,19=26   21,23=31     25,27=30     29,31=25     33,35=14   37,39=20   41,43=19   45,47=13   49,51=6   53,55=8     57,59=4     61,63=2 |
+""");
+    // stop("maximumNodes used", t.maxNodeUsed); // 12
+   }
+
   protected static void oldTests()                                              // Tests thought to be in good shape
    {final boolean longRunning = github_actions && 1 == 0;
     test_find_and_insert();
@@ -4283,11 +4358,13 @@ StuckSML(maxSize:4 size:1)
     test_verilogDelete();
     test_verilogFind();
     test_verilogPut();
+    test_delete_odd_ascending();
+    test_delete_even_descending();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_node();
+    test_delete_even_descending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
