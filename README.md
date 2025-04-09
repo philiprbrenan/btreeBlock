@@ -435,7 +435,7 @@ After deleting: 32
 # The sieve of Eratosthenes
 
 The Sieve of Eratosthenes is an ancient and efficient algorithm used to [find](https://en.wikipedia.org/wiki/Find_(Unix)) all prime numbers up to a given number **N**. It works by iteratively removing
-the the multiples of each prime number from an initial set integers.
+the the multiples of each prime number from an initial set of integers.
 
 In this example, with **N** set to **64**, the initial set of integers was
 successfully reduced to a set of primes by deleting the multiples of each
