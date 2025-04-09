@@ -2033,24 +2033,24 @@ abstract class BtreePA extends Test                                             
             findFirstGreaterThanOrEqualInLeaf(leafFound, T.at(Key),             // Leaf known not to contain the search key
               T.at(found), lT.T.at(lT.index));
 
-            P.new If(T.at(found))                                               // Insert
-             {void Then()
-               {z();
+//            P.new If(T.at(found))                                               // Insert
+//             {void Then()
+//               {z();
                 P.parallelStart();    lT.T.at(lT.tKey ).move(T.at(Key));
                 P.parallelSection();  lT.T.at(lT.tData).move(T.at(Data));
 //                P.parallelSection();  lT.T.at(lT.index).move(T.at(first));
                 P.parallelEnd();
 
                 lT.insertElementAt();
-               }
-              void Else()                                                       // Extend
-               {z();
-                P.parallelStart();   lT.T.at(lT.tKey ).move(T.at(Key));
-                P.parallelSection(); lT.T.at(lT.tData).move(T.at(Data));
-                P.parallelEnd();
-                lT.push();
-               }
-             };
+//               }
+//              void Else()                                                       // Extend
+//               {z();
+//                P.parallelStart();   lT.T.at(lT.tKey ).move(T.at(Key));
+//                P.parallelSection(); lT.T.at(lT.tData).move(T.at(Data));
+//                P.parallelEnd();
+//                lT.push();
+//               }
+//             };
             P.parallelStart();   T.at(success).ones();
             P.parallelSection(); tt(findAndInsert, leafFound);
             P.parallelSection(); P.Goto(Success == null ? Return : Success);
