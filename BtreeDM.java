@@ -172,7 +172,7 @@ abstract class BtreeDM extends Test                                             
    }
 
   StuckDM createLeafStuck(String name)                                          // Create a branch Stuck
-   {final StuckDM l = new StuckDM(name)                 // Leaf stucks
+   {final StuckDM l = new StuckDM(name)                                         // Leaf stucks
      {int     maxSize() {return BtreeDM.this.maxKeysPerLeaf();}
       int  bitsPerKey() {return BtreeDM.this.bitsPerKey();}
       int bitsPerData() {return BtreeDM.this.bitsPerData();}
@@ -4340,6 +4340,43 @@ StuckSML(maxSize:4 size:1)
     // stop("maximumNodes used", t.maxNodeUsed); // 12
    }
 
+  static void test_primes()
+   {final BtreeDM t = BtreeDM(2, 3, 100);
+    t.P.run(); t.P.clear();
+    t.put();
+
+    int N = 64;
+    for (int i = 1; i <= N; i++)
+     {t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(i);
+      t.P.run();
+     }
+    for (int i = 2; i <= N; i++)
+     {t.P.clear(); t.find();
+      t.T.at(t.Key ).setInt(i);
+      t.P.run();
+      if (t.T.at(t.found).getInt() > 0)
+       {t.P.clear(); t.delete();
+        for (int j = 2*i; j <= N; j += i)
+         {t.T.at(t.Key ).setInt(j);
+          t.P.run();
+         }
+       }
+     }
+    //stop(t);
+    ok(t, """
+             6                        17                               40                                 |
+             0                        0.1                              0.2                                |
+             5                        11                               23                                 |
+                                                                       6                                  |
+      2           8         16                 19         29                       43         53          |
+      5           11        11.1               23         23.1                     6          6.1         |
+      1           7         8                  14         18                       29         35          |
+      3                     13                            26                                  21          |
+1,2=1  3,5=3  7=7   11,13=8     17=13    19=14   23,29=18     31,37=26    41,43=29   47,53=35    59,61=21 |
+""");
+   }
+
   protected static void oldTests()                                              // Tests thought to be in good shape
    {final boolean longRunning = github_actions && 1 == 0;
     test_find_and_insert();
@@ -4360,11 +4397,11 @@ StuckSML(maxSize:4 size:1)
     test_verilogPut();
     test_delete_odd_ascending();
     test_delete_even_descending();
+    test_primes();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_delete_even_descending();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
