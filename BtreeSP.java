@@ -1197,13 +1197,13 @@ abstract class BtreeSP extends Test                                             
       search = Key;
       node_findFirstGreaterThanOrEqualInLeaf = leafFound;
       findFirstGreaterThanOrEqualInLeaf();
-      if (found)                                                                // Overwrite existing key
-       {z();
+//      if (found)                                                                // Overwrite existing key
+//       {z();
         lT.tKey = Key; lT.tData = Data; lT.index = first; lT.insertElementAt();
-       }
-      else                                                                      // Insert into position
-       {z(); lT.tKey = Key; lT.tData = Data; lT.push();
-       }
+//       }
+//      else                                                                      // Insert into position
+//       {z(); lT.tKey = Key; lT.tData = Data; lT.push();
+//       }
       success = true;
       findAndInsert = leafFound;
       return;
