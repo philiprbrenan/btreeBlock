@@ -1026,13 +1026,13 @@ abstract class BtreeSML extends Test                                            
        {z();
         final Node.FindFirstGreaterThanOrEqualInLeaf f =
           leaf().findFirstGreaterThanOrEqualInLeaf1(Key);
-        if (f.found)                                                            // Overwrite existing key
+//        if (f.found)                                                            // Overwrite existing key
          {z(); leaf().Leaf.insertElementAt(Key, Data, f.first);
          }
-        else                                                                    // Insert into position
-         {z();
-           leaf().Leaf.push(Key, Data);
-         }
+//        else                                                                    // Insert into position
+//         {z();
+//           leaf().Leaf.push(Key, Data);
+//         }
         success = true;
         return this;
        }
