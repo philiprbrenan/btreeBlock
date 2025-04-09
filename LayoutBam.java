@@ -11,6 +11,25 @@ abstract class LayoutBam extends Test                                           
   final Stack         <Array> order  = new Stack<>();                           // The order in which the arrays were defined
   final TreeMap<String,Array> arrays = new TreeMap<>();                         // A number of different sized arrays concatenated to make one array
   final int[]memory;                                                            // The concatenation of all the arrays
+  final int[]save;                                                              // A save area so we can save and restore before printing
+
+  LayoutBam()                                                                   // Create a layout
+   {load();                                                                     // Load array definitions
+    memory = new int[size];                                                     // Create the memory for the basic array machine
+    save   = new int[size];                                                     // Create the save area
+   }
+
+  void load() {}                                                                // Override this method to define the layout
+
+  void save()                                                                   // Save the memory
+   {final int N = memory.length;
+    for (int i = 0; i < N; i++) save[i] = memory[i];
+   }
+
+  void restore()                                                                // Restore the memory
+   {final int N = memory.length;
+    for (int i = 0; i < N; i++) memory[i] = save[i];
+   }
 
   class Array
    {final String name;
@@ -48,14 +67,7 @@ abstract class LayoutBam extends Test                                           
     return q;                                                                   // Return overlay
    }
 
-  void load() {}                                                                // Override this method to define the layout
-
-  LayoutBam()                                                                   // Create a layout
-   {load();                                                                     // Load array definitions
-    memory = new int[size];                                                     // Create the memeory for the basic array machine
-   }
-
-  private Array get(String Name)                                                // Get an array by name or complain if the name is invalid
+  private Array getArray(String Name)                                                // Get an array by name or complain if the name is invalid
    {final Array A = arrays.get(Name);
     if (A == null) stop("No such array as", Name);
     return A;
@@ -67,7 +79,7 @@ abstract class LayoutBam extends Test                                           
      {v = Integer.parseInt(Index);                                              // The integer has been supplied directly as a string that we can parse
      }
     catch (NumberFormatException e)                                             // The index is a reference to an array
-     {final Array I = get(Index);                                               // Hopefully the index is a field - a zero dimensional array
+     {final Array I = getArray(Index);                                          // Hopefully the index is a field - a zero dimensional array
       if (I.dimensions.length > 0)                                              // Complain if the index is not a field
        {stop("Index:", Index, "cannot itself be be an indexed array element");
        }
@@ -79,7 +91,7 @@ abstract class LayoutBam extends Test                                           
    }
 
   void set(int Value, String target, String...Indices)                          // Set the value of an array element
-   {final Array t   = get(target);
+   {final Array t   = getArray(target);
     final String[]i = Indices;
 
     final int I = i.length;
@@ -94,7 +106,7 @@ abstract class LayoutBam extends Test                                           
    }
 
   void set(String target, int...values)                                         // Load an array
-   {final Array t = get(target);
+   {final Array t = getArray(target);
     final int   N = values.length;
     if (N > t.length) stop("Too many initializers for array:", t.name, "with length", t.length);
 
@@ -102,7 +114,7 @@ abstract class LayoutBam extends Test                                           
    }
 
   int get(String source, String...Indices)                                      // Get the value of an array element
-   {final Array s   = get(source);
+   {final Array s   = getArray(source);
     final String[]i = Indices;
 
     final int I = i.length;
@@ -117,7 +129,7 @@ abstract class LayoutBam extends Test                                           
    }
 
   void clear(int Value, String target, String...Indices)                        // Clear the indicated part of the specified array to the the specified value
-   {final Array t   = get(target);
+   {final Array t   = getArray(target);
     final String[]i = Indices;
 
     final int I = i.length;
@@ -146,7 +158,7 @@ abstract class LayoutBam extends Test                                           
   void ones(String source, String...Indices) {clear(-1, source, Indices);}      // Set the indicated part of the specified array to all ones
 
   void move(String target, String source, String...Indices)                     // Copy the indexed source field to the indexed target fields
-   {final Array t = get(target), s = get(source);
+   {final Array t = getArray(target), s = getArray(source);
 
     final int I = Indices.length;
     final int T = t.dimensions.length, S = s.dimensions.length;
@@ -161,7 +173,7 @@ abstract class LayoutBam extends Test                                           
    }
 
   int compareImmediate(int immediate, String source, String...Indices)          // Compare the indexed source field to the immediate value returning -1 if source is less that target, 0 if equal otherwise +1
-   {final Array s = get(source);
+   {final Array s = getArray(source);
 
     final int I = Indices.length;
     final int S = s.dimensions.length;
@@ -173,7 +185,7 @@ abstract class LayoutBam extends Test                                           
    }
 
   int compare(String target, String source, String...Indices)                   // Compare the indexed source field to the indexed target field returning -1 if source is less that target, 0 if equal otherwise +1
-   {final Array t = get(target), s = get(source);
+   {final Array t = getArray(target), s = getArray(source);
 
     final int I = Indices.length;
     final int T = t.dimensions.length, S = s.dimensions.length;
@@ -190,7 +202,7 @@ abstract class LayoutBam extends Test                                           
    }
 
   void addImmediate(int immediate, String source, String...Indices)             // Add a constant value to the source field
-   {final Array s = get(source);
+   {final Array s = getArray(source);
 
     final int I = Indices.length;
     final int S = s.dimensions.length;
@@ -201,7 +213,7 @@ abstract class LayoutBam extends Test                                           
    }
 
   void add(String target, String source, String...Indices)                      // Add the source to the target replacing the target
-   {final Array t = get(target), s = get(source);
+   {final Array t = getArray(target), s = getArray(source);
 
     final int I = Indices.length;
     final int T = t.dimensions.length, S = s.dimensions.length;
@@ -239,6 +251,49 @@ abstract class LayoutBam extends Test                                           
      }
 
     return ""+s;
+   }
+
+  String print(String Source, String...Indices)                                 // Print the indocated aprt of teh array
+   {final Array s   = getArray(Source);
+    final String[]i = Indices;
+    final StringBuilder t = new StringBuilder();
+
+    final int I = i.length;
+    final int S = s.dimensions.length;
+    if (I > S) stop("Too many dimensions:", I, ">", S, "for array:", Source);
+
+    if (I == 0)                                                                 // Print entire array
+     {if (s.dimensions.length == 0) return ""+get(Source);
+      if (s.dimensions.length == 1)
+       {for (int j = 0; j < s.length; j++) t.append(""+memory[s.base + j]+", ");
+        t.setLength(t.length()-2);
+        return ""+t;
+       }
+      for   (int k = 0; k < s.dimensions[1]; k++)
+       {t.append("[");
+        for (int j = 0; j < s.dimensions[0]; j++)
+         {t.append(""+memory[s.base + k*s.dimensions[0]+ j]+", ");
+         }
+        t.setLength(t.length()-2);
+        t.append("],\n");
+       }
+      t.setLength(t.length()-2);
+      return ""+t+"\n";
+     }
+
+    if ((I == 1 && S == 1) || (I == 2 && S == 2))                               // Print single element of one or two dimensional array
+     {t.append(get(Source, Indices));
+      return ""+get(Source, Indices);
+     }
+
+    if (I == 1 && S == 2)                                                       // Print indicated sub array
+     {final int l = s.dimensions[0];                                            // Size of sub array
+      final int p = l * lookUpIndex(s, 1, i[0]);                                // Start of sub array
+      for (int j = 0; j < l; j++) t.append(""+memory[s.base+ p + j]+", ");      // Clear sub array in two dimensional array
+      t.setLength(t.length()-2);
+      return ""+t;
+     }
+    return "";
    }
 
 //D0 Tests                                                                      // Testing
@@ -465,7 +520,7 @@ abstract class LayoutBam extends Test                                           
 """);
    }
 
-  static void test_initialize()
+  static LayoutBam test_initialize()
    {final LayoutBam l = new LayoutBam()
      {void load()
        {array("a");
@@ -489,6 +544,33 @@ abstract class LayoutBam extends Test                                           
    7     3     1     1     22  c |
    8     3     1     2     23  c |
 """);
+    return l;
+   }
+
+  static void test_print()
+   {final LayoutBam l = test_initialize();
+
+    ok(l.print("a"), "1");
+    ok(l.print("b"), "1, 2");
+    ok(l.print("c"), """
+[11, 12, 13],
+[21, 22, 23]
+""");
+    l.set("b", 1, 2);
+    l.set("c", 11, 12, 13, 21, 22, 23);
+   }
+
+  static void test_save_and_restore()
+   {final LayoutBam l = test_initialize();
+
+    ok(l.print("a"), "1");
+    l.save();
+
+    l.set(0, "a");
+    ok(l.print("a"), "0");
+
+    l.restore();
+    ok(l.print("a"), "1");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -500,11 +582,14 @@ abstract class LayoutBam extends Test                                           
     test_add();
     test_overlay();
     test_clear();
+    test_initialize();
+    test_print();
+    test_save_and_restore();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_initialize();
+    test_save_and_restore();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
