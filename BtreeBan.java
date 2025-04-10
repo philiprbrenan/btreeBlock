@@ -66,7 +66,13 @@ class BtreeBan extends Test                                                     
         array("free_1");                                                        // Result of calling isLeaf
         array("isLeaf_0");                                                      // A node to be freed
         array("isLeaf_1");                                                      // First parameter to is leaf
-        array("rootIsLeaf");                                                    // WHether the root is a
+        array("rootIsLeaf");                                                    // Whether the root is a
+        array("setLeaf");                                                       // Set the specified  node as a leaf
+        array("setBranch");                                                     // Set the specified  node as a branch
+        array("leafSize");                                                      // The result of leaf size
+        array("leafSize_1");                                                    // The leaf whose size we would know
+        array("branchSize");                                                    // The result of branch size
+        array("branchSize_1");                                                  // The branch whose size we would know
         array("free",         numberOfNodes);                                   // Used to place the node  on the free chain else zero if in use
         array("isLeaf",       numberOfNodes);                                   // Whether each node is a leaf or a branch
         array("current_size", numberOfNodes);                                   // Current size of stuck
@@ -100,8 +106,8 @@ class BtreeBan extends Test                                                     
     L.move("freeChainHead", f);                                                 // Freed node becomes head of the free chain
    }
 
-  int allocLeaf()   {allocate(); int n = L.get("allocate"); setLeaf  (n); return n;} // Allocate leaf
-  int allocBranch() {allocate(); int n = L.get("allocate"); setBranch(n); return n;} // Allocate branch
+  int allocLeaf()   {allocate(); int n = L.get("allocate"); L.set(n, "setLeaf");   setLeaf();   return n;} // Allocate leaf
+  int allocBranch() {allocate(); int n = L.get("allocate"); L.set(n, "setBranch"); setBranch(); return n;} // Allocate branch
 
 //D2 Basics                                                                     // Basic operations on nodes
 
@@ -131,23 +137,30 @@ class BtreeBan extends Test                                                     
   void putFSuccess (int n) {L.set(n, "f_success");}                             // Inserted or updated if true
   void putFInserted(int n) {L.set(n, "f_inserted");}                            // Inserted if true
 
-  void isLeaf()  {L.move("isLeaf_0", "isLeaf", "isLeaf_1");}                    // A leaf if true
-
+  void isLeaf    () {L.move("isLeaf_0", "isLeaf", "isLeaf_1");}                 // A leaf if true
   void rootIsLeaf() {L.move("rootIsLeaf", "isLeaf", "root");}                   // The root is a leaf if the target is not zero
 
-  void    setLeaf(int n) {L.set(1, "isLeaf",  ""+n);}                           // Set as leaf
-  void  setBranch(int n) {L.set(0, "isLeaf",  ""+n);}                           // Set as branch
-  void    setLeafRoot () {L.set(1, "isLeaf", "root");}                          // Set root as leaf
-  void  setBranchRoot () {L.set(0, "isLeaf", "root");}                          // Set root as branch
+  void setLeaf      () {L.set(1, "isLeaf", "setLeaf");}                         // Set as leaf
+  void setBranch    () {L.set(0, "isLeaf", "setBranch");}                       // Set as branch
+  void setLeafRoot  () {L.set(1, "isLeaf", "root");}                            // Set root as leaf
+  void setBranchRoot() {L.set(0, "isLeaf", "root");}                            // Set root as branch
 
-  int   leafSize(int n)  {return L.get("current_size", ""+n);}                  // Number of children in leaf
-  int branchSize(int n)  {return L.get("current_size", ""+n)-1;}                // Number of children in body of branch
+  void leafSize  () {L.move("leafSize",   "current_size", "leafSize_1"  );}     // Number of children in leaf
+  void branchSize() {L.move("branchSize", "current_size", "branchSize_1"); L.addImmediate(-1, "branchSize");} // Number of children in body of branch
 
   boolean isFull(int n)                                                         // The node is full
    {L.set(n, "isLeaf_1");
     isLeaf();
-    return L.get("isLeaf_0") > 0 ? leafSize(n) >= maxKeysPerLeaf  :
-                                 branchSize(n) >= maxKeysPerBranch;             // Allow for top
+    if (L.get("isLeaf_0") > 0)
+     {L.set(n, "leafSize_1");
+      leafSize();
+      return L.get("leafSize") >= maxKeysPerLeaf;
+     }
+    else
+     {L.set(n, "branchSize_1");
+      branchSize();
+      return L.get("branchSize") >= maxKeysPerBranch;
+     }
    }
 
   boolean isFullRoot() {return isFull(0);}                                      // The node is full
@@ -155,7 +168,16 @@ class BtreeBan extends Test                                                     
   boolean isLow(int n)                                                          // The node is low on children making it impossible to merge two sibling children
    {L.set(n, "isLeaf_1");
     isLeaf();
-    return (L.get("isLeaf_0") > 0 ? leafSize(n) : branchSize(n)) < 2;
+    if (L.get("isLeaf_0") > 0)
+     {L.set(n, "leafSize_1");
+      leafSize();
+      return L.get("leafSize") < 2;
+     }
+    else
+     {L.set(n, "branchSize_1");
+      branchSize();
+      return L.get("branchSize") < 2;
+     }
    }
 
   boolean hasLeavesForChildren(int n)                                           // Whether the branch has leaves for children
@@ -268,8 +290,8 @@ class BtreeBan extends Test                                                     
     setIndex(index-0); stuck_elementAt(); final int r = getData();
 
     if (hasLeavesForChildren(node))                                             // Children are leaves
-     {final int nl = leafSize(l);
-      final int nr = leafSize(r);
+     {L.set(l, "leafSize_1"); leafSize(); final int nl = L.get("leafSize");
+      L.set(r, "leafSize_1"); leafSize(); final int nr = L.get("leafSize");
 
       if (nr >= maxKeysPerLeaf) return false;                                   // Steal not possible because there is no where to put the steal
       if (nl <= 1) return false;                                                // Steal not allowed because it would leave the leaf sibling empty
@@ -280,8 +302,8 @@ class BtreeBan extends Test                                                     
       setIndex(nl-2); stuck_elementAt();                                        // Last key on left
      }
     else                                                                        // Children are branches
-     {final int nl = branchSize(l);
-      final int nr = branchSize(r);
+     {L.set(l, "branchSize_1"); branchSize(); final int nl = L.get("branchSize");
+      L.set(r, "branchSize_1"); branchSize(); final int nr = L.get("branchSize");
 
       if (nr >= maxKeysPerBranch) return false;                                 // Steal not possible because there is no where to put the steal
       if (nl <= 1) return false;                                                // Steal not allowed because it would leave the left sibling empty
@@ -304,21 +326,23 @@ class BtreeBan extends Test                                                     
 
   boolean stealFromRight(int node, int index)                                   // Steal from the right sibling of the indicated child if possible
    {final int P = node;
-    if (index == branchSize(P)) return false;
+    L.set(P, "branchSize_1"); branchSize(); final int nP = L.get("branchSize");
+
+    if (index == nP) return false;
     setStuck(P);
     setIndex(index+0); stuck_elementAt(); final int l = getData(), lk = getKey();
     setIndex(index+1); stuck_elementAt(); final int r = getData();
 
     if (hasLeavesForChildren(P))                                                // Children are leaves
-     {final int nl = leafSize(l);
-      final int nr = leafSize(r);
+     {L.set(l, "leafSize_1"); leafSize(); final int nl = L.get("leafSize");
+      L.set(r, "leafSize_1"); leafSize(); final int nr = L.get("leafSize");
 
       if (nl >= maxKeysPerLeaf) return false;                                       // Steal not possible because there is no where to put the steal
       if (nr <= 1) return false;                                                    // Steal not allowed because it would leave the right sibling empty
      }
     else                                                                        // Children are branches
-     {final int nl = branchSize(l);
-      final int nr = branchSize(r);
+     {L.set(l, "branchSize_1"); branchSize(); final int nl = L.get("branchSize");
+      L.set(r, "branchSize_1"); branchSize(); final int nr = L.get("branchSize");
 
       if (nl >= maxKeysPerBranch) return false;                                 // Steal not possible because there is no where to put the steal
       if (nr <= 1) return false;                                                // Steal not allowed because it would leave the right sibling empty
@@ -338,7 +362,9 @@ class BtreeBan extends Test                                                     
 
   boolean mergeRoot()                                                           // Merge into the root
    {rootIsLeaf();
-    if (L.get("rootIsLeaf") > 0 || branchSize(0) > 1) return false;
+    if (L.get("rootIsLeaf") > 0) return false;
+    L.set(0, "branchSize_1"); branchSize(); final int nP = L.get("branchSize");
+    if (nP > 1) return false;
 
     int p = 0;
     setStuck(p);
@@ -346,35 +372,38 @@ class BtreeBan extends Test                                                     
     stuck_lastElement (); int r = getData();
 
     if (hasLeavesForChildren(p))                                                // Leaves
-     {if (leafSize(l) + leafSize(r) <= maxKeysPerLeaf)
+     {L.set(l, "leafSize_1"); leafSize(); final int nl = L.get("leafSize");
+      L.set(r, "leafSize_1"); leafSize(); final int nr = L.get("leafSize");
+
+       if (nl + nr <= maxKeysPerLeaf)
        {setStuck(p); stuck_clear();
-        int nl = leafSize(l);
         for (int i = 0; i < nl; ++i)
          {setStuck(l); stuck_shift();
           setStuck(p); stuck_push();
          }
-        int nr = leafSize(r);
         for (int i = 0; i < nr; ++i)
          {setStuck(r); stuck_shift();
           setStuck(p); stuck_push();
          }
-        setLeaf(p);
+        L.set(p, "setLeaf"); setLeaf();
         L.set(l, "free_1"); free();
         L.set(r, "free_1"); free();
         return true;
        }
      }
-    else if (branchSize(l) + 1 + branchSize(r) <= maxKeysPerBranch)         // Branches
-     {setStuck(p); stuck_firstElement(); final int pkn = getKey();
+    else
+     {L.set(l, "branchSize_1"); branchSize(); final int nl = L.get("branchSize");
+      L.set(r, "branchSize_1"); branchSize(); final int nr = L.get("branchSize");
+      if (nl + 1 + nr >  maxKeysPerBranch) return false;
+      setStuck(p); stuck_firstElement(); final int pkn = getKey();
       stuck_clear();
-      int nl = branchSize(l);
       for (int i = 0; i < nl; ++i)
        {setStuck(l); stuck_shift();
         setStuck(p); stuck_push();
        }
       setStuck(l); stuck_lastElement();
       setStuck(p); setKey(pkn); stuck_push();
-      final int nr = branchSize(r);
+
       for (int i = 0; i < nr; ++i)
        {setStuck(r); stuck_shift();
         setStuck(p); stuck_push();
@@ -391,7 +420,7 @@ class BtreeBan extends Test                                                     
   boolean mergeLeftSibling(int parent, int index)                               // Merge the left sibling
    {final int P = parent;
     if (index == 0) return false;
-    int bs = branchSize(P);
+    L.set(P, "branchSize_1"); branchSize(); final int bs = L.get("branchSize");
     if (index >= bs) return false;
 
     setStuck(P);
@@ -399,8 +428,8 @@ class BtreeBan extends Test                                                     
     setIndex(index-0); stuck_elementAt(); final int r = getData();
 
     if (hasLeavesForChildren(P))                                                // Children are leaves
-     {final int nl = leafSize(l);
-      final int nr = leafSize(r);
+     {L.set(l, "leafSize_1"); leafSize(); final int nl = L.get("leafSize");
+      L.set(r, "leafSize_1"); leafSize(); final int nr = L.get("leafSize");
 
       if (nl + nr >= maxKeysPerLeaf) return false;                              // Combined body would be too big
 
@@ -411,8 +440,8 @@ class BtreeBan extends Test                                                     
        }
      }
     else                                                                        // Children are branches
-     {final int nl = branchSize(l);
-      final int nr = branchSize(r);
+     {L.set(l, "branchSize_1"); branchSize(); final int nl = L.get("branchSize");
+      L.set(r, "branchSize_1"); branchSize(); final int nr = L.get("branchSize");
 
       if (nl + 1 + nr > maxKeysPerBranch) return false;                         // Merge not possible because there is not enough room for the combined result
 
@@ -421,7 +450,8 @@ class BtreeBan extends Test                                                     
       setStuck(r); setKey(t); stuck_unshift();                                  // Left top to right
 
       setStuck(l); stuck_pop();                                                 // Remove left top
-      int N = branchSize(l)+1;                                                  // Number of entries to remove
+      L.set(l, "branchSize_1"); branchSize(); final int N = L.get("branchSize") + 1;
+
       for (int i = 0; i < N; i++)                                               // Transfer left to right
        {setStuck(l); stuck_pop();
         setStuck(r); stuck_unshift();
@@ -443,8 +473,8 @@ class BtreeBan extends Test                                                     
     setIndex(index+1); stuck_elementAt(); final int r = getData();
 
     if (hasLeavesForChildren(P))                                                // Children are leaves
-     {final int nl = leafSize(l);
-      final int nr = leafSize(r);
+     {L.set(l, "leafSize_1"); leafSize(); final int nl = L.get("leafSize");
+      L.set(r, "leafSize_1"); leafSize(); final int nr = L.get("leafSize");
 
       if (nl + nr > maxKeysPerLeaf) return false;                               // Combined body would be too big for one leaf
 
@@ -455,8 +485,8 @@ class BtreeBan extends Test                                                     
        }
      }
     else                                                                        // Children are branches
-     {final int nl = branchSize(l);
-      final int nr = branchSize(r);
+     {L.set(l, "branchSize_1"); branchSize(); final int nl = L.get("branchSize");
+      L.set(r, "branchSize_1"); branchSize(); final int nr = L.get("branchSize");
 
       if (nl + 1 + nr >  maxKeysPerBranch) return false;                        // Merge not possible because there is not enough room in a single branch
       setStuck(l); stuck_lastElement(); final int ld = getData();               // Last element of left child
@@ -766,7 +796,9 @@ class BtreeBan extends Test                                                     
       isLeaf();
       if (L.get("isLeaf_0") > 0) return;
 
-      for (int j = 0; j < branchSize(p)+1; j++)                                  // Try merging each sibling pair which might change the size of the parent
+      L.set(p, "branchSize_1"); branchSize(); final int N = L.get("branchSize") + 1;
+
+      for (int j = 0; j < N; j++)                                               // Try merging each sibling pair which might change the size of the parent
        {if (mergeLeftSibling(p, j)) --j;                                        // A successful merge of the left  sibling reduces the current index and the upper limit
         mergeRightSibling(p, j);                                                // A successful merge of the right sibling maintains the current position but reduces the upper limit
        }
