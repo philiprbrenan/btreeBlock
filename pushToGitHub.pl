@@ -76,20 +76,35 @@ writeFileUsingSavedToken($user, $repo, q(.config/geany/keybindings.conf),       
                   readFile(q(//home/phil/.config/geany/keybindings.conf)));
 writeFileUsingSavedToken($user, $repo, q(.config/bashrc),                       # Save bash commands that are useful for running synthesis on a server
                          <<'END');
+function f  { # Files by partial name case insensitive
+  find . -wholename "*$@*"
+ }
+
+function g { # Search for lines in files in current folder tree case insensitive
+  grep -Iinr -P "$@"
+ }
+
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
-alias b='cd   ~/btreeBlock/'
-alias bv='cd  ~/btreeBlock/vivado'
-alias g='git status; git add *; git commit -m aaa; git push --force'
+alias b='cd   /home/azureuser/btreeBlock/'
+alias bv='cd  /home/azureuser/btreeBlock/vivado'
 alias gg='cd; sudo rm -r ~/btreeBlock/; git clone git@github.com:philiprbrenan/btreeBlock.git; cd ~/btreeBlock'
 alias m='micro'
-alias dv='cd  ~/btreeBlock/verilog/delete/vivado/reports'
-alias fv='cd  ~/btreeBlock/verilog/find/vivado/reports'
-alias pv='cd  ~/btreeBlock/verilog/put/vivado/reports'
-alias s='perl ~/btreeBlock/vivado/synthesis.pl'
+alias dv='cd  /home/azureuser/btreeBlock/verilog/delete/3/vivado/reports ;ll'
+alias fv='cd  /home/azureuser/btreeBlock/verilog/find/0/vivado/reports   ;ll'
+alias pv='cd  /home/azureuser/btreeBlock/verilog/put/1/vivado/reports    ;ll'
+alias s='perl /home/azureuser/btreeBlock/vivado/synthesis.pl'
 alias t='top -u azureuser -E g'
-alias x='bash ~/btreeBlock/j.sh
+alias v='/home/azureuser/Vivado/2024.2/bin/vivado'
+alias x='bash /home/azureuser/btreeBlock/j.sh BtreeSF'
+alias scd="source /home/azureuser/siliconcompiler/bin/activate; cd /home/azureuser/btreeBlock/verilog/delete/1/siliconCompiler; python3 delete.py"
+alias scf="source /home/azureuser/siliconcompiler/bin/activate; cd /home/azureuser/btreeBlock/verilog/find/1/siliconCompiler;   python3 find.py"
+alias scp="source /home/azureuser/siliconcompiler/bin/activate; cd /home/azureuser/btreeBlock/verilog/put/1/siliconCompiler;    python3 put.py"
+
+export GIT_SSH_COMMAND="ssh -i ~/.ssh/Azure.pem"
+export XINSTALLER_SCALE=2
+export LD_LIBRARY_PATH="/home/azureuser/.local/lib:$LD_LIBRARY_PATH"
 END
 
 if (1)                                                                          # Write workflow
