@@ -1,18 +1,23 @@
 from graphviz import Digraph
 
-# Create a Digraph object for the flowchart
-dot = Digraph(comment='Flowchart Example')
+# The relationships between the various derived implementations of the btree machine
 
-dot.node('B',    'The Btree algorithm in normal Java',      fontcolor='red', style='bold', fontsize='20')
+dot = Digraph()
+dot.attr(label='A custom CPU for the  Btree algorithm versus a generic CPU\n ')
+dot.attr(labelloc='t')
+dot.attr(fontsize='24')
+
+dot.node('B',    'The Btree algorithm in normal Java',               fontcolor='red', style='bold', fontsize='20')
 dot.node('BS',   'BtreeStuck\nfixed key/value stack')
 dot.node('BSS',  'BtreeStuckStatic\nreduced use of new')
 dot.node('BSML', 'BtreeSML\nstatic bit memory')
 dot.node('BSP',  'BtreeSP\ntransactional')
-dot.node('BSA',  'BtreeSA\ntransaction in bit memory');
-dot.node('BPA',  'BtreePA\npseudo assembler');
-dot.node('BDM',  'BtreeDM\nroutable Verilog');
-dot.node('RVL',  'The Btree algorithm in Routable Verilog\nThe CUSTOM cpu', fontcolor='darkgreen', style='bold', fontsize='20')
-dot.node('BAM',  'The Btree algorithm\non a basic array machine\nThe GENERIC cpu',      fontcolor='blue', style='bold', fontsize='20')
+dot.node('BSA',  'BtreeSA\ntransaction in bit memory')
+dot.node('BPA',  'BtreePA\npseudo assembler')
+dot.node('BDM',  'BtreeDM\nroutable Verilog')
+dot.node('BSF',  'BtreeSF\nThe CUSTOM cpu',                          fontcolor='darkgreen', style='bold', fontsize='20')
+dot.node('BAM',  'BtreeBAM\non a basic array machine')
+dot.node('BAN',  'BtreeBan\nThe GENERIC cpu',                        fontcolor='darkblue', style='bold', fontsize='20')
 
 dot.node('S',    'Stuck\nfixed key/value stack in normal Java')
 dot.node('SS',   'StuckStatic\nreduced use of new')
@@ -32,8 +37,9 @@ dot.edge('BSML', 'BSP')
 dot.edge('BSP',  'BSA')
 dot.edge('BSA',  'BPA')
 dot.edge('BPA',  'BDM')
-dot.edge('BDM',  'RVL')
+dot.edge('BDM',  'BSF')
 dot.edge('B',    'BAM')
+dot.edge('BAM',  'BAN')
 
 dot.edge('S',    'SS')
 dot.edge('SS',   'SSML')
