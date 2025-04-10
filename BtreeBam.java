@@ -1,9 +1,9 @@
 //------------------------------------------------------------------------------
-// Btree on the Basic Array Machine for performance comparision with BtreeSF.
+// Btree on the Basic Array Machine.
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-//Collapse steal from left and indeed any other method where leaf/branch nolonger needed to be consodered differently
+
 import java.util.*;
 
 class BtreeBam extends Test                                                     // Manipulate a btree
@@ -14,17 +14,15 @@ class BtreeBam extends Test                                                     
     maxKeysPerBranch,                                                           // Maximum number of keys in a branch
     splitLeafSize,                                                              // The number of key, data pairs to split out of a leaf
     splitBranchSize,                                                            // The number of key, next pairs to split out of a branch
-    numberOfNodes;                                                              // The number of noes in the btree
+    numberOfNodes;                                                              // The number of nodes in the btree
 
   final static int
-   linesToPrintABranch =  4,                                                    // The number of lines required to print a branch
-        maxPrintLevels = 10,                                                    // Maximum number of levels to print in a tree
-              maxDepth = 9,                                                    // Maximum depth of any realistic tree
-                gutter =  2,                                                    // Gutter between printed items
-          linesPerNode =  4,                                                    // Number of lines needed to print a node
+              maxDepth = 9,                                                     // Maximum depth of any realistic tree
+                gutter = 2,                                                     // Gutter between printed items
+          linesPerNode = 4,                                                     // Number of lines needed to print a node
           linesPerTree = linesPerNode * maxDepth;                               // Number of lines needed to print a tree
 
-  static boolean debug = false;                                                 // Debugging enabled
+  static boolean debug = false;                                                 // Debugging when enabled
 
 //D1 Construction                                                               // Create a BTree from nodes which can be branches or leaves.  The data associated with the BTree is stored only in the leaves opposite the keys
 
@@ -64,6 +62,11 @@ class BtreeBam extends Test                                                     
         array("f_data");                                                        // Data associated with key
         array("f_success");                                                     // Inserted or updated if true
         array("f_inserted");                                                    // Inserted if true
+        array("allocate");                                                      // Result of calling allocate
+        array("free_1");                                                        // Result of calling isLeaf
+        array("isLeaf_0");                                                      // A node to be freed
+        array("isLeaf_1");                                                      // First parameter to is leaf
+        array("rootIsLeaf");                                                    // WHether the root is a
         array("free",         numberOfNodes);                                   // Used to place the node  on the free chain else zero if in use
         array("isLeaf",       numberOfNodes);                                   // Whether each node is a leaf or a branch
         array("current_size", numberOfNodes);                                   // Current size of stuck
@@ -77,26 +80,28 @@ class BtreeBam extends Test                                                     
 
 //D2 Allocate and free                                                          // Allocate nodes for use in the tree and free them for reuse
 
-  int allocate()                                                                // Allocate a node
-   {int f = L.get("freeChainHead");                                             // Last freed node
+  void allocate()                                                                // Allocate a node
+   {final String fc = "freeChainHead", a = "allocate";
+    L.move(a, fc);
+    int f = L.get(a);                                                           // Last freed node
     if (f == 0) stop("No more memory available");                               // No more free nodes available
-    L.move("freeChainHead", "free", ""+f);                                      // Second to last freed node becomes head of the free chain
-    L.zero("free", ""+f); L.zero("isLeaf", ""+f); L.zero("current_size", ""+f); // Clear all control information
-    L.zero("keys", ""+f); L.zero("data",   ""+f);
-    return f;                                                                   // Return the node to be reused
+    L.move(fc, "free", a);                                                      // Second to last freed node becomes head of the free chain
+    L.zero("free", a); L.zero("isLeaf", a); L.zero("current_size", a);          // Clear all control information
+    L.zero("keys", a); L.zero("data",   a);
    }
 
-  void  free(int n)                                                             // Free a new node to make it available for reuse
-   {if (n == 0) stop("Cannot free root");                                       // The root is never freed
-    L.zero("free", ""+n); L.zero("isLeaf", ""+n); L.zero("current_size", ""+n); // Invalidate all control information
-    L.zero("keys", ""+n); L.zero("data",   ""+n);
-    int f = L.get("freeChainHead");                                             // Last freed node
-    L.set(n, "freeChainHead");                                                  // Chain this node in front of the last freed node
-    L.set(f, "free", ""+n);                                                     // Second to last freed node becomes head of the free chain
+  void  free()                                                                  // Free a new node to make it available for reuse
+   {final String f = "free_1";                                                  // Index of node to be freed
+    final int n = L.get(f);
+    if (n == 0) stop("Cannot free root");                                       // The root is never freed
+    L.ones("free", f); L.ones("isLeaf", f); L.ones("current_size", f);          // Invalidate all control information
+    L.ones("keys", f); L.ones("data",   f);
+    L.move("free", "freeChainHead", f);                                         // Chain this node in front of the last freed node
+    L.move("freeChainHead", f);                                                 // Freed node becomes head of the free chain
    }
 
-  int allocLeaf()   {int n = allocate(); setLeaf  (n); return n;}               // Allocate leaf
-  int allocBranch() {int n = allocate(); setBranch(n); return n;}               // Allocate branch
+  int allocLeaf()   {allocate(); int n = L.get("allocate"); setLeaf  (n); return n;} // Allocate leaf
+  int allocBranch() {allocate(); int n = L.get("allocate"); setBranch(n); return n;} // Allocate branch
 
 //D2 Basics                                                                     // Basic operations on nodes
 
@@ -127,7 +132,9 @@ class BtreeBam extends Test                                                     
   void putFInserted(int n) {L.set(n, "f_inserted");}                            // Inserted if true
 
   boolean isLeaf(int n)  {return L.get("isLeaf", ""+n)   > 0;}                  // A leaf if true
-  boolean rootIsLeaf()   {return L.get("isLeaf", "root") > 0;}                  // The root is a leaf if true
+
+  void rootIsLeaf() {L.move("rootIsLeaf", "isLeaf", "root");}                   // The root is a leaf if the target is not zero
+
   void    setLeaf(int n) {L.set(1, "isLeaf",  ""+n);}                           // Set as leaf
   void  setBranch(int n) {L.set(0, "isLeaf",  ""+n);}                           // Set as branch
   void    setLeafRoot () {L.set(1, "isLeaf", "root");}                          // Set root as leaf
@@ -153,7 +160,7 @@ class BtreeBam extends Test                                                     
 
 //D2 Split                                                                      // Split nodes in half to increase the number of nodes in the tree
 
-  void splitLeafRoot()                                                         // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
+  void splitLeafRoot()                                                          // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
    {final int l = allocLeaf();                                                  // New left leaf
     final int r = allocLeaf();                                                  // New right leaf
     final int p = 0;                                                            // Root
@@ -262,7 +269,6 @@ class BtreeBam extends Test                                                     
       setStuck(r); setIndex(0); stuck_insertElementAt();                        // Increase right
       setStuck(l); stuck_pop();                                                 // Reduce left
       setIndex(nl-2); stuck_elementAt();                                        // Last key on left
-      setStuck(P); setData(l); setIndex(index-1); stuck_setElementAt();         // Swap key of parent
      }
     else                                                                        // Children are branches
      {final int nl = branchSize(l);
@@ -282,9 +288,8 @@ class BtreeBam extends Test                                                     
 
       setStuck(r); setData(bd); setIndex(0); stuck_setElementAt();              // Reduce key of parent of right
       setStuck(l); stuck_lastElement();                                         // Last left key
-
-      setStuck(P); setData(l); setIndex(index-1); stuck_setElementAt();         // Reduce key of parent of left
      }
+    setStuck(P); setData(l); setIndex(index-1); stuck_setElementAt();         // Reduce key of parent of left
     return true;
    }
 
@@ -301,11 +306,6 @@ class BtreeBam extends Test                                                     
 
       if (nl >= maxKeysPerLeaf) return false;                                       // Steal not possible because there is no where to put the steal
       if (nr <= 1) return false;                                                    // Steal not allowed because it would leave the right sibling empty
-
-      setStuck(r); stuck_firstElement(); final int fk = getKey();               // First element of right child
-      setStuck(l); stuck_push();                                                // Increase left
-      setStuck(P); setKey(fk); setData(l); setIndex(index);stuck_setElementAt();// Swap key of parent
-      setStuck(r); stuck_shift();                                               // Reduce right
      }
     else                                                                        // Children are branches
      {final int nl = branchSize(l);
@@ -316,20 +316,20 @@ class BtreeBam extends Test                                                     
 
       setStuck(l); stuck_lastElement();                                         // Last element of left child
       setStuck(l); setKey(lk); setIndex(nl); stuck_setElementAt();              // Left top becomes real
-
-      setStuck(r); stuck_firstElement(); final int fk = getKey();               // First element of  right child
-      setStuck(l); setKey(0); stuck_push();                                     // New top for left is ignored by search ,.. except last
-
-      setStuck(P); setKey(fk); setData(l); setIndex(index);stuck_setElementAt();// Swap key of parent
-      setStuck(r); stuck_shift();                                               // Reduce right
      }
+
+    setStuck(r); stuck_firstElement(); final int fk = getKey();                 // First element of right child
+    setStuck(l); stuck_push();                                                  // Increase left
+    setStuck(P); setKey(fk); setData(l); setIndex(index); stuck_setElementAt(); // Swap key of parent
+    setStuck(r); stuck_shift();                                                 // Reduce right
     return true;
    }
 
 //D2 Merge                                                                      // Merge two nodes together and free the resulting free node
 
   boolean mergeRoot()                                                           // Merge into the root
-   {if (rootIsLeaf() || branchSize(0) > 1) return false;
+   {rootIsLeaf();
+    if (L.get("rootIsLeaf") > 0 || branchSize(0) > 1) return false;
 
     int p = 0;
     setStuck(p);
@@ -350,8 +350,8 @@ class BtreeBam extends Test                                                     
           setStuck(p); stuck_push();
          }
         setLeaf(p);
-        free(l);
-        free(r);
+        L.set(l, "free_1"); free();
+        L.set(r, "free_1"); free();
         return true;
        }
      }
@@ -372,8 +372,8 @@ class BtreeBam extends Test                                                     
        }
       setStuck(r); stuck_lastElement();                                         // Top next
       setStuck(p); setKey(0); stuck_push();                                     // Top so ignored by search ... except last
-      free(l);
-      free(r);
+      L.set(l, "free_1"); free();
+      L.set(r, "free_1"); free();
       return true;
      }
     return false;
@@ -400,26 +400,25 @@ class BtreeBam extends Test                                                     
        {setStuck(l); stuck_pop();
         setStuck(r); stuck_unshift();
        }
-      free(l);                                                                  // Free the empty left node
      }
     else                                                                        // Children are branches
      {final int nl = branchSize(l);
       final int nr = branchSize(r);
 
-      if (nl + 1 + nr > maxKeysPerBranch) return false;                      // Merge not possible because there is not enough room for the combined result
+      if (nl + 1 + nr > maxKeysPerBranch) return false;                         // Merge not possible because there is not enough room for the combined result
 
       setStuck(P); setIndex(index-1); stuck_elementAt(); final int t = getKey();// Top key
       setStuck(l); stuck_lastElement();                                         // Last element of left child
       setStuck(r); setKey(t); stuck_unshift();                                  // Left top to right
 
       setStuck(l); stuck_pop();                                                 // Remove left top
-      int N = branchSize(l)+1;                                                    // Number of entries to remove
+      int N = branchSize(l)+1;                                                  // Number of entries to remove
       for (int i = 0; i < N; i++)                                               // Transfer left to right
        {setStuck(l); stuck_pop();
         setStuck(r); stuck_unshift();
        }
-      free(l);                                                                  // Free the empty left node
      }
+    L.set(l, "free_1"); free();                                                 // Free the empty left node
     setStuck(P); setIndex(index-1); stuck_removeElementAt();                    // Reduce P on left
     return true;
    }
@@ -429,7 +428,6 @@ class BtreeBam extends Test                                                     
     setStuck(P);
     final int bs = stuck_size()-1;
     if (index >= bs) return false;                                              // No right sibling
-    //if (bs < 2) return false;
 
     setStuck(parent);
     setIndex(index+0); stuck_elementAt(); final int l = getData();
@@ -446,29 +444,29 @@ class BtreeBam extends Test                                                     
        {setStuck(r); stuck_shift();
         setStuck(l); stuck_push();
        }
-      free(r);                                                                  // Free the empty right node
      }
     else                                                                        // Children are branches
      {final int nl = branchSize(l);
       final int nr = branchSize(r);
 
-      if (nl + 1 + nr >  maxKeysPerBranch) return false;                      // Merge not possible because there is not enough room in a single branch
+      if (nl + 1 + nr >  maxKeysPerBranch) return false;                        // Merge not possible because there is not enough room in a single branch
       setStuck(l); stuck_lastElement(); final int ld = getData();               // Last element of left child
       setStuck(parent); setIndex(index); stuck_elementAt();                     // Parent dividing element
       setStuck(l); setData(ld); setIndex(nl); stuck_setElementAt();             // Re-key left top
 
-      for (int i = 0; i < nr+1; i++)                                               // Transfer right to left
+      for (int i = 0; i < nr+1; i++)                                            // Transfer right to left
        {setStuck(r); stuck_shift();
         setStuck(l); stuck_push();
        }
-      free(r);                                                                  // Free the empty right node
      }
+    L.set(r, "free_1"); free();                                                // Free the empty right node
 
     setStuck(P);
     setIndex(index+1); stuck_elementAt(); final int pk = getKey();              // One up from dividing point in parent
     setIndex(index+0); stuck_elementAt();                                       // Dividing point in parent
     setKey(pk); setIndex(index); stuck_setElementAt();                          // Install key of right sibling in this child
     setIndex(index+1); stuck_removeElementAt();                                 // Reduce parent on right
+
     return true;
    }
 
@@ -552,7 +550,8 @@ class BtreeBam extends Test                                                     
     final int N = linesPerTree*linesPerNode;                                    // A big buffer with room for several lines per node
     final StringBuilder [] S = new StringBuilder[N];                            // A big buffer with room for several lines per node
     for (int i = 0; i < N; i++) S[i] = new StringBuilder();
-    if (rootIsLeaf()) printLeaf(0, S, 0); else printBranch(0, S, 0);            // Print tree
+    rootIsLeaf();
+    if (L.get("rootIsLeaf") > 0) printLeaf(0, S, 0); else printBranch(0, S, 0); // Print tree
     L.restore();
     return printCollapsed(S);                                                   // Collapse lines into text
    }
@@ -583,7 +582,8 @@ class BtreeBam extends Test                                                     
    }
 
   void find(int Key)                                                            // Find the data associated with a key in the tree
-   {if (rootIsLeaf())                                                           // The root is a leaf
+   {rootIsLeaf();                                                               // The root is a leaf
+    if (L.get("rootIsLeaf") > 0)
      {setStuck(0); setKey(Key); stuck_search();
       find_result(0, L.get("s_found"), getIndex(), Key, getData());
       return;
@@ -645,7 +645,8 @@ class BtreeBam extends Test                                                     
     if (getFSuccess() > 0) return;                                              // Inserted or updated successfully
 
     if (isFullRoot())                                                           // Start the insertion at the root, after splitting it if necessary
-     {if (rootIsLeaf())
+     {rootIsLeaf();
+      if (L.get("rootIsLeaf") > 0)
        {splitLeafRoot();
        }
       else
@@ -707,7 +708,8 @@ class BtreeBam extends Test                                                     
   void delete(int Key)                                                          // Insert a key, data pair into the tree or update and existing key with a new datum
    {mergeRoot();
 
-    if (rootIsLeaf())                                                           // Find and delete directly in root as a leaf
+    rootIsLeaf();                                                               // Find and delete directly in root as a leaf
+    if (L.get("rootIsLeaf") > 0)
      {findAndDelete(Key);
       return;
      }
