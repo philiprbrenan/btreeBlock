@@ -73,6 +73,9 @@ class BtreeBan extends Test                                                     
         array("leafSize_1");                                                    // The leaf whose size we would know
         array("branchSize");                                                    // The result of branch size
         array("branchSize_1");                                                  // The branch whose size we would know
+        array("isFull");                                                        // Whether the node is  full or not
+        array("isFull_1");                                                      // The mode whose fullness we would know
+        array("isFullRoot");                                                    // Whether the root is full
         array("free",         numberOfNodes);                                   // Used to place the node  on the free chain else zero if in use
         array("isLeaf",       numberOfNodes);                                   // Whether each node is a leaf or a branch
         array("current_size", numberOfNodes);                                   // Current size of stuck
@@ -148,22 +151,22 @@ class BtreeBan extends Test                                                     
   void leafSize  () {L.move("leafSize",   "current_size", "leafSize_1"  );}     // Number of children in leaf
   void branchSize() {L.move("branchSize", "current_size", "branchSize_1"); L.addImmediate(-1, "branchSize");} // Number of children in body of branch
 
-  boolean isFull(int n)                                                         // The node is full
-   {L.set(n, "isLeaf_1");
+  void isFull()                                                                 // The node is full
+   {L.move("isLeaf_1", "isFull_1");
     isLeaf();
     if (L.get("isLeaf_0") > 0)
-     {L.set(n, "leafSize_1");
+     {L.move("leafSize_1", "isFull_1");
       leafSize();
-      return L.get("leafSize") >= maxKeysPerLeaf;
+      L.set(L.get("leafSize") >= maxKeysPerLeaf ? 1 : 0, "isFull");
      }
     else
-     {L.set(n, "branchSize_1");
+     {L.move("branchSize_1", "isFull_1");
       branchSize();
-      return L.get("branchSize") >= maxKeysPerBranch;
+      L.set(L.get("branchSize") >= maxKeysPerBranch ? 1 : 0, "isFull");
      }
    }
 
-  boolean isFullRoot() {return isFull(0);}                                      // The node is full
+  void isFullRoot() {L.zero("isFull_1"); isFull(); L.set(L.get("isFull"), "isFullRoot");} // The root is full
 
   boolean isLow(int n)                                                          // The node is low on children making it impossible to merge two sibling children
    {L.set(n, "isLeaf_1");
@@ -663,10 +666,12 @@ class BtreeBan extends Test                                                     
       return;
      }
 
-    if (!isFull(getFLeaf()))                                                    // Leaf is not full so we can insert immediately
+    L.set(getFLeaf(), "isFull_1");
+    isFull();
+    if (L.get("isFull") == 0)                                                   // Leaf is not full so we can insert immediately
      {setStuck(getFLeaf()); setKey(Key);
       stuck_searchFirstGreaterThanOrEqual();
-//      if (getFound() > 0)                                                       // Overwrite existing key
+//      if (getFound() > 0)                                                     // Overwrite existing key
        {setStuck(getFLeaf());
         setKey(Key); setData(Data); //setIndex(getFIndex());
         stuck_insertElementAt();
@@ -690,7 +695,8 @@ class BtreeBan extends Test                                                     
    {findAndInsert(Key, Data);                                                   // Try direct insertion with no modifications to the shape of the tree
     if (getFSuccess() > 0) return;                                              // Inserted or updated successfully
 
-    if (isFullRoot())                                                           // Start the insertion at the root, after splitting it if necessary
+    isFullRoot();
+    if (L.get("isFullRoot") > 0)                                                // Start the insertion at the root, after splitting it if necessary
      {rootIsLeaf();
       if (L.get("rootIsLeaf") > 0)
        {splitLeafRoot();
@@ -719,7 +725,9 @@ class BtreeBan extends Test                                                     
         return;
        }
 
-      if (isFull(q))
+      L.set(q, "isFull_1");
+      isFull();
+      if (L.get("isFull") > 0)
        {splitBranch(q, p, getIndex());                                          // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
         setStuck(p); setKey(Key);
         stuck_searchFirstGreaterThanOrEqualExceptLast();
