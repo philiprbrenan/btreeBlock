@@ -341,12 +341,14 @@ class BtreeBan extends Test                                                     
     setIndex(index+0); stuck_elementAt(); final int l = getData(), lk = getKey();
     setIndex(index+1); stuck_elementAt(); final int r = getData();
 
-    if (hasLeavesForChildren(P))                                                // Children are leaves
+    L.set(P, "hasLeavesForChildren_1");                                         // Children are leaves
+    hasLeavesForChildren();
+    if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
      {L.set(l, "leafSize_1"); leafSize(); final int nl = L.get("leafSize");
       L.set(r, "leafSize_1"); leafSize(); final int nr = L.get("leafSize");
 
-      if (nl >= maxKeysPerLeaf) return false;                                       // Steal not possible because there is no where to put the steal
-      if (nr <= 1) return false;                                                    // Steal not allowed because it would leave the right sibling empty
+      if (nl >= maxKeysPerLeaf) return false;                                   // Steal not possible because there is no where to put the steal
+      if (nr <= 1) return false;                                                // Steal not allowed because it would leave the right sibling empty
      }
     else                                                                        // Children are branches
      {L.set(l, "branchSize_1"); branchSize(); final int nl = L.get("branchSize");
