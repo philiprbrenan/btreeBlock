@@ -4340,7 +4340,7 @@ StuckSML(maxSize:4 size:1)
     // stop("maximumNodes used", t.maxNodeUsed); // 12
    }
 
-  static void test_primes()
+  static void test_primes()                                                     // 240 seconds
    {final BtreeDM t = BtreeDM(2, 3, 100);
     t.P.run(); t.P.clear();
     t.put();
@@ -4371,9 +4371,9 @@ StuckSML(maxSize:4 size:1)
                                                                        6                                  |
       2           8         16                 19         29                       43         53          |
       5           11        11.1               23         23.1                     6          6.1         |
-      1           7         8                  14         18                       29         35          |
-      3                     13                            26                                  21          |
-1,2=1  3,5=3  7=7   11,13=8     17=13    19=14   23,29=18     31,37=26    41,43=29   47,53=35    59,61=21 |
+      1           8         7                  14         18                       29         35          |
+      4                     13                            26                                  16          |
+1,2=1  3,5=4  7=8   11,13=7     17=13    19=14   23,29=18     31,37=26    41,43=29   47,53=35    59,61=16 |
 """);
    }
 
