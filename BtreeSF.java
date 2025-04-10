@@ -4053,6 +4053,74 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
+  static void test_delete_random_not_100()
+   {z(); sayCurrentTestName();
+    final BtreeSF t = BtreeSF(2, 3, 999);
+    t.P.run(); t.P.clear();
+    t.put();
+
+    int N = random_large.length;
+    for (int i = 0; i < N; ++i)
+     {final int r = random_large[i];
+      t.T.at(t.Key).setInt(r); t.T.at(t.Data).setInt(i);
+      t.P.run();
+     }
+    t.P.run(); t.P.clear();
+    t.delete();
+    for (int i = 0; i < N; ++i)
+     {final int r = random_large[i];
+      if (r % 100 > 0)
+       {t.T.at(t.Key).setInt(r);
+        t.P.run();
+       }
+     }
+    stop(t);
+    ok(t, """
+               1846             4249                  6600             +
+               223              163                   733              638
+               0                0                     0                0
+               0                1                     2                3
+700 1800=223         3700=163         5000 6600=733         9700=638
+""");
+   }
+
+  static void test_primes()
+   {final BtreeSF t = BtreeSF(2, 3, 100);
+    t.P.run(); t.P.clear();
+    t.put();
+
+    int N = 64;
+    for (int i = 1; i <= N; i++)
+     {t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(i);
+      t.P.run();
+     }
+    for (int i = 2; i <= N; i++)
+     {t.P.clear(); t.find();
+      t.T.at(t.Key ).setInt(i);
+      t.P.run();
+      if (t.T.at(t.found).getInt() > 0)
+       {t.P.clear(); t.delete();
+        for (int j = 2*i; j <= N; j += i)
+         {t.T.at(t.Key ).setInt(j);
+          t.P.run();
+         }
+       }
+     }
+    //stop(t);
+    ok(t, """
+             6                        17                               40                                 |
+             0                        0.1                              0.2                                |
+             5                        11                               23                                 |
+                                                                       6                                  |
+      2           8         16                 19         29                       43         53          |
+      5           11        11.1               23         23.1                     6          6.1         |
+      1           7         8                  14         18                       29         35          |
+      3                     13                            26                                  21          |
+1,2=1  3,5=3  7=7   11,13=8     17=13    19=14   23,29=18     31,37=26    41,43=29   47,53=35    59,61=21 |
+""");
+   }
+
   private static void test_node()
    {z();
     final int N = 3;
@@ -4385,6 +4453,8 @@ StuckSML(maxSize:4 size:1)
     test_delete_descending();
     test_delete_small_random();
     if (longRunning) test_delete_large_random();
+    test_delete_random_not_100();
+    test_primes();
     test_node();
     test_verilogDelete();
     test_verilogFind();
@@ -4393,10 +4463,12 @@ StuckSML(maxSize:4 size:1)
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_verilogDelete();
-    test_verilogFind();
-    test_verilogPut();
-    test_find_and_insert();
+    //test_verilogDelete();
+    //test_verilogFind();
+    //test_verilogPut();
+    //test_find_and_insert();
+    //test_primes();
+    test_delete_random_not_100();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
