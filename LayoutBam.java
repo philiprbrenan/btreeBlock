@@ -50,6 +50,9 @@ abstract class LayoutBam extends Test                                           
         default -> dimensions[1] * dimensions[0];
        };
       order.push(this);                                                         // The definition order
+      if (arrays.containsKey(name))
+       {stop("Name :", name, "has already been defined");
+       }
       arrays.put(name, this);                                                   // Make the array accessible by name
      }
    }
