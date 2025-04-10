@@ -74,8 +74,10 @@ class BtreeBan extends Test                                                     
         array("branchSize");                                                    // The result of branch size
         array("branchSize_1");                                                  // The branch whose size we would know
         array("isFull");                                                        // Whether the node is  full or not
-        array("isFull_1");                                                      // The mode whose fullness we would know
+        array("isFull_1");                                                      // The node whose fullness we would know
         array("isFullRoot");                                                    // Whether the root is full
+        array("isLow");                                                         // Whether the node is low on childre
+        array("isLow_1");                                                       // The node whose lowness we would know
         array("free",         numberOfNodes);                                   // Used to place the node  on the free chain else zero if in use
         array("isLeaf",       numberOfNodes);                                   // Whether each node is a leaf or a branch
         array("current_size", numberOfNodes);                                   // Current size of stuck
@@ -154,33 +156,26 @@ class BtreeBan extends Test                                                     
   void isFull()                                                                 // The node is full
    {L.move("isLeaf_1", "isFull_1");
     isLeaf();
-    if (L.get("isLeaf_0") > 0)
-     {L.move("leafSize_1", "isFull_1");
-      leafSize();
-      L.set(L.get("leafSize") >= maxKeysPerLeaf ? 1 : 0, "isFull");
-     }
-    else
-     {L.move("branchSize_1", "isFull_1");
-      branchSize();
-      L.set(L.get("branchSize") >= maxKeysPerBranch ? 1 : 0, "isFull");
-     }
+    if (L.get("isLeaf_0") > 0) isFullLeaf(); else isFullBranch();
+   }
+
+  void isFullLeaf()                                                             // The leaf is full
+   {L.move("leafSize_1", "isFull_1");
+    leafSize();
+    L.set(L.get("leafSize") >= maxKeysPerLeaf ? 1 : 0, "isFull");
+   }
+  void isFullBranch()                                                           // The branch is full
+   {L.move("branchSize_1", "isFull_1");
+    branchSize();
+    L.set(L.get("branchSize") >= maxKeysPerBranch ? 1 : 0, "isFull");
    }
 
   void isFullRoot() {L.zero("isFull_1"); isFull(); L.set(L.get("isFull"), "isFullRoot");} // The root is full
 
-  boolean isLow(int n)                                                          // The node is low on children making it impossible to merge two sibling children
-   {L.set(n, "isLeaf_1");
-    isLeaf();
-    if (L.get("isLeaf_0") > 0)
-     {L.set(n, "leafSize_1");
-      leafSize();
-      return L.get("leafSize") < 2;
-     }
-    else
-     {L.set(n, "branchSize_1");
-      branchSize();
-      return L.get("branchSize") < 2;
-     }
+  void isLow()                                                                  // The branch is low on children making it impossible to merge two sibling children
+   {L.move("branchSize_1", "isLow_1");
+    branchSize();
+    L.set(L.get("branchSize") < 2 ? 1 : 0, "isLow");
    }
 
   boolean hasLeavesForChildren(int n)                                           // Whether the branch has leaves for children
@@ -515,9 +510,10 @@ class BtreeBan extends Test                                                     
 //D2 Balance                                                                    // Balance the tree by merging and stealing
 
   void  balance(int parent, int index)                                          // Augment the indexed child so it has at least two children in its body
-   {setStuck(parent); setIndex(index); stuck_elementAt();
-
-    if (!isLow(getData())) return;
+   {setStuck(parent); setIndex(index); stuck_elementAt(); getData();
+    L.move("isLow_1", "s_data");
+    isLow();
+    if (L.get("isLow") == 0) return;
     if (stealFromLeft    (parent, index)) return;
     if (stealFromRight   (parent, index)) return;
     if (mergeLeftSibling (parent, index)) return;
@@ -667,7 +663,7 @@ class BtreeBan extends Test                                                     
      }
 
     L.set(getFLeaf(), "isFull_1");
-    isFull();
+    isFullLeaf();
     if (L.get("isFull") == 0)                                                   // Leaf is not full so we can insert immediately
      {setStuck(getFLeaf()); setKey(Key);
       stuck_searchFirstGreaterThanOrEqual();
@@ -726,7 +722,7 @@ class BtreeBan extends Test                                                     
        }
 
       L.set(q, "isFull_1");
-      isFull();
+      isFullBranch();
       if (L.get("isFull") > 0)
        {splitBranch(q, p, getIndex());                                          // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
         setStuck(p); setKey(Key);
@@ -1336,6 +1332,24 @@ Stuck(size:3)
 """);
    }
 
+  static void test_delete_random()
+   {final BtreeBan b = new BtreeBan(2, 3, 999);
+    int N = random_large.length;
+    for (int i = 0; i < N; ++i) b.put(random_large[i], i);
+    for (int i = 0; i < N; ++i)
+     {final int r = random_large[i];
+      if (r % 100 > 0) b.delete(r);
+     }
+    //stop(b);
+    ok(b, """
+               1846             4249                  6600             +
+               223              163                   733              638
+               0                0                     0                0
+               0                1                     2                3
+700 1800=223         3700=163         5000 6600=733         9700=638
+""");
+   }
+
   static void test_delete_odd_ascending()
    {final BtreeBan b = new BtreeBan(2, 3, 30);
     int N = 32;
@@ -1419,6 +1433,7 @@ Stuck(size:3)
     test_put_ascending();
     test_put_descending();
     test_put_random_small();
+    test_delete_random();
     test_delete_odd_ascending();
     test_delete_even_descending();
     test_primes();
