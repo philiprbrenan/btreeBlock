@@ -76,8 +76,10 @@ class BtreeBan extends Test                                                     
         array("isFull");                                                        // Whether the node is  full or not
         array("isFull_1");                                                      // The node whose fullness we would know
         array("isFullRoot");                                                    // Whether the root is full
-        array("isLow");                                                         // Whether the node is low on childre
+        array("isLow");                                                         // Whether the node is low on children
         array("isLow_1");                                                       // The node whose lowness we would know
+        array("hasLeavesForChildren");                                          // Whether the node has leaves for children
+        array("hasLeavesForChildren_1");                                        // The node whose lowness we would know
         array("free",         numberOfNodes);                                   // Used to place the node  on the free chain else zero if in use
         array("isLeaf",       numberOfNodes);                                   // Whether each node is a leaf or a branch
         array("current_size", numberOfNodes);                                   // Current size of stuck
@@ -176,6 +178,12 @@ class BtreeBan extends Test                                                     
    {L.move("branchSize_1", "isLow_1");
     branchSize();
     L.set(L.get("branchSize") < 2 ? 1 : 0, "isLow");
+   }
+
+  void hasLeavesForChildren()                                                   // Whether the branch has leaves for children
+   {L.move("isLeaf_1", "data", "hasLeavesForChildren_1", "0");
+    isLeaf();
+    L.set(L.get("isLeaf_0") > 0 ? 1 : 0, "hasLeavesForChildren");
    }
 
   boolean hasLeavesForChildren(int n)                                           // Whether the branch has leaves for children
@@ -287,7 +295,9 @@ class BtreeBan extends Test                                                     
     setIndex(index-1); stuck_elementAt(); final int l = getData();
     setIndex(index-0); stuck_elementAt(); final int r = getData();
 
-    if (hasLeavesForChildren(node))                                             // Children are leaves
+    L.set(node, "hasLeavesForChildren_1");
+    hasLeavesForChildren();
+    if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
      {L.set(l, "leafSize_1"); leafSize(); final int nl = L.get("leafSize");
       L.set(r, "leafSize_1"); leafSize(); final int nr = L.get("leafSize");
 
@@ -364,26 +374,28 @@ class BtreeBan extends Test                                                     
     L.set(0, "branchSize_1"); branchSize(); final int nP = L.get("branchSize");
     if (nP > 1) return false;
 
-    int p = 0;
-    setStuck(p);
+    int P = 0;
+    setStuck(P);
     stuck_firstElement(); int l = getData();
     stuck_lastElement (); int r = getData();
 
-    if (hasLeavesForChildren(p))                                                // Leaves
+    L.set(P, "hasLeavesForChildren_1");                                         // Children are leaves
+    hasLeavesForChildren();
+    if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
      {L.set(l, "leafSize_1"); leafSize(); final int nl = L.get("leafSize");
       L.set(r, "leafSize_1"); leafSize(); final int nr = L.get("leafSize");
 
        if (nl + nr <= maxKeysPerLeaf)
-       {setStuck(p); stuck_clear();
+       {setStuck(P); stuck_clear();
         for (int i = 0; i < nl; ++i)
          {setStuck(l); stuck_shift();
-          setStuck(p); stuck_push();
+          setStuck(P); stuck_push();
          }
         for (int i = 0; i < nr; ++i)
          {setStuck(r); stuck_shift();
-          setStuck(p); stuck_push();
+          setStuck(P); stuck_push();
          }
-        L.set(p, "setLeaf"); setLeaf();
+        L.set(P, "setLeaf"); setLeaf();
         L.set(l, "free_1"); free();
         L.set(r, "free_1"); free();
         return true;
@@ -393,21 +405,21 @@ class BtreeBan extends Test                                                     
      {L.set(l, "branchSize_1"); branchSize(); final int nl = L.get("branchSize");
       L.set(r, "branchSize_1"); branchSize(); final int nr = L.get("branchSize");
       if (nl + 1 + nr >  maxKeysPerBranch) return false;
-      setStuck(p); stuck_firstElement(); final int pkn = getKey();
+      setStuck(P); stuck_firstElement(); final int pkn = getKey();
       stuck_clear();
       for (int i = 0; i < nl; ++i)
        {setStuck(l); stuck_shift();
-        setStuck(p); stuck_push();
+        setStuck(P); stuck_push();
        }
       setStuck(l); stuck_lastElement();
-      setStuck(p); setKey(pkn); stuck_push();
+      setStuck(P); setKey(pkn); stuck_push();
 
       for (int i = 0; i < nr; ++i)
        {setStuck(r); stuck_shift();
-        setStuck(p); stuck_push();
+        setStuck(P); stuck_push();
        }
       setStuck(r); stuck_lastElement();                                         // Top next
-      setStuck(p); setKey(0); stuck_push();                                     // Top so ignored by search ... except last
+      setStuck(P); setKey(0); stuck_push();                                     // Top so ignored by search ... except last
       L.set(l, "free_1"); free();
       L.set(r, "free_1"); free();
       return true;
@@ -425,7 +437,9 @@ class BtreeBan extends Test                                                     
     setIndex(index-1); stuck_elementAt(); final int l = getData();
     setIndex(index-0); stuck_elementAt(); final int r = getData();
 
-    if (hasLeavesForChildren(P))                                                // Children are leaves
+    L.set(P, "hasLeavesForChildren_1");                                         // Children are leaves
+    hasLeavesForChildren();
+    if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
      {L.set(l, "leafSize_1"); leafSize(); final int nl = L.get("leafSize");
       L.set(r, "leafSize_1"); leafSize(); final int nr = L.get("leafSize");
 
@@ -470,7 +484,9 @@ class BtreeBan extends Test                                                     
     setIndex(index+0); stuck_elementAt(); final int l = getData();
     setIndex(index+1); stuck_elementAt(); final int r = getData();
 
-    if (hasLeavesForChildren(P))                                                // Children are leaves
+    L.set(P, "hasLeavesForChildren_1");                                         // Children are leaves
+    hasLeavesForChildren();
+    if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
      {L.set(l, "leafSize_1"); leafSize(); final int nl = L.get("leafSize");
       L.set(r, "leafSize_1"); leafSize(); final int nr = L.get("leafSize");
 
