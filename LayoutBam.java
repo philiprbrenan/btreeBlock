@@ -70,7 +70,7 @@ abstract class LayoutBam extends Test                                           
     return q;                                                                   // Return overlay
    }
 
-  private Array getArray(String Name)                                                // Get an array by name or complain if the name is invalid
+  private Array getArray(String Name)                                           // Get an array by name or complain if the name is invalid
    {final Array A = arrays.get(Name);
     if (A == null) stop("No such array as", Name);
     return A;
@@ -203,6 +203,54 @@ abstract class LayoutBam extends Test                                           
     final int b = get(target, ti);
     return Integer.valueOf(b).compareTo(Integer.valueOf(a));
    }
+
+  void compareImmediateAndSet                                                   // Compare the indexed source field to the immediate value storing -1 in the target if the source is less than the immediate value, 0 if equal otherwise +1
+   (String Target, int immediate, String Source, String...Indices)
+   {final Array s = getArray(Source);
+    final Array t = getArray(Target);
+
+    final int I = Indices.length;
+    final int S = s.dimensions.length;
+    final int T = t.dimensions.length;
+    if (S != I) stop("Wrong number of dimensions:", S, "!=", I, "for array:", Source);
+    if (T >  0) stop("A field (an array with zero dimansions) is required for the target:", Target);
+
+    final int a = immediate;
+    final int b = get(Source, Indices);
+    final int r = Integer.valueOf(b).compareTo(Integer.valueOf(a));
+    set(r, Target);
+   }
+
+  void compareAndSet                                                            // Compare the indexed source fields and write -1 into the target if the first is less than the second, 0 if equal otherwise +1
+   (String Target, String S1, String S2, String...Indices)
+   {final Array s1 = getArray(S1);
+    final Array s2 = getArray(S2);
+    final Array t  = getArray(Target);
+
+    final int I  = Indices.length;
+    final int d1 = s1.dimensions.length;
+    final int d2 = s2.dimensions.length;
+    if (d1 + d2 != I) stop("Wrong number of dimensions:", d1, "+", d2, "!=", I, "for arrays:", S1+",", S2);
+    final int T = t.dimensions.length;
+    if (T > 0) stop("A field (an array with zero dimansions) is required for the target:", Target);
+
+    final String[]i1 = new String[d1];
+    final String[]i2 = new String[d2];
+    for (int i = 0;  i < d1; i++) i1[i]    = Indices[i];
+    for (int i = d1; i < I;  i++) i2[i-d1] = Indices[i];
+
+    final int a = get(S1, i1);
+    final int b = get(S2, i2);
+    final int r = Integer.valueOf(a).compareTo(Integer.valueOf(b));
+    set(r, Target);
+   }
+
+  void gtZero(String Target) {set(get(Target) >  0 ? 1 : 0, Target);}           // Set the target to one if it is currently greater than             zero else zero
+  void geZero(String Target) {set(get(Target) >= 0 ? 1 : 0, Target);}           // Set the target to one if it is currently greater than or equal to zero else zero
+  void ltZero(String Target) {set(get(Target) <  0 ? 1 : 0, Target);}           // Set the target to one if it is currently less    than             zero else zero
+  void leZero(String Target) {set(get(Target) <= 0 ? 1 : 0, Target);}           // Set the target to one if it is currently less    than or equal to zero else zero
+  void eqZero(String Target) {set(get(Target) == 0 ? 1 : 0, Target);}           // Set the target to one if it is currently equal                 to zero else zero
+  void neZero(String Target) {set(get(Target) != 0 ? 1 : 0, Target);}           // Set the target to one if it is currently less        not equal to zero else zero
 
   void addImmediate(int immediate, String source, String...Indices)             // Add a constant value to the source field
    {final Array s = getArray(source);
@@ -434,6 +482,43 @@ abstract class LayoutBam extends Test                                           
     ok(l.compare("B", "a", "3", "j", "j"),       0);
    }
 
+//  4     3           1      4  a |
+//  5     3           2      5  a |
+
+  static void test_compare_and_set()
+   {LayoutBam l = test_move();
+    l.compareImmediateAndSet("j", 3, "a", "1"); ok(l.get("j"),  +1);
+    l.compareImmediateAndSet("j", 5, "a", "2"); ok(l.get("j"),   0);
+    l.compareImmediateAndSet("j", 6, "a", "1"); ok(l.get("j"),  -1);
+    l.compareAndSet("k", "a", "a", "1",   "2"); ok(l.get("k"),  -1);
+    l.compareAndSet("k", "a", "a", "1",   "1"); ok(l.get("k"),   0);
+    l.compareAndSet("k", "a", "a", "2",   "1"); ok(l.get("k"),  +1);
+   }
+
+  static void test_comparisons()
+   {LayoutBam l = test_move();
+    l.compareImmediateAndSet("j", 3, "a", "1"); l.eqZero("j"); ok(l.get("j"), 0);
+    l.compareImmediateAndSet("j", 3, "a", "1"); l.neZero("j"); ok(l.get("j"), 1);
+    l.compareImmediateAndSet("j", 3, "a", "1"); l.ltZero("j"); ok(l.get("j"), 0);
+    l.compareImmediateAndSet("j", 3, "a", "1"); l.leZero("j"); ok(l.get("j"), 0);
+    l.compareImmediateAndSet("j", 3, "a", "1"); l.gtZero("j"); ok(l.get("j"), 1);
+    l.compareImmediateAndSet("j", 3, "a", "1"); l.geZero("j"); ok(l.get("j"), 1);
+
+    l.compareImmediateAndSet("j", 5, "a", "2"); l.eqZero("j"); ok(l.get("j"), 1);
+    l.compareImmediateAndSet("j", 5, "a", "2"); l.neZero("j"); ok(l.get("j"), 0);
+    l.compareImmediateAndSet("j", 5, "a", "2"); l.ltZero("j"); ok(l.get("j"), 0);
+    l.compareImmediateAndSet("j", 5, "a", "2"); l.leZero("j"); ok(l.get("j"), 1);
+    l.compareImmediateAndSet("j", 5, "a", "2"); l.gtZero("j"); ok(l.get("j"), 0);
+    l.compareImmediateAndSet("j", 5, "a", "2"); l.geZero("j"); ok(l.get("j"), 1);
+
+    l.compareImmediateAndSet("j", 6, "a", "1"); l.eqZero("j"); ok(l.get("j"), 0);
+    l.compareImmediateAndSet("j", 6, "a", "1"); l.neZero("j"); ok(l.get("j"), 1);
+    l.compareImmediateAndSet("j", 6, "a", "1"); l.ltZero("j"); ok(l.get("j"), 1);
+    l.compareImmediateAndSet("j", 6, "a", "1"); l.leZero("j"); ok(l.get("j"), 1);
+    l.compareImmediateAndSet("j", 6, "a", "1"); l.gtZero("j"); ok(l.get("j"), 0);
+    l.compareImmediateAndSet("j", 6, "a", "1"); l.geZero("j"); ok(l.get("j"), 0);
+   }
+
   static void test_add()
    {LayoutBam l = test_move();
 
@@ -582,6 +667,8 @@ abstract class LayoutBam extends Test                                           
     test_move();
     test_compare();
     test_compare_int();
+    test_compare_and_set();
+    test_comparisons();
     test_add();
     test_overlay();
     test_clear();
@@ -592,7 +679,6 @@ abstract class LayoutBam extends Test                                           
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    test_save_and_restore();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
