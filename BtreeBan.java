@@ -122,6 +122,16 @@ class BtreeBan extends Test                                                     
         array("stealFromRight");                                                // Whether the steal from the right was successful
         array("stealFromRight_parent");                                         // The parent of the branch which wants to steal from the right child
         array("stealFromRight_index");                                          // The index of the child that wants to steal from the right sibling in its parent
+        array("stealFromRight_parentBranchSize");                               // Parent branch size
+        array("stealFromRight_right");                                          // Index of sibling on right
+        array("stealFromRight_l");                                              // Left child index
+        array("stealFromRight_lk");                                             // Left child key
+        array("stealFromRight_fk");                                             // Right child key
+        array("stealFromRight_r");                                              // Right child index
+        array("stealFromRight_nl");                                             // Number in left child
+        array("stealFromRight_nr");                                             // Number in right child
+        array("stealFromRight_td");                                             //
+        array("stealFromRight_bd");                                             //
 
         array("mergeLeftSibling");                                              // Whether the merge with the left sibling was successful
         array("mergeLeftSibling_parent");                                       // The parent of the branch which wants to merge with its left sibling
@@ -424,40 +434,55 @@ class BtreeBan extends Test                                                     
    }
 
   void stealFromRight()                                                         // Steal from the right sibling of the indicated child if possible
-   {final int P     = L.get("stealFromRight_parent");
-    final int index = L.get("stealFromRight_index");
-    L.set(P, "branchSize_1"); branchSize(); final int nP = L.get("branchSize");
+   {final String $sfr    = "stealFromRight";                                    // Whether the steal from the right was successful
+    final String $P      = "stealFromRight_parent";                             // Parent node
+    final String $index  = "stealFromRight_index";                              // Index of child stealing from the right sibling
+    final String $parent = "stealFromRight_parent";                             // The parent of the branch which wants to steal from the right child
+    final String $nP     = "stealFromRight_parentBranchSize";                   // Parent branch size
+    final String $right  = "stealFromRight_right";                              // Index of sibling on right
+    final String $l      = "stealFromRight_l";                                  // Left child index
+    final String $lk     = "stealFromRight_lk";                                 // Left child key
+    final String $fk     = "stealFromRight_fk";                                 // Right child key
+    final String $r      = "stealFromRight_r";                                  // Right child index
+    final String $nl     = "stealFromRight_nl";                                 // Number in left child
+    final String $nr     = "stealFromRight_nr";                                 // Number in right child
+    final String $td     = "stealFromRight_td";                                 //
+    final String $bd     = "stealFromRight_bd";                                 //
 
-    if (index == nP) {L.set(0, "stealFromRight"); return;};
-    setStuck(P);
-    setIndex(index+0); stuck_elementAt(); final int l = getData(), lk = getKey();
-    setIndex(index+1); stuck_elementAt(); final int r = getData();
+    L.move("branchSize_1", $P); branchSize(); L.move($nP, "branchSize");
 
-    L.set(P, "hasLeavesForChildren_1");                                         // Children are leaves
+    if (L.get($index) >= L.get($nP)) {L.set(0, $sfr); return;};
+    setStuck($P);
+    setIndex($index); stuck_elementAt(); getData($l); getKey($lk);
+    L.set($right, L.get($index)+1);
+    setIndex($right); stuck_elementAt(); getData($r);
+
+    L.move("hasLeavesForChildren_1", $P);
     hasLeavesForChildren();
     if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
-     {L.set(l, "leafSize_1"); leafSize(); final int nl = L.get("leafSize");
-      L.set(r, "leafSize_1"); leafSize(); final int nr = L.get("leafSize");
+     {L.move("leafSize_1", $l); leafSize(); L.move($nl, "leafSize");
+      L.move("leafSize_1", $r); leafSize(); L.move($nr, "leafSize");
 
-      if (nl >= maxKeysPerLeaf) {L.set(0, "stealFromRight"); return;};          // Steal not possible because there is no where to put the steal
-      if (nr <= 1) {L.set(0, "stealFromRight"); return;};                       // Steal not allowed because it would leave the right sibling empty
+      if (L.get($nl) >= maxKeysPerLeaf) {L.set(0, $sfr); return;};              // Steal not possible because there is no where to put the steal
+      if (L.get($nr) <= 1)              {L.set(0, $sfr); return;};              // Steal not allowed because it would leave the right sibling empty
      }
     else                                                                        // Children are branches
-     {L.set(l, "branchSize_1"); branchSize(); final int nl = L.get("branchSize");
-      L.set(r, "branchSize_1"); branchSize(); final int nr = L.get("branchSize");
+     {L.move("branchSize_1", $l); branchSize(); L.move($nl, "branchSize");
+      L.move("branchSize_1", $r); branchSize(); L.move($nr, "branchSize");
 
-      if (nl >= maxKeysPerBranch) {L.set(0, "stealFromRight"); return;};        // Steal not possible because there is no where to put the steal
-      if (nr <= 1) {L.set(0, "stealFromRight"); return;};                       // Steal not allowed because it would leave the right sibling empty
+      if (L.get($nl) >= maxKeysPerBranch) {L.set(0, $sfr); return;};            // Steal not possible because there is no where to put the steal
+      if (L.get($nr) <= 1)                {L.set(0, $sfr); return;};            // Steal not allowed because it would leave the right sibling empty
 
-      setStuck(l); stuck_lastElement();                                         // Last element of left child
-      setStuck(l); setKey(lk); setIndex(nl); stuck_setElementAt();              // Left top becomes real
+      setStuck($l);
+      stuck_lastElement();                                                      // Last element of left child
+      setKey($lk); setIndex($nl); stuck_setElementAt();                         // Left top becomes real
      }
 
-    setStuck(r); stuck_firstElement(); final int fk = getKey();                 // First element of right child
-    setStuck(l); stuck_push();                                                  // Increase left
-    setStuck(P); setKey(fk); setData(l); setIndex(index); stuck_setElementAt(); // Swap key of parent
-    setStuck(r); stuck_shift();                                                 // Reduce right
-    L.set(1, "stealFromRight");
+    setStuck($r); stuck_firstElement(); getKey($fk);                            // First element of right child
+    setStuck($l); stuck_push();                                                  // Increase left
+    setStuck($P); setKey($fk); setData($l); setIndex($index); stuck_setElementAt(); // Swap key of parent
+    setStuck($r); stuck_shift();                                                 // Reduce right
+    L.set(1, $sfr);
    }
 
 //D2 Merge                                                                      // Merge two nodes together and free the resulting free node
