@@ -84,6 +84,10 @@ class BtreeBan extends Test                                                     
         array("splitLeaf_node");                                                // The leaf to be split
         array("splitLeaf_parent");                                              // The parent of the leag=f to be split
         array("splitLeaf_index");                                               // The index in the parent of the leaf to be split
+        array("splitLeaf_l");                                                   // New left split out leaf
+        array("splitLeaf_F");                                                   // First of right
+        array("splitLeaf_L");                                                   // Last of left
+        array("splitLeaf_fl");                                                  // Mid point
 
         array("splitLeafRoot_l");                                               // New left leaf
         array("splitLeafRoot_r");                                               // New right leaf
@@ -92,13 +96,28 @@ class BtreeBan extends Test                                                     
         array("splitLeafRoot_last");                                            // Last of left leaf
         array("splitLeafRoot_kv");                                              // Mid key
 
+        array("splitBranchRoot_l");                                             // New left branch
+        array("splitBranchRoot_r");                                             // New right branch
+        array("splitBranchRoot_plk");                                           // Parent left key
+
+
         array("splitBranch_node");                                              // The branch to be split
         array("splitBranch_parent");                                            // The parent of the leag=f to be split
         array("splitBranch_index");                                             // The index in the parent of the branch to be split
+        array("splitBranch_l");                                                 // New left leaf
+        array("splitBranch_rk");                                                // Right key
 
         array("stealFromLeft");                                                 // Whether the steal from the left was successful
         array("stealFromLeft_parent");                                          // The parent of the branch which wants to steal from the left to give to the right
         array("stealFromLeft_index");                                           // The index of the child that wants to steal from its left sibling in its parent
+        array("stealFromLeft_nl2");                                             // Two less than the number on the left
+        array("stealFromLeft_left");                                            // The index of the left child being stolen from
+        array("stealFromLeft_l");                                               // New left node
+        array("stealFromLeft_r");                                               // Existing right node
+        array("stealFromLeft_nl");                                              // Size of left node
+        array("stealFromLeft_nr");                                              // Size of right node
+        array("stealFromLeft_td");                                              // Left half of mid key
+        array("stealFromLeft_bd");                                              // Right half of mid key
 
         array("stealFromRight");                                                // Whether the steal from the right was successful
         array("stealFromRight_parent");                                         // The parent of the branch which wants to steal from the right child
@@ -176,15 +195,15 @@ class BtreeBan extends Test                                                     
 
 //D2 Basics                                                                     // Basic operations on nodes
 
-  int getKey  () {return L.get("s_key");}                                       // Get current key
-  int getData () {return L.get("s_data");}                                      // Get current data
-  int getStuck() {return L.get("stuck");}                                       // Get current stuck
-  int getIndex() {return L.get("s_index");}                                     // Get current index
+  int getKey  () {return L.get("s_key");}      void getKey  (String n) {L.move(n, "s_key"  );} // Get current key
+  int getData () {return L.get("s_data");}     void getData (String n) {L.move(n, "s_data" );} // Get current data
+  int getStuck() {return L.get("stuck");}      void getStuck(String n) {L.move(n, "stuck"  );} // Get current stuck
+  int getIndex() {return L.get("s_index");}    void getIndex(String n) {L.move(n, "s_index");} // Get current index
 
-  void setKey  (int n) {L.set(n, "s_key");}                                     // Set current key
-  void setData (int n) {L.set(n, "s_data");}                                    // Set current data
-  void setStuck(int n) {L.set(n, "stuck");}                                     // Set current stuck
-  void setIndex(int n) {L.set(n, "s_index");}                                   // Set current index
+  void setKey  (int n) {L.set(n, "s_key");}    void setKey  (String n) {L.move("s_key" ,  n);} // Set current key
+  void setData (int n) {L.set(n, "s_data");}   void setData (String n) {L.move("s_data",  n);} // Set current data
+  void setStuck(int n) {L.set(n, "stuck");}    void setStuck(String n) {L.move("stuck",   n);} // Set current stuck
+  void setIndex(int n) {L.set(n, "s_index");}  void setIndex(String n) {L.move("s_index", n);} // Set current index
 
   int getFLeaf    () {return L.get("f_leaf");}                                  // Node number of leaf found
   int getFound    () {return L.get("f_found");}                                 // Whether the key was found
@@ -249,139 +268,159 @@ class BtreeBan extends Test                                                     
 //D2 Split                                                                      // Split nodes in half to increase the number of nodes in the tree
 
   void splitLeafRoot()                                                          // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
-   {final String $l = "splitLeafRoot_l"; allocLeaf($l);                         // Allocate new left leaf
-    final String $r = "splitLeafRoot_r"; allocLeaf($r);                         // Allocate new right leaf
+   {final String $l     = "splitLeafRoot_l"; allocLeaf($l);                     // Allocate new left leaf
+    final String $r     = "splitLeafRoot_r"; allocLeaf($r);                     // Allocate new right leaf
+    final String $p     = "root";                                               // Parent
+    final String $first = "splitLeafRoot_first";
+    final String $last  = "splitLeafRoot_last";
+    final String $kv    = "splitLeafRoot_kv";
 
     for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf from parent
-     {L.move("stuck", "root"); stuck_shift();
-      L.move("stuck", $l);     stuck_push();
+     {setStuck($p); stuck_shift();
+      setStuck($l); stuck_push();
      }
     for (int i = 0; i < splitLeafSize; i++)                                     // Build right leaf from parent
-     {L.move("stuck", "root"); stuck_shift();
-      L.move("stuck", $r);     stuck_push();
+     {setStuck($p); stuck_shift();
+      setStuck($r); stuck_push();
      }
 
     stuck_firstElement();
-    final String $first = "splitLeafRoot_first"; L.move($first, "s_key");       // First of right leaf
+    getKey($first);                                                             // First of right leaf
 
     L.move("stuck", $l); stuck_lastElement();                                   // Last of left leaf
-    final String $last = "splitLeafRoot_last";   L.move($last,  "s_key");       // Last of left leaf
-    final String $kv   = "splitLeafRoot_kv";     L.set((L.get($last) + L.get($first)) / 2, $kv);                                // Mid key
+    getKey($last);                                                              // Last of left leaf
+
+    L.set((L.get($last) + L.get($first)) / 2, $kv);                             // Mid key
 
     setBranchRoot();
-    L.move("stuck", "root"); stuck_clear();                                     // Clear the root
-    L.move("s_key", $kv);    L.move("s_data", $l); stuck_push();                // Insert left leaf into root
-    L.move("s_key", "root"); L.move("s_data", $r); stuck_push();                // Insert right into root. This will be the top node and so ignored by search ... except last.
+    setStuck($p);  stuck_clear();                                               // Clear the root
+    setKey($kv); setData($l); stuck_push();                                     // Insert left leaf into root
+    setKey($p);  setData($r); stuck_push();                                     // Insert right into root. This will be the top node and so ignored by search ... except last.
    }
 
   void splitBranchRoot()                                                        // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
-   {final int l = allocBranch();                                                // New left branch
-    final int r = allocBranch();                                                // New right branch
-    final int p = 0;                                                            // Root
-    final int sb = splitBranchSize;                                             // Branch split size
+   {final String $l = "splitBranchRoot_l"; allocBranch($l);                     // New left branch
+    final String $r = "splitBranchRoot_r"; allocBranch($r);                     // New right branch
+    final String $p = "root";                                                   // Root
+    final String $plk = "splitBranchRoot_plk";
 
-    for (int i = 0; i < sb; i++)                                                // Build left child from parent
-     {setStuck(p); stuck_shift();
-      setStuck(l); stuck_push();
+    for (int i = 0; i < splitBranchSize; i++)                                   // Build left child from parent
+     {setStuck($p); stuck_shift();
+      setStuck($l); stuck_push();
      }
-    setStuck(p); stuck_shift();
-    final int plk = getKey();
-    setStuck(l); setKey(0); stuck_push();                                       // Left top
+    setStuck($p); stuck_shift();
+    getKey($plk);
+    setStuck($l); setKey($p); stuck_push();                                     // Left top
 
-    for(int i = 0; i < sb; i++)                                                 // Build right child from parent
-     {setStuck(p); stuck_shift();
-      setStuck(r); stuck_push();
+    for(int i = 0; i < splitBranchSize; i++)                                    // Build right child from parent
+     {setStuck($p); stuck_shift();
+      setStuck($r); stuck_push();
      }
 
-    setStuck(p); stuck_shift();
-    setStuck(r); setKey(0); stuck_push();                                       // Right top
+    setStuck($p); stuck_shift();
+    setStuck($r); setKey($p); stuck_push();                                     // Right top
 
-    setStuck(p);                                                                // Clear root
+    setStuck($p);                                                               // Clear root
     stuck_clear();
-    setKey(plk);  setData(l); stuck_push();
-    setKey(0);    setData(r); stuck_push();
+    setKey($plk);  setData($l); stuck_push();
+    setKey($p);    setData($r); stuck_push();
    }
 
   void splitLeaf()                                                              // Split a leaf which is not the root
-   {final int p  = L.get("splitLeaf_parent");                                   // Parent
-    final int l  = allocLeaf();                                                 // New  split out leaf
-    final int r  = L.get("splitLeaf_node");                                     // Existing  leaf on right
-    final int in = L.get("splitLeaf_index");                                    // Index of the child to be split in its parent
-    final int sl = splitLeafSize;                                               // Size of a split leaf
+   {final String $p  = "splitLeaf_parent";                                      // Parent
+    final String $l  = "splitLeaf_l";      allocLeaf($l);                       // New  split out leaf
+    final String $r  = "splitLeaf_node";                                        // Existing  leaf on right
+    final String $in = "splitLeaf_index";                                       // Index of the child to be split in its parent
+    final String $fl = "splitLeaf_fl";
+    final String $F  = "splitLeaf_F";
+    final String $L  = "splitLeaf_L";
 
-    for (int i = 0; i < sl; i++)                                                // Build left leaf
-     {setStuck(r); stuck_shift();
-      setStuck(l); stuck_push();
+    for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf
+     {setStuck($r); stuck_shift();
+      setStuck($l); stuck_push();
      }
-    setStuck(r); stuck_firstElement(); final int F = getKey();
-    setStuck(l); stuck_lastElement (); final int L = getKey();
-    final int sk = (F + L) / 2;
-    setStuck(p); setKey(sk); setData(l); setIndex(in);
+    setStuck($r); stuck_firstElement(); getKey($F);
+    setStuck($l); stuck_lastElement (); getKey($L);
+    L.set((L.get($F) + L.get($L)) / 2, $fl);
+    setStuck($p); setKey($fl); setData($l); setIndex($in);
     stuck_insertElementAt();                                                    // Insert new key, next pair in parent
    }
 
   void splitBranch()                                                            // Split a branch which is not the root by splitting right to left
-   {final int p  = L.get("splitBranch_parent");
-     final int l  = allocBranch();
-    final int r  = L.get("splitBranch_node");  ;
-    final int in = L.get("splitBranch_index"); ;
-    final int sb = splitBranchSize;
+   {final String $p  = "splitBranch_parent";
+    final String $l  = "splitBranch_l";       allocBranch($l);
+    final String $r  = "splitBranch_node";
+    final String $in = "splitBranch_index";
+    final String $rk = "splitBranch_rk";
 
-    for (int i = 0; i < sb; i++)                                                // Build left branch from right
-     {setStuck(r); stuck_shift();
-      setStuck(l); stuck_push();
+    for (int i = 0; i < splitBranchSize; i++)                                   // Build left branch from right
+     {setStuck($r); stuck_shift();
+      setStuck($l); stuck_push();
      }
 
-    setStuck(r); stuck_shift();                                                 // Build right branch
-    final int sk = getKey();
-    setStuck(l); setKey(0); stuck_push();                                       // Becomes top and so is ignored by search ... except last
-    setStuck(p); setKey(sk); setData(l); setIndex(in);
+    setStuck($r); stuck_shift();                                                // Build right branch
+    getKey($rk);
+    setStuck($l); setKey("root"); stuck_push();                                 // Becomes top and so is ignored by search ... except last
+    setStuck($p); setKey($rk); setData($l); setIndex($in);
     stuck_insertElementAt();
    }
 
   void stealFromLeft()                                                          // Steal from the left sibling of the indicated child if possible to give to the right - Dennis Moore, Dennis Moore, Dennis Moore.
-   {final int P     = L.get("stealFromLeft_parent");
-    final int index = L.get("stealFromLeft_index");
-    setStuck(P);
-    if (index == 0) {L.set(0, "stealFromLeft"); return;};
-    setIndex(index-1); stuck_elementAt(); final int l = getData();
-    setIndex(index-0); stuck_elementAt(); final int r = getData();
+   {final String $sfl    = "stealFromLeft";
+    final String $P      = "stealFromLeft_parent";
+    final String $index  = "stealFromLeft_index";
+    final String $nl2    = "stealFromLeft_nl2";
+    final String $left   = "stealFromLeft_left";
+    final String $l      = "stealFromLeft_l";
+    final String $r      = "stealFromLeft_r";
+    final String $nl     = "stealFromLeft_nl";
+    final String $nr     = "stealFromLeft_nr";
+    final String $td     = "stealFromLeft_td";
+    final String $bd     = "stealFromLeft_bd";
 
-    L.set(P, "hasLeavesForChildren_1");
+    setStuck($P);
+    if (L.get($index) == 0) {L.set(0, $sfl); return;};                          // Nothing to the left to steal from
+    L.set(L.get($index)-1, $left);                                              // Index of left child
+    setIndex($left);  stuck_elementAt(); getData($l);
+    setIndex($index); stuck_elementAt(); getData($r);
+
+    L.move("hasLeavesForChildren_1", $P);
     hasLeavesForChildren();
     if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
-     {L.set(l, "leafSize_1"); leafSize(); final int nl = L.get("leafSize");
-      L.set(r, "leafSize_1"); leafSize(); final int nr = L.get("leafSize");
+     {L.move("leafSize_1", $l); leafSize(); L.move($nl, "leafSize");
+      L.move("leafSize_1", $r); leafSize(); L.move($nr, "leafSize");
 
-      if (nr >= maxKeysPerLeaf) {L.set(0, "stealFromLeft"); return;}            // Steal not possible because there is no where to put the steal
-      if (nl <= 1) {L.set(0, "stealFromLeft"); return;};                        // Steal not allowed because it would leave the leaf sibling empty
+      if (L.get($nr) >= maxKeysPerLeaf) {L.set(0, $sfl); return;}               // Steal not possible because there is no where to put the steal
+      if (L.get($nl) <= 1)              {L.set(0, $sfl); return;};              // Steal not allowed because it would leave the leaf sibling empty
 
-      setStuck(l); stuck_lastElement();
-      setStuck(r); setIndex(0); stuck_insertElementAt();                        // Increase right
-      setStuck(l); stuck_pop();                                                 // Reduce left
-      setIndex(nl-2); stuck_elementAt();                                        // Last key on left
+      setStuck($l); stuck_lastElement();
+      setStuck($r); stuck_unshift();                                            // Increase right
+      setStuck($l); stuck_pop();                                                // Reduce left
+
+      L.set(L.get($nl)-2, $nl2);                                                // Index of last key on left
+      setIndex($nl2); stuck_elementAt();                                        // Last key on left
      }
     else                                                                        // Children are branches
-     {L.set(l, "branchSize_1"); branchSize(); final int nl = L.get("branchSize");
-      L.set(r, "branchSize_1"); branchSize(); final int nr = L.get("branchSize");
+     {L.move("branchSize_1", $l); branchSize(); L.move($nl, "branchSize");
+      L.move("branchSize_1", $r); branchSize(); L.move($nr, "branchSize");
 
-      if (nr >= maxKeysPerBranch)  {L.set(0, "stealFromLeft"); return;};        // Steal not possible because there is no where to put the steal
-      if (nl <= 1) {L.set(0, "stealFromLeft"); return;};                        // Steal not allowed because it would leave the left sibling empty
+      if (L.get($nr) >= maxKeysPerBranch)  {L.set(0, $sfl); return;};           // Steal not possible because there is no where to put the steal
+      if (L.get($nl) <= 1)                 {L.set(0, $sfl); return;};           // Steal not allowed because it would leave the left sibling empty
 
-      setStuck(l); stuck_lastElement(); final int td = getData();               // Increase right with left top
-      setStuck(P); setIndex(index); stuck_elementAt();
+      setStuck($l); stuck_lastElement(); getData($td);                          // Increase right with left top
+      setStuck($P); setIndex($index);    stuck_elementAt();
 
-      setStuck(r); setData(td); setIndex(0); stuck_insertElementAt();           // Increase right with left top
-      setStuck(l); stuck_pop();                                                 // Remove left top
+      setStuck($r); setData($td); setIndex("root"); stuck_insertElementAt();    // Increase right with left top
+      setStuck($l); stuck_pop();                                                // Remove left top
 
-      setStuck(r); stuck_firstElement(); final int bd = getData();              // Increase right with left top
-      setStuck(P); setIndex(index-1); stuck_elementAt();
+      setStuck($r); stuck_firstElement(); getData($bd);                         // Increase right with left top
+      setStuck($P); setIndex($left); stuck_elementAt();
 
-      setStuck(r); setData(bd); setIndex(0); stuck_setElementAt();              // Reduce key of parent of right
-      setStuck(l); stuck_lastElement();                                         // Last left key
+      setStuck($r); setData($bd); setIndex("root"); stuck_setElementAt();       // Reduce key of parent of right
+      setStuck($l); stuck_lastElement();                                        // Last left key
      }
-    setStuck(P); setData(l); setIndex(index-1); stuck_setElementAt();           // Reduce key of parent of left
-    L.set(1, "stealFromLeft");
+    setStuck($P); setData($l); setIndex($left); stuck_setElementAt();           // Reduce key of parent of left
+    L.set(1, $sfl);
    }
 
   void stealFromRight()                                                         // Steal from the right sibling of the indicated child if possible
