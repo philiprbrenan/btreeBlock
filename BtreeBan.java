@@ -254,7 +254,11 @@ class BtreeBan extends Test                                                     
     L.set(L.get("branchSize") >= maxKeysPerBranch ? 1 : 0, "isFull");
    }
 
-  void isFullRoot() {L.zero("isFull"); isFull(); L.set(L.get("isFull"), "isFullRoot");} // The root is full
+  void isFullRoot()                                                             // The root is full
+   {L.zero("isFull");
+    isFull();
+    L.set(L.get("isFull"), "isFullRoot");
+   }
 
   void isLow()                                                                  // The branch is low on children making it impossible to merge two sibling children
    {L.move("branchSize", "isLow");
@@ -384,49 +388,54 @@ class BtreeBan extends Test                                                     
     final String $bd     = "stealFromLeft_bd";
     L.set(0, $sfl);                                                             // Assume at the start that we cannot steal from the lrft
 
-    setStuck($P);
-    if (L.get($index) == 0) return;                                             // Nothing to the left to steal from
-    L.set(L.get($index)-1, $left);                                              // Index of left child
-    setIndex($left);  stuck_elementAt(); getData($l);
-    setIndex($index); stuck_elementAt(); getData($r);
+    finished:                                                                   // Return
+     {setStuck($P);
+      if (L.get($index) == 0) break finished;                                   // Nothing to the left to steal from
+      L.set(L.get($index)-1, $left);                                            // Index of left child
+      setIndex($left);  stuck_elementAt(); getData($l);
+      setIndex($index); stuck_elementAt(); getData($r);
 
-    L.move("hasLeavesForChildren", $P);
-    hasLeavesForChildren();
-    if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
-     {L.move("leafSize", $l); leafSize(); L.move($nl, "leafSize");
-      L.move("leafSize", $r); leafSize(); L.move($nr, "leafSize");
+      L.move("hasLeavesForChildren", $P);
+      hasLeavesForChildren();
 
-      if (L.get($nr) >= maxKeysPerLeaf) return;                                 // Steal not possible because there is no where to put the steal
-      if (L.get($nl) <= 1)              return;                                 // Steal not allowed because it would leave the leaf sibling empty
+      leaves:
+       {if (L.get("hasLeavesForChildren") == 0) break leaves;                   // Children are leaves
+        L.move("leafSize", $l); leafSize(); L.move($nl, "leafSize");
+        L.move("leafSize", $r); leafSize(); L.move($nr, "leafSize");
 
-      setStuck($l); stuck_lastElement();
-      setStuck($r); stuck_unshift();                                            // Increase right
-      setStuck($l); stuck_pop();                                                // Reduce left
+        if (L.get($nr) >= maxKeysPerLeaf) break finished;                       // Steal not possible because there is no where to put the steal
+        if (L.get($nl) <= 1)              break finished;                       // Steal not allowed because it would leave the leaf sibling empty
 
-      L.set(L.get($nl)-2, $nl2);                                                // Index of last key on left
-      setIndex($nl2); stuck_elementAt();                                        // Last key on left
+        setStuck($l); stuck_lastElement();
+        setStuck($r); stuck_unshift();                                          // Increase right
+        setStuck($l); stuck_pop();                                              // Reduce left
+
+        L.set(L.get($nl)-2, $nl2);                                              // Index of last key on left
+        setIndex($nl2); stuck_elementAt();                                      // Last key on left
+       }
+      branches:                                                                 // Children are branches
+       {if (L.get("hasLeavesForChildren") > 0) break branches;
+        L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
+        L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
+
+        if (L.get($nr) >= maxKeysPerBranch) break finished;                     // Steal not possible because there is no where to put the steal
+        if (L.get($nl) <= 1)                break finished;                     // Steal not allowed because it would leave the left sibling empty
+
+        setStuck($l); stuck_lastElement(); getData($td);                        // Increase right with left top
+        setStuck($P); setIndex($index);    stuck_elementAt();
+
+        setStuck($r); setData($td); setIndex("root"); stuck_insertElementAt();  // Increase right with left top
+        setStuck($l); stuck_pop();                                              // Remove left top
+
+        setStuck($r); stuck_firstElement(); getData($bd);                       // Increase right with left top
+        setStuck($P); setIndex($left); stuck_elementAt();
+
+        setStuck($r); setData($bd); setIndex("root"); stuck_setElementAt();     // Reduce key of parent of right
+        setStuck($l); stuck_lastElement();                                      // Last left key
+       }
+      setStuck($P); setData($l); setIndex($left); stuck_setElementAt();         // Reduce key of parent of left
+      L.set(1, $sfl);
      }
-    else                                                                        // Children are branches
-     {L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
-      L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
-
-      if (L.get($nr) >= maxKeysPerBranch) return;                               // Steal not possible because there is no where to put the steal
-      if (L.get($nl) <= 1)                return;                               // Steal not allowed because it would leave the left sibling empty
-
-      setStuck($l); stuck_lastElement(); getData($td);                          // Increase right with left top
-      setStuck($P); setIndex($index);    stuck_elementAt();
-
-      setStuck($r); setData($td); setIndex("root"); stuck_insertElementAt();    // Increase right with left top
-      setStuck($l); stuck_pop();                                                // Remove left top
-
-      setStuck($r); stuck_firstElement(); getData($bd);                         // Increase right with left top
-      setStuck($P); setIndex($left); stuck_elementAt();
-
-      setStuck($r); setData($bd); setIndex("root"); stuck_setElementAt();       // Reduce key of parent of right
-      setStuck($l); stuck_lastElement();                                        // Last left key
-     }
-    setStuck($P); setData($l); setIndex($left); stuck_setElementAt();           // Reduce key of parent of left
-    L.set(1, $sfl);
    }
 
   void stealFromRight()                                                         // Steal from the right sibling of the indicated child if possible
@@ -493,23 +502,25 @@ class BtreeBan extends Test                                                     
     final String $nr  = "mergeRoot_nr";
     final String $pkn = "mergeRoot_pkn";
 
-    rootIsLeaf();
-    if (L.get("rootIsLeaf") > 0) return;
-    L.set(0, "branchSize"); branchSize(); L.move($nP, "branchSize");
-    if (L.get($nP) > 1) return;
+    finished:
+     {rootIsLeaf();
+      if (L.get("rootIsLeaf") > 0) break finished;
+      L.set(0, "branchSize"); branchSize(); L.move($nP, "branchSize");
+      if (L.get($nP) > 1)          break finished;
 
-    setStuck(0);
-    stuck_firstElement(); getData($l);
-    stuck_lastElement (); getData($r);
+      setStuck(0);
+      stuck_firstElement(); getData($l);
+      stuck_lastElement (); getData($r);
 
-    L.move("hasLeavesForChildren", "root");
-    hasLeavesForChildren();
-    if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
-     {L.move("leafSize", $l); leafSize(); L.move($nl, "leafSize");
-      L.move("leafSize", $r); leafSize(); L.move($nr, "leafSize");
+      L.move("hasLeavesForChildren", "root");
+      hasLeavesForChildren();
+      leaves:
+       {if (L.get("hasLeavesForChildren") == 0) break leaves;                   // Children are leaves
+        L.move("leafSize", $l); leafSize(); L.move($nl, "leafSize");
+        L.move("leafSize", $r); leafSize(); L.move($nr, "leafSize");
 
-      if (L.get($nl) + L.get($nr) <= maxKeysPerLeaf)
-       {setStuck("root"); stuck_clear();
+        if (L.get($nl) + L.get($nr) <= maxKeysPerLeaf) break finished;
+        setStuck("root"); stuck_clear();
         for (int i = 0; i < L.get($nl); ++i)
          {setStuck($l); stuck_shift();
           setStuck("root"); stuck_push();
@@ -522,28 +533,29 @@ class BtreeBan extends Test                                                     
         free($l);
         free($r);
        }
-     }
-    else
-     {L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
-      L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
-      if (L.get($nl) + 1 + L.get($nr) >  maxKeysPerBranch) return;
-      setStuck("root"); stuck_firstElement(); getKey($pkn);
-      stuck_clear();
-      for (int i = 0; i < L.get($nl); ++i)
-       {setStuck($l); stuck_shift();
-        setStuck("root"); stuck_push();
-       }
-      setStuck($l); stuck_lastElement();
-      setStuck("root"); setKey($pkn); stuck_push();
+      branches:                                                                 // Children are branches
+       {if (L.get("hasLeavesForChildren") > 0) break branches;
+        L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
+        L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
+        if (L.get($nl) + 1 + L.get($nr) >  maxKeysPerBranch) break finished;
+        setStuck("root"); stuck_firstElement(); getKey($pkn);
+        stuck_clear();
+        for (int i = 0; i < L.get($nl); ++i)
+         {setStuck($l); stuck_shift();
+          setStuck("root"); stuck_push();
+         }
+        setStuck($l); stuck_lastElement();
+        setStuck("root"); setKey($pkn); stuck_push();
 
-      for (int i = 0; i < L.get($nr); ++i)
-       {setStuck($r); stuck_shift();
-        setStuck("root"); stuck_push();
+        for (int i = 0; i < L.get($nr); ++i)
+         {setStuck($r); stuck_shift();
+          setStuck("root"); stuck_push();
+         }
+        setStuck($r); stuck_lastElement();                                      // Top next
+        setStuck("root"); setKey("root"); stuck_push();                         // Top so ignored by search ... except last
+        free($l);
+        free($r);
        }
-      setStuck($r); stuck_lastElement();                                        // Top next
-      setStuck("root"); setKey("root"); stuck_push();                           // Top so ignored by search ... except last
-      free($l);
-      free($r);
      }
    }
 
@@ -561,50 +573,55 @@ class BtreeBan extends Test                                                     
     final String $t      = "mergeLeftSibling_t";
     L.set(0, $mls);                                                             // Assume at the start that we will not be able to merge with the left sibling
 
-    if (L.get($index) == 0)          return;
-    L.move("branchSize", $P); branchSize(); L.move($bs, "branchSize");
-    if (L.get($index) >= L.get($bs)) return;
+    finished:
+     {if (L.get($index) == 0)          break finished;
+      L.move("branchSize", $P); branchSize(); L.move($bs, "branchSize");
+      if (L.get($index) >= L.get($bs)) break finished;
 
-    setStuck($P);
-    L.set($left, L.get($index)-1);
-    setIndex($left);  stuck_elementAt(); getData($l);
-    setIndex($index); stuck_elementAt(); getData($r);
+      setStuck($P);
+      L.set($left, L.get($index)-1);
+      setIndex($left);  stuck_elementAt(); getData($l);
+      setIndex($index); stuck_elementAt(); getData($r);
 
-    L.move("hasLeavesForChildren", $P);                                         // Children are leaves
-    hasLeavesForChildren();
-    if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
-     {L.move("leafSize", $l); leafSize(); L.move($nl, "leafSize");
-      L.move("leafSize", $r); leafSize(); L.move($nr, "leafSize");
+      L.move("hasLeavesForChildren", $P);
+      hasLeavesForChildren();
+      leaves:                                                                   // Children are leaves
+       {if (L.get("hasLeavesForChildren") == 0) break leaves;
+        L.move("leafSize", $l); leafSize(); L.move($nl, "leafSize");
+        L.move("leafSize", $r); leafSize(); L.move($nr, "leafSize");
 
-      if (L.get($nl) + L.get($nr) >= maxKeysPerLeaf) return;                    // Combined body would be too big
+        if (L.get($nl) + L.get($nr) >= maxKeysPerLeaf) break finished;          // Combined body would be too big
 
-      stuck_size($size, $l);                                                    // Number of entries to remove
-      for (int i = 0; i < L.get($size); i++)                                    // Transfer left to right
-       {setStuck($l); stuck_pop();
-        setStuck($r); stuck_unshift();
+        stuck_size($size, $l);                                                  // Number of entries to remove
+        for (int i = 0; i < L.get($size); i++)                                  // Transfer left to right
+         {setStuck($l); stuck_pop();
+          setStuck($r); stuck_unshift();
+         }
        }
-     }
-    else                                                                        // Children are branches
-     {L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
-      L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
+      branches:                                                                 // Children are branches
+       {if (L.get("hasLeavesForChildren") > 0) break branches;
+        L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
+        L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
 
-      if (L.get($nl) + 1 + L.get($nr) > maxKeysPerBranch) return;               // Merge not possible because there is not enough room for the combined result
+        if (L.get($nl) + 1 + L.get($nr) > maxKeysPerBranch) break finished;     // Merge not possible because there is not enough room for the combined result
 
-      setStuck($P); setIndex($left); stuck_elementAt(); getKey($t);             // Top key
-      setStuck($l); stuck_lastElement();                                        // Last element of left child
-      setStuck($r); setKey($t); stuck_unshift();                                // Left top to right
+        setStuck($P); setIndex($left); stuck_elementAt(); getKey($t);           // Top key
+        setStuck($l); stuck_lastElement();                                      // Last element of left child
+        setStuck($r); setKey($t); stuck_unshift();                              // Left top to right
 
-      setStuck($l); stuck_pop();                                                // Remove left top
-      L.move("branchSize", $l); branchSize(); L.set(L.get("branchSize") + 1, $size);
+        setStuck($l); stuck_pop();                                              // Remove left top
+        L.move("branchSize", $l); branchSize();
+        L.set(L.get("branchSize") + 1, $size);
 
-      for (int i = 0; i < L.get($size); i++)                                               // Transfer left to right
-       {setStuck($l); stuck_pop();
-        setStuck($r); stuck_unshift();
+        for (int i = 0; i < L.get($size); i++)                                  // Transfer left to right
+         {setStuck($l); stuck_pop();
+          setStuck($r); stuck_unshift();
+         }
        }
+      free($l);                                                                 // Free the empty left node
+      setStuck($P); setIndex($left); stuck_removeElementAt();                   // Reduce P on left
+      L.set(1, $mls);                                                           // Success
      }
-    free($l);                                                                   // Free the empty left node
-    setStuck($P); setIndex($left); stuck_removeElementAt();                     // Reduce P on left
-    L.set(1, $mls);                                                             // Success
    }
 
   void mergeRightSibling()                                                      // Merge the right sibling
@@ -622,51 +639,56 @@ class BtreeBan extends Test                                                     
     final String $pk     = "mergeRightSibling_pk";
     L.set(0, $mrs);                                                             // Assume at the start that it will  mnot be possible to merge with the right sibling
 
-    stuck_size1($bs, $P);
-    if (L.get($index) >= L.get($bs)) return;                                    // No right sibling
+    finished:
+     {stuck_size1($bs, $P);
+      if (L.get($index) >= L.get($bs)) break finished;                          // No right sibling
 
-    setStuck($P);
-    setIndex(L.get($index)+0); stuck_elementAt(); getData($l);
-    setIndex(L.get($index)+1); stuck_elementAt(); getData($r);
+      setStuck($P);
+      setIndex(L.get($index)+0); stuck_elementAt(); getData($l);
+      setIndex(L.get($index)+1); stuck_elementAt(); getData($r);
 
-    L.move("hasLeavesForChildren", $P);                                         // Children are leaves
-    hasLeavesForChildren();
-    if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
-     {L.move("leafSize", $l); leafSize(); L.move($nl, "leafSize");
-      L.move("leafSize", $r); leafSize(); L.move($nr, "leafSize");
+      L.move("hasLeavesForChildren", $P);
+      hasLeavesForChildren();
+      leaves:                                                                   // Children are leaves
+       {if (L.get("hasLeavesForChildren") == 0) break leaves;
+        L.move("leafSize", $l); leafSize(); L.move($nl, "leafSize");
+        L.move("leafSize", $r); leafSize(); L.move($nr, "leafSize");
 
-      if (L.get($nl) + L.get($nr) > maxKeysPerLeaf) return;                     // Combined body would be too big for one leaf
+        if (L.get($nl) + L.get($nr) > maxKeysPerLeaf) break finished;           // Combined body would be too big for one leaf
 
-      stuck_size($size, $r);                                                    // Number of entries to remove
-      for (int i = 0; i < L.get($size); i++)                                    // Transfer right to left
-       {setStuck($r); stuck_shift();
-        setStuck($l); stuck_push();
+        stuck_size($size, $r);                                                  // Number of entries to remove
+        for (int i = 0; i < L.get($size); i++)                                  // Transfer right to left
+         {setStuck($r); stuck_shift();
+          setStuck($l); stuck_push();
+         }
        }
-     }
-    else                                                                        // Children are branches
-     {L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
-      L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
+      branches:                                                                 // Children are branches
+       {if (L.get("hasLeavesForChildren") > 0) break branches;
+        L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
+        L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
 
-      if (L.get($nl) + 1 + L.get($nr) >  maxKeysPerBranch) return;              // Merge not possible because there is not enough room in a single branch
-      setStuck($l); stuck_lastElement(); final int ld = getData();              // Last element of left child
-      setStuck($P); setIndex($index); stuck_elementAt();                        // Parent dividing element
-      setStuck($l); setData(ld); setIndex($nl); stuck_setElementAt();           // Re-key left top
-      L.set(L.get($nr)+1, $size);
+        if (L.get($nl) + 1 + L.get($nr) >  maxKeysPerBranch) break finished;    // Merge not possible because there is not enough room in a single branch
+        setStuck($l); stuck_lastElement(); final int ld = getData();            // Last element of left child
+        setStuck($P); setIndex($index); stuck_elementAt();                      // Parent dividing element
+        setStuck($l); setData(ld); setIndex($nl); stuck_setElementAt();         // Re-key left top
+        L.set(L.get($nr)+1, $size);
 
-      for (int i = 0; i < L.get($size); i++)                                    // Transfer right to left
-       {setStuck($r); stuck_shift();
-        setStuck($l); stuck_push();
+        for (int i = 0; i < L.get($size); i++)                                  // Transfer right to left
+         {setStuck($r); stuck_shift();
+          setStuck($l); stuck_push();
+         }
        }
+
+      free($r);                                                                 // Free the empty right node
+
+      setStuck($P);
+      setIndex(L.get($index)+1);     stuck_elementAt(); getKey($pk);            // One up from dividing point in parent
+      setIndex(L.get($index));       stuck_elementAt();                         // Dividing point in parent
+      setKey($pk); setIndex($index); stuck_setElementAt();                      // Install key of right sibling in this child
+      setIndex(L.get($index)+1);     stuck_removeElementAt();                   // Reduce parent on right
+
+      L.set(1, "mergeRightSibling");
      }
-    free($r);                                                                   // Free the empty right node
-
-    setStuck($P);
-    setIndex(L.get($index)+1);    stuck_elementAt(); getKey($pk);               // One up from dividing point in parent
-    setIndex(L.get($index));      stuck_elementAt();                            // Dividing point in parent
-    setKey($pk); setIndex($index); stuck_setElementAt();                        // Install key of right sibling in this child
-    setIndex(L.get($index)+1);    stuck_removeElementAt();                      // Reduce parent on right
-
-    L.set(1, "mergeRightSibling");
    }
 
 //D2 Balance                                                                    // Balance the tree by merging and stealing
@@ -675,25 +697,27 @@ class BtreeBan extends Test                                                     
    {final String $parent = "balance_parent";
     final String $index  = "balance_index";
 
-    setStuck($parent); setIndex($index); stuck_elementAt(); getData();
-    L.move("isLow", "s_data");
-    isLow();
-    if (L.get("isLow") == 0) return;
-    L.move("stealFromLeft_parent", $parent);
-    L.move("stealFromLeft_index",  $index);
-    stealFromLeft (); if (L.get("stealFromLeft")  > 0) return;
+    finished:
+     {setStuck($parent); setIndex($index); stuck_elementAt(); getData();
+      L.move("isLow", "s_data");
+      isLow();
+      if (L.get("isLow") == 0)                                 break finished;
+      L.move("stealFromLeft_parent", $parent);
+      L.move("stealFromLeft_index",  $index);
+      stealFromLeft (); if (L.get("stealFromLeft")  > 0)       break finished;
 
-    L.move("stealFromRight_parent", $parent);
-    L.move("stealFromRight_index",  $index);
-    stealFromRight(); if (L.get("stealFromRight") > 0) return;
+      L.move("stealFromRight_parent", $parent);
+      L.move("stealFromRight_index",  $index);
+      stealFromRight(); if (L.get("stealFromRight") > 0)       break finished;
 
-    L.move("mergeLeftSibling_parent", $parent);
-    L.move("mergeLeftSibling_index",  $index);
-    mergeLeftSibling(); if (L.get("mergeLeftSibling") > 0) return;
+      L.move("mergeLeftSibling_parent", $parent);
+      L.move("mergeLeftSibling_index",  $index);
+      mergeLeftSibling(); if (L.get("mergeLeftSibling") > 0)   break finished;
 
-    L.move("mergeRightSibling_parent", $parent);
-    L.move("mergeRightSibling_index",  $index);
-    mergeRightSibling(); if (L.get("mergeRightSibling") > 0) return;
+      L.move("mergeRightSibling_parent", $parent);
+      L.move("mergeRightSibling_index",  $index);
+      mergeRightSibling(); if (L.get("mergeRightSibling") > 0) break finished;
+     }
    }
 
 //D1 Print                                                                      // Print a BTree horizontally
@@ -798,31 +822,34 @@ class BtreeBan extends Test                                                     
   void find()                                                                   // Find the data associated with a key in the tree
    {final int Key = L.get("find_Key");
     rootIsLeaf();                                                               // The root is a leaf
-    if (L.get("rootIsLeaf") > 0)
-     {setStuck(0); setKey(Key); stuck_search();
-      find_result("root", "s_found", "s_index", "s_key", "s_data");
-      return;
-     }
-
-    L.move("parent", "root");                                                   // Parent starts at root which is known to be a branch
-
-    for (int i = 0; i < maxDepth; i++)                                          // Step down through tree
-     {setStuck("parent"); setKey(Key);
-      stuck_searchFirstGreaterThanOrEqualExceptLast();
-      getData("child");
-
-      L.move("isALeaf", "child");
-      isLeaf();                                                                 // Found the containing search
-      if (L.get("isALeaf") > 0)
-       {setStuck("child"); setKey(Key); stuck_search();
-
-        L.move("find_result_leaf", "child");
-        find_result("find_result_leaf", "s_found", "s_index", "s_key", "s_data");
-        return;
+    finished:
+     {root:
+       {if (L.get("rootIsLeaf") == 0) break root;
+        setStuck(0); setKey(Key); stuck_search();
+        find_result("root", "s_found", "s_index", "s_key", "s_data");
+        break finished;
        }
-      L.move("parent", "child");                                                // Step down to lower branch
+
+      L.move("parent", "root");                                                 // Parent starts at root which is known to be a branch
+
+      for (int i = 0; i < maxDepth; i++)                                        // Step down through tree
+       {setStuck("parent"); setKey(Key);
+        stuck_searchFirstGreaterThanOrEqualExceptLast();
+        getData("child");
+
+        L.move("isALeaf", "child");
+        isLeaf();                                                               // Found the containing search
+        if (L.get("isALeaf") > 0)
+         {setStuck("child"); setKey(Key); stuck_search();
+
+          L.move("find_result_leaf", "child");
+          find_result("find_result_leaf", "s_found", "s_index", "s_key", "s_data");
+          break finished;
+         }
+        L.move("parent", "child");                                              // Step down to lower branch
+       }
+      stop("Search did not terminate in a leaf");
      }
-    stop("Search did not terminate in a leaf");
    }
 
   void findAndInsert()                                                          // Find the leaf that should contain this key and insert or update it is possible
