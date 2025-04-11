@@ -595,7 +595,7 @@ class BtreeBan extends Test                                                     
     final String $r      = "mergeLeftSibling_r";
     final String $nl     = "mergeLeftSibling_nl";
     final String $nr     = "mergeLeftSibling_nr";
-    //final String $size   = "mergeLeftSibling_size";
+    final String $size   = "mergeLeftSibling_size";
     final String $t      = "mergeLeftSibling_t";
 
     //final int P     = L.get("mergeLeftSibling_parent");
@@ -617,8 +617,8 @@ class BtreeBan extends Test                                                     
 
       if (L.get($nl) + L.get($nr) >= maxKeysPerLeaf) {L.set(0, $mls); return;}; // Combined body would be too big
 
-      setStuck($l); final int N = stuck_size();                                 // Number of entries to remove
-      for (int i = 0; i < N; i++)                                               // Transfer left to right
+      setStuck($l); L.set(stuck_size(), $size);                                // Number of entries to remove
+      for (int i = 0; i < L.get($size); i++)                                    // Transfer left to right
        {setStuck($l); stuck_pop();
         setStuck($r); stuck_unshift();
        }
@@ -634,9 +634,9 @@ class BtreeBan extends Test                                                     
       setStuck($r); setKey($t); stuck_unshift();                                // Left top to right
 
       setStuck($l); stuck_pop();                                                // Remove left top
-      L.move("branchSize_1", $l); branchSize(); final int N = L.get("branchSize") + 1;
+      L.move("branchSize_1", $l); branchSize(); L.set(L.get("branchSize") + 1, $size);
 
-      for (int i = 0; i < N; i++)                                               // Transfer left to right
+      for (int i = 0; i < L.get($size); i++)                                               // Transfer left to right
        {setStuck($l); stuck_pop();
         setStuck($r); stuck_unshift();
        }
@@ -656,7 +656,7 @@ class BtreeBan extends Test                                                     
     final String $r      = "mergeRightSibling_r";
     final String $nl     = "mergeRightSibling_nl";
     final String $nr     = "mergeRightSibling_nr";
-    //final String $size   = "mergeRightSibling_size";
+    final String $size   = "mergeRightSibling_size";
     final String $t      = "mergeRightSibling_t";
     final String $pk     = "mergeRightSibling_pk";
 
@@ -676,8 +676,8 @@ class BtreeBan extends Test                                                     
 
       if (L.get($nl) + L.get($nr) > maxKeysPerLeaf) {L.set(0, "mergeRightSibling"); return;}    // Combined body would be too big for one leaf
 
-      setStuck($r); final int N = stuck_size();                                 // Number of entries to remove
-      for (int i = 0; i < N; i++)                                               // Transfer right to left
+      setStuck($r); L.set(stuck_size(), $size);                                 // Number of entries to remove
+      for (int i = 0; i < L.get($size); i++)                                    // Transfer right to left
        {setStuck($r); stuck_shift();
         setStuck($l); stuck_push();
        }
@@ -690,8 +690,9 @@ class BtreeBan extends Test                                                     
       setStuck($l); stuck_lastElement(); final int ld = getData();              // Last element of left child
       setStuck($P); setIndex($index); stuck_elementAt();                        // Parent dividing element
       setStuck($l); setData(ld); setIndex($nl); stuck_setElementAt();           // Re-key left top
+      L.set(L.get($nr)+1, $size);
 
-      for (int i = 0; i < L.get($nr)+1; i++)                                    // Transfer right to left
+      for (int i = 0; i < L.get($size); i++)                                    // Transfer right to left
        {setStuck($r); stuck_shift();
         setStuck($l); stuck_push();
        }
