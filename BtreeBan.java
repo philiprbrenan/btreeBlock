@@ -322,7 +322,7 @@ class BtreeBan extends Test                                                     
 
   void splitBranch()                                                            // Split a branch which is not the root by splitting right to left
    {final int p  = L.get("splitBranch_parent");
-    final int l  = allocBranch();
+     final int l  = allocBranch();
     final int r  = L.get("splitBranch_node");  ;
     final int in = L.get("splitBranch_index"); ;
     final int sb = splitBranchSize;
