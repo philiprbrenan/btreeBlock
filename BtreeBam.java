@@ -314,8 +314,9 @@ class BtreeBam extends Test                                                     
       if (nl >= maxKeysPerBranch) return false;                                 // Steal not possible because there is no where to put the steal
       if (nr <= 1) return false;                                                // Steal not allowed because it would leave the right sibling empty
 
-      setStuck(l); stuck_lastElement();                                         // Last element of left child
-      setStuck(l); setKey(lk); setIndex(nl); stuck_setElementAt();              // Left top becomes real
+      setStuck(l);
+      stuck_lastElement();                                                      // Last element of left child
+      setKey(lk); setIndex(nl); stuck_setElementAt();                           // Left top becomes real
      }
 
     setStuck(r); stuck_firstElement(); final int fk = getKey();                 // First element of right child
