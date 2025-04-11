@@ -47,145 +47,124 @@ class BtreeBan extends Test                                                     
     final int d = max(maxKeysPerBranch+1, maxKeysPerLeaf);
 
     return new LayoutBam()
-     {void load()
-       {array("freeChainHead");                                                 // The head of the free chain
-        array("root");                                                          // Always zero indicating the location of the root which never changes
-        array("stuck");                                                         // The index of the stuck to be operated on
-        array("s_key");                                                         // The input key for searching or adding to a stuck and the output of a search greater than
-        array("s_data");                                                        // The input data for a stuck or the resulting data found in a stuck
-        array("s_index");                                                       // The input index of a key,data pair in a stuck or the output index of a located key, data pair
-        array("s_found");                                                       // Whether a matching key was found when searching a stuck
-        array("f_leaf");                                                        // Node number of leaf found
-        array("f_found");                                                       // Whether the key was found
-        array("f_index");                                                       // The index in the leaf or branch of the greater than or equal key
-        array("f_key");                                                         // Matching found key
-        array("f_data");                                                        // Data associated with key
-        array("f_success");                                                     // Inserted or updated if true
-        array("f_inserted");                                                    // Inserted if true
+     {void load() {
         array("allocate");                                                      // Result of calling allocate
-        array("free_1");                                                        // Result of calling isLeaf
-        array("isLeaf_0");                                                      // A node to be freed
-        array("isLeaf_1");                                                      // First parameter to is leaf
-        array("rootIsLeaf");                                                    // Whether the root is a
-        array("setLeaf");                                                       // Set the specified  node as a leaf
-        array("setBranch");                                                     // Set the specified  node as a branch
-        array("leafSize");                                                      // The result of leaf size
-        array("leafSize_1");                                                    // The leaf whose size we would know
-        array("branchSize");                                                    // The result of branch size
-        array("branchSize_1");                                                  // The branch whose size we would know
-        array("isFull");                                                        // Whether the node is  full or not
-        array("isFull_1");                                                      // The node whose fullness we would know
-        array("isFullRoot");                                                    // Whether the root is full
-        array("isLow");                                                         // Whether the node is low on children
-        array("isLow_1");                                                       // The node whose lowness we would know
+        array("balance_index");                                                 // The index of the child to be balanced
+        array("balance_parent");                                                // The parent of the branch which wants to balance a child
+        array("branchSize");                                                    // Get branch size
+        array("child");                                                         // The child node during a descent through the tree
+        array("current_size", numberOfNodes);                                   // Current size of stuck
+        array("data",         numberOfNodes, d);                                // Data
+        array("delete_Key");                                                    // The key to delete
+        array("f_data");                                                        // Data associated with key
+        array("f_found");                                                       // Whether the key was found
+        array("findAndDelete_Key");                                             // The key to find and delete
+        array("findAndInsert_Data");                                            // The data to insert
+        array("findAndInsert_Key");                                             // The key to insert
+        array("f_index");                                                       // The index in the leaf or branch of the greater than or equal key
+        array("find_Key");                                                      // Key to find in a tree
+        array("find_result_leaf");                                              // The node index of the leaf containing the key found by fine
+        array("f_inserted");                                                    // Inserted if true
+        array("f_key");                                                         // Matching found key
+        array("f_leaf");                                                        // Node number of leaf found
+        array("freeChainHead");                                                 // The head of the free chain
+        array("free",         numberOfNodes);                                   // Used to place the node  on the free chain else zero if in use
+        array("f_success");                                                     // Inserted or updated if true
         array("hasLeavesForChildren");                                          // Whether the node has leaves for children
-        array("hasLeavesForChildren_1");                                        // The node whose lowness we would know
-
-        array("splitLeaf_node");                                                // The leaf to be split
-        array("splitLeaf_parent");                                              // The parent of the leag=f to be split
-        array("splitLeaf_index");                                               // The index in the parent of the leaf to be split
-        array("splitLeaf_l");                                                   // New left split out leaf
-        array("splitLeaf_F");                                                   // First of right
-        array("splitLeaf_L");                                                   // Last of left
-        array("splitLeaf_fl");                                                  // Mid point
-
-        array("splitLeafRoot_l");                                               // New left leaf
-        array("splitLeafRoot_r");                                               // New right leaf
-        array("splitLeafRoot_i");                                               // Build left leaf from parent
-        array("splitLeafRoot_first");                                           // First of right leaf
-        array("splitLeafRoot_last");                                            // Last of left leaf
-        array("splitLeafRoot_kv");                                              // Mid key
-
-        array("splitBranchRoot_l");                                             // New left branch
-        array("splitBranchRoot_r");                                             // New right branch
-        array("splitBranchRoot_plk");                                           // Parent left key
-
-
-        array("splitBranch_node");                                              // The branch to be split
-        array("splitBranch_parent");                                            // The parent of the leag=f to be split
-        array("splitBranch_index");                                             // The index in the parent of the branch to be split
-        array("splitBranch_l");                                                 // New left leaf
-        array("splitBranch_rk");                                                // Right key
-
-        array("stealFromLeft");                                                 // Whether the steal from the left was successful
-        array("stealFromLeft_parent");                                          // The parent of the branch which wants to steal from the left to give to the right
-        array("stealFromLeft_index");                                           // The index of the child that wants to steal from its left sibling in its parent
-        array("stealFromLeft_nl2");                                             // Two less than the number on the left
-        array("stealFromLeft_left");                                            // The index of the left child being stolen from
-        array("stealFromLeft_l");                                               // New left node
-        array("stealFromLeft_r");                                               // Existing right node
-        array("stealFromLeft_nl");                                              // Size of left node
-        array("stealFromLeft_nr");                                              // Size of right node
-        array("stealFromLeft_td");                                              // Left half of mid key
-        array("stealFromLeft_bd");                                              // Right half of mid key
-
-        array("stealFromRight");                                                // Whether the steal from the right was successful
-        array("stealFromRight_parent");                                         // The parent of the branch which wants to steal from the right child
-        array("stealFromRight_index");                                          // The index of the child that wants to steal from the right sibling in its parent
-        array("stealFromRight_nP");                                             // Parent branch size
-        array("stealFromRight_right");                                          // Index of sibling on right
-        array("stealFromRight_l");                                              // Left child index
-        array("stealFromRight_lk");                                             // Left child key
-        array("stealFromRight_fk");                                             // Right child key
-        array("stealFromRight_r");                                              // Right child index
-        array("stealFromRight_nl");                                             // Number in left child
-        array("stealFromRight_nr");                                             // Number in right child
-        array("stealFromRight_td");                                             //
-        array("stealFromRight_bd");                                             //
-
-        array("mergeRoot_nP");                                                  // Number in root
-        array("mergeRoot_l");                                                   // Left child of root
-        array("mergeRoot_r");                                                   // Right child of node
-        array("mergeRoot_nl");                                                  // Number in left child
-        array("mergeRoot_nr");                                                  // Number in right child
-        array("mergeRoot_pkn");                                                 //
-
-        array("mergeLeftSibling");                                              // Whether the merge with the left sibling was successful
-        array("mergeLeftSibling_parent");                                       // The parent of the branch which wants to merge with its left sibling
-        array("mergeLeftSibling_index");                                        // The index of the child that wants to steal from the child in its parent
+        array("isFullRoot");                                                    // Whether the root is full
+        array("isFull");                                                        // Whether the node is  full or not
+        array("isALeaf");                                                       // Test whether a node is a leaf
+        array("isLeaf",       numberOfNodes);                                   // Whether each node is a leaf or a branch
+        array("isLow");                                                         // Test whether the node is low on children
+        array("keys",         numberOfNodes, k);                                // Keys
+        array("leafSize");                                                      // The result of leaf size
+        array("merge_Key");                                                     // The Key along whose path we should merge
         array("mergeLeftSibling_bs");
-        array("mergeLeftSibling_left");
+        array("mergeLeftSibling_index");                                        // The index of the child that wants to steal from the child in its parent
         array("mergeLeftSibling_l");
-        array("mergeLeftSibling_r");
+        array("mergeLeftSibling_left");
         array("mergeLeftSibling_nl");
         array("mergeLeftSibling_nr");
+        array("mergeLeftSibling_parent");                                       // The parent of the branch which wants to merge with its left sibling
+        array("mergeLeftSibling_r");
         array("mergeLeftSibling_size");
         array("mergeLeftSibling_t");
-
-        array("mergeRightSibling");                                             // Whether the merge with the left sibling was successful
-        array("mergeRightSibling_parent");                                      // The parent of the branch which wants to merge with its left sibling
-        array("mergeRightSibling_index");                                       // The index of the child that wants to steal from the child in its parent
+        array("mergeLeftSibling");                                              // Whether the merge with the left sibling was successful
         array("mergeRightSibling_bs");
-        array("mergeRightSibling_left");
+        array("mergeRightSibling_index");                                       // The index of the child that wants to steal from the child in its parent
         array("mergeRightSibling_l");
-        array("mergeRightSibling_r");
+        array("mergeRightSibling_left");
         array("mergeRightSibling_nl");
         array("mergeRightSibling_nr");
+        array("mergeRightSibling_parent");                                      // The parent of the branch which wants to merge with its left sibling
+        array("mergeRightSibling_pk");
+        array("mergeRightSibling_r");
         array("mergeRightSibling_size");
         array("mergeRightSibling_t");
-        array("mergeRightSibling_pk");
-
-        array("balance_parent");                                                // The parent of the branch which wants to balance a child
-        array("balance_index");                                                 // The index of the child to be balanced
-
-        array("find_result_leaf");                                              // The node index of the leaf containing the key found by fine
-        array("find_Key");                                                      // Key to find in a tree
-
-        array("findAndInsert_Key");                                             // The key to insert
-        array("findAndInsert_Data");                                            // The data to insert
-
-        array("put_Key");                                                       // The key to put into the tree
+        array("mergeRightSibling");                                             // Whether the merge with the left sibling was successful
+        array("mergeRoot_l");                                                   // Left child of root
+        array("mergeRoot_nl");                                                  // Number in left child
+        array("mergeRoot_nP");                                                  // Number in root
+        array("mergeRoot_nr");                                                  // Number in right child
+        array("mergeRoot_pkn");                                                 // First key in root
+        array("mergeRoot_r");                                                   // Right child of node
+        array("parent");                                                        // The parent node during a descent through the tree
         array("put_Data");                                                      // The data to put into the tree
-
-        array("findAndDelete_Key");                                             // The key to find and delete
-        array("delete_Key");                                                    // The key to delete
-        array("merge_Key");                                                     // The Key along whose path we should merge
-
-        array("free",         numberOfNodes);                                   // Used to place the node  on the free chain else zero if in use
-        array("isLeaf",       numberOfNodes);                                   // Whether each node is a leaf or a branch
-        array("current_size", numberOfNodes);                                   // Current size of stuck
-        array("keys",         numberOfNodes, k);                                // Keys
-        array("data",         numberOfNodes, d);                                // Data
+        array("put_Key");                                                       // The key to put into the tree
+        array("root");                                                          // Always zero indicating the location of the root which never changes
+        array("rootIsLeaf");                                                    // Whether the root is a
+        array("s_data");                                                        // The input data for a stuck or the resulting data found in a stuck
+        array("setBranch");                                                     // Set the specified  node as a branch
+        array("setLeaf");                                                       // Set the specified  node as a leaf
+        array("s_found");                                                       // Whether a matching key was found when searching a stuck
+        array("s_index");                                                       // The input index of a key,data pair in a stuck or the output index of a located key, data pair
+        array("s_key");                                                         // The input key for searching or adding to a stuck and the output of a search greater than
+        array("splitBranch_index");                                             // The index in the parent of the branch to be split
+        array("splitBranch_l");                                                 // New left leaf
+        array("splitBranch_node");                                              // The branch to be split
+        array("splitBranch_parent");                                            // The parent of the leag=f to be split
+        array("splitBranch_rk");                                                // Right key
+        array("splitBranchRoot_l");                                             // New left branch
+        array("splitBranchRoot_plk");                                           // Parent left key
+        array("splitBranchRoot_r");                                             // New right branch
+        array("splitLeaf_F");                                                   // First of right
+        array("splitLeaf_fl");                                                  // Mid point
+        array("splitLeaf_index");                                               // The index in the parent of the leaf to be split
+        array("splitLeaf_L");                                                   // Last of left
+        array("splitLeaf_l");                                                   // New left split out leaf
+        array("splitLeaf_node");                                                // The leaf to be split
+        array("splitLeaf_parent");                                              // The parent of the leag=f to be split
+        array("splitLeafRoot_first");                                           // First of right leaf
+        array("splitLeafRoot_i");                                               // Build left leaf from parent
+        array("splitLeafRoot_kv");                                              // Mid key
+        array("splitLeafRoot_last");                                            // Last of left leaf
+        array("splitLeafRoot_l");                                               // New left leaf
+        array("splitLeafRoot_r");                                               // New right leaf
+        array("stealFromLeft_bd");                                              // Right half of mid key
+        array("stealFromLeft_index");                                           // The index of the child that wants to steal from its left sibling in its parent
+        array("stealFromLeft_left");                                            // The index of the left child being stolen from
+        array("stealFromLeft_l");                                               // New left node
+        array("stealFromLeft_nl2");                                             // Two less than the number on the left
+        array("stealFromLeft_nl");                                              // Size of left node
+        array("stealFromLeft_nr");                                              // Size of right node
+        array("stealFromLeft_parent");                                          // The parent of the branch which wants to steal from the left to give to the right
+        array("stealFromLeft_r");                                               // Existing right node
+        array("stealFromLeft_td");                                              // Left half of mid key
+        array("stealFromLeft");                                                 // Whether the steal from the left was successful
+        array("stealFromRight_bd");                                             //
+        array("stealFromRight_fk");                                             // Right child key
+        array("stealFromRight_index");                                          // The index of the child that wants to steal from the right sibling in its parent
+        array("stealFromRight_lk");                                             // Left child key
+        array("stealFromRight_l");                                              // Left child index
+        array("stealFromRight_nl");                                             // Number in left child
+        array("stealFromRight_nP");                                             // Parent branch size
+        array("stealFromRight_nr");                                             // Number in right child
+        array("stealFromRight_parent");                                         // The parent of the branch which wants to steal from the right child
+        array("stealFromRight_right");                                          // Index of sibling on right
+        array("stealFromRight_r");                                              // Right child index
+        array("stealFromRight_td");                                             //
+        array("stealFromRight");                                                // Whether the steal from the right was successful
+        array("stuck");                                                         // The index of the stuck to be operated on
        }
      };
    }
@@ -204,16 +183,6 @@ class BtreeBan extends Test                                                     
     L.zero("keys", a); L.zero("data",   a);
    }
 
-  void allocate()                                                               // Allocate a node
-   {final String fc = "freeChainHead", a = "allocate";
-    L.move(a, fc);
-    int f = L.get(a);                                                           // Last freed node
-    if (f == 0) stop("No more memory available");                               // No more free nodes available
-    L.move(fc, "free", a);                                                      // Second to last freed node becomes head of the free chain
-    L.zero("free", a); L.zero("isLeaf", a); L.zero("current_size", a);          // Clear all control information
-    L.zero("keys", a); L.zero("data",   a);
-   }
-
   void  free(String f)                                                          // Free a new node to make it available for reuse
    {final int n = L.get(f);
     if (n == 0) stop("Cannot free root");                                       // The root is never freed
@@ -222,19 +191,6 @@ class BtreeBan extends Test                                                     
     L.move("free", "freeChainHead", f);                                         // Chain this node in front of the last freed node
     L.move("freeChainHead", f);                                                 // Freed node becomes head of the free chain
    }
-
-  void  free()                                                                  // Free a new node to make it available for reuse
-   {final String f = "free_1";                                                  // Index of node to be freed
-    final int n = L.get(f);
-    if (n == 0) stop("Cannot free root");                                       // The root is never freed
-    L.ones("free", f); L.ones("isLeaf", f); L.ones("current_size", f);          // Invalidate all control information
-    L.ones("keys", f); L.ones("data",   f);
-    L.move("free", "freeChainHead", f);                                         // Chain this node in front of the last freed node
-    L.move("freeChainHead", f);                                                 // Freed node becomes head of the free chain
-   }
-
-  int allocLeaf()   {allocate(); int n = L.get("allocate"); L.set(n, "setLeaf");   setLeaf();   return n;} // Allocate leaf
-  int allocBranch() {allocate(); int n = L.get("allocate"); L.set(n, "setBranch"); setBranch(); return n;} // Allocate branch
 
   void allocLeaf  (String node) {allocate(node); L.move("setLeaf",   node);   setLeaf();} // Allocate leaf
   void allocBranch(String node) {allocate(node); L.move("setBranch", node); setBranch();} // Allocate branch
@@ -267,46 +223,46 @@ class BtreeBan extends Test                                                     
   void putFSuccess (int n) {L.set(n, "f_success");}                             // Inserted or updated if true
   void putFInserted(int n) {L.set(n, "f_inserted");}                            // Inserted if true
 
-  void isLeaf    () {L.move("isLeaf_0", "isLeaf", "isLeaf_1");}                 // A leaf if true
-  void rootIsLeaf() {L.move("rootIsLeaf", "isLeaf", "root");}                   // The root is a leaf if the target is not zero
+  void isLeaf       () {L.move("isALeaf", "isLeaf", "isALeaf");}              // A leaf if true
+  void rootIsLeaf   () {L.move("rootIsLeaf", "isLeaf", "root");}                // The root is a leaf if the target is not zero
 
   void setLeaf      () {L.set(1, "isLeaf", "setLeaf");}                         // Set as leaf
   void setBranch    () {L.set(0, "isLeaf", "setBranch");}                       // Set as branch
   void setLeafRoot  () {L.set(1, "isLeaf", "root");}                            // Set root as leaf
   void setBranchRoot() {L.set(0, "isLeaf", "root");}                            // Set root as branch
 
-  void leafSize  () {L.move("leafSize",   "current_size", "leafSize_1"  );}     // Number of children in leaf
-  void branchSize() {L.move("branchSize", "current_size", "branchSize_1"); L.addImmediate(-1, "branchSize");} // Number of children in body of branch
+  void leafSize     () {L.move("leafSize",   "current_size", "leafSize"  );}  // Number of children in leaf
+  void branchSize   () {L.move("branchSize", "current_size", "branchSize"); L.addImmediate(-1, "branchSize");} // Number of children in body of branch
 
   void isFull()                                                                 // The node is full
-   {L.move("isLeaf_1", "isFull_1");
+   {L.move("isALeaf", "isFull");
     isLeaf();
-    if (L.get("isLeaf_0") > 0) isFullLeaf(); else isFullBranch();
+    if (L.get("isALeaf") > 0) isFullLeaf(); else isFullBranch();
    }
 
   void isFullLeaf()                                                             // The leaf is full
-   {L.move("leafSize_1", "isFull_1");
+   {L.move("leafSize", "isFull");
     leafSize();
     L.set(L.get("leafSize") >= maxKeysPerLeaf ? 1 : 0, "isFull");
    }
   void isFullBranch()                                                           // The branch is full
-   {L.move("branchSize_1", "isFull_1");
+   {L.move("branchSize", "isFull");
     branchSize();
     L.set(L.get("branchSize") >= maxKeysPerBranch ? 1 : 0, "isFull");
    }
 
-  void isFullRoot() {L.zero("isFull_1"); isFull(); L.set(L.get("isFull"), "isFullRoot");} // The root is full
+  void isFullRoot() {L.zero("isFull"); isFull(); L.set(L.get("isFull"), "isFullRoot");} // The root is full
 
   void isLow()                                                                  // The branch is low on children making it impossible to merge two sibling children
-   {L.move("branchSize_1", "isLow_1");
+   {L.move("branchSize", "isLow");
     branchSize();
     L.set(L.get("branchSize") < 2 ? 1 : 0, "isLow");
    }
 
   void hasLeavesForChildren()                                                   // Whether the branch has leaves for children
-   {L.move("isLeaf_1", "data", "hasLeavesForChildren_1", "0");
+   {L.move("isALeaf", "data", "hasLeavesForChildren", "0");
     isLeaf();
-    L.set(L.get("isLeaf_0") > 0 ? 1 : 0, "hasLeavesForChildren");
+    L.set(L.get("isALeaf") > 0 ? 1 : 0, "hasLeavesForChildren");
    }
 
 //D2 Nodes                                                                      // Operations on nodes
@@ -430,11 +386,11 @@ class BtreeBan extends Test                                                     
     setIndex($left);  stuck_elementAt(); getData($l);
     setIndex($index); stuck_elementAt(); getData($r);
 
-    L.move("hasLeavesForChildren_1", $P);
+    L.move("hasLeavesForChildren", $P);
     hasLeavesForChildren();
     if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
-     {L.move("leafSize_1", $l); leafSize(); L.move($nl, "leafSize");
-      L.move("leafSize_1", $r); leafSize(); L.move($nr, "leafSize");
+     {L.move("leafSize", $l); leafSize(); L.move($nl, "leafSize");
+      L.move("leafSize", $r); leafSize(); L.move($nr, "leafSize");
 
       if (L.get($nr) >= maxKeysPerLeaf) {L.set(0, $sfl); return;}               // Steal not possible because there is no where to put the steal
       if (L.get($nl) <= 1)              {L.set(0, $sfl); return;};              // Steal not allowed because it would leave the leaf sibling empty
@@ -447,8 +403,8 @@ class BtreeBan extends Test                                                     
       setIndex($nl2); stuck_elementAt();                                        // Last key on left
      }
     else                                                                        // Children are branches
-     {L.move("branchSize_1", $l); branchSize(); L.move($nl, "branchSize");
-      L.move("branchSize_1", $r); branchSize(); L.move($nr, "branchSize");
+     {L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
+      L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
 
       if (L.get($nr) >= maxKeysPerBranch)  {L.set(0, $sfl); return;};           // Steal not possible because there is no where to put the steal
       if (L.get($nl) <= 1)                 {L.set(0, $sfl); return;};           // Steal not allowed because it would leave the left sibling empty
@@ -485,7 +441,7 @@ class BtreeBan extends Test                                                     
     final String $td     = "stealFromRight_td";                                 //
     final String $bd     = "stealFromRight_bd";                                 //
 
-    L.move("branchSize_1", $P); branchSize(); L.move($nP, "branchSize");
+    L.move("branchSize", $P); branchSize(); L.move($nP, "branchSize");
 
     if (L.get($index) >= L.get($nP)) {L.set(0, $sfr); return;};
     setStuck($P);
@@ -493,18 +449,18 @@ class BtreeBan extends Test                                                     
     L.set($right, L.get($index)+1);
     setIndex($right); stuck_elementAt(); getData($r);
 
-    L.move("hasLeavesForChildren_1", $P);
+    L.move("hasLeavesForChildren", $P);
     hasLeavesForChildren();
     if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
-     {L.move("leafSize_1", $l); leafSize(); L.move($nl, "leafSize");
-      L.move("leafSize_1", $r); leafSize(); L.move($nr, "leafSize");
+     {L.move("leafSize", $l); leafSize(); L.move($nl, "leafSize");
+      L.move("leafSize", $r); leafSize(); L.move($nr, "leafSize");
 
       if (L.get($nl) >= maxKeysPerLeaf) {L.set(0, $sfr); return;};              // Steal not possible because there is no where to put the steal
       if (L.get($nr) <= 1)              {L.set(0, $sfr); return;};              // Steal not allowed because it would leave the right sibling empty
      }
     else                                                                        // Children are branches
-     {L.move("branchSize_1", $l); branchSize(); L.move($nl, "branchSize");
-      L.move("branchSize_1", $r); branchSize(); L.move($nr, "branchSize");
+     {L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
+      L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
 
       if (L.get($nl) >= maxKeysPerBranch) {L.set(0, $sfr); return;};            // Steal not possible because there is no where to put the steal
       if (L.get($nr) <= 1)                {L.set(0, $sfr); return;};            // Steal not allowed because it would leave the right sibling empty
@@ -533,18 +489,18 @@ class BtreeBan extends Test                                                     
 
     rootIsLeaf();
     if (L.get("rootIsLeaf") > 0) return;
-    L.set(0, "branchSize_1"); branchSize(); L.move($nP, "branchSize");
+    L.set(0, "branchSize"); branchSize(); L.move($nP, "branchSize");
     if (L.get($nP) > 1) return;
 
     setStuck(0);
     stuck_firstElement(); getData($l);
     stuck_lastElement (); getData($r);
 
-    L.move("hasLeavesForChildren_1", "root");
+    L.move("hasLeavesForChildren", "root");
     hasLeavesForChildren();
     if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
-     {L.move("leafSize_1", $l); leafSize(); L.move($nl, "leafSize");
-      L.move("leafSize_1", $r); leafSize(); L.move($nr, "leafSize");
+     {L.move("leafSize", $l); leafSize(); L.move($nl, "leafSize");
+      L.move("leafSize", $r); leafSize(); L.move($nr, "leafSize");
 
       if (L.get($nl) + L.get($nr) <= maxKeysPerLeaf)
        {setStuck("root"); stuck_clear();
@@ -562,8 +518,8 @@ class BtreeBan extends Test                                                     
        }
      }
     else
-     {L.move("branchSize_1", $l); branchSize(); L.move($nl, "branchSize");
-      L.move("branchSize_1", $r); branchSize(); L.move($nr, "branchSize");
+     {L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
+      L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
       if (L.get($nl) + 1 + L.get($nr) >  maxKeysPerBranch) return;
       setStuck("root"); stuck_firstElement(); getKey($pkn);
       stuck_clear();
@@ -598,10 +554,8 @@ class BtreeBan extends Test                                                     
     final String $size   = "mergeLeftSibling_size";
     final String $t      = "mergeLeftSibling_t";
 
-    //final int P     = L.get("mergeLeftSibling_parent");
-    //final int index = L.get("mergeLeftSibling_index");
-    if (L.get($index) == 0)  {L.set(0, $mls); return;};
-    L.move("branchSize_1", $P); branchSize(); L.move($bs, "branchSize");
+    if (L.get($index) == 0)          {L.set(0, $mls); return;};
+    L.move("branchSize", $P); branchSize(); L.move($bs, "branchSize");
     if (L.get($index) >= L.get($bs)) {L.set(0, $mls); return;};
 
     setStuck($P);
@@ -609,23 +563,23 @@ class BtreeBan extends Test                                                     
     setIndex($left);  stuck_elementAt(); getData($l);
     setIndex($index); stuck_elementAt(); getData($r);
 
-    L.move("hasLeavesForChildren_1", $P);                                       // Children are leaves
+    L.move("hasLeavesForChildren", $P);                                       // Children are leaves
     hasLeavesForChildren();
     if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
-     {L.move("leafSize_1", $l); leafSize(); L.move($nl, "leafSize");
-      L.move("leafSize_1", $r); leafSize(); L.move($nr, "leafSize");
+     {L.move("leafSize", $l); leafSize(); L.move($nl, "leafSize");
+      L.move("leafSize", $r); leafSize(); L.move($nr, "leafSize");
 
       if (L.get($nl) + L.get($nr) >= maxKeysPerLeaf) {L.set(0, $mls); return;}; // Combined body would be too big
 
-      L.set(stuck_size($l), $size);                                // Number of entries to remove
+      stuck_size($size, $l);                                                    // Number of entries to remove
       for (int i = 0; i < L.get($size); i++)                                    // Transfer left to right
        {setStuck($l); stuck_pop();
         setStuck($r); stuck_unshift();
        }
      }
     else                                                                        // Children are branches
-     {L.move("branchSize_1", $l); branchSize(); L.move($nl, "branchSize");
-      L.move("branchSize_1", $r); branchSize(); L.move($nr, "branchSize");
+     {L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
+      L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
 
       if (L.get($nl) + 1 + L.get($nr) > maxKeysPerBranch) {L.set(0, $mls); return;}; // Merge not possible because there is not enough room for the combined result
 
@@ -634,7 +588,7 @@ class BtreeBan extends Test                                                     
       setStuck($r); setKey($t); stuck_unshift();                                // Left top to right
 
       setStuck($l); stuck_pop();                                                // Remove left top
-      L.move("branchSize_1", $l); branchSize(); L.set(L.get("branchSize") + 1, $size);
+      L.move("branchSize", $l); branchSize(); L.set(L.get("branchSize") + 1, $size);
 
       for (int i = 0; i < L.get($size); i++)                                               // Transfer left to right
        {setStuck($l); stuck_pop();
@@ -660,30 +614,30 @@ class BtreeBan extends Test                                                     
     final String $t      = "mergeRightSibling_t";
     final String $pk     = "mergeRightSibling_pk";
 
-    L.set(stuck_size1($P), $bs);
+    stuck_size1($bs, $P);
     if (L.get($index) >= L.get($bs)) {L.set(0, "mergeRightSibling"); return;}   // No right sibling
 
     setStuck($P);
     setIndex(L.get($index)+0); stuck_elementAt(); getData($l);
     setIndex(L.get($index)+1); stuck_elementAt(); getData($r);
 
-    L.move("hasLeavesForChildren_1", $P);                                       // Children are leaves
+    L.move("hasLeavesForChildren", $P);                                       // Children are leaves
     hasLeavesForChildren();
     if (L.get("hasLeavesForChildren") > 0)                                      // Children are leaves
-     {L.move("leafSize_1", $l); leafSize(); L.move($nl, "leafSize");
-      L.move("leafSize_1", $r); leafSize(); L.move($nr, "leafSize");
+     {L.move("leafSize", $l); leafSize(); L.move($nl, "leafSize");
+      L.move("leafSize", $r); leafSize(); L.move($nr, "leafSize");
 
       if (L.get($nl) + L.get($nr) > maxKeysPerLeaf) {L.set(0, "mergeRightSibling"); return;}    // Combined body would be too big for one leaf
 
-      L.set(stuck_size($r), $size);                                             // Number of entries to remove
+      stuck_size($size, $r);                                                    // Number of entries to remove
       for (int i = 0; i < L.get($size); i++)                                    // Transfer right to left
        {setStuck($r); stuck_shift();
         setStuck($l); stuck_push();
        }
      }
     else                                                                        // Children are branches
-     {L.move("branchSize_1", $l); branchSize(); L.move($nl, "branchSize");
-      L.move("branchSize_1", $r); branchSize(); L.move($nr, "branchSize");
+     {L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
+      L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
 
       if (L.get($nl) + 1 + L.get($nr) >  maxKeysPerBranch) {L.set(0, "mergeRightSibling"); return;}; // Merge not possible because there is not enough room in a single branch
       setStuck($l); stuck_lastElement(); final int ld = getData();              // Last element of left child
@@ -714,7 +668,7 @@ class BtreeBan extends Test                                                     
     final String $index  = "balance_index";
 
     setStuck($parent); setIndex($index); stuck_elementAt(); getData();
-    L.move("isLow_1", "s_data");
+    L.move("isLow", "s_data");
     isLow();
     if (L.get("isLow") == 0) return;
     L.move("stealFromLeft_parent", $parent);
@@ -747,8 +701,8 @@ class BtreeBan extends Test                                                     
 
   void  printLeaf(int node, StringBuilder[]S, int level)                        // Print a leaf
    {final StringBuilder s = S[level];
-    setStuck(node); final int L = stuck_size();
-    for (int i = 0; i < L; i++)                                                 // Each element in the leaf
+    setStuck(node); final int N = L.get("current_size", "stuck");
+    for (int i = 0; i < N; i++)                                                 // Each element in the leaf
      {setStuck(node); setIndex(i); stuck_elementAt();
       s.append(String.format("%d ", getKey()));
      }
@@ -759,13 +713,13 @@ class BtreeBan extends Test                                                     
 
   void  printBranch(int node, StringBuilder[]S, int level)                      // Print a branch
    {setStuck(node);
-    final int N = stuck_size1();
+    final int N = L.get("current_size", "stuck")-1;
     for (int i = 0; i < N; i++)                                                 // Each element in the branch
      {setStuck(node); setIndex(i); stuck_elementAt();
       final int k = getKey(), d = getData();
-      L.set(d, "isLeaf_1");
+      L.set(d, "isALeaf");
       isLeaf();
-      if (L.get("isLeaf_0") > 0) printLeaf(d, S, level+linesPerNode);
+      if (L.get("isALeaf") > 0) printLeaf(d, S, level+linesPerNode);
       else         printBranch(d, S, level+linesPerNode);
       S[level+0].append(String.format("%d", k));
       S[level+1].append(String.format("%d", d));
@@ -776,9 +730,9 @@ class BtreeBan extends Test                                                     
     setStuck(node); setIndex(N); stuck_elementAt();
 
     final int k = getKey(), d = getData();
-    L.set(d, "isLeaf_1");
+    L.set(d, "isALeaf");
     isLeaf();
-    if (L.get("isLeaf_0") > 0) printLeaf(d, S, level+linesPerNode);
+    if (L.get("isALeaf") > 0) printLeaf(d, S, level+linesPerNode);
     else                     printBranch(d, S, level+linesPerNode);
     S[level+0].append("+");
     S[level+1].append(String.format("%d", d));
@@ -833,11 +787,6 @@ class BtreeBan extends Test                                                     
     putFInserted(Inserted);
    }
 
-  String print_find_result()                                                    // Print result
-   {return String.format("Find_Result leaf=%d,found=%d,index=%d,key=%d,data=%d,success=%d,inserted=%d",
-      getFLeaf(), getFound(), getFIndex(), getFKey(), getFData(), getFSuccess(), getFInserted());
-   }
-
   void find()                                                                   // Find the data associated with a key in the tree
    {final int Key = L.get("find_Key");
     rootIsLeaf();                                                               // The root is a leaf
@@ -847,23 +796,23 @@ class BtreeBan extends Test                                                     
       return;
      }
 
-    int p = 0;                                                                  // Parent starts at root which is known to be a branch
+    L.move("parent", "root");                                                   // Parent starts at root which is known to be a branch
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down through tree
-     {setStuck(p); setKey(Key);
+     {setStuck("parent"); setKey(Key);
       stuck_searchFirstGreaterThanOrEqualExceptLast();
-      final int q = getData();
+      getData("child");
 
-      L.set(q, "isLeaf_1");
+      L.move("isALeaf", "child");
       isLeaf();                                                                 // Found the containing search
-      if (L.get("isLeaf_0") > 0)
-       {setStuck(q);  setKey(Key); stuck_search();
+      if (L.get("isALeaf") > 0)
+       {setStuck("child"); setKey(Key); stuck_search();
 
-        L.set(q, "find_result_leaf");
+        L.move("find_result_leaf", "child");
         find_result("find_result_leaf", "s_found", "s_index", "s_key", "s_data");
         return;
        }
-      p = q;                                                                    // Step down to lower branch
+      L.move("parent", "child");                                                // Step down to lower branch
      }
     stop("Search did not terminate in a leaf");
    }
@@ -881,7 +830,7 @@ class BtreeBan extends Test                                                     
       return;
      }
 
-    L.set(getFLeaf(), "isFull_1");
+    L.set(getFLeaf(), "isFull");
     isFullLeaf();
     if (L.get("isFull") == 0)                                                   // Leaf is not full so we can insert immediately
      {setStuck(getFLeaf()); setKey(Key);
@@ -929,19 +878,19 @@ class BtreeBan extends Test                                                     
       if (getFSuccess() > 0) return;                                            // Inserted or updated successfully
      }
 
-    int p = 0;                                                                  // Step down the tree from the root
+    L.move("parent", "root");                                                   // Parent starts at root which is known to be a branch
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-     {setStuck(p); setKey(Key);
+     {setStuck("parent"); setKey(Key);
       stuck_searchFirstGreaterThanOrEqualExceptLast();
-      final int q = getData();
+      getData("child");
 
-      L.set(q, "isLeaf_1");                                                     // Reached a leaf
+      L.move("isALeaf", "child");
       isLeaf();
-      if (L.get("isLeaf_0") > 0)                                                // Reached a leaf
-       {L.set(q, "splitLeaf_node");
-        L.set(p, "splitLeaf_parent");
-        L.move(  "splitLeaf_index", "s_index");
+      if (L.get("isALeaf") > 0)                                                 // Reached a leaf
+       {L.move("splitLeaf_node",   "child");
+        L.move("splitLeaf_parent", "parent");
+        L.move("splitLeaf_index",  "s_index");
         splitLeaf();
 
         findAndInsert();
@@ -950,19 +899,19 @@ class BtreeBan extends Test                                                     
         return;
        }
 
-      L.set(q, "isFull_1");
+      L.move("isFull", "child");
       isFullBranch();
       if (L.get("isFull") > 0)
-       {L.set(q, "splitBranch_node");
-        L.set(p, "splitBranch_parent");
-        L.move(  "splitBranch_index", "s_index");
+       {L.move("splitBranch_node",   "child");
+        L.move("splitBranch_parent", "parent");
+        L.move("splitBranch_index",  "s_index");
         splitBranch();                                                          // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
-        setStuck(p); setKey(Key);
+        setStuck("parent"); setKey(Key);
         stuck_searchFirstGreaterThanOrEqualExceptLast();
-        p = getData();
+        getData("parent");
        }
       else
-       {p = q;
+       {L.move("parent", "child");
        }
      }
     stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
@@ -1002,29 +951,29 @@ class BtreeBan extends Test                                                     
       return;
      }
 
-    int p = 0;                                                                  // Start at root
+    L.move("parent", "root");                                                   // Parent starts at root which is known to be a branch
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-     {setStuck(p); setKey(Key);
+     {setStuck("parent"); setKey(Key);
       stuck_searchFirstGreaterThanOrEqualExceptLast();
-      L.set(p,          "balance_parent");
-      L.set(getIndex(), "balance_index");
+      L.move("balance_parent", "parent");
+      getIndex("balance_index");
       balance();                                                                // Make sure there are enough entries in the parent to permit a deletion
 
-      setStuck(p); setKey(Key);
+      setStuck("parent"); setKey(Key);
       stuck_searchFirstGreaterThanOrEqualExceptLast();
 
-      final int q = getData();
-      L.set(q, "isLeaf_1");
+      getData("child");
+      L.move("isALeaf", "child");
       isLeaf();
-      if (L.get("isLeaf_0") > 0)                                                // Reached a leaf
+      if (L.get("isALeaf") > 0)                                                // Reached a leaf
        {L.set(Key, "findAndDelete_Key");                                        // The key to find and delete
         findAndDelete();
         L.set(Key, "merge_Key");
         merge();
         return;
        }
-      p = q;
+      L.move("parent", "child");
      }
     stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
    }
@@ -1034,47 +983,63 @@ class BtreeBan extends Test                                                     
   void merge()                                                                  // Merge along the specified search path
    {final int Key = L.get("merge_Key");
     mergeRoot();
-    int p = 0;                                                                  // Start at root
+
+    L.move("parent", "root");                                                   // Parent starts at root
 
     for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-     {L.set(p, "isLeaf_1");
+     {L.move("isALeaf", "parent");
       isLeaf();
-      if (L.get("isLeaf_0") > 0) return;
+      if (L.get("isALeaf") > 0) return;
 
-      L.set(p, "branchSize_1"); branchSize(); final int N = L.get("branchSize") + 1;
+      L.move("branchSize", "parent"); branchSize();
+      final int N = L.get("branchSize") + 1;
 
       for (int j = 0; j < N; j++)                                               // Try merging each sibling pair which might change the size of the parent
-       {L.set(p, "mergeLeftSibling_parent");
+       {L.move("mergeLeftSibling_parent", "parent");
         L.set(j, "mergeLeftSibling_index");
 
         mergeLeftSibling();                                                     // A successful merge of the left  sibling reduces the current index and the upper limit
         if (L.get("mergeLeftSibling") > 0) --j;
 
-        L.set(p, "mergeRightSibling_parent");
+        L.move("mergeRightSibling_parent", "parent");
         L.set(j, "mergeRightSibling_index");
         mergeRightSibling();                                                    // A successful merge of the right sibling maintains the current position but reduces the upper limit
        }
 
-      setStuck(p); setKey(Key);
+      setStuck("parent"); setKey(Key);
       stuck_searchFirstGreaterThanOrEqualExceptLast();
-      p = getData();
+      getData("parent");
      }
     stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
    }
 
 //D1 Stucks                                                                     // Store data in each node
 
-  int stuck_size       () {return L.get("current_size", "stuck");}              // The current number of key elements in a stuck
-  int stuck_size1      () {return stuck_size() - 1;}                            // The current number of key elements in a stuck minus one whichmakes it suitable for describing a branch
-  boolean stuck_isEmpty() {return stuck_size() == 0;}                           // Check the stuck is empty
-  boolean leaf_isFull  () {return stuck_size() > maxKeysPerLeaf;}               // Check the leaf stuck is full
-  boolean branch_isFull() {return stuck_size() > maxKeysPerBranch;}             // Check the branch stuck is full
+  void stuck_size (String target, String stuck)                                 // The current number of key elements in a stuck
+   {L.move(target, "current_size", stuck);
+   }
 
-  int stuck_size       (String s) {return L.get("current_size", s);}            // The current number of key elements in a stuck
-  int stuck_size1      (String s) {return stuck_size(s) - 1;}                   // The current number of key elements in a stuck minus one whichmakes it suitable for describing a branch
-  boolean stuck_isEmpty(String s) {return stuck_size(s) == 0;}                  // Check the stuck is empty
-  boolean leaf_isFull  (String s) {return stuck_size(s) > maxKeysPerLeaf;}      // Check the leaf stuck is full
-  boolean branch_isFull(String s) {return stuck_size(s) > maxKeysPerBranch;}    // Check the branch stuck is full
+  void stuck_size1(String target, String stuck)                                 // The current number of key elements in a stuck minus one which makes it suitable for describing a branch
+   {stuck_size(target, stuck); L.addImmediate(-1, target);
+   }
+
+  void stuck_isEmpty(String target, String stuck)                               // Check the stuck is empty
+   {stuck_size(target, stuck);
+    L.compareImmediateAndSet(target, 0, target);
+    L.leZero(target);
+   }
+
+  void leaf_isFull(String target, String stuck)                                 // Check the leaf stuck is full
+   {stuck_size(target, stuck);
+    L.compareImmediateAndSet(target, maxKeysPerLeaf, target);
+    L.geZero(target);
+   }
+
+  void branch_isFull(String target, String stuck)                               // Check the branch stuck is full
+   {stuck_size(target, stuck);
+    L.compareImmediateAndSet(target, maxKeysPerBranch, target);
+    L.geZero(target);
+   }
 
   void stuck_key () {L.set(L.get("keys", "stuck", "s_index"), "s_key" );}       // Key from a stuck at indicated index
   void stuck_data() {L.set(L.get("data", "stuck", "s_index"), "s_data");}       // Data from a stuck at indicated index
@@ -1100,13 +1065,15 @@ class BtreeBan extends Test                                                     
   void stuck_clear() {L.set( 0, "current_size", "stuck");}                      // Clear the stuck
 
   void stuck_push()                                                             // Push an element onto a stuck
-   {L.set(stuck_size(), "s_index");
+   {L.move("s_index", "current_size", "stuck");
     stuck_setKeyData();
     stuck_inc();
    }
 
   void stuck_unshift()                                                          // Unshift an element onto a stuck
-   {for (int i = stuck_size(); i > 0; --i) stuck_copyKeyData(i, i-1);           // Shift the stuck up one place
+   {for (int i = L.get("current_size", "stuck"); i > 0; --i)                    // Shift the stuck up one place
+     {stuck_copyKeyData(i, i-1);
+     }
     L.set(0, "s_index");
     stuck_setKeyData();
     stuck_inc();
@@ -1114,15 +1081,15 @@ class BtreeBan extends Test                                                     
 
   void stuck_pop()                                                              // Pop from a stuck
    {stuck_dec();
-    final int s = stuck_size();
-    L.set(s, "s_index");
+    L.move("s_index", "current_size", "stuck");
     stuck_elementAt();
    }
 
   void stuck_shift()                                                            // Shift off the first element
    {L.set(0, "s_index");
     stuck_elementAt();
-    for (int i = 0, j = stuck_size1(); i < j; i++) stuck_copyKeyData(i, i+1);
+    final int N = L.get("current_size", "stuck") - 1;
+    for (int i = 0, j = N; i < j; i++) stuck_copyKeyData(i, i+1);
     stuck_dec();
    }
 
@@ -1132,22 +1099,20 @@ class BtreeBan extends Test                                                     
    }
 
   void stuck_setElementAt()                                                     // Set an element either in range or one above the current range
-   {final int size = stuck_size();                                              // Size of stuck
-    final int indx = L.get("s_index");                                          // Set index
-    stuck_setKeyData();                                                         // Set key and data
-    if (indx == size) stuck_inc();                                              // Extend range if necessary
+   {stuck_setKeyData();                                                         // Set key and data
+    if (L.get("s_index") == L.get("current_size", "stuck")) stuck_inc();        // Extend range if necessary
    }
 
   void stuck_insertElementAt()                                                  // Insert an element at the indicated location shifting all the remaining elements up one
-   {final int size = stuck_size();                                              // Size of stuck
+   {final int size = L.get("current_size", "stuck");                            // Size of stuck
     final int indx = L.get("s_index");                                          // Set index
-    for (int i = size; i > indx; --i) stuck_copyKeyData(i, i-1);
+    for (int i = size; i > indx; --i) stuck_copyKeyData(i, i - 1);
     stuck_setKeyData();
     stuck_inc();
    }
 
   void stuck_removeElementAt()                                                  // Remove the indicated element
-   {final int size = stuck_size();                                              // Size of stuck
+   {final int size = L.get("current_size", "stuck");                            // Size of stuck
     final int indx = L.get("s_index");                                          // Set index
     stuck_elementAt();
     for (int i = indx, j = size-1; i < j; i++) stuck_copyKeyData(i, i+1);       // Shift the stuck down one place
@@ -1160,7 +1125,7 @@ class BtreeBan extends Test                                                     
    }
 
   void stuck_lastElement()                                                      // Last element
-   {final int size = stuck_size();                                              // Size of stuck
+   {final int size = L.get("current_size", "stuck");                            // Size of stuck
     L.set(size-1, "s_index");
     stuck_elementAt();
    }
@@ -1168,7 +1133,8 @@ class BtreeBan extends Test                                                     
 //D1 Search                                                                     // Search a stuck.
 
   void stuck_search()                                                           // Search for an element within all elements of the stuck
-   {for (int i = 0, j = stuck_size(); i < j; i++)                               // Search
+   {final int N = L.get("current_size", "stuck");
+     for (int i = 0, j = N; i < j; i++)                                         // Search
      {L.set(i, "s_index");
       final int c = L.compare("s_key", "keys", "stuck", "s_index");
       if (c == 0)
@@ -1181,7 +1147,7 @@ class BtreeBan extends Test                                                     
    }
 
   void stuck_searchFirstGreaterThanOrEqual()                                    // Find first key equal or greater than the search key
-   {final int s = stuck_size();
+   {final int s = L.get("current_size", "stuck");
     for (int i = 0, j = s; i < j; i++)
      {L.set(i, "s_index");
       final int c = L.compare("s_key", "keys", "stuck", "s_index");
@@ -1196,7 +1162,7 @@ class BtreeBan extends Test                                                     
    }
 
   void stuck_searchFirstGreaterThanOrEqualExceptLast()                          // Find first key equal or greater than the search key
-   {final int s = stuck_size1();
+   {final int s = L.get("current_size", "stuck") - 1;
     for (int i = 0; i < s; i++)
      {L.set(i, "s_index");
       final int c = L.compare("s_key", "keys", "stuck", "s_index");
@@ -1217,7 +1183,7 @@ class BtreeBan extends Test                                                     
 
   String stuck_print()                                                          // Print a stuck
    {final StringBuilder s = new StringBuilder();
-    int N = stuck_size();
+    int N = L.get("current_size", "stuck");
     s.append(String.format("Stuck(size:%d)\n", N));
     for (int i = 0; i < N; i++)                                                 // Search
      {L.set(i, "s_index");
