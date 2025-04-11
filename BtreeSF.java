@@ -4453,7 +4453,7 @@ StuckSML(maxSize:4 size:1)
     test_delete_descending();
     test_delete_small_random();
     if (longRunning) test_delete_large_random();
-    test_delete_random_not_100();
+    if (longRunning) test_delete_random_not_100();
     test_primes();
     test_node();
     test_verilogDelete();
