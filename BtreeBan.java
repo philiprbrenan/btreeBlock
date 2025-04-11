@@ -617,7 +617,7 @@ class BtreeBan extends Test                                                     
 
       if (L.get($nl) + L.get($nr) >= maxKeysPerLeaf) {L.set(0, $mls); return;}; // Combined body would be too big
 
-      setStuck($l); L.set(stuck_size(), $size);                                // Number of entries to remove
+      L.set(stuck_size($l), $size);                                // Number of entries to remove
       for (int i = 0; i < L.get($size); i++)                                    // Transfer left to right
        {setStuck($l); stuck_pop();
         setStuck($r); stuck_unshift();
@@ -660,8 +660,7 @@ class BtreeBan extends Test                                                     
     final String $t      = "mergeRightSibling_t";
     final String $pk     = "mergeRightSibling_pk";
 
-    setStuck($P);
-    L.set(stuck_size()-1, $bs);
+    L.set(stuck_size1($P), $bs);
     if (L.get($index) >= L.get($bs)) {L.set(0, "mergeRightSibling"); return;}   // No right sibling
 
     setStuck($P);
@@ -676,7 +675,7 @@ class BtreeBan extends Test                                                     
 
       if (L.get($nl) + L.get($nr) > maxKeysPerLeaf) {L.set(0, "mergeRightSibling"); return;}    // Combined body would be too big for one leaf
 
-      setStuck($r); L.set(stuck_size(), $size);                                 // Number of entries to remove
+      L.set(stuck_size($r), $size);                                             // Number of entries to remove
       for (int i = 0; i < L.get($size); i++)                                    // Transfer right to left
        {setStuck($r); stuck_shift();
         setStuck($l); stuck_push();
@@ -760,7 +759,7 @@ class BtreeBan extends Test                                                     
 
   void  printBranch(int node, StringBuilder[]S, int level)                      // Print a branch
    {setStuck(node);
-    final int N = stuck_size() - 1;
+    final int N = stuck_size1();
     for (int i = 0; i < N; i++)                                                 // Each element in the branch
      {setStuck(node); setIndex(i); stuck_elementAt();
       final int k = getKey(), d = getData();
@@ -1071,6 +1070,12 @@ class BtreeBan extends Test                                                     
   boolean leaf_isFull  () {return stuck_size() > maxKeysPerLeaf;}               // Check the leaf stuck is full
   boolean branch_isFull() {return stuck_size() > maxKeysPerBranch;}             // Check the branch stuck is full
 
+  int stuck_size       (String s) {return L.get("current_size", s);}            // The current number of key elements in a stuck
+  int stuck_size1      (String s) {return stuck_size(s) - 1;}                   // The current number of key elements in a stuck minus one whichmakes it suitable for describing a branch
+  boolean stuck_isEmpty(String s) {return stuck_size(s) == 0;}                  // Check the stuck is empty
+  boolean leaf_isFull  (String s) {return stuck_size(s) > maxKeysPerLeaf;}      // Check the leaf stuck is full
+  boolean branch_isFull(String s) {return stuck_size(s) > maxKeysPerBranch;}    // Check the branch stuck is full
+
   void stuck_key () {L.set(L.get("keys", "stuck", "s_index"), "s_key" );}       // Key from a stuck at indicated index
   void stuck_data() {L.set(L.get("data", "stuck", "s_index"), "s_data");}       // Data from a stuck at indicated index
 
@@ -1117,7 +1122,7 @@ class BtreeBan extends Test                                                     
   void stuck_shift()                                                            // Shift off the first element
    {L.set(0, "s_index");
     stuck_elementAt();
-    for (int i = 0, j = stuck_size()-1; i < j; i++) stuck_copyKeyData(i, i+1);
+    for (int i = 0, j = stuck_size1(); i < j; i++) stuck_copyKeyData(i, i+1);
     stuck_dec();
    }
 
@@ -1191,7 +1196,7 @@ class BtreeBan extends Test                                                     
    }
 
   void stuck_searchFirstGreaterThanOrEqualExceptLast()                          // Find first key equal or greater than the search key
-   {final int s = stuck_size()-1;
+   {final int s = stuck_size1();
     for (int i = 0; i < s; i++)
      {L.set(i, "s_index");
       final int c = L.compare("s_key", "keys", "stuck", "s_index");
