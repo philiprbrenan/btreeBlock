@@ -838,9 +838,10 @@ class BtreeBan extends Test                                                     
         getData("child");
 
         L.move("isALeaf", "child");
-        isLeaf();                                                               // Found the containing search
-        if (L.get("isALeaf") > 0)
-         {setStuck("child"); setKey(Key); stuck_search();
+        isLeaf();                                                               // Found the containing leaf
+        leaf:
+         {if (L.get("isALeaf") == 0) break leaf;
+          setStuck("child"); setKey(Key); stuck_search();
 
           L.move("find_result_leaf", "child");
           find_result("find_result_leaf", "s_found", "s_index", "s_key", "s_data");
@@ -858,34 +859,30 @@ class BtreeBan extends Test                                                     
     L.move("find_Key", "findAndInsert_Key");
     find();                                                                     // Find the leaf that should contain this key
 
-    if (getFound() > 0)                                                         // Found the key in the leaf so update it with the new data
-     {setStuck(getFLeaf()); setKey(Key); setData(Data); setIndex(getFIndex());
-      stuck_setElementAt();
-      findAndInsert_result(1, 0);
-      return;
-     }
+    finished:
+     {found:
+       {if (getFound() == 0) break found;                                       // Found the key in the leaf so update it with the new data
+        setStuck(getFLeaf()); setKey(Key); setData(Data); setIndex(getFIndex());
+        stuck_setElementAt();
+        findAndInsert_result(1, 0);
+        break finished;
+       }
 
-    L.set(getFLeaf(), "isFull");
-    isFullLeaf();
-    if (L.get("isFull") == 0)                                                   // Leaf is not full so we can insert immediately
-     {setStuck(getFLeaf()); setKey(Key);
-      stuck_searchFirstGreaterThanOrEqual();
-//      if (getFound() > 0)                                                     // Overwrite existing key
-       {setStuck(getFLeaf());
-        setKey(Key); setData(Data); //setIndex(getFIndex());
+      L.set(getFLeaf(), "isFull");
+      isFullLeaf();
+      notFull:
+       {if (L.get("isFull") > 0) break notFull;                                 // Leaf is not full so we can insert immediately
+        setStuck(getFLeaf()); setKey(Key);
+        stuck_searchFirstGreaterThanOrEqual();
+        setStuck(getFLeaf());
+        setKey(Key); setData(Data);
         stuck_insertElementAt();
         findAndInsert_result(1, 0);
+        break finished;
        }
-//    else                                                                      // Insert into position
-//     {setStuck(getFLeaf());
-//      setKey(Key); setData(Data);
-//      stuck_push();
-//     }
-//    findAndInsert_result(1, 1);                                               // Record result of insertion
-      return;
+      findAndInsert_result(0, 0);
+      break finished;
      }
-    findAndInsert_result(0, 0);
-    return;
    }
 
   //D1 Insertion                                                                // Insert a key, data pair into the tree or update and existing key with a new datum
@@ -897,59 +894,69 @@ class BtreeBan extends Test                                                     
     L.set(Data, "findAndInsert_Data");
 
     findAndInsert();                                                            // Try direct insertion with no modifications to the shape of the tree
-    if (getFSuccess() > 0) return;                                              // Inserted or updated successfully
+    finished:
+     {if (getFSuccess() > 0) break finished;                                    // Inserted or updated successfully
 
-    isFullRoot();
-    if (L.get("isFullRoot") > 0)                                                // Start the insertion at the root, after splitting it if necessary
-     {rootIsLeaf();
-      if (L.get("rootIsLeaf") > 0)
-       {splitLeafRoot();
-       }
-      else
-       {splitBranchRoot();
-       }
+      isFullRoot();
+      fullRoot:
+       {if (L.get("isFullRoot") == 0) break fullRoot;                           // Start the insertion at the root, after splitting it if necessary
+        rootIsLeaf();
 
-      findAndInsert();                                                          // Splitting the root might have been enough
-      if (getFSuccess() > 0) return;                                            // Inserted or updated successfully
-     }
+        rootIsLeaf:
+         {if (L.get("rootIsLeaf") == 0) break rootIsLeaf;
+          splitLeafRoot();
+         }
+        rootIsBranch:
+         {if (L.get("rootIsLeaf") >  0) break rootIsBranch;
+           {splitBranchRoot();
+           }
+         }
 
-    L.move("parent", "root");                                                   // Parent starts at root which is known to be a branch
-
-    for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-     {setStuck("parent"); setKey(Key);
-      stuck_searchFirstGreaterThanOrEqualExceptLast();
-      getData("child");
-
-      L.move("isALeaf", "child");
-      isLeaf();
-      if (L.get("isALeaf") > 0)                                                 // Reached a leaf
-       {L.move("splitLeaf_node",   "child");
-        L.move("splitLeaf_parent", "parent");
-        L.move("splitLeaf_index",  "s_index");
-        splitLeaf();
-
-        findAndInsert();
-        L.set(Key, "merge_Key");
-        merge();
-        return;
+        findAndInsert();                                                        // Splitting the root might have been enough
+        if (getFSuccess() > 0)  break finished;                                 // Inserted or updated successfully
        }
 
-      L.move("isFull", "child");
-      isFullBranch();
-      if (L.get("isFull") > 0)
-       {L.move("splitBranch_node",   "child");
-        L.move("splitBranch_parent", "parent");
-        L.move("splitBranch_index",  "s_index");
-        splitBranch();                                                          // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
-        setStuck("parent"); setKey(Key);
+      L.move("parent", "root");                                                 // Parent starts at root which is known to be a branch
+
+      for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
+       {setStuck("parent"); setKey(Key);
         stuck_searchFirstGreaterThanOrEqualExceptLast();
-        getData("parent");
+        getData("child");
+
+        L.move("isALeaf", "child");
+        isLeaf();
+        isLeaf:
+         {if (L.get("isALeaf") == 0) break isLeaf;                              // Reached a leaf
+          L.move("splitLeaf_node",   "child");
+          L.move("splitLeaf_parent", "parent");
+          L.move("splitLeaf_index",  "s_index");
+          splitLeaf();
+
+          findAndInsert();
+          L.set(Key, "merge_Key");
+          merge();
+          break finished;
+         }
+
+        L.move("isFull", "child");
+        isFullBranch();
+        isFullBranch:
+         {if (L.get("isFull") == 0) break isFullBranch;
+          L.move("splitBranch_node",   "child");
+          L.move("splitBranch_parent", "parent");
+          L.move("splitBranch_index",  "s_index");
+          splitBranch();                                                          // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
+          setStuck("parent"); setKey(Key);
+          stuck_searchFirstGreaterThanOrEqualExceptLast();
+          getData("parent");
+         }
+        isNotFullBranch:
+         {if (L.get("isFull") > 0) break isNotFullBranch;
+          L.move("parent", "child");
+         }
        }
-      else
-       {L.move("parent", "child");
-       }
+      stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
      }
-    stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
    }
 
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
