@@ -159,7 +159,9 @@ class ProgramDM extends Test                                                    
     Trace.clear();
     running = true;
     final int N = code.size();
-    for (step = start, steps = 0; step >= 0 && step < N && steps < maxSteps && running; step++, steps++)
+    for (step = start, steps = 0;                                               // The execution loop
+      step >= 0 && step < N && steps < maxSteps && running;
+      step++, steps++)
      {traceMemory();
       for (I i : code.elementAt(step))                                          // Execute each instruction in the parallel block
        {currentInstruction = i;
