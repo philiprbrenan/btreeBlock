@@ -165,6 +165,10 @@ class BtreeBan extends Test                                                     
         array("stealFromRight_td");                                             //
         array("stealFromRight");                                                // Whether the steal from the right was successful
         array("stuck");                                                         // The index of the stuck to be operated on
+        array("find_loop");                                                     // Iterator for the find loop
+        array("put_loop");                                                      // Iterator for the put loop
+        array("delete_loop");                                                   // Iterator for the delete loop
+        array("merge_loop");                                                    // Iterator for the merge loop
        }
      };
    }
@@ -522,18 +526,24 @@ class BtreeBan extends Test                                                     
 
         if (L.get($nl) + L.get($nr) <= maxKeysPerLeaf) break finished;
         setStuck("root"); stuck_clear();
-        for (int i = 0; i < L.get($nl); ++i)
-         {setStuck($l); stuck_shift();
+
+        for (int i = 0; i < maxKeysPerLeaf; ++i)
+         {if (i >= L.get($nl)) break;
+           setStuck($l); stuck_shift();
           setStuck("root"); stuck_push();
          }
-        for (int i = 0; i < L.get($nr); ++i)
-         {setStuck($r); stuck_shift();
+
+        for (int i = 0; i < maxKeysPerLeaf; ++i)
+         {if (i >= L.get($nr)) break;
+          setStuck($r); stuck_shift();
           setStuck("root"); stuck_push();
          }
+
         L.move("setLeaf", "root"); setLeaf();
         free($l);
         free($r);
        }
+
       branches:                                                                 // Children are branches
        {if (L.get("hasLeavesForChildren") > 0) break branches;
         L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
@@ -541,15 +551,18 @@ class BtreeBan extends Test                                                     
         if (L.get($nl) + 1 + L.get($nr) >  maxKeysPerBranch) break finished;
         setStuck("root"); stuck_firstElement(); getKey($pkn);
         stuck_clear();
-        for (int i = 0; i < L.get($nl); ++i)
-         {setStuck($l); stuck_shift();
+
+        for (int i = 0; i < maxKeysPerBranch; ++i)
+         {if (i >= L.get($nl)) break;
+          setStuck($l); stuck_shift();
           setStuck("root"); stuck_push();
          }
         setStuck($l); stuck_lastElement();
         setStuck("root"); setKey($pkn); stuck_push();
 
-        for (int i = 0; i < L.get($nr); ++i)
-         {setStuck($r); stuck_shift();
+        for (int i = 0; i < maxKeysPerBranch; ++i)
+         {if (i >= L.get($nr)) break;
+          setStuck($r); stuck_shift();
           setStuck("root"); stuck_push();
          }
         setStuck($r); stuck_lastElement();                                      // Top next
@@ -594,8 +607,9 @@ class BtreeBan extends Test                                                     
         if (L.get($nl) + L.get($nr) >= maxKeysPerLeaf) break finished;          // Combined body would be too big
 
         stuck_size($size, $l);                                                  // Number of entries to remove
-        for (int i = 0; i < L.get($size); i++)                                  // Transfer left to right
-         {setStuck($l); stuck_pop();
+        for (int i = 0; i < maxKeysPerLeaf; i++)                                // Transfer left to right
+         {if (i >= L.get($size)) break;
+          setStuck($l); stuck_pop();
           setStuck($r); stuck_unshift();
          }
        }
@@ -614,8 +628,9 @@ class BtreeBan extends Test                                                     
         L.move("branchSize", $l); branchSize();
         L.set(L.get("branchSize") + 1, $size);
 
-        for (int i = 0; i < L.get($size); i++)                                  // Transfer left to right
-         {setStuck($l); stuck_pop();
+        for (int i = 0; i < maxKeysPerBranch; i++)                              // Transfer left to right
+         {if (i >= L.get($size)) break;
+          setStuck($l); stuck_pop();
           setStuck($r); stuck_unshift();
          }
        }
@@ -658,8 +673,9 @@ class BtreeBan extends Test                                                     
         if (L.get($nl) + L.get($nr) > maxKeysPerLeaf) break finished;           // Combined body would be too big for one leaf
 
         stuck_size($size, $r);                                                  // Number of entries to remove
-        for (int i = 0; i < L.get($size); i++)                                  // Transfer right to left
-         {setStuck($r); stuck_shift();
+        for (int i = 0; i < maxKeysPerLeaf; i++)                                // Transfer right to left
+         {if (i >= L.get($size)) break;                                         // Transfer right to left
+          setStuck($r); stuck_shift();
           setStuck($l); stuck_push();
          }
        }
@@ -674,8 +690,9 @@ class BtreeBan extends Test                                                     
         setStuck($l); setData(ld); setIndex($nl); stuck_setElementAt();         // Re-key left top
         L.set(L.get($nr)+1, $size);
 
-        for (int i = 0; i < L.get($size); i++)                                  // Transfer right to left
-         {setStuck($r); stuck_shift();
+        for (int i = 0; i < maxKeysPerBranch; i++)                              // Transfer right to left
+         {if (i >= L.get($size)) break;
+          setStuck($r); stuck_shift();
           setStuck($l); stuck_push();
          }
        }
@@ -822,7 +839,8 @@ class BtreeBan extends Test                                                     
    }
 
   void find()                                                                   // Find the data associated with a key in the tree
-   {final int Key = L.get("find_Key");
+   {final String $i = "find_loop";                                              // Step down iterator
+    final int   Key = L.get("find_Key");
     rootIsLeaf();                                                               // The root is a leaf
     finished:
      {root:
@@ -834,7 +852,8 @@ class BtreeBan extends Test                                                     
 
       L.move("parent", "root");                                                 // Parent starts at root which is known to be a branch
 
-      for (int i = 0; i < maxDepth; i++)                                        // Step down through tree
+      L.clear(0, $i);                                                           // Step down iterator
+      for (int i = 0;; i++)                                                     // Step down through tree
        {setStuck("parent"); setKey(Key);
         stuck_searchFirstGreaterThanOrEqualExceptLast();
         getData("child");
@@ -850,6 +869,7 @@ class BtreeBan extends Test                                                     
           break finished;
          }
         L.move("parent", "child");                                              // Step down to lower branch
+        L.addImmediate(1, $i); if (L.get($i) > maxDepth) break;
        }
       stop("Search did not terminate in a leaf");
      }
@@ -890,7 +910,8 @@ class BtreeBan extends Test                                                     
   //D1 Insertion                                                                // Insert a key, data pair into the tree or update and existing key with a new datum
 
   void put()                                                                    // Insert a key, data pair into the tree or update and existing key with a new datum
-   {final int Key  = L.get("put_Key");
+   {final String $i = "put_loop";                                               // Step down iterator
+    final int Key  = L.get("put_Key");
     final int Data = L.get("put_Data");
     L.set(Key,  "findAndInsert_Key");
     L.set(Data, "findAndInsert_Data");
@@ -920,7 +941,8 @@ class BtreeBan extends Test                                                     
 
       L.move("parent", "root");                                                 // Parent starts at root which is known to be a branch
 
-      for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
+      L.clear(0, $i);                                                           // Step down iterator
+      for (int i = 0;; i++)                                                     // Step down from branch to branch through the tree until reaching a leaf repacking as we go
        {setStuck("parent"); setKey(Key);
         stuck_searchFirstGreaterThanOrEqualExceptLast();
         getData("child");
@@ -956,6 +978,7 @@ class BtreeBan extends Test                                                     
          {if (L.get("isFull") > 0) break isNotFullBranch;
           L.move("parent", "child");
          }
+        L.addImmediate(1, $i); if (L.get($i) > maxDepth) break;
        }
       stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
      }
@@ -987,7 +1010,8 @@ class BtreeBan extends Test                                                     
    }
 
   void delete()                                                                 // Insert a key, data pair into the tree or update and existing key with a new datum
-   {final int Key = L.get("delete_Key");
+   {final String $i = "delete_loop";                                            // Step down iterator
+    final int Key = L.get("delete_Key");
     mergeRoot();
     finished:
      {rootIsLeaf();                                                             // Find and delete directly in root as a leaf
@@ -999,7 +1023,8 @@ class BtreeBan extends Test                                                     
 
       L.move("parent", "root");                                                 // Parent starts at root which is known to be a branch
 
-      for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
+      L.clear(0, $i);                                                           // Step down iterator
+      for (int i = 0;; i++)                                                     // Step down from branch to branch through the tree until reaching a leaf repacking as we go
        {setStuck("parent"); setKey(Key);
         stuck_searchFirstGreaterThanOrEqualExceptLast();
         L.move("balance_parent", "parent");
@@ -1021,6 +1046,7 @@ class BtreeBan extends Test                                                     
           break finished;
          }
         L.move("parent", "child");
+        L.addImmediate(1, $i); if (L.get($i) > maxDepth) break;
        }
       stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
      }
@@ -1029,13 +1055,15 @@ class BtreeBan extends Test                                                     
 //D1 Merge                                                                      // Merge along the specified search path
 
   void merge()                                                                  // Merge along the specified search path
-   {final int Key = L.get("merge_Key");
+   {final String $i = "merge_loop";                                             // Step down iterator
+    final int Key = L.get("merge_Key");
     mergeRoot();
 
     L.move("parent", "root");                                                   // Parent starts at root
 
     finished:
-     {for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
+     {L.clear(0, $i);                                                           // Step down iterator
+      for (int i = 0;; i++)                                                     // Step down from branch to branch through the tree until reaching a leaf repacking as we go
        {L.move("isALeaf", "parent");
         isLeaf();
         if (L.get("isALeaf") > 0) break finished;
@@ -1043,8 +1071,9 @@ class BtreeBan extends Test                                                     
         L.move("branchSize", "parent"); branchSize();
         final int N = L.get("branchSize") + 1;
 
-        for (int j = 0; j < N; j++)                                             // Try merging each sibling pair which might change the size of the parent
-         {L.move("mergeLeftSibling_parent", "parent");
+        for (int j = 0; j < maxKeysPerBranch+1; j++)                            // Try merging each sibling pair which might change the size of the parent
+         {if (j >= N) break;
+          L.move("mergeLeftSibling_parent", "parent");
           L.set(j, "mergeLeftSibling_index");
 
           mergeLeftSibling();                                                   // A successful merge of the left  sibling reduces the current index and the upper limit
@@ -1060,6 +1089,7 @@ class BtreeBan extends Test                                                     
         setStuck("parent"); setKey(Key);
         stuck_searchFirstGreaterThanOrEqualExceptLast();
         getData("parent");
+        L.addImmediate(1, $i); if (L.get($i) > maxDepth) break;
        }
       stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
      }
@@ -1763,9 +1793,9 @@ Stuck(size:3)
  }
 
 /*
-Phase transformation of normal Java into machine code
-The first pass removed all return values and parameters by replacing them with layout variables.
-The second pass removes all internal variables so we are left with set(get) and move as the data manipulation operations
-The third pass replaces if statements with single iteration for(for(break/continue))
-The fourth pass replaces for loops with multiple iteration for(break/continue)
+Phased transformation of normal Java into machine code
+1. Remove return values and parameters by replacing them with layout variables.
+2. Remove internal variables so we are left with set(get) and move as the data manipulation operations
+3. Replace if statements with label: {}
+4. Replace for loop conditions with interior break
 */
