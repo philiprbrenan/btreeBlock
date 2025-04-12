@@ -304,7 +304,7 @@ abstract class LayoutBam extends Test                                           
     return ""+s;
    }
 
-  String print(String Source, String...Indices)                                 // Print the indocated aprt of teh array
+  String print(String Source, String...Indices)                                 // Print the indicated part of the array
    {final Array s   = getArray(Source);
     final String[]i = Indices;
     final StringBuilder t = new StringBuilder();
