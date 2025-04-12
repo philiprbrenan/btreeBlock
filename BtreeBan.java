@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Btree on the Basic Array Machine for performance comparision with BtreeSF.
+// Btree on a Basic Array Machine for performance comparision with BtreeSF.
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
@@ -486,9 +486,10 @@ class BtreeBan extends Test                                                     
      }
 
     setStuck($r); stuck_firstElement(); getKey($fk);                            // First element of right child
-    setStuck($l); stuck_push();                                                  // Increase left
-    setStuck($P); setKey($fk); setData($l); setIndex($index); stuck_setElementAt(); // Swap key of parent
-    setStuck($r); stuck_shift();                                                 // Reduce right
+    setStuck($l); stuck_push();                                                 // Increase left
+    setStuck($P); setKey($fk); setData($l);
+    setIndex($index); stuck_setElementAt();                                     // Swap key of parent
+    setStuck($r); stuck_shift();                                                // Reduce right
     L.set(1, $sfr);
    }
 
@@ -806,7 +807,8 @@ class BtreeBan extends Test                                                     
 
 //D1 Find                                                                       // Find the data associated with a key
 
-  void find_result(String Leaf, String Found, String Index, String Key, String Data)  // Find result
+  void find_result                                                              // Find result
+   (String Leaf, String Found, String Index, String Key, String Data)
    {L.move("f_leaf",  Leaf);
     L.move("f_found", Found);
     L.move("f_index", Index);
@@ -945,7 +947,7 @@ class BtreeBan extends Test                                                     
           L.move("splitBranch_node",   "child");
           L.move("splitBranch_parent", "parent");
           L.move("splitBranch_index",  "s_index");
-          splitBranch();                                                          // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
+          splitBranch();                                                        // Split the child branch in the search path for the key from the parent so the the search path does not contain a full branch above the containing leaf
           setStuck("parent"); setKey(Key);
           stuck_searchFirstGreaterThanOrEqualExceptLast();
           getData("parent");
@@ -955,7 +957,7 @@ class BtreeBan extends Test                                                     
           L.move("parent", "child");
          }
        }
-      stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
+      stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
      }
    }
 
@@ -970,54 +972,58 @@ class BtreeBan extends Test                                                     
    {final int Key = L.get("findAndDelete_Key");                                 // The key to find and delete
     L.set(Key, "find_Key");
     find();                                                                     // Find the key
-    if (getFound() == 0)                                                        // No such key
-     {findAndInsert_result(0, 0);
-      return;
+    finished:
+     {notFound:
+       {if (getFound() > 0) break notFound;                                     // No such key
+        findAndInsert_result(0, 0);
+        break finished;
+       }
+      final int l = getFLeaf();                                                 // The leaf that contains the key
+      final int i = getFIndex();                                                // Position in the leaf of the key
+      setStuck(l); setIndex(i);                                                 // Key, data pairs in the leaf
+      stuck_removeElementAt();                                                  // Remove the key, data pair from the leaf
+      delete_result(1, getData());                                              // Delete result
      }
-    final int l = getFLeaf();                                                   // The leaf that contains the key
-    final int i = getFIndex();                                                  // Position in the leaf of the key
-    setStuck(l); setIndex(i);                                                   // Key, data pairs in the leaf
-    stuck_removeElementAt();                                                    // Remove the key, data pair from the leaf
-    delete_result(1, getData());                                                // Delete result
-    return;
    }
 
   void delete()                                                                 // Insert a key, data pair into the tree or update and existing key with a new datum
    {final int Key = L.get("delete_Key");
     mergeRoot();
-
-    rootIsLeaf();                                                               // Find and delete directly in root as a leaf
-    if (L.get("rootIsLeaf") > 0)
-     {L.set(Key, "findAndDelete_Key");                                          // The key to find and delete
-      findAndDelete();
-      return;
-     }
-
-    L.move("parent", "root");                                                   // Parent starts at root which is known to be a branch
-
-    for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-     {setStuck("parent"); setKey(Key);
-      stuck_searchFirstGreaterThanOrEqualExceptLast();
-      L.move("balance_parent", "parent");
-      getIndex("balance_index");
-      balance();                                                                // Make sure there are enough entries in the parent to permit a deletion
-
-      setStuck("parent"); setKey(Key);
-      stuck_searchFirstGreaterThanOrEqualExceptLast();
-
-      getData("child");
-      L.move("isALeaf", "child");
-      isLeaf();
-      if (L.get("isALeaf") > 0)                                                // Reached a leaf
+    finished:
+     {rootIsLeaf();                                                             // Find and delete directly in root as a leaf
+      if (L.get("rootIsLeaf") > 0)
        {L.set(Key, "findAndDelete_Key");                                        // The key to find and delete
         findAndDelete();
-        L.set(Key, "merge_Key");
-        merge();
-        return;
+        break finished;
        }
-      L.move("parent", "child");
+
+      L.move("parent", "root");                                                 // Parent starts at root which is known to be a branch
+
+      for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
+       {setStuck("parent"); setKey(Key);
+        stuck_searchFirstGreaterThanOrEqualExceptLast();
+        L.move("balance_parent", "parent");
+        getIndex("balance_index");
+        balance();                                                              // Make sure there are enough entries in the parent to permit a deletion
+
+        setStuck("parent"); setKey(Key);
+        stuck_searchFirstGreaterThanOrEqualExceptLast();
+
+        getData("child");
+        L.move("isALeaf", "child");
+        isLeaf();
+        isLeaf:
+         {if (L.get("isALeaf") == 0) break isLeaf;                              // Reached a leaf
+          L.set(Key, "findAndDelete_Key");                                      // The key to find and delete
+          findAndDelete();
+          L.set(Key, "merge_Key");
+          merge();
+          break finished;
+         }
+        L.move("parent", "child");
+       }
+      stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
      }
-    stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
    }
 
 //D1 Merge                                                                      // Merge along the specified search path
@@ -1028,31 +1034,35 @@ class BtreeBan extends Test                                                     
 
     L.move("parent", "root");                                                   // Parent starts at root
 
-    for (int i = 0; i < maxDepth; i++)                                          // Step down from branch to branch through the tree until reaching a leaf repacking as we go
-     {L.move("isALeaf", "parent");
-      isLeaf();
-      if (L.get("isALeaf") > 0) return;
+    finished:
+     {for (int i = 0; i < maxDepth; i++)                                        // Step down from branch to branch through the tree until reaching a leaf repacking as we go
+       {L.move("isALeaf", "parent");
+        isLeaf();
+        if (L.get("isALeaf") > 0) break finished;
 
-      L.move("branchSize", "parent"); branchSize();
-      final int N = L.get("branchSize") + 1;
+        L.move("branchSize", "parent"); branchSize();
+        final int N = L.get("branchSize") + 1;
 
-      for (int j = 0; j < N; j++)                                               // Try merging each sibling pair which might change the size of the parent
-       {L.move("mergeLeftSibling_parent", "parent");
-        L.set(j, "mergeLeftSibling_index");
+        for (int j = 0; j < N; j++)                                             // Try merging each sibling pair which might change the size of the parent
+         {L.move("mergeLeftSibling_parent", "parent");
+          L.set(j, "mergeLeftSibling_index");
 
-        mergeLeftSibling();                                                     // A successful merge of the left  sibling reduces the current index and the upper limit
-        if (L.get("mergeLeftSibling") > 0) --j;
+          mergeLeftSibling();                                                   // A successful merge of the left  sibling reduces the current index and the upper limit
+          merged:
+           {if (L.get("mergeLeftSibling") == 0) break merged;
+            --j;
+           }
+          L.move("mergeRightSibling_parent", "parent");
+          L.set(j, "mergeRightSibling_index");
+          mergeRightSibling();                                                  // A successful merge of the right sibling maintains the current position but reduces the upper limit
+         }
 
-        L.move("mergeRightSibling_parent", "parent");
-        L.set(j, "mergeRightSibling_index");
-        mergeRightSibling();                                                    // A successful merge of the right sibling maintains the current position but reduces the upper limit
+        setStuck("parent"); setKey(Key);
+        stuck_searchFirstGreaterThanOrEqualExceptLast();
+        getData("parent");
        }
-
-      setStuck("parent"); setKey(Key);
-      stuck_searchFirstGreaterThanOrEqualExceptLast();
-      getData("parent");
+      stop("Fallen off the end of the tree");                                   // The tree must be missing a leaf
      }
-    stop("Fallen off the end of the tree");                                     // The tree must be missing a leaf
    }
 
 //D1 Stucks                                                                     // Store data in each node
