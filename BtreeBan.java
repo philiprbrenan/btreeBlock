@@ -37,9 +37,9 @@ class BtreeBan extends Test                                                     
     L.zero("free"); L.zero("isLeaf"); L.zero("current_size");                   // Clear all control information
     L.zero("keys"); L.zero("data");                                             // Clear all data
     for (int i = numberOfNodes-1; i > 1; --i) L.set(i, "free", ""+(i-1));       // Initialize free chain by putting all the nodes on the free chain except the root (which is permanently allocated at position 0) with the low nodes first to be allocated.
-    L.set(1, "freeChainHead");                                                  // The first freed node
-    L.set(0, "root");                                                           // The root
-    L.set(1, "isLeaf", "root");                                                 // The root starts as a leaf
+    L.clear(1, "freeChainHead");                                                // The first freed node
+    L.clear(0, "root");                                                         // The root
+    L.clear(1, "isLeaf", "root");                                               // The root starts as a leaf
    }
 
   LayoutBam layoutBtree()                                                       // Layout the btree
@@ -230,10 +230,10 @@ class BtreeBan extends Test                                                     
   void isLeaf       () {L.move("isALeaf", "isLeaf", "isALeaf");}                // A leaf if true
   void rootIsLeaf   () {L.move("rootIsLeaf", "isLeaf", "root");}                // The root is a leaf if the target is not zero
 
-  void setLeaf      () {L.set(1, "isLeaf", "setLeaf");}                         // Set as leaf
-  void setBranch    () {L.set(0, "isLeaf", "setBranch");}                       // Set as branch
-  void setLeafRoot  () {L.set(1, "isLeaf", "root");}                            // Set root as leaf
-  void setBranchRoot() {L.set(0, "isLeaf", "root");}                            // Set root as branch
+  void setLeaf      () {L.clear(1, "isLeaf", "setLeaf");}                       // Set as leaf
+  void setBranch    () {L.clear(0, "isLeaf", "setBranch");}                     // Set as branch
+  void setLeafRoot  () {L.clear(1, "isLeaf", "root");}                          // Set root as leaf
+  void setBranchRoot() {L.clear(0, "isLeaf", "root");}                          // Set root as branch
 
   void leafSize     () {L.move("leafSize",   "current_size", "leafSize"  );}    // Number of children in leaf
   void branchSize   ()                                                          // Number of children in body of branch
@@ -390,7 +390,7 @@ class BtreeBan extends Test                                                     
     final String $nr     = "stealFromLeft_nr";
     final String $td     = "stealFromLeft_td";
     final String $bd     = "stealFromLeft_bd";
-    L.set(0, $sfl);                                                             // Assume at the start that we cannot steal from the lrft
+    L.clear(0, $sfl);                                                           // Assume at the start that we cannot steal from the lrft
 
     finished:                                                                   // Return
      {setStuck($P);
@@ -438,7 +438,7 @@ class BtreeBan extends Test                                                     
         setStuck($l); stuck_lastElement();                                      // Last left key
        }
       setStuck($P); setData($l); setIndex($left); stuck_setElementAt();         // Reduce key of parent of left
-      L.set(1, $sfl);
+      L.clear(1, $sfl);
      }
    }
 
@@ -458,7 +458,7 @@ class BtreeBan extends Test                                                     
     final String $td     = "stealFromRight_td";                                 //
     final String $bd     = "stealFromRight_bd";                                 //
 
-    L.set(0, $sfr);                                                             // Assume at the start that we cannot steal from the right
+    L.clear(0, $sfr);                                                             // Assume at the start that we cannot steal from the right
 
     L.move("branchSize", $P); branchSize(); L.move($nP, "branchSize");
 
@@ -494,7 +494,7 @@ class BtreeBan extends Test                                                     
     setStuck($P); setKey($fk); setData($l);
     setIndex($index); stuck_setElementAt();                                     // Swap key of parent
     setStuck($r); stuck_shift();                                                // Reduce right
-    L.set(1, $sfr);
+    L.clear(1, $sfr);
    }
 
 //D2 Merge                                                                      // Merge two nodes together and free the resulting free node
@@ -510,7 +510,7 @@ class BtreeBan extends Test                                                     
     finished:
      {rootIsLeaf();
       if (L.get("rootIsLeaf") > 0) break finished;
-      L.set(0, "branchSize"); branchSize(); L.move($nP, "branchSize");
+      L.clear(0, "branchSize"); branchSize(); L.move($nP, "branchSize");
       if (L.get($nP) > 1)          break finished;
 
       setStuck(0);
@@ -585,7 +585,7 @@ class BtreeBan extends Test                                                     
     final String $nr     = "mergeLeftSibling_nr";
     final String $size   = "mergeLeftSibling_size";
     final String $t      = "mergeLeftSibling_t";
-    L.set(0, $mls);                                                             // Assume at the start that we will not be able to merge with the left sibling
+    L.clear(0, $mls);                                                             // Assume at the start that we will not be able to merge with the left sibling
 
     finished:
      {if (L.get($index) == 0)          break finished;
@@ -636,7 +636,7 @@ class BtreeBan extends Test                                                     
        }
       free($l);                                                                 // Free the empty left node
       setStuck($P); setIndex($left); stuck_removeElementAt();                   // Reduce P on left
-      L.set(1, $mls);                                                           // Success
+      L.clear(1, $mls);                                                           // Success
      }
    }
 
@@ -653,7 +653,7 @@ class BtreeBan extends Test                                                     
     final String $size   = "mergeRightSibling_size";
     final String $t      = "mergeRightSibling_t";
     final String $pk     = "mergeRightSibling_pk";
-    L.set(0, $mrs);                                                             // Assume at the start that it will  mnot be possible to merge with the right sibling
+    L.clear(0, $mrs);                                                             // Assume at the start that it will  mnot be possible to merge with the right sibling
 
     finished:
      {stuck_size1($bs, $P);
@@ -705,7 +705,7 @@ class BtreeBan extends Test                                                     
       setKey($pk); setIndex($index); stuck_setElementAt();                      // Install key of right sibling in this child
       setIndex(L.get($index)+1);     stuck_removeElementAt();                   // Reduce parent on right
 
-      L.set(1, "mergeRightSibling");
+      L.clear(1, "mergeRightSibling");
      }
    }
 
@@ -1156,7 +1156,7 @@ class BtreeBan extends Test                                                     
    {for (int i = L.get("current_size", "stuck"); i > 0; --i)                    // Shift the stuck up one place
      {stuck_copyKeyData(i, i-1);
      }
-    L.set(0, "s_index");
+    L.clear(0, "s_index");
     stuck_setKeyData();
     stuck_inc();
    }
@@ -1168,7 +1168,7 @@ class BtreeBan extends Test                                                     
    }
 
   void stuck_shift()                                                            // Shift off the first element
-   {L.set(0, "s_index");
+   {L.clear(0, "s_index");
     stuck_elementAt();
     final int N = L.get("current_size", "stuck") - 1;
     for (int i = 0, j = N; i < j; i++) stuck_copyKeyData(i, i+1);
@@ -1202,7 +1202,7 @@ class BtreeBan extends Test                                                     
    }
 
   void stuck_firstElement()                                                     // First element
-   {L.set(0, "s_index");
+   {L.clear(0, "s_index");
     stuck_elementAt();
    }
 
@@ -1220,12 +1220,12 @@ class BtreeBan extends Test                                                     
      {L.set(i, "s_index");
       final int c = L.compare("s_key", "keys", "stuck", "s_index");
       if (c == 0)
-       {L.set(1, "s_found");
+       {L.clear(1, "s_found");
         stuck_elementAt();
         return;
        }
      }
-    L.set(0, "s_found");
+    L.clear(0, "s_found");
    }
 
   void stuck_searchFirstGreaterThanOrEqual()                                    // Find first key equal or greater than the search key
@@ -1234,13 +1234,13 @@ class BtreeBan extends Test                                                     
      {L.set(i, "s_index");
       final int c = L.compare("s_key", "keys", "stuck", "s_index");
       if (c <= 0)
-       {L.set(1, "s_found");
+       {L.clear(1, "s_found");
         stuck_elementAt();
         return;
        }
      }
     L.set(s, "s_index");
-    L.set(0, "s_found");
+    L.clear(0, "s_found");
    }
 
   void stuck_searchFirstGreaterThanOrEqualExceptLast()                          // Find first key equal or greater than the search key
@@ -1249,14 +1249,14 @@ class BtreeBan extends Test                                                     
      {L.set(i, "s_index");
       final int c = L.compare("s_key", "keys", "stuck", "s_index");
       if (c <= 0)
-       {L.set(1, "s_found");
+       {L.clear(1, "s_found");
         stuck_elementAt();
         return;
        }
      }
     L.set(s, "s_index");
     stuck_elementAt();
-    L.set(0, "s_found");
+    L.clear(0, "s_found");
    }
 
 // Tests
@@ -1375,7 +1375,7 @@ Stuck(size:3)
   static void stuck_test_elementAt()
    {final BtreeBan b = stuck_test_unshift();
 
-    b.L.set(1, "s_index");
+    b.L.clear(1, "s_index");
     b.stuck_elementAt();
 
     ok(b.stuck_print_result(), """
@@ -1388,7 +1388,7 @@ Stuck(size:3)
 
   static BtreeBan stuck_test_insertElementAt()
    {final BtreeBan b = stuck_test_push();
-    b.L.set(1, "s_index"); b.L.set(3, "s_key"); b.L.set(33, "s_data");
+    b.L.clear(1, "s_index"); b.L.set(3, "s_key"); b.L.set(33, "s_data");
     b.stuck_insertElementAt();
 
     ok(b.stuck_print_result(), """
@@ -1410,7 +1410,7 @@ Stuck(size:3)
 
   static BtreeBan stuck_test_remove_element_at()
    {final BtreeBan b = stuck_test_insertElementAt();
-    b.L.set(1, "s_index");
+    b.L.clear(1, "s_index");
     b.stuck_removeElementAt();
 
     ok(b.stuck_print_result(), """
