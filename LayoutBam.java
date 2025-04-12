@@ -12,6 +12,7 @@ abstract class LayoutBam extends Test                                           
   final TreeMap<String,Array> arrays = new TreeMap<>();                         // A number of different sized arrays concatenated to make one array
   final int[]memory;                                                            // The concatenation of all the arrays
   final int[]save;                                                              // A save area so we can save and restore before printing
+  int intermediate;                                                             // Written by get and used by set if no value has been supplied
 
   LayoutBam()                                                                   // Create a layout
    {load();                                                                     // Load array definitions
@@ -108,6 +109,10 @@ abstract class LayoutBam extends Test                                           
      };
    }
 
+  void set(String target, String...Indices)                                     // Set the value of an array element from the intermediate value
+   {set(intermediate, target, Indices);
+   }
+
   void set(String target, int...values)                                         // Load an array
    {final Array t = getArray(target);
     final int   N = values.length;
@@ -124,7 +129,7 @@ abstract class LayoutBam extends Test                                           
     final int S = s.dimensions.length;
     if (S != I) stop("Wrong number of dimensions:", S, "!=", I, "for array:", source);
 
-    return switch(S)
+    return intermediate = switch(S)
      {case  0 -> memory[s.base];
       case  1 -> memory[s.base+lookUpIndex(s, 0, i[0])];
       default -> memory[s.base+lookUpIndex(s, 1, i[0])*s.dimensions[0]+lookUpIndex(s, 0, i[1])];
@@ -145,14 +150,14 @@ abstract class LayoutBam extends Test                                           
      }
 
     if ((I == 1 && T == 1) || (I == 2 && T == 2))                               // Clear single element of one or two dimensional array
-     {set(0, target, Indices);
+     {set(Value, target, Indices);
       return;
      }
 
     if (I == 1 && T == 2)                                                       // Clear indicated sub array
      {final int l = t.dimensions[0];                                            // Size of sub array
       final int p = l * lookUpIndex(t, 1, i[0]);                                // Start of sub array
-      for (int j = 0; j < l; j++) memory[t.base+ p + j] = 0;                    // Clear sub array in two dimensional array
+      for (int j = 0; j < l; j++) memory[t.base+ p + j] = Value;                // Clear sub array in two dimensional array
       return;
      }
    }
@@ -555,7 +560,7 @@ abstract class LayoutBam extends Test                                           
     return l;
    }
 
-  static void test_clear()
+  static LayoutBam test_clear()
    {final int M = 4, N = 3;
      final LayoutBam l = new LayoutBam()
      {void load()
@@ -592,20 +597,21 @@ abstract class LayoutBam extends Test                                           
    3     3           0      0  a -
    4     3           1      1  a |
    5     3           2      2  a |
-   6     3           3      0  a |
+   6     3           3      4  a |
    7     7     0     0      0  b -
    8     7     0     1      1  b |
    9     7     0     2      2  b |
   10     7     1     0      3  b +
   11     7     1     1      4  b |
   12     7     1     2      5  b |
-  13     7     2     0      0  b +
-  14     7     2     1      0  b |
-  15     7     2     2      0  b |
+  13     7     2     0      5  b +
+  14     7     2     1      5  b |
+  15     7     2     2      5  b |
   16     7     3     0      9  b +
   17     7     3     1     10  b |
   18     7     3     2     11  b |
 """);
+    return l;
    }
 
   static LayoutBam test_initialize()
@@ -661,9 +667,20 @@ abstract class LayoutBam extends Test                                           
     ok(l.print("a"), "1");
    }
 
+  static void test_get_set()
+   {final LayoutBam l = test_clear();
+
+    ok(l.print("b", "1", "1"), "4");
+    l.get("b", "1", "1");
+    ok(l.print("a"), "0, 1, 2, 4");
+    l.set("a", "2");
+    ok(l.print("a"), "0, 1, 4, 4");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_set();
     test_get();
+    test_get_set();
     test_move();
     test_compare();
     test_compare_int();
