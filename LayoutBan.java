@@ -7,29 +7,46 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 abstract class LayoutBan extends Test                                           // Layout the basic array machine and execute a program in it
- {int size = 0;                                                                 // The size of the memory used by the basic array machine
-  final Stack         <Array> order  = new Stack<>();                           // The order in which the arrays were defined
-  final TreeMap<String,Array> arrays = new TreeMap<>();                         // A number of different sized arrays concatenated to make one array
-  final int[]memory;                                                            // The concatenation of all the arrays
-  final Stack<I> code = new Stack<>();                                          // Code of the program
-  final int   maxTime = 1000;                                                   // Maximum numner of steps permitted while running the program
-  int            step = 0;                                                      // Execution step
-  int            time = 0;                                                      // Execution time
-  boolean     running = false;                                                  // Executing if true
-  Stack<Label> labels = new Stack<>();                                          // Labels for some instructions
-  int intermediateValue;                                                        // Written by get and used by set if no value has been supplied
+ {private int size = 0;                                                         // The size of the memory used by the basic array machine
+  private Stack         <Array> order  = new Stack<>();                         // The order in which the arrays were defined
+  private TreeMap<String,Array> arrays = new TreeMap<>();                       // A number of different sized arrays concatenated to make one array
+  private Stack<I>       code = new Stack<>();                                  // Code of the program
+  private Stack<Label> labels = new Stack<>();                                  // Labels for some instructions
+  private int []       memory;                                                  // The concatenation of all the arrays
+  private final int   maxTime = 1000;                                           // Maximum numner of steps permitted while running the program
+  private int            step = 0;                                              // Execution step
+  private int            time = 0;                                              // Execution time
+  private boolean     running = false;                                          // Executing if true
+  private int intermediateValue;                                                // Written by get and used by set if no value has been supplied
 
-  LayoutBan()                                                                   // Create a layout
+  LayoutBan()                                                                   // Create a basic array machine
    {load();                                                                     // Load array definitions
     memory = new int[size];                                                     // Create the memory for the basic array machine
    }
 
+  LayoutBan exec()                                                              // Fork a basic array machine copying memory but not the code
+   {final LayoutBan source = this, target = new LayoutBan() {void load(){};};
+    target.order  = source.order;
+    target.arrays = source.arrays;
+    final int M = source.memory.length;
+    for (int i = 0; i < M; i++) target.memory[i] = source.memory[i];
+    return target;
+   }
+
+  LayoutBan thread()                                                            // Fork a basic array machine using the same memory but not the code
+   {final LayoutBan source = this, target = new LayoutBan() {void load(){};};
+    target.order  = source.order;
+    target.arrays = source.arrays;
+    target.memory = source.memory;
+    return target;
+   }
+
   void load() {}                                                                // Override this method to define the layout
 
-  void wantRunning  () {if (!running) stop("Too early: not running yet");}      // This operation can only occur when we are running
-  void wantCompiling() {if ( running) stop("Too late: not compiling");}         // This operation can only occur when we are compiling
+  private void wantRunning  () {if (!running) stop("Too early: not running yet");} // This operation can only occur when we are running
+  private void wantCompiling() {if ( running) stop("Too late: not compiling");}    // This operation can only occur when we are compiling
 
-  class Array                                                                   // Define an array in the basic array machine
+  private class Array                                                           // Define an array in the basic array machine
    {final String name;                                                          // Name of the array
     final int[]dimensions;                                                      // Dimensions of the array
     int base;                                                                   // Base position of this array
@@ -57,11 +74,11 @@ abstract class LayoutBan extends Test                                           
      }
    }
 
-  Array array(String Name, int...Dimensions)                                    // Array definition within the basic array machine
+  protected Array array(String Name, int...Dimensions)                          // Array definition within the basic array machine
    {return new Array(Name, Dimensions);
    }
 
-  Array overlay(String Name, int...Dimensions)                                  // Overlay this array definition over the previous one
+  protected Array overlay(String Name, int...Dimensions)                        // Overlay this array definition over the previous one
    {wantCompiling();
     if (order.size() == 0) stop("No previous array to overlay");                // Nothing to overlay
     final Array p = order.lastElement();                                        // Previous array which we will overlay
@@ -155,7 +172,7 @@ abstract class LayoutBan extends Test                                           
     final int S = s.dimensions.length;
     if (S != I) stop("Wrong number of dimensions:", S, "!=", I, "for array:", source);
 
-    return intermediateValue = switch(S)
+    return switch(S)
      {case  0 -> memory[s.base];
       case  1 -> memory[s.base+lookUpIndex(s, 0, i[0])];
       default -> memory[s.base+lookUpIndex(s, 1, i[0])*s.dimensions[0]+lookUpIndex(s, 0, i[1])];
@@ -216,7 +233,7 @@ abstract class LayoutBan extends Test                                           
     set(target, ti);
    }
 
-  void compareImmediate(int immediate, String source, String...Indices)         // Compare the indexed source field to the immediate value setting the intermediate value to -1 if is less that source, 0 if equal otherwise +1
+  void compare(int immediate, String source, String...Indices)                  // Compare the indexed source field to the immediate value setting the intermediate value to -1 if is less that source, 0 if equal otherwise +1
    {wantCompiling();
     final Array s = getArray(source);
 
@@ -237,37 +254,24 @@ abstract class LayoutBan extends Test                                           
 
   void compare(String target, String source, String...Indices)                  // Compare the indexed source fields setting the intermediate value to -1 if source is less that target, 0 if equal otherwise +1
    {wantCompiling();
-    if (target != null)
-     {final Array t = getArray(target), s = getArray(source);
+    final Array t = getArray(target), s = getArray(source);
 
-      final int I = Indices.length;
-      final int T = t.dimensions.length, S = s.dimensions.length;
-      if (T + S != I) stop("Wrong number of dimensions:", T, "+", S, "!=", I);  // Check we have the right number of indices
+    final int I = Indices.length;
+    final int T = t.dimensions.length, S = s.dimensions.length;
+    if (T + S != I) stop("Wrong number of dimensions:", T, "+", S, "!=", I);    // Check we have the right number of indices
 
-      final String[]ti = new String[T];                                         // Assign indices
-      final String[]si = new String[S];
-      for (int i = 0; i < T; i++) ti[i]   = Indices[i];
-      for (int i = T; i < I; i++) si[i-T] = Indices[i];
+    final String[]ti = new String[T];                                           // Assign indices
+    final String[]si = new String[S];
+    for (int i = 0; i < T; i++) ti[i]   = Indices[i];
+    for (int i = T; i < I; i++) si[i-T] = Indices[i];
 
-      compare(null, source, si);                                                // Load the intermediate value
-
-      new I()
-       {void a()
-         {final int b = intermediateValue;
-          final int a = getMemory(target, ti);
-          intermediateValue = Integer.valueOf(a).compareTo(b);
-         }
-       };
-     }
-    else                                                                        // Load the interneditae value from the source
-     {final Array s = getArray(source);
-
-      final int I = Indices.length;
-      final int S = s.dimensions.length;
-      if (S != I) stop("Wrong number of dimensions:", S, "!=", I);              // Check we have the right number of indices
-
-      new I() {void a() {getMemory(source, Indices);}};
-     }
+    new I()
+     {void a()
+       {final int b = getMemory(source, si);
+        final int a = getMemory(target, ti);
+        intermediateValue = Integer.valueOf(a).compareTo(b);
+       }
+     };
    }
 
   void gt() {new I() {void a(){intermediateValue = intermediateValue >  0 ? 1 : 0;}};} // Set the intermediate value to one if it is currently greater than             zero else zero
@@ -277,7 +281,7 @@ abstract class LayoutBan extends Test                                           
   void eq() {new I() {void a(){intermediateValue = intermediateValue == 0 ? 1 : 0;}};} // Set the intermediate value to one if it is currently equal                 to zero else zero
   void ne() {new I() {void a(){intermediateValue = intermediateValue != 0 ? 1 : 0;}};} // Set the intermediate value to one if it is currently less        not equal to zero else zero
 
-  void addImmediate(int immediate, String source, String...Indices)             // Add a constant value to the source field
+  void add(int immediate, String source, String...Indices)                      // Add a constant value to the source field
    {wantCompiling();
     final Array s = getArray(source);
 
@@ -303,9 +307,59 @@ abstract class LayoutBan extends Test                                           
     for (int i = 0; i < T; i++) ti[i]   = Indices[i];
     for (int i = T; i < I; i++) si[i-T] = Indices[i];
 
-    get(source, si); final int a = intermediateValue;
-    get(target, ti); final int b = intermediateValue;
-    set(a+b, target, ti);
+    new I() {void a() {intermediateValue  = getMemory(source, si) + getMemory(target, ti); }};
+    set(target, ti);
+   }
+
+  void subtract(String target, String source, String...Indices)                 // Subtract the source from the target and replace the target
+   {wantCompiling();
+    final Array t = getArray(target), s = getArray(source);
+
+    final int I = Indices.length;
+    final int T = t.dimensions.length, S = s.dimensions.length;
+    if (T + S != I) stop("Wrong number of dimensions:", T, "+", S, "!=", I);    // Check we have the right number of indices
+
+    final String[]ti = new String[T];                                           // Assign indices
+    final String[]si = new String[S];
+    for (int i = 0; i < T; i++) ti[i]   = Indices[i];
+    for (int i = T; i < I; i++) si[i-T] = Indices[i];
+
+    new I() {void a() {intermediateValue  = getMemory(target, ti) - getMemory(source, si); }};
+    set(target, ti);
+   }
+
+  void multiply(String target, String source, String...Indices)                 // Multiply the target by the source and replace the target
+   {wantCompiling();
+    final Array t = getArray(target), s = getArray(source);
+
+    final int I = Indices.length;
+    final int T = t.dimensions.length, S = s.dimensions.length;
+    if (T + S != I) stop("Wrong number of dimensions:", T, "+", S, "!=", I);    // Check we have the right number of indices
+
+    final String[]ti = new String[T];                                           // Assign indices
+    final String[]si = new String[S];
+    for (int i = 0; i < T; i++) ti[i]   = Indices[i];
+    for (int i = T; i < I; i++) si[i-T] = Indices[i];
+
+    new I() {void a() {intermediateValue  = getMemory(source, si) * getMemory(target, ti); }};
+    set(target, ti);
+   }
+
+  void modulus(String target, String source, String...Indices)                  // Save the target modulus the source into the source
+   {wantCompiling();
+    final Array t = getArray(target), s = getArray(source);
+
+    final int I = Indices.length;
+    final int T = t.dimensions.length, S = s.dimensions.length;
+    if (T + S != I) stop("Wrong number of dimensions:", T, "+", S, "!=", I);    // Check we have the right number of indices
+
+    final String[]ti = new String[T];                                           // Assign indices
+    final String[]si = new String[S];
+    for (int i = 0; i < T; i++) ti[i]   = Indices[i];
+    for (int i = T; i < I; i++) si[i-T] = Indices[i];
+
+    new I() {void a() {intermediateValue  = getMemory(source, si) % getMemory(target, ti); }};
+    set(target, ti);
    }
 
   public String toString()                                                      // Print layout
@@ -378,13 +432,13 @@ abstract class LayoutBan extends Test                                           
     return "";
    }
 
-  class Label                                                                   // Label definition
+  private class Label                                                           // Label definition
    {int instruction;                                                            // The instruction to which this labels applies
     Label() {set(); labels.push(this);}                                         // A label assigned to an instruction
     void set() {wantCompiling(); instruction = code.size();}                    // Reassign the label to an instruction
    }
 
-  class I                                                                       // Instruction definition
+  private class I                                                               // Instruction definition
    {int instructionNumber;                                                      // Instruction number
     final String definition = traceBack();                                      // Location of code that defined this instruction
     I()                                                                         // Define an instruction
@@ -419,21 +473,39 @@ abstract class LayoutBan extends Test                                           
 
 //D1 Blocks                                                                     // Blocks of code used to implement if statements and for loops
 
-  void Goto(Label label) {z(); step = label.instruction-1;}                     // The program execution for loop will increment first
-  void GoOn(Label label, MemoryLayout.At condition)                             // Go to a specified label if a memory location is on, i.e. not zero
-   {z(); if (condition.setOff().getInt() > 0) Goto(label);
-   }
-  void GoOff(Label label, MemoryLayout.At condition)                            // Go to a specified label if a memory location is off, i.e. zero
-   {z(); if (condition.setOff().getInt() == 0) Goto(label);
-   }
+  void Goto(Label label) {new I() {void a() {step = label.instruction-1;}                            };} // The program execution for loop will increment first
+  void GoEq(Label label) {new I() {void a() {if (intermediateValue == 0) step = label.instruction-1;}};} // Go to a specified label if the intermediate value is equal to zero
+  void GoNe(Label label) {new I() {void a() {if (intermediateValue != 0) step = label.instruction-1;}};} // Go to a specified label if the intermediate value is not equal to zero
+  void GoGt(Label label) {new I() {void a() {if (intermediateValue >  0) step = label.instruction-1;}};} // Go to a specified label if the intermediate value is greater than zero
+  void GoGe(Label label) {new I() {void a() {if (intermediateValue >= 0) step = label.instruction-1;}};} // Go to a specified label if the intermediate value is greater than or equal to zero
+  void GoLt(Label label) {new I() {void a() {if (intermediateValue <  0) step = label.instruction-1;}};} // Go to a specified label if the intermediate value is less than zero
+  void GoLe(Label label) {new I() {void a() {if (intermediateValue <= 0) step = label.instruction-1;}};} // Go to a specified label if the intermediate value is less than or equal to zero
 
   abstract class Block                                                          // A block that can be continued or exited
    {final Label start = new Label(), end = new Label();                         // Labels at start and end of block to facilitate continuing or exiting
+
     Block()
      {code();
       end.set();
      }
-    abstract void code();
+
+    abstract void code();                                                       // Override this method to supply the code of the block
+
+    void start    () {new I() {void a() {step = start.instruction-1;}                            };}  // Restart the block
+    void startIfEq() {new I() {void a() {if (intermediateValue == 0) step = start.instruction-1;}};}  // Restart the block if the intermediate value is equal to zero
+    void startIfNe() {new I() {void a() {if (intermediateValue != 0) step = start.instruction-1;}};}  // Restart the block if the intermediate value is not equal to zero
+    void startIfGt() {new I() {void a() {if (intermediateValue >  0) step = start.instruction-1;}};}  // Restart the block if the intermediate value is greater than zero
+    void startIfGe() {new I() {void a() {if (intermediateValue >= 0) step = start.instruction-1;}};}  // Restart the block if the intermediate value is greater than or equal to zero
+    void startIfLt() {new I() {void a() {if (intermediateValue <  0) step = start.instruction-1;}};}  // Restart the block if the intermediate value is less than zero
+    void startIfLe() {new I() {void a() {if (intermediateValue <= 0) step = start.instruction-1;}};}  // Restart the block if the intermediate value is less than or equal to zero
+
+    void end    ()   {new I() {void a() {step = end.instruction-1;}                              };}  // End the block
+    void endIfEq()   {new I() {void a() {if (intermediateValue == 0) step = end.instruction-1;}  };}  // End the block if the intermediate value is equal to zero
+    void endIfNe()   {new I() {void a() {if (intermediateValue != 0) step = end.instruction-1;}  };}  // End the block if the intermediate value is not equal to zero
+    void endIfGt()   {new I() {void a() {if (intermediateValue >  0) step = end.instruction-1;}  };}  // End the block if the intermediate value is greater than zero
+    void endIfGe()   {new I() {void a() {if (intermediateValue >= 0) step = end.instruction-1;}  };}  // End the block if the intermediate value is greater than or equal to zero
+    void endIfLt()   {new I() {void a() {if (intermediateValue <  0) step = end.instruction-1;}  };}  // End the block if the intermediate value is less than zero
+    void endIfLe()   {new I() {void a() {if (intermediateValue <= 0) step = end.instruction-1;}  };}  // End the block if the intermediate value is less than or equal to zero
    }
 
 //D0 Tests                                                                      // Testing
@@ -564,9 +636,9 @@ abstract class LayoutBan extends Test                                           
 
   static void test_compare()
    {LayoutBan l = test_move();
-    l.compareImmediate(4, "B", "c3", "c2");      l.run(); ok(l.intermediateValue, +1);
-    l.compareImmediate(5, "B", "c3", "c2");      l.run(); ok(l.intermediateValue,  0);
-    l.compareImmediate(6, "B", "c3", "c2");      l.run(); ok(l.intermediateValue, -1);
+    l.compare(4, "B", "c3", "c2");               l.run(); ok(l.intermediateValue, +1);
+    l.compare(5, "B", "c3", "c2");               l.run(); ok(l.intermediateValue,  0);
+    l.compare(6, "B", "c3", "c2");               l.run(); ok(l.intermediateValue, -1);
     l.compare("B", "B", "c3", "c2", "c3", "c1"); l.run(); ok(l.intermediateValue, +1);
     l.compare("B", "B", "c3", "c2", "c2", "c2"); l.run(); ok(l.intermediateValue, -1);
     l.compare("B", "a", "c3", "c2", "c2");       l.run(); ok(l.intermediateValue,  0);
@@ -574,9 +646,9 @@ abstract class LayoutBan extends Test                                           
 
   static void test_compare_int()                                                // Encode some indices directly instead of indirectly
    {LayoutBan l = test_move();
-    l.compareImmediate(4, "B",    "3",  "c2");   l.run(); ok(l.intermediateValue, +1);
-    l.compareImmediate(5, "B",    "3",  "c2");   l.run(); ok(l.intermediateValue,  0);
-    l.compareImmediate(6, "B",    "3",  "c2");   l.run(); ok(l.intermediateValue, -1);
+    l.compare(4, "B",    "3",  "c2");            l.run(); ok(l.intermediateValue, +1);
+    l.compare(5, "B",    "3",  "c2");            l.run(); ok(l.intermediateValue,  0);
+    l.compare(6, "B",    "3",  "c2");            l.run(); ok(l.intermediateValue, -1);
     l.compare("B", "B", "3", "c2", "3",  "c1");  l.run(); ok(l.intermediateValue, +1);
     l.compare("B", "B", "3", "c2", "c2",  "c2"); l.run(); ok(l.intermediateValue, -1);
     l.compare("B", "a", "3", "c2", "c2");        l.run(); ok(l.intermediateValue,  0);
@@ -586,7 +658,7 @@ abstract class LayoutBan extends Test                                           
   static void test_add()
    {LayoutBan l = test_move();
 
-    l.addImmediate(1, "B", "c3", "c1");
+    l.add(1, "B", "c3", "c1");
     l.get("B", "c3", "c1");
     l.run();
     ok(l.intermediateValue,  5);
@@ -722,6 +794,84 @@ abstract class LayoutBan extends Test                                           
 """);
    }
 
+  static void test_sum()
+   {final LayoutBan l = new LayoutBan()
+     {void load()
+       {array("i");
+        array("s");
+       }
+     };
+
+    l.set(0, "i");
+    l.set(0, "s");
+    l.new Block()
+     {void code()
+       {l.add ("s",   "i");
+        l.add (1,     "i");
+        l.compare(10, "i"); endIfGt(); start();
+       }
+     };
+    l.run();
+    ok(l.getMemory("s"), 55);
+   }
+
+  static void test_fibonacci()
+   {final LayoutBan l = new LayoutBan()
+     {void load()
+       {array("a");
+        array("b");
+        array("c");
+       }
+     };
+
+    Stack<Integer> f = new Stack<>();
+    l.set(1, "b");
+
+    l.new Block()
+     {void code()
+       {l.move("c", "a");
+        l.add ("c", "b");
+        l.new I() {void a() {f.push(l.intermediateValue);}};
+        l.move("a", "b");
+        l.move("b", "c");
+        l.compare(100, "c"); endIfGt(); start();
+       }
+     };
+    l.run();
+    ok(f, "[1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144]");
+   }
+
+  static void test_euclid()
+   {final LayoutBan l = new LayoutBan()
+     {void load()
+       {array("a");
+        array("b");
+       }
+     };
+
+    l.set(4*13, "a");
+    l.set(4*11, "b");
+
+    l.new Block()
+     {void code()
+       {final Block outer = this;
+        l.new Block()
+         {void code()
+           {l.compare("a", "b");
+            outer.endIfEq();
+            endIfGt();
+            l.subtract("b", "a");
+            outer.start();
+           }
+         };
+        l.subtract("a", "b");
+        outer.start();
+       }
+     };
+    l.run();
+    ok(l.getMemory("a"), 4);
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_clear();
     test_get();
@@ -734,6 +884,9 @@ abstract class LayoutBan extends Test                                           
     test_initialize();
     test_print();
     test_move();
+    test_sum();
+    test_fibonacci();
+    test_euclid();
    }
 
   static void newTests()                                                        // Tests being worked on
