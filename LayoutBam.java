@@ -7,12 +7,12 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 abstract class LayoutBam extends Test                                           // Layout the array used by the basic array machine
- {int size = 0;                                                                 // The size of the memory used by the basic array machine
-  final Stack         <Array> order  = new Stack<>();                           // The order in which the arrays were defined
-  final TreeMap<String,Array> arrays = new TreeMap<>();                         // A number of different sized arrays concatenated to make one array
-  final int[]memory;                                                            // The concatenation of all the arrays
-  final int[]save;                                                              // A save area so we can save and restore before printing
-  int intermediate;                                                             // Written by get and used by set if no value has been supplied
+ {private int size = 0;                                                         // The size of the memory used by the basic array machine
+  private final Stack         <Array> order  = new Stack<>();                   // The order in which the arrays were defined
+  private final TreeMap<String,Array> arrays = new TreeMap<>();                 // A number of different sized arrays concatenated to make one array
+  private final int[]memory;                                                    // The concatenation of all the arrays
+  private final int[]save;                                                      // A save area so we can save and restore before printing
+  private int intermediate;                                                     // Written by get and used by set if no value has been supplied
 
   LayoutBam()                                                                   // Create a layout
    {load();                                                                     // Load array definitions
