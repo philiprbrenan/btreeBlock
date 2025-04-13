@@ -3641,7 +3641,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    (int Key, int data, int steps, String expected)
    {z();
 
-    VerilogCode v = new VerilogCode("delete", "verilog")                        // Generate verilog now that memories have beeninitialzied and the program written
+    VerilogCode v = new VerilogCode("delete", "verilog")                        // Generate verilog now that memories have been initialzied and the program written
      {int     Key     () {return   Key;}                                        // Input key value
       Integer Data    () {return     3;}                                        // Input key value
       Integer found   () {return     1;}                                        // Whether we should expect to find the key on a find operation
