@@ -6,7 +6,7 @@ package com.AppaApps.Silicon;                                                   
 
 import java.util.*;
 
-abstract class Ban extends Test                                           // Layout the basic array machine and execute a program in it
+abstract class Ban extends Test                                                 // Layout the basic array machine and execute a program in it
  {private int size = 0;                                                         // The size of the memory used by the basic array machine
   private Stack         <Array> order  = new Stack<>();                         // The order in which the arrays were defined
   private TreeMap<String,Array> arrays = new TreeMap<>();                       // A number of different sized arrays concatenated to make one array
@@ -19,12 +19,12 @@ abstract class Ban extends Test                                           // Lay
   private boolean     running = false;                                          // Executing if true
   private int intermediateValue;                                                // Written by get and used by set if no value has been supplied
 
-  Ban()                                                                   // Create a basic array machine
+  Ban()                                                                         // Create a basic array machine
    {load();                                                                     // Load array definitions
     memory = new int[size];                                                     // Create the memory for the basic array machine
    }
 
-  Ban exec()                                                              // Fork a basic array machine copying memory but not the code
+  Ban exec()                                                                    // Fork a basic array machine copying memory but not the code
    {final Ban source = this, target = new Ban() {void load(){};};
     target.order  = source.order;
     target.arrays = source.arrays;
@@ -33,7 +33,7 @@ abstract class Ban extends Test                                           // Lay
     return target;
    }
 
-  Ban thread()                                                            // Fork a basic array machine using the same memory but not the code
+  Ban thread()                                                                  // Fork a basic array machine using the same memory but not the code
    {final Ban source = this, target = new Ban() {void load(){};};
     target.order  = source.order;
     target.arrays = source.arrays;
@@ -44,7 +44,7 @@ abstract class Ban extends Test                                           // Lay
   void load() {}                                                                // Override this method to define the layout
 
   private void wantRunning  () {if (!running) stop("Too early: not running yet");} // This operation can only occur when we are running
-  private void wantCompiling() {if ( running) stop("Too late: not compiling");}    // This operation can only occur when we are compiling
+  private void wantCompiling() {if ( running) stop("Too late: not compiling");} // This operation can only occur when we are compiling
 
   private class Array                                                           // Define an array in the basic array machine
    {final String name;                                                          // Name of the array
@@ -310,6 +310,9 @@ abstract class Ban extends Test                                           // Lay
     new I() {void a() {intermediateValue  = getMemory(source, si) + getMemory(target, ti); }};
     set(target, ti);
    }
+
+  void inc(String source, String...Indices) {add(+1, source, Indices);}         // Increment a field
+  void dec(String source, String...Indices) {add(-1, source, Indices);}         // Increment a field
 
   void subtract(String target, String source, String...Indices)                 // Subtract the source from the target and replace the target
    {wantCompiling();
@@ -873,6 +876,45 @@ abstract class Ban extends Test                                           // Lay
     ok(l.getMemory("a"), N);
    }
 
+  static void test_bubble_sort()
+   {final int N = 8;
+    final Ban l = new Ban()
+     {void load()
+       {array("i");
+        array("j");
+        array("t");
+        array("a", N);
+       }
+     };
+
+    for (int i = 0; i < N; i++) l.set(N - i, "a", ""+i);
+
+    l.new Block()
+     {void code()
+       {l.move("j", "i");
+        l.new Block()
+         {void code()
+           {l.new Block()
+             {void code()
+               {l.compare("a", "a", "i", "j");
+                endIfLe();
+                l.move("t", "a", "i");
+                l.move("a", "a", "i", "j");
+                l.move("a", "t", "j");
+               }
+             };
+            l.inc("j");
+            l.compare(N, "j"); endIfGe(); start();
+           }
+         };
+        l.inc("i");
+        l.compare(N, "i"); endIfGe(); start();
+       }
+     };
+    l.run();
+    ok(l.print("a"), "1, 2, 3, 4, 5, 6, 7, 8");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_clear();
     test_get();
@@ -888,6 +930,7 @@ abstract class Ban extends Test                                           // Lay
     test_sum();
     test_fibonacci();
     test_euclid();
+    test_bubble_sort();
    }
 
   static void newTests()                                                        // Tests being worked on
