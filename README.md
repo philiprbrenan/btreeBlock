@@ -32,7 +32,7 @@ facilitate the **put**, **find** and **delete** operations on a [B-Tree](https:/
 The same  [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm is now being implemented on a generic [reduced instruction set computer](https://en.wikipedia.org/wiki/Reduced_instruction_set_computer) soft [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) so that the performance of the generic [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) versus the performance of the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) can be compared by running them both on the same [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array) to see which
 implementation is faster and which uses less power.
 
-![ð¢ HMS Alecto vs. HMS Rattler (1845)](https://prb.appaapps.com/zesal/presentation/images/SpecializedVersusGeneric.jpg)
+![ð¢ HMS Rattler vs. HMS Alecto (1845)](https://prb.appaapps.com/zesal/presentation/images/SpecializedVersusGeneric.jpg)
 
 # Synthesis, Placement and Routing
 
