@@ -111,7 +111,7 @@ abstract class Ban extends Test                                                 
     return v;
    }
 
-  void set(Integer Value, String target, String...Indices)                      // Set the value of an array element
+  void set(Integer Value, String target, String...Indices)                      // Set the value of an array element to a specified value or the current value of the intermediate value
    {wantCompiling();
     final Array t   = getArray(target);
     final String[]i = Indices;
@@ -120,7 +120,7 @@ abstract class Ban extends Test                                                 
     final int T = t.dimensions.length;
     if (T != I) stop("Wrong number of dimensions:", T, "!=", I, "for array:", target);
 
-    new I()
+    new I()                                                                     // Assign value to the indicated array element
      {void a()
        {final int v = switch(T)
          {case  0 -> memory[t.base]                                                                 = Value != null ? Value : intermediateValue;
@@ -887,14 +887,14 @@ abstract class Ban extends Test                                                 
        }
      };
 
-    for (int i = 0; i < N; i++) l.set(N - i, "a", ""+i);
+    for (int i = 0; i < N; i++) l.set(N - i, "a", ""+i);                        // Load in reverse order
 
-    l.new Block()
+    l.new Block()                                                               // Outer loop
      {void code()
        {l.move("j", "i");
-        l.new Block()
+        l.new Block()                                                           // Inner loop
          {void code()
-           {l.new Block()
+           {l.new Block()                                                       // If
              {void code()
                {l.compare("a", "a", "i", "j");
                 endIfLe();
