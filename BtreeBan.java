@@ -36,7 +36,7 @@ class BtreeBan extends Test                                                     
     L                = layoutBtree();
     L.zero("free"); L.zero("isLeaf"); L.zero("current_size");                   // Clear all control information
     L.zero("keys"); L.zero("data");                                             // Clear all data
-    for (int i = numberOfNodes-1; i > 1; --i) L.set(i, "free", ""+(i-1));       // Initialize free chain by putting all the nodes on the free chain except the root (which is permanently allocated at position 0) with the low nodes first to be allocated.
+    for (int i = numberOfNodes-1; i > 1; --i) L.clear(i, "free", ""+(i-1));     // Initialize free chain by putting all the nodes on the free chain except the root (which is permanently allocated at position 0) with the low nodes first to be allocated.
     L.clear(1, "freeChainHead");                                                // The first freed node
     L.clear(0, "root");                                                         // The root
     L.clear(1, "isLeaf", "root");                                               // The root starts as a leaf
@@ -1643,7 +1643,7 @@ Stuck(size:3)
 """);
    }
 
-  static void test_delete_random()
+  static void test_delete_random_not_100()                                      // Produces the same answer as BtreeSF with a slightly different layout. Why?
    {final BtreeBan b = new BtreeBan(2, 3, 999);
     int N = random_large.length;
     for (int i = 0; i < N; ++i)
@@ -1765,7 +1765,7 @@ Stuck(size:3)
     test_put_ascending();
     test_put_descending();
     test_put_random_small();
-    test_delete_random();
+    test_delete_random_not_100();
     test_delete_odd_ascending();
     test_delete_even_descending();
     test_primes();
