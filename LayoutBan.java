@@ -842,15 +842,16 @@ abstract class LayoutBan extends Test                                           
    }
 
   static void test_euclid()
-   {final LayoutBan l = new LayoutBan()
+   {final int N = 9, p = 11, q = 13;
+    final LayoutBan l = new LayoutBan()
      {void load()
        {array("a");
         array("b");
        }
      };
 
-    l.set(4*13, "a");
-    l.set(4*11, "b");
+    l.set(N*p, "a");
+    l.set(N*q, "b");
 
     l.new Block()
      {void code()
@@ -869,7 +870,7 @@ abstract class LayoutBan extends Test                                           
        }
      };
     l.run();
-    ok(l.getMemory("a"), 4);
+    ok(l.getMemory("a"), N);
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
