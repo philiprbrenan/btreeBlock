@@ -30,8 +30,8 @@ dot.node('SDM',  'StuckDM\nroutable Verilog')
 
 dot.node('MPA',  'MemoryLayoutPA\npseudo assembler')
 dot.node('MDM',  'MemoryLayoutDM\nroutable Verilog')
-dot.node('LBAM', 'LayoutBam\nmemory layout\nfor basic array machine')
-dot.node('LBAP', 'LayoutBap\nexecutable\nbasic array machine')
+dot.node('LBAM', 'LayoutBam\nBasic Array Machine')
+dot.node('LBAN', 'LayoutBap\nBasic Array Machine\nwith one register')
 
 dot.edge('B',    'BS',   color='red')
 dot.edge('BS',   'BSS',  color='red')
@@ -69,8 +69,8 @@ dot.edge('MDM',  'BDM'  , arrowhead='diamond', color='grey')
 
 dot.edge('LBAM', 'BAM'  , arrowhead='diamond', color='grey')
 dot.edge('LBAM', 'BAN'  , arrowhead='diamond', color='grey')
-dot.edge('LBAM', 'LBAP' , arrowhead='diamond', color='grey')
-dot.edge('LBAP', 'BAP'  , arrowhead='diamond', color='grey')
+dot.edge('LBAM', 'LBAN' , arrowhead='diamond', color='grey')
+dot.edge('LBAN', 'BAP'  , arrowhead='diamond', color='grey')
 
 dot.render('DevelopmentFlowChart', format='png', cleanup=True)                  # Display
 dot.view('flowchart_output')
