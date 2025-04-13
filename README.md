@@ -53,7 +53,7 @@ components of the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_
 
 Open Road successfully compiles the ``find``, ``delete`` and ``put`` operations
 implemented by the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) onto [freepdk-45nm](https://github.com/mflowgen/freepdk-45nm) [Silicon](https://en.wikipedia.org/wiki/Silicon) .  The following images
-show the layout of [Silicon](https://en.wikipedia.org/wiki/Silicon) for each operation:
+show the layout on [Silicon](https://en.wikipedia.org/wiki/Silicon) for each operation:
 
 ### Put
 
@@ -76,7 +76,8 @@ The ``find`` operation of [the](https://en.wikipedia.org/wiki/The)  custom [CPU]
 In the image, the power light is the LED at the bottom, then reading up the
 first **4** leds from the power LED having values **8**, **4**, **2**, **1**
 are signalling that the [data](https://en.wikipedia.org/wiki/Data) associated with [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) **5** is **4** or in binary
-**P 0100F**0 wher **F** is powered on showing that the [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) was found in the [B-Tree](https://en.wikipedia.org/wiki/B-tree) .
+**P 0100F0** where **F** is powered on showing that the [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) was successfully
+found in the [B-Tree](https://en.wikipedia.org/wiki/B-tree) .
 
 # Example: finding the [data](https://en.wikipedia.org/wiki/Data) associated with a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) 
 For a small [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)): 
