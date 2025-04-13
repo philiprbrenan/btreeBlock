@@ -97,7 +97,8 @@ class BtreeBan extends Test                                                     
         array("mergeRightSibling_nl");
         array("mergeRightSibling_nr");
         array("mergeRightSibling_parent");                                      // The parent of the branch which wants to merge with its left sibling
-        array("mergeRightSibling_pk");
+        array("mergeRightSibling_ld");                                          // Last child of left node
+        array("mergeRightSibling_pk");                                          // One up from split point in parent
         array("mergeRightSibling_r");
         array("mergeRightSibling_size");
         array("mergeRightSibling_t");
@@ -201,33 +202,28 @@ class BtreeBan extends Test                                                     
 
 //D2 Basics                                                                     // Basic operations on nodes
 
-  int getKey  () {return L.get("s_key");}      void getKey  (String n) {L.move(n, "s_key"  );} // Get current key
-  int getData () {return L.get("s_data");}     void getData (String n) {L.move(n, "s_data" );} // Get current data
-  int getStuck() {return L.get("stuck");}      void getStuck(String n) {L.move(n, "stuck"  );} // Get current stuck
-  int getIndex() {return L.get("s_index");}    void getIndex(String n) {L.move(n, "s_index");} // Get current index
+  void getKey  (String n) {L.move(n, "s_key"  );}                               // Move current key   to target
+  void getData (String n) {L.move(n, "s_data" );}                               // Move current data  to target
+  void getStuck(String n) {L.move(n, "stuck"  );}                               // Move current stuck to target
+  void getIndex(String n) {L.move(n, "s_index");}                               // Move current index to target
 
-  void setKey  (int n) {L.set(n, "s_key");}    void setKey  (String n) {L.move("s_key" ,  n);} // Set current key
-  void setData (int n) {L.set(n, "s_data");}   void setData (String n) {L.move("s_data",  n);} // Set current data
-  void setStuck(int n) {L.set(n, "stuck");}    void setStuck(String n) {L.move("stuck",   n);} // Set current stuck
-  void setIndex(int n) {L.set(n, "s_index");}  void setIndex(String n) {L.move("s_index", n);} // Set current index
+  void setKey  (int n) {L.set(n, "s_key");}
+  void setData (int n) {L.set(n, "s_data");}
+  void setStuck(int n) {L.set(n, "stuck");}
+  void setIndex(int n) {L.set(n, "s_index");}
 
-  int getFLeaf    () {return L.get("f_leaf");}                                  // Node number of leaf found
+  void setKey  (String n) {L.move("s_key" ,  n);} // Set current key
+  void setData (String n) {L.move("s_data",  n);} // Set current data
+  void setStuck(String n) {L.move("stuck",   n);} // Set current stuck
+  void setIndex(String n) {L.move("s_index", n);} // Set current index
+
   int getFound    () {return L.get("f_found");}                                 // Whether the key was found
-  int getFIndex   () {return L.get("f_index");}                                 // The index in the leaf or branch of the greater than or equal key
-  int getFKey     () {return L.get("f_key");}                                   // Matching found key
-  int getFData    () {return L.get("f_data");}                                  // Data associated with key
   int getFSuccess () {return L.get("f_success");}                               // Inserted or updated if true
-  int getFInserted() {return L.get("f_inserted");}                              // Inserted if true
 
-  void putFLeaf    (int n) {L.set(n, "f_leaf");}                                // Node number of leaf found
-  void putFound    (int n) {L.set(n, "f_found");}                               // Whether the key was found
-  void putFIndex   (int n) {L.set(n, "f_index");}                               // The index in the leaf or branch of the greater than or equal key
-  void putFKey     (int n) {L.set(n, "f_key");}                                 // Matching found key
-  void putFData    (int n) {L.set(n, "f_data");}                                // Data associated with key
   void putFSuccess (int n) {L.set(n, "f_success");}                             // Inserted or updated if true
   void putFInserted(int n) {L.set(n, "f_inserted");}                            // Inserted if true
 
-  void isLeaf       () {L.move("isALeaf", "isLeaf", "isALeaf");}                // A leaf if true
+  void isLeaf       () {L.move("isALeaf", "isLeaf", "isALeaf");}                // A leaf if the target is not zero
   void rootIsLeaf   () {L.move("rootIsLeaf", "isLeaf", "root");}                // The root is a leaf if the target is not zero
 
   void setLeaf      () {L.clear(1, "isLeaf", "setLeaf");}                       // Set as leaf
@@ -585,7 +581,7 @@ class BtreeBan extends Test                                                     
     final String $nr     = "mergeLeftSibling_nr";
     final String $size   = "mergeLeftSibling_size";
     final String $t      = "mergeLeftSibling_t";
-    L.clear(0, $mls);                                                             // Assume at the start that we will not be able to merge with the left sibling
+    L.clear(0, $mls);                                                           // Assume at the start that we will not be able to merge with the left sibling
 
     finished:
      {if (L.get($index) == 0)          break finished;
@@ -653,7 +649,8 @@ class BtreeBan extends Test                                                     
     final String $size   = "mergeRightSibling_size";
     final String $t      = "mergeRightSibling_t";
     final String $pk     = "mergeRightSibling_pk";
-    L.clear(0, $mrs);                                                             // Assume at the start that it will  mnot be possible to merge with the right sibling
+    final String $ld     = "mergeRightSibling_ld";
+    L.clear(0, $mrs);                                                           // Assume at the start that it will  mnot be possible to merge with the right sibling
 
     finished:
      {stuck_size1($bs, $P);
@@ -685,9 +682,9 @@ class BtreeBan extends Test                                                     
         L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
 
         if (L.get($nl) + 1 + L.get($nr) >  maxKeysPerBranch) break finished;    // Merge not possible because there is not enough room in a single branch
-        setStuck($l); stuck_lastElement(); final int ld = getData();            // Last element of left child
+        setStuck($l); stuck_lastElement(); L.move($ld, "s_data");               // Last element of left child
         setStuck($P); setIndex($index); stuck_elementAt();                      // Parent dividing element
-        setStuck($l); setData(ld); setIndex($nl); stuck_setElementAt();         // Re-key left top
+        setStuck($l); setData($ld); setIndex($nl); stuck_setElementAt();        // Re-key left top
         L.set(L.get($nr)+1, $size);
 
         for (int i = 0; i < maxKeysPerBranch; i++)                              // Transfer right to left
@@ -716,7 +713,7 @@ class BtreeBan extends Test                                                     
     final String $index  = "balance_index";
 
     finished:
-     {setStuck($parent); setIndex($index); stuck_elementAt(); getData();
+     {setStuck($parent); setIndex($index); stuck_elementAt();
       L.move("isLow", "s_data");
       isLow();
       if (L.get("isLow") == 0)                                 break finished;
@@ -754,7 +751,7 @@ class BtreeBan extends Test                                                     
     setStuck(node); final int N = L.get("current_size", "stuck");
     for (int i = 0; i < N; i++)                                                 // Each element in the leaf
      {setStuck(node); setIndex(i); stuck_elementAt();
-      s.append(String.format("%d ", getKey()));
+      s.append(String.format("%d ", L.get("s_key")));
      }
     if (s.length() > 0) s.setLength(s.length()-1);
     s.append(String.format("=%d ", node));
@@ -766,7 +763,7 @@ class BtreeBan extends Test                                                     
     final int N = L.get("current_size", "stuck")-1;
     for (int i = 0; i < N; i++)                                                 // Each element in the branch
      {setStuck(node); setIndex(i); stuck_elementAt();
-      final int k = getKey(), d = getData();
+      final int k = L.get("s_key"), d = L.get("s_data");
       L.set(d, "isALeaf");
       isLeaf();
       if (L.get("isALeaf") > 0) printLeaf(d, S, level+linesPerNode);
@@ -779,7 +776,7 @@ class BtreeBan extends Test                                                     
      }
     setStuck(node); setIndex(N); stuck_elementAt();
 
-    final int k = getKey(), d = getData();
+    final int k = L.get("s_key"), d = L.get("s_data");
     L.set(d, "isALeaf");
     isLeaf();
     if (L.get("isALeaf") > 0) printLeaf(d, S, level+linesPerNode);
@@ -884,19 +881,19 @@ class BtreeBan extends Test                                                     
     finished:
      {found:
        {if (getFound() == 0) break found;                                       // Found the key in the leaf so update it with the new data
-        setStuck(getFLeaf()); setKey(Key); setData(Data); setIndex(getFIndex());
+        setStuck("f_leaf"); setKey(Key); setData(Data); setIndex("f_index");
         stuck_setElementAt();
         findAndInsert_result(1, 0);
         break finished;
        }
 
-      L.set(getFLeaf(), "isFull");
+      L.move("isFull", "f_leaf");
       isFullLeaf();
       notFull:
        {if (L.get("isFull") > 0) break notFull;                                 // Leaf is not full so we can insert immediately
-        setStuck(getFLeaf()); setKey(Key);
+        setStuck("f_leaf"); setKey(Key);
         stuck_searchFirstGreaterThanOrEqual();
-        setStuck(getFLeaf());
+        setStuck("f_leaf");
         setKey(Key); setData(Data);
         stuck_insertElementAt();
         findAndInsert_result(1, 0);
@@ -986,11 +983,6 @@ class BtreeBan extends Test                                                     
 
 //D1 Deletion                                                                   // Delete a key, data pair from the tree
 
-  void delete_result(int Found, int Data)                                       // Delete and insert result
-   {putFound(Found);
-    putFData(Data);
-   }
-
   void findAndDelete()                                                          // Delete a key from the tree and returns its data if present without modifying the shape of tree
    {final int Key = L.get("findAndDelete_Key");                                 // The key to find and delete
     L.set(Key, "find_Key");
@@ -1001,11 +993,10 @@ class BtreeBan extends Test                                                     
         findAndInsert_result(0, 0);
         break finished;
        }
-      final int l = getFLeaf();                                                 // The leaf that contains the key
-      final int i = getFIndex();                                                // Position in the leaf of the key
-      setStuck(l); setIndex(i);                                                 // Key, data pairs in the leaf
+      setStuck("f_leaf"); setIndex("f_index");                                  // Key, data pairs in the leaf
       stuck_removeElementAt();                                                  // Remove the key, data pair from the leaf
-      delete_result(1, getData());                                              // Delete result
+      L.set(1, "f_found");
+      L.move("f_data", "s_data");
      }
    }
 
