@@ -16,7 +16,7 @@ dot.node('BSA',  'BtreeSA\ntransaction in bit memory')
 dot.node('BPA',  'BtreePA\npseudo assembler')
 dot.node('BDM',  'BtreeDM\nroutable Verilog')
 dot.node('BSF',  'BtreeSF\nThe CUSTOM cpu',                          fontcolor='red',      style='bold', fontsize='20')
-dot.node('BAM',  'BtreeBAM\non a basic array machine')
+dot.node('BAM',  'BtreeBam\non a basic array machine')
 dot.node('BAN',  'BtreeBan\nreduced Java');
 dot.node('BAP',  'BtreeBap\nThe GENERIC cpu',                        fontcolor='darkblue', style='bold', fontsize='20')
 
@@ -31,7 +31,7 @@ dot.node('SDM',  'StuckDM\nroutable Verilog')
 dot.node('MPA',  'MemoryLayoutPA\npseudo assembler')
 dot.node('MDM',  'MemoryLayoutDM\nroutable Verilog')
 dot.node('LBAM', 'LayoutBam\nBasic Array Machine')
-dot.node('LBAN', 'LayoutBap\nBasic Array Machine\nwith one register')
+dot.node('LBAN', 'Ban\nBasic Array Machine\nwith one register')
 
 dot.edge('B',    'BS',   color='red')
 dot.edge('BS',   'BSS',  color='red')
