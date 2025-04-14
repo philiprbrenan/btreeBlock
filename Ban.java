@@ -111,6 +111,8 @@ abstract class Ban extends Test                                                 
     return v;
    }
 
+  int i() {return intermediateValue;}                                           // Return intermediate value making it read only
+
   void set(Integer Value, String target, String...Indices)                      // Set the value of an array element to a specified value or the current value of the intermediate value
    {wantCompiling();
     final Array t   = getArray(target);
@@ -164,7 +166,7 @@ abstract class Ban extends Test                                                 
      };
    }
 
-  private int getMemory(String source, String...Indices)                        // Get the value of an array element from memory
+  int getMemory(String source, String...Indices)                                // Get the value of an array element from memory
    {final Array s   = getArray(source);
     final String[]i = Indices;
 
@@ -363,6 +365,19 @@ abstract class Ban extends Test                                                 
 
     new I() {void a() {intermediateValue  = getMemory(source, si) % getMemory(target, ti); }};
     set(target, ti);
+   }
+
+  void shiftRight(String source, String...Indices)                              // Shift the source by one place to the right inserti g a one if the number os  neagtive else a zero
+   {wantCompiling();
+    final Array s = getArray(source);
+
+    final int I = Indices.length;
+    final int S = s.dimensions.length;
+    if (S != I) stop("Wrong number of dimensions:", S, "!=", I);                // Check we have the right number of indices
+
+    get(source, Indices);
+    new I() {void a() {intermediateValue >>= 1;}};
+    set(source, Indices);
    }
 
   public String toString()                                                      // Print layout
@@ -672,7 +687,13 @@ abstract class Ban extends Test                                                 
     ok(l.intermediateValue, 10);
    }
 
-  static Ban test_overlay()                                               // A test layout  with overlays
+  static void test_shiftRight()
+   {Ban l = test_move();
+    l.shiftRight("A", "c1", "c2"); l.run();  ok(l.intermediateValue, 4);
+    l.shiftRight("A", "c1", "c2"); l.run();  ok(l.intermediateValue, 2);
+   }
+
+  static Ban test_overlay()                                                     // A test layout with overlays
    {final int M = 4, N = 3;
      final Ban l = new Ban()
      {void load()
@@ -922,6 +943,7 @@ abstract class Ban extends Test                                                 
     test_compare();
     test_compare_int();
     test_add();
+    test_shiftRight();
     test_overlay();
     test_clear();
     test_initialize();
