@@ -1206,7 +1206,7 @@ Stuck(size:3)
    {final BtreeBam b = new BtreeBam(2, 3, 29);
     int N = 32;
     for (int i = 1; i <= N; i++) b.put(i, i);
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                                                                                                   16                                                                                                                     +
                                                                                                   17                                                                                                                     21
@@ -1228,7 +1228,7 @@ Stuck(size:3)
    {final BtreeBam b = new BtreeBam(2, 3, 29);
     int N = 32;
     for (int i = N; i > 0; i--) b.put(i, i);
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                                                                                                            16                                                                                                               +
                                                                                                            9                                                                                                                22
@@ -1253,7 +1253,7 @@ Stuck(size:3)
    {final BtreeBam b = new BtreeBam(2, 3, 100);
     int N = random_small.length;
     for (int i = 0; i < N; ++i) b.put(random_small[i], i);
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 493                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               +
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 60
@@ -1275,12 +1275,56 @@ Stuck(size:3)
 """);
    }
 
+  static void test_delete_ascending()
+   {final BtreeBam b = new BtreeBam(2, 3, 30);
+    int N = 32;
+    for (int i = 1; i <= N; i++) b.put(i, i);
+    for (int i = 1; i <= N; i++) b.delete(i);
+    //stop(b);
+    ok(b, """
+=0
+""");
+   }
+
+  static void test_delete_descending()
+   {final BtreeBam b = new BtreeBam(2, 3, 30);
+    int N = 32;
+    for (int i = 1; i <= N; i++) b.put(i, i);
+    for (int i = N; i >= 1; i--) b.delete(i);
+    //stop(b);
+    ok(b, """
+=0
+""");
+   }
+
+  static void test_delete_random_not_100()                                      // Produces the same answer as BtreeSF with a slightly different layout. Why?
+   {final BtreeBam b = new BtreeBam(2, 3, 999);
+    int N = random_large.length;
+    for (int i = 0; i < N; ++i)
+     {b.put(random_large[i], i);
+     }
+    for (int i = 0; i < N; ++i)
+     {final int r = random_large[i];
+      if (r % 100 > 0)
+       {b.delete(r);
+       }
+     }
+    //stop(b);
+    ok(b, """
+               1846             4249                  6600             +
+               223              163                   733              638
+               0                0                     0                0
+               0                1                     2                3
+700 1800=223         3700=163         5000 6600=733         9700=638
+""");
+   }
+
   static void test_delete_odd_ascending()
    {final BtreeBam b = new BtreeBam(2, 3, 30);
     int N = 32;
     for (int i = 1; i <= N; i++)    b.put(i, i);
     for (int i = 1; i <= N; i += 2) b.delete(i);
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                                               16                            24                            +
                                               5                             16                            23
@@ -1299,7 +1343,7 @@ Stuck(size:3)
     int N = 32;
     for (int i = 1; i <= N; i++)   b.put(i, i);
     for (int i = N; i > 0; i -= 2) b.delete(i);
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                    8                         16                                                          +
                    5                         11                                                          16
@@ -1327,7 +1371,7 @@ Stuck(size:3)
          }
        }
      }
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                    6                                  17                                        40                                           +
                    5                                  11                                        23                                           33
@@ -1358,6 +1402,9 @@ Stuck(size:3)
     test_put_ascending();
     test_put_descending();
     test_put_random_small();
+    test_delete_ascending();
+    test_delete_descending();
+    test_delete_random_not_100();
     test_delete_odd_ascending();
     test_delete_even_descending();
     test_primes();
@@ -1365,7 +1412,6 @@ Stuck(size:3)
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-    //test_primes();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
