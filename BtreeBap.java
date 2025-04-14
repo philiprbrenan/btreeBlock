@@ -1,16 +1,16 @@
 //------------------------------------------------------------------------------
-// BtreeBap with machine code
+// BtreeBap with machine code driving a basic array machine with one register
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
 
 import java.util.*;
 
-class BtreeBap extends Test                                                     // Manipulate a btree using only a basic array machine.
- {final Ban L;                                                                  // The btree laid out in arrays and operated on by a program
+class BtreeBap extends Test                                                     // Manipulate a btree using machine code driving a basic array machine with one register.
+ {final Ban L;                                                                  // The btree laid out in arrays and operated on by a machione code program
 
   final int
-    maxKeysPerLeaf,                                                             // Maximum number of leafs in a key
+    maxKeysPerLeaf,                                                             // Maximum number of leaves in a key
     maxKeysPerBranch,                                                           // Maximum number of keys in a branch
     splitLeafSize,                                                              // The number of key, data pairs to split out of a leaf
     splitBranchSize,                                                            // The number of key, next pairs to split out of a branch
@@ -51,59 +51,58 @@ class BtreeBap extends Test                                                     
         array("allocate");                                                      // Result of calling allocate
         array("balance_index");                                                 // The index of the child to be balanced
         array("balance_parent");                                                // The parent of the branch which wants to balance a child
-        array("branchSize");                                                    // Get branch size
+        array("branchSize");                                                    // Branch size of current indexed stuck
         array("child");                                                         // The child node during a descent through the tree
         array("current_size", numberOfNodes);                                   // Current size of stuck
-        array("data",         numberOfNodes, d);                                // Data
+        array("data",         numberOfNodes, d);                                // Data associated with each key in the stuck
         array("delete_Key");                                                    // The key to delete
-        array("f_data");                                                        // Data associated with key
+        array("f_data");                                                        // Data found for the specified key
         array("f_found");                                                       // Whether the key was found
         array("findAndDelete_Key");                                             // The key to find and delete
-        array("findAndInsert_Data");                                            // The data to insert
+        array("findAndInsert_Data");                                            // The data to insert if the key is inserted or update if the key is found
         array("findAndInsert_Key");                                             // The key to insert
         array("f_index");                                                       // The index in the leaf or branch of the greater than or equal key
         array("find_Key");                                                      // Key to find in a tree
-        array("find_result_leaf");                                              // The node index of the leaf containing the key found by fine
-        array("f_inserted");                                                    // Inserted if true
-        array("f_key");                                                         // Matching found key
+        array("find_result_leaf");                                              // The node index of the leaf containing the key found by find
+        array("f_inserted");                                                    // Find and insert perfomed an insert
+        array("f_key");                                                         // Matching found key after a search
         array("f_leaf");                                                        // Node number of leaf found
         array("freeChainHead");                                                 // The head of the free chain
-        array("free",         numberOfNodes);                                   // Used to place the node  on the free chain else zero if in use
-        array("f_success");                                                     // Inserted or updated if true
+        array("free",         numberOfNodes);                                   // Place the node  on the free chain else zero if in use
+        array("f_success");                                                     // Inserted or updated the tree with a key, data pair
         array("hasLeavesForChildren");                                          // Whether the node has leaves for children
         array("isFullRoot");                                                    // Whether the root is full
-        array("isFull");                                                        // Whether the node is  full or not
+        array("isFull");                                                        // Whether the node is full or not
         array("isALeaf");                                                       // Test whether a node is a leaf
         array("isLeaf",       numberOfNodes);                                   // Whether each node is a leaf or a branch
         array("isLow");                                                         // Test whether the node is low on children
-        array("keys",         numberOfNodes, k);                                // Keys
-        array("leafSize");                                                      // The result of leaf size
-        array("merge_Key");                                                     // The Key along whose path we should merge
-        array("mergeLeftSibling_bs");
+        array("keys",         numberOfNodes, k);                                // Keys held in the tree
+        array("leafSize");                                                      // The result of a leaf size request
+        array("merge_Key");                                                     // The key along whose path we should merge
+        array("mergeLeftSibling_bs");                                           // Branch size
         array("mergeLeftSibling_index");                                        // The index of the child that wants to steal from the child in its parent
-        array("mergeLeftSibling_l");
-        array("mergeLeftSibling_left");
+        array("mergeLeftSibling_l");                                            // Left sibling
         array("mergeLeftSibling_nl");                                           // Number of children on left
         array("mergeLeftSibling_nr");                                           // Number of children on right
         array("mergeLeftSibling_nlr");                                          // Number of children on left and right
         array("mergeLeftSibling_parent");                                       // The parent of the branch which wants to merge with its left sibling
-        array("mergeLeftSibling_r");
-        array("mergeLeftSibling_size");
-        array("mergeLeftSibling_t");
+        array("mergeLeftSibling_r");                                            // Right sibling
+        array("mergeLeftSibling_size");                                         // Left sibling size
+        array("mergeLeftSibling_t");                                            // Top key
         array("mergeLeftSibling");                                              // Whether the merge with the left sibling was successful
-        array("mergeRightSibling_bs");
+        array("mergeRightSibling_bs");                                          // Branch size
         array("mergeRightSibling_index");                                       // The index of the child that wants to steal from the child in its parent
         array("mergeRightSibling_index1");                                      // The index of the child to be stolen from
-        array("mergeRightSibling_l");
+        array("mergeRightSibling_l");                                           // Left sibling
         array("mergeRightSibling_nl");                                          // Number of children on left
         array("mergeRightSibling_nr");                                          // Number of children on right
         array("mergeRightSibling_nlr");                                         // Number of children on left and right
         array("mergeRightSibling_parent");                                      // The parent of the branch which wants to merge with its left sibling
         array("mergeRightSibling_ld");                                          // Last child of left node
         array("mergeRightSibling_pk");                                          // One up from split point in parent
-        array("mergeRightSibling_r");
-        array("mergeRightSibling_size");
-        array("mergeRightSibling_t");
+        array("mergeRightSibling_r");                                           // Right sibling
+        array("mergeRightSibling_size");                                        // Size of right sibling
+        array("mergeRightSibling_t");                                           // Top key
         array("mergeRightSibling");                                             // Whether the merge with the left sibling was successful
         array("mergeRoot_l");                                                   // Left child of root
         array("mergeRoot_nl");                                                  // Number in left child
@@ -155,7 +154,6 @@ class BtreeBap extends Test                                                     
         array("stealFromLeft_r");                                               // Existing right node
         array("stealFromLeft_td");                                              // Left half of mid key
         array("stealFromLeft");                                                 // Whether the steal from the left was successful
-        array("stealFromRight_bd");                                             //
         array("stealFromRight_fk");                                             // Right child key
         array("stealFromRight_index");                                          // The index of the child that wants to steal from the right sibling in its parent
         array("stealFromRight_lk");                                             // Left child key
@@ -166,7 +164,6 @@ class BtreeBap extends Test                                                     
         array("stealFromRight_parent");                                         // The parent of the branch which wants to steal from the right child
         array("stealFromRight_right");                                          // Index of sibling on right
         array("stealFromRight_r");                                              // Right child index
-        array("stealFromRight_td");                                             //
         array("stealFromRight");                                                // Whether the steal from the right was successful
         array("stuck");                                                         // The index of the stuck to be operated on
         array("find_loop");                                                     // Iterator for the find loop
@@ -219,15 +216,13 @@ class BtreeBap extends Test                                                     
 
 //D2 Basics                                                                     // Basic operations on nodes
 
-  void getKey  (String n) {L.move(n, "s_key"  );}                               // Move current key   to target
-  void getData (String n) {L.move(n, "s_data" );}                               // Move current data  to target
-  void getStuck(String n) {L.move(n, "stuck"  );}                               // Move current stuck to target
-  void getIndex(String n) {L.move(n, "s_index");}                               // Move current index to target
+  void getKey  (String n)  {L.move(n, "s_key"  );}                              // Move current key   to target
+  void getData (String n)  {L.move(n, "s_data" );}                              // Move current data  to target
+  void getStuck(String n)  {L.move(n, "stuck"  );}                              // Move current stuck to target
+  void getIndex(String n)  {L.move(n, "s_index");}                              // Move current index to target
 
-  void setKey  (int n) {L.set(n, "s_key");}
-  void setData (int n) {L.set(n, "s_data");}
-  void setStuck(int n) {L.set(n, "stuck");}
-  void setIndex(int n) {L.set(n, "s_index");}
+  void setStuck(int n)     {L.set(n, "stuck");}                                 // Only used for printing
+  void setIndex(int n)     {L.set(n, "s_index");}                               // Only used for printing
 
   void setKey   (String n) {L.move("s_key" ,  n);}                              // Set current key
   void setData  (String n) {L.move("s_data",  n);}                              // Set current data
@@ -495,8 +490,6 @@ class BtreeBap extends Test                                                     
     final String $r      = "stealFromRight_r";                                  // Right child index
     final String $nl     = "stealFromRight_nl";                                 // Number in left child
     final String $nr     = "stealFromRight_nr";                                 // Number in right child
-    final String $td     = "stealFromRight_td";                                 //
-    final String $bd     = "stealFromRight_bd";                                 //
 
     L.clear(0, $sfr);                                                           // Assume at the start that we cannot steal from the right
 
@@ -1168,17 +1161,24 @@ class BtreeBap extends Test                                                     
    {final String $Key = "findAndDelete_Key";                                    // The key to find and delete
     L.set($Key, "find_Key");
     find();                                                                     // Find the key
-    finished:
-     {notFound:
-       {if (getFound() > 0) break notFound;                                     // No such key
-        findAndInsert_result(0, 0);
-        break finished;
+    L.new Block()
+     {void code()
+       {final Ban.Block finished = this;
+        rootIsLeaf();                                                           // Find and delete directly in root as a leaf
+        L.new Block()
+         {void code()
+           {final Ban.Block notFound = this;
+            getFound(); notFound.endIfGt();                                     // No such key
+            findAndInsert_result(0, 0);
+            finished.end();
+           }
+         };
+        setStuck("f_leaf"); setIndex("f_index");                                // Key, data pairs in the leaf
+        stuck_removeElementAt();                                                // Remove the key, data pair from the leaf
+        L.set(1, "f_found");
+        L.move("f_data", "s_data");
        }
-      setStuck("f_leaf"); setIndex("f_index");                                  // Key, data pairs in the leaf
-      stuck_removeElementAt();                                                  // Remove the key, data pair from the leaf
-      L.set(1, "f_found");
-      L.move("f_data", "s_data");
-     }
+     };
    }
 
 
@@ -2077,11 +2077,3 @@ Stuck(size:3)
      }
    }
  }
-
-/*
-Phased transformation of normal Java into machine code
-1. Remove return values and parameters by replacing them with layout variables.
-2. Remove internal variables so we are left with set(get) and move as the data manipulation operations
-3. Replace if statements with label: {}
-4. Replace for loop conditions with interior break
-*/
