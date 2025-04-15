@@ -7,7 +7,7 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 class BtreeBap extends Test                                                     // Manipulate a btree using machine code driving a basic array machine with one register.
- {final Ban L;                                                                  // The btree laid out in arrays and operated on by a machione code program
+ {Ban L;                                                                        // The btree laid out in arrays and operated on by a machione code program
 
   final int
     maxKeysPerLeaf,                                                             // Maximum number of leaves in a key
@@ -42,6 +42,13 @@ class BtreeBap extends Test                                                     
     L.clear(1, "isLeaf", "root");                                               // The root starts as a leaf
    }
 
+  BtreeBap thread()                                                             // Duplicate a BTree keeping its memory but create a new program
+   {zz();
+    final BtreeBap t = new BtreeBap(maxKeysPerLeaf, maxKeysPerBranch, numberOfNodes);
+    t.L = L.thread();
+    return t;
+   }
+
   Ban layoutBtree()                                                             // Layout the btree
    {final int k = max(maxKeysPerBranch+1, maxKeysPerLeaf);
     final int d = max(maxKeysPerBranch+1, maxKeysPerLeaf);
@@ -56,6 +63,7 @@ class BtreeBap extends Test                                                     
         array("current_size", numberOfNodes);                                   // Current size of stuck
         array("data",         numberOfNodes, d);                                // Data associated with each key in the stuck
         array("delete_Key");                                                    // The key to delete
+        array("delete_loop");                                                   // Iterator for the delete loop
         array("f_data");                                                        // Data found for the specified key
         array("f_found");                                                       // Whether the key was found
         array("findAndDelete_Key");                                             // The key to find and delete
@@ -63,42 +71,47 @@ class BtreeBap extends Test                                                     
         array("findAndInsert_Key");                                             // The key to insert
         array("f_index");                                                       // The index in the leaf or branch of the greater than or equal key
         array("find_Key");                                                      // Key to find in a tree
+        array("find_loop");                                                     // Iterator for the find loop
         array("find_result_leaf");                                              // The node index of the leaf containing the key found by find
         array("f_inserted");                                                    // Find and insert perfomed an insert
         array("f_key");                                                         // Matching found key after a search
         array("f_leaf");                                                        // Node number of leaf found
         array("freeChainHead");                                                 // The head of the free chain
+        final Array free =
         array("free",         numberOfNodes);                                   // Place the node  on the free chain else zero if in use
         array("f_success");                                                     // Inserted or updated the tree with a key, data pair
         array("hasLeavesForChildren");                                          // Whether the node has leaves for children
+        array("isALeaf");                                                       // Test whether a node is a leaf
         array("isFullRoot");                                                    // Whether the root is full
         array("isFull");                                                        // Whether the node is full or not
-        array("isALeaf");                                                       // Test whether a node is a leaf
         array("isLeaf",       numberOfNodes);                                   // Whether each node is a leaf or a branch
         array("isLow");                                                         // Test whether the node is low on children
         array("keys",         numberOfNodes, k);                                // Keys held in the tree
         array("leafSize");                                                      // The result of a leaf size request
+        array("merge_indexLimit");                                              // The number of indoces to be checked
+        array("merge_indices");                                                 // Iterator for each index in a node being examined for merges
         array("merge_Key");                                                     // The key along whose path we should merge
         array("mergeLeftSibling_bs");                                           // Branch size
         array("mergeLeftSibling_index");                                        // The index of the child that wants to steal from the child in its parent
         array("mergeLeftSibling_l");                                            // Left sibling
         array("mergeLeftSibling_nl");                                           // Number of children on left
-        array("mergeLeftSibling_nr");                                           // Number of children on right
         array("mergeLeftSibling_nlr");                                          // Number of children on left and right
+        array("mergeLeftSibling_nr");                                           // Number of children on right
         array("mergeLeftSibling_parent");                                       // The parent of the branch which wants to merge with its left sibling
         array("mergeLeftSibling_r");                                            // Right sibling
         array("mergeLeftSibling_size");                                         // Left sibling size
         array("mergeLeftSibling_t");                                            // Top key
         array("mergeLeftSibling");                                              // Whether the merge with the left sibling was successful
+        array("merge_loop");                                                    // Iterator for the merge loop
         array("mergeRightSibling_bs");                                          // Branch size
-        array("mergeRightSibling_index");                                       // The index of the child that wants to steal from the child in its parent
         array("mergeRightSibling_index1");                                      // The index of the child to be stolen from
+        array("mergeRightSibling_index");                                       // The index of the child that wants to steal from the child in its parent
+        array("mergeRightSibling_ld");                                          // Last child of left node
         array("mergeRightSibling_l");                                           // Left sibling
         array("mergeRightSibling_nl");                                          // Number of children on left
-        array("mergeRightSibling_nr");                                          // Number of children on right
         array("mergeRightSibling_nlr");                                         // Number of children on left and right
+        array("mergeRightSibling_nr");                                          // Number of children on right
         array("mergeRightSibling_parent");                                      // The parent of the branch which wants to merge with its left sibling
-        array("mergeRightSibling_ld");                                          // Last child of left node
         array("mergeRightSibling_pk");                                          // One up from split point in parent
         array("mergeRightSibling_r");                                           // Right sibling
         array("mergeRightSibling_size");                                        // Size of right sibling
@@ -106,14 +119,15 @@ class BtreeBap extends Test                                                     
         array("mergeRightSibling");                                             // Whether the merge with the left sibling was successful
         array("mergeRoot_l");                                                   // Left child of root
         array("mergeRoot_nl");                                                  // Number in left child
+        array("mergeRoot_nlr");                                                 // Number in left plus right child
         array("mergeRoot_nP");                                                  // Number in root
         array("mergeRoot_nr");                                                  // Number in right child
-        array("mergeRoot_nlr");                                                 // Number in left plus right child
         array("mergeRoot_pkn");                                                 // First key in root
         array("mergeRoot_r");                                                   // Right child of node
         array("parent");                                                        // The parent node during a descent through the tree
         array("put_Data");                                                      // The data to put into the tree
         array("put_Key");                                                       // The key to put into the tree
+        array("put_loop");                                                      // Iterator for the put loop
         array("root");                                                          // Always zero indicating the location of the root which never changes
         array("rootIsLeaf");                                                    // Whether the root is a
         array("s_data");                                                        // The input data for a stuck or the resulting data found in a stuck
@@ -165,25 +179,20 @@ class BtreeBap extends Test                                                     
         array("stealFromRight_right");                                          // Index of sibling on right
         array("stealFromRight_r");                                              // Right child index
         array("stealFromRight");                                                // Whether the steal from the right was successful
-        array("stuck");                                                         // The index of the stuck to be operated on
-        array("find_loop");                                                     // Iterator for the find loop
-        array("put_loop");                                                      // Iterator for the put loop
-        array("delete_loop");                                                   // Iterator for the delete loop
-        array("merge_loop");                                                    // Iterator for the merge loop
-        array("merge_indices");                                                 // Iterator for each index in a node being examined for merges
-        array("merge_IndexLimit");                                              // The number of indoces to be checked
-        array("stuckUnshift_i");                                                // Loop iterator to move elements up
-        array("stuckUnshift_I");                                                // Loop iterator to move elements up minus one
+        array("stuckInsertElementAt_I");                                        // Index of lower element to be moved
+        array("stuckInsertElementAt_i");                                        // Index of upper element to move up to
+        array("stuckInsertElementAt_L");                                        // Loop limit
+        array("stuckRemoveElementAt_I");                                        // Index of lower element to be moved
+        array("stuckRemoveElementAt_i");                                        // Index of upper element to move up to
+        array("stuckRemoveElementAt_N");                                        // Loop limit
+        array("stuckSearch_N");                                                 // Stuck size
         array("stuckShift_i");                                                  // Loop iterator to move elements down
         array("stuckShift_I");                                                  // Loop iterator to move elements down minus one
         array("stuckShift_N");                                                  // Loop limit to move elements down
-        array("stuckInsertElementAt_i");                                        // Index of upper element to move up to
-        array("stuckInsertElementAt_I");                                        // Index of lower element to be moved
-        array("stuckInsertElementAt_L");                                        // Loop limit
-        array("stuckRemoveElementAt_i");                                        // Index of upper element to move up to
-        array("stuckRemoveElementAt_I");                                        // Index of lower element to be moved
-        array("stuckRemoveElementAt_N");                                        // Loop limit
-        array("stuckSearch_N");                                                 // Stuck size
+        array("stuck");                                                         // The index of the stuck to be operated on
+        array("stuckUnshift_i");                                                // Loop iterator to move elements up
+        array("stuckUnshift_I");                                                // Loop iterator to move elements up minus one
+        free.quiet = true;                                                      // Suppress printing of this field
        }
      };
    }
@@ -196,7 +205,12 @@ class BtreeBap extends Test                                                     
    {final String fc = "freeChainHead";
     L.move(a, fc);
     L.get(a);                                                                   // Last freed node
-    if (L.i() == 0) stop("No more memory available");                           // No more free nodes available
+    L.new Block()                                                               // No more memory available
+     {void code()
+       {endIfGt();
+        L.stop("No more memory available");
+       }
+     };
     L.move(fc, "free", a);                                                      // Second to last freed node becomes head of the free chain
     L.zero("free", a); L.zero("isLeaf", a); L.zero("current_size", a);          // Clear all control information
     L.zero("keys", a); L.zero("data",   a);
@@ -204,7 +218,6 @@ class BtreeBap extends Test                                                     
 
   void  free(String f)                                                          // Free a new node to make it available for reuse
    {L.get(f);
-    if (L.i() == 0) stop("Cannot free root");                                       // The root is never freed
     L.ones("free", f); L.ones("isLeaf", f); L.ones("current_size", f);          // Invalidate all control information
     L.ones("keys", f); L.ones("data",   f);
     L.move("free", "freeChainHead", f);                                         // Chain this node in front of the last freed node
@@ -255,41 +268,52 @@ class BtreeBap extends Test                                                     
    {L.move("isALeaf", "isFull");
     isLeaf();
     L.get("isALeaf");
-    if (L.i() > 0) isFullLeaf(); else isFullBranch();
+    L.new Block()                                                               // Process a leaf
+     {void code()
+       {endIfEq();
+        isFullLeaf();
+       }
+     };
+    L.new Block()                                                               // Process a branch
+     {void code()
+       {endIfGt();
+        isFullBranch();
+       }
+     };
    }
 
   void isFullLeaf()                                                             // The leaf is full
    {L.move("leafSize", "isFull");
     leafSize();
-    L.get("leafSize");
-    L.set(L.i() >= maxKeysPerLeaf ? 1 : 0, "isFull");
+    L.compare(maxKeysPerLeaf, "leafSize"); L.ge();
+    L.set("isFull");
    }
+
   void isFullBranch()                                                           // The branch is full
    {L.move("branchSize", "isFull");
     branchSize();
-    L.get("branchSize");
-    L.set(L.i() >= maxKeysPerBranch ? 1 : 0, "isFull");
+    L.compare(maxKeysPerBranch, "branchSize"); L.ge();
+    L.set("isFull");
    }
 
   void isFullRoot()                                                             // The root is full
    {L.zero("isFull");
     isFull();
-    L.get("isFull");
-    L.set(L.i(), "isFullRoot");
+    L.move("isFullRoot", "isFull");
    }
 
   void isLow()                                                                  // The branch is low on children making it impossible to merge two sibling children
    {L.move("branchSize", "isLow");
     branchSize();
-    L.get("branchSize");
-    L.set(L.i() < 2 ? 1 : 0, "isLow");
+    L.compare(2, "branchSize");
+    L.lt();
+    L.set("isLow");
    }
 
   void hasLeavesForChildren()                                                   // Whether the branch has leaves for children
-   {L.move("isALeaf", "data", "hasLeavesForChildren", "0");
+   {L.move("isALeaf", "data", "hasLeavesForChildren", "0");                     // First data field
     isLeaf();
-    L.get("isALeaf");
-    L.set(L.i() > 0 ? 1 : 0, "hasLeavesForChildren");
+    L.move("hasLeavesForChildren", "isALeaf");
    }
 
 //D2 Nodes                                                                      // Operations on nodes
@@ -322,7 +346,6 @@ class BtreeBap extends Test                                                     
     L.move($kv, $last);                                                         // Mid key
     L.add ($kv, $first);
     L.shiftRight($kv);
-
     setBranchRoot();
     setStuck($p);  stuck_clear();                                               // Clear the root
     setKey($kv); setData($l); stuck_push();                                     // Insert left leaf into root
@@ -365,6 +388,7 @@ class BtreeBap extends Test                                                     
     final String $fl = "splitLeaf_fl";
     final String $F  = "splitLeaf_F";
     final String $L  = "splitLeaf_L";
+    final BtreeBap btree = this;
 
     for (int i = 0; i < splitLeafSize; i++)                                     // Build left leaf
      {setStuck($r); stuck_shift();
@@ -412,6 +436,7 @@ class BtreeBap extends Test                                                     
     final String $nr     = "stealFromLeft_nr";
     final String $td     = "stealFromLeft_td";
     final String $bd     = "stealFromLeft_bd";
+    final BtreeBap btree = this;
     L.clear(0, $sfl);                                                           // Assume at the start that we cannot steal from the lrft
 
     L.new Block()                                                               // Exiting this block has the same effect as return would have
@@ -429,50 +454,48 @@ class BtreeBap extends Test                                                     
         L.new Block()                                                           // Exiting this block has the same effect as return would have
          {void code()
            {final Ban.Block leaves = this;
-             {L.get("hasLeavesForChildren"); leaves.endIfEq();                  // Children are leaves
-              L.move("leafSize", $l); leafSize(); L.move($nl, "leafSize");
-              L.move("leafSize", $r); leafSize(); L.move($nr, "leafSize");
+            L.get("hasLeavesForChildren"); leaves.endIfEq();                    // Children are leaves
+            L.move("leafSize", $l); leafSize(); L.move($nl, "leafSize");
+            L.move("leafSize", $r); leafSize(); L.move($nr, "leafSize");
 
-              L.compare(maxKeysPerLeaf, $nr); finished.endIfGe();               // Steal not possible because there is no where to put the steal
-              L.compare(1, $nl); finished.endIfLe();                            // Steal not allowed because it would leave the leaf sibling empty
+            L.compare(maxKeysPerLeaf, $nr); finished.endIfGe();                 // Steal not possible because there is no where to put the steal
+            L.compare(1, $nl); finished.endIfLe();                              // Steal not allowed because it would leave the leaf sibling empty
 
-              setStuck($l); stuck_lastElement();
-              setStuck($r); stuck_unshift();                                    // Increase right
-              setStuck($l); stuck_pop();                                        // Reduce left
+            setStuck($l); stuck_lastElement();
+            setStuck($r); stuck_unshift();                                      // Increase right
+            setStuck($l); stuck_pop();                                          // Reduce left
 
-              L.move($nl2, $nl); L.add(-2, $nl2);                               // Index of last key on left
-              setIndex($nl2); stuck_elementAt();                                // Last key on left
-             }
+            L.move($nl2, $nl); L.add(-2, $nl2);                                 // Index of last key on left
+            setIndex($nl2); stuck_elementAt();                                  // Last key on left
            }
          };
         L.new Block()                                                           // Exiting this block has the same effect as return would have
          {void code()
            {final Ban.Block branches = this;                                    // Children are branches
-             {L.get("hasLeavesForChildren"); branches.endIfGt();
-              L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
-              L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
+            L.get("hasLeavesForChildren"); branches.endIfGt();
+            L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
+            L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
 
-              L.compare(maxKeysPerBranch, $nr); finished.endIfGe();             // Steal not possible because there is no where to put the steal
-              L.compare(1, $nl); finished.endIfLe();                            // Steal not allowed because it would leave the left sibling empty
+            L.compare(maxKeysPerBranch, $nr); finished.endIfGe();               // Steal not possible because there is no where to put the steal
+            L.compare(1, $nl); finished.endIfLe();                              // Steal not allowed because it would leave the left sibling empty
 
-              setStuck($l); stuck_lastElement(); getData($td);                  // Increase right with left top
-              setStuck($P); setIndex($index);    stuck_elementAt();
+            setStuck($l); stuck_lastElement(); getData($td);                    // Increase right with left top
+            setStuck($P); setIndex($index);    stuck_elementAt();
 
-              setStuck($r); setData($td); setIndex("root");
-              stuck_insertElementAt();                                          // Increase right with left top
-              setStuck($l); stuck_pop();                                        // Remove left top
+            setStuck($r); setData($td); setIndex("root");
+            stuck_insertElementAt();                                            // Increase right with left top
+            setStuck($l); stuck_pop();                                          // Remove left top
 
-              setStuck($r); stuck_firstElement(); getData($bd);                 // Increase right with left top
-              setStuck($P); setIndex($left); stuck_elementAt();
+            setStuck($r); stuck_firstElement(); getData($bd);                   // Increase right with left top
+            setStuck($P); setIndex($left); stuck_elementAt();
 
-              setStuck($r); setData($bd); setIndex("root");
-              stuck_setElementAt();                                             // Reduce key of parent of right
-              setStuck($l); stuck_lastElement();                                // Last left key
-             }
-            setStuck($P); setData($l); setIndex($left); stuck_setElementAt();   // Reduce key of parent of left
-            L.clear(1, $sfl);
+            setStuck($r); setData($bd); setIndex("root");
+            stuck_setElementAt();                                               // Reduce key of parent of right
+            setStuck($l); stuck_lastElement();                                  // Last left key
            }
          };
+        setStuck($P); setData($l); setIndex($left); stuck_setElementAt();   // Reduce key of parent of left
+        L.clear(1, $sfl);
        }
      };
    }
@@ -610,7 +633,7 @@ class BtreeBap extends Test                                                     
         L.new Block()                                                           // Children are branches
          {void code()
            {final Ban.Block branches = this;
-            L.get("hasLeavesForChildren"); branches.endIfGe();
+            L.get("hasLeavesForChildren"); branches.endIfGt();
             L.move("branchSize", $l); branchSize(); L.move($nl, "branchSize");
             L.move("branchSize", $r); branchSize(); L.move($nr, "branchSize");
 
@@ -755,7 +778,10 @@ class BtreeBap extends Test                                                     
     final String $t      = "mergeRightSibling_t";
     final String $pk     = "mergeRightSibling_pk";
     final String $ld     = "mergeRightSibling_ld";
+    final BtreeBap btree = this;
+
     L.clear(0, $mrs);                                                           // Assume at the start that it will  mnot be possible to merge with the right sibling
+
 
     L.new Block()
      {void code()
@@ -822,12 +848,11 @@ class BtreeBap extends Test                                                     
          };
 
         free($r);                                                               // Free the empty right node
-
         setStuck($P);
         setIndexR($index); stuck_elementAt(); getKey($pk);                      // One up from dividing point in parent
         setIndex ($index); stuck_elementAt();                                   // Dividing point in parent
         setKey($pk); setIndex($index); stuck_setElementAt();                    // Install key of right sibling in this child
-        setIndexR($index);             stuck_removeElementAt();                 // Reduce parent on right
+        setIndexR($index); stuck_removeElementAt();                             // Reduce parent on right
 
         L.clear(1, "mergeRightSibling");
        }
@@ -839,6 +864,7 @@ class BtreeBap extends Test                                                     
   void balance()                                                                // Augment the indexed child so it has at least two children in its body
    {final String $parent = "balance_parent";
     final String $index  = "balance_index";
+    final BtreeBap btree = this;
 
     L.new Block()
      {void code()
@@ -879,10 +905,9 @@ class BtreeBap extends Test                                                     
 
   void  printLeaf(int node, StringBuilder[]S, int level)                        // Print a leaf
    {final StringBuilder s = S[level];
-    setStuck(node); final int N = L.getMemory("current_size", "stuck");
+    final int N = L.getMemory("current_size", ""+node);                         // Number of key, data pairs in leaf
     for (int i = 0; i < N; i++)                                                 // Each element in the leaf
-     {setStuck(node); setIndex(i); stuck_elementAt();
-      s.append(String.format("%d ", L.getMemory("s_key")));
+     {s.append(String.format("%d ", L.getMemory("keys", ""+node, ""+i)));
      }
     if (s.length() > 0) s.setLength(s.length()-1);
     s.append(String.format("=%d ", node));
@@ -890,28 +915,22 @@ class BtreeBap extends Test                                                     
    }
 
   void  printBranch(int node, StringBuilder[]S, int level)                      // Print a branch
-   {setStuck(node);
-    final int N = L.getMemory("current_size", "stuck")-1;
+   {final int N = L.getMemory("current_size", ""+node)-1;
     for (int i = 0; i < N; i++)                                                 // Each element in the branch
-     {setStuck(node); setIndex(i); stuck_elementAt();
-      final int k = L.getMemory("s_key"), d = L.getMemory("s_data");
-      L.set(d, "isALeaf");
-      isLeaf();
-      if (L.getMemory("isALeaf") > 0) printLeaf(d, S, level+linesPerNode);
-      else         printBranch(d, S, level+linesPerNode);
+     {final int k = L.getMemory("keys", ""+node, ""+i),
+                d = L.getMemory("data", ""+node, ""+i);
+      if (L.getMemory("isLeaf", ""+d) > 0) printLeaf(d, S, level+linesPerNode);
+      else                                 printBranch(d, S, level+linesPerNode);
       S[level+0].append(String.format("%d", k));
       S[level+1].append(String.format("%d", d));
       S[level+2].append(String.format("%d", node));
       S[level+3].append(String.format("%d", i));
       padStrings(S);
      }
-    setStuck(node); setIndex(N); stuck_elementAt();
-
-    final int k = L.getMemory("s_key"), d = L.getMemory("s_data");
-    L.set(d, "isALeaf");
-    isLeaf();
-    if (L.getMemory("isALeaf") > 0) printLeaf  (d, S, level+linesPerNode);
-    else                            printBranch(d, S, level+linesPerNode);
+    final int k = L.getMemory("keys", ""+node, ""+N),
+              d = L.getMemory("data", ""+node, ""+N);
+    if (L.getMemory("isLeaf", ""+d) > 0) printLeaf(d, S, level+linesPerNode);
+    else                               printBranch(d, S, level+linesPerNode);
     S[level+0].append("+");
     S[level+1].append(String.format("%d", d));
     S[level+2].append(String.format("%d", node));
@@ -938,9 +957,8 @@ class BtreeBap extends Test                                                     
    {final int N = linesPerTree*linesPerNode;                                    // A big buffer with room for several lines per node
     final StringBuilder [] S = new StringBuilder[N];                            // A big buffer with room for several lines per node
     for (int i = 0; i < N; i++) S[i] = new StringBuilder();
-    rootIsLeaf();
-    if (L.getMemory("rootIsLeaf") > 0) printLeaf  (0, S, 0);                    // Print tree
-    else                               printBranch(0, S, 0);
+    if (L.getMemory("isLeaf", "0") > 0) printLeaf  (0, S, 0);                   // Print tree
+    else                                printBranch(0, S, 0);
     return printCollapsed(S);                                                   // Collapse lines into text
    }
 
@@ -1009,9 +1027,9 @@ class BtreeBap extends Test                                                     
             L.inc($i); L.compare(maxDepth, $i); loop.endIfGe(); loop.start();
            }
          };
+        L.stop("Search did not terminate in a leaf");
        }
      };
-    stop("Search did not terminate in a leaf");
    }
 
   void findAndInsert()                                                          // Find the leaf that should contain this key and insert or update it is possible
@@ -1056,9 +1074,10 @@ class BtreeBap extends Test                                                     
   //D1 Insertion                                                                // Insert a key, data pair into the tree or update and existing key with a new datum
 
   void put()                                                                    // Insert a key, data pair into the tree or update and existing key with a new datum
-   {final String $i    = "put_loop";                                            // Step down iterator
-    final String $Key  = "put_Key";
-    final String $Data = "put_Data";
+   {final String   $i    = "put_loop";                                          // Step down iterator
+    final String   $Key  = "put_Key";
+    final String   $Data = "put_Data";
+    final BtreeBap btree = this;
     L.move("findAndInsert_Key",  $Key);
     L.move("findAndInsert_Data", $Data);
 
@@ -1066,7 +1085,7 @@ class BtreeBap extends Test                                                     
     L.new Block()
      {void code()
        {final Ban.Block finished = this;
-        getFSuccess(); finished.endIfGt();                                      // Inserted or updated successfully
+        L.get("f_success"); finished.endIfGt();                                 // Inserted or updated successfully
 
         isFullRoot();
         L.new Block()
@@ -1115,10 +1134,11 @@ class BtreeBap extends Test                                                     
                 L.move("splitLeaf_node",   "child");
                 L.move("splitLeaf_parent", "parent");
                 L.move("splitLeaf_index",  "s_index");
+
                 splitLeaf();
 
                 findAndInsert();
-                L.set($Key, "merge_Key");
+                L.move("merge_Key", $Key);
                 merge();
                 finished.end();
                }
@@ -1150,7 +1170,7 @@ class BtreeBap extends Test                                                     
             L.inc($i); L.compare(maxDepth, $i); loop.endIfGt(); loop.start();
            }
          };
-        stop("Fallen off the end of the tree");                                 // The tree must be missing a leaf
+        L.stop("Fallen off the end of the tree");                                 // The tree must be missing a leaf
        }
      };
    }
@@ -1159,7 +1179,7 @@ class BtreeBap extends Test                                                     
 
   void findAndDelete()                                                          // Delete a key from the tree and returns its data if present without modifying the shape of tree
    {final String $Key = "findAndDelete_Key";                                    // The key to find and delete
-    L.set($Key, "find_Key");
+    L.move("find_Key", $Key);
     find();                                                                     // Find the key
     L.new Block()
      {void code()
@@ -1185,7 +1205,10 @@ class BtreeBap extends Test                                                     
   void delete()                                                                 // Insert a key, data pair into the tree or update and existing key with a new datum
    {final String $i   = "delete_loop";                                          // Step down iterator
     final String $Key = "delete_Key";
+    final BtreeBap btree = this;
+
     mergeRoot();
+
     L.new Block()
      {void code()
        {final Ban.Block finished = this;
@@ -1210,7 +1233,8 @@ class BtreeBap extends Test                                                     
             stuck_searchFirstGreaterThanOrEqualExceptLast();
             L.move("balance_parent", "parent");
             getIndex("balance_index");
-            balance();                                                            // Make sure there are enough entries in the parent to permit a deletion
+
+            balance();                                                          // Make sure there are enough entries in the parent to permit a deletion
 
             setStuck("parent"); setKey($Key);
             stuck_searchFirstGreaterThanOrEqualExceptLast();
@@ -1230,10 +1254,9 @@ class BtreeBap extends Test                                                     
                }
              };
             L.move("parent", "child");
-            L.inc($i); L.compare(maxDepth, $i); loop.endIfGt();
+            L.inc($i); L.compare(maxDepth, $i); loop.endIfGt(); loop.start();
            }
          };
-        stop("Fallen off the end of the tree");                                 // The tree must be missing a leaf
        }
      };
    }
@@ -1246,6 +1269,7 @@ class BtreeBap extends Test                                                     
     final String $N   = "merge_indexLimit";                                     // Index iterator
     final String $Key = "merge_Key";
     mergeRoot();
+    final BtreeBap btree = this;
 
     L.move("parent", "root");                                                   // Parent starts at root
     L.clear(0, $i);                                                             // Step down iterator
@@ -1270,8 +1294,7 @@ class BtreeBap extends Test                                                     
                {final Ban.Block indices = this;
                 L.compare($j, $N); indices.endIfGe();
                 L.move("mergeLeftSibling_parent", "parent");
-                L.set(0, $j);
-
+                L.move("mergeLeftSibling_index", $j);
                 mergeLeftSibling();                                             // A successful merge of the left  sibling reduces the current index and the upper limit
 
                 L.new Block()
@@ -1282,8 +1305,9 @@ class BtreeBap extends Test                                                     
                    }
                  };
                 L.move("mergeRightSibling_parent", "parent");
-                L.set($j, "mergeRightSibling_index");
+                L.move("mergeRightSibling_index", $j);
                 mergeRightSibling();                                            // A successful merge of the right sibling maintains the current position but reduces the upper limit
+                L.inc($j); indices.start();
                }
              };
             setStuck("parent"); setKey($Key);
@@ -1292,7 +1316,7 @@ class BtreeBap extends Test                                                     
             L.inc($i); L.compare(maxDepth, $i); loop.endIfGe(); loop.start();
            }
          };
-        stop("Fallen off the end of the tree");                                 // The tree must be missing a leaf
+        L.stop("Fallen off the end of the tree");                               // The tree must be missing a leaf
        }
      };
    }
@@ -1307,7 +1331,9 @@ class BtreeBap extends Test                                                     
    {stuck_size(target, stuck); L.dec(target);
    }
 
-  void stuck_key () {L.get("keys", "stuck", "s_index"); L.set("s_key");}        // Key from a stuck at indicated index
+  void stuck_key ()
+  {L.get("keys", "stuck", "s_index");
+  L.set("s_key");}        // Key from a stuck at indicated index
   void stuck_data() {L.get("data", "stuck", "s_index"); L.set("s_data");}       // Data from a stuck at indicated index
 
   void stuck_setKey () {L.get("s_key" ); L.set("keys", "stuck", "s_index");}    // Save a key  in a stuck at the specified index
@@ -1406,12 +1432,14 @@ class BtreeBap extends Test                                                     
     L.move($L, "s_index");                                                      // Set limit
     L.move($i, "current_size", "stuck");                                                             // Set index
     L.move($I, $i); L.dec($I);                                                  // Element below index
+    final BtreeBap btree = this;
     L.new Block()
      {void code()
        {final Ban.Block loop = this;                                            // Loop to move each element down in the stuck
         L.compare($i, $L); loop.endIfEq();
         stuck_copyKeyData($i, $I);
         L.dec($i); L.dec($I);
+        loop.start();
        }
      };
     stuck_setKeyData();                                                         // Insert new key, data pair in liberated slot
@@ -1432,6 +1460,7 @@ class BtreeBap extends Test                                                     
         L.compare($I, $N); loop.endIfEq();
         stuck_copyKeyData($i, $I);                                              // Shift the stuck down one place
         L.inc($i); L.inc($I);                                                   // Shift the stuck down one place
+        loop.start();
        }
      };
     stuck_dec();
@@ -1549,14 +1578,14 @@ class BtreeBap extends Test                                                     
 
 //D1 Print                                                                      // Print a stuck
 
-  String stuck_print()                                                          // Print a stuck
+  String stuck_print(int S)                                                     // Print a stuck
    {final StringBuilder s = new StringBuilder();
-    int N = L.getMemory("current_size", "stuck");
+    final int N = L.getMemory("current_size", "stuck");
     s.append(String.format("Stuck(size:%d)\n", N));
     for (int i = 0; i < N; i++)                                                 // Search
-     {L.set(i, "s_index");
-      stuck_elementAt();
-      s.append(String.format("  %2d key: %2d data: %2d\n", i, L.getMemory("s_key"),   L.getMemory("s_data")));
+     {s.append(String.format("  %2d key: %2d data: %2d\n", i,
+       L.getMemory("keys", ""+S, ""+i),
+       L.getMemory("data", ""+S, ""+i)));
      }
     return ""+s;
    }
@@ -1580,8 +1609,7 @@ class BtreeBap extends Test                                                     
     b.L.loadArray("current_size", 1);
     b.L.loadArray("keys", 1, 2, 3);
     b.L.loadArray("data", 11, 22, 33, 44);
-
-    ok(b.stuck_print(), """
+    ok(b.stuck_print(0), """
 Stuck(size:1)
    0 key:  1 data: 11
 """);
@@ -1591,10 +1619,12 @@ Stuck(size:1)
   static BtreeBap stuck_test_push()
    {final BtreeBap b = stuck_test_load();
 
-    b.L.set(2, "s_key"); b.L.set(22, "s_data");
-    b.stuck_push();
+    b.L.set(0, "stuck");
+    b.L.set(1, "s_key"); b.L.set(11, "s_data"); b.stuck_push();
+    b.L.set(2, "s_key"); b.L.set(22, "s_data"); b.stuck_push();
+    b.L.run();
 
-    ok(b.stuck_print(), """
+    ok(b.stuck_print(0), """
 Stuck(size:2)
    0 key:  1 data: 11
    1 key:  2 data: 22
@@ -1605,6 +1635,7 @@ Stuck(size:2)
   static void stuck_test_pop()
    {final BtreeBap b = stuck_test_push();
     b.stuck_pop();
+    b.L.run();
 
     ok(b.stuck_print_result(), """
  found: 0
@@ -1613,7 +1644,7 @@ Stuck(size:2)
   data: 22
 """);
 
-    ok(b.stuck_print(), """
+    ok(b.stuck_print(0), """
 Stuck(size:1)
    0 key:  1 data: 11
 """);
@@ -1622,6 +1653,7 @@ Stuck(size:1)
   static void stuck_test_shift()
    {final BtreeBap b = stuck_test_push();
     b.stuck_shift();
+    b.L.run();
 
     ok(b.stuck_print_result(), """
  found: 0
@@ -1630,7 +1662,7 @@ Stuck(size:1)
   data: 11
 """);
 
-    ok(b.stuck_print(), """
+    ok(b.stuck_print(0), """
 Stuck(size:1)
    0 key:  2 data: 22
 """);
@@ -1641,6 +1673,7 @@ Stuck(size:1)
 
     b.L.set(3, "s_key"); b.L.set(33, "s_data");
     b.stuck_unshift();
+    b.L.run();
 
     ok(b.stuck_print_result(), """
  found: 0
@@ -1649,7 +1682,7 @@ Stuck(size:1)
   data: 33
 """);
 
-    ok(b.stuck_print(), """
+    ok(b.stuck_print(0), """
 Stuck(size:3)
    0 key:  3 data: 33
    1 key:  1 data: 11
@@ -1663,6 +1696,7 @@ Stuck(size:3)
 
     b.L.clear(1, "s_index");
     b.stuck_elementAt();
+    b.L.run();
 
     ok(b.stuck_print_result(), """
  found: 0
@@ -1676,6 +1710,7 @@ Stuck(size:3)
    {final BtreeBap b = stuck_test_push();
     b.L.clear(1, "s_index"); b.L.set(3, "s_key"); b.L.set(33, "s_data");
     b.stuck_insertElementAt();
+    b.L.run();
 
     ok(b.stuck_print_result(), """
  found: 0
@@ -1685,7 +1720,7 @@ Stuck(size:3)
 """);
 
     //stop(b.stuck_print());
-    ok(b.stuck_print(), """
+    ok(b.stuck_print(0), """
 Stuck(size:3)
    0 key:  1 data: 11
    1 key:  3 data: 33
@@ -1698,6 +1733,7 @@ Stuck(size:3)
    {final BtreeBap b = stuck_test_insertElementAt();
     b.L.clear(1, "s_index");
     b.stuck_removeElementAt();
+    b.L.run();
 
     ok(b.stuck_print_result(), """
  found: 0
@@ -1707,7 +1743,7 @@ Stuck(size:3)
 """);
 
     //stop(b.stuck_print());
-    ok(b.stuck_print(), """
+    ok(b.stuck_print(0), """
 Stuck(size:2)
    0 key:  1 data: 11
    1 key:  2 data: 22
@@ -1719,6 +1755,7 @@ Stuck(size:2)
    {final BtreeBap b = stuck_test_insertElementAt();
 
     b.stuck_firstElement();
+    b.L.run(); b.L.code.clear();
     ok(b.stuck_print_result(), """
  found: 0
  index: 0
@@ -1727,6 +1764,7 @@ Stuck(size:2)
 """);
 
     b.stuck_lastElement();
+    b.L.run();
     ok(b.stuck_print_result(), """
  found: 0
  index: 2
@@ -1744,6 +1782,7 @@ Stuck(size:2)
 
     b.L.set(2, "s_key");
     b.stuck_search();
+    b.L.run(); b.L.code.clear();
     ok(b.stuck_print_result(), """
  found: 1
  index: 1
@@ -1753,9 +1792,10 @@ Stuck(size:2)
 
     b.L.set(4, "s_key");
     b.stuck_search();
+    b.L.run(); b.L.code.clear();
     ok(b.stuck_print_result(), """
  found: 0
- index: 2
+ index: 3
    key: 4
   data: 22
 """);
@@ -1764,12 +1804,13 @@ Stuck(size:2)
 
   static BtreeBap stuck_test_search_greater_than_or_equal()
    {final BtreeBap b = new BtreeBap(3, 3, 1);
+    b.L.clearCode();
     b.L.loadArray("s_index", 0);
     b.L.loadArray("current_size", 3);
     b.L.loadArray("keys", 2, 4, 6);
     b.L.loadArray("data", 1, 3, 5, 7);
 
-    ok(b.stuck_print(), """
+    ok(b.stuck_print(0), """
 Stuck(size:3)
    0 key:  2 data:  1
    1 key:  4 data:  3
@@ -1778,6 +1819,8 @@ Stuck(size:3)
 
     b.L.set(3, "s_key");
     b.stuck_searchFirstGreaterThanOrEqual();
+    b.L.run(); b.L.code.clear();
+
     ok(b.stuck_print_result(), """
  found: 1
  index: 1
@@ -1787,6 +1830,7 @@ Stuck(size:3)
 
     b.L.set(4, "s_key");
     b.stuck_searchFirstGreaterThanOrEqual();
+    b.L.run(); b.L.code.clear();
     ok(b.stuck_print_result(), """
  found: 1
  index: 1
@@ -1797,6 +1841,7 @@ Stuck(size:3)
     b.L.set(5, "s_key");
 debug = true;
     b.stuck_searchFirstGreaterThanOrEqual();
+    b.L.run(); b.L.code.clear();
     ok(b.stuck_print_result(), """
  found: 1
  index: 2
@@ -1805,8 +1850,8 @@ debug = true;
 """);
 
     b.L.set(6, "s_key");
-debug = true;
     b.stuck_searchFirstGreaterThanOrEqual();
+    b.L.run(); b.L.code.clear();
     ok(b.stuck_print_result(), """
  found: 1
  index: 2
@@ -1815,8 +1860,8 @@ debug = true;
 """);
 
     b.L.set(7, "s_key");
-debug = true;
     b.stuck_searchFirstGreaterThanOrEqual();
+    b.L.run(); b.L.code.clear();
     ok(b.stuck_print_result(), """
  found: 0
  index: 3
@@ -1829,7 +1874,7 @@ debug = true;
   static BtreeBap stuck_test_search_greater_than_or_equal_except_last()
    {final BtreeBap b = stuck_test_search_greater_than_or_equal();
 
-    ok(b.stuck_print(), """
+    ok(b.stuck_print(0), """
 Stuck(size:3)
    0 key:  2 data:  1
    1 key:  4 data:  3
@@ -1838,6 +1883,7 @@ Stuck(size:3)
 
     b.L.set(7, "s_key");
     b.stuck_searchFirstGreaterThanOrEqualExceptLast();
+    b.L.run(); b.L.code.clear();
     ok(b.stuck_print_result(), """
  found: 0
  index: 2
@@ -1848,13 +1894,17 @@ Stuck(size:3)
    }
 
   static void test_put_ascending()
-   {final BtreeBap b = new BtreeBap(2, 3, 29);
+   {final BtreeBap b = new BtreeBap(2, 3, 40);
+    b.L.run(); b.L.clearCode();                                                 // Initialize tree
+
     int N = 32;
+    b.put();
     for (int i = 1; i <= N; i++)
-     {b.L.set(i, "put_Key"); b.L.set(i, "put_Data");
-      b.put();
+     {b.L.setMemory(i, "put_Key"); b.L.setMemory(i, "put_Data");
+      b.L.run();
      }
-    //stop(b.print());
+    //stop(b.L);
+    //stop(b);
     ok(b, """
                                                                                                   16                                                                                                                     +
                                                                                                   17                                                                                                                     21
@@ -1873,13 +1923,16 @@ Stuck(size:3)
    }
 
   static void test_put_descending()
-   {final BtreeBap b = new BtreeBap(2, 3, 29);
+   {final BtreeBap b = new BtreeBap(2, 3, 60);
+    b.L.run(); b.L.clearCode();                                                 // Initialize tree
+    b.put();
+
     int N = 32;
     for (int i = N; i > 0; i--)
-     {b.L.set(i, "put_Key"); b.L.set(i, "put_Data");
-      b.put();
+     {b.L.setMemory(i, "put_Key"); b.L.setMemory(i, "put_Data");
+      b.L.run();
      }
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                                                                                                            16                                                                                                               +
                                                                                                            9                                                                                                                22
@@ -1902,12 +1955,14 @@ Stuck(size:3)
 
   static void test_put_random_small()
    {final BtreeBap b = new BtreeBap(2, 3, 100);
+    b.L.run(); b.L.clearCode();                                                 // Initialize tree
+    b.put();
     int N = random_small.length;
     for (int i = 0; i < N; ++i)
-     {b.L.set(random_small[i], "put_Key"); b.L.set(i, "put_Data");
-      b.put();
+     {b.L.setMemory(random_small[i], "put_Key"); b.L.setMemory(i, "put_Data");
+      b.L.run();
      }
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 493                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               +
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 60
@@ -1931,16 +1986,20 @@ Stuck(size:3)
 
   static void test_delete_random_not_100()                                      // Produces the same answer as BtreeSF with a slightly different layout. Why?
    {final BtreeBap b = new BtreeBap(2, 3, 999);
+    b.L.run(); b.L.clearCode();                                                 // Initialize tree
+    b.put();
     int N = random_large.length;
     for (int i = 0; i < N; ++i)
-     {b.L.set(random_large[i], "put_Key"); b.L.set(i, "put_Data");
-      b.put();
+     {b.L.setMemory(random_large[i], "put_Key"); b.L.setMemory(i, "put_Data");
+      b.L.run();
      }
+    b.L.clearCode();
+    b.delete();
     for (int i = 0; i < N; ++i)
      {final int r = random_large[i];
       if (r % 100 > 0)
-       {b.L.set(r, "delete_Key");
-        b.delete();
+       {b.L.setMemory(r, "delete_Key");
+        b.L.run();
        }
      }
     //stop(b);
@@ -1955,16 +2014,22 @@ Stuck(size:3)
 
   static void test_delete_odd_ascending()
    {final BtreeBap b = new BtreeBap(2, 3, 30);
+    b.L.run(); b.L.clearCode();                                                 // Initialize tree
+    b.put();
+
     int N = 32;
     for (int i = 1; i <= N; i++)
-     {b.L.set(i, "put_Key"); b.L.set(i, "put_Data");
-      b.put();
+     {b.L.setMemory(i, "put_Key"); b.L.setMemory(i, "put_Data");
+      b.L.run();
      }
+
+    b.L.clearCode();  b.delete();
+
     for (int i = 1; i <= N; i += 2)
-     {b.L.set(i, "delete_Key");
-      b.delete();
+     {b.L.setMemory(i, "delete_Key");
+      b.L.run();
      }
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                                               16                            24                            +
                                               5                             16                            23
@@ -1980,16 +2045,22 @@ Stuck(size:3)
 
   static void test_delete_even_descending()
    {final BtreeBap b = new BtreeBap(2, 3, 100);
+    b.L.run(); b.L.clearCode();                                                 // Initialize tree
+    b.put();
+
     int N = 32;
     for (int i = 1; i <= N; i++)
-     {b.L.set(i, "put_Key"); b.L.set(i, "put_Data");
-      b.put();
+     {b.L.setMemory(i, "put_Key"); b.L.setMemory(i, "put_Data");
+      b.L.run();
      }
+
+    b.L.clearCode();  b.delete();
+
     for (int i = N; i > 0; i -= 2)
-     {b.L.set(i, "delete_Key");
-      b.delete();
+     {b.L.setMemory(i, "delete_Key");
+      b.L.run();
      }
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                    8                         16                                                          +
                    5                         11                                                          16
@@ -2005,22 +2076,29 @@ Stuck(size:3)
 
   static void test_primes()
    {final BtreeBap b = new BtreeBap(2, 3, 100);
+    b.L.run(); b.L.clearCode();                                                 // Initialize tree
+    b.put();
+    final BtreeBap f = b.thread(); f.find();
+    final BtreeBap d = b.thread(); d.delete();
+
     int N = 64;
     for (int i = 1; i <= N; i++)
-     {b.L.set(i, "put_Key"); b.L.set(i, "put_Data");
-      b.put();
+     {b.L.setMemory(i, "put_Key"); b.L.setMemory(i, "put_Data");
+      b.L.run();
      }
+
     for (int i = 2; i <= N; i++)
-     {b.L.set(i, "find_Key");
-      b.find();
-      if (b.getFound() > 0)
+     {f.L.setMemory(i, "find_Key");
+      f.L.run();
+      if (f.getFound() > 0)
        {for (int j = 2*i; j <= N; j += i)
-         {b.L.set(j, "delete_Key");
-          b.delete();
+         {d.L.setMemory(j, "delete_Key");
+          debug = i == 3 && j == 24;
+          d.L.run();
          }
        }
      }
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                    6                                  17                                        40                                           +
                    5                                  11                                        23                                           33
