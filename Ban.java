@@ -7,17 +7,18 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 abstract class Ban extends Test                                                 // Layout the basic array machine and execute a program in it
- {private int size = 0;                                                         // The size of the memory used by the basic array machine
-  private Stack         <Array> order  = new Stack<>();                         // The order in which the arrays were defined
-  private TreeMap<String,Array> arrays = new TreeMap<>();                       // A number of different sized arrays concatenated to make one array
-  private Stack<I>       code = new Stack<>();                                  // Code of the program
-  private Stack<Label> labels = new Stack<>();                                  // Labels for some instructions
-  private int []       memory;                                                  // The concatenation of all the arrays
-  private final int   maxTime = 1000;                                           // Maximum numner of steps permitted while running the program
-  private int            step = 0;                                              // Execution step
-  private int            time = 0;                                              // Execution time
-  private boolean     running = false;                                          // Executing if true
-  private int intermediateValue;                                                // Written by get and used by set if no value has been supplied
+ {int size = 0;                                                                 // The size of the memory used by the basic array machine
+  Stack         <Array> order  = new Stack<>();                                 // The order in which the arrays were defined
+  TreeMap<String,Array> arrays = new TreeMap<>();                               // A number of different sized arrays concatenated to make one array
+  Stack<I>       code = new Stack<>();                                          // Code of the program
+  Stack<Label> labels = new Stack<>();                                          // Labels for some instructions
+  int []       memory;                                                          // The concatenation of all the arrays
+  int         maxTime = 1_000_000;                                                 // Maximum numner of steps permitted while running the program
+  int            step = 0;                                                      // Execution step
+  int            time = 0;                                                      // Execution time
+  boolean     running = false;                                                  // Executing if true
+  boolean       debug = false;                                                  // Debug if true
+  int intermediateValue;                                                        // Written by get and used by set if no value has been supplied
 
   Ban()                                                                         // Create a basic array machine
    {load();                                                                     // Load array definitions
@@ -46,11 +47,12 @@ abstract class Ban extends Test                                                 
   private void wantRunning  () {if (!running) stop("Too early: not running yet");} // This operation can only occur when we are running
   private void wantCompiling() {if ( running) stop("Too late: not compiling");} // This operation can only occur when we are compiling
 
-  private class Array                                                           // Define an array in the basic array machine
+  class Array                                                                   // Define an array in the basic array machine
    {final String name;                                                          // Name of the array
     final int[]dimensions;                                                      // Dimensions of the array
     int base;                                                                   // Base position of this array
     final int length;                                                           // Total number of elements in this array
+    boolean quiet = false;                                                      // Do not print this field
 
     Array(String Name, int...Dimensions)                                        // Array definition within the basic array machine
      {wantCompiling();
@@ -113,6 +115,22 @@ abstract class Ban extends Test                                                 
 
   int i() {return intermediateValue;}                                           // Return intermediate value making it read only
 
+  void setMemory(int Value, String target, String...Indices)                    // Set the value of an array element to a specified value or the current value of the intermediate value outside an instruction
+   {wantCompiling();
+    final Array t   = getArray(target);
+    final String[]i = Indices;
+
+    final int I = i.length;
+    final int T = t.dimensions.length;
+    if (T != I) stop("Wrong number of dimensions:", T, "!=", I, "for array:", target);
+
+    final int v = switch(T)
+     {case  0 -> memory[t.base]                                                                 = Value;
+      case  1 -> memory[t.base+lookUpIndex(t, 0, i[0])]                                         = Value;
+      default -> memory[t.base+lookUpIndex(t, 1, i[0])*t.dimensions[0]+lookUpIndex(t, 0, i[1])] = Value;
+     };
+   }
+
   void set(Integer Value, String target, String...Indices)                      // Set the value of an array element to a specified value or the current value of the intermediate value
    {wantCompiling();
     final Array t   = getArray(target);
@@ -166,7 +184,7 @@ abstract class Ban extends Test                                                 
      };
    }
 
-  int getMemory(String source, String...Indices)                                // Get the value of an array element from memory
+  int getMemory(String source, String...Indices)                                // Get the value of an array element from memory outi=side an instruction
    {final Array s   = getArray(source);
     final String[]i = Indices;
 
@@ -385,18 +403,25 @@ abstract class Ban extends Test                                                 
     final StringBuilder s = new StringBuilder();
     int l = 0;
     for  (Array a: order)
-     {if      (a.dimensions.length == 0)
-       {    s.append(String.format("%4d  %4d               %4d  %s %s\n", l++, a.base,     memory[a.base], a.name, "-"));
+     {if (a.quiet) continue;
+      if      (a.dimensions.length == 0)
+       {    final int v = memory[a.base];
+            if (v == 0) continue;
+            s.append(String.format("%4d  %4d               %4d  %s %s\n", l++, a.base,     memory[a.base], a.name, "-"));
        }
       else if (a.dimensions.length == 1)
        {for   (int i = 0; i < a.dimensions[0]; i++)
-         {  s.append(String.format("%4d  %4d        %4d   %4d  %s %s\n", l++, a.base, i,   memory[a.base+i], a.name, i == 0 ? "-" : "|"));
+         {  final int v = memory[a.base+i];
+            if (v == 0) continue;
+            s.append(String.format("%4d  %4d        %4d   %4d  %s %s\n", l++, a.base, i,   memory[a.base+i], a.name, i == 0 ? "-" : "|"));
          }
        }
       else if (a.dimensions.length == 2)
        {for   (int j = 0; j < a.dimensions[1]; j++)
          {for (int i = 0; i < a.dimensions[0]; i++)
-           {s.append(String.format("%4d  %4d  %4d  %4d   %4d  %s %s\n", l++, a.base, j, i, memory[a.base+j*a.dimensions[0]+i], a.name,  i == 0 && j == 0 ? "-" : i == 0 ?  "+" : "|"));
+           {final int v = memory[a.base+j*a.dimensions[0]+i];
+            if (v == 0) continue;
+            s.append(String.format("%4d  %4d  %4d  %4d   %4d  %s %s\n", l++, a.base, j, i, memory[a.base+j*a.dimensions[0]+i], a.name,  i == 0 && j == 0 ? "-" : i == 0 ?  "+" : "|"));
            }
          }
        }
@@ -450,13 +475,13 @@ abstract class Ban extends Test                                                 
     return "";
    }
 
-  private class Label                                                           // Label definition
+  class Label                                                                   // Label definition
    {int instruction;                                                            // The instruction to which this labels applies
     Label() {set(); labels.push(this);}                                         // A label assigned to an instruction
     void set() {wantCompiling(); instruction = code.size();}                    // Reassign the label to an instruction
    }
 
-  private class I                                                               // Instruction definition
+  class I                                                                       // Instruction definition
    {int instructionNumber;                                                      // Instruction number
     final String definition = traceBack();                                      // Location of code that defined this instruction
     I()                                                                         // Define an instruction
@@ -480,6 +505,7 @@ abstract class Ban extends Test                                                 
      {z(); code.elementAt(step).a();
      }
     running = false;
+    if (time >= maxTime) stop("Out of time:", time);
    }
 
   void stop(String em)                                                          // Stop everything with an explanatory message
@@ -562,40 +588,24 @@ abstract class Ban extends Test                                                 
     l.run();
     //stop(l);
     ok(""+l, """
-   0     0                  0  c0 -
-   1     1                  1  c1 -
-   2     2                  2  c2 -
-   3     3                  3  c3 -
-   4     4           0      4  a -
-   5     4           1      4  a |
-   6     4           2      5  a |
-   7     4           3      4  a |
-   8     8           0      0  b -
-   9     8           1      0  b |
-  10     8           2      7  b |
-  11     8           3      0  b |
-  12     8           4      0  b |
-  13     8           5      0  b |
-  14    14     0     0      0  A -
-  15    14     0     1      0  A |
-  16    14     0     2      0  A |
-  17    14     0     3      0  A |
-  18    14     1     0      8  A +
-  19    14     1     1      8  A |
-  20    14     1     2      9  A |
-  21    14     1     3      8  A |
-  22    22     0     0      0  B -
-  23    22     0     1      0  B |
-  24    22     0     2      0  B |
-  25    22     1     0     11  B +
-  26    22     1     1     33  B |
-  27    22     1     2     11  B |
-  28    22     2     0     22  B +
-  29    22     2     1     22  B |
-  30    22     2     2     44  B |
-  31    22     3     0      0  B +
-  32    22     3     1      0  B |
-  33    22     3     2      0  B |
+   0     1                  1  c1 -
+   1     2                  2  c2 -
+   2     3                  3  c3 -
+   3     4           0      4  a -
+   4     4           1      4  a |
+   5     4           2      5  a |
+   6     4           3      4  a |
+   7     8           2      7  b |
+   8    14     1     0      8  A +
+   9    14     1     1      8  A |
+  10    14     1     2      9  A |
+  11    14     1     3      8  A |
+  12    22     1     0     11  B +
+  13    22     1     1     33  B |
+  14    22     1     2     11  B |
+  15    22     2     0     22  B +
+  16    22     2     1     22  B |
+  17    22     2     2     44  B |
 """);
     return l;
    }
@@ -614,40 +624,26 @@ abstract class Ban extends Test                                                 
     l.run();
     //stop(l);
     ok(""+l, """
-   0     0                  0  c0 -
-   1     1                  1  c1 -
-   2     2                  2  c2 -
-   3     3                  3  c3 -
-   4     4           0      4  a -
-   5     4           1      4  a |
-   6     4           2      5  a |
-   7     4           3      4  a |
-   8     8           0      0  b -
-   9     8           1      0  b |
-  10     8           2      7  b |
-  11     8           3      0  b |
-  12     8           4      0  b |
-  13     8           5      0  b |
-  14    14     0     0      0  A -
-  15    14     0     1      0  A |
-  16    14     0     2      0  A |
-  17    14     0     3      0  A |
-  18    14     1     0      8  A +
-  19    14     1     1      8  A |
-  20    14     1     2      9  A |
-  21    14     1     3      8  A |
-  22    22     0     0      0  B -
-  23    22     0     1      0  B |
-  24    22     0     2      0  B |
-  25    22     1     0     11  B +
-  26    22     1     1     33  B |
-  27    22     1     2     11  B |
-  28    22     2     0     22  B +
-  29    22     2     1     22  B |
-  30    22     2     2     44  B |
-  31    22     3     0      0  B +
-  32    22     3     1      4  B |
-  33    22     3     2      5  B |
+   0     1                  1  c1 -
+   1     2                  2  c2 -
+   2     3                  3  c3 -
+   3     4           0      4  a -
+   4     4           1      4  a |
+   5     4           2      5  a |
+   6     4           3      4  a |
+   7     8           2      7  b |
+   8    14     1     0      8  A +
+   9    14     1     1      8  A |
+  10    14     1     2      9  A |
+  11    14     1     3      8  A |
+  12    22     1     0     11  B +
+  13    22     1     1     33  B |
+  14    22     1     2     11  B |
+  15    22     2     0     22  B +
+  16    22     2     1     22  B |
+  17    22     2     2     44  B |
+  18    22     3     1      4  B |
+  19    22     3     2      5  B |
 """);
     return l;
    }
@@ -728,7 +724,8 @@ abstract class Ban extends Test                                                 
    {final int M = 4, N = 3;
      final Ban l = new Ban()
      {void load()
-       {array("c1");
+       {array("c0");
+        array("c1");
         array("c2");
         array("c3");
         array("a", M);
@@ -736,46 +733,35 @@ abstract class Ban extends Test                                                 
        }
      };
 
-    for (int i = 0; i < M; i++)
-     {l.set(i, "c1");
-      l.set(i, "a", "c1");
-     }
+    for (int i = 0; i < M; i++) l.set(i, "c"+i);
+    for (int i = 0; i < M; i++) l.set(i, "a",   ""+i);
 
     for   (int i = 0; i < M; i++)
      {for (int j = 0; j < N; j++)
-       {
-        l.set(i, "c1");
-        l.set(j, "c2");
-        l.set(i*N+j, "b", "c1", "c2");
+       {l.set(i*N+j, "b", "c"+i, "c"+j);
        }
      }
 
-    l.set(3, "c2");
-    l.set(4, "a", "c2");
-    l.set(2, "c1");
-    l.set(5, "b", "c1");
     l.run();
-    stop(l);
+    //stop(l);
     ok(""+l, """
-   0     0                  2  i -
-   1     1                  3  j -
-   2     2                  0  k -
-   3     3           0      0  a -
-   4     3           1      1  a |
-   5     3           2      2  a |
-   6     3           3      0  a |
-   7     7     0     0      0  b -
-   8     7     0     1      1  b |
-   9     7     0     2      2  b |
-  10     7     1     0      3  b +
-  11     7     1     1      4  b |
-  12     7     1     2      5  b |
-  13     7     2     0      0  b +
-  14     7     2     1      0  b |
-  15     7     2     2      0  b |
-  16     7     3     0      9  b +
-  17     7     3     1     10  b |
-  18     7     3     2     11  b |
+   0     1                  1  c1 -
+   1     2                  2  c2 -
+   2     3                  3  c3 -
+   3     4           1      1  a |
+   4     4           2      2  a |
+   5     4           3      3  a |
+   6     8     0     1      1  b |
+   7     8     0     2      2  b |
+   8     8     1     0      3  b +
+   9     8     1     1      4  b |
+  10     8     1     2      5  b |
+  11     8     2     0      6  b +
+  12     8     2     1      7  b |
+  13     8     2     2      8  b |
+  14     8     3     0      9  b +
+  15     8     3     1     10  b |
+  16     8     3     2     11  b |
 """);
    }
 
@@ -938,6 +924,7 @@ abstract class Ban extends Test                                                 
 
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_clear();
+    test_set();
     test_get();
     test_move();
     test_compare();
