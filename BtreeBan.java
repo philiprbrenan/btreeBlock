@@ -1545,7 +1545,7 @@ Stuck(size:3)
      {b.L.set(i, "put_Key"); b.L.set(i, "put_Data");
       b.put();
      }
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                                                                                                   16                                                                                                                     +
                                                                                                   17                                                                                                                     21
@@ -1570,7 +1570,7 @@ Stuck(size:3)
      {b.L.set(i, "put_Key"); b.L.set(i, "put_Data");
       b.put();
      }
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                                                                                                            16                                                                                                               +
                                                                                                            9                                                                                                                22
@@ -1634,7 +1634,7 @@ Stuck(size:3)
      {b.L.set(random_small[i], "put_Key"); b.L.set(i, "put_Data");
       b.put();
      }
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 493                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               +
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 60
@@ -1691,7 +1691,7 @@ Stuck(size:3)
      {b.L.set(i, "delete_Key");
       b.delete();
      }
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                                               16                            24                            +
                                               5                             16                            23
@@ -1716,7 +1716,7 @@ Stuck(size:3)
      {b.L.set(i, "delete_Key");
       b.delete();
      }
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                    8                         16                                                          +
                    5                         11                                                          16
@@ -1747,7 +1747,7 @@ Stuck(size:3)
          }
        }
      }
-    //stop(b.print());
+    //stop(b);
     ok(b, """
                    6                                  17                                        40                                           +
                    5                                  11                                        23                                           33
