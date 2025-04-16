@@ -3,8 +3,9 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-
+// Could parallelize like BtreeSF with mutiple instruction streams
 import java.util.*;
+import java.nio.file.*;
 
 class BtreeBap extends Test                                                     // Manipulate a btree using machine code driving a basic array machine with one register.
  {Ban L;                                                                        // The btree laid out in arrays and operated on by a machione code program
@@ -243,9 +244,6 @@ class BtreeBap extends Test                                                     
   void setIndex (String n) {L.move("s_index", n);}                              // Set current index
   void setIndexL(String n) {L.move("s_index", n); L.dec("s_index");}            // Set current index left
   void setIndexR(String n) {L.move("s_index", n); L.inc("s_index");}            // Set current index right
-
-  int getFound    () {L.get("f_found");  return L.i();}                         // Whether the key was found
-  int getFSuccess () {L.get("f_success");return L.i();}                         // Inserted or updated if true
 
   void putFSuccess (int n) {L.set(n, "f_success");}                             // Inserted or updated if true
   void putFInserted(int n) {L.set(n, "f_inserted");}                            // Inserted if true
@@ -1110,7 +1108,7 @@ class BtreeBap extends Test                                                     
              };
 
             findAndInsert();                                                    // Splitting the root might have been enough
-            getFSuccess(); finished.endIfGt();                                  // Inserted or updated successfully
+            L.get("f_success"); finished.endIfGt();                             // Inserted or updated successfully
            }
          };
 
@@ -1188,7 +1186,7 @@ class BtreeBap extends Test                                                     
         L.new Block()
          {void code()
            {final Ban.Block notFound = this;
-            getFound(); notFound.endIfGt();                                     // No such key
+            L.get("f_found"); notFound.endIfGt();                               // No such key
             findAndInsert_result(0, 0);
             finished.end();
            }
@@ -1574,6 +1572,120 @@ class BtreeBap extends Test                                                     
     stuck_elementAt();
    }
 
+// D1 Verilog                                                                   // Generate verilog code to implement the basic array amchine
+
+  class VerilogCode                                                             // Generate verilog code
+   {final String project;                                                       // The project find, put, delete
+    final int    key;                                                           // The input key for this project
+    final int    data;                                                          // The input data for this project if any
+    final String folder = "generic/verilog";                                    // Place the code in this folder
+    final String verilogSource;                                                 // Verilog source code
+    final String verilogTest;                                                   // Verilog test bench
+    final int bitsPerInteger = 16;                                              // Number of bits in an integer
+
+    VerilogCode(String Project, int Key, int Data)                              // Generate verilog code
+     {project = Project; key = Key; data = Data;
+      verilogSource = Paths.get(folder, project)+Verilog.ext;
+      verilogTest   = Paths.get(folder, project)+Verilog.testExt;
+      generateVerilogCode();
+      generateVerilogTestBench();
+     }
+
+    void generateVerilogCode()                                                  // Generate verilog code for standalone verification and for Vivado
+     {final StringBuilder s = new StringBuilder();                              // Generate code
+      s.append("""
+//-----------------------------------------------------------------------------
+// Generic cpu
+// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-01-07
+//------------------------------------------------------------------------------
+`timescale 10ps/1ps
+(* keep_hierarchy = "yes" *)
+module $project(reset, stop, clock, Key, Data, data, found);                    // Database on a chip
+  input                      reset;                                             // Restart the program run sequence when this goes high
+  input                      clock;                                             // Program counter clock
+  input [$bitsPerInteger-1:0]  Key;                                             // Input key
+  input [$bitsPerInteger-1:0] Data;                                             // Input data
+  output                      stop;                                             // Program has stopped when this goes high
+  output[$bitsPerInteger-1:0] data;                                             // Output data
+  output                     found;                                             // Whether the key was found on put, find delete
+
+  integer step;
+  integer steps;
+  integer stopped;
+  integer intermediateValue;
+  reg [$bitsPerInteger-1:0] memory [$memorySize-1: 0];
+
+  assign stop = stopped > 0 ? 1 : 0;
+
+  always @ (posedge clock) begin                                                // Execute next step in program
+    if (reset) begin                                                            // Reset
+      step     <= 0;
+      steps    <= 0;
+      stopped  <= 0;
+    end
+    else begin                                                                  // Run
+      steps <= steps + 1;
+      case(step)
+$opCodes
+        default: stopped <= 1;
+      endcase
+      step     <= step  + 1;
+      steps    <= steps + 1;
+    end // Execute
+  end // Always
+endmodule
+""");
+      writeFile(verilogSource, editVariables(""+s));                            // Write verilog module
+     }
+
+    void generateVerilogTestBench()                                             // Generate verilog test bench for normal and Vivado versions
+     {final StringBuilder s = new StringBuilder();                              // Test bench
+      s.append("""
+//-----------------------------------------------------------------------------
+// Database on a chip test bench
+// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-01-07
+//------------------------------------------------------------------------------
+`timescale 10ps/1ps
+module $project_tb;                                                             // Test bench for database on a chip
+  reg                       reset;                                              // Restart the program run sequence when this goes high
+  reg                        stop;                                              // Program has stopped when this goes high
+  reg                       clock;                                              // Program counter clock
+  reg  [$bitsPerInteger-1:0]  Key = $Key;                                       // Input key
+  reg  [$bitsPerInteger-1:0] Data = $Data;                                      // Input data
+  reg  [$bitsPerInteger-1:0] data;                                              // Output data
+  reg                       found;                                              // Whether the key was found on put, find delete
+  integer testResults;                                                          // Test results file
+  integer step;
+
+  $project a1(.reset(reset), .stop(stop), .clock(clock),                        // Connect to the module
+    .Key(Key), .Data(Data), .data(data), .found(found));
+
+  initial begin                                                                 // Test the module
+    clock = 0; reset = 0; #1;                                                   // Reset the module
+    clock = 1; reset = 1; #1;
+    clock = 0; reset = 0; #1;
+    for(step = 0; step < $maxSteps && !stop; step = step + 1) begin
+      $display("AAAA %d %d", step, stop);
+      clock = 0; #1; clock = 1; #1;
+    end
+  end
+endmodule
+""");
+      writeFile(verilogTest, editVariables(""+s));                              // Write verilog test bench
+     }
+
+    private String editVariables(String s)                                      // Edit the variables in a string builder
+     {s = s.replace("$bitsPerInteger",   ""+bitsPerInteger);
+      s = s.replace("$memorySize",       ""+L.memory.length);
+      s = s.replace("$project",             project);
+      s = s.replace("$Key",              ""+key);
+      s = s.replace("$Data",             ""+data);
+      s = s.replace("$opCodes",             L.verilog());
+      s = s.replace("$maxSteps",         ""+L.maxTime);
+      return s;
+     }
+   }
+
 // Tests
 
 //D1 Print                                                                      // Print a stuck
@@ -1893,6 +2005,8 @@ Stuck(size:3)
     return b;
    }
 
+//D2 Test Btree                                                                 // Tests on btree
+
   static void test_put_ascending()
    {final BtreeBap b = new BtreeBap(2, 3, 40);
     b.L.run(); b.L.clearCode();                                                 // Initialize tree
@@ -1919,6 +2033,28 @@ Stuck(size:3)
         5          5          5          5            11             11            11             11             16             16             16             16             23             23             6             6
         0          1          2          3            0              1             2              3              0              1              2              3              0              1              0             1
 1 2=1      3 4=3      5 6=4      7 8=7       9 10=8       11 12=10       13 14=9       15 16=12       17 18=13       19 20=15       21 22=14       23 24=19       25 26=18       27 28=22       29 30=20       31 32=2
+""");
+   }
+
+  static void test_put_ascending_wide()
+   {final BtreeBap b = new BtreeBap(16, 17, 400);
+    b.L.run(); b.L.clearCode();
+
+    int N = 256, t = 0;
+    b.put();
+    for (int i = 1; i <= N; i++)
+     {b.L.setMemory(i, "put_Key"); b.L.setMemory(i, "put_Data");
+      b.L.run();
+      t += b.L.time;
+     }
+    //stop(b);
+    ok(t, 210899);                                                              // vs 26717 = 8 times more instructions
+    ok(b, """
+                                           16                                                      32                                                      48                                                      64                                                      80                                                      96                                                                   112                                                                      128                                                                       144                                                                       160                                                                       176                                                                       192                                                                       208                                                                       224                                                                       240                                                                      +
+                                           1                                                       3                                                       4                                                       5                                                       6                                                       7                                                                    8                                                                        9                                                                         10                                                                        11                                                                        12                                                                        13                                                                        14                                                                        15                                                                        16                                                                       2
+                                           0                                                       0                                                       0                                                       0                                                       0                                                       0                                                                    0                                                                        0                                                                         0                                                                         0                                                                         0                                                                         0                                                                         0                                                                         0                                                                         0                                                                        0
+                                           0                                                       1                                                       2                                                       3                                                       4                                                       5                                                                    6                                                                        7                                                                         8                                                                         9                                                                         10                                                                        11                                                                        12                                                                        13                                                                        14                                                                       15
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16=1       17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32=3       33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48=4       49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64=5       65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80=6       81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96=7       97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112=8        113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128=9        129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144=10        145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160=11        161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176=12        177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192=13        193 194 195 196 197 198 199 200 201 202 203 204 205 206 207 208=14        209 210 211 212 213 214 215 216 217 218 219 220 221 222 223 224=15        225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240=16        241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256=2
 """);
    }
 
@@ -2074,6 +2210,37 @@ Stuck(size:3)
 """);
    }
 
+  static void test_find()
+   {final BtreeBap b = new BtreeBap(2, 3, 100);
+    b.L.run(); b.L.clearCode();                                                 // Initialize tree
+    b.put();
+
+    final int N = 9;
+    for (int i = 1; i <= N; i++)
+     {b.L.setMemory(i, "put_Key"); b.L.setMemory(i, "put_Data");
+      b.L.run();
+     }
+
+    b.L.clearCode();  b.find();
+
+    int t = 0;
+    for (int i = 1; i <= N; ++i)
+     {b.L.setMemory(i, "find_Key");
+      b.L.run();
+      ok(b.L.getMemory("f_found"), 1);
+      t += b.L.time;
+     }
+
+    b.L.setMemory(0, "find_Key"); b.L.run();
+    ok(b.L.getMemory("f_found"), 0);
+    t += b.L.time;
+
+    b.L.setMemory(N+1, "find_Key"); b.L.run();
+    ok(b.L.getMemory("f_found"), 0);
+    t += b.L.time;
+    ok(t, 1330);                                                                // vs 253  = 5.2 x more instructions
+   }
+
   static void test_primes()
    {final BtreeBap b = new BtreeBap(2, 3, 100);
     b.L.run(); b.L.clearCode();                                                 // Initialize tree
@@ -2090,7 +2257,7 @@ Stuck(size:3)
     for (int i = 2; i <= N; i++)
      {f.L.setMemory(i, "find_Key");
       f.L.run();
-      if (f.getFound() > 0)
+      if (f.L.getMemory("f_found") > 0)
        {for (int j = 2*i; j <= N; j += i)
          {d.L.setMemory(j, "delete_Key");
           debug = i == 3 && j == 24;
@@ -2112,6 +2279,24 @@ Stuck(size:3)
 """);
    }
 
+//D2 Test verilog                                                               // Generate some verilog
+
+  static void test_find_verilog()
+   {final BtreeBap b = new BtreeBap(2, 3, 20);
+    b.L.run(); b.L.clearCode();
+    b.find();
+    b.L.debug = true;
+    b.new VerilogCode("find", 4, 4);
+   }
+
+  static void test_put_verilog()
+   {final BtreeBap b = new BtreeBap(2, 3, 20);
+    b.L.run(); b.L.clearCode();
+    b.put();
+    b.L.debug = true;
+    b.new VerilogCode("put", 4, 4);
+   }
+
 //D0 Tests                                                                      // Testing
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -2126,17 +2311,22 @@ Stuck(size:3)
     stuck_test_search();
     stuck_test_search_greater_than_or_equal();
     stuck_test_search_greater_than_or_equal_except_last();
+    test_put_ascending_wide();
     test_put_ascending();
     test_put_descending();
     test_put_random_small();
     test_delete_random_not_100();
     test_delete_odd_ascending();
     test_delete_even_descending();
+    test_find();
     test_primes();
+    test_put_verilog();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_find_verilog();
+    //test_put_verilog();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
