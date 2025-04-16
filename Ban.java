@@ -13,7 +13,7 @@ abstract class Ban extends Test                                                 
   Stack<I>       code = new Stack<>();                                          // Code of the program
   Stack<Label> labels = new Stack<>();                                          // Labels for some instructions
   int []       memory;                                                          // The concatenation of all the arrays
-  int         maxTime = 1_000;                                              // Maximum number of steps permitted while running the program
+  int         maxTime = 1_000_000;                                              // Maximum number of steps permitted while running the program
   int            step = 0;                                                      // Execution step
   int            time = 0;                                                      // Execution time
   boolean     running = false;                                                  // Executing if true
