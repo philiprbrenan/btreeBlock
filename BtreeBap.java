@@ -1631,7 +1631,7 @@ $initializeMemory
       $assignData
     end
     else begin                                                                  // Run
-      $display("AAAA %4d %4d %4d s=%4d f=%4d d=%4d", steps, step, intermediateValue, stop, found, data);
+      $display("%4d %4d %4d s=%4d f=%4d d=%4d", steps, step, intermediateValue, stop, found, data);
       case(step)
 $opCodes
         default: stopped <= 1;
@@ -1692,14 +1692,14 @@ endmodule
       s = s.replace("$declareMemory",       L.declareVerilogMemory(bitsPerInteger));
       s = s.replace("$initializeMemory",    L.initializeVerilogMemory());
       switch(project)
-       {case Action.delete: s = s.replace("$assignKey", "memory["+L.getArray("delete_Key").base+"] = "+key+"; /* delete key */"); break;
-        case Action.find:   s = s.replace("$assignKey", "memory["+L.getArray(  "find_Key").base+"] = "+key+"; /* find key */"); break;
-        case Action.put:    s = s.replace("$assignKey", "memory["+L.getArray(   "put_Key").base+"] = "+key+"; /* put key*/"); break;
+       {case Action.delete: s = s.replace("$assignKey", "memory["+L.getArray("delete_Key").base+"] <= "+key+"; /* delete key */"); break;
+        case Action.find:   s = s.replace("$assignKey", "memory["+L.getArray(  "find_Key").base+"] <= "+key+"; /* find key */"); break;
+        case Action.put:    s = s.replace("$assignKey", "memory["+L.getArray(   "put_Key").base+"] <= "+key+"; /* put key*/"); break;
        }
       switch(project)
        {case Action.delete: s = s.replace("$assignData",  ""); break;
         case Action.find:   s = s.replace("$assignData",  ""); break;
-        case Action.put:    s = s.replace("$assignData",  "memory["+L.getArray("find_Data").base+"] = "+data+"; /* put data */"); break;
+        case Action.put:    s = s.replace("$assignData",  "memory["+L.getArray("find_Data").base+"] <= "+data+"; /* put data */"); break;
        }
       return s;
      }
@@ -2236,7 +2236,7 @@ Stuck(size:3)
 
     final int N = 9;
     for (int i = 1; i <= N; i++)
-     {b.L.setMemory(i, "put_Key"); b.L.setMemory(i, "put_Data");
+     {b.L.setMemory(i, "put_Key"); b.L.setMemory(N-i, "put_Data");
       b.L.run();
      }
 
@@ -2247,6 +2247,7 @@ Stuck(size:3)
      {b.L.setMemory(i, "find_Key");
       b.L.run();
       ok(b.L.getMemory("f_found"), 1);
+      ok(b.L.getMemory("f_data"),  N-i);
       t += b.L.time;
      }
 
@@ -2311,7 +2312,19 @@ Stuck(size:3)
       b.L.run();
      }
 
-    f.new VerilogCode(VerilogCode.Action.find, 4, N+1-4);
+    int Key = 22, Data = N+1 - Key;
+    f.new VerilogCode(VerilogCode.Action.find, Key, Data);
+    f.L.debugStep = f.L.new Debug()
+     {void debug()
+       {say(String.format("%4d %4d %4d s=%4d f=%4d d=%4d", f.L.time, f.L.step, f.L.intermediateValue, f.L.running ? 0 : 1, f.L.getMemory("f_found"), f.L.getMemory("f_data")));
+       }
+     };
+
+    f.L.setMemory(Key, "find_Key");
+    f.L.run();
+    say(String.format("%4d %4d %4d s=%4d f=%4d d=%4d", f.L.time, f.L.step, f.L.intermediateValue, f.L.running ? 0 : 1, f.L.getMemory("f_found"), f.L.getMemory("f_data")));
+    ok(f.L.getMemory("f_data"), Data);
+
    }
 
   static void test_put_verilog()
@@ -2350,6 +2363,7 @@ Stuck(size:3)
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
+    //test_find();
     test_find_verilog();
     //test_put_verilog();
    }
