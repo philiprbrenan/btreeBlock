@@ -112,6 +112,7 @@ if (1)                                                                          
           grep {!m(/c/)}                                                        # Excluding the java files in the C folder
           searchDirectoryTreesForMatchingFiles($home, qw(.java));               # Java files
   @j = qw(BtreeSF BtreeDM BtreeBam BtreeBan Ban BtreeBap);                      # This will test all the stuff of current interest
+  @j = qw(                BtreeBam BtreeBan Ban BtreeBap);                      # This will test all the stuff of current interest
 
   my $d = dateTimeStamp;
   my $c = q(com/AppaApps/Silicon);                                              # Package to classes folder
