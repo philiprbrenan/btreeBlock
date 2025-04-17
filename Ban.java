@@ -8,12 +8,13 @@ import java.util.*;
 
 abstract class Ban extends Test                                                 // Layout the basic array machine and execute a program in it
  {int size = 0;                                                                 // The size of the memory used by the basic array machine
-  Stack         <Array> order  = new Stack<>();                                 // The order in which the arrays were defined
-  TreeMap<String,Array> arrays = new TreeMap<>();                               // A number of different sized arrays concatenated to make one array
+  Stack         <Array> order    = new Stack<>();                               // The order in which the arrays were defined
+  TreeMap<String,Array> arrays   = new TreeMap<>();                             // A number of different sized arrays concatenated to make one array
+  TreeMap<Integer, Stack<Array>> overlaid = new TreeMap<>();                    // Given a memory location, produce the arrays which overlay it
   Stack<I>       code = new Stack<>();                                          // Code of the program
   Stack<Label> labels = new Stack<>();                                          // Labels for some instructions
   int []       memory;                                                          // The concatenation of all the arrays
-  int         maxTime = 1_000_000;                                              // Maximum number of steps permitted while running the program
+  int         maxTime = 1_000_000;                                                  // Maximum number of steps permitted while running the program
   int            step = 0;                                                      // Execution step
   int            time = 0;                                                      // Execution time
   boolean     running = false;                                                  // Executing if true
@@ -27,8 +28,9 @@ abstract class Ban extends Test                                                 
 
   Ban exec()                                                                    // Fork a basic array machine copying memory but not the code
    {final Ban source = this, target = new Ban() {void load(){};};
-    target.order  = source.order;
-    target.arrays = source.arrays;
+    target.order    = source.order;
+    target.arrays   = source.arrays;
+    target.overlaid = source.overlaid;
     final int M = source.memory.length;
     for (int i = 0; i < M; i++) target.memory[i] = source.memory[i];
     return target;
@@ -36,9 +38,10 @@ abstract class Ban extends Test                                                 
 
   Ban thread()                                                                  // Fork a basic array machine using the same memory but not the code
    {final Ban source = this, target = new Ban() {void load(){};};
-    target.order  = source.order;
-    target.arrays = source.arrays;
-    target.memory = source.memory;
+    target.order    = source.order;
+    target.arrays   = source.arrays;
+    target.memory   = source.memory;
+    target.overlaid = source.overlaid;
     return target;
    }
 
@@ -61,7 +64,7 @@ abstract class Ban extends Test                                                 
       if (D > 2) stop("Too many dimensions:", D);                               // Too many dimensions
       dimensions = new int[D];
 
-      for (int i = 0; i < D; i++) dimensions[D-1-i] = Dimensions[i];            // Save the dimensions. A zero dimension array is a field.
+      for (int i = 0; i < D; i++) dimensions[D-1-i] = Dimensions[i];            // Save the dimensions with first dimension varying slowest like a number. A zero dimension array is a field.
       base = size;
       size += length = switch(D)                                                // Number of elements in this array
        {case  0 -> 1;
@@ -73,6 +76,20 @@ abstract class Ban extends Test                                                 
        {stop("Name :", name, "has already been defined");
        }
       arrays.put(name, this);                                                   // Make the array accessible by name
+
+      for (int i = 0; i < length; i++)                                          // Record which array occupies each index
+       {final int p = base+i;                                                   // Index occupied by the array
+        if (!overlaid.containsKey(p)) overlaid.put(p, new Stack<Array>());      // New location overlaid by at least one array
+        overlaid.get(base+i).push(this);                                        // Record which arrays occupy each index
+       }
+     }
+    public String toString()                                                    // Print an array
+     {final StringBuilder s = new StringBuilder();
+      switch(dimensions.length)
+       {case  0: return "variable:"+name;
+        case  1: return "array["+dimensions[0]+"]"+name;
+        default: return "array["+dimensions[1]+","+dimensions[0]+"]"+name;
+       }
      }
    }
 
@@ -84,16 +101,33 @@ abstract class Ban extends Test                                                 
    {wantCompiling();
     if (order.size() == 0) stop("No previous array to overlay");                // Nothing to overlay
     final Array p = order.lastElement();                                        // Previous array which we will overlay
+    size = p.base;                                                              // Overlay on previous array
     final Array q = array(Name, Dimensions);                                    // New array
-    q.base = p.base;                                                            // Overlay on previous array
-    size   = size - p.length + max(p.length, q.length);                         // Account for overall size
+    size   = size - q.length + max(p.length, q.length);                         // Account for overall size
     return q;                                                                   // Return overlay
    }
 
-  private Array getArray(String Name)                                           // Get an array by name or complain if the name is invalid
+  Array getArray(String Name)                                                   // Get an array by name or complain if the name is invalid
    {final Array A = arrays.get(Name);
     if (A == null) stop("No such array as", Name);
     return A;
+   }
+
+  String getArrays(int i)                                                       // Print the details of the arrays that overlay the specified location
+   {final Stack<Array> A = overlaid.get(i);
+    if (A == null) return null;
+    final Stack<String> s = new Stack<>();
+    for (Array a: A)                                                            // Each array overlaid on this location
+     {final int d = i - a.base;
+       switch(a.dimensions.length)
+       {case  0: s.push(a.name); continue;                                      // Variable
+        case  1: s.push(a.name+"["+d+"]"); continue;                            // One dimensional array
+        default:                                                                // Two dimension
+          final int n = a.dimensions[0], x = d / n, y = d % n;
+          s.push(a.name+"["+x+","+y+"]");
+       }
+     }
+    return joinStrings(s, ", ");
    }
 
   private int lookUpIndex(Array Array, int Dimension, String Index)             // Look up an index which will be used in the specified dimension of the specified array
@@ -131,6 +165,33 @@ abstract class Ban extends Test                                                 
      };
    }
 
+  String variableName(String target, String...Indices)                          // The name of a variable
+   {final Array t = getArray(target);
+    final int   T = t.dimensions.length;
+    switch(T)
+     {case  0: return target;
+      case  1: return target+"["+Indices[0]+"]";
+      default: return target+"["+Indices[1]+","+Indices[0]+"]";
+     }
+   }
+
+  String getMemoryName(String source, String...Indices)                         // Get the name of an array element in memory
+   {final Array s   = getArray(source);
+    final String[]i = Indices;
+
+    final int I = i.length;
+    final int S = s.dimensions.length;
+    if (S != I) stop("Wrong number of dimensions:", S, "!=", I, "for array:", source);
+
+    final String n = variableName(source, Indices);
+
+    switch(S)
+     {case  0: return "memory["+(s.base                                                                )+"]/*"+n+"*/";
+      case  1: return "memory["+(s.base+lookUpIndex(s, 0, i[0])                                        )+"]/*"+n+"*/";
+      default: return "memory["+(s.base+lookUpIndex(s, 1, i[0])*s.dimensions[0]+lookUpIndex(s, 0, i[1]))+"]/*"+n+"*/";
+     }
+   }
+
   void set(Integer Value, String target, String...Indices)                      // Set the value of an array element to a specified value or the current value of the intermediate value
    {wantCompiling();
     final Array t   = getArray(target);
@@ -150,11 +211,12 @@ abstract class Ban extends Test                                                 
          };
        }
       String v()
-       {final int v = Value != null ? Value : intermediateValue;
+       {final String v = Value != null ? ""+Value : "intermediateValue";
+        final String n = getMemoryName(target, Indices);
         switch(T)
-         {case  0: return "memory["+(t.base                                                                )+"] <= " + v + "; /*set 1 */";
-          case  1: return "memory["+(t.base+lookUpIndex(t, 0, i[0])                                        )+"] <= " + v + "; /*set 2 */";
-          default: return "memory["+(t.base+lookUpIndex(t, 1, i[0])*t.dimensions[0]+lookUpIndex(t, 0, i[1]))+"] <= " + v + "; /*set 3 */";
+         {case  0: return n+" <= " + v + "; /* set 1 */ step <= step + 1;";
+          case  1: return n+" <= " + v + "; /* set 2 */ step <= step + 1;";
+          default: return n+" <= " + v + "; /* set 3 */ step <= step + 1;";
          }
        }
      };
@@ -191,10 +253,11 @@ abstract class Ban extends Test                                                 
          };
        }
       String v()
-       {switch(S)
-         {case  0: return "intermediateValue <= memory["+(s.base                                                                )+"]; /* get 1 */";
-          case  1: return "intermediateValue <= memory["+(s.base+lookUpIndex(s, 0, i[0])                                        )+"]; /* get 2 */";
-          default: return "intermediateValue <= memory["+(s.base+lookUpIndex(s, 1, i[0])*s.dimensions[0]+lookUpIndex(s, 0, i[1]))+"]; /* get 3 */";
+       {final String n = getMemoryName(source, Indices);
+        switch(S)
+         {case  0: return "intermediateValue <= "+n+"; /* get 1 */ step <= step + 1;";
+          case  1: return "intermediateValue <= "+n+"; /* get 2 */ step <= step + 1;";
+          default: return "intermediateValue <= "+n+"; /* get 3 */ step <= step + 1;";
          }
        }
      };
@@ -215,21 +278,6 @@ abstract class Ban extends Test                                                 
      };
    }
 
-  String getMemoryName(String source, String...Indices)                         // Get the name of an array element in memory
-   {final Array s   = getArray(source);
-    final String[]i = Indices;
-
-    final int I = i.length;
-    final int S = s.dimensions.length;
-    if (S != I) stop("Wrong number of dimensions:", S, "!=", I, "for array:", source);
-
-    switch(S)
-     {case  0: return "memory["+(s.base                                                                )+"]";
-      case  1: return "memory["+(s.base+lookUpIndex(s, 0, i[0])                                        )+"]";
-      default: return "memory["+(s.base+lookUpIndex(s, 1, i[0])*s.dimensions[0]+lookUpIndex(s, 0, i[1]))+"]";
-     }
-   }
-
   void clear(int Value, String target, String...Indices)                        // Clear the indicated part of the specified array to the the specified value presumed to be a constant, typically -1 or 0
    {wantCompiling();
     final Array t   = getArray(target);
@@ -244,7 +292,7 @@ abstract class Ban extends Test                                                 
        {final int J = j;
         new I()
          {void   a() {memory[t.base + J] = Value;}
-          String v() {return "memory["+(t.base + J)+"] <= "+Value+"; /* clear 1 */";}
+          String v() {return "memory["+(t.base + J)+"] <= "+Value+"; /* clear 1 */ step <= step + 1;";}
          };
        }
       return;
@@ -261,7 +309,7 @@ abstract class Ban extends Test                                                 
        {final int J = j;
         new I()
          {void   a() {        memory[   t.base + l * lookUpIndex(t, 1, i[0]) + J   ] =   Value;}
-          String v() {return "memory["+(t.base + l * lookUpIndex(t, 1, i[0]) + J)+"] <= "+Value+"; /* clear 2 */";}
+          String v() {return "memory["+(t.base + l * lookUpIndex(t, 1, i[0]) + J)+"] <= "+Value+"; /* clear 2 */ step <= step + 1;";}
          };
        }
       return;
@@ -307,7 +355,7 @@ abstract class Ban extends Test                                                 
       String v()
        {final String a = ""+immediate;
         final String b = "intermediateValue";
-        return "intermediateValue <= "+a+" <  intermediateValue ? -1 : "+a+" == intermediateValue ?  0 : +1; /* compare 1 */";
+        return "intermediateValue <= "+a+" <  intermediateValue ? -1 : "+a+" == intermediateValue ?  0 : +1; /* compare 1 */ step <= step + 1;";
        }
      };
    }
@@ -334,17 +382,17 @@ abstract class Ban extends Test                                                 
       String v()
        {final String b = getMemoryName(source, si);
         final String a = getMemoryName(target, ti);
-        return "intermediateValue <= "+a+" < "+b+" ? -1 : "+a+" == "+b+" ?  0 : +1; /* compare 2 */";
+        return "intermediateValue <= "+a+" < "+b+" ? -1 : "+a+" == "+b+" ?  0 : +1; /* compare 2 */ step <= step + 1;";
        }
      };
    }
 
-  void gt() {new I() {void a(){intermediateValue = intermediateValue >  0 ? 1 : 0;} String v() {return "intermediateValue <= intermediateValue >  0 ? 1 : 0; /* gt */";}};} // Set the intermediate value to one if it is currently greater than             zero else zero
-  void ge() {new I() {void a(){intermediateValue = intermediateValue >= 0 ? 1 : 0;} String v() {return "intermediateValue <= intermediateValue >= 0 ? 1 : 0; /* ge */";}};} // Set the intermediate value to one if it is currently greater than or equal to zero else zero
-  void lt() {new I() {void a(){intermediateValue = intermediateValue <  0 ? 1 : 0;} String v() {return "intermediateValue <= intermediateValue <  0 ? 1 : 0; /* lt */";}};} // Set the intermediate value to one if it is currently less    than             zero else zero
-  void le() {new I() {void a(){intermediateValue = intermediateValue <= 0 ? 1 : 0;} String v() {return "intermediateValue <= intermediateValue <= 0 ? 1 : 0; /* le */";}};} // Set the intermediate value to one if it is currently less    than or equal to zero else zero
-  void eq() {new I() {void a(){intermediateValue = intermediateValue == 0 ? 1 : 0;} String v() {return "intermediateValue <= intermediateValue == 0 ? 1 : 0; /* eq */";}};} // Set the intermediate value to one if it is currently equal                 to zero else zero
-  void ne() {new I() {void a(){intermediateValue = intermediateValue != 0 ? 1 : 0;} String v() {return "intermediateValue <= intermediateValue != 0 ? 1 : 0; /* ne */";}};} // Set the intermediate value to one if it is currently less        not equal to zero else zero
+  void gt() {new I() {void a(){intermediateValue = intermediateValue >  0 ? 1 : 0;} String v() {return "intermediateValue <= intermediateValue >  0 ? 1 : 0; /* gt */ step <= step + 1;";}};} // Set the intermediate value to one if it is currently greater than             zero else zero
+  void ge() {new I() {void a(){intermediateValue = intermediateValue >= 0 ? 1 : 0;} String v() {return "intermediateValue <= intermediateValue >= 0 ? 1 : 0; /* ge */ step <= step + 1;";}};} // Set the intermediate value to one if it is currently greater than or equal to zero else zero
+  void lt() {new I() {void a(){intermediateValue = intermediateValue <  0 ? 1 : 0;} String v() {return "intermediateValue <= intermediateValue <  0 ? 1 : 0; /* lt */ step <= step + 1;";}};} // Set the intermediate value to one if it is currently less    than             zero else zero
+  void le() {new I() {void a(){intermediateValue = intermediateValue <= 0 ? 1 : 0;} String v() {return "intermediateValue <= intermediateValue <= 0 ? 1 : 0; /* le */ step <= step + 1;";}};} // Set the intermediate value to one if it is currently less    than or equal to zero else zero
+  void eq() {new I() {void a(){intermediateValue = intermediateValue == 0 ? 1 : 0;} String v() {return "intermediateValue <= intermediateValue == 0 ? 1 : 0; /* eq */ step <= step + 1;";}};} // Set the intermediate value to one if it is currently equal                 to zero else zero
+  void ne() {new I() {void a(){intermediateValue = intermediateValue != 0 ? 1 : 0;} String v() {return "intermediateValue <= intermediateValue != 0 ? 1 : 0; /* ne */ step <= step + 1;";}};} // Set the intermediate value to one if it is currently less        not equal to zero else zero
 
   void add(int immediate, String source, String...Indices)                      // Add a constant value to the source field
    {wantCompiling();
@@ -357,7 +405,7 @@ abstract class Ban extends Test                                                 
     get(source, Indices);
     new I()
      {void   a() {        intermediateValue  =   immediate   + intermediateValue;}
-      String v() {return "intermediateValue <= "+immediate+" + intermediateValue;  /* add 1 */";}
+      String v() {return "intermediateValue <= "+immediate+" + intermediateValue;  /* add 1 */ step <= step + 1;";}
      };
     set(source, Indices);
    }
@@ -376,8 +424,8 @@ abstract class Ban extends Test                                                 
     for (int i = T; i < I; i++) si[i-T] = Indices[i];
 
     new I()
-     {void   a() {        intermediateValue  =   getMemory    (source, si)   +   getMemory    (target, ti)               ;}
-      String v() {return "intermediateValue <= "+getMemoryName(source, si)+" + "+getMemoryName(target, ti)+"; /* add2 */";}
+     {void   a() {        intermediateValue  =   getMemory    (source, si)   +   getMemory    (target, ti);}
+      String v() {return "intermediateValue <= "+getMemoryName(source, si)+" + "+getMemoryName(target, ti)+"; /* add2 */ step <= step + 1;";}
      };
     set(target, ti);
    }
@@ -400,7 +448,7 @@ abstract class Ban extends Test                                                 
 
     new I()
      {void   a() {        intermediateValue  =   getMemory    (target, ti)   -   getMemory    (source, si);                   }
-      String v() {return "intermediateValue <= "+getMemoryName(target, ti)+" - "+getMemoryName(source, si)+"; /* subtract */";}
+      String v() {return "intermediateValue <= "+getMemoryName(target, ti)+" - "+getMemoryName(source, si)+"; /* subtract */ step <= step + 1;";}
      };
     set(target, ti);
    }
@@ -420,7 +468,7 @@ abstract class Ban extends Test                                                 
 
     new I()
      {void   a() {        intermediateValue  =   getMemory    (source, si)   *   getMemory    (target, ti);                   }
-      String v() {return "intermediateValue <= "+getMemoryName(target, ti)+" * "+getMemoryName(source, si)+"; /* multiply */";}
+      String v() {return "intermediateValue <= "+getMemoryName(target, ti)+" * "+getMemoryName(source, si)+"; /* multiply */ step <= step + 1;";}
      };
     set(target, ti);
    }
@@ -440,7 +488,7 @@ abstract class Ban extends Test                                                 
 
     new I()
      {void   a() {        intermediateValue  =   getMemory    (source, si)   %   getMemory    (target, ti);                  }
-      String v() {return "intermediateValue <= "+getMemoryName(target, ti)+" % "+getMemoryName(source, si)+"; /* modulus */";}
+      String v() {return "intermediateValue <= "+getMemoryName(target, ti)+" % "+getMemoryName(source, si)+"; /* modulus */ step <= step + 1;";}
      };
     set(target, ti);
    }
@@ -456,12 +504,14 @@ abstract class Ban extends Test                                                 
     get(source, Indices);
     new I()
      {void   a() {        intermediateValue  = intermediateValue >> 1;                    }
-      String v() {return "intermediateValue <= intermediateValue >> 1; /* shift right */";}
+      String v() {return "intermediateValue <= intermediateValue >> 1; /* shift right */ step <= step + 1;";}
      };
     set(source, Indices);
    }
 
-  public String toString()                                                      // Print layout
+//D1 Print                                                                      // Print a layout
+
+  public String toString()                                                      // Print layout supressing zero entries
    {wantCompiling();
     final StringBuilder s = new StringBuilder();
     int l = 0;
@@ -580,13 +630,13 @@ abstract class Ban extends Test                                                 
 
 //D1 Blocks                                                                     // Blocks of code used to implement if statements and for loops
 
-  void Goto(Label label) {new I() {void a() {                            step = label.instruction-1;} String v() {return                             "step = label.instruction-1;";}};} // The program execution for loop will increment first
-  void GoEq(Label label) {new I() {void a() {if (intermediateValue == 0) step = label.instruction-1;} String v() {return "if (intermediateValue == 0) step = label.instruction-1;";}};} // Go to a specified label if the intermediate value is equal to zero
-  void GoNe(Label label) {new I() {void a() {if (intermediateValue != 0) step = label.instruction-1;} String v() {return "if (intermediateValue != 0) step = label.instruction-1;";}};} // Go to a specified label if the intermediate value is not equal to zero
-  void GoGt(Label label) {new I() {void a() {if (intermediateValue >  0) step = label.instruction-1;} String v() {return "if (intermediateValue >  0) step = label.instruction-1;";}};} // Go to a specified label if the intermediate value is greater than zero
-  void GoGe(Label label) {new I() {void a() {if (intermediateValue >= 0) step = label.instruction-1;} String v() {return "if (intermediateValue >= 0) step = label.instruction-1;";}};} // Go to a specified label if the intermediate value is greater than or equal to zero
-  void GoLt(Label label) {new I() {void a() {if (intermediateValue <  0) step = label.instruction-1;} String v() {return "if (intermediateValue <  0) step = label.instruction-1;";}};} // Go to a specified label if the intermediate value is less than zero
-  void GoLe(Label label) {new I() {void a() {if (intermediateValue <= 0) step = label.instruction-1;} String v() {return "if (intermediateValue <= 0) step = label.instruction-1;";}};} // Go to a specified label if the intermediate value is less than or equal to zero
+  void Goto(Label label) {new I() {void a() {                            step = label.instruction-1;} String v() {return                             "step = label.instruction; /* Goto */"                     ;}};} // The program execution for loop will increment first
+  void GoEq(Label label) {new I() {void a() {if (intermediateValue == 0) step = label.instruction-1;} String v() {return "if (intermediateValue == 0) step = label.instruction; else step = step + 1;/* GoEq */";}};} // Go to a specified label if the intermediate value is equal to zero
+  void GoNe(Label label) {new I() {void a() {if (intermediateValue != 0) step = label.instruction-1;} String v() {return "if (intermediateValue != 0) step = label.instruction; else step = step + 1;/* GoNe */";}};} // Go to a specified label if the intermediate value is not equal to zero
+  void GoGt(Label label) {new I() {void a() {if (intermediateValue >  0) step = label.instruction-1;} String v() {return "if (intermediateValue >  0) step = label.instruction; else step = step + 1;/* GoGt */";}};} // Go to a specified label if the intermediate value is greater than zero
+  void GoGe(Label label) {new I() {void a() {if (intermediateValue >= 0) step = label.instruction-1;} String v() {return "if (intermediateValue >= 0) step = label.instruction; else step = step + 1;/* GoGe */";}};} // Go to a specified label if the intermediate value is greater than or equal to zero
+  void GoLt(Label label) {new I() {void a() {if (intermediateValue <  0) step = label.instruction-1;} String v() {return "if (intermediateValue <  0) step = label.instruction; else step = step + 1;/* GoLt */";}};} // Go to a specified label if the intermediate value is less than zero
+  void GoLe(Label label) {new I() {void a() {if (intermediateValue <= 0) step = label.instruction-1;} String v() {return "if (intermediateValue <= 0) step = label.instruction; else step = step + 1;/* GoLe */";}};} // Go to a specified label if the intermediate value is less than or equal to zero
 
   abstract class Block                                                          // A block that can be continued or exited
    {final Label Start = new Label(), End = new Label();                         // Labels at start and end of block to facilitate continuing or exiting
@@ -598,21 +648,21 @@ abstract class Ban extends Test                                                 
 
     abstract void code();                                                       // Override this method to supply the code of the block
 
-    void start    () {new I() {void a() {                            step = Start.instruction-1;} String v() {return                             "step <= "+(Start.instruction-1)+";";}};}  // Restart the block
-    void startIfEq() {new I() {void a() {if (intermediateValue == 0) step = Start.instruction-1;} String v() {return "if (intermediateValue == 0) step <= "+(Start.instruction-1)+";";}};}  // Restart the block if the intermediate value is equal to zero
-    void startIfNe() {new I() {void a() {if (intermediateValue != 0) step = Start.instruction-1;} String v() {return "if (intermediateValue != 0) step <= "+(Start.instruction-1)+";";}};}  // Restart the block if the intermediate value is not equal to zero
-    void startIfGt() {new I() {void a() {if (intermediateValue >  0) step = Start.instruction-1;} String v() {return "if (intermediateValue >  0) step <= "+(Start.instruction-1)+";";}};}  // Restart the block if the intermediate value is greater than zero
-    void startIfGe() {new I() {void a() {if (intermediateValue >= 0) step = Start.instruction-1;} String v() {return "if (intermediateValue >= 0) step <= "+(Start.instruction-1)+";";}};}  // Restart the block if the intermediate value is greater than or equal to zero
-    void startIfLt() {new I() {void a() {if (intermediateValue <  0) step = Start.instruction-1;} String v() {return "if (intermediateValue <  0) step <= "+(Start.instruction-1)+";";}};}  // Restart the block if the intermediate value is less than zero
-    void startIfLe() {new I() {void a() {if (intermediateValue <= 0) step = Start.instruction-1;} String v() {return "if (intermediateValue <= 0) step <= "+(Start.instruction-1)+";";}};}  // Restart the block if the intermediate value is less than or equal to zero
+    void start    () {new I() {void a() {                            step = Start.instruction-1;} String v() {return                             "step <= "+(Start.instruction)+"; /* start */"                         ;}};}  // Restart the block
+    void startIfEq() {new I() {void a() {if (intermediateValue == 0) step = Start.instruction-1;} String v() {return "if (intermediateValue == 0) step <= "+(Start.instruction)+"; else step = step + 1;/* startIfEq */";}};}  // Restart the block if the intermediate value is equal to zero
+    void startIfNe() {new I() {void a() {if (intermediateValue != 0) step = Start.instruction-1;} String v() {return "if (intermediateValue != 0) step <= "+(Start.instruction)+"; else step = step + 1;/* startIfNe */";}};}  // Restart the block if the intermediate value is not equal to zero
+    void startIfGt() {new I() {void a() {if (intermediateValue >  0) step = Start.instruction-1;} String v() {return "if (intermediateValue >  0) step <= "+(Start.instruction)+"; else step = step + 1;/* startIfGt */";}};}  // Restart the block if the intermediate value is greater than zero
+    void startIfGe() {new I() {void a() {if (intermediateValue >= 0) step = Start.instruction-1;} String v() {return "if (intermediateValue >= 0) step <= "+(Start.instruction)+"; else step = step + 1;/* startIfGe */";}};}  // Restart the block if the intermediate value is greater than or equal to zero
+    void startIfLt() {new I() {void a() {if (intermediateValue <  0) step = Start.instruction-1;} String v() {return "if (intermediateValue <  0) step <= "+(Start.instruction)+"; else step = step + 1;/* startIfLt */";}};}  // Restart the block if the intermediate value is less than zero
+    void startIfLe() {new I() {void a() {if (intermediateValue <= 0) step = Start.instruction-1;} String v() {return "if (intermediateValue <= 0) step <= "+(Start.instruction)+"; else step = step + 1;/* startIfLe */";}};}  // Restart the block if the intermediate value is less than or equal to zero
 
-    void end    ()   {new I() {void a() {                            step =   End.instruction-1;} String v() {return                             "step <=   "+(End.instruction-1)+";";}};}  // End the block
-    void endIfEq()   {new I() {void a() {if (intermediateValue == 0) step =   End.instruction-1;} String v() {return "if (intermediateValue == 0) step <=   "+(End.instruction-1)+";";}};}  // End the block if the intermediate value is equal to zero
-    void endIfNe()   {new I() {void a() {if (intermediateValue != 0) step =   End.instruction-1;} String v() {return "if (intermediateValue != 0) step <=   "+(End.instruction-1)+";";}};}  // End the block if the intermediate value is not equal to zero
-    void endIfGt()   {new I() {void a() {if (intermediateValue >  0) step =   End.instruction-1;} String v() {return "if (intermediateValue >  0) step <=   "+(End.instruction-1)+";";}};}  // End the block if the intermediate value is greater than zero
-    void endIfGe()   {new I() {void a() {if (intermediateValue >= 0) step =   End.instruction-1;} String v() {return "if (intermediateValue >= 0) step <=   "+(End.instruction-1)+";";}};}  // End the block if the intermediate value is greater than or equal to zero
-    void endIfLt()   {new I() {void a() {if (intermediateValue <  0) step =   End.instruction-1;} String v() {return "if (intermediateValue <  0) step <=   "+(End.instruction-1)+";";}};}  // End the block if the intermediate value is less than zero
-    void endIfLe()   {new I() {void a() {if (intermediateValue <= 0) step =   End.instruction-1;} String v() {return "if (intermediateValue <= 0) step <=   "+(End.instruction-1)+";";}};}  // End the block if the intermediate value is less than or equal to zero
+    void end    ()   {new I() {void a() {                            step =   End.instruction-1;} String v() {return                             "step <=   "+(End.instruction)+"; /* end */"                           ;}};}  // End the block
+    void endIfEq()   {new I() {void a() {if (intermediateValue == 0) step =   End.instruction-1;} String v() {return "if (intermediateValue == 0) step <=   "+(End.instruction)+"; else step = step + 1;/* endIfEq*/   ";}};}  // End the block if the intermediate value is equal to zero
+    void endIfNe()   {new I() {void a() {if (intermediateValue != 0) step =   End.instruction-1;} String v() {return "if (intermediateValue != 0) step <=   "+(End.instruction)+"; else step = step + 1;/* endIfNe*/   ";}};}  // End the block if the intermediate value is not equal to zero
+    void endIfGt()   {new I() {void a() {if (intermediateValue >  0) step =   End.instruction-1;} String v() {return "if (intermediateValue >  0) step <=   "+(End.instruction)+"; else step = step + 1;/* endIfGt*/   ";}};}  // End the block if the intermediate value is greater than zero
+    void endIfGe()   {new I() {void a() {if (intermediateValue >= 0) step =   End.instruction-1;} String v() {return "if (intermediateValue >= 0) step <=   "+(End.instruction)+"; else step = step + 1;/* endIfGe*/   ";}};}  // End the block if the intermediate value is greater than or equal to zero
+    void endIfLt()   {new I() {void a() {if (intermediateValue <  0) step =   End.instruction-1;} String v() {return "if (intermediateValue <  0) step <=   "+(End.instruction)+"; else step = step + 1;/* endIfLt*/   ";}};}  // End the block if the intermediate value is less than zero
+    void endIfLe()   {new I() {void a() {if (intermediateValue <= 0) step =   End.instruction-1;} String v() {return "if (intermediateValue <= 0) step <=   "+(End.instruction)+"; else step = step + 1;/* endIfLe*/   ";}};}  // End the block if the intermediate value is less than or equal to zero
    }
 
 //D1 Verilog                                                                    // Generate verilog for the program
@@ -623,6 +673,33 @@ abstract class Ban extends Test                                                 
     for(int i = 0; i < N; ++i)
      {final String c = code.elementAt(i).v();
       v.append("      "+String.format("%4d", i)+": begin "+c+" end\n");
+     }
+    return ""+v;
+   }
+
+  String declareVerilogMemory(int width)                                        // Declare memory in verilog
+   {final int N = memory.length;
+    return "  reg ["+width+"-1:0] memory ["+N+"-1: 0];\n";
+   }
+
+  String initializeVerilogMemory()                                              // Initialize memory in verilog
+   {final StringBuilder v = new StringBuilder();                                // Generated verilog
+    final int N = memory.length;
+    String z = """
+      begin
+        integer i;
+        for (i = 0; i < NNN; i = i + 1) begin
+          memory[i] <= 0;
+        end
+      end
+""";
+    v.append(z.replace("NNN", ""+N));                                           // Zero code
+
+    for(int i = 0; i < N; ++i)
+     {final int m = memory[i];
+      if (m == 0) continue;
+      final String a = getArrays(i);
+      v.append("      "+String.format("memory[%4d] <= %4d; /* %s */\n", i, m, a));  // Non zero elements
      }
     return ""+v;
    }
@@ -997,6 +1074,32 @@ abstract class Ban extends Test                                                 
     ok(l.print("a"), "1, 2, 3, 4, 5, 6, 7, 8");
    }
 
+  static void test_overlaid()
+   {final int M = 5, N = 3;
+    final Ban l = new Ban()
+     {void load()
+       {array  ("i");
+        overlay("j");
+        array  ("a", M*N);
+        overlay("b", M,N);
+       }
+     };
+
+    ok(l.overlaid.get(0).firstElement(), "variable:i");
+    ok(l.overlaid.get(0).lastElement (), "variable:j");
+    ok(l.overlaid.get(1).firstElement(), "array[15]a");
+    ok(l.overlaid.get(1).lastElement (), "array[5,3]b");
+
+    ok(l.getArrays(1), "a[0], b[0,0]");
+    ok(l.getArrays(2), "a[1], b[0,1]");
+    ok(l.getArrays(3), "a[2], b[0,2]");
+    ok(l.getArrays(4), "a[3], b[1,0]");
+    ok(l.getArrays(5), "a[4], b[1,1]");
+    ok(l.getArrays(6), "a[5], b[1,2]");
+    ok(l.getArrays(7), "a[6], b[2,0]");
+    ok(l.getArrays(8), "a[7], b[2,1]");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_clear();
     test_set();
@@ -1015,10 +1118,12 @@ abstract class Ban extends Test                                                 
     test_fibonacci();
     test_euclid();
     test_bubble_sort();
+    test_overlaid();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_overlaid();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
