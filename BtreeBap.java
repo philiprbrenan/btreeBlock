@@ -2358,14 +2358,13 @@ Stuck(size:3)
     test_delete_even_descending();
     test_find();
     test_primes();
+    test_find_verilog();
     test_put_verilog();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    //test_find();
-    test_find_verilog();
-    //test_put_verilog();
+   {oldTests();
+    //test_find_verilog();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
