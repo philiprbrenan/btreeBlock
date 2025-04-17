@@ -2363,8 +2363,8 @@ Stuck(size:3)
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
-    //test_find_verilog();
+   {//oldTests();
+    test_find_verilog();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
