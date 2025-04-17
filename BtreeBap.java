@@ -1575,7 +1575,7 @@ class BtreeBap extends Test                                                     
 // D1 Verilog                                                                   // Generate verilog code to implement the basic array amchine
 
   class VerilogCode                                                             // Generate verilog code
-   {final String project;                                                       // The project find, put, delete
+   {final Action project;                                                       // The project find, put, delete
     final int    key;                                                           // The input key for this project
     final int    data;                                                          // The input data for this project if any
     final String folder = "generic/verilog";                                    // Place the code in this folder
@@ -1583,10 +1583,12 @@ class BtreeBap extends Test                                                     
     final String verilogTest;                                                   // Verilog test bench
     final int bitsPerInteger = 16;                                              // Number of bits in an integer
 
-    VerilogCode(String Project, int Key, int Data)                              // Generate verilog code
+    enum Action{find, put, delete};                                             // The actions we can perform on the Btree via verilog
+
+    VerilogCode(Action Project, int Key, int Data)                              // Generate verilog code
      {project = Project; key = Key; data = Data;
-      verilogSource = Paths.get(folder, project)+Verilog.ext;
-      verilogTest   = Paths.get(folder, project)+Verilog.testExt;
+      verilogSource = Paths.get(folder, project.name())+Verilog.ext;
+      verilogTest   = Paths.get(folder, project.name())+Verilog.testExt;
       generateVerilogCode();
       generateVerilogTestBench();
      }
@@ -1613,23 +1615,27 @@ module $project(reset, stop, clock, Key, Data, data, found);                    
   integer steps;
   integer stopped;
   integer intermediateValue;
-  reg [$bitsPerInteger-1:0] memory [$memorySize-1: 0];
+$declareMemory
 
-  assign stop = stopped > 0 ? 1 : 0;
+  assign stop  = stopped > 0 ? 1 : 0;
+  assign found = memory[$foundBase];
+  assign data  = memory[$dataBase];
 
   always @ (posedge clock) begin                                                // Execute next step in program
     if (reset) begin                                                            // Reset
       step     <= 0;
       steps    <= 0;
       stopped  <= 0;
+$initializeMemory
+      $assignKey
+      $assignData
     end
     else begin                                                                  // Run
-      steps <= steps + 1;
+      $display("AAAA %4d %4d %4d s=%4d f=%4d d=%4d", steps, step, intermediateValue, stop, found, data);
       case(step)
 $opCodes
         default: stopped <= 1;
       endcase
-      step     <= step  + 1;
       steps    <= steps + 1;
     end // Execute
   end // Always
@@ -1665,7 +1671,6 @@ module $project_tb;                                                             
     clock = 1; reset = 1; #1;
     clock = 0; reset = 0; #1;
     for(step = 0; step < $maxSteps && !stop; step = step + 1) begin
-      $display("AAAA %d %d", step, stop);
       clock = 0; #1; clock = 1; #1;
     end
   end
@@ -1677,11 +1682,25 @@ endmodule
     private String editVariables(String s)                                      // Edit the variables in a string builder
      {s = s.replace("$bitsPerInteger",   ""+bitsPerInteger);
       s = s.replace("$memorySize",       ""+L.memory.length);
-      s = s.replace("$project",             project);
+      s = s.replace("$project",             project.name());
       s = s.replace("$Key",              ""+key);
       s = s.replace("$Data",             ""+data);
+      s = s.replace("$foundBase",        ""+L.getArray("f_found").base);
+      s = s.replace("$dataBase",         ""+L.getArray("f_data").base);
       s = s.replace("$opCodes",             L.verilog());
       s = s.replace("$maxSteps",         ""+L.maxTime);
+      s = s.replace("$declareMemory",       L.declareVerilogMemory(bitsPerInteger));
+      s = s.replace("$initializeMemory",    L.initializeVerilogMemory());
+      switch(project)
+       {case Action.delete: s = s.replace("$assignKey", "memory["+L.getArray("delete_Key").base+"] = "+key+"; /* delete key */"); break;
+        case Action.find:   s = s.replace("$assignKey", "memory["+L.getArray(  "find_Key").base+"] = "+key+"; /* find key */"); break;
+        case Action.put:    s = s.replace("$assignKey", "memory["+L.getArray(   "put_Key").base+"] = "+key+"; /* put key*/"); break;
+       }
+      switch(project)
+       {case Action.delete: s = s.replace("$assignData",  ""); break;
+        case Action.find:   s = s.replace("$assignData",  ""); break;
+        case Action.put:    s = s.replace("$assignData",  "memory["+L.getArray("find_Data").base+"] = "+data+"; /* put data */"); break;
+       }
       return s;
      }
    }
@@ -2282,11 +2301,17 @@ Stuck(size:3)
 //D2 Test verilog                                                               // Generate some verilog
 
   static void test_find_verilog()
-   {final BtreeBap b = new BtreeBap(2, 3, 20);
-    b.L.run(); b.L.clearCode();
-    b.find();
-    b.L.debug = true;
-    b.new VerilogCode("find", 4, 4);
+   {final BtreeBap b = new BtreeBap(16, 17, 600);
+    b.L.run(); b.L.clearCode();    b.put();
+    final BtreeBap f = b.thread(); f.find();
+
+    int N = 256;
+    for (int i = 1; i <= N; i++)
+     {b.L.setMemory(i, "put_Key"); b.L.setMemory(N+1-i, "put_Data");
+      b.L.run();
+     }
+
+    f.new VerilogCode(VerilogCode.Action.find, 4, N+1-4);
    }
 
   static void test_put_verilog()
@@ -2294,7 +2319,7 @@ Stuck(size:3)
     b.L.run(); b.L.clearCode();
     b.put();
     b.L.debug = true;
-    b.new VerilogCode("put", 4, 4);
+    b.new VerilogCode(VerilogCode.Action.put, 4, 4);
    }
 
 //D0 Tests                                                                      // Testing
