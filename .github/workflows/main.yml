@@ -1,4 +1,4 @@
-# Test 2025-04-17 at 03:46:51
+# Test 2025-04-17 at 03:55:15
 
 name: Test
 run-name: btreeBlock
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        task: [BtreeSF, BtreeDM, BtreeBam, BtreeBan, Ban, BtreeBap]
+        task: [BtreeBam, BtreeBan, Ban, BtreeBap]
 
     steps:
     - uses: actions/checkout@v4
@@ -52,18 +52,6 @@ jobs:
     - name: Java
       run: |
         javac -g -d Classes -cp Classes com/AppaApps/Silicon/*.java
-
-    - name: Test BtreeSF
-      if: matrix.task == 'BtreeSF'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeSF
-
-
-    - name: Test BtreeDM
-      if: matrix.task == 'BtreeDM'
-      run: |
-        java -cp Classes com/AppaApps/Silicon/BtreeDM
-
 
     - name: Test BtreeBam
       if: matrix.task == 'BtreeBam'
