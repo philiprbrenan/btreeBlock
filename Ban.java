@@ -634,7 +634,8 @@ abstract class Ban extends Test                                                 
 
   void stop(String em)                                                          // Stop everything with an explanatory message
    {z();
-    new I() {void a() {Test.stop(em);} String v() {return "$finish(1);";}};
+//  new I() {void a() {Test.stop(em);} String v() {return "$finish(1);";}};
+    new I() {void a() {Test.stop(em);} String v() {return "stopped <= 1;";}};
    }
 
   void clearCode() {z(); code.clear(); running = false;}                        // Clear the program code
