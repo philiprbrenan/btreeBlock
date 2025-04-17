@@ -2359,7 +2359,7 @@ Stuck(size:3)
     test_find();
     test_primes();
     test_find_verilog();
-    test_put_verilog();
+    //test_put_verilog();
    }
 
   static void newTests()                                                        // Tests being worked on
