@@ -1631,7 +1631,7 @@ $initializeMemory
       $assignData
     end
     else begin                                                                  // Run
-      $display("%4d %4d %4d s=%4d f=%4d d=%4d", steps, step, intermediateValue, stop, found, data);
+      //$display("%4d %4d %4d s=%4d f=%4d d=%4d", steps, step, intermediateValue, stop, found, data);
       case(step)
 $opCodes
         default: stopped <= 1;
