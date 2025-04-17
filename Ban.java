@@ -179,7 +179,13 @@ abstract class Ban extends Test                                                 
    }
 
   String getMemoryName(String source, String...Indices)                         // Get the name of an array element in memory
-   {final Array s   = getArray(source);
+   {try
+     {final int a = Integer.parseInt(source);                                   // The array name is an integer
+      return "memory["+a+"]";
+     }
+    catch (NumberFormatException e) {}                                          // The index is a reference to an array
+
+    final Array s   = getArray(source);
     final String[]i = Indices;
 
     final int I = i.length;
