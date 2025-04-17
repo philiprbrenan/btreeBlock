@@ -1297,10 +1297,10 @@ module find(reset, stop, clock, Key, Data, data, found);                    // D
       memory[23528] <=    2; /* stuck */
 
       memory[11413] <= 22; /* find key */
-      
+
     end
     else begin                                                                  // Run
-      $display("%4d %4d %4d s=%4d f=%4d d=%4d", steps, step, intermediateValue, stop, found, data);
+      //$display("%4d %4d %4d s=%4d f=%4d d=%4d", steps, step, intermediateValue, stop, found, data);
       case(step)
          0: begin intermediateValue <= memory[12025+memory[23467]/*root*/]/*isLeaf[root]*/; /* get 2 */ step <= step + 1; end
          1: begin memory[23468]/*rootIsLeaf*/ <= intermediateValue; /* set 1 */ step <= step + 1; end
@@ -1428,7 +1428,7 @@ module find(reset, stop, clock, Key, Data, data, found);                    // D
        123: begin intermediateValue <= 9 <  intermediateValue ? -1 : 9 == intermediateValue ?  0 : +1; /* compare 1 */ step <= step + 1; end
        124: begin if (intermediateValue >= 0) step <=   126; else step = step + 1;/* endIfGe*/    end
        125: begin step <= 41; /* start */ end
-       126: begin $finish(1); end
+       126: begin stopped <= 1; end
 
         default: stopped <= 1;
       endcase
