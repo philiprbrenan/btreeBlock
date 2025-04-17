@@ -19,7 +19,9 @@ my $repo    = q(btreeBlock);                                                    
 my $wf      = q(.github/workflows/main.yml);                                    # Work flow on Ubuntu
 my @ext     = qw(.html .java .jpg .md .pl .pdf .png .py .rpt .sdc .txt .xdc);   # Extensions of files to upload to github
 my $sc      = fpd $home, qw(siliconCompiler);                                   # Silicon compiler
+my $generic = fpd $home, qw(generic);                                           # Generic cpu implementation
 my @scExt   = qw(.gds .py .xdc .v);                                             # Silicon compiler extensions
+my @gExt    = qw(.py .v .tb);                                                   # Generic cpu implementation
 
 say STDERR timeStamp,  " push to github $repo";
 
@@ -39,6 +41,11 @@ if (1)                                                                          
    {next if $f =~ m(verilog) and $f !~ m(/(reports|timing_route)/);
     push @files, $f;
    }
+ }
+
+if (1)
+ {push my @g, searchDirectoryTreesForMatchingFiles($generic, @gExt);            # Generic cpu files
+  @files = (@files, @g);
  }
 
 if (0)
