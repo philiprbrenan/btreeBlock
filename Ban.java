@@ -19,6 +19,7 @@ abstract class Ban extends Test                                                 
   int            time = 0;                                                      // Execution time
   boolean     running = false;                                                  // Executing if true
   boolean       debug = false;                                                  // Debug if true
+  Debug     debugStep = null;                                                   // Create a debug class here to print the execution of each statement
   int intermediateValue;                                                        // Written by get and used by set if no value has been supplied
 
   Ban()                                                                         // Create a basic array machine
@@ -49,6 +50,8 @@ abstract class Ban extends Test                                                 
 
   private void wantRunning  () {if (!running) stop("Too early: not running yet");} // This operation can only occur when we are running
   private void wantCompiling() {if ( running) stop("Too late: not compiling");} // This operation can only occur when we are compiling
+
+  class Debug {void debug() {}}                                                 // Debug each step of the execution
 
   class Array                                                                   // Define an array in the basic array machine
    {final String name;                                                          // Name of the array
@@ -186,9 +189,9 @@ abstract class Ban extends Test                                                 
     final String n = variableName(source, Indices);
 
     switch(S)
-     {case  0: return "memory["+(s.base                                                                )+"]/*"+n+"*/";
-      case  1: return "memory["+(s.base+lookUpIndex(s, 0, i[0])                                        )+"]/*"+n+"*/";
-      default: return "memory["+(s.base+lookUpIndex(s, 1, i[0])*s.dimensions[0]+lookUpIndex(s, 0, i[1]))+"]/*"+n+"*/";
+     {case  0: return "memory["+(s.base                                                                                )+"]/*"+n+"*/";
+      case  1: return "memory["+(s.base+"+"+getMemoryName(Indices[0])                                                  )+"]/*"+n+"*/";
+      default: return "memory["+(s.base+"+"+getMemoryName(Indices[0])+"*"+s.dimensions[0]+"+"+getMemoryName(Indices[1]))+"]/*"+n+"*/";
      }
    }
 
@@ -615,7 +618,9 @@ abstract class Ban extends Test                                                 
     running = true;
     final int N = code.size();
     for (step = 0, time = 0; step < N && time < maxTime; step++, time++)
-     {z(); code.elementAt(step).a();
+     {z();
+      if (debugStep != null) debugStep.debug();
+      code.elementAt(step).a();
      }
     running = false;
     if (time >= maxTime) stop("Out of time:", time);
