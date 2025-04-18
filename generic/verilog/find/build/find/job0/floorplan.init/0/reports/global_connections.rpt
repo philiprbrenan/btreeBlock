@@ -1,0 +1,3 @@
+Global connection rules: 2
+  Instances: ".*" with pins "VDD" connect to "VDD"
+  Instances: ".*" with pins "VSS" connect to "VSS"
