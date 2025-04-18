@@ -53,12 +53,12 @@ adapted to manipulating a [B-Tree](https://en.wikipedia.org/wiki/B-tree) .
 
 ## Custom CPU
 
-![custom](https://github.com/philiprbrenan/btreeBlock/blob/main/custom/find.png)
+![custom](https://raw.githubusercontent.com/philiprbrenan/btreeBlock/refs/heads/main/custom/find.png)
 
 
 ## Generic CPU
 
-![generic](https://github.com/philiprbrenan/btreeBlock/blob/main/generic/find.png)
+![generic](https://raw.githubusercontent.com/philiprbrenan/btreeBlock/refs/heads/main/generic/find.png)
 
 
 # Synthesis, Placement and Routing
