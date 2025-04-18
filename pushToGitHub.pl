@@ -34,6 +34,7 @@ push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              
         @files = grep {!m(/c/)}                   @files;
         @files = grep {!m(/bam/)}                 @files;
         @files = grep {!m(/zzz/)}                 @files;
+        @files = grep {fileSize($_) > 0}          @files;
 
 if (0)                                                                          # Remove most of the verilog except the reports
  {my @f = @files; @files = ();
