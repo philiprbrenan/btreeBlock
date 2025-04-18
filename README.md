@@ -44,8 +44,8 @@ number of keys in each branch and leaf towards 2**20/2**20+1 keys per node.
 <tr><th colspan=2>Area um2<th colspan=2>Fmax MHz<th colspan=2>Statements
 <tr><th>Custom<th>Generic <th>Custom<th>Generic<th>Custom<th>Generic
 <tr><td>2467<td>12927<td>902<td>399<td>23<td>122
-<tr><td colspan=2> 5.24 x Smaller<td colspan=2> 2.26 x Faster<td colspan=2> 5.30 * Compact [code](https://en.wikipedia.org/wiki/Computer_program)
-<tr><td colspan=4>62.76 x better
+<tr><td colspan=2> 5.24 x Smaller<td colspan=2> 2.26 x Faster<td colspan=2> 5.30 * Compact Code
+<tr><td colspan=4 style="text-align: center;">62.76 x better
 </table>
 
 ## Custom CPU
