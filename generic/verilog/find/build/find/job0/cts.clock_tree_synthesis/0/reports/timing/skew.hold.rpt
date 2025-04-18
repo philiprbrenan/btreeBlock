@@ -1,0 +1,7 @@
+Clock clk0
+ 0.1790 source latency memory[183][9]$_SDFFE_PP0P_/CK ^
+-0.1855 target latency intermediateValue[7]$_DFFE_PP_/CK ^
+ 0.0000 CRPR
+--------------
+-0.0065 hold skew
+
