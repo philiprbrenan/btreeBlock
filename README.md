@@ -34,7 +34,26 @@ implementation is faster and which uses less power.
 
 ![ð¢ HMS Rattler vs. HMS Alecto (1845)](https://prb.appaapps.com/zesal/presentation/images/SpecializedVersusGeneric.jpg)
 
+# The customc CPU is 62 * better than the generic CPU
+
+Performance as measured by OpenRoad for the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) versus the generic CPu
+on a 2/3 keys per node [B-Tree](https://en.wikipedia.org/wiki/B-tree) .  The performance gap widens as we increase the
+number of keys in each branch and leaf towards 2**20/2**20+1 keys per node.
+
+<table cellpadding=10 border=1>
+<tr><th colspan=2>Area um2<th colspan=2>Fmax MHz<th colspan=2>Statements
+<tr><th>Custom<th>Generic <th>Custom<th>Generic<th>Custom<th>Generic
+<tr><td>2467<td>12927<td>902<td>399<td>23<td>122
+<tr><td colspan=2> 5.24 x Smaller<td colspan=2> 2.26 x Faster<td colspan=2> 5.30 * Compact [code](https://en.wikipedia.org/wiki/Computer_program) <tr><td colspan=4>62.76 x better
+</table>
+
+## Custom CPU
+
 ![custom](https://github.com/philiprbrenan/btreeBlock/blob/main/custom/find.png)
+
+
+## Generic CPU
+
 ![generic](https://github.com/philiprbrenan/btreeBlock/blob/main/generic/find.png)
 
 
