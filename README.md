@@ -34,7 +34,7 @@ implementation is faster and which uses less power.
 
 ![ð¢ HMS Rattler vs. HMS Alecto (1845)](https://prb.appaapps.com/zesal/presentation/images/SpecializedVersusGeneric.jpg)
 
-# The customc CPU is 62 * better than the generic CPU
+# The custom CPU is 62 * better than the generic CPU
 
 Performance as measured by OpenRoad for the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) versus the generic CPu
 on a 2/3 keys per node [B-Tree](https://en.wikipedia.org/wiki/B-tree) .  The performance gap widens as we increase the
