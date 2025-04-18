@@ -1,0 +1,36 @@
+Cell type report:                       Count       Area
+  Inverter                                294     156.41
+  Sequential cell                         297    1343.03
+  Multi-Input combinational cell         2948    3556.95
+  Total                                  3539    5056.39
+
+Cell instance report:
+  AND2_X1                                  70      74.48
+  AND3_X1                                  19      25.27
+  AND4_X1                                  14      22.34
+  AOI211_X1                               203     269.99
+  AOI21_X1                                287     305.37
+  AOI221_X1                                62      98.95
+  AOI222_X1                               154     327.71
+  AOI22_X1                                312     414.96
+  DFF_X1                                  297    1343.03
+  FA_X1                                     3      12.77
+  HA_X1                                    84     223.44
+  INV_X1                                  294     156.41
+  MUX2_X1                                  10      18.62
+  NAND2_X1                                314     250.57
+  NAND3_X1                                142     151.09
+  NAND4_X1                                113     150.29
+  NOR2_X1                                 484     386.23
+  NOR3_X1                                  93      98.95
+  NOR4_X1                                  56      74.48
+  OAI21_X1                                303     322.39
+  OAI221_X1                                21      33.52
+  OAI222_X1                                 8      17.02
+  OAI22_X1                                 50      66.50
+  OAI33_X1                                 14      26.07
+  OR2_X1                                   37      39.37
+  OR3_X1                                   19      25.27
+  OR4_X1                                   13      20.75
+  XNOR2_X1                                 45      71.82
+  XOR2_X1                                  18      28.73
