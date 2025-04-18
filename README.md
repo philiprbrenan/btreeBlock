@@ -43,7 +43,7 @@ leaf/branch [B-Tree](https://en.wikipedia.org/wiki/B-tree).
 <tr><th>Custom<th>Generic <th>Custom<th>Generic<th>Custom<th>Generic
 <tr><td>2467<td>12927<td>902<td>399<td>23<td>122
 <tr><td colspan=2> 5.24 x Smaller<td colspan=2> 2.26 x Faster<td colspan=2> 5.30 * Compact Code
-<tr><td colspan=4 style="text-align: center;"><b>62.76</b> x better
+<tr><td colspan=6 style="text-align: center;"><b>62.76</b> x better
 </table>
 
 In the above **area** in micro meters squared equates to **power** consumption
