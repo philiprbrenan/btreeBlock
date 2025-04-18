@@ -1,0 +1,58 @@
+Startpoint: memory[182][0]$_SDFFE_PP0P_
+            (rising edge-triggered flip-flop clocked by clk0)
+Endpoint: memory[182][0]$_SDFFE_PP0P_
+          (rising edge-triggered flip-flop clocked by clk0)
+Path Group: clk0
+Path Type: min
+
+Fanout     Cap    Slew   Delay    Time   Description
+-----------------------------------------------------------------------------
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.00    0.00   clock source latency
+     1   12.24    0.03    0.03    0.03 ^ clock (in)
+                                         clock (net)
+                  0.03    0.00    0.03 ^ clkbuf_0_clock/A (CLKBUF_X3)
+     2    6.12    0.01    0.04    0.07 ^ clkbuf_0_clock/Z (CLKBUF_X3)
+                                         clknet_0_clock (net)
+                  0.01    0.00    0.07 ^ clkbuf_1_0__f_clock/A (CLKBUF_X3)
+     5   20.80    0.02    0.04    0.12 ^ clkbuf_1_0__f_clock/Z (CLKBUF_X3)
+                                         clknet_1_0__leaf_clock (net)
+                  0.02    0.00    0.12 ^ clkbuf_leaf_7_clock/A (CLKBUF_X3)
+    30   45.22    0.04    0.07    0.18 ^ clkbuf_leaf_7_clock/Z (CLKBUF_X3)
+                                         clknet_leaf_7_clock (net)
+                  0.04    0.00    0.18 ^ memory[182][0]$_SDFFE_PP0P_/CK (DFF_X1)
+     1    1.73    0.01    0.09    0.28 v memory[182][0]$_SDFFE_PP0P_/Q (DFF_X1)
+                                         memory[182][0] (net)
+                  0.01    0.00    0.28 v _7203_/A1 (NAND2_X1)
+     1    1.78    0.01    0.01    0.29 ^ _7203_/ZN (NAND2_X1)
+                                         _3194_ (net)
+                  0.01    0.00    0.29 ^ _7204_/B2 (AOI21_X1)
+     1    1.20    0.01    0.01    0.30 v _7204_/ZN (AOI21_X1)
+                                         _0330_ (net)
+                  0.01    0.00    0.30 v memory[182][0]$_SDFFE_PP0P_/D (DFF_X1)
+                                  0.30   data arrival time
+
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.00    0.00   clock source latency
+     1   12.24    0.03    0.03    0.03 ^ clock (in)
+                                         clock (net)
+                  0.03    0.00    0.03 ^ clkbuf_0_clock/A (CLKBUF_X3)
+     2    6.12    0.01    0.04    0.07 ^ clkbuf_0_clock/Z (CLKBUF_X3)
+                                         clknet_0_clock (net)
+                  0.01    0.00    0.07 ^ clkbuf_1_0__f_clock/A (CLKBUF_X3)
+     5   20.80    0.02    0.04    0.12 ^ clkbuf_1_0__f_clock/Z (CLKBUF_X3)
+                                         clknet_1_0__leaf_clock (net)
+                  0.02    0.00    0.12 ^ clkbuf_leaf_7_clock/A (CLKBUF_X3)
+    30   45.22    0.04    0.07    0.18 ^ clkbuf_leaf_7_clock/Z (CLKBUF_X3)
+                                         clknet_leaf_7_clock (net)
+                  0.04    0.00    0.18 ^ memory[182][0]$_SDFFE_PP0P_/CK (DFF_X1)
+                          0.00    0.18   clock reconvergence pessimism
+                          0.01    0.19   library hold time
+                                  0.19   data required time
+-----------------------------------------------------------------------------
+                                  0.19   data required time
+                                 -0.30   data arrival time
+-----------------------------------------------------------------------------
+                                  0.11   slack (MET)
+
+
