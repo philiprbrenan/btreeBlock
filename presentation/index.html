@@ -8,15 +8,23 @@ body {
     font-size: 2em;
     line-height: 2;
    }
+#news {
+    font-size: 0.6em;
+    line-height: 1.5;
+    background-color: ghostwhite;
+    padding: 1em;
+    border-radius: 1em;
+   }
 
-td, th {
+#consumption td,
+#consumption th {
     font-size: 2em;
     font-weight: bold;
    }
 
 li {
     margin-bottom: 1em; /* Adds space between <a href="https://en.wikipedia.org/wiki/Linked_list">list</a> items */
-    padding: 0.5em; /* Adds padding inside each item */
+    padding: 0.5em;  /* Adds padding inside each item */
     border-bottom: 1px solid #ccc; /* Optional: Adds a line between items */
 }
 
@@ -28,14 +36,19 @@ li {
 
 <h1 id="xxx">Database on a Chip</h1>
 
-<p>Data centers: save money on your electricity bills with <b>Database on a Chip</b>.
+<h1>Data Centers:</h1>
 
-Performance as measured by openroad for a custom cpu versus a generic cpu on a
-2/3 keys per leaf/branch btree .  The performance gap widens significantly as
-we increase the number of keys in each branch and leaf towards 2**20/2**20+1
-leaf/branch btree.
+<h2>Save a lot of money on your electricity bills!</h2>
 
-<table cellpadding=10 border=1>
+<div id="news">
+
+<p>Performance as measured by <a href="https://openroad-flow-scripts.readthedocs.io/en/latest/mainREADME.html">Open Road</a> for a
+<a href="https://github.com/philiprbrenan/btreeBlock">custom</a> processor
+versus a generic processor on a <b>2/3</b> Keys per leaf/branch <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .  The
+performance gap widens significantly as we increase the number of Keys in each
+branch and leaf in the <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .
+
+<p><table cellpadding="10"  cellspacing="10" border=1>
 <tr><th colspan=2>Area um2<th colspan=2>Fmax MHz<th colspan=2>Statements
 <tr><th>Custom<th>Generic <th>Custom<th>Generic<th>Custom<th>Generic
 <tr><td>2467<td>12927<td>902<td>399<td>23<td>122
@@ -43,22 +56,24 @@ leaf/branch btree.
 <tr><td colspan=4 style="text-align: center;"><b>62.76</b> x better
 </table>
 
-In the above **area** in micro meters squared equates to **power** consumption
-while **frequency** in mega hertz equates to **execution speed**. And even
-better a find operation takes far fewer statements to execute on the custom cpu
-than it does on the generic cpu because the operation codes are so much better
-adapted to manipulating a btree .
+<p>In the above <b>area</b> in micro-meters squared equates to <b>power</b>
+consumption while <b>frequency</b> in Mega Hertz equates to <b>execution
+speed</b>b>. And even better a <b>find</b> operation takes far fewer statements
+to execute on the custom <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> than it does on the generic <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> because the
+operation-codes are so much better adapted to manipulating a <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .
+
+</div>
 
 <h2 id="xxx">The problem</h2>
 
-<p>Data centers consume more electricity than they really need to.</p>
+<p><a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>s consume more electricity than they really need to.</p>
 
-<p><q>Data centers use one hundred times as much electricity as most other
+<p><q><a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>s use one hundred times as much electricity as most other
 businesses do</q>, according to the <a href="https://www.wsj.com/">The Wall Street Journal</a>.
 
 <p><img src="images/DataCentersUseALotOfElectricity.jpg">
 
-<p>Data centers consume about <b>300</b> Tera Watt hours per year or <b>1%</b>
+<p><a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>s consume about <b>300</b> Tera Watt hours per year or <b>1%</b>
 of world electricity production.</p>
 
 <p><img src="images/GlobalElectricityProduction.jpg">
@@ -70,7 +85,7 @@ of world electricity production.</p>
 <p>About equal to the combined total electricity consumed by these major
 cities:</p>
 
-<table border="1" cellpadding="10" cellspacing="10">
+<table id="consumption" border="1" cellpadding="10" cellspacing="10">
   <tr>
     <th>City</th>
     <th>Annual Consumption (Terra Watt hours)</th>
@@ -119,7 +134,7 @@ cities:</p>
   </tr>
 </table>
 
-<p>As a consequence, <a href="https://en.wikipedia.org/wiki/Data">data</a> center operators like to locate themselves close to
+<p>As a consequence, <a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a> operators like to locate themselves close to
 reliable supplies of cheap electricity. For example, <i>Gmail</i> is located
 near the Bonneville Dam in The Cascades, on the River Columbia, in Oregon.</p>
 
@@ -133,26 +148,26 @@ equivalent to the gdp of Italy.</p>
 <h2 id="xxx">The Solution</h2>
 
 <p>Appa Apps Inc. is prototyping a specialized <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a> for use in Data
-Centers to perform <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups <b>10</b> times faster while using
+Centers to performdatabaselook-ups <b>10</b> times faster while using
 <b>10</b> times less electricity than the generic <a href="https://en.wikipedia.org/wiki/Computer">computer</a>s currently in use.
 </p>
 
 <p><img src="images/AppaAppsIsPrototypingASiliconChip.jpg">
 
-<p>Data centers do a lot of <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups. Every company has a <a href="https://en.wikipedia.org/wiki/Database">database</a>
+<p><a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>s do a lot of <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups. Every company has a <a href="https://en.wikipedia.org/wiki/Database">database</a>
 nowadays and every company spends lots of time and money looking stuff up in
 their <a href="https://en.wikipedia.org/wiki/Database">database</a>, quickly, because their customers demand it.</p>
 
 <p><img src="images/EveryCompanyHasADatabase.jpg">
 
-<p>If we could make <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups just a <a href="https://en.wikipedia.org/wiki/Bit">bit</a> more efficient, <a href="https://en.wikipedia.org/wiki/Data">data</a> center
+<p>If we could make <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups just a <a href="https://en.wikipedia.org/wiki/Bit">bit</a> more efficient, <a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>
 operators would save quite a lot of money on their huge electricity bills - a
 saving of perhaps <b>$100 million</b> per year.</p>
 
 <h2>This is not a new idea...</h2>
 
 <p>Today, everyone has a mobile phone with a <a href="https://en.wikipedia.org/wiki/Graphics_processing_unit">Graphics Processing Unit</a> implemented in <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> rather
-than <a href="https://en.wikipedia.org/wiki/Software">software</a> because the original, software-only <a href="https://en.wikipedia.org/wiki/Software_versioning">version</a>s were far too slow.
+thansoftware because the original, software-only <a href="https://en.wikipedia.org/wiki/Software_versioning">version</a>s were far too slow.
 And every personal <a href="https://en.wikipedia.org/wiki/Computer">computer</a> has a <a href="https://en.wikipedia.org/wiki/Graphics_processing_unit">Graphics Processing Unit</a> for much the same reason.</p>
 
 <p><img src="images/EvolutionOfMobilePhone.png">
@@ -164,36 +179,51 @@ processing in <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> rather
 
 <p><img src="images/BitCoinMiner.jpg">
 
-<p>Implementing <a href="https://en.wikipedia.org/wiki/Database">database</a> <a href="https://en.wikipedia.org/wiki/Software">software</a> effectively in <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> will <a href="https://en.wikipedia.org/wiki/Online_help">help</a> <a href="https://en.wikipedia.org/wiki/Data">data</a> center
+<p>Implementing <a href="https://en.wikipedia.org/wiki/Database">database</a> <a href="https://en.wikipedia.org/wiki/Software">software</a> effectively in <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> will <a href="https://en.wikipedia.org/wiki/Online_help">help</a> <a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>
 operators be more competitive by reducing the cost and time spent doing
 <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups.</p>
 
-<h2 id="xxx">Roadmap</h2>
-
-<p>Appa Apps Inc. has recently succeeded in synthesizing a Verilog <a href="https://en.wikipedia.org/wiki/Software_versioning">version</a> of
-the well known <a href="https://en.wikipedia.org/wiki/Database">database</a> algorithm normally written in <b>C</b> ready for
-programming into a <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a> or an <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> (FPGA). Nobody else seems to have been able
-to do this yet otherwise we would be able to buy their solution on the open
-market.</p>
-
-<p><img src="images/fpga.jpg">
-
-<p>We are going to a <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> to compare the performance of our specialized
-implementation of the <a href="https://en.wikipedia.org/wiki/Database">database</a> algorithm with the performance of a generic
-<a href="https://en.wikipedia.org/wiki/Computer">computer</a>, likewise implemented on the same <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a>, running the <b>C</b> <a href="https://en.wikipedia.org/wiki/Software_versioning">version</a>
-of the algorithm.</p>
+<h2 id="xxx">Prototype Retest Results</h2>
 
 <p><img id="tugOfWar" src="images/SpecializedVersusGeneric.jpg">
 
-<p>Hopefully our specialized <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> implementation will be able to do <a href="https://en.wikipedia.org/wiki/Database">database</a>
-look-ups significantly faster while using less power than the comparable
-implementation on a generic computer.</p>
+<p>Appa Apps Inc. has recently succeeded in synthesizing and routing a Verilog
+<a href="https://en.wikipedia.org/wiki/Software_versioning">version</a> of the well known <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> <a href="https://en.wikipedia.org/wiki/Database">database</a> algorithm normally written in the <a href="https://b-ok.xyz/book/633119/db5c78">C programming language</a>
+ready for placement on an <a href="https://en.wikipedia.org/wiki/Application-specific_integrated_circuit">application specific integrated circuit</a> .
 
-<p>If it can, we want to send the major operators copies of the programmed <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a>
-mounted on a board so that they can plug it in and see for themselves that they
-are currently wasting money, needlessly, on their huge electricity bills
-because they are not using using our technology. Their share holders will
-demand that they do!</p>
+<p>The custom CPU is <b>62</b> * better than a generic CPU
+
+<p>Performance as measured by <a href="https://openroad-flow-scripts.readthedocs.io/en/latest/mainREADME.html">Open Road</a> for the custom <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> versus a generic <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a>
+on a <b>2/3</b> Keys per leaf/branch <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .  The performance gap widens as we
+increase the number of Keys in each branch and leaf of the <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .
+
+<p><table cellpadding=10 cellspacing=10 border=1>
+<tr><th colspan=2>Area um2<th colspan=2>Fmax MHz<th colspan=2>Statements
+<tr><th>Custom<th>Generic <th>Custom<th>Generic<th>Custom<th>Generic
+<tr><td>2467<td>12927<td>902<td>399<td>23<td>122
+<tr><td colspan=2> 5.24 x Smaller<td colspan=2> 2.26 x Faster<td colspan=2> 5.30 * Compact Code
+<tr><td colspan=4 style="text-align: center;"><b>62.76</b> x better
+</table>
+
+<p>In the above <b>area</b> in micro meters squared equates to <b>power</b> consumption
+while <b>frequency</b> in mega hertz equates to <b>execution speed</b>. And even
+better a <a href="https://en.wikipedia.org/wiki/Find_(Unix)">find</a> operation takes far fewer statements to execute on the custom <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a>
+than it does on the generic <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> because the operation-codes are so much better
+adapted to manipulating a <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .
+
+<h3>Custom CPU </h3>
+
+<p>The layout of the custom <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> as produced by <a href="https://openroad-flow-scripts.readthedocs.io/en/latest/mainREADME.html">Open Road</a> .</p>
+
+<p><img src="https://github.com/philiprbrenan/btreeBlock/blob/main/custom/find.png">
+
+
+<h3>Generic CPU</h3>
+
+<p>The layout of a custom <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> capable of executing the <a href="https://b-ok.xyz/book/633119/db5c78">C programming language</a> <a href="https://en.wikipedia.org/wiki/Software_versioning">version</a> of the <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a>
+algorithm as produced by <a href="https://openroad-flow-scripts.readthedocs.io/en/latest/mainREADME.html">Open Road</a> .</p>
+
+<p><img src="https://github.com/philiprbrenan/btreeBlock/blob/main/generic/find.png">
 
 <p><img src="images/DatabaseOnAnFPGA.png">
 
@@ -203,7 +233,7 @@ demand that they do!</p>
 
 <li>Buy the <a href="https://en.wikipedia.org/wiki/Digital_electronics">hardware</a> necessary to demonstrate our technology,</li>
 
-<li>Hire <a href="https://en.wikipedia.org/wiki/Digital_electronics">hardware</a> engineers to implement our technology as an actual programmed
+<li>Hire <a href="https://en.wikipedia.org/wiki/Digital_electronics">hardware</a> engineers to implement our technology as an
 <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> connected to the real world via <a href="https://en.wikipedia.org/wiki/Ethernet">Ethernet</a> and usb,</li>
 
 <li>Hire sales and marketing personnel to present our findings to the major
@@ -251,10 +281,8 @@ semiconductor foundries that produce chips.</li>
 <li><a href="https://en.wikipedia.org/wiki/Artificial_intelligence">artificial intelligence</a> makes it possible to explore the myriad <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a> design possibilities much
 more easily than ever before.</li>
 
-<li>Recent availability of the <a
-href="https://docs.siliconcompiler.com/en/latest/index.html">Open Source
-Silicon Compiler</a> makes designing specialized <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s easier than ever
-before.</li>
+<li>Recent availability of the <a href="https://docs.siliconcompiler.com/en/latest/index.html">Open Source Silicon Compiler</a> makes designing specialized
+<a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s easier than ever before.</li>
 
 </ul>
 
@@ -262,13 +290,13 @@ before.</li>
 
 <p>Our business model is a pure Intellectual Property play. We would license
 the copyright to our design, allowing foundries to fabricate specialized
-<a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s to replace the generic ones currently in use for <a href="https://en.wikipedia.org/wiki/Database">database</a> lookups
-in Data Centers. This approach mirrors the business model of industry leaders
+<a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s to replace the generic ones currently in use fordatabaselookups
+in <a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>s. This approach mirrors the business model of industry leaders
 such as NVIDIA, ARM, and Qualcomm.</p>
 
 <h3 id="xxx">Who would be your customers?</h3>
 
-<p>Our ideal customers are the top 10 hyperscale <a href="https://en.wikipedia.org/wiki/Data">data</a> center operators, such
+<p>Our ideal customers are the top 10 hyperscale <a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a> operators, such
 as:
 
 <ol>
@@ -286,7 +314,7 @@ as:
 <h3 id="xxx">How do you know the hyperscalers want your solution?</h3>
 
 <p>Hyperscalers have enormous electricity bills, which is why they
-strategically locate their <a href="https://en.wikipedia.org/wiki/Data">data</a> centers near hydroelectric dams and nuclear
+strategically locate their <a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>s near hydroelectric dams and nuclear
 power stations. They are well aware of the need to reduce electricity costs, as
 their shareholders demand it. As a result, they must invest in the most cost
 effective <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s available. There is no other alternative except going out of
@@ -294,15 +322,13 @@ business.
 
 <h3 id="xxx">Why are you the best team?</h3>
 
-<p>We are the best team to bring this solution to market because we have many
-years of unique, specialized expertise in <a href="https://en.wikipedia.org/wiki/Database">database</a> <a href="https://en.wikipedia.org/wiki/Software">software</a> and electronics
-design which enables us to drive ChatGPT to efficiently develop and deliver a
-high-performance, market-ready solution.
+<p>We are the best team to bring this solution to market because we have
+succeeded in producing routable Verilog when no else seems to have done so.
 
 <h3 id="xxx">How can we best support your business?</h3>
 
-<p>We need <a href="https://en.wikipedia.org/wiki/Online_help">help</a> in presenting our prototype effectively to the right <a href="https://en.wikipedia.org/wiki/Person">people</a>
-who are capable of making investment decisions.
+<p>We need <a href="https://en.wikipedia.org/wiki/Online_help">help</a> in presenting our prototype effectively to the right <a href="https://en.wikipedia.org/wiki/Person">people</a> who
+are capable of making investment decisions.
 
 <h3 id="xxx">Github page?</h3>
 
@@ -311,6 +337,3 @@ who are capable of making investment decisions.
 <h3 id="xxx">Email address?</h3>
 
 <p> <a href="mailto:philiprbrenan@gmail.com">philiprbrenan@gmail.com</a></p>
-
-<p>I will be happy to <a href="https://en.wikipedia.org/wiki/Online_help">help</a> you with your project, gratis, if you will try to
-<a href="https://en.wikipedia.org/wiki/Online_help">help</a> me with mine.</p>
