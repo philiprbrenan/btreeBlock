@@ -38,8 +38,8 @@ The same  [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm has now been 
 Performance as measured by [Open Road](https://openroad-flow-scripts.readthedocs.io/en/latest/mainREADME.html) for the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) versus the generic [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) on a 2/3 keys per leaf/branch [B-Tree](https://en.wikipedia.org/wiki/B-tree) .  The performance gap widens as we
 increase the number of keys in each branch and leaf towards 2**20/2**20+1
 leaf/branch [B-Tree](https://en.wikipedia.org/wiki/B-tree). 
-<table cellpadding=10 border=1>
-<tr><th colspan=2>Area um2<th colspan=2>Fmax MHz<th colspan=2>Statements
+<p><table cellpadding="10"  cellspacing="10" border=1>
+<tr><th colspan=2>Area Î¼mÂ²<th colspan=2>Fmax MHz<th colspan=2>Statements
 <tr><th>Custom<th>Generic <th>Custom<th>Generic<th>Custom<th>Generic
 <tr><td>2467<td>12927<td>902<td>399<td>23<td>122
 <tr><td colspan=2> 5.24 x Smaller<td colspan=2> 2.26 x Faster<td colspan=2> 5.30 * Compact Code
