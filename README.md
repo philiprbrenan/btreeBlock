@@ -29,8 +29,7 @@ congestion. ![Roadmap](flowChart/DevelopmentFlowChart.png)
 This produced a custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) with an instruction set specifically designed to
 facilitate the **put**, **find** and **delete** operations on a [B-Tree](https://en.wikipedia.org/wiki/B-tree) .
 
-The same  [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm has been implemented on a generic [reduced instruction set computer](https://en.wikipedia.org/wiki/Reduced_instruction_set_computer) soft [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) so that the performance of the generic [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) versus the performance of the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) can be compared by running them both on the same [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array) to see which
-implementation is faster and which uses less power.
+The same  [B-Tree](https://en.wikipedia.org/wiki/B-tree) algorithm has now been implemented on a generic [reduced instruction set computer](https://en.wikipedia.org/wiki/Reduced_instruction_set_computer) [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) so that the performance of the generic [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) versus the performance of the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) can be compared.
 
 ![ð¢ HMS Rattler vs. HMS Alecto (1845)](https://prb.appaapps.com/zesal/presentation/images/SpecializedVersusGeneric.jpg)
 
@@ -46,6 +45,11 @@ leaf/branch [B-Tree](https://en.wikipedia.org/wiki/B-tree).
 <tr><td colspan=2> 5.24 x Smaller<td colspan=2> 2.26 x Faster<td colspan=2> 5.30 * Compact Code
 <tr><td colspan=4 style="text-align: center;"><b>62.76</b> x better
 </table>
+
+In the above **area** in micro meters squared equates to **power** consumption
+while **frequency** in mega hertz equates to **execution speed**. And even
+better a [find](https://en.wikipedia.org/wiki/Find_(Unix)) operation takes far fewer statements to execute on the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) than it does on the generic [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) because the operation codes are so much better
+adapted to manipulating a [B-Tree](https://en.wikipedia.org/wiki/B-tree) .
 
 ## Custom CPU
 
