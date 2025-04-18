@@ -36,10 +36,9 @@ implementation is faster and which uses less power.
 
 # The custom CPU is 62 * better than the generic CPU
 
-Performance as measured by OpenRoad for the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) versus the generic CPu
-on a 2/3 keys per node [B-Tree](https://en.wikipedia.org/wiki/B-tree) .  The performance gap widens as we increase the
-number of keys in each branch and leaf towards 2**20/2**20+1 keys per node.
-
+Performance as measured by OpenRoad for the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) versus the generic [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) on a 2/3 keys per leaf/branch [B-Tree](https://en.wikipedia.org/wiki/B-tree) .  The performance gap widens as we
+increase the number of keys in each branch and leaf towards 2**20/2**20+1
+leaf/branch [B-Tree](https://en.wikipedia.org/wiki/B-tree). 
 <table cellpadding=10 border=1>
 <tr><th colspan=2>Area um2<th colspan=2>Fmax MHz<th colspan=2>Statements
 <tr><th>Custom<th>Generic <th>Custom<th>Generic<th>Custom<th>Generic
