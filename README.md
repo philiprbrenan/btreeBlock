@@ -48,7 +48,7 @@ leaf/branch [B-Tree](https://en.wikipedia.org/wiki/B-tree).
 
 In the above **area** in micro meters squared equates to **power** consumption
 while **frequency** in mega hertz equates to **execution speed**. And even
-better a [find](https://en.wikipedia.org/wiki/Find_(Unix)) operation takes far fewer statements to execute on the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) than it does on the generic [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) because the operation codes are so much better
+better a [find](https://en.wikipedia.org/wiki/Find_(Unix)) operation takes far fewer statements to execute on the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) than it does on the generic [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) because the custom operation codes are so much better
 adapted to manipulating a [B-Tree](https://en.wikipedia.org/wiki/B-tree) .
 
 ## Custom CPU
