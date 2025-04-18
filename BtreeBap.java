@@ -1581,14 +1581,21 @@ class BtreeBap extends Test                                                     
     final String folder = "generic/verilog";                                    // Place the code in this folder
     final String verilogSource;                                                 // Verilog source code
     final String verilogTest;                                                   // Verilog test bench
+    final String opCodeFile;                                                    // The file containing the opcode mapping
+    final String opCodeName = "opCodes";                                        // The name of the opcode mapping array
     final int bitsPerInteger = 16;                                              // Number of bits in an integer
+    final Ban.Verilog verilog;                                                  // Generated verilog
 
     enum Action{find, put, delete};                                             // The actions we can perform on the Btree via verilog
 
     VerilogCode(Action Project, int Key, int Data)                              // Generate verilog code
      {project = Project; key = Key; data = Data;
-      verilogSource = Paths.get(folder, project.name())+Verilog.ext;
-      verilogTest   = Paths.get(folder, project.name())+Verilog.testExt;
+      final String name = project.name();
+      verilogSource = Paths.get(folder, name, name)     +Verilog.ext;
+      verilogTest   = Paths.get(folder, name, name)     +Verilog.testExt;
+      opCodeFile    = Paths.get(folder, name, "opCodes")+Verilog.testExt;
+      verilog       = L.new Verilog(opCodeName, bitsPerInteger);
+
       generateVerilogCode();
       generateVerilogTestBench();
      }
@@ -1615,11 +1622,12 @@ module $project(reset, stop, clock, Key, Data, data, found);                    
   integer steps;
   integer stopped;
   integer intermediateValue;
-$declareMemory
+  $declareMemory
+  $declareOpCodeMap
 
   assign stop  = stopped > 0 ? 1 : 0;
-  assign found = memory[$foundBase];
-  assign data  = memory[$dataBase];
+  assign found = memory[$foundBase];  // found
+  assign data  = memory[$dataBase];   // data
 
   always @ (posedge clock) begin                                                // Execute next step in program
     if (reset) begin                                                            // Reset
@@ -1627,12 +1635,13 @@ $declareMemory
       steps    <= 0;
       stopped  <= 0;
 $initializeMemory
+$initializeOpCodeMap
       $assignKey
       $assignData
     end
     else begin                                                                  // Run
       //$display("%4d %4d %4d s=%4d f=%4d d=%4d", steps, step, intermediateValue, stop, found, data);
-      case(step)
+      case(opCodes[step])
 $opCodes
         default: stopped <= 1;
       endcase
@@ -1687,10 +1696,12 @@ endmodule
       s = s.replace("$Data",             ""+data);
       s = s.replace("$foundBase",        ""+L.getArray("f_found").base);
       s = s.replace("$dataBase",         ""+L.getArray("f_data").base);
-      s = s.replace("$opCodes",             L.verilog());
+      s = s.replace("$opCodes",             verilog.opCodes);
+      s = s.replace("$initializeOpCodeMap", verilog.initializeOpCodes);
       s = s.replace("$maxSteps",         ""+L.maxTime);
-      s = s.replace("$declareMemory",       L.declareVerilogMemory(bitsPerInteger));
-      s = s.replace("$initializeMemory",    L.initializeVerilogMemory());
+      s = s.replace("$declareMemory",       verilog.declareMemory);
+      s = s.replace("$declareOpCodeMap",    verilog.declareOpCodes);
+      s = s.replace("$initializeMemory",    verilog.initializeMemory);
       switch(project)
        {case Action.delete: s = s.replace("$assignKey", "memory["+L.getArray("delete_Key").base+"] <= "+key+"; /* delete key */"); break;
         case Action.find:   s = s.replace("$assignKey", "memory["+L.getArray(  "find_Key").base+"] <= "+key+"; /* find key */"); break;
@@ -2302,17 +2313,17 @@ Stuck(size:3)
 //D2 Test verilog                                                               // Generate some verilog
 
   static void test_find_verilog()
-   {final BtreeBap b = new BtreeBap(16, 17, 600);
+   {final BtreeBap b = new BtreeBap(2, 3, 10);
     b.L.run(); b.L.clearCode();    b.put();
     final BtreeBap f = b.thread(); f.find();
 
-    int N = 256;
+    int N = 9;
     for (int i = 1; i <= N; i++)
-     {b.L.setMemory(i, "put_Key"); b.L.setMemory(N+1-i, "put_Data");
+     {b.L.setMemory(i, "put_Key"); b.L.setMemory(N-i, "put_Data");
       b.L.run();
      }
 
-    int Key = 22, Data = N+1 - Key;
+    int Key = 4, Data = N - Key;
     f.new VerilogCode(VerilogCode.Action.find, Key, Data);
     f.L.debugStep = f.L.new Debug()
      {void debug()
