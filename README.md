@@ -39,7 +39,7 @@ Performance as measured by [Open Road](https://openroad-flow-scripts.readthedocs
 increase the number of keys in each branch and leaf towards 2**20/2**20+1
 leaf/branch [B-Tree](https://en.wikipedia.org/wiki/B-tree). 
 <p><table cellpadding="10"  cellspacing="10" border=1>
-<tr><th colspan=2>Area Î¼mÂ²<th colspan=2>Fmax MHz<th colspan=2>Statements
+<tr><th colspan=2>Area &mu;m&sup2;<th colspan=2>Fmax MHz<th colspan=2>Statements
 <tr><th>Custom<th>Generic <th>Custom<th>Generic<th>Custom<th>Generic
 <tr><td>2467<td>12927<td>902<td>399<td>23<td>122
 <tr><td colspan=2> 5.24 x Smaller<td colspan=2> 2.26 x Faster<td colspan=2> 5.30 * Compact Code
