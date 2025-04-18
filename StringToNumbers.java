@@ -59,19 +59,34 @@ class StringToNumbers extends Test                                              
 //D1 Verilog                                                                    // Generate verilog
 
   void genVerilog(String file, String name)                                     // Verilog to map sets of numbers to the ordinal of the element in the order and then writethe verilog to a file
+   {writeFile(file, declareOpCodes(name)+"\n"+initializeOpCodeProc(name));
+   }
+
+  String declareOpCodes(String name)                                            // Verilog array to map sets of numbers to the ordinal of the element in the order and then writethe verilog to a file
+   {final int N = outputOrder.size(), L = logTwo(N);
+    return "reg ["+L+"-1: 0] "+name+"["+max+" : 0];";
+   }
+
+  String initializeOpCodeProc(String name)                                         // Verilog array to map sets of numbers to the ordinal of the element in the order and then writethe verilog to a file
    {final StringBuilder s = new StringBuilder();
-    final int N = outputOrder.size(), L = logTwo(N);
-    s.append("reg ["+L+"-1: 0] "+name+"["+max+" : 0];\n");
+    final int N = outputOrder.size();
     s.append("task initialize_"+name+";\n");
     s.append("  begin\n");
-    for (int i = 0; i < N; i++)
-     {final Order o = outputOrder.elementAt(i);
-      for(Integer j : o.keys) s.append("        "+name+"["+j+"] <= "+i+";\n");
-     }
+    s.append(initializeOpCodes(name, 8));
     s.append("  end\n");
     s.append("endtask\n");
 
-    writeFile(file, s.toString());
+    return ""+s;
+   }
+
+  String initializeOpCodes(String Name, int Indent)                             // Verilog array to map sets of numbers to the ordinal of the element in the order and then writethe verilog to a file
+   {final StringBuilder s = new StringBuilder();
+    final int N = outputOrder.size();
+    for (int i = 0; i < N; i++)
+     {final Order o = outputOrder.elementAt(i);
+      for(Integer j : o.keys) s.append(" ".repeat(Indent)+Name+"["+j+"] <= "+i+";\n");
+     }
+    return ""+s;
    }
 
 //D0 Tests                                                                      // Testing
