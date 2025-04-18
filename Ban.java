@@ -679,41 +679,74 @@ abstract class Ban extends Test                                                 
 
 //D1 Verilog                                                                    // Generate verilog for the program
 
-  String verilog()                                                              // Generate verilog for the program
-   {final StringBuilder v = new StringBuilder();                                // Generated verilog
-    final int N = code.size();
-    for(int i = 0; i < N; ++i)
-     {final String c = code.elementAt(i).v();
-      v.append("      "+String.format("%4d", i)+": begin "+c+" end\n");
+  class Verilog                                                                 // Generate Verilog code representing the progrma suitable for inserting into a test harness
+   {final String opCodes;
+    final String declareOpCodes;
+    final String declareMemory;
+    final String initializeOpCodes;
+    final String initializeMemory;
+
+    Verilog(String Name, int Width)                                             // Generate verilog for the program with the op codes named as specified for integers of teh specified width
+     {final StringBuilder   v   = new StringBuilder();                          // Generated verilog
+      final StringToNumbers ops = new StringToNumbers();                        // Collapse identical instructions when writing verilog
+
+      final int N = code.size();
+      for(int i = 0; i < N; ++i)
+       {final String c = code.elementAt(i).v();
+        ops.put(c, i);
+       }
+
+      ops.order();                                                              // Order the instructions
+
+      for(StringToNumbers.Order o : ops.outputOrder)                            // I shall say each instruction only once
+       {final int    n = o.ordinal;                                             // Step
+        final String i = o.string;                                              // Instruction before next added
+        v.append(String.format("        %4d : begin %s end\n",  n, i));
+       }
+      opCodes           = ""+v;
+      declareOpCodes    = ops.declareOpCodes(Name);                             // Write op code map
+      declareMemory     = declareVerilogMemory(Width);                          // Declare memory in verilog
+      initializeOpCodes = ops.initializeOpCodes(Name, 6);                       // Initialize memory in verilog
+      initializeMemory  = initializeVerilogMemory();                            // Initialize memory in verilog
      }
-    return ""+v;
-   }
 
-  String declareVerilogMemory(int width)                                        // Declare memory in verilog
-   {final int N = memory.length;
-    return "  reg ["+width+"-1:0] memory ["+N+"-1: 0];\n";
-   }
+    String verilog22()                                                          // Generate verilog for the program
+     {final StringBuilder v = new StringBuilder();                              // Generated verilog
 
-  String initializeVerilogMemory()                                              // Initialize memory in verilog
-   {final StringBuilder v = new StringBuilder();                                // Generated verilog
-    final int N = memory.length;
-    String z = """
-      begin
+      final int N = code.size();
+      for(int i = 0; i < N; ++i)
+       {final String c = code.elementAt(i).v();
+        v.append("      "+String.format("%4d", i)+": begin "+c+" end\n");
+       }
+      return ""+v;
+     }
+
+    String declareVerilogMemory(int width)                                      // Declare memory in verilog
+     {final int N = memory.length;
+      return "reg ["+width+"-1:0] memory ["+N+"-1: 0]; /* declareVerilogMemory */";
+     }
+
+    String initializeVerilogMemory()                                            // Initialize memory in verilog
+     {final StringBuilder v = new StringBuilder();                              // Generated verilog
+      final int N = memory.length;
+      String z = """
+      begin /* initilizeVerilogMemory */
         integer i;
         for (i = 0; i < NNN; i = i + 1) begin
           memory[i] <= 0;
         end
       end
 """;
-    v.append(z.replace("NNN", ""+N));                                           // Zero code
+      v.append(z.replace("NNN", ""+N));                                         // Zero code
 
-    for(int i = 0; i < N; ++i)
-     {final int m = memory[i];
-      if (m == 0) continue;
-      final String a = getArrays(i);
-      v.append("      "+String.format("memory[%4d] <= %4d; /* %s */\n", i, m, a));  // Non zero elements
+      for(int i = 0; i < N; ++i)
+       {final int m = memory[i];
+        if (m == 0) continue;
+        final String a = getArrays(i);
+        v.append("      "+String.format("memory[%4d] <= %4d; /* %s */\n", i, m, a));  // Non zero elements
+       }
+      return ""+v;
      }
-    return ""+v;
    }
 
 //D0 Tests                                                                      // Testing
