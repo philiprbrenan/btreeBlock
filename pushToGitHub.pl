@@ -35,15 +35,15 @@ push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              
         @files = grep {!m(/bam/)}                 @files;
         @files = grep {!m(/zzz/)}                 @files;
 
-if (1)                                                                          # Remove most of the verilog except the reports
+if (0)                                                                          # Remove most of the verilog except the reports
  {my @f = @files; @files = ();
   for my $f(@f)
-   {next if $f =~ m(verilog) and $f !~ m(/(reports|timing_route)/);
+   {next if $f =~ m(verilog) and $f !~ m(/(reports|timing_route)|png\Z/);
     push @files, $f;
    }
  }
 
-if (1)
+if (0)
  {push my @g, searchDirectoryTreesForMatchingFiles($generic, @gExt);            # Generic cpu files
   @files = (@files, @g);
  }
