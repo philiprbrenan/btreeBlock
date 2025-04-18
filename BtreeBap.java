@@ -2335,7 +2335,7 @@ Stuck(size:3)
     f.L.run();
     say(String.format("%4d %4d %4d s=%4d f=%4d d=%4d", f.L.time, f.L.step, f.L.intermediateValue, f.L.running ? 0 : 1, f.L.getMemory("f_found"), f.L.getMemory("f_data")));
     ok(f.L.getMemory("f_data"), Data);
-
+    ok(f.L.time, 122);
    }
 
   static void test_put_verilog()
