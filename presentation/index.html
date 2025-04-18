@@ -28,7 +28,26 @@ li {
 
 <h1 id="xxx">Database on a Chip</h1>
 
-<p>Data centers: save money on your electricity bills with <q>Database on a Chip</q>.
+<p>Data centers: save money on your electricity bills with <b>Database on a Chip</b>.
+
+Performance as measured by openroad for a custom cpu versus a generic cpu on a
+2/3 keys per leaf/branch btree .  The performance gap widens significantly as
+we increase the number of keys in each branch and leaf towards 2**20/2**20+1
+leaf/branch btree.
+
+<table cellpadding=10 border=1>
+<tr><th colspan=2>Area um2<th colspan=2>Fmax MHz<th colspan=2>Statements
+<tr><th>Custom<th>Generic <th>Custom<th>Generic<th>Custom<th>Generic
+<tr><td>2467<td>12927<td>902<td>399<td>23<td>122
+<tr><td colspan=2> 5.24 x Smaller<td colspan=2> 2.26 x Faster<td colspan=2> 5.30 * Compact Code
+<tr><td colspan=4 style="text-align: center;"><b>62.76</b> x better
+</table>
+
+In the above **area** in micro meters squared equates to **power** consumption
+while **frequency** in mega hertz equates to **execution speed**. And even
+better a find operation takes far fewer statements to execute on the custom cpu
+than it does on the generic cpu because the operation codes are so much better
+adapted to manipulating a btree .
 
 <h2 id="xxx">The problem</h2>
 
