@@ -1,0 +1,361 @@
+[WARNING STA-0503] report_checks -group_count is deprecated. Use -group_path_count instead.
+Startpoint: memory[182][0]$_SDFFE_PP0P_
+            (rising edge-triggered flip-flop clocked by clk0)
+Endpoint: memory[182][0]$_SDFFE_PP0P_
+          (rising edge-triggered flip-flop clocked by clk0)
+Path Group: clk0
+Path Type: min
+
+Fanout     Cap    Slew   Delay    Time   Description
+-----------------------------------------------------------------------------
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                  0.04    0.00    0.18 ^ memory[182][0]$_SDFFE_PP0P_/CK (DFF_X1)
+     1    1.73    0.01    0.09    0.28 v memory[182][0]$_SDFFE_PP0P_/Q (DFF_X1)
+                                         memory[182][0] (net)
+                  0.01    0.00    0.28 v _7203_/A1 (NAND2_X1)
+     1    1.78    0.01    0.01    0.29 ^ _7203_/ZN (NAND2_X1)
+                                         _3194_ (net)
+                  0.01    0.00    0.29 ^ _7204_/B2 (AOI21_X1)
+     1    1.20    0.01    0.01    0.30 v _7204_/ZN (AOI21_X1)
+                                         _0330_ (net)
+                  0.01    0.00    0.30 v memory[182][0]$_SDFFE_PP0P_/D (DFF_X1)
+                                  0.30   data arrival time
+
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                          0.00    0.18   clock reconvergence pessimism
+                                  0.18 ^ memory[182][0]$_SDFFE_PP0P_/CK (DFF_X1)
+                          0.01    0.19   library hold time
+                                  0.19   data required time
+-----------------------------------------------------------------------------
+                                  0.19   data required time
+                                 -0.30   data arrival time
+-----------------------------------------------------------------------------
+                                  0.11   slack (MET)
+
+
+Startpoint: intermediateValue[16]$_DFFE_PP_
+            (rising edge-triggered flip-flop clocked by clk0)
+Endpoint: intermediateValue[16]$_DFFE_PP_
+          (rising edge-triggered flip-flop clocked by clk0)
+Path Group: clk0
+Path Type: min
+
+Fanout     Cap    Slew   Delay    Time   Description
+-----------------------------------------------------------------------------
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                  0.03    0.00    0.18 ^ intermediateValue[16]$_DFFE_PP_/CK (DFF_X1)
+     3    6.89    0.02    0.11    0.29 ^ intermediateValue[16]$_DFFE_PP_/Q (DFF_X1)
+                                         intermediateValue[16] (net)
+                  0.02    0.00    0.29 ^ _6270_/A1 (OAI22_X1)
+     1    1.67    0.01    0.01    0.30 v _6270_/ZN (OAI22_X1)
+                                         _2540_ (net)
+                  0.01    0.00    0.30 v _6271_/A (INV_X1)
+     1    1.34    0.01    0.01    0.31 ^ _6271_/ZN (INV_X1)
+                                         _0058_ (net)
+                  0.01    0.00    0.31 ^ intermediateValue[16]$_DFFE_PP_/D (DFF_X1)
+                                  0.31   data arrival time
+
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                          0.00    0.18   clock reconvergence pessimism
+                                  0.18 ^ intermediateValue[16]$_DFFE_PP_/CK (DFF_X1)
+                          0.01    0.20   library hold time
+                                  0.20   data required time
+-----------------------------------------------------------------------------
+                                  0.20   data required time
+                                 -0.31   data arrival time
+-----------------------------------------------------------------------------
+                                  0.12   slack (MET)
+
+
+Startpoint: intermediateValue[18]$_DFFE_PP_
+            (rising edge-triggered flip-flop clocked by clk0)
+Endpoint: intermediateValue[18]$_DFFE_PP_
+          (rising edge-triggered flip-flop clocked by clk0)
+Path Group: clk0
+Path Type: min
+
+Fanout     Cap    Slew   Delay    Time   Description
+-----------------------------------------------------------------------------
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                  0.03    0.00    0.18 ^ intermediateValue[18]$_DFFE_PP_/CK (DFF_X1)
+     3    6.93    0.02    0.11    0.29 ^ intermediateValue[18]$_DFFE_PP_/Q (DFF_X1)
+                                         intermediateValue[18] (net)
+                  0.02    0.00    0.29 ^ _6286_/A1 (OAI22_X1)
+     1    1.90    0.01    0.01    0.30 v _6286_/ZN (OAI22_X1)
+                                         _2554_ (net)
+                  0.01    0.00    0.30 v _6287_/A (INV_X1)
+     1    1.35    0.01    0.01    0.31 ^ _6287_/ZN (INV_X1)
+                                         _0060_ (net)
+                  0.01    0.00    0.31 ^ intermediateValue[18]$_DFFE_PP_/D (DFF_X1)
+                                  0.31   data arrival time
+
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                          0.00    0.18   clock reconvergence pessimism
+                                  0.18 ^ intermediateValue[18]$_DFFE_PP_/CK (DFF_X1)
+                          0.01    0.20   library hold time
+                                  0.20   data required time
+-----------------------------------------------------------------------------
+                                  0.20   data required time
+                                 -0.31   data arrival time
+-----------------------------------------------------------------------------
+                                  0.12   slack (MET)
+
+
+Startpoint: memory[82][6]$_SDFFE_PP0N_
+            (rising edge-triggered flip-flop clocked by clk0)
+Endpoint: memory[82][6]$_SDFFE_PP0N_
+          (rising edge-triggered flip-flop clocked by clk0)
+Path Group: clk0
+Path Type: min
+
+Fanout     Cap    Slew   Delay    Time   Description
+-----------------------------------------------------------------------------
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                  0.03    0.00    0.18 ^ memory[82][6]$_SDFFE_PP0N_/CK (DFF_X1)
+     2    5.09    0.01    0.10    0.28 v memory[82][6]$_SDFFE_PP0N_/Q (DFF_X1)
+                                         memory[82][6] (net)
+                  0.01    0.00    0.28 v _4653_/A (INV_X2)
+     2    7.36    0.01    0.02    0.30 ^ _4653_/ZN (INV_X2)
+                                         _0939_ (net)
+                  0.01    0.00    0.30 ^ _6886_/B2 (AOI21_X1)
+     1    1.17    0.01    0.01    0.31 v _6886_/ZN (AOI21_X1)
+                                         _0208_ (net)
+                  0.01    0.00    0.31 v memory[82][6]$_SDFFE_PP0N_/D (DFF_X1)
+                                  0.31   data arrival time
+
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                          0.00    0.18   clock reconvergence pessimism
+                                  0.18 ^ memory[82][6]$_SDFFE_PP0N_/CK (DFF_X1)
+                          0.01    0.19   library hold time
+                                  0.19   data required time
+-----------------------------------------------------------------------------
+                                  0.19   data required time
+                                 -0.31   data arrival time
+-----------------------------------------------------------------------------
+                                  0.12   slack (MET)
+
+
+Startpoint: intermediateValue[20]$_DFFE_PP_
+            (rising edge-triggered flip-flop clocked by clk0)
+Endpoint: intermediateValue[20]$_DFFE_PP_
+          (rising edge-triggered flip-flop clocked by clk0)
+Path Group: clk0
+Path Type: min
+
+Fanout     Cap    Slew   Delay    Time   Description
+-----------------------------------------------------------------------------
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                  0.03    0.00    0.18 ^ intermediateValue[20]$_DFFE_PP_/CK (DFF_X1)
+     3    7.51    0.02    0.11    0.29 ^ intermediateValue[20]$_DFFE_PP_/Q (DFF_X1)
+                                         intermediateValue[20] (net)
+                  0.02    0.00    0.29 ^ _6301_/A1 (OAI22_X1)
+     1    1.60    0.01    0.01    0.30 v _6301_/ZN (OAI22_X1)
+                                         _2567_ (net)
+                  0.01    0.00    0.30 v _6302_/A (INV_X1)
+     1    1.34    0.01    0.01    0.31 ^ _6302_/ZN (INV_X1)
+                                         _0062_ (net)
+                  0.01    0.00    0.31 ^ intermediateValue[20]$_DFFE_PP_/D (DFF_X1)
+                                  0.31   data arrival time
+
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                          0.00    0.18   clock reconvergence pessimism
+                                  0.18 ^ intermediateValue[20]$_DFFE_PP_/CK (DFF_X1)
+                          0.01    0.19   library hold time
+                                  0.19   data required time
+-----------------------------------------------------------------------------
+                                  0.19   data required time
+                                 -0.31   data arrival time
+-----------------------------------------------------------------------------
+                                  0.12   slack (MET)
+
+
+Startpoint: memory[58][2]$_SDFFE_PP0P_
+            (rising edge-triggered flip-flop clocked by clk0)
+Endpoint: memory[58][2]$_SDFFE_PP0P_
+          (rising edge-triggered flip-flop clocked by clk0)
+Path Group: clk0
+Path Type: min
+
+Fanout     Cap    Slew   Delay    Time   Description
+-----------------------------------------------------------------------------
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                  0.03    0.00    0.18 ^ memory[58][2]$_SDFFE_PP0P_/CK (DFF_X1)
+     5    8.41    0.01    0.10    0.29 v memory[58][2]$_SDFFE_PP0P_/Q (DFF_X1)
+                                         memory[58][2] (net)
+                  0.01    0.00    0.29 v _6616_/A (INV_X1)
+     1    1.71    0.01    0.01    0.30 ^ _6616_/ZN (INV_X1)
+                                         _2829_ (net)
+                  0.01    0.00    0.30 ^ _6617_/B2 (AOI21_X1)
+     1    1.22    0.01    0.01    0.31 v _6617_/ZN (AOI21_X1)
+                                         _0108_ (net)
+                  0.01    0.00    0.31 v memory[58][2]$_SDFFE_PP0P_/D (DFF_X1)
+                                  0.31   data arrival time
+
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                          0.00    0.18   clock reconvergence pessimism
+                                  0.18 ^ memory[58][2]$_SDFFE_PP0P_/CK (DFF_X1)
+                          0.01    0.19   library hold time
+                                  0.19   data required time
+-----------------------------------------------------------------------------
+                                  0.19   data required time
+                                 -0.31   data arrival time
+-----------------------------------------------------------------------------
+                                  0.12   slack (MET)
+
+
+Startpoint: memory[58][4]$_SDFFE_PP0P_
+            (rising edge-triggered flip-flop clocked by clk0)
+Endpoint: memory[58][4]$_SDFFE_PP0P_
+          (rising edge-triggered flip-flop clocked by clk0)
+Path Group: clk0
+Path Type: min
+
+Fanout     Cap    Slew   Delay    Time   Description
+-----------------------------------------------------------------------------
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                  0.03    0.00    0.18 ^ memory[58][4]$_SDFFE_PP0P_/CK (DFF_X1)
+     5    8.41    0.01    0.10    0.28 v memory[58][4]$_SDFFE_PP0P_/Q (DFF_X1)
+                                         memory[58][4] (net)
+                  0.01    0.00    0.28 v _6623_/A (INV_X1)
+     1    1.83    0.01    0.01    0.30 ^ _6623_/ZN (INV_X1)
+                                         _2834_ (net)
+                  0.01    0.00    0.30 ^ _6624_/B2 (AOI21_X1)
+     1    1.39    0.01    0.01    0.31 v _6624_/ZN (AOI21_X1)
+                                         _0110_ (net)
+                  0.01    0.00    0.31 v memory[58][4]$_SDFFE_PP0P_/D (DFF_X1)
+                                  0.31   data arrival time
+
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                          0.00    0.18   clock reconvergence pessimism
+                                  0.18 ^ memory[58][4]$_SDFFE_PP0P_/CK (DFF_X1)
+                          0.01    0.19   library hold time
+                                  0.19   data required time
+-----------------------------------------------------------------------------
+                                  0.19   data required time
+                                 -0.31   data arrival time
+-----------------------------------------------------------------------------
+                                  0.12   slack (MET)
+
+
+Startpoint: memory[68][2]$_SDFFE_PP0P_
+            (rising edge-triggered flip-flop clocked by clk0)
+Endpoint: memory[68][2]$_SDFFE_PP0P_
+          (rising edge-triggered flip-flop clocked by clk0)
+Path Group: clk0
+Path Type: min
+
+Fanout     Cap    Slew   Delay    Time   Description
+-----------------------------------------------------------------------------
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                  0.03    0.00    0.18 ^ memory[68][2]$_SDFFE_PP0P_/CK (DFF_X1)
+     5    8.90    0.01    0.10    0.29 v memory[68][2]$_SDFFE_PP0P_/Q (DFF_X1)
+                                         memory[68][2] (net)
+                  0.01    0.00    0.29 v _6830_/A (INV_X1)
+     1    1.71    0.01    0.01    0.30 ^ _6830_/ZN (INV_X1)
+                                         _2963_ (net)
+                  0.01    0.00    0.30 ^ _6831_/B2 (AOI21_X1)
+     1    1.25    0.01    0.01    0.31 v _6831_/ZN (AOI21_X1)
+                                         _0188_ (net)
+                  0.01    0.00    0.31 v memory[68][2]$_SDFFE_PP0P_/D (DFF_X1)
+                                  0.31   data arrival time
+
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                          0.00    0.18   clock reconvergence pessimism
+                                  0.18 ^ memory[68][2]$_SDFFE_PP0P_/CK (DFF_X1)
+                          0.01    0.19   library hold time
+                                  0.19   data required time
+-----------------------------------------------------------------------------
+                                  0.19   data required time
+                                 -0.31   data arrival time
+-----------------------------------------------------------------------------
+                                  0.12   slack (MET)
+
+
+Startpoint: memory[68][3]$_SDFFE_PP0P_
+            (rising edge-triggered flip-flop clocked by clk0)
+Endpoint: memory[68][3]$_SDFFE_PP0P_
+          (rising edge-triggered flip-flop clocked by clk0)
+Path Group: clk0
+Path Type: min
+
+Fanout     Cap    Slew   Delay    Time   Description
+-----------------------------------------------------------------------------
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                  0.03    0.00    0.18 ^ memory[68][3]$_SDFFE_PP0P_/CK (DFF_X1)
+     5    9.08    0.01    0.10    0.28 v memory[68][3]$_SDFFE_PP0P_/Q (DFF_X1)
+                                         memory[68][3] (net)
+                  0.01    0.00    0.28 v _6834_/A (INV_X1)
+     1    1.71    0.01    0.01    0.30 ^ _6834_/ZN (INV_X1)
+                                         _2966_ (net)
+                  0.01    0.00    0.30 ^ _6835_/B2 (AOI21_X1)
+     1    1.19    0.01    0.01    0.31 v _6835_/ZN (AOI21_X1)
+                                         _0189_ (net)
+                  0.01    0.00    0.31 v memory[68][3]$_SDFFE_PP0P_/D (DFF_X1)
+                                  0.31   data arrival time
+
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                          0.00    0.18   clock reconvergence pessimism
+                                  0.18 ^ memory[68][3]$_SDFFE_PP0P_/CK (DFF_X1)
+                          0.01    0.19   library hold time
+                                  0.19   data required time
+-----------------------------------------------------------------------------
+                                  0.19   data required time
+                                 -0.31   data arrival time
+-----------------------------------------------------------------------------
+                                  0.12   slack (MET)
+
+
+Startpoint: memory[4][7]$_SDFFE_PP0P_
+            (rising edge-triggered flip-flop clocked by clk0)
+Endpoint: memory[4][7]$_SDFFE_PP0P_
+          (rising edge-triggered flip-flop clocked by clk0)
+Path Group: clk0
+Path Type: min
+
+Fanout     Cap    Slew   Delay    Time   Description
+-----------------------------------------------------------------------------
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                  0.03    0.00    0.18 ^ memory[4][7]$_SDFFE_PP0P_/CK (DFF_X1)
+     2    3.13    0.01    0.09    0.27 v memory[4][7]$_SDFFE_PP0P_/Q (DFF_X1)
+                                         memory[4][7] (net)
+                  0.01    0.00    0.27 v _6542_/A1 (NOR2_X1)
+     1    1.75    0.02    0.02    0.30 ^ _6542_/ZN (NOR2_X1)
+                                         _2782_ (net)
+                  0.02    0.00    0.30 ^ _6544_/B (AOI211_X1)
+     1    1.29    0.01    0.01    0.31 v _6544_/ZN (AOI211_X1)
+                                         _0081_ (net)
+                  0.01    0.00    0.31 v memory[4][7]$_SDFFE_PP0P_/D (DFF_X1)
+                                  0.31   data arrival time
+
+                          0.00    0.00   clock clk0 (rise edge)
+                          0.18    0.18   clock network delay (propagated)
+                          0.00    0.18   clock reconvergence pessimism
+                                  0.18 ^ memory[4][7]$_SDFFE_PP0P_/CK (DFF_X1)
+                          0.01    0.19   library hold time
+                                  0.19   data required time
+-----------------------------------------------------------------------------
+                                  0.19   data required time
+                                 -0.31   data arrival time
+-----------------------------------------------------------------------------
+                                  0.12   slack (MET)
+
+
