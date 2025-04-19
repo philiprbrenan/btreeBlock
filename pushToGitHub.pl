@@ -52,6 +52,7 @@ if (1)
  }
 
 
+@files = setUnion @files;                                                       # Remove any duplicates
 @files = grep {fileSize($_) > 0} @files;                                        # Remove empty files
 @files = changedFiles $md5File,  @files if 1;                                   # Filter out files that have not changed
 
@@ -59,8 +60,6 @@ if (!@files)                                                                    
  {say "Everything up to date";
   exit;
  }
-
-say STDERR "AAAA", dump(\@files);
 
 if  (1)                                                                         # Upload via github crud
  {for my $s(@files)                                                             # Upload each selected file
