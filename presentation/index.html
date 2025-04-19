@@ -23,12 +23,18 @@ body {
    }
 
 li {
-    margin-bottom: 1em; /* Adds space between <a href="https://en.wikipedia.org/wiki/Linked_list">list</a> items */
-    padding: 0.5em;  /* Adds padding inside each item */
-    border-bottom: 1px solid #ccc; /* Optional: Adds a line between items */
+    margin-bottom: 1em;
+    padding: 0.5em;
+    border-bottom: 1px solid #ccc;
 }
 
-#tugOfWar {
+#hsc li {
+    margin-bottom: 0.5em;
+    padding: 0.5em;
+    border-bottom: 1px solid #ccc;
+}
+
+#tugOfWar, #ngw {
     width: 80vw; /* Doubles the original size */
     height: auto; /* Maintains aspect ratio */
 }
@@ -42,6 +48,9 @@ li {
 
 <div id="news">
 
+<p><b>Problem:</b> <a href="https://en.wikipedia.org/wiki/Data">data</a> centers use a lot of electricity.</p>
+<p><b>Solution:</b> a specialized <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a> to perform <a href="https://en.wikipedia.org/wiki/Database">database</a> lookups much more efficiently.</p>
+
 <p>Performance as measured by <a href="https://openroad-flow-scripts.readthedocs.io/en/latest/mainREADME.html">Open Road</a> for a
 <a href="https://github.com/philiprbrenan/btreeBlock">custom</a> processor
 versus a generic processor on a <b>2/3</b> Keys per leaf/branch <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .  The
@@ -53,7 +62,7 @@ branch and leaf in the <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a>
 <tr><th>Custom<th>Generic <th>Custom<th>Generic<th>Custom<th>Generic
 <tr><td>2467<td>12927<td>902<td>399<td>23<td>122
 <tr><td colspan=2> 5.24 x Smaller<td colspan=2> 2.26 x Faster<td colspan=2> 5.30 * Compact Code
-<tr><td colspan=6 style="text-align: center;"><b>62.76</b> x better
+<tr><td colspan=6 style="text-align: center;"><b><big>62.76 x better</big></b>
 </table>
 
 <p>In the above <b>area</b> in micro-meters squared equates to <b>power</b>
@@ -148,7 +157,7 @@ equivalent to the gdp of Italy.</p>
 <h2 id="xxx">The Solution</h2>
 
 <p>Appa Apps Inc. is prototyping a specialized <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a> for use in Data
-Centers to performdatabaselook-ups <b>10</b> times faster while using
+Centers to perform <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups <b>10</b> times faster while using
 <b>10</b> times less electricity than the generic <a href="https://en.wikipedia.org/wiki/Computer">computer</a>s currently in use.
 </p>
 
@@ -167,7 +176,7 @@ saving of perhaps <b>$100 million</b> per year.</p>
 <h2>This is not a new idea...</h2>
 
 <p>Today, everyone has a mobile phone with a <a href="https://en.wikipedia.org/wiki/Graphics_processing_unit">Graphics Processing Unit</a> implemented in <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> rather
-thansoftware because the original, software-only <a href="https://en.wikipedia.org/wiki/Software_versioning">version</a>s were far too slow.
+than <a href="https://en.wikipedia.org/wiki/Software">software</a> because the original, software-only <a href="https://en.wikipedia.org/wiki/Software_versioning">version</a>s were far too slow.
 And every personal <a href="https://en.wikipedia.org/wiki/Computer">computer</a> has a <a href="https://en.wikipedia.org/wiki/Graphics_processing_unit">Graphics Processing Unit</a> for much the same reason.</p>
 
 <p><img src="images/EvolutionOfMobilePhone.png">
@@ -183,7 +192,7 @@ processing in <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> rather
 operators be more competitive by reducing the cost and time spent doing
 <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups.</p>
 
-<h2 id="xxx">Prototype Retest Results</h2>
+<h2 id="xxx">Prototype Test Results</h2>
 
 <p><img id="tugOfWar" src="images/SpecializedVersusGeneric.jpg">
 
@@ -194,8 +203,8 @@ ready for placement on an <a href="https://en.wikipedia.org/wiki/Application-spe
 <h3>The custom processor is <b>62</b> * better than a generic processor !</h3>
 
 <p>Performance as measured by <a href="https://openroad-flow-scripts.readthedocs.io/en/latest/mainREADME.html">Open Road</a> for the custom <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> versus a generic <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a>
-on a <b>2/3</b> Keys per leaf/branch <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .  The performance gap widens as we
-increase the number of Keys in each branch and leaf of the <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .
+on a <b>2/3</b> Keys per leaf/branch <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .  The performance gets even better
+as we increase the number of Keys in each branch and leaf of the <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .
 
 <p><table cellpadding="10"  cellspacing="10" border=1>
 <tr><th colspan=2>Area &mu;m&sup2;<th colspan=2>Fmax MHz<th colspan=2>Statements
@@ -205,11 +214,11 @@ increase the number of Keys in each branch and leaf of the <a href="https://en.w
 <tr><td colspan=6 style="text-align: center;"><b>62.76</b> x better
 </table>
 
-<p>In the above <b>area</b> in micro meters squared equates to <b>power</b> consumption
-while <b>frequency</b> in mega hertz equates to <b>execution speed</b>. And even
-better a <a href="https://en.wikipedia.org/wiki/Find_(Unix)">find</a> operation takes far fewer statements to execute on the custom <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a>
-than it does on the generic <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> because the custom operation-codes are so much better
-adapted to manipulating a <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .
+<p>In the above <b>area</b> in micro meters squared equates to <b>power</b>
+consumption while <b>frequency</b> in mega hertz equates to <b>execution
+speed</b>. And even better a <a href="https://en.wikipedia.org/wiki/Find_(Unix)">find</a> operation takes far fewer statements to
+execute on the custom <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> than it does on the generic <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> because the custom
+operation-codes are so much better adapted to manipulating a <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .
 
 <h3>Custom CPU </h3>
 
@@ -217,37 +226,59 @@ adapted to manipulating a <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree<
 
 <p><img src="https://raw.githubusercontent.com/philiprbrenan/btreeBlock/refs/heads/main/custom/find.png">
 
-
 <h3>Generic CPU</h3>
 
-<p>The layout of a generic <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> capable of executing the <a href="https://b-ok.xyz/book/633119/db5c78">C programming language</a> <a href="https://en.wikipedia.org/wiki/Software_versioning">version</a> of the <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a>
-algorithm as produced by <a href="https://openroad-flow-scripts.readthedocs.io/en/latest/mainREADME.html">Open Road</a> .</p>
+<p>The layout of a generic <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> capable of executing the <a href="https://b-ok.xyz/book/633119/db5c78">C programming language</a> <a href="https://en.wikipedia.org/wiki/Software_versioning">version</a> of the
+<a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> algorithm as produced by <a href="https://openroad-flow-scripts.readthedocs.io/en/latest/mainREADME.html">Open Road</a> .</p>
 
 <p><img src="https://raw.githubusercontent.com/philiprbrenan/btreeBlock/refs/heads/main/generic/find.png">
 
+<h3>Field Programmable Gate Array Version</h3>
+
+<p>We have aslo been able to run the <b>find</b> action successfully on an <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a>:
+
+<p><img id="ngw" src="https://raw.githubusercontent.com/philiprbrenan/btreeBlock/refs/heads/main/presentation/images/first_light_doc_nano9K.jpg">
+
+<p>In the image, the power light is the <b>LED</b> at the bottom, then reading
+up the first <b>4</b> LEDs from the power LED having values <b>8, 4, 2, 1</b>
+are signalling that the <a href="https://en.wikipedia.org/wiki/Data">data</a> associated with <a href="https://en.wikipedia.org/wiki/Key%E2%80%93value_database">database key</a> <b></b> is <b>4</b> or in
+binary:
+
+<pre>
+<b>P 0100F0</b>
+</pre>
+
+<p>where <b>F</b> is powered on showing that the <a href="https://en.wikipedia.org/wiki/Key%E2%80%93value_database">database key</a> was successfully found in
+the <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .
+
 <h1>Seed Round</h1>
 
-<p>We aim to raise <b>$1 million</b> for a seed round to:</p>
+<p>We aim to raise <b>$1 million</b> for a seed round to produce a prototype
+working <a href="https://en.wikipedia.org/wiki/Application-specific_integrated_circuit">application specific integrated circuit</a> to show to the major <a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a> operators as proof of
+<a href="http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/langRef/technicalContent/concept.html#concept">concept</a>. This will envolve:</p>
 
 <ol>
 
-<li>Buy the <a href="https://en.wikipedia.org/wiki/Digital_electronics">hardware</a> necessary to demonstrate our technology,</li>
+<li>Hiring <a href="https://en.wikipedia.org/wiki/Digital_electronics">hardware</a> engineers to convert our prototype from an <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> to taped out
+<a href="https://en.wikipedia.org/wiki/Application-specific_integrated_circuit">application specific integrated circuit</a> <a href="https://en.wikipedia.org/wiki/Integrated_circuit_layout">mask</a>.
 
-<li>Hire <a href="https://en.wikipedia.org/wiki/Digital_electronics">hardware</a> engineers to implement our technology as an
-<a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> connected to the real world via <a href="https://en.wikipedia.org/wiki/Ethernet">Ethernet</a> .</li>
+<li>Adding the <a href="https://en.wikipedia.org/wiki/Integrated_circuit_layout">mask</a> to a multi project wafer to get a small number of <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s built
+to confirm our design functionds as expected.
 
-<li>Hire sales and marketing personnel to present our findings to the major
-operators with the goal of getting letters of intent from them to buy <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s
-based on our design.</li>
+<li>Testing the fabrication results and iterating as needed.
 
-</ol>
+<li>Hiring sales and marketing personnel to present our findings to the major
+<a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a> operators with the goal of getting letters of intent from them to buy <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s
+based on our design.
 
 <p><img src="images/LetterOfIntent.jpg">
 
-<p>If they provide letters of intent to buy such <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s, we will use them to
-drive a large Series <b>A</b> funding round to convert the <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> into an <a href="https://en.wikipedia.org/wiki/Application-specific_integrated_circuit">application specific integrated circuit</a>
-implemented on <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s to reduce the time and electricity consumed doing
-<a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups even more effectively.</p>
+<li>Use the letters of intent to buy such <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s to raise an <b>A</b> funding
+round
+
+<li>Go into full scale production at our favorite <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> foundry.
+
+</ol>
 
 <h2 id="xxx">Frequently asked questions</h2>
 
@@ -299,7 +330,7 @@ such as NVIDIA, ARM, and Qualcomm.</p>
 <p>Our ideal customers are the top 10 hyperscale <a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a> operators, such
 as:
 
-<ol>
+<ol id="hsc">
 <li>Amazon Web Services
 <li>Microsoft Azure
 <li>Google Cloud Platform
@@ -328,8 +359,8 @@ done so.
 
 <h3 id="xxx">How can we best support your business?</h3>
 
-<p>We need <a href="https://en.wikipedia.org/wiki/Online_help">help</a> in presenting our prototype effectively to the right <a href="https://en.wikipedia.org/wiki/Person">people</a> who
-are capable of making investment decisions.
+<p>We need funding and <a href="https://en.wikipedia.org/wiki/Online_help">help</a> presenting our prototype effectively to the right
+<a href="https://en.wikipedia.org/wiki/Person">people</a> who are capable of making purchase decisions.
 
 <h3 id="xxx">Github page?</h3>
 
