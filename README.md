@@ -95,9 +95,9 @@ show the layout on [Silicon](https://en.wikipedia.org/wiki/Silicon) for each ope
 
 ## Gowin Tang Nano 9K
 
-The ``find`` operation of [the](https://en.wikipedia.org/wiki/The)  custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) is small enough to be run on a Gowin Tang Nano 9K [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array), see:
+The ``find`` operation of the custom [CPU](https://en.wikipedia.org/wiki/Central_processing_unit) is small enough to be run on a Gowin Tang Nano 9K [Field Programmable Gate Array](https://en.wikipedia.org/wiki/Field-programmable_gate_array), see:
 
-![Nano 9k](https://github.com/philiprbrenan/btreeBlock/blob/main/images/first_light_doc_nano9K.jpg)
+![Nano 9k](https://raw.githubusercontent.com/philiprbrenan/btreeBlock/refs/heads/main/presentation/images/first_light_doc_nano9K.jpg)
 
 In the image, the power light is the LED at the bottom, then reading up the
 first **4** leds from the power LED having values **8**, **4**, **2**, **1**
@@ -482,3 +482,11 @@ upon the [tree](https://en.wikipedia.org/wiki/Tree_(data_structure)):
       3                     13                            26                                  21          |
 1,2=1  3,5=3  7=7   11,13=8     17=13    19=14   23,29=18     31,37=26    41,43=29   47,53=35    59,61=21 |
 ```
+
+# To do
+
+Find next
+Further optimization of generic and custom CPUs.
+Automate reporting of crucial results from mass of files produced by Vivado and Open Road
+Much larger pages controlled by embedded btrees
+Widen BtreeSF from one [bit](https://en.wikipedia.org/wiki/Bit) to multiples of bits
