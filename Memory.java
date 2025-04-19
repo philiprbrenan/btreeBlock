@@ -7,7 +7,7 @@ package com.AppaApps.Silicon;                                                   
 import java.util.*;
 
 class Memory extends Test                                                       // Memory provided in bits
- {private final boolean[]bits;                                                  // The memory in bits
+ {private final boolean[]bits;                                                     // The memory in bits with one bit per byte to speed up emulations
   final String name;                                                            // The name of the memory
   private long reads, writes;                                                   // Number of reads and writes for this memory
 
@@ -527,7 +527,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      //if (github_actions)                                                       // Coverage analysis
+      if (github_actions)                                                       // Coverage analysis
        {coverageAnalysis(sourceFileName(), 12);
        }
       testSummary();                                                            // Summarize test results
