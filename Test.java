@@ -863,7 +863,7 @@ public class Test                                                               
       a = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")),      // Time at which run was executed
       C = Thread.currentThread().getStackTrace()[2].getClassName(),             // Containing class
       c = C.substring(C.lastIndexOf('.') + 1),                                  // Short name of containing class
-      m = String.format("tests in %5.2f seconds using %s at %s", d, c, a);      // Format test summary
+      m = String.format("tests in %7.4f seconds using %s at %s", d, c, a);      // Format test summary
     if (false) {}                                                               // Analyze results of tests
     else if (testsPassed == 0 && testsFailed == 0) say("No",    m);             // No tests
     else if (testsFailed == 0)   say("PASSed ALL", testsPassed, m);             // Passed all tests
