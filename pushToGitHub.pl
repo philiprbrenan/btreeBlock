@@ -29,14 +29,10 @@ push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              
         @files = grep {!m(/\.|backups/|Classes/)} @files;                       # Remove files that do not need to be saved
         @files = grep {!m(/vivado/runs/)}         @files;
         @files = grep {!m(/vivado/pins/)}         @files;
-        @files = grep {!m(/gowin/\w+/reports/)}   @files;
         @files = grep {!m(/logs/)}                @files;
-        @files = grep {!m(/c/)}                   @files;
-        @files = grep {!m(/bam/)}                 @files;
-        @files = grep {!m(/zzz/)}                 @files;
-        @files = grep {fileSize($_) > 0}          @files;
+        @files = grep {!m(/build/)}               @files;
 
-if (0)                                                                          # Remove most of the verilog except the reports
+if (1)                                                                          # Remove most of the verilog except the reports
  {my @f = @files; @files = ();
   for my $f(@f)
    {next if $f =~ m(verilog) and $f !~ m(/(reports|timing_route)|png\Z/);
@@ -44,23 +40,27 @@ if (0)                                                                          
    }
  }
 
-if (0)
+if (1)
  {push my @g, searchDirectoryTreesForMatchingFiles($generic, @gExt);            # Generic cpu files
   @files = (@files, @g);
  }
 
-if (0)
+if (1)
  {push my @sc, searchDirectoryTreesForMatchingFiles($sc, @scExt);               # Silicon compiler files
   my %s;
   @files = grep {!$s{$_}++} @files, @sc;
  }
 
-@files = changedFiles $md5File, @files if 1;                                    # Filter out files that have not changed
+
+@files = grep {fileSize($_) > 0} @files;                                        # Remove empty files
+@files = changedFiles $md5File,  @files if 1;                                   # Filter out files that have not changed
 
 if (!@files)                                                                    # No new files
  {say "Everything up to date";
   exit;
  }
+
+say STDERR "AAAA", dump(\@files);
 
 if  (1)                                                                         # Upload via github crud
  {for my $s(@files)                                                             # Upload each selected file
