@@ -5,7 +5,7 @@ body {
     margin-right: 5vw;
     max-width: 60ch;
     word-wrap: break-word;
-    font-size: 2em;
+    font-size: 1.5em;
     line-height: 2;
    }
 #news {
@@ -18,42 +18,49 @@ body {
 
 #consumption td,
 #consumption th {
-    font-size: 2em;
+    font-size: 1.2em;
     font-weight: bold;
    }
 
 li {
     margin-bottom: 1em;
     padding: 0.5em;
-    border-bottom: 1px solid #ccc;
 }
 
-#hsc li {
-    margin-bottom: 0.5em;
-    padding: 0.5em;
-    border-bottom: 1px solid #ccc;
+.hsc {
+    margin-bottom: 0em;
+    padding: 0em;
 }
 
-#tugOfWar, #ngw {
-    width: 80vw; /* Doubles the original size */
-    height: auto; /* Maintains aspect ratio */
+img {height: 70vh;}
+
+.city     {width: 15vw; height: auto;}
+#tugOfWar {height: 50vh;}
+#gowin    {height: 50vh;}
+#phones   {width: 40vw; height:auto;}
+#logo     {height: 2em; vertical-align: middle;}
+
+.rattler {
+  width: 100vw;
+  border-radius: 6px;
+  padding: 5px;
+  font-size: 0.75em;
 }
+
 </style>
 
-<h1 id="xxx">Database on a Chip</h1>
-
-<h1>Data Centers:</h1>
+<h1 id="doc"><img id=logo src="https://raw.githubusercontent.com/philiprbrenan/btreeBlock/refs/heads/main/presentation/images/logo.png">Data Centers:</h1>
 
 <h2>Save a lot of money on your electricity bills!</h2>
 
 <div id="news">
 
-<p><b>Problem:</b> <a href="https://en.wikipedia.org/wiki/Data">data</a> centers use a lot of electricity.</p>
-<p><b>Solution:</b> a specialized <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a> to perform <a href="https://en.wikipedia.org/wiki/Database">database</a> lookups much more efficiently.</p>
+<p><b><a href="#problem">Problem:</a></b> <a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>s use a lot of electricity.</p>
+<p><b><a href="#solution">Solution:</a></b> a specialized <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a> to look up <a href="https://en.wikipedia.org/wiki/Data">data</a> much more efficiently.</p>
 
-<p>Performance as measured by <a href="https://openroad-flow-scripts.readthedocs.io/en/latest/mainREADME.html">Open Road</a> for a
+<p>Performance independently measured by <a href="https://openroad-flow-scripts.readthedocs.io/en/latest/mainREADME.html">Open Road</a> for a
 <a href="https://github.com/philiprbrenan/btreeBlock">custom</a> processor
-versus a generic processor on a <b>2/3</b> Keys per leaf/branch <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .  The
+versus a generic <a href="https://en.wikipedia.org/wiki/Reduced_instruction_set_computer">reduced instruction set computer</a> processor on a <b>2/3</b> Keys per leaf/branch <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .  The
 performance gap widens significantly as we increase the number of Keys in each
 branch and leaf in the <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .
 
@@ -61,19 +68,19 @@ branch and leaf in the <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a>
 <tr><th colspan=2>Area &mu;m&sup2;<th colspan=2>Fmax MHz<th colspan=2>Statements
 <tr><th>Custom<th>Generic <th>Custom<th>Generic<th>Custom<th>Generic
 <tr><td>2467<td>12927<td>902<td>399<td>23<td>122
-<tr><td colspan=2> 5.24 x Smaller<td colspan=2> 2.26 x Faster<td colspan=2> 5.30 * Compact Code
-<tr><td colspan=6 style="text-align: center;"><b><big>62.76 x better</big></b>
+<tr><td colspan=2><b>5.24</b> x Smaller<td colspan=2> <b>2.26</b> x Faster<td colspan=2> <b>5.30</b> * Compact Code
+<tr><td colspan=6 style="text-align: center;"> <a href="https://github.com/philiprbrenan/btreeBlock">Database on a Chip</a> is <b><big>62.76 x better</big></b>
 </table>
 
-<p>In the above <b>area</b> in micro-meters squared equates to <b>power</b>
-consumption while <b>frequency</b> in Mega Hertz equates to <b>execution
+<p>In the above <b>area</b> in micrometers squared equates to <b>power</b>
+consumption while <b>frequency</b> in megahertz equates to <b>execution
 speed</b>. And even better a <b>find</b> operation takes far fewer statements
 to execute on the custom <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> than it does on the generic <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> because the
 custom operation-codes are so much better adapted to manipulating a <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .
 
 </div>
 
-<h2 id="xxx">The problem</h2>
+<h2 id="problem">The problem</h2>
 
 <p><a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>s consume more electricity than they really need to.</p>
 
@@ -82,7 +89,7 @@ businesses do</q>, according to the <a href="https://www.wsj.com/">The Wall Stre
 
 <p><img src="images/DataCentersUseALotOfElectricity.jpg">
 
-<p><a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>s consume about <b>300</b> Tera Watt hours per year or <b>1%</b>
+<p><a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>s consume about <b>300</b> Terawatt hours per year or <b>1%</b>
 of world electricity production.</p>
 
 <p><img src="images/GlobalElectricityProduction.jpg">
@@ -97,11 +104,11 @@ cities:</p>
 <table id="consumption" border="1" cellpadding="10" cellspacing="10">
   <tr>
     <th>City</th>
-    <th>Annual Consumption (Terra Watt hours)</th>
+    <th>Annual Consumption (Terawatt hours)</th>
     <th>Percentage of Global Production (%)</th>
     <th>Image</th>
     <th>City</th>
-    <th>Annual Consumption (Terra Watt hours)</th>
+    <th>Annual Consumption (Terawatt hours)</th>
     <th>Percentage of Global Production (%)</th>
     <th>Image</th>
   </tr>
@@ -109,31 +116,31 @@ cities:</p>
     <td>New York City</td>
     <td>53.65 TWh</td>
     <td>0.18%</td>
-    <td><img src="https://tse4.mm.bing.net/th?id=OIP.5n_lTh5552iAeos02SrJ5gHaE8&pid=Api" alt="New York at night"></td>
+    <td><img class="city" src="https://tse4.mm.bing.net/th?id=OIP.5n_lTh5552iAeos02SrJ5gHaE8&pid=Api" alt="New York at night"></td>
     <td>Los Angeles</td>
     <td>46.3 TWh</td>
     <td>0.15%</td>
-    <td><img src="https://tse3.mm.bing.net/th?id=OIP.FDNmBNyHK83sTbJq01y2wQHaFM&pid=Api" alt="Los Angeles at night"></td>
+    <td><img class="city" src="https://tse3.mm.bing.net/th?id=OIP.FDNmBNyHK83sTbJq01y2wQHaFM&pid=Api" alt="Los Angeles at night"></td>
   </tr>
   <tr>
     <td>Chicago</td>
     <td>40 TWh</td>
     <td>0.13%</td>
-    <td><img src="https://tse1.mm.bing.net/th?id=OIP.QfwUid1SOz6L7nq06y-ekAHaE8&pid=Api" alt="Chicago at night"></td>
+    <td><img class="city" src="https://tse1.mm.bing.net/th?id=OIP.QfwUid1SOz6L7nq06y-ekAHaE8&pid=Api" alt="Chicago at night"></td>
     <td>Houston</td>
     <td>70 TWh</td>
     <td>0.23%</td>
-    <td><img src="https://tse3.mm.bing.net/th?id=OIP.GG3UMXmH98Aj4pqyTlgzbwHaE8&pid=Api" alt="Houston at night"></td>
+    <td><img class="city" src="https://tse3.mm.bing.net/th?id=OIP.GG3UMXmH98Aj4pqyTlgzbwHaE8&pid=Api" alt="Houston at night"></td>
   </tr>
   <tr>
     <td>London</td>
     <td>40 TWh</td>
     <td>0.13%</td>
-    <td><img src="https://tse1.mm.bing.net/th?id=OIP.zQRO6xpk42YSsYTV7t90sAHaEo&pid=Api" alt="London at night"></td>
+    <td><img class="city" src="https://tse1.mm.bing.net/th?id=OIP.zQRO6xpk42YSsYTV7t90sAHaEo&pid=Api" alt="London at night"></td>
     <td>Paris</td>
     <td>68.2 TWh</td>
     <td>0.23%</td>
-    <td><img src="https://tse2.mm.bing.net/th?id=OIP.gfebCoCPDgictBvRhlP2YQHaE7&pid=Api" alt="Paris at night"></td>
+    <td><img class="city" src="https://tse2.mm.bing.net/th?id=OIP.gfebCoCPDgictBvRhlP2YQHaE7&pid=Api" alt="Paris at night"></td>
   </tr>
   <tr>
     <th>Total</th>
@@ -154,32 +161,34 @@ equivalent to the gdp of Italy.</p>
 
 <p><img src="images/Italy.jpg"/>
 
-<h2 id="xxx">The Solution</h2>
+<h2 id="solution">The Solution</h2>
 
-<p>Appa Apps Inc. is prototyping a specialized <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a> for use in Data
-Centers to perform <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups <b>10</b> times faster while using
-<b>10</b> times less electricity than the generic <a href="https://en.wikipedia.org/wiki/Computer">computer</a>s currently in use.
-</p>
+<p>Appa Apps Inc. is prototyping <a href="https://github.com/philiprbrenan/btreeBlock">Database on a Chip</a>, a specialized <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a>
+<a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a> for use in Data Centers to perform <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups <b>10</b> times
+faster while using <b>10</b> times less electricity than the generic <a href="https://en.wikipedia.org/wiki/Computer">computer</a>s
+currently in use. </p>
 
 <p><img src="images/AppaAppsIsPrototypingASiliconChip.jpg">
 
 <p><a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>s do a lot of <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups. Every company has a <a href="https://en.wikipedia.org/wiki/Database">database</a>
-nowadays and every company spends lots of time and money looking stuff up in
+nowadays and every company spends lots of time and money looking up <a href="https://en.wikipedia.org/wiki/Data">data</a> up in
 their <a href="https://en.wikipedia.org/wiki/Database">database</a>, quickly, because their customers demand it.</p>
 
 <p><img src="images/EveryCompanyHasADatabase.jpg">
 
 <p>If we could make <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups just a <a href="https://en.wikipedia.org/wiki/Bit">bit</a> more efficient, <a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>
 operators would save quite a lot of money on their huge electricity bills - a
-saving of perhaps <b>$100 million</b> per year.</p>
+saving of perhaps <b>$100 million</b> per year.</p>   A <a href="https://en.wikipedia.org/wiki/Bit">bit</a> like <a href="https://en.wikipedia.org/wiki/James_Watt">James Watt</a>
+increasing the performance of steam engines from <b>1%</b> to <b>2%</b> and
+thereby kicking off the <a href="https://en.wikipedia.org/wiki/Industrial_Revolution">Industrial Revolution</a> .
 
 <h2>This is not a new idea...</h2>
 
 <p>Today, everyone has a mobile phone with a <a href="https://en.wikipedia.org/wiki/Graphics_processing_unit">Graphics Processing Unit</a> implemented in <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> rather
-than <a href="https://en.wikipedia.org/wiki/Software">software</a> because the original, software-only <a href="https://en.wikipedia.org/wiki/Software_versioning">version</a>s were far too slow.
+than <a href="https://en.wikipedia.org/wiki/Software">software</a> because the original, software-only versions were far too slow.
 And every personal <a href="https://en.wikipedia.org/wiki/Computer">computer</a> has a <a href="https://en.wikipedia.org/wiki/Graphics_processing_unit">Graphics Processing Unit</a> for much the same reason.</p>
 
-<p><img src="images/EvolutionOfMobilePhone.png">
+<p><img id=phones src="images/EvolutionOfMobilePhone.png">
 
 <p>Bitcoin mining used to be done using just <a href="https://en.wikipedia.org/wiki/Software">software</a>. At one time you could
 easily mine a few bitcoins every day with a generic notebook <a href="https://en.wikipedia.org/wiki/Computer">computer</a>. Now, you
@@ -192,12 +201,13 @@ processing in <a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> rather
 operators be more competitive by reducing the cost and time spent doing
 <a href="https://en.wikipedia.org/wiki/Database">database</a> look-ups.</p>
 
-<h2 id="xxx">Prototype Test Results</h2>
+<h2 id="ptr">Prototype Test Results</h2>
 
 <p><img id="tugOfWar" src="images/SpecializedVersusGeneric.jpg">
+<p class="rattler"> 1845: HMS Rattler (propeller) vs HMS Alecto (paddle wheels). Rattler pulled Alecto backwards, proving propellers are more effective than paddle wheels.
 
-<p>Appa Apps Inc. has recently succeeded in synthesizing and routing a Verilog
-<a href="https://en.wikipedia.org/wiki/Software_versioning">version</a> of the well known <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> <a href="https://en.wikipedia.org/wiki/Database">database</a> algorithm normally written in the <a href="https://b-ok.xyz/book/633119/db5c78">C programming language</a>
+<p>Appa Apps Inc. has recently succeeded in synthesizing and routing a <a href="https://en.wikipedia.org/wiki/Verilog">Verilog</a>
+version of the well known <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> <a href="https://en.wikipedia.org/wiki/Database">database</a> algorithm normally written in the <a href="https://b-ok.xyz/book/633119/db5c78">C programming language</a>
 ready for placement on an <a href="https://en.wikipedia.org/wiki/Application-specific_integrated_circuit">application specific integrated circuit</a> .
 
 <h3>The custom processor is <b>62</b> * better than a generic processor !</h3>
@@ -214,8 +224,8 @@ as we increase the number of Keys in each branch and leaf of the <a href="https:
 <tr><td colspan=6 style="text-align: center;"><b>62.76</b> x better
 </table>
 
-<p>In the above <b>area</b> in micro meters squared equates to <b>power</b>
-consumption while <b>frequency</b> in mega hertz equates to <b>execution
+<p>In the above <b>area</b> in micrometers squared equates to <b>power</b>
+consumption while <b>frequency</b> in megahertz equates to <b>execution
 speed</b>. And even better a <a href="https://en.wikipedia.org/wiki/Find_(Unix)">find</a> operation takes far fewer statements to
 execute on the custom <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> than it does on the generic <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> because the custom
 operation-codes are so much better adapted to manipulating a <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .
@@ -228,16 +238,16 @@ operation-codes are so much better adapted to manipulating a <a href="https://en
 
 <h3>Generic CPU</h3>
 
-<p>The layout of a generic <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> capable of executing the <a href="https://b-ok.xyz/book/633119/db5c78">C programming language</a> <a href="https://en.wikipedia.org/wiki/Software_versioning">version</a> of the
+<p>The layout of a generic <a href="https://en.wikipedia.org/wiki/Central_processing_unit">CPU</a> capable of executing the <a href="https://b-ok.xyz/book/633119/db5c78">C programming language</a> version of the
 <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> algorithm as produced by <a href="https://openroad-flow-scripts.readthedocs.io/en/latest/mainREADME.html">Open Road</a> .</p>
 
 <p><img src="https://raw.githubusercontent.com/philiprbrenan/btreeBlock/refs/heads/main/generic/find.png">
 
 <h3>Field Programmable Gate Array Version</h3>
 
-<p>We have aslo been able to run the <b>find</b> action successfully on an <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a>:
+<p>We have also been able to run the <b>find</b> action successfully on an <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a>:
 
-<p><img id="ngw" src="https://raw.githubusercontent.com/philiprbrenan/btreeBlock/refs/heads/main/presentation/images/first_light_doc_nano9K.jpg">
+<p><img id="gowin" src="https://raw.githubusercontent.com/philiprbrenan/btreeBlock/refs/heads/main/presentation/images/first_light_doc_nano9K.jpg">
 
 <p>In the image, the power light is the <b>LED</b> at the bottom, then reading
 up the first <b>4</b> LEDs from the power LED having values <b>8, 4, 2, 1</b>
@@ -255,21 +265,21 @@ the <a href="https://en.wikipedia.org/wiki/B-tree">B-Tree</a> .
 
 <p>We aim to raise <b>$1 million</b> for a seed round to produce a prototype
 working <a href="https://en.wikipedia.org/wiki/Application-specific_integrated_circuit">application specific integrated circuit</a> to show to the major <a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a> operators as proof of
-<a href="http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/langRef/technicalContent/concept.html#concept">concept</a>. This will envolve:</p>
+<a href="http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/langRef/technicalContent/concept.html#concept">concept</a>. This will involve:</p>
 
 <ol>
 
-<li>Hiring <a href="https://en.wikipedia.org/wiki/Digital_electronics">hardware</a> engineers to convert our prototype from an <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> to taped out
-<a href="https://en.wikipedia.org/wiki/Application-specific_integrated_circuit">application specific integrated circuit</a> <a href="https://en.wikipedia.org/wiki/Integrated_circuit_layout">mask</a>.
+<li>Hiring <a href="https://en.wikipedia.org/wiki/Digital_electronics">hardware</a> engineers to convert our prototype from an <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> to a taped
+out <a href="https://en.wikipedia.org/wiki/Application-specific_integrated_circuit">application specific integrated circuit</a> <a href="https://en.wikipedia.org/wiki/Integrated_circuit_layout">mask</a>.
 
-<li>Adding the <a href="https://en.wikipedia.org/wiki/Integrated_circuit_layout">mask</a> to a multi project wafer to get a small number of <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s built
-to confirm our design functionds as expected.
+<li>Adding the <a href="https://en.wikipedia.org/wiki/Integrated_circuit_layout">mask</a> to a multi project wafer to get a small number of <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s
+built to confirm our design <a href="https://en.wikipedia.org/wiki/Function_(computer_programming)">function</a>s as expected.
 
 <li>Testing the fabrication results and iterating as needed.
 
 <li>Hiring sales and marketing personnel to present our findings to the major
-<a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a> operators with the goal of getting letters of intent from them to buy <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s
-based on our design.
+<a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a> operators with the goal of getting letters of intent from them to
+buy <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s based on our design.
 
 <p><img src="images/LetterOfIntent.jpg">
 
@@ -280,9 +290,9 @@ round
 
 </ol>
 
-<h2 id="xxx">Frequently asked questions</h2>
+<h2 id="faq">Frequently asked questions</h2>
 
-<h3 id="xxx">Who is Appa Apps Inc?</h3>
+<h3 id="whoIsAppaApps">Who is Appa Apps Inc?</h3>
 
 <p>Just me and <a href="https://platform.openai.com/docs/guides/text-generation">Chat GPT</a> </p>
 
@@ -294,12 +304,12 @@ me concentrate on the problem of what, exactly, should be coded.
 <p>Appa Apps Inc. is a class <b>C</b> corporation registered in Austin,
 Texas.</p>
 
-<h3 id="xxx">Do you have any traction?</h3>
+<h3 id="traction">Do you have any traction?</h3>
 
 <p>No, none at all. Just creating the prototype has occupied me fully for the
 last two years with no time off for anything else.
 
-<h3 id="xxx">Why now?</h3>
+<h3 id="whyNow">Why now?</h3>
 
 <ul>
 
@@ -317,32 +327,32 @@ more easily than ever before.</li>
 
 </ul>
 
-<h3 id="xxx">What is your business model?</h3>
+<h3 id="businessModel">What is your business model?</h3>
 
 <p>Our business model is a pure Intellectual Property play. We would license
 the copyright to our design, allowing foundries to fabricate specialized
-<a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s to replace the generic ones currently in use fordatabaselookups
-in <a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>s. This approach mirrors the business model of industry leaders
+<a href="https://en.wikipedia.org/wiki/Silicon">Silicon</a> <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s to replace the generic ones currently in use for <a href="https://en.wikipedia.org/wiki/Database">database</a> lookups
+in <a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>s . This approach mirrors the business model of industry leaders
 such as NVIDIA, ARM, and Qualcomm.</p>
 
-<h3 id="xxx">Who would be your customers?</h3>
+<h3 id="customers">Who would be your customers?</h3>
 
 <p>Our ideal customers are the top 10 hyperscale <a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a> operators, such
 as:
 
-<ol id="hsc">
-<li>Amazon Web Services
-<li>Microsoft Azure
-<li>Google Cloud Platform
-<li>Alibaba Cloud
-<li>IBM Cloud
-<li>Oracle Cloud
-<li>Tencent Cloud
-<li>Huawei Cloud
+<ol>
+<li class="hsc">Amazon Web Services
+<li class="hsc">Microsoft Azure
+<li class="hsc">Google Cloud Platform
+<li class="hsc">Alibaba Cloud
+<li class="hsc">IBM Cloud
+<li class="hsc">Oracle Cloud
+<li class="hsc">Tencent Cloud
+<li class="hsc">Huawei Cloud
 </ol>
 </p>
 
-<h3 id="xxx">How do you know the hyperscalers want your solution?</h3>
+<h3 id="whywanted">How do you know the hyperscalers want your solution?</h3>
 
 <p>Hyperscalers have enormous electricity bills, which is why they
 strategically locate their <a href="https://en.wikipedia.org/wiki/Data_center">Data Center</a>s near hydroelectric dams and nuclear
@@ -351,21 +361,69 @@ their shareholders demand it. As a result, they must invest in the most cost
 effective <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s available. There is no other alternative except going out of
 business.
 
-<h3 id="xxx">Why are you the best team?</h3>
+<h3 id="whyBest">Why are you the best team?</h3>
 
 <p>We are the best team to bring this solution to market because we have
-succeeded in producing a routable Verilog design when no else seems to have
-done so.
+succeeded in producing a routable <a href="https://en.wikipedia.org/wiki/Verilog">Verilog</a> design when no else seems to have
+done so.  We are combining the ideas of specialized <a href="https://en.wikipedia.org/wiki/Integrated_circuit">chip</a>s and
+continuous improvement as discussed in these seminal books:
 
-<h3 id="xxx">How can we best support your business?</h3>
+<ol>
+  <li>
+    <a href="https://en.wikipedia.org/wiki/Mead%E2%80%93Conway_VLSI_chip_design_revolution">Introduction to VLSI</a> <br>
+    Authors: Carver Mead & Lynn Conway<br>
+    ISBN-13: 978-0201043580
+  </li>
+
+  <li>
+    <a href="https://en.wikipedia.org/wiki/W._Edwards_Deming#Key_principles">Out of the Crisis</a> <br>
+    Author: W. Edwards Deming<br>
+    ISBN-13: 978-0262541152
+  </li>
+</ol>
+
+<h3 id="competitors">Who are your competitors?</h3>
+
+<p><a href="https://www.wasaitech.com/big-data">wasaitech</a>  - but only
+<b>3</b> times faster compared to <b>62</b> times faster
+
+<p><a
+href="https://www.umccapital.com/en/news/news_list/Supercharged-Performance-for-Open-Source-Databases">rENIAC</a>
+- but uses <b>100</b> times as much power while still being slower because they
+use an <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">Field Programmable Gate Array</a> instead of an <a href="https://en.wikipedia.org/wiki/Application-specific_integrated_circuit">application specific integrated circuit</a> .
+
+<h3 id="howSupport">How can we best support your business?</h3>
 
 <p>We need funding and <a href="https://en.wikipedia.org/wiki/Online_help">help</a> presenting our prototype effectively to the right
 <a href="https://en.wikipedia.org/wiki/Person">people</a> who are capable of making purchase decisions.
 
-<h3 id="xxx">Github page?</h3>
+<h3 id="ghpage">Github page?</h3>
 
 <p> <a href="https://github.com/philiprbrenan/btreeBlock">https://github.com/philiprbrenan/btreeBlock</a></p>
 
-<h3 id="xxx">Email address?</h3>
+<h3 id="email">Email address?</h3>
 
 <p> <a href="mailto:philiprbrenan@gmail.com">philiprbrenan@gmail.com</a></p>
+
+<h1>Table of Contents</h1>
+
+<div id=toc>
+  <table cellspacing=10 border=0>
+    <tr><td align=right>1<td>&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_1" href="#doc"><img id=logo src="https://raw.githubusercontent.com/philiprbrenan/btreeBlock/refs/heads/main/presentation/images/logo.png">Data Centers:</a>
+    <tr><td align=right>2<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_2" href="#problem">The problem</a>
+    <tr><td align=right>3<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_2" href="#solution">The Solution</a>
+    <tr><td align=right>4<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_2" href="#ptr">Prototype Test Results</a>
+    <tr><td align=right>5<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_2" href="#faq">Frequently asked questions</a>
+    <tr><td align=right>6<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_3" href="#whoIsAppaApps">Who is Appa Apps Inc?</a>
+    <tr><td align=right>7<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_3" href="#traction">Do you have any traction?</a>
+    <tr><td align=right>8<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_3" href="#whyNow">Why now?</a>
+    <tr><td align=right>9<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_3" href="#businessModel">What is your business model?</a>
+    <tr><td align=right>10<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_3" href="#customers">Who would be your customers?</a>
+    <tr><td align=right>11<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_3" href="#whywanted">How do you know the hyperscalers want your solution?</a>
+    <tr><td align=right>12<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_3" href="#whyBest">Why are you the best team?</a>
+    <tr><td align=right>13<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_3" href="#competitors">Who are your competitors?</a>
+    <tr><td align=right>14<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_3" href="#howSupport">How can we best support your business?</a>
+    <tr><td align=right>15<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_3" href="#ghpage">Github page?</a>
+    <tr><td align=right>16<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="toc_3" href="#email">Email address?</a>
+  </table>
+</div>
