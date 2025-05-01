@@ -33,8 +33,8 @@ if (1)                                                                          
  }
 
 if (1)                                                                          # Expand Index.htm
- {my $c = expandWellKnownWordsAsUrlsInHtmlFormat readFile $inHtml;
-  owf($outHtml, $c);
+ {my $c = expandWellKnownWordsAsUrlsAndAddTocToMakeANewHtmlFile $inHtml;
+  #owf($outHtml, $c);
   unshift @files, ($inHtml, $outHtml);
  }
 
