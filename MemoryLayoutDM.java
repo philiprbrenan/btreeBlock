@@ -2014,6 +2014,129 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
+  static void test_moveUpAll()
+   {z();
+    final int M = 4, N = 6;
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", M);
+    Layout.Array     A = l.array    ("A", a, N);
+    Layout.Variable  b = l.variable ("b", M);
+    Layout.Array     B = l.array    ("B", b, N);
+    Layout.Structure S = l.structure("s", A, B);
+    MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "arrays");
+
+    for (int i = 0; i < N; i++) m.at(a, i).setInt(i);
+    //stop(m);
+    ok(m, """
+MemoryLayout: arrays
+Memory      : arrays
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        48                                      s
+   2 A        0        24          6                             A
+   3 V        0         4               0                  0       a
+   4 V        4         4               1                  1       a
+   5 V        8         4               2                  2       a
+   6 V       12         4               3                  3       a
+   7 V       16         4               4                  4       a
+   8 V       20         4               5                  5       a
+   9 A       24        24          6                             B
+  10 V       24         4               0                  0       b
+  11 V       28         4               1                  0       b
+  12 V       32         4               2                  0       b
+  13 V       36         4               3                  0       b
+  14 V       40         4               4                  0       b
+  15 V       44         4               5                  0       b
+""");
+
+    m.at(A).moveUp(null, m.at(B));
+    m.P.run(); m.P.clear();
+    //stop(m);
+    ok(m, """
+MemoryLayout: arrays
+Memory      : arrays
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        48                                      s
+   2 A        0        24          6                             A
+   3 V        0         4               0                  0       a
+   4 V        4         4               1                  0       a
+   5 V        8         4               2                  1       a
+   6 V       12         4               3                  2       a
+   7 V       16         4               4                  3       a
+   8 V       20         4               5                  4       a
+   9 A       24        24          6                             B
+  10 V       24         4               0                  0       b
+  11 V       28         4               1                  1       b
+  12 V       32         4               2                  2       b
+  13 V       36         4               3                  3       b
+  14 V       40         4               4                  4       b
+  15 V       44         4               5                  5       b
+""");
+   }
+
+  static void test_moveUpLin()
+   {z();
+    final int M = 4, N = 6;
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", M);
+    Layout.Array     A = l.array    ("A", a, N);
+    Layout.Variable  b = l.variable ("b", M);
+    Layout.Array     B = l.array    ("B", b, N);
+    Layout.Variable  i = l.variable ("i", M);
+    Layout.Structure S = l.structure("s", A, B, i);
+    MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "arrays");
+
+    for (int j = 0; j < N; j++) m.at(a, j).setInt(j);
+    m.at(i).setInt(1);
+
+    //stop(m);
+    ok(m, """
+MemoryLayout: arrays
+Memory      : arrays
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        52                                      s
+   2 A        0        24          6                             A
+   3 V        0         4               0                  0       a
+   4 V        4         4               1                  1       a
+   5 V        8         4               2                  2       a
+   6 V       12         4               3                  3       a
+   7 V       16         4               4                  4       a
+   8 V       20         4               5                  5       a
+   9 A       24        24          6                             B
+  10 V       24         4               0                  0       b
+  11 V       28         4               1                  0       b
+  12 V       32         4               2                  0       b
+  13 V       36         4               3                  0       b
+  14 V       40         4               4                  0       b
+  15 V       44         4               5                  0       b
+  16 V       48         4                                  1     i
+""");
+
+    m.at(A).moveUp(m.at(i), m.at(B));
+    m.P.run(); m.P.clear();
+    //stop(m);
+    ok(m, """
+MemoryLayout: arrays
+Memory      : arrays
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        52                                      s
+   2 A        0        24          6                             A
+   3 V        0         4               0                  0       a
+   4 V        4         4               1                  1       a
+   5 V        8         4               2                  1       a
+   6 V       12         4               3                  2       a
+   7 V       16         4               4                  3       a
+   8 V       20         4               5                  4       a
+   9 A       24        24          6                             B
+  10 V       24         4               0                  0       b
+  11 V       28         4               1                  1       b
+  12 V       32         4               2                  2       b
+  13 V       36         4               3                  3       b
+  14 V       40         4               4                  4       b
+  15 V       44         4               5                  5       b
+  16 V       48         4                                  1     i
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_get_set();
     test_boolean();
@@ -2029,10 +2152,14 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_copy_bits();
     test_copy_memory();
     test_array_addressing();
+    test_moveUpAll();
+    test_moveUpLin();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    //test_moveUpAll();
+    test_moveUpLin();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
