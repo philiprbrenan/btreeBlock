@@ -511,7 +511,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
            }
          }
         String v()                                                              // Verilog
-         {final StringBuilder   s = new StringBuilder("/* MemoryLayoutDM.moveUp */\n");
+         {final StringBuilder   s = new StringBuilder("/* MemoryLayoutDM.moveUpLog */\n");
           final String      start = Index == null ? "0" : Index.verilogLoad();  // Load above this index
           final MemoryLayoutDM tm = ml();                                       // Target memory
           final MemoryLayoutDM sm = buffer.ml();                                // Source memory
@@ -545,7 +545,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
            }
          }
         String v()                                                              // Verilog
-         {final StringBuilder   s = new StringBuilder("/* MemoryLayoutDM.moveUp */\n");
+         {final StringBuilder   s = new StringBuilder("/* MemoryLayoutDM.moveUpLin */\n");
           final String      start = Index == null ? "0" : Index.verilogLoad();  // Load above this index
           final MemoryLayoutDM tm = ml();                                       // Target memory
           final MemoryLayoutDM sm = buffer.ml();                                // Source memory
@@ -601,6 +601,21 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       else if (A.size >= useLogMove) moveUpLog(Index, buffer);                  // Log move
       else                           moveUpLin(Index, buffer);                  // Linear move
      }
+
+    void moveUp(At Index)                                                       // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.
+     {zz();
+      if (!(field instanceof Layout.Array))  stop("Array required for moveUp");
+      final Layout.Array     A = field.toArray();                               // Array of elements to be moved
+      final Layout.Field     a = A.element;                                     // Array element
+      final Layout           b = Layout.layout();
+      final Layout.Variable ba = b.variable ("ba", a.width);
+      final Layout.Array    bA = b.array    ("BA", ba, A.size);
+      MemoryLayoutDM         m = new MemoryLayoutDM(b.compile(), "buffer");     // Create a matching array buffer
+      m.program(P);
+      moveUp(Index, m.at(bA));
+     }
+
+    void moveUp() {moveUp(null);}                                               // Move the elements of an array up one position deleting the last element.
 
     void moveDown(At Index, At buffer)                                          // Move the elements of an array down one position deleting the indexed element.  A buffer of the same size is used to permit copy in parallel.
      {zz(); sameSize(buffer);
@@ -2020,9 +2035,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", M);
     Layout.Array     A = l.array    ("A", a, N);
-    Layout.Variable  b = l.variable ("b", M);
-    Layout.Array     B = l.array    ("B", b, N);
-    Layout.Structure S = l.structure("s", A, B);
+    Layout.Structure S = l.structure("s", A);
     MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "arrays");
 
     for (int i = 0; i < N; i++) m.at(a, i).setInt(i);
@@ -2031,7 +2044,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 MemoryLayout: arrays
 Memory      : arrays
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        48                                      s
+   1 S        0        24                                      s
    2 A        0        24          6                             A
    3 V        0         4               0                  0       a
    4 V        4         4               1                  1       a
@@ -2039,23 +2052,16 @@ Line T       At      Wide       Size    Indices        Value   Name
    6 V       12         4               3                  3       a
    7 V       16         4               4                  4       a
    8 V       20         4               5                  5       a
-   9 A       24        24          6                             B
-  10 V       24         4               0                  0       b
-  11 V       28         4               1                  0       b
-  12 V       32         4               2                  0       b
-  13 V       36         4               3                  0       b
-  14 V       40         4               4                  0       b
-  15 V       44         4               5                  0       b
 """);
 
-    m.at(A).moveUp(null, m.at(B));
+    m.at(A).moveUp(null);
     m.P.run(); m.P.clear();
     //stop(m);
     ok(m, """
 MemoryLayout: arrays
 Memory      : arrays
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        48                                      s
+   1 S        0        24                                      s
    2 A        0        24          6                             A
    3 V        0         4               0                  0       a
    4 V        4         4               1                  0       a
@@ -2063,13 +2069,6 @@ Line T       At      Wide       Size    Indices        Value   Name
    6 V       12         4               3                  2       a
    7 V       16         4               4                  3       a
    8 V       20         4               5                  4       a
-   9 A       24        24          6                             B
-  10 V       24         4               0                  0       b
-  11 V       28         4               1                  1       b
-  12 V       32         4               2                  2       b
-  13 V       36         4               3                  3       b
-  14 V       40         4               4                  4       b
-  15 V       44         4               5                  5       b
 """);
    }
 
@@ -2079,10 +2078,8 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", M);
     Layout.Array     A = l.array    ("A", a, N);
-    Layout.Variable  b = l.variable ("b", M);
-    Layout.Array     B = l.array    ("B", b, N);
     Layout.Variable  i = l.variable ("i", M);
-    Layout.Structure S = l.structure("s", A, B, i);
+    Layout.Structure S = l.structure("s", A, i);
     MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "arrays");
 
     for (int j = 0; j < N; j++) m.at(a, j).setInt(j);
@@ -2093,7 +2090,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 MemoryLayout: arrays
 Memory      : arrays
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        52                                      s
+   1 S        0        28                                      s
    2 A        0        24          6                             A
    3 V        0         4               0                  0       a
    4 V        4         4               1                  1       a
@@ -2101,24 +2098,17 @@ Line T       At      Wide       Size    Indices        Value   Name
    6 V       12         4               3                  3       a
    7 V       16         4               4                  4       a
    8 V       20         4               5                  5       a
-   9 A       24        24          6                             B
-  10 V       24         4               0                  0       b
-  11 V       28         4               1                  0       b
-  12 V       32         4               2                  0       b
-  13 V       36         4               3                  0       b
-  14 V       40         4               4                  0       b
-  15 V       44         4               5                  0       b
-  16 V       48         4                                  1     i
+   9 V       24         4                                  1     i
 """);
 
-    m.at(A).moveUp(m.at(i), m.at(B));
+    m.at(A).moveUp(m.at(i));
     m.P.run(); m.P.clear();
     //stop(m);
-    ok(m, """
+    ok(""+m, """
 MemoryLayout: arrays
 Memory      : arrays
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        52                                      s
+   1 S        0        28                                      s
    2 A        0        24          6                             A
    3 V        0         4               0                  0       a
    4 V        4         4               1                  1       a
@@ -2126,14 +2116,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    6 V       12         4               3                  2       a
    7 V       16         4               4                  3       a
    8 V       20         4               5                  4       a
-   9 A       24        24          6                             B
-  10 V       24         4               0                  0       b
-  11 V       28         4               1                  1       b
-  12 V       32         4               2                  2       b
-  13 V       36         4               3                  3       b
-  14 V       40         4               4                  4       b
-  15 V       44         4               5                  5       b
-  16 V       48         4                                  1     i
+   9 V       24         4                                  1     i
 """);
    }
 
@@ -2158,7 +2141,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    //test_moveUpAll();
+    test_moveUpAll();
     test_moveUpLin();
    }
 
