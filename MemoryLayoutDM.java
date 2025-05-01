@@ -494,7 +494,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       move(buffer);
      }
 
-    void moveUpLog(At Index, At buffer)                                         // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Bits are copied in bloxks that decrease logarithmically in size as this reduces teh number of binary "less than" comparisons required
+    void moveUpLog(At Index, At buffer)                                         // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Bits are copied in bloxks that decrease logarithmically in size as this reduces the number of binary "less than" comparisons required
      {final Layout.Array A = field.toArray();                                   // Array of elements to be moved
       final Layout.Array B = buffer.field.toArray();                            // Buffer containg a copy of the array to be moved
       final Layout.Field a = A.element;                                         // Array element
