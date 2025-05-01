@@ -14,6 +14,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
   ProgramDM                P = new ProgramDM();                                 // Program containing generated code
   static int         numbers = 0;
   final  int          number = ++numbers;                                       // Number each memory layout
+  final  int      useLogMove = 8;                                               // Transition to logarithmic moves at this point
+
   final BlockArray    block;                                                    // The memory layout represents an array the elements of which have a width equal to a power of two
 
 //D1 Construction                                                               // Construct a memory layout
@@ -492,12 +494,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       move(buffer);
      }
 
-    void moveUp(At Index, At buffer)                                            // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.
-     {zz(); sameSize(buffer);
-      if (!(field instanceof Layout.Array))  stop("Array required for moveUp");
-      final At target = this;
-      buffer.move(target);                                                      // Make a copy of the thing to be moved so we can move in parallel
-      final Layout.Array A = field.toArray();                                   // Array of elements tp be moved
+    void moveUpLog(At Index, At buffer)                                         // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Bits are copied in bloxks that decrease logarithmically in size as this reduces teh number of binary "less than" comparisons required
+     {final Layout.Array A = field.toArray();                                   // Array of elements to be moved
       final Layout.Array B = buffer.field.toArray();                            // Buffer containg a copy of the array to be moved
       final Layout.Field a = A.element;                                         // Array element
       final Layout.Field b = B.element;                                         // Buffer array element
@@ -507,8 +505,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          {final int S = Index == null ? 1 : (Index.setOff().result + 1);        // A null index means start at the very beginning
           for   (int i = S; i < A.size; i++)                                    // Each element
            {for (int j = 0; j < w;      j++)                                    // Each bit in each element
-             {final boolean b = buffer.getBit((i-1)*w + j);
-              target.setBit(i*w+j, b);
+             {final boolean b = buffer.getBit((i-1)*w + j);                     // The bit to be moved
+              setBit(i*w+j, b);                                                 // Copy the bit into its new position
              }
            }
          }
@@ -528,6 +526,49 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          }
         String n() {return field.name+" moveUp @ "+(Index != null ? Index.field.name : "0")+" using "+buffer.field.name;}
        };
+     }
+
+    void moveUpLin(At Index, At buffer)                                         // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Whether each bit is copied is dependent on a binary "less than" which is expensive
+     {final Layout.Array A = field.toArray();                                   // Array of elements to be moved
+      final Layout.Array B = buffer.field.toArray();                            // Buffer containg a copy of the array to be moved
+      final Layout.Field a = A.element;                                         // Array element
+      final Layout.Field b = B.element;                                         // Buffer array element
+      final int          w = a.width;                                           // Width of array element
+      P.new I()
+       {void a()                                                                // Emulation
+         {final int S = Index == null ? 1 : (Index.setOff().result + 1);        // A null index means start at the very beginning
+          for   (int i = S; i < A.size; i++)                                    // Each element
+           {for (int j = 0; j < w;      j++)                                    // Each bit in each element
+             {final boolean b = buffer.getBit((i-1)*w + j);                     // The bit to be moved
+              setBit(i*w+j, b);                                                 // Copy the bit into its new position
+             }
+           }
+         }
+        String v()                                                              // Verilog
+         {final StringBuilder   s = new StringBuilder("/* MemoryLayoutDM.moveUp */\n");
+          final String      start = Index == null ? "0" : Index.verilogLoad();  // Load above this index
+          final MemoryLayoutDM tm = ml();                                       // Target memory
+          final MemoryLayoutDM sm = buffer.ml();                                // Source memory
+          for   (int i = 1; i < A.size; i++)                                    // Each element
+           {s.append("\nif ("+i+" > "+start +") begin\n  ");                    // Start moving when we are above the index
+            s.append
+             (tm.at(a, i-0).verilogLoad()+ " <= " +
+              sm.at(b, i-1).verilogLoad()+ ";");
+            s.append("\nend\n");
+           }
+          return s.toString();
+         }
+        String n() {return field.name+" moveUp @ "+(Index != null ? Index.field.name : "0")+" using "+buffer.field.name;}
+       };
+     }
+
+    void moveUp(At Index, At buffer)                                            // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.
+     {zz(); sameSize(buffer);
+      if (!(field instanceof Layout.Array))  stop("Array required for moveUp");
+      buffer.move(this);                                                        // Make a copy of the thing to be moved so we can move in parallel
+      final Layout.Array A = field.toArray();                                   // Array of elements to be moved
+      if (A.size >= useLogMove) moveUpLog(Index, buffer);                       // Log move
+      else                      moveUpLin(Index, buffer);                       // Linear move
      }
 
     void moveDown(At Index, At buffer)                                          // Move the elements of an array down one position deleting the indexed element.  A buffer of the same size is used to permit copy in parallel.
