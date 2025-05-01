@@ -686,7 +686,7 @@ abstract class Ban extends Test                                                 
     final String initializeOpCodes;
     final String initializeMemory;
 
-    Verilog(String Name, int Width)                                             // Generate verilog for the program with the op codes named as specified for integers of teh specified width
+    Verilog(String Name, int Width)                                             // Generate verilog for the program with the op codes named as specified for integers of the specified width
      {final StringBuilder   v   = new StringBuilder();                          // Generated verilog
       final StringToNumbers ops = new StringToNumbers();                        // Collapse identical instructions when writing verilog
 
