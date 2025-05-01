@@ -490,3 +490,4 @@ Further optimization of generic and custom CPUs.
 Automate reporting of crucial results from mass of files produced by Vivado and Open Road
 Much larger pages controlled by embedded btrees
 Widen BtreeSF from one [bit](https://en.wikipedia.org/wiki/Bit) to multiples of bits
+Use BinarySearch to locate a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) in a node.
