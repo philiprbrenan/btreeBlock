@@ -494,7 +494,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       move(buffer);
      }
 
-    void moveUpLog(At Index, At buffer)                                         // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Bits are copied in bloxks that decrease logarithmically in size as this reduces the number of binary "less than" comparisons required
+    void moveUpLog(At Index, At buffer)                                         // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Elements are copied in blocks that decrease logarithmically in size as this reduces the number of binary "less than" comparisons required
      {final Layout.Array A = field.toArray();                                   // Array of elements to be moved
       final Layout.Array B = buffer.field.toArray();                            // Buffer containg a copy of the array to be moved
       final Layout.Field a = A.element;                                         // Array element
@@ -528,7 +528,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
        };
      }
 
-    void moveUpLin(At Index, At buffer)                                         // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Whether each bit is copied is dependent on a binary "less than" which is expensive
+    void moveUpLin(At Index, At buffer)                                         // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Whether each element is copied is dependent on a binary "less than" which is expensive
      {final Layout.Array A = field.toArray();                                   // Array of elements to be moved
       final Layout.Array B = buffer.field.toArray();                            // Buffer containg a copy of the array to be moved
       final Layout.Field a = A.element;                                         // Array element
@@ -559,6 +559,36 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           return s.toString();
          }
         String n() {return field.name+" moveUp @ "+(Index != null ? Index.field.name : "0")+" using "+buffer.field.name;}
+       };
+     }
+
+    void moveUpAll(At Index, At buffer)                                         // Move all the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.
+     {final Layout.Array A = field.toArray();                                   // Array of elements to be moved
+      final Layout.Array B = buffer.field.toArray();                            // Buffer containg a copy of the array to be moved
+      final Layout.Field a = A.element;                                         // Array element
+      final Layout.Field b = B.element;                                         // Buffer array element
+      final int          w = a.width;                                           // Width of array element
+      P.new I()
+       {void a()                                                                // Emulation
+         {for   (int i = 1; i < A.size; i++)                                    // Each element
+           {for (int j = 0; j < w;      j++)                                    // Each bit in each element
+             {final boolean b = buffer.getBit((i-1)*w + j);                     // The bit to be moved
+              setBit(i*w+j, b);                                                 // Copy the bit into its new position
+             }
+           }
+         }
+        String v()                                                              // Verilog
+         {final StringBuilder   s = new StringBuilder("/* MemoryLayoutDM.moveUpAll */\n");
+          final MemoryLayoutDM tm = ml();                                       // Target memory
+          final MemoryLayoutDM sm = buffer.ml();                                // Source memory
+          for   (int i = 1; i < A.size; i++)                                    // Each element
+           {s.append
+             (tm.at(a, i-0).verilogLoad()+ " <= " +
+              sm.at(b, i-1).verilogLoad()+ ";");
+           }
+          return s.toString();
+         }
+        String n() {return field.name+" moveUpAll @ "+(Index != null ? Index.field.name : "0")+" using "+buffer.field.name;}
        };
      }
 
@@ -567,8 +597,9 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       if (!(field instanceof Layout.Array))  stop("Array required for moveUp");
       buffer.move(this);                                                        // Make a copy of the thing to be moved so we can move in parallel
       final Layout.Array A = field.toArray();                                   // Array of elements to be moved
-      if (A.size >= useLogMove) moveUpLog(Index, buffer);                       // Log move
-      else                      moveUpLin(Index, buffer);                       // Linear move
+      if      (Index  == null)       moveUpAll(Index, buffer);                  // Move all elements
+      else if (A.size >= useLogMove) moveUpLog(Index, buffer);                  // Log move
+      else                           moveUpLin(Index, buffer);                  // Linear move
      }
 
     void moveDown(At Index, At buffer)                                          // Move the elements of an array down one position deleting the indexed element.  A buffer of the same size is used to permit copy in parallel.
@@ -1342,39 +1373,6 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
-/* static void test_move_parallel()
-   {z();
-    Layout           l = Layout.layout();
-    Layout.Variable  a = l.variable("a", 4);
-    Layout.Variable  b = l.variable("b", 4);
-    Layout.Variable  c = l.variable("c", 4);
-    Layout.Variable  d = l.variable("d", 4);
-    Layout.Variable  e = l.variable("e", 4);
-    Layout.Variable  f = l.variable("f", 4);
-    Layout.Structure s = l.structure("s", a, b, c, d, e, f);
-
-    MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "test");
-    m.setIntInstruction(a, 14);
-    m.setIntInstruction(c, 13);
-    m.setIntInstruction(e, 12);
-    m.moveParallel(m.at(b), m.at(a), m.at(d), m.at(c), m.at(f), m.at(e));
-    m.P.run();
-
-    //stop(m);
-    m.ok("""
-MemoryLayout: test
-Memory      : test
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        24                                      s
-   2 V        0         4                                 14     a
-   3 V        4         4                                 14     b
-   4 V        8         4                                 13     c
-   5 V       12         4                                 13     d
-   6 V       16         4                                 12     e
-   7 V       20         4                                 12     f
-""");
-   } */
-
   static void test_set_inc_dec_get()
    {z();
     Layout           l = Layout.layout();
@@ -1720,96 +1718,6 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(m.at(b, 2).verilogLoad(), n+"[       2/*b       */ + 2 * 6 +: 2]");
    }
 
-/*  static void test_dump_verilog()
-   {z();
-    final String v = "verilog/memoryLayoutPA/dump_verilog.txt";
-
-    Layout               l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", 2);
-    Layout.Array     A = l.array    ("A", a, 4);
-
-    MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "M");
-    final String     n = m.name();
-    final String     i = m.initializeMemory();
-    m.memory().alternating(4);
-    m.dumpVerilog(v);
-
-    final Stack<String> r = readFile(v);
-    //r.removeElementAt(0);
-    ok(joinLines(r)+"\n", String.format("""
-task %s;
-    begin
-        %s[0] <= 0;
-        %s[1] <= 0;
-        %s[2] <= 0;
-        %s[3] <= 0;
-        %s[4] <= 1;
-        %s[5] <= 1;
-        %s[6] <= 1;
-        %s[7] <= 1;
-    end
-endtask
-""", i, n, n, n, n, n, n, n, n));
-    deleteAllFiles(folderName(v), 1);
-   }
-
-  static void test_dump_verilog_ignore()
-   {z();
-    final String v = "verilog/memoryLayoutPA/dump_verilog.txt";
-
-    Layout               l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", 1);
-    Layout.Variable  b = l.variable ("b", 2);
-    Layout.Variable  c = l.variable ("c", 3);
-    Layout.Variable  d = l.variable ("d", 4);
-    Layout.Variable  e = l.variable ("e", 5);
-    Layout.Structure S = l.structure("S", a, b, c, d, e);
-
-    MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "M");
-    final String     n = m.name();
-    final String     i = m.initializeMemory();
-    m.memory().alternating(4);
-    m.dumpVerilog(v, b, d);
-
-    final Stack<String> r = readFile(v);
-    //r.removeElementAt(0);
-    //stop(joinLines(r));
-    ok(joinLines(r)+"\n", String.format("""
-task %s;
-    begin
-        %s[0] <= 0;
-     `ifndef SYNTHESIS
-        %s[1] <= 0;
-     `endif
-     `ifndef SYNTHESIS
-        %s[2] <= 0;
-     `endif
-        %s[3] <= 0;
-        %s[4] <= 1;
-        %s[5] <= 1;
-     `ifndef SYNTHESIS
-        %s[6] <= 1;
-     `endif
-     `ifndef SYNTHESIS
-        %s[7] <= 1;
-     `endif
-     `ifndef SYNTHESIS
-        %s[8] <= 0;
-     `endif
-     `ifndef SYNTHESIS
-        %s[9] <= 0;
-     `endif
-        %s[10] <= 0;
-        %s[11] <= 0;
-        %s[12] <= 1;
-        %s[13] <= 1;
-        %s[14] <= 1;
-    end
-endtask
-""", i, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n));
-    deleteAllFiles(folderName(v), 1);
-   }
-*/
   static void test_copy_bits()
    {z();
     Layout               l = Layout.layout();
@@ -2112,23 +2020,19 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_copy();
     test_move();
     test_move_to();
-//  test_move_parallel();
     test_set_inc_dec_get();
     test_addressing();
     test_boolean_result();
     test_is_ones_or_zeros();
     test_union();
     test_verilog_address();
-//  test_dump_verilog();
-//  test_dump_verilog_ignore();
     test_copy_bits();
     test_copy_memory();
     test_array_addressing();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_array_addressing();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
