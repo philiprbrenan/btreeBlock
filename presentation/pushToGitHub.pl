@@ -1,6 +1,6 @@
 #!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/
 #-------------------------------------------------------------------------------
-# Push Btree presntation to GitHub
+# Push Btree presentation to GitHub
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2025
 #-------------------------------------------------------------------------------
 use warnings FATAL => qw(all);
@@ -11,14 +11,16 @@ use Data::Table::Text qw(:all);
 use GitHub::Crud qw(:all);
 use feature qw(say current_sub);
 
-my $home    = q(/home/phil/btreeBlock/presentation/);                           # Home folder
-my $inHtml  = q(/home/phil/btreeBlock/presentation/index.htm);                  # Output html
-my $outHtml = q(/home/phil/btreeBlock/presentation/index.html);                 # Output html
-my $shaFile = q(/home/phil/btreeBlock/presentation/.shaFile);                   # File shas
-my $user    = q(philiprbrenan);                                                 # User
-my $repo    = q(philiprbrenan.github.io);                                       # Repo
-my $dir     = q(zesal/presentation);                                            # Work flow on Ubuntu
-my @ext     = qw(.jpg .pl);                                                     # Extensions of files to upload to github
+my $home     = q(/home/phil/btreeBlock/presentation/);                          # Home folder
+my $inHtml   = q(/home/phil/btreeBlock/presentation/index.htm);                 # Index
+my $outHtml  = q(/home/phil/btreeBlock/presentation/index.html);                #
+my $dInHtml  = q(/home/phil/btreeBlock/presentation/darpa.htm);                 # Darpa
+my $dOutHtml = q(/home/phil/btreeBlock/presentation/darpa.html);
+my $shaFile  = q(/home/phil/btreeBlock/presentation/.shaFile);                  # File shas
+my $user     = q(philiprbrenan);                                                # User
+my $repo     = q(philiprbrenan.github.io);                                      # Repo
+my $dir      = q(zesal/presentation);                                           # Work flow on Ubuntu
+my @ext      = qw(.jpg .pl);                                                    # Extensions of files to upload to github
 
 say STDERR timeStamp,  " Push presentation to github $repo";
 
@@ -32,10 +34,14 @@ if (1)                                                                          
    }
  }
 
-if (1)                                                                          # Expand Index.htm
+if (1)                                                                          # Expand Index
  {my $c = expandWellKnownWordsAsUrlsAndAddTocToMakeANewHtmlFile $inHtml;
-  #owf($outHtml, $c);
   unshift @files, ($inHtml, $outHtml);
+ }
+
+if (1)                                                                          # Expand Darpa
+ {my $c = expandWellKnownWordsAsUrlsAndAddTocToMakeANewHtmlFile $dInHtml;
+  unshift @files, ($dInHtml, $dOutHtml);
  }
 
 @files = changedFiles $shaFile, @files if 1;                                    # Filter out files that have not changed
