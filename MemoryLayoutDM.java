@@ -14,7 +14,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
   ProgramDM                P = new ProgramDM();                                 // Program containing generated code
   static int         numbers = 0;
   final  int          number = ++numbers;                                       // Number each memory layout
-  final  int      useLogMove = 8;                                               // Transition to logarithmic moves at this point
+  int             useLogMove = 8;                                               // Transition to logarithmic moves at this point
 
   final BlockArray    block;                                                    // The memory layout represents an array the elements of which have a width equal to a power of two
 
@@ -494,41 +494,60 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       move(buffer);
      }
 
-    void moveUpLog(At Index, At buffer)                                         // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Elements are copied in blocks that decrease logarithmically in size as this reduces the number of binary "less than" comparisons required
-     {final Layout.Array A = field.toArray();                                   // Array of elements to be moved
-      final Layout.Array B = buffer.field.toArray();                            // Buffer containg a copy of the array to be moved
-      final Layout.Field a = A.element;                                         // Array element
-      final Layout.Field b = B.element;                                         // Buffer array element
-      final int          w = a.width;                                           // Width of array element
-      P.new I()
-       {void a()                                                                // Emulation
-         {final int S = Index == null ? 1 : (Index.setOff().result + 1);        // A null index means start at the very beginning
-          for   (int i = S; i < A.size; i++)                                    // Each element
-           {for (int j = 0; j < w;      j++)                                    // Each bit in each element
-             {final boolean b = buffer.getBit((i-1)*w + j);                     // The bit to be moved
-              setBit(i*w+j, b);                                                 // Copy the bit into its new position
-             }
-           }
+    private void moveFromBuffer(int Start, int End, int Width, At Buffer)       // Copy the elements of a buffer back into the source array in the specified span
+     {for   (int i = Start; i < End;   i++)                                     // Each element
+       {for (int j = 0;     j < Width; j++)                                     // Each bit in each element
+         {final boolean b = Buffer.getBit((i-1)*Width + j);                     // The bit to be moved
+          setBit(i*Width+j, b);                                                 // Copy the bit into its new position
          }
-        String v()                                                              // Verilog
-         {final StringBuilder   s = new StringBuilder("/* MemoryLayoutDM.moveUpLog */\n");
-          final String      start = Index == null ? "0" : Index.verilogLoad();  // Load above this index
-          final MemoryLayoutDM tm = ml();                                       // Target memory
-          final MemoryLayoutDM sm = buffer.ml();                                // Source memory
-          for   (int i = 1; i < A.size; i++)                                    // Each element
-           {s.append("\nif ("+i+" > "+start +") begin\n  ");                    // Start moving when we are above the index
-            s.append
-             (tm.at(a, i-0).verilogLoad()+ " <= " +
-              sm.at(b, i-1).verilogLoad()+ ";");
-            s.append("\nend\n");
-           }
-          return s.toString();
-         }
-        String n() {return field.name+" moveUp @ "+(Index != null ? Index.field.name : "0")+" using "+buffer.field.name;}
-       };
+       }
      }
 
-    void moveUpLin(At Index, At buffer)                                         // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Whether each element is copied is dependent on a binary "less than" which is expensive
+    private void moveUpLog(At Index, At buffer)                                 // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Elements are copied in blocks that decrease logarithmically in size as this reduces the number of binary "less than" comparisons required
+     {final Layout.Array A = field.toArray();                                   // Array of elements to be moved
+      final Layout.Array B = buffer.field.toArray();                            // Buffer containg a copy of the array to be moved
+      final Layout.Field a = A.element;                                         // Array element
+      final Layout.Field b = B.element;                                         // Buffer array element
+      final int          w = a.width;                                           // Width of array element
+      final int          S = logTwo(A.size);                                    // Next log 2 of size of array
+
+      final Layout           l = Layout.layout();
+      final Layout.Variable  p = l.variable ("position", Index.width);
+      MemoryLayoutDM         m = new MemoryLayoutDM(l.compile(), "position");   // Create a position index so we know which  block to move
+      m.program(P);
+      m.setIntInstruction(p, A.size);                                           // Current block end position
+      for (int i = 0; i <= S; i++)                                              // Move each logarithmically sized block
+       {final int q = 1<<(S-i);                                                 // Size of block
+        P.new I()
+         {void a()                                                              // Emulation
+           {final int O = m.getInt(p), o = O - q, r = Index.setOff().result+1;  // End and start of block to move, index of start element to be moved
+            if (o >= r)                                                         // Block is in range
+             {moveFromBuffer(o, O, w, buffer);                                  // Move block
+              m.setInt(p, o);                                                   // Address remainder of area to be moved
+             }
+           }
+          String i(int i) {return String.format("%8d", i);}                     // Format an index
+          String v()                                                            // Verilog
+           {final StringBuilder   s = new StringBuilder();
+            final String start = Index.verilogLoad();                           // Load above this index
+            final String O = m.at(p).verilogLoad();                             // End of block
+            final String o = O+"-"+i(q);                                           // Start of block
+            final String A = verilogAddr();                                     // Offset of array in memory
+            final MemoryLayoutDM tm = ml();                                     // Target memory
+            final MemoryLayoutDM sm = buffer.ml();                              // Source memory
+            s.append("if (("+o+")*"+w+" >= "+start +") begin ");                // Start moving when we are above the index
+            s.append(
+              tm.name()+"["+A+"+("+o+"  )*"+w+" +: "+i(q*w)+"] <= " +           // Move power of two block
+              sm.name()+"[      ("+o+"-1)*"+w+" +: "+i(q*w)+"]; ");
+            s.append(O+" <= "+o+"; ");                                          // Move position down over moved block
+            s.append("end /* MemoryLayoutDM.moveUpLog */\n");
+            return s.toString();
+           }
+         };
+       }
+     }
+
+    private void moveUpLin(At Index, At buffer)                                 // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Whether each element is copied is dependent on a binary "less than" which is expensive
      {final Layout.Array A = field.toArray();                                   // Array of elements to be moved
       final Layout.Array B = buffer.field.toArray();                            // Buffer containg a copy of the array to be moved
       final Layout.Field a = A.element;                                         // Array element
@@ -536,17 +555,12 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       final int          w = a.width;                                           // Width of array element
       P.new I()
        {void a()                                                                // Emulation
-         {final int S = Index == null ? 1 : (Index.setOff().result + 1);        // A null index means start at the very beginning
-          for   (int i = S; i < A.size; i++)                                    // Each element
-           {for (int j = 0; j < w;      j++)                                    // Each bit in each element
-             {final boolean b = buffer.getBit((i-1)*w + j);                     // The bit to be moved
-              setBit(i*w+j, b);                                                 // Copy the bit into its new position
-             }
-           }
+         {final int S = Index.setOff().result + 1;                              // A null index means start at the very beginning
+          moveFromBuffer(S, A.size, w, buffer);                                 // Each element
          }
         String v()                                                              // Verilog
          {final StringBuilder   s = new StringBuilder("/* MemoryLayoutDM.moveUpLin */\n");
-          final String      start = Index == null ? "0" : Index.verilogLoad();  // Load above this index
+          final String      start = Index.verilogLoad();                        // Load above this index
           final MemoryLayoutDM tm = ml();                                       // Target memory
           final MemoryLayoutDM sm = buffer.ml();                                // Source memory
           for   (int i = 1; i < A.size; i++)                                    // Each element
@@ -558,11 +572,11 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
            }
           return s.toString();
          }
-        String n() {return field.name+" moveUp @ "+(Index != null ? Index.field.name : "0")+" using "+buffer.field.name;}
+        String n() {return field.name+" moveUp @ "+ Index.field.name+" using "+buffer.field.name;}
        };
      }
 
-    void moveUpAll(At Index, At buffer)                                         // Move all the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.
+    private void moveUpAll(At Index, At buffer)                                 // Move all the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.
      {final Layout.Array A = field.toArray();                                   // Array of elements to be moved
       final Layout.Array B = buffer.field.toArray();                            // Buffer containg a copy of the array to be moved
       final Layout.Field a = A.element;                                         // Array element
@@ -570,12 +584,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       final int          w = a.width;                                           // Width of array element
       P.new I()
        {void a()                                                                // Emulation
-         {for   (int i = 1; i < A.size; i++)                                    // Each element
-           {for (int j = 0; j < w;      j++)                                    // Each bit in each element
-             {final boolean b = buffer.getBit((i-1)*w + j);                     // The bit to be moved
-              setBit(i*w+j, b);                                                 // Copy the bit into its new position
-             }
-           }
+         {moveFromBuffer(1, A.size, w, buffer);                                 // Each element
          }
         String v()                                                              // Verilog
          {final StringBuilder   s = new StringBuilder("/* MemoryLayoutDM.moveUpAll */\n");
@@ -588,7 +597,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
            }
           return s.toString();
          }
-        String n() {return field.name+" moveUpAll @ "+(Index != null ? Index.field.name : "0")+" using "+buffer.field.name;}
+        String n() {return field.name+" moveUpAll @ "+ Index.field.name+" using "+buffer.field.name;}
        };
      }
 
@@ -2035,40 +2044,44 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout           l = Layout.layout();
     Layout.Variable  a = l.variable ("a", M);
     Layout.Array     A = l.array    ("A", a, N);
-    Layout.Structure S = l.structure("s", A);
+    Layout.Variable  z = l.variable ("z", M);
+    Layout.Structure S = l.structure("s", z, A);
     MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "arrays");
 
     for (int i = 0; i < N; i++) m.at(a, i).setInt(i);
+    m.at(z).setInt(11);
     //stop(m);
-    ok(m, """
+    ok(""+m, """
 MemoryLayout: arrays
 Memory      : arrays
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        24                                      s
-   2 A        0        24          6                             A
-   3 V        0         4               0                  0       a
-   4 V        4         4               1                  1       a
-   5 V        8         4               2                  2       a
-   6 V       12         4               3                  3       a
-   7 V       16         4               4                  4       a
-   8 V       20         4               5                  5       a
+   1 S        0        28                                      s
+   2 V        0         4                                 11     z
+   3 A        4        24          6                             A
+   4 V        4         4               0                  0       a
+   5 V        8         4               1                  1       a
+   6 V       12         4               2                  2       a
+   7 V       16         4               3                  3       a
+   8 V       20         4               4                  4       a
+   9 V       24         4               5                  5       a
 """);
 
-    m.at(A).moveUp(null);
+    m.at(A).moveUp();
     m.P.run(); m.P.clear();
     //stop(m);
     ok(m, """
 MemoryLayout: arrays
 Memory      : arrays
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        24                                      s
-   2 A        0        24          6                             A
-   3 V        0         4               0                  0       a
-   4 V        4         4               1                  0       a
-   5 V        8         4               2                  1       a
-   6 V       12         4               3                  2       a
-   7 V       16         4               4                  3       a
-   8 V       20         4               5                  4       a
+   1 S        0        28                                      s
+   2 V        0         4                                 11     z
+   3 A        4        24          6                             A
+   4 V        4         4               0                  0       a
+   5 V        8         4               1                  0       a
+   6 V       12         4               2                  1       a
+   7 V       16         4               3                  2       a
+   8 V       20         4               4                  3       a
+   9 V       24         4               5                  4       a
 """);
    }
 
@@ -2079,10 +2092,12 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  a = l.variable ("a", M);
     Layout.Array     A = l.array    ("A", a, N);
     Layout.Variable  i = l.variable ("i", M);
-    Layout.Structure S = l.structure("s", A, i);
+    Layout.Variable  z = l.variable ("z", M);
+    Layout.Structure S = l.structure("s", z, A, i);
     MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "arrays");
 
     for (int j = 0; j < N; j++) m.at(a, j).setInt(j);
+    m.at(z).setInt(11);
     m.at(i).setInt(1);
 
     //stop(m);
@@ -2090,15 +2105,16 @@ Line T       At      Wide       Size    Indices        Value   Name
 MemoryLayout: arrays
 Memory      : arrays
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        28                                      s
-   2 A        0        24          6                             A
-   3 V        0         4               0                  0       a
-   4 V        4         4               1                  1       a
-   5 V        8         4               2                  2       a
-   6 V       12         4               3                  3       a
-   7 V       16         4               4                  4       a
-   8 V       20         4               5                  5       a
-   9 V       24         4                                  1     i
+   1 S        0        32                                      s
+   2 V        0         4                                 11     z
+   3 A        4        24          6                             A
+   4 V        4         4               0                  0       a
+   5 V        8         4               1                  1       a
+   6 V       12         4               2                  2       a
+   7 V       16         4               3                  3       a
+   8 V       20         4               4                  4       a
+   9 V       24         4               5                  5       a
+  10 V       28         4                                  1     i
 """);
 
     m.at(A).moveUp(m.at(i));
@@ -2108,15 +2124,81 @@ Line T       At      Wide       Size    Indices        Value   Name
 MemoryLayout: arrays
 Memory      : arrays
 Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        28                                      s
-   2 A        0        24          6                             A
-   3 V        0         4               0                  0       a
-   4 V        4         4               1                  1       a
-   5 V        8         4               2                  1       a
-   6 V       12         4               3                  2       a
-   7 V       16         4               4                  3       a
-   8 V       20         4               5                  4       a
-   9 V       24         4                                  1     i
+   1 S        0        32                                      s
+   2 V        0         4                                 11     z
+   3 A        4        24          6                             A
+   4 V        4         4               0                  0       a
+   5 V        8         4               1                  1       a
+   6 V       12         4               2                  1       a
+   7 V       16         4               3                  2       a
+   8 V       20         4               4                  3       a
+   9 V       24         4               5                  4       a
+  10 V       28         4                                  1     i
+""");
+   }
+
+  static void test_moveUpLog()
+   {z();
+    final int M = 4, N = 12;
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", M);
+    Layout.Array     A = l.array    ("A", a, N);
+    Layout.Variable  i = l.variable ("i", M);
+    Layout.Variable  z = l.variable ("z", M);
+    Layout.Structure S = l.structure("s", z, A, i);
+    MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "arrays");
+
+    for (int j = 0; j < N; j++) m.at(a, j).setInt(j);
+    m.at(z).setInt(11);
+    m.at(i).setInt(1);
+
+    //stop(m);
+    ok(m, """
+MemoryLayout: arrays
+Memory      : arrays
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        56                                      s
+   2 V        0         4                                 11     z
+   3 A        4        48         12                             A
+   4 V        4         4               0                  0       a
+   5 V        8         4               1                  1       a
+   6 V       12         4               2                  2       a
+   7 V       16         4               3                  3       a
+   8 V       20         4               4                  4       a
+   9 V       24         4               5                  5       a
+  10 V       28         4               6                  6       a
+  11 V       32         4               7                  7       a
+  12 V       36         4               8                  8       a
+  13 V       40         4               9                  9       a
+  14 V       44         4              10                 10       a
+  15 V       48         4              11                 11       a
+  16 V       52         4                                  1     i
+""");
+
+    m.at(A).moveUp(m.at(i));
+    m.P.run();
+    say("AAAA", m.P.printVerilog());
+    //stop(m);
+    ok(""+m, """
+MemoryLayout: arrays
+Memory      : arrays
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        56                                      s
+   2 V        0         4                                 11     z
+   3 A        4        48         12                             A
+   4 V        4         4               0                  0       a
+   5 V        8         4               1                  1       a
+   6 V       12         4               2                  1       a
+   7 V       16         4               3                  2       a
+   8 V       20         4               4                  3       a
+   9 V       24         4               5                  4       a
+  10 V       28         4               6                  5       a
+  11 V       32         4               7                  6       a
+  12 V       36         4               8                  7       a
+  13 V       40         4               9                  8       a
+  14 V       44         4              10                  9       a
+  15 V       48         4              11                 10       a
+  16 V       52         4                                  1     i
 """);
    }
 
@@ -2137,12 +2219,14 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_array_addressing();
     test_moveUpAll();
     test_moveUpLin();
+    test_moveUpLog();
    }
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
     test_moveUpAll();
     test_moveUpLin();
+    test_moveUpLog();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
