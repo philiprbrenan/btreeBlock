@@ -4,8 +4,6 @@
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Memory layout
 
-// Lok  Yamg, Mike Holmes Bryan Jacobs, Julkianm McMorrow, Daniel ridge, Michael Sangillo
-
 import java.util.*;
 
 class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         // Memory layout
