@@ -4,6 +4,8 @@
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Memory layout
 
+// Lok  Yamg, Mike Holmes Bryan Jacobs, Julkianm McMorrow, Daniel ridge, Michael Sangillo
+
 import java.util.*;
 
 class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         // Memory layout
@@ -2262,7 +2264,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     m.at(A).moveUp(m.at(i));
     m.P.run();
-    say("AAAA", m.P.printVerilog());
+    //stop(m.P.printVerilog());
     //stop(m);
     ok(""+m, """
 MemoryLayout: arrays
@@ -2426,7 +2428,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     m.at(A).moveDown(m.at(i));
     m.P.run();
-    say("AAAA", m.P.printVerilog());
+    //stop(m.P.printVerilog());
     //stop(m);
     ok(""+m, """
 MemoryLayout: arrays
@@ -2469,13 +2471,13 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_moveUpAll();
     test_moveUpLin();
     test_moveUpLog();
-   }
-
-  static void newTests()                                                        // Tests being worked on
-   {//oldTests();
     test_moveDownAll();
     test_moveDownLin();
     test_moveDownLog();
+   }
+
+  static void newTests()                                                        // Tests being worked on
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
