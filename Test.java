@@ -298,9 +298,9 @@ public class Test                                                               
 
   static String currentTestNameSuffix()                                         // Name of the current test
    {final String t = currentTestName();
-    if (t == null) return null;
+    if (t == null) stop("Not in a test");
     final String[]s = t.split("_", 2);
-    if (s.length < 2) return null;
+    if (s.length < 2) stop("Not in a test_name");
     return s[1];
    }
 
