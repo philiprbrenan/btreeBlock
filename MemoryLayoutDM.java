@@ -638,7 +638,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
        };
      }
 
-    private void moveUp()                                                       // Move the elements of an array up one position deleting the last element.
+    void moveUp()                                                               // Move the elements of an array up one position deleting the last element.
      {if (!(field instanceof Layout.Array))  stop("Array required for moveUp");
       final Layout.Array A = field.toArray();                                   // Array of elements to be moved
       final At           B = createMoveBuffer();                                // Buffer containg a copy of the array to be moved
@@ -648,7 +648,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
         copyMoveBuffer(B);
      }
 
-    private void moveDown()                                                     // Move the elements of an array down one position deleting the first element.
+    void moveDown()                                                             // Move the elements of an array down one position deleting the first element.
      {if (!(field instanceof Layout.Array))  stop("Array required for moveDown");
       final Layout.Array A = field.toArray();                                   // Array of elements to be moved
       final At           B = createMoveBuffer();                                // Buffer containg a copy of the array to be moved
@@ -658,7 +658,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
         copyMoveBuffer(B);
      }
 
-    private void moveUp(At Index)                                               // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Whether each element is copied is dependent on a binary "less than" which is expensive
+    void moveUp(At Index)                                                       // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Whether each element is copied is dependent on a binary "less than" which is expensive
      {if (!(field instanceof Layout.Array)) stop("Array required for moveUp");
       final Layout.Array A = field.toArray();                                   // Array of elements to be moved
       final int          S = logTwo(A.size)-1;                                  // Next log 2 of size of array. Minus one because that is the size of the maximum move
@@ -701,7 +701,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       copyMoveBuffer(B);                                                        // Rewrite the array after performing the move in the buffer
      }
 
-    private void moveDown(At Index)                                             // Move the elements of an array down one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Whether each element is copied is dependent on a binary "less than" which is expensive
+    void moveDown(At Index)                                                     // Move the elements of an array down one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Whether each element is copied is dependent on a binary "less than" which is expensive
      {if (!(field instanceof Layout.Array)) stop("Array required for moveUp");
       final Layout.Array A = field.toArray();                                   // Array of elements to be moved
       final int          S = logTwo(A.size)-1;                                  // Next log 2 of size of array. Minus one because that is the size of the maximum move
