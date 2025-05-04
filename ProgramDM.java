@@ -3,7 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
-
+// Create a case statement so that we can perform a linear memory move in Java and Verilog with identical effects on memory
 import java.util.*;
 
 class ProgramDM extends Test                                                    // A program that manipulates a memory layout via instructions
@@ -22,6 +22,7 @@ class ProgramDM extends Test                                                    
   static int         numbers = 0;                                               // Program numbers
   final  int          number = ++numbers;                                       // Program number
   final TreeSet<MemoryLayoutDM> memories = new TreeSet<>();                     // Memory layouts associated with this program
+  final TreeSet<String>      uniqueNames = new TreeSet<>();                     // Confirm that memory layouts that claim they have unique names really do have unique names
 
   ProgramDM() {z();}                                                            // Create a program that instructions can be added to and then executed
 
@@ -33,8 +34,18 @@ class ProgramDM extends Test                                                    
 
   ProgramDM programDM() {return this;}                                          // Address containing class
 
-  void addMemoryLayout(MemoryLayoutDM ml)                                       // This program uses this memory layout amongst others
-   {memories.add(ml);
+  void addMemoryLayout(MemoryLayoutDM ml, boolean uniqueName)                   // This program uses this memory layout amongst others
+   {final String name = ml.name;
+    if (uniqueName)                                                             // The intention is to use this name directly in verilog programs
+     {if (uniqueNames.contains(name))                                           // Confirm it is unique
+       {stop("Memory layout with name:", name, "has already been defined");
+       }
+      uniqueNames.add(name);                                                    // Record new unique name
+     }
+    if (memories.contains(ml))                                                  // Record memories assocaited w uth this program
+     {stop("Already added to memories for this program:", name);
+     }
+    memories.add(ml);                                                           // Add this memory layout to the set of memory layouts associated with this progam
    }
 
   class Label                                                                   // Label definition
@@ -74,6 +85,8 @@ class ProgramDM extends Test                                                    
     String n() {return "instruction";}                                          // Instruction name
     String v() {stop("No instruction definition:\n"+traceBack); return null;}   // Corresponding verilog
     void   i() {}                                                               // initialization for each instruction
+    String i4(int i) {return String.format("%4d", i);}                          // Format an index
+    String i8(int i) {return String.format("%8d", i);}                          // Format an index
 
     String traceComment() {return " /* " + traceBack.replaceAll("\n", " ") + " */";} // Traceback as a comment
 
@@ -367,7 +380,6 @@ class ProgramDM extends Test                                                    
    }
 
 //D1 Verilog                                                                    // Dump verilog equivalents of the instructions in this program
-
 
   void debugVerilog(String title, MemoryLayoutDM.At at)                         // Add a debug statement to both the program and the verilog version
    {final int N = code.size();
