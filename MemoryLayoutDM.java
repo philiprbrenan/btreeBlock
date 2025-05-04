@@ -687,7 +687,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
             final String n = B.ml().name();                                     // Memory name in which the move will be performed
             final String Q = i4(q);
 
-            return "if ("+S+"-"+Q+" > "+Index.verilogLoad()+") begin " +        // Block is in range
+            return "if ("+S+" > "+Index.verilogLoad()+"+"+Q+") begin " +        // Block is in range
               n+"[("+S+" - "+Q+")"+"*"+width+          " +: "+N+"] <= "+
               n+"[("+S+" - "+Q+")"+"*"+width+"-"+width+" +: "+N+"]; "+          // Parallel move
               p.verilogLoad()+" <= "+p.verilogLoad()+"-"+Q+";"+                 // Update position
@@ -2539,10 +2539,10 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(""+m.P.printVerilog(), """
    1  buffer_2[       0/*b       */+:48] <= arrays[       4/*A       */+:48];/* copyMoveBuffer */
    2  position_3[       0/*position*/ +: 4] <= 12;
-   3  if (position_3[       0/*position*/ +: 4]-   8 > arrays[      52/*i       */ +: 4]) begin buffer_2[(position_3[       0/*position*/ +: 4] -    8)*4 +:       32] <= buffer_2[(position_3[       0/*position*/ +: 4] -    8)*4-4 +:       32]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   8;end /* moveUp */
-   4  if (position_3[       0/*position*/ +: 4]-   4 > arrays[      52/*i       */ +: 4]) begin buffer_2[(position_3[       0/*position*/ +: 4] -    4)*4 +:       16] <= buffer_2[(position_3[       0/*position*/ +: 4] -    4)*4-4 +:       16]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   4;end /* moveUp */
-   5  if (position_3[       0/*position*/ +: 4]-   2 > arrays[      52/*i       */ +: 4]) begin buffer_2[(position_3[       0/*position*/ +: 4] -    2)*4 +:        8] <= buffer_2[(position_3[       0/*position*/ +: 4] -    2)*4-4 +:        8]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   2;end /* moveUp */
-   6  if (position_3[       0/*position*/ +: 4]-   1 > arrays[      52/*i       */ +: 4]) begin buffer_2[(position_3[       0/*position*/ +: 4] -    1)*4 +:        4] <= buffer_2[(position_3[       0/*position*/ +: 4] -    1)*4-4 +:        4]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   1;end /* moveUp */
+   3  if (position_3[       0/*position*/ +: 4] > arrays[      52/*i       */ +: 4]+   8) begin buffer_2[(position_3[       0/*position*/ +: 4] -    8)*4 +:       32] <= buffer_2[(position_3[       0/*position*/ +: 4] -    8)*4-4 +:       32]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   8;end /* moveUp */
+   4  if (position_3[       0/*position*/ +: 4] > arrays[      52/*i       */ +: 4]+   4) begin buffer_2[(position_3[       0/*position*/ +: 4] -    4)*4 +:       16] <= buffer_2[(position_3[       0/*position*/ +: 4] -    4)*4-4 +:       16]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   4;end /* moveUp */
+   5  if (position_3[       0/*position*/ +: 4] > arrays[      52/*i       */ +: 4]+   2) begin buffer_2[(position_3[       0/*position*/ +: 4] -    2)*4 +:        8] <= buffer_2[(position_3[       0/*position*/ +: 4] -    2)*4-4 +:        8]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   2;end /* moveUp */
+   6  if (position_3[       0/*position*/ +: 4] > arrays[      52/*i       */ +: 4]+   1) begin buffer_2[(position_3[       0/*position*/ +: 4] -    1)*4 +:        4] <= buffer_2[(position_3[       0/*position*/ +: 4] -    1)*4-4 +:        4]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   1;end /* moveUp */
    7  arrays[       4/*A       */+:48] <= buffer_2[       0/*b       */+:48];/* copyMoveBuffer */
 """);
     //stop(m);
