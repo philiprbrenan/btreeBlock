@@ -581,7 +581,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          }
         String v()                                                              // Verilog
          {final String n = l.name();                                            // Memory name in which the move will be performed
-          return n+"["+S+"+:"+N+"] <= "+n+"["+Width+":"+N+"];"+                 // Parallel move
+          return n+"["+S+"+:"+N+"] <= "+n+"["+Width+"+:"+N+"];"+                 // Parallel move
             "/* downMoveBufferLinear */";
          }
        };
@@ -2170,7 +2170,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.P.run();
     //stop(m.P.printVerilog());
     ok(""+m.P.printVerilog(), """
-   1  arrays[0+:20] <= arrays[4:20];/* downMoveBufferLinear */
+   1  arrays[0+:20] <= arrays[4+:20];/* downMoveBufferLinear */
 """);
     //stop(m);
     ok(""+m, """
@@ -2251,7 +2251,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.P.run();
     //stop(m.P.printVerilog());
     ok(""+m.P.printVerilog(), """
-   1  arrays[8+:12] <= arrays[4:12];/* downMoveBufferLinear */
+   1  arrays[8+:12] <= arrays[4+:12];/* downMoveBufferLinear */
 """);
     //stop(m);
     ok(""+m, """
