@@ -14,7 +14,6 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
   ProgramDM             P = new ProgramDM();                                    // Program containing generated code
   static int      numbers = 0;                                                  // Unique number for each memory layout recreated
   final  int       number = ++numbers;                                          // Number each memory layout
-  int          useLogMove = 8;                                                  // Transition to logarithmic moves at this point
 
   final BlockArray block;                                                       // The memory layout represents an array the elements of which have a width equal to a power of two
 
@@ -606,8 +605,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           final String N = ""+(Length * Width);                                 // Number of bits to move
           final String n = l.name();                                            // Memory name in which the move will be performed
           return "begin " +
-          "wire ["+Start.width+"-1:0] address = "+S+"; "+                       // Common sub expression
-          n+"[address+"+Width+"+:"+N+"] <= "+n+"[address+:"+N+"]; "+            // Parallel move
+          n+"["+S+"+"+Width+"+:"+N+"] <= "+n+"["+S+"+:"+N+"]; "+                // Parallel move
           "end /* upMoveBufferBlock */";
          }
        };
@@ -631,8 +629,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           final String N = ""+(Length * Width);                                 // Number of bits to move
           final String n = l.name();                                            // Memory name in which the move will be performed
           return "begin " +
-          "wire ["+Start.width+"-1:0] address = "+S+"; "+                       // Common sub expression
-          n+"[address+:"+N+"] <= "+n+"[address+"+Width+"+:"+N+"]; "+            // Parallel move
+          n+"["+S+"+:"+N+"] <= "+n+"["+S+"+"+Width+"+:"+N+"]; "+                // Parallel move
           "end /* downMoveBufferBlock */";
          }
        };
@@ -689,12 +686,12 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
             final String N = i8(q * width);                                     // Number of bits to move
             final String n = B.ml().name();                                     // Memory name in which the move will be performed
             final String Q = i4(q);
+
             return "if ("+S+"-"+Q+" > "+Index.verilogLoad()+") begin " +        // Block is in range
-              "wire ["+p.width+"-1:0] address = ("+S+" - "+Q+")"+"*"+width+"); "+ // Common sub expression
-              n+"[address"       +" +: "+N+"] <= "+
-              n+"[address-"+width+" +: "+N+"]; "+                               // Parallel move
+              n+"[("+S+" - "+Q+")"+"*"+width+          " +: "+N+"] <= "+
+              n+"[("+S+" - "+Q+")"+"*"+width+"-"+width+" +: "+N+"]; "+          // Parallel move
               p.verilogLoad()+" <= "+p.verilogLoad()+"-"+Q+";"+                 // Update position
-              "end /* moveUp */";
+             "end /* moveUp */";
            }
          };
        }
@@ -733,9 +730,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
             final String n = B.ml().name();                                     // Memory name in which the move will be performed
             final String Q = i8(q);                                             // Move width
             return "if ("+S+"+"+Q+" < "+A.size+") begin " +
-              "wire ["+p.width+"-1:0] address = "+S+"*"+width+"; "+             // Common sub expression
-              n+"[address"       +" +: "+N+"] <= "+
-              n+"[address+"+width+" +: "+N+"]; "+                               // Parallel move
+              n+"["+S+"*"+width          +" +: "+N+"] <= "+
+              n+"["+S+"*"+width+"+"+width+" +: "+N+"]; "+                               // Parallel move
               p.verilogLoad()+" <= "+p.verilogLoad()+"+"+Q+";"+
               "end /* moveDown */";
            }
@@ -2312,7 +2308,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.P.run();
     //stop(m.P.printVerilog());
     ok(""+m.P.printVerilog(), """
-   1  begin wire [4-1:0] address = arrays[      28/*i       */ +: 4]; arrays[address+4+:8] <= arrays[address+:8]; end /* upMoveBufferBlock */
+   1  begin arrays[arrays[      28/*i       */ +: 4]+4+:8] <= arrays[arrays[      28/*i       */ +: 4]+:8]; end /* upMoveBufferBlock */
 """);
     //stop(m);
     ok(""+m, """
@@ -2336,7 +2332,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.P.run();
     //stop(m.P.printVerilog());
     ok(""+m.P.printVerilog(), """
-   1  begin wire [4-1:0] address = arrays[      28/*i       */ +: 4]; arrays[address+:8] <= arrays[address+4+:8]; end /* downMoveBufferBlock */
+   1  begin arrays[arrays[      28/*i       */ +: 4]+:8] <= arrays[arrays[      28/*i       */ +: 4]+4+:8]; end /* downMoveBufferBlock */
 """);
     //stop(m);
     ok(""+m, """
@@ -2414,7 +2410,7 @@ Line  FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654 3210 FEDC BA98 7654
 
     //stop(B.ml().P.printVerilog());
     ok(B.ml().P.printVerilog(), """
-   1  begin wire [4-1:0] address = arrays[      28/*i       */ +: 4]; buffer_2[address+4+:8] <= buffer_2[address+:8]; end /* upMoveBufferBlock */
+   1  begin buffer_2[arrays[      28/*i       */ +: 4]+4+:8] <= buffer_2[arrays[      28/*i       */ +: 4]+:8]; end /* upMoveBufferBlock */
 """);
 
     //stop(B.ml().memory());
@@ -2543,10 +2539,10 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(""+m.P.printVerilog(), """
    1  buffer_2[       0/*b       */+:48] <= arrays[       4/*A       */+:48];/* copyMoveBuffer */
    2  position_3[       0/*position*/ +: 4] <= 12;
-   3  if (position_3[       0/*position*/ +: 4]-   8 > arrays[      52/*i       */ +: 4]) begin wire [4-1:0] address = (position_3[       0/*position*/ +: 4] -    8)*4); buffer_2[address +:       32] <= buffer_2[address-4 +:       32]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   8;end /* moveUp */
-   4  if (position_3[       0/*position*/ +: 4]-   4 > arrays[      52/*i       */ +: 4]) begin wire [4-1:0] address = (position_3[       0/*position*/ +: 4] -    4)*4); buffer_2[address +:       16] <= buffer_2[address-4 +:       16]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   4;end /* moveUp */
-   5  if (position_3[       0/*position*/ +: 4]-   2 > arrays[      52/*i       */ +: 4]) begin wire [4-1:0] address = (position_3[       0/*position*/ +: 4] -    2)*4); buffer_2[address +:        8] <= buffer_2[address-4 +:        8]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   2;end /* moveUp */
-   6  if (position_3[       0/*position*/ +: 4]-   1 > arrays[      52/*i       */ +: 4]) begin wire [4-1:0] address = (position_3[       0/*position*/ +: 4] -    1)*4); buffer_2[address +:        4] <= buffer_2[address-4 +:        4]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   1;end /* moveUp */
+   3  if (position_3[       0/*position*/ +: 4]-   8 > arrays[      52/*i       */ +: 4]) begin buffer_2[(position_3[       0/*position*/ +: 4] -    8)*4 +:       32] <= buffer_2[(position_3[       0/*position*/ +: 4] -    8)*4-4 +:       32]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   8;end /* moveUp */
+   4  if (position_3[       0/*position*/ +: 4]-   4 > arrays[      52/*i       */ +: 4]) begin buffer_2[(position_3[       0/*position*/ +: 4] -    4)*4 +:       16] <= buffer_2[(position_3[       0/*position*/ +: 4] -    4)*4-4 +:       16]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   4;end /* moveUp */
+   5  if (position_3[       0/*position*/ +: 4]-   2 > arrays[      52/*i       */ +: 4]) begin buffer_2[(position_3[       0/*position*/ +: 4] -    2)*4 +:        8] <= buffer_2[(position_3[       0/*position*/ +: 4] -    2)*4-4 +:        8]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   2;end /* moveUp */
+   6  if (position_3[       0/*position*/ +: 4]-   1 > arrays[      52/*i       */ +: 4]) begin buffer_2[(position_3[       0/*position*/ +: 4] -    1)*4 +:        4] <= buffer_2[(position_3[       0/*position*/ +: 4] -    1)*4-4 +:        4]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]-   1;end /* moveUp */
    7  arrays[       4/*A       */+:48] <= buffer_2[       0/*b       */+:48];/* copyMoveBuffer */
 """);
     //stop(m);
@@ -2665,10 +2661,10 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(m.P.printVerilog(), """
    1  buffer_2[       0/*b       */+:48] <= arrays_1[       4/*A       */+:48];/* copyMoveBuffer */
    2  position_3[       0/*position*/ +: 4] <= arrays_1[      52/*i       */ +: 4]/* MemoryLayoutDM.move */;
-   3  if (position_3[       0/*position*/ +: 4]+       8 < 12) begin wire [4-1:0] address = position_3[       0/*position*/ +: 4]*4; buffer_2[address +:       32] <= buffer_2[address+4 +:       32]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]+       8;end /* moveDown */
-   4  if (position_3[       0/*position*/ +: 4]+       4 < 12) begin wire [4-1:0] address = position_3[       0/*position*/ +: 4]*4; buffer_2[address +:       16] <= buffer_2[address+4 +:       16]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]+       4;end /* moveDown */
-   5  if (position_3[       0/*position*/ +: 4]+       2 < 12) begin wire [4-1:0] address = position_3[       0/*position*/ +: 4]*4; buffer_2[address +:        8] <= buffer_2[address+4 +:        8]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]+       2;end /* moveDown */
-   6  if (position_3[       0/*position*/ +: 4]+       1 < 12) begin wire [4-1:0] address = position_3[       0/*position*/ +: 4]*4; buffer_2[address +:        4] <= buffer_2[address+4 +:        4]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]+       1;end /* moveDown */
+   3  if (position_3[       0/*position*/ +: 4]+       8 < 12) begin buffer_2[position_3[       0/*position*/ +: 4]*4 +:       32] <= buffer_2[position_3[       0/*position*/ +: 4]*4+4 +:       32]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]+       8;end /* moveDown */
+   4  if (position_3[       0/*position*/ +: 4]+       4 < 12) begin buffer_2[position_3[       0/*position*/ +: 4]*4 +:       16] <= buffer_2[position_3[       0/*position*/ +: 4]*4+4 +:       16]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]+       4;end /* moveDown */
+   5  if (position_3[       0/*position*/ +: 4]+       2 < 12) begin buffer_2[position_3[       0/*position*/ +: 4]*4 +:        8] <= buffer_2[position_3[       0/*position*/ +: 4]*4+4 +:        8]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]+       2;end /* moveDown */
+   6  if (position_3[       0/*position*/ +: 4]+       1 < 12) begin buffer_2[position_3[       0/*position*/ +: 4]*4 +:        4] <= buffer_2[position_3[       0/*position*/ +: 4]*4+4 +:        4]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]+       1;end /* moveDown */
    7  arrays_1[       4/*A       */+:48] <= buffer_2[       0/*b       */+:48];/* copyMoveBuffer */
 """);
     //stop(m);
