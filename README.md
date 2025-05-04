@@ -491,3 +491,6 @@ Automate reporting of crucial results from mass of files produced by Vivado and 
 Much larger pages controlled by embedded btrees
 Widen BtreeSF from one [bit](https://en.wikipedia.org/wiki/Bit) to multiples of bits
 Use BinarySearch to locate a [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) in a node.
+
+## Expansion of [memory](https://en.wikipedia.org/wiki/Computer_memory), stuck, keys/data
+Expanding [memory](https://en.wikipedia.org/wiki/Computer_memory) to 128 makes [Open Road](https://openroad-flow-scripts.readthedocs.io/en/latest/mainREADME.html) [fail](https://1lib.eu/book/2468851/544b50). Not enough metal.
