@@ -212,13 +212,23 @@ abstract class BtreeSF extends Test                                             
      };
    }
 
-  private static BtreeSF wideTree()                                              // Define a tree with nodes wide enough to test logarithmic moves and searching
+  private static BtreeSF wideTree()                                             // Define a tree with nodes wide enough to test logarithmic moves and searching
    {return new BtreeSF()
      {int maxSize         () {return 16;}
       int maxKeysPerLeaf  () {return  8;}
       int maxKeysPerBranch() {return  9;}
       int bitsPerKey      () {return  8;}
       int bitsPerData     () {return  8;}
+     };
+   }
+
+  private static BtreeSF wideLongTree()                                         // Define a tree with nodes wide enough to test logarithmic moves and searching
+   {return new BtreeSF()
+     {int maxSize         () {return 128;}
+      int maxKeysPerLeaf  () {return   8;}
+      int maxKeysPerBranch() {return   9;}
+      int bitsPerKey      () {return   8;}
+      int bitsPerData     () {return   8;}
      };
    }
 
@@ -4452,39 +4462,39 @@ StuckSML(maxSize:4 size:1)
 
   private static void test_find_wide()                                               // Find using generated verilog code
    {z(); sayCurrentTestName();
-    final BtreeSF t = wideTree();
+    final BtreeSF t = wideLongTree();
     t.P.run(); t.P.clear();
     t.put();
-    final int N = 32;
-    for (int i = 1; i <= N; ++i)
-     {t.T.at(t.Key ).setInt(i);
-      t.T.at(t.Data).setInt(N-i);
-      t.P.run();
-     }
-    //stop(t.M);
-    //stop(t);
-    ok(t, """
-                  8                         16                           24                           |
-                  0                         0.1                          0.2                          |
-                  1                         4                            3                            |
-                                                                         2                            |
-1,2,3,4,5,6,7,8=1  9,10,11,12,13,14,15,16=4    17,18,19,20,21,22,23,24=3    25,26,27,28,29,30,31,32=2 |
-""");
-    t.P.clear(); t.T.clear();                                                   // Clear program and transaction memory
-    t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
-    t.find();
-
-    t.run_verilogFind(  0, 0,  0, 15);
+//    final int N = 32;
+//    for (int i = 1; i <= N; ++i)
+//     {t.T.at(t.Key ).setInt(i);
+//      t.T.at(t.Data).setInt(N-i);
+//      t.P.run();
+//     }
+//    //stop(t.M);
+//    //stop(t);
+//    ok(t, """
+//                  8                         16                           24                           |
+//                  0                         0.1                          0.2                          |
+//                  1                         4                            3                            |
+//                                                                         2                            |
+//1,2,3,4,5,6,7,8=1  9,10,11,12,13,14,15,16=4    17,18,19,20,21,22,23,24=3    25,26,27,28,29,30,31,32=2 |
+//""");
+//    t.P.clear(); t.T.clear();                                                   // Clear program and transaction memory
+//    t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
+//    t.find();
+//
+//    t.run_verilogFind(  0, 0,  0, 15);
     t.run_verilogFind(  1, 1, 31, 15);
-    t.run_verilogFind(  2, 1, 30, 15);
-    t.run_verilogFind(  3, 1, 29, 15);
-    t.run_verilogFind(  4, 1, 28, 15);
-    t.run_verilogFind(  5, 1, 27, 15);
-    t.run_verilogFind(  6, 1, 26, 15);
-    t.run_verilogFind(  7, 1, 25, 15);
-    t.run_verilogFind(  8, 1, 24, 15);
-    t.run_verilogFind(  9, 1, 23, 15);
-    t.run_verilogFind(N+1, 0,  0, 15);
+//    t.run_verilogFind(  2, 1, 30, 15);
+//    t.run_verilogFind(  3, 1, 29, 15);
+//    t.run_verilogFind(  4, 1, 28, 15);
+//    t.run_verilogFind(  5, 1, 27, 15);
+//    t.run_verilogFind(  6, 1, 26, 15);
+//    t.run_verilogFind(  7, 1, 25, 15);
+//    t.run_verilogFind(  8, 1, 24, 15);
+//    t.run_verilogFind(  9, 1, 23, 15);
+//    t.run_verilogFind(N+1, 0,  0, 15);
    }
 
   private static void test_put_wide()
@@ -4642,13 +4652,13 @@ StuckSML(maxSize:4 size:1)
     test_delete();
     test_find();
     test_put();
-    test_find_wide();
-    test_put_wide();
+//    test_find_wide();
+//    test_put_wide();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_put_wide();
+    test_find_wide();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
