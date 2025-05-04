@@ -212,7 +212,7 @@ abstract class BtreeSF extends Test                                             
      };
    }
 
-  private static BtreeSF logTree()                                              // Define a tree with nodes wide enough to test logarithmic moves and searching
+  private static BtreeSF wideTree()                                              // Define a tree with nodes wide enough to test logarithmic moves and searching
    {return new BtreeSF()
      {int maxSize         () {return 16;}
       int maxKeysPerLeaf  () {return  8;}
@@ -2746,7 +2746,7 @@ create_clock -name clock -period 100 [get_ports {clock}]
      }
    }
 
-  private static void test_find()
+  private static void test_find32()
    {z(); sayCurrentTestName();
     final int     N = 32;
     final BtreeSF t = BtreeSF(2, 3, N);
@@ -3671,7 +3671,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   void run_verilogFind(int Key, int Found, int Data, int ExpSteps)              // Test a find operation in Verilog
-   {VerilogCode v = new VerilogCode("find", "verilog")                          // Generate verilog now that memories have been initialized and the program written
+   {VerilogCode v = new VerilogCode(currentTestNameSuffix(), "verilog")         // Generate verilog now that memories have been initialized and the program written
      {int     Key     () {return      Key;}                                     // Input key value
       Integer Data    () {return     null;}                                     // Input data value
       Integer found   () {return    Found;}                                     // Whether we should expect to find the key on a find operation
@@ -3682,7 +3682,7 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
    }
 
-  private static void test_verilogFind()                                        // Find using generated verilog code
+  private static void test_find()                                               // Find using generated verilog code
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps();
     t.P.run(); t.P.clear();
@@ -3728,7 +3728,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    (int Key, int data, int steps, String expected)
    {z();
 
-    VerilogCode v = new VerilogCode("delete", "verilog")                        // Generate verilog now that memories have beeninitialzied and the program written
+    VerilogCode v = new VerilogCode(currentTestNameSuffix(), "verilog")         // Generate verilog now that memories have beeninitialzied and the program written
      {int     Key     () {return   Key;}                                        // Input key value
       Integer Data    () {return     3;}                                        // Input key value
       Integer found   () {return     1;}                                        // Whether we should expect to find the key on a find operation
@@ -3739,7 +3739,7 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
    }
 
-  private static void test_verilogDelete()                                      // Delete using generated verilog code
+  private static void test_delete()                                             // Delete using generated verilog code
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps();
     t.P.run(); t.P.clear();
@@ -3841,7 +3841,8 @@ Line T       At      Wide       Size    Indices        Value   Name
   private void runVerilogPutTest                                                // Run the java and verilog versions and compare the resulting memory traces
    (int value, int steps, String expected)
    {z();
-    VerilogCode v = new VerilogCode("put", "verilog")                           // Generate verilog now that memories have been initialized and the program written
+
+    VerilogCode v = new VerilogCode(currentTestNameSuffix(), "verilog")         // Generate verilog now that memories have been initialized and the program written
      {int     Key     () {return value;}                                        // Input key value
       Integer Data    () {return value;}                                        // Input data value
       Integer found   () {return     0;}                                        // Whether we should expect to find the key on a find operation
@@ -3852,7 +3853,7 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
    }
 
-  private static void test_verilogPut()                                         // Delete using generated verilog code
+  private static void test_put()                                                // Delete using generated verilog code
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps();
     t.P.run(); t.P.clear();
@@ -4449,9 +4450,46 @@ StuckSML(maxSize:4 size:1)
     ok(t.M.at(t.bTree_free, 3), "M.free[3]769=0");
    }
 
-  private static void test_verilogPut_logTree()
+  private static void test_find_wide()                                               // Find using generated verilog code
    {z(); sayCurrentTestName();
-    final BtreeSF t = logTree();
+    final BtreeSF t = wideTree();
+    t.P.run(); t.P.clear();
+    t.put();
+    final int N = 32;
+    for (int i = 1; i <= N; ++i)
+     {t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(N-i);
+      t.P.run();
+     }
+    //stop(t.M);
+    //stop(t);
+    ok(t, """
+                  8                         16                           24                           |
+                  0                         0.1                          0.2                          |
+                  1                         4                            3                            |
+                                                                         2                            |
+1,2,3,4,5,6,7,8=1  9,10,11,12,13,14,15,16=4    17,18,19,20,21,22,23,24=3    25,26,27,28,29,30,31,32=2 |
+""");
+    t.P.clear(); t.T.clear();                                                   // Clear program and transaction memory
+    t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
+    t.find();
+
+    t.run_verilogFind(  0, 0,  0, 15);
+    t.run_verilogFind(  1, 1, 31, 15);
+    t.run_verilogFind(  2, 1, 30, 15);
+    t.run_verilogFind(  3, 1, 29, 15);
+    t.run_verilogFind(  4, 1, 28, 15);
+    t.run_verilogFind(  5, 1, 27, 15);
+    t.run_verilogFind(  6, 1, 26, 15);
+    t.run_verilogFind(  7, 1, 25, 15);
+    t.run_verilogFind(  8, 1, 24, 15);
+    t.run_verilogFind(  9, 1, 23, 15);
+    t.run_verilogFind(N+1, 0,  0, 15);
+   }
+
+  private static void test_put_wide()
+   {z(); sayCurrentTestName();
+    final BtreeSF t = wideTree();
     t.P.run(); t.P.clear();
     t.put();
     t.runVerilogPutTest(1, 29, """
@@ -4592,7 +4630,7 @@ StuckSML(maxSize:4 size:1)
     test_put_descending();
     test_put_small_random();
     if (longRunning) test_put_large_random();
-    test_find();
+    test_find32();
     test_find_and_update();
     test_delete_ascending();
     test_delete_descending();
@@ -4601,15 +4639,16 @@ StuckSML(maxSize:4 size:1)
     if (longRunning) test_delete_random_not_100();
     test_primes();
     test_node();
-    test_verilogDelete();
-    test_verilogFind();
-    test_verilogPut();
-    test_verilogPut_logTree();
+    test_delete();
+    test_find();
+    test_put();
+    test_find_wide();
+    test_put_wide();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_node();
+    test_find_wide();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
