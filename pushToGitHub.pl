@@ -109,6 +109,10 @@ alias scd="source /home/azureuser/siliconcompiler/bin/activate; cd /home/azureus
 alias scf="source /home/azureuser/siliconcompiler/bin/activate; cd /home/azureuser/btreeBlock/verilog/find/1/siliconCompiler;   python3 find.py"
 alias scp="source /home/azureuser/siliconcompiler/bin/activate; cd /home/azureuser/btreeBlock/verilog/put/1/siliconCompiler;    python3 put.py"
 
+alias scdw="source /home/azureuser/siliconcompiler/bin/activate; cd /home/azureuser/btreeBlock/verilog/delete_wide/1/siliconCompiler; python3 delete_wide.py"
+alias scfw="source /home/azureuser/siliconcompiler/bin/activate; cd /home/azureuser/btreeBlock/verilog/find_wide/1/siliconCompiler;   python3 find_wide.py"
+alias scpw="source /home/azureuser/siliconcompiler/bin/activate; cd /home/azureuser/btreeBlock/verilog/put_wide/1/siliconCompiler;    python3 put_wide.py"
+
 export GIT_SSH_COMMAND="ssh -i ~/.ssh/Azure.pem"
 export XINSTALLER_SCALE=2
 export LD_LIBRARY_PATH="/home/azureuser/.local/lib:$LD_LIBRARY_PATH"
