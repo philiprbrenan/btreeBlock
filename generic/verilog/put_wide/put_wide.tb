@@ -1,0 +1,28 @@
+//-----------------------------------------------------------------------------
+// Database on a chip test bench
+// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-01-07
+//------------------------------------------------------------------------------
+`timescale 10ps/1ps
+module put_wide_tb;                                                             // Test bench for database on a chip
+  reg                       reset;                                              // Restart the program run sequence when this goes high
+  reg                        stop;                                              // Program has stopped when this goes high
+  reg                       clock;                                              // Program counter clock
+  reg  [16-1:0]  Key = 4;                                       // Input key
+  reg  [16-1:0] Data = 4;                                      // Input data
+  reg  [16-1:0] data;                                              // Output data
+  reg                       found;                                              // Whether the key was found on put, find delete
+  integer testResults;                                                          // Test results file
+  integer step;
+
+  put_wide a1(.reset(reset), .stop(stop), .clock(clock),                        // Connect to the module
+    .Key(Key), .Data(Data), .data(data), .found(found));
+
+  initial begin                                                                 // Test the module
+    clock = 0; reset = 0; #1;                                                   // Reset the module
+    clock = 1; reset = 1; #1;
+    clock = 0; reset = 0; #1;
+    for(step = 0; step < 1000000 && !stop; step = step + 1) begin
+      clock = 0; #1; clock = 1; #1;
+    end
+  end
+endmodule
