@@ -68,7 +68,6 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
    }
   void program(ProgramDM program) {program(program, true);}                     // Add this memory layout to a program with the intention of using its uqnique name to identify it in verilog
 
-  Layout  layout (){zz(); return layout;}                                       // Get the layout in use
   String  name()                                                                // A unique name for this memory layout within its containing program if any
    {zz();
     if (P != null && P.uniqueNames.contains(name)) return name;                 // Use the name without a unique making number as we know that this memeory has a name which is unique among the memory layouts used by this program
@@ -76,11 +75,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
    }
 
   int size () {z(); return memory.size();}                                      // Size of associated memory
-
-  void clear()                                                                  // Clear underlying memory
-   {z();
-    memory.zero();
-   }
+  void clear() {z(); memory.zero();}                                            // Clear underlying memory
 
   void ok(String Lines)                                                         // Check that specified lines are present in the memory layout
    {final String  m = toString();                                               // Memory as string
@@ -157,19 +152,11 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      };
    }
 
-  void zero()                                                                   // Clear the memory associated with the layout to zeros
-   {z();
-    memory.zero(0, size());
-   }
-
-  void ones()                                                                   // Set the memory associated with the layout to zeros
-   {z();
-    memory.ones(0, size());
-   }
+  void zero() {z(); memory.zero(0, size());}                                    // Clear the memory associated with the layout to zeros
+  void ones() {z();memory.ones(0, size());}                                     // Set the memory associated with the layout to zeros
 
   void copy(MemoryLayoutDM source)                                              // Copy as many of the bits from the source into the target as possible
    {zz();
-    //if (size() != source.size()) stop("Memory layouts have different sizes");
     final int N = size();
     P.new I()
      {void a()
@@ -397,17 +384,15 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       z(); return true;
      }
 
-    boolean hasIndirection() {return directs != null;}                          // Is indirection used in this at reference ?
-
-    int width() {z(); return field.width();}                                    // Width of the field in memory
-
-    At setOff() {z(); return setOff(true);}                                     // Set the base address of the field from its indices confirming that we are inside an executing instruction
+    boolean hasIndirection() {z(); return directs != null;}                     // Is indirection used in this at reference ?
+    int width()              {z(); return field.width();}                       // Width of the field in memory
+    At setOff()              {z(); return setOff(true);}                        // Set the base address of the field from its indices confirming that we are inside an executing instruction
 
     At setOff(boolean checkSetOff)                                              // Set the base address of the field
      {zz();
       if (checkSetOff && !P.running) P.halt("Set off must be inside an instruction");
       if (hasIndirection()) {z(); locateInDirectAddress();}                     // Evaluate indirect indices
-      else                  {zz(); locateDirectAddress();}                       // Evaluate direct indices
+      else                  {zz(); locateDirectAddress();}                      // Evaluate direct indices
       return this;
      }
 
@@ -932,13 +917,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
        };
      }
 
-    boolean isAllZero()                                                         // Check that the specified memory is all zeros
-     {z(); setOff(); return memory.isAllZero(at, width);
-     }
-
-    boolean isAllOnes()                                                         // Check that  the specified memory is all ones
-     {z(); setOff(); return memory.isAllOnes(at, width);
-     }
+    boolean isAllZero() {z(); setOff(); return memory.isAllZero(at, width);}    // Check that the specified memory is all zeros
+    boolean isAllOnes() {z(); setOff(); return memory.isAllOnes(at, width);}    // Check that  the specified memory is all ones
 
 //D1 Boolean                                                                    // Boolean operations on fields held in memories.
 
