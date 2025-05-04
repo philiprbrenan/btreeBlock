@@ -1,3 +1,2 @@
 {statements=>0, projects=>{
-  put=>[1, 365],
 }}
