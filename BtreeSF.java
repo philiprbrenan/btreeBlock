@@ -4604,12 +4604,11 @@ StuckSML(maxSize:4 size:1)
     test_verilogDelete();
     test_verilogFind();
     test_verilogPut();
+    test_verilogPut_logTree();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    //test_verilogFind();
-    test_verilogPut_logTree();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
