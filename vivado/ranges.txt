@@ -1,3 +1,2 @@
 {statements=>0, projects=>{
-  find=>[0, 16],
 }}
