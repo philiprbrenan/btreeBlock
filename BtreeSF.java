@@ -4337,7 +4337,7 @@ StuckSML(maxSize:2 size:2)
     final Layout.Bit    branchBit = L.bit("branchBit");
     final Layout.Bit      leafBit = L.bit("leafBit");
     final Layout.Structure struct = L.structure("struct", index, branchBit, leafBit);
-    final MemoryLayoutDM        M = new MemoryLayoutDM(L.compile(), "M");
+    final MemoryLayoutDM        M = new MemoryLayoutDM(L.compile(), "MM");
     M.program(t.P);
     M.at(index).setInt(2);
 
