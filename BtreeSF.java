@@ -212,6 +212,16 @@ abstract class BtreeSF extends Test                                             
      };
    }
 
+  private static BtreeSF logTree()                                              // Define a tree with nodes wide enough to test logarithmic moves and searching
+   {return new BtreeSF()
+     {int maxSize         () {return 16;}
+      int maxKeysPerLeaf  () {return  8;}
+      int maxKeysPerBranch() {return  9;}
+      int bitsPerKey      () {return  8;}
+      int bitsPerData     () {return  8;}
+     };
+   }
+
   Layout nodeLayout()                                                           // Layout describing a node in btree
    {zz();
     final BtreeSF btree = this;
@@ -2010,11 +2020,11 @@ abstract class BtreeSF extends Test                                             
       final StringBuilder s = new StringBuilder();
       for(MemoryLayoutDM m : P.memories)                                        // Each memory used by the program
        {final MemoryLayoutDM.BlockArray a = m.block;
-       if (a.array)                                                             // Block memory
-         {s.append("  reg["+a.width+"-1 : 0] "+m.name+"["+a.size+"-1 : 0];\n"); // Declare the memory
+        if (a.array)                                                            // Block memory
+         {s.append("  reg["+a.width+"-1 : 0] "+m.name()+"["+a.size+"-1 : 0];/*ProgramDM_declareMemories_1*/\n"); // Declare the memory
          }
         else                                                                    // Bit memory
-         {s.append("  reg["+m.size()+"-1 : 0] "+m.name+";\n");                  // Declare the memory
+         {s.append("  reg["+m.size()+"-1 : 0] "+m.name()+"; /*ProgramDM_declareMemories_2*/\n");                 // Declare the memory
          }
        }
       writeFile(declareMemory(), s);
@@ -2033,7 +2043,7 @@ abstract class BtreeSF extends Test                                             
              }
             removeAllButLastTrailingZero(S);
             S.reverse();
-            s.append("  "+m.name+"["+i+"] <= "+W+"'b"+S+";\n");                 // Initialize memory
+            s.append("  "+m.name()+"["+i+"] <= "+W+"'b"+S+";\n");               // Initialize memory
            }
          }
         else                                                                    // Bit memory
@@ -2042,7 +2052,7 @@ abstract class BtreeSF extends Test                                             
           for (int i = 0; i < N; i++) S.append(m.getBit(i) ? 1 : 0);
           removeAllButLastTrailingZero(S);
           S.reverse();
-          s.append("  "+m.name+" <= "+N+"'b"+S+";\n");                          // Initialize memory
+          s.append("  "+m.name()+" <= "+N+"'b"+S+";\n");                        // Initialize memory
          }
        }
       writeFile(initializeMemory(), s);
@@ -2051,6 +2061,7 @@ abstract class BtreeSF extends Test                                             
     String memoryPrintFormat()                                                  // Print format
      {final StringBuilder f = new StringBuilder("\"%4d  %4d ");
       final StringBuilder s = new StringBuilder("\", steps, step");
+
       for(MemoryLayoutDM m : P.memories)
        {final MemoryLayoutDM.BlockArray a = m.block;
         if (a.blocked())
@@ -4438,6 +4449,161 @@ StuckSML(maxSize:4 size:1)
     ok(t.M.at(t.bTree_free, 3), "M.free[3]769=0");
    }
 
+  private static void test_verilogPut_logTree()
+   {z(); sayCurrentTestName();
+    final BtreeSF t = logTree();
+    t.P.run(); t.P.clear();
+    t.put();
+    t.runVerilogPutTest(1, 29, """
+1=0 |
+""");
+
+    t.runVerilogPutTest(2, 29, """
+1,2=0 |
+""");
+                                                                                // Split instruction
+    t.runVerilogPutTest(3, 29, """
+1,2,3=0 |
+""");
+
+    t.runVerilogPutTest(4, 29, """
+1,2,3,4=0 |
+""");
+
+    t.runVerilogPutTest(5, 29, """
+1,2,3,4,5=0 |
+""");
+
+    t.runVerilogPutTest(6, 29, """
+1,2,3,4,5,6=0 |
+""");
+
+    t.runVerilogPutTest(7, 29, """
+1,2,3,4,5,6,7=0 |
+""");
+
+    t.runVerilogPutTest(8, 29, """
+1,2,3,4,5,6,7,8=0 |
+""");
+
+    t.runVerilogPutTest(9, 131, """
+          4            |
+          0            |
+          1            |
+          2            |
+1,2,3,4=1  5,6,7,8,9=2 |
+""");
+
+    t.runVerilogPutTest(10, 36, """
+          4               |
+          0               |
+          1               |
+          2               |
+1,2,3,4=1  5,6,7,8,9,10=2 |
+""");
+
+    t.runVerilogPutTest(11, 36, """
+          4                  |
+          0                  |
+          1                  |
+          2                  |
+1,2,3,4=1  5,6,7,8,9,10,11=2 |
+""");
+
+    t.runVerilogPutTest(12, 36, """
+          4                     |
+          0                     |
+          1                     |
+          2                     |
+1,2,3,4=1  5,6,7,8,9,10,11,12=2 |
+""");
+
+    t.runVerilogPutTest(13, 36, """
+          4          8                  |
+          0          0.1                |
+          1          3                  |
+                     2                  |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12,13=2 |
+""");
+
+    t.runVerilogPutTest(14, 36, """
+          4          8                     |
+          0          0.1                   |
+          1          3                     |
+                     2                     |
+1,2,3,4=1  5,6,7,8=3    9,10,11,12,13,14=2 |
+""");
+
+    t.runVerilogPutTest(15, 36, """
+                               8                                     |
+                               0                                     |
+                               5                                     |
+                               6                                     |
+      2      4        6                10         12      13         |
+      5      5.1      5.2              6          6.1     6.2        |
+      1      4        3                7          10      9          |
+                      8                                   2          |
+1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13=9    14,15=2 |
+""");
+stop("");
+
+    t.runVerilogPutTest(16, 36, """
+                               8                  12                   |
+                               0                  0.1                  |
+                               5                  11                   |
+                                                  6                    |
+      2      4        6                10                    14        |
+      5      5.1      5.2              11                    6         |
+      1      4        3                7                     9         |
+                      8                10                    2         |
+1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=2 |
+""");
+
+    t.runVerilogPutTest(17, 305, """
+                               8                  12                            |
+                               0                  0.1                           |
+                               5                  11                            |
+                                                  6                             |
+      2      4        6                10                    14      15         |
+      5      5.1      5.2              11                    6       6.1        |
+      1      4        3                7                     9       12         |
+                      8                10                            2          |
+1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15=12    16,17=2 |
+""");
+
+    t.runVerilogPutTest(18, 36, """
+                               8                  12                               |
+                               0                  0.1                              |
+                               5                  11                               |
+                                                  6                                |
+      2      4        6                10                    14         16         |
+      5      5.1      5.2              11                    6          6.1        |
+      1      4        3                7                     9          12         |
+                      8                10                               2          |
+1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=12    17,18=2 |
+""");
+
+    t.runVerilogPutTest(19, 36, """
+                               8                  12                                        |
+                               0                  0.1                                       |
+                               5                  11                                        |
+                                                  6                                         |
+      2      4        6                10                    14         16       17         |
+      5      5.1      5.2              11                    6          6.1      6.2        |
+      1      4        3                7                     9          12       13         |
+                      8                10                                        2          |
+1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
+""");
+
+    t.runVerilogPutTest(20, 36, """
+                  8             12                           |
+                  0             0.1                          |
+                  1             4                            |
+                                2                            |
+1,2,3,4,5,6,7,8=1  9,10,11,12=4    13,14,15,16,17,18,19,20=2 |
+""");
+   }
+
   protected static void oldTests()                                              // Tests thought to be in good shape
    {final boolean longRunning = github_actions && 1 == 0;
     test_memory();
@@ -4463,7 +4629,7 @@ StuckSML(maxSize:4 size:1)
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_verilogFind();
+    test_verilogPut_logTree();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
