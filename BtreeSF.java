@@ -4480,9 +4480,9 @@ StuckSML(maxSize:4 size:1)
 //                                                                         2                            |
 //1,2,3,4,5,6,7,8=1  9,10,11,12,13,14,15,16=4    17,18,19,20,21,22,23,24=3    25,26,27,28,29,30,31,32=2 |
 //""");
-//    t.P.clear(); t.T.clear();                                                   // Clear program and transaction memory
-//    t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
-//    t.find();
+      t.P.clear(); t.T.clear();                                                 // Clear program and transaction memory
+      t.T.at(t.Key).setInt(2);                                                  // Sets memory directly not via an instruction
+      t.find();
 //
 //    t.run_verilogFind(  0, 0,  0, 15);
     t.run_verilogFind(  1, 1, 31, 15);
