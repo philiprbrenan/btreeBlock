@@ -4,6 +4,7 @@
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
 // Could parallelize like BtreeSF with mutiple instruction streams
+// Replace the enum with the test name suffix as it is much easier to extend
 import java.util.*;
 import java.nio.file.*;
 
@@ -1586,7 +1587,7 @@ class BtreeBap extends Test                                                     
     final int bitsPerInteger = 16;                                              // Number of bits in an integer
     final Ban.Verilog verilog;                                                  // Generated verilog
 
-    enum Action{find, put, delete};                                             // The actions we can perform on the Btree via verilog
+    enum Action{find, put, delete, delete_wide, find_wide, put_wide};           // The actions we can perform on the Btree via verilog
 
     VerilogCode(Action Project, int Key, int Data)                              // Generate verilog code
      {project = Project; key = Key; data = Data;
@@ -1710,7 +1711,8 @@ endmodule
       switch(project)
        {case Action.delete: s = s.replace("$assignData",  ""); break;
         case Action.find:   s = s.replace("$assignData",  ""); break;
-        case Action.put:    s = s.replace("$assignData",  "memory["+L.getArray("find_Data").base+"] <= "+data+"; /* put data */"); break;
+        case Action.put_wide:
+        case Action.put:    s = s.replace("$assignData",  "memory["+L.getArray("f_data").base+"] <= "+data+"; /* put data */"); break;
        }
       return s;
      }
@@ -2346,6 +2348,13 @@ Stuck(size:3)
     b.new VerilogCode(VerilogCode.Action.put, 4, 4);
    }
 
+  static void test_put_wide_verilog()
+   {final BtreeBap b = new BtreeBap(8, 9, 16);
+    b.L.run(); b.L.clearCode();
+    b.put();
+    b.new VerilogCode(VerilogCode.Action.put_wide, 4, 4);
+   }
+
 //D0 Tests                                                                      // Testing
 
   static void oldTests()                                                        // Tests thought to be in good shape
@@ -2370,12 +2379,13 @@ Stuck(size:3)
     test_find();
     test_primes();
     test_find_verilog();
-    //test_put_verilog();
+    test_put_verilog();
+    test_put_wide_verilog();
    }
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_find_verilog();
+    test_put_wide_verilog();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
