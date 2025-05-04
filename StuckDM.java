@@ -14,7 +14,7 @@ abstract class StuckDM extends Test                                             
   final String      name;                                                       // Name of the stuck
   final int bitsPerAddress;                                                     // Number of bits needed to address a bit in the memory containign the stuck
   final MemoryLayoutDM M;                                                       // Memory for stuck
-  final MemoryLayoutDM C;                                                       // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
+  //final MemoryLayoutDM C2;                                                       // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
   final MemoryLayoutDM T;                                                       // Memory for transaction intermediates
   ProgramDM            P = new ProgramDM();                                     // The program to be written to to describe the actions on the stuck.  The caller can provide a different one as this field is not final
   final static boolean Assert = false;                                          // Whether asserts should be executed or not
@@ -58,8 +58,8 @@ abstract class StuckDM extends Test                                             
   StuckDM(String Name)                                                          // Create the stuck. The memory layout containing the stuck
    {zz(); name = Name;
     final Layout layout = layout();                                             // Layout out the stuck
-    M = new MemoryLayoutDM(layout, Name+"_StuckSA_Memory");                     // Mmeory for the stuck
-    C = new MemoryLayoutDM(layout, name+"_StuckSA_Copy");                       // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
+    M = new MemoryLayoutDM(layout, Name+"_StuckSA_Memory");                     // Memory for the stuck
+    //C = new MemoryLayoutDM(layout, name+"_StuckSA_Copy");                     // Temporary storage containing a copy of parts of the stuck to allow shifts to occur in parallel
 
     bitsPerAddress = logTwo(layout.size());                                     // The stuck might be located any where in this memory
     final Layout tl = transactionLayout();                                      // Layout out of transations performed on stuck
@@ -69,9 +69,9 @@ abstract class StuckDM extends Test                                             
 
   void program(ProgramDM program)                                               // Set the program in which the various components should generate code
    {zz();  P = program;
-    M.program(P);
-    C.program(P);
-    T.program(P);
+    M.program(P, false);
+    //C.program(P);
+    T.program(P, false);
    }
 
   Layout layout()                                                               // Layout describing stuck
@@ -270,11 +270,11 @@ abstract class StuckDM extends Test                                             
     //T.setIntInstruction(index, 0);
     //M.at(Keys).moveUp(T.at(index), C.at(Keys));
     P.parallelStart();
-      M.at(Keys).moveUp(null, C.at(Keys));
+      M.at(Keys).moveUp();
     //T.setIntInstruction(index, 0);
     //M.at(Data).moveUp(T.at(index), C.at(Data));
     P.parallelSection();
-      M.at(Data).moveUp(null, C.at(Data));
+      M.at(Data).moveUp();
     P.parallelSection();
       inc();
     P.parallelEnd();
@@ -304,8 +304,8 @@ abstract class StuckDM extends Test                                             
   void shift()                                                                  // Shift an element from the stuck
    {zz(); action = "shift";
     firstElement();
-    P.parallelStart();    M.at(Keys).moveDown(null, C.at(Keys));
-    P.parallelSection();  M.at(Data).moveDown(null, C.at(Data));
+    P.parallelStart();    M.at(Keys).moveDown();
+    P.parallelSection();  M.at(Data).moveDown();
     P.parallelSection();  dec();
     P.parallelEnd();
     //sizeFullEmpty();
@@ -344,8 +344,8 @@ abstract class StuckDM extends Test                                             
     //isFull();
     //assertInExtended();
     //T.zero();
-    P.parallelStart();   M.at(Keys).moveUp(T.at(index), C.at(Keys));
-    P.parallelSection(); M.at(Data).moveUp(T.at(index), C.at(Data));
+    P.parallelStart();   M.at(Keys).moveUp(T.at(index));
+    P.parallelSection(); M.at(Data).moveUp(T.at(index));
     P.parallelSection(); M.at(currentSize).inc();
     P.parallelEnd();
     setKeyData();
@@ -359,8 +359,8 @@ abstract class StuckDM extends Test                                             
     //setFound();
     moveKeyData();
     //T.zero();
-    P.parallelStart();    M.at(Keys).moveDown(T.at(index), C.at(Keys));
-    P.parallelSection();  M.at(Data).moveDown(T.at(index), C.at(Data));
+    P.parallelStart();    M.at(Keys).moveDown(T.at(index));
+    P.parallelSection();  M.at(Data).moveDown(T.at(index));
     P.parallelSection();  M.at(currentSize).dec();
     P.parallelEnd();
     //sizeFullEmpty();
@@ -1347,7 +1347,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  d = l.variable ("d", s.bitsPerData());
     Layout.Structure S = l.structure("S", k, f, i, K, d);
     MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "m");
-                     m.program(s.P);
+                     m.program(s.P, false);
 
     //s.P.new I() {void a() {s.T.at(s.limit).setInt(1);}};
     m.setIntInstruction(k, 5);
