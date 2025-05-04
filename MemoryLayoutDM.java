@@ -766,7 +766,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
        };
      }
 
-    void copy(At Source, At Length, At TargetA, At SourceA, At LengthL)         // Copy the specified number of bits from the location addressed by the source to the location addressed by the target usign the specified memory locations to hold the source and target locations and the remaining length
+    void copy(At Source, At Length, At TargetA, At SourceA, At LengthL)         // Copy the specified number of bits from the location addressed by the source to the location addressed by the target using the specified memory locations to hold the source and target locations and the remaining length
      {zz();
       final At  Target = this;
       final int size   = Source.ml().size();
