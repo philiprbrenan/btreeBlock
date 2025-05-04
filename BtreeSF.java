@@ -4357,8 +4357,8 @@ StuckSML(maxSize:2 size:1)
 
     //stop(M);
     ok(""+M, """
-MemoryLayout: M
-Memory      : M
+MemoryLayout: MM
+Memory      : MM
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0         4                                      struct
    2 V        0         2                                  2     index
@@ -4609,7 +4609,7 @@ StuckSML(maxSize:4 size:1)
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_verilogPut();
+    test_node();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
