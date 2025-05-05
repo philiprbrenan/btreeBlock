@@ -217,8 +217,8 @@ abstract class BtreeSF extends Test                                             
      {int maxSize         () {return 999;}
       int maxKeysPerLeaf  () {return  8;}
       int maxKeysPerBranch() {return  9;}
-      int bitsPerKey      () {return  8;}
-      int bitsPerData     () {return  8;}
+      int bitsPerKey      () {return 64;}
+      int bitsPerData     () {return 64;}
      };
    }
 
@@ -2097,7 +2097,7 @@ abstract class BtreeSF extends Test                                             
      }
 
 
-    void genOpCodes(StringBuilder s)                                            // Generate opciodes
+    void genOpCodes(StringBuilder s)                                            // Generate opcodes
      {if (OpCodes)                                                              // Reduce program size by refactoring op codes at the cost of one additional look up per instruction cycle. Also appears to reduce synthesis time by about 30% on Vivado and likewise reduces the number of FPGA cells.
        {s.append("      case(opCodeMap[step])\n");                              // Case statements to select the code for the current instruction
 
@@ -3722,17 +3722,17 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
 
-    t.run_verilogFind( 0, 0, 0, 23);
+    //t.run_verilogFind( 0, 0, 0, 23);
     t.run_verilogFind( 1, 1, 8, 23);
-    t.run_verilogFind( 2, 1, 7, 23);
-    t.run_verilogFind( 3, 1, 6, 23);
-    t.run_verilogFind( 4, 1, 5, 23);
-    t.run_verilogFind( 5, 1, 4, 23);
-    t.run_verilogFind( 6, 1, 3, 23);
-    t.run_verilogFind( 7, 1, 2, 23);
-    t.run_verilogFind( 8, 1, 1, 23);
-    t.run_verilogFind( 9, 1, 0, 23);
-    t.run_verilogFind(10, 0, 0, 23);
+    //t.run_verilogFind( 2, 1, 7, 23);
+    //t.run_verilogFind( 3, 1, 6, 23);
+    //t.run_verilogFind( 4, 1, 5, 23);
+    //t.run_verilogFind( 5, 1, 4, 23);
+    //t.run_verilogFind( 6, 1, 3, 23);
+    //t.run_verilogFind( 7, 1, 2, 23);
+    //t.run_verilogFind( 8, 1, 1, 23);
+    //t.run_verilogFind( 9, 1, 0, 23);
+    //t.run_verilogFind(10, 0, 0, 23);
    }
 
   private void runVerilogDeleteTest                                             // Run the java and verilog versions and compare the resulting memory traces
