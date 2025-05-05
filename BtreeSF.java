@@ -3694,8 +3694,8 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   private static void test_find()                                               // Find using generated verilog code
    {z(); sayCurrentTestName();
-//  final BtreeSF t = allTreeOps() ;
-    final BtreeSF t = wideTree();
+    final BtreeSF t = allTreeOps() ;
+//  final BtreeSF t = wideTree();
     t.P.run(); t.P.clear();
     t.put();
     final int N = 9;
@@ -3722,17 +3722,17 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
 
-    //t.run_verilogFind( 0, 0, 0, 23);
+    t.run_verilogFind( 0, 0, 0, 23);
     t.run_verilogFind( 1, 1, 8, 23);
-    //t.run_verilogFind( 2, 1, 7, 23);
-    //t.run_verilogFind( 3, 1, 6, 23);
-    //t.run_verilogFind( 4, 1, 5, 23);
-    //t.run_verilogFind( 5, 1, 4, 23);
-    //t.run_verilogFind( 6, 1, 3, 23);
-    //t.run_verilogFind( 7, 1, 2, 23);
-    //t.run_verilogFind( 8, 1, 1, 23);
-    //t.run_verilogFind( 9, 1, 0, 23);
-    //t.run_verilogFind(10, 0, 0, 23);
+    t.run_verilogFind( 2, 1, 7, 23);
+    t.run_verilogFind( 3, 1, 6, 23);
+    t.run_verilogFind( 4, 1, 5, 23);
+    t.run_verilogFind( 5, 1, 4, 23);
+    t.run_verilogFind( 6, 1, 3, 23);
+    t.run_verilogFind( 7, 1, 2, 23);
+    t.run_verilogFind( 8, 1, 1, 23);
+    t.run_verilogFind( 9, 1, 0, 23);
+    t.run_verilogFind(10, 0, 0, 23);
    }
 
   private void runVerilogDeleteTest                                             // Run the java and verilog versions and compare the resulting memory traces
