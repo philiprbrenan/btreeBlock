@@ -494,6 +494,7 @@ Use BinarySearch to locate a [database key](https://en.wikipedia.org/wiki/Key%E2
 
 ## Expansion of [memory](https://en.wikipedia.org/wiki/Computer_memory), stuck, keys/data
 ###Expanding [memory](https://en.wikipedia.org/wiki/Computer_memory) alltreeOps takes 3 minutes on open road
- 16,8,98,8   3 minutes
-160,8,98,8   3 minutes
-999,8,98,8
+ 16,8,9,8,8   3 minutes
+160,8,9,8,8   3 minutes
+999,8,9,8,8   10 minutes
+999,8,9,64,64 6am
