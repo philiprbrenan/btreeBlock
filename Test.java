@@ -561,11 +561,12 @@ public class Test                                                               
           return FileVisitResult.CONTINUE;
          }
         public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException
-         {Files.delete(dir);                                     // Delete the folder
+         {Files.delete(dir);                                                    // Delete the folder
           return FileVisitResult.CONTINUE;
          }
        });
      }
+    catch (NoSuchFileException e) {}                                            // No problem
     catch (Exception e)
      {stop("Cannot find files under", filePath, e);
      }
