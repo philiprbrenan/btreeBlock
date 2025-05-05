@@ -3694,7 +3694,8 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   private static void test_find()                                               // Find using generated verilog code
    {z(); sayCurrentTestName();
-    final BtreeSF t = allTreeOps();
+//  final BtreeSF t = allTreeOps();
+    final BtreeSF t = wideTree();
     t.P.run(); t.P.clear();
     t.put();
     final int N = 9;
