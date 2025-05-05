@@ -1,4 +1,0 @@
-Steps=23
-Key=3
-data=6
-
