@@ -214,7 +214,7 @@ abstract class BtreeSF extends Test                                             
 
   private static BtreeSF wideTree()                                             // Define a tree with nodes wide enough to test logarithmic moves and searching
    {return new BtreeSF()
-     {int maxSize         () {return 160;}
+     {int maxSize         () {return 999;}
       int maxKeysPerLeaf  () {return  8;}
       int maxKeysPerBranch() {return  9;}
       int bitsPerKey      () {return  8;}
