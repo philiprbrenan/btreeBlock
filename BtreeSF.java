@@ -215,11 +215,11 @@ abstract class BtreeSF extends Test                                             
 
   private static BtreeSF wideTree()                                             // Define a tree with nodes wide enough to test logarithmic moves and searching
    {return new BtreeSF()
-     {int maxSize         () {return  6;}
-      int maxKeysPerLeaf  () {return  8;}
-      int maxKeysPerBranch() {return  9;}
-      int bitsPerKey      () {return 64;}
-      int bitsPerData     () {return 64;}
+     {int maxSize         () {return    6;}
+      int maxKeysPerLeaf  () {return    8;}
+      int maxKeysPerBranch() {return    9;}
+      int bitsPerKey      () {return 1024;}
+      int bitsPerData     () {return 1024;}
      };
    }
 
@@ -2276,6 +2276,17 @@ module $project(button1, stop, clock, Key, Data, data, found, led);             
     end // Execute
   end // Always
 endmodule
+
+module Memory (
+    input clock,
+    input [19:0] addr,
+    input [31:0] din,
+    output reg [31:0] dout,
+    input we
+);
+    // no internal implementation
+endmodule
+
 """);
       writeFile(nano9kVerilog(), editVariables(s));                             // Write verilog for nano 9k
      }
