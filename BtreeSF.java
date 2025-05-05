@@ -36,6 +36,7 @@ abstract class BtreeSF extends Test                                             
   final    int bitsPerAddress;                                                  // The number of bits required to address a bit in memory
   final    int bitsPerNext;                                                     // The number of bits in a next field
   final    int bitsPerSize;                                                     // The number of bits in stuck size field
+  final static String verilogFolder = "verilog";                                // The folder to write verilog into
 
   Layout.Field     leaf;                                                        // Layout of a leaf in the memory used by btree
   Layout.Field     branch;                                                      // Layout of a branch in the memory used by btree
@@ -214,21 +215,11 @@ abstract class BtreeSF extends Test                                             
 
   private static BtreeSF wideTree()                                             // Define a tree with nodes wide enough to test logarithmic moves and searching
    {return new BtreeSF()
-     {int maxSize         () {return 999;}
+     {int maxSize         () {return  6;}
       int maxKeysPerLeaf  () {return  8;}
       int maxKeysPerBranch() {return  9;}
       int bitsPerKey      () {return 64;}
       int bitsPerData     () {return 64;}
-     };
-   }
-
-  private static BtreeSF wideLongTree()                                         // Define a tree with nodes wide enough to test logarithmic moves and searching
-   {return new BtreeSF()
-     {int maxSize         () {return 16;}
-      int maxKeysPerLeaf  () {return   8;}
-      int maxKeysPerBranch() {return   9;}
-      int bitsPerKey      () {return   8;}
-      int bitsPerData     () {return   8;}
      };
    }
 
@@ -3681,7 +3672,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   void run_verilogFind(int Key, int Found, int Data, int ExpSteps)              // Test a find operation in Verilog
-   {VerilogCode v = new VerilogCode(currentTestNameSuffix(), "verilog")         // Generate verilog now that memories have been initialized and the program written
+   {VerilogCode v = new VerilogCode(currentTestNameSuffix(), verilogFolder)     // Generate verilog now that memories have been initialized and the program written
      {int     Key     () {return      Key;}                                     // Input key value
       Integer Data    () {return     null;}                                     // Input data value
       Integer found   () {return    Found;}                                     // Whether we should expect to find the key on a find operation
@@ -3694,8 +3685,8 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   private static void test_find()                                               // Find using generated verilog code
    {z(); sayCurrentTestName();
-    final BtreeSF t = allTreeOps() ;
-//  final BtreeSF t = wideTree();
+//  final BtreeSF t = allTreeOps() ;
+    final BtreeSF t = wideTree();
     t.P.run(); t.P.clear();
     t.put();
     final int N = 9;
@@ -4463,7 +4454,7 @@ StuckSML(maxSize:4 size:1)
 
   private static void test_find_wide()                                               // Find using generated verilog code
    {z(); sayCurrentTestName();
-    final BtreeSF t = wideLongTree();
+    final BtreeSF t = wideTree();
     t.P.run(); t.P.clear();
     t.put();
 //    final int N = 32;
@@ -4663,7 +4654,8 @@ StuckSML(maxSize:4 size:1)
    }
 
   public static void main(String[] args)                                        // Test if called as a program
-   {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
+   {deleteAllFiles(verilogFolder, 200);                                         // Clear the verilog folder as otherwise life gets very confusing
+    try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
       rangesAsPerl("vivado/ranges.txt");                                        // Print the ranges as a Perl data structure
       if (github_actions)                                                       // Coverage analysis
