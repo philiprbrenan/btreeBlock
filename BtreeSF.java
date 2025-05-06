@@ -152,7 +152,7 @@ abstract class BtreeSF extends Test                                             
      {void a()
        {final int N = maxSize();                                                // Put all the nodes on the free chain at the start with low nodes first
         for (int i = N; i > 0; --i) setInt(bTree_free, (i == N ? 0 : i), i - 1);// Link this node to the previous node
-        F.setInt(freeChainHead, root);                                            // Root is first on free chain
+        F.setInt(freeChainHead, root);                                          // Root is first on free chain
        }
       String v() {return "/* Construct Free list */";}
      };
@@ -2277,13 +2277,13 @@ module $project(button1, stop, clock, Key, Data, data, found, led);             
   end // Always
 endmodule
 
-module Memory (
-    input clock,
-    input [19:0] addr,
-    input [31:0] din,
-    output reg [31:0] dout,
-    input we
-);
+module Memory                                                                   // Memory used to hold the btree
+ (input                      reset,                                             // Reinitialize memory when this bit goes high
+  input                      clock,                                             // Clock
+  input [$bitsPerAddress-1:0] node,                                             // Number of the node to read or write
+  input [31:0] din,
+  output reg [31:0] dout,
+  input        we);
     // no internal implementation
 endmodule
 
@@ -2487,6 +2487,11 @@ if __name__ == "__main__":
     chip.set('option', 'remote', False)                                         # Run remote in the cloud
     chip.run()                                                                  # Run compilation of design and target
     chip.summary()
+    chip.show()
+# chip.set('option', 'env', 'PDK_HOME', '/disk/mypdk')
+# chip.set('option', 'idir', './mylib')
+# chip.set('option', 'loglevel', 'warning')
+# chip.set('option', 'nodisplay', True)
 """);
       writeFile(scBuild(), editVariables(s));                                   // Write build file for silicon compiler
 
@@ -2574,6 +2579,9 @@ create_clock -name clock -period 100 [get_ports {clock}]
       s = s.replace("$data",             ""+data());
       s = s.replace("$Key",              ""+Key());
       s = s.replace("$Data",             ""+(Data() != null ? Data() : 0));
+      s = s.replace("$sizeOfNode",       ""+nodeLayout.size());
+      s = s.replace("$numberOfNodes",    ""+maxSize());
+      s = s.replace("$bitsPerAddress",   ""+bitsPerAddress);
       s = s.replace("$maxSteps",         ""+maxSteps());
       s = s.replace("$expSteps",         ""+expSteps());
       s = s.replace("$found_at",         ""+found.at);
@@ -3696,8 +3704,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   private static void test_find()                                               // Find using generated verilog code
    {z(); sayCurrentTestName();
-//  final BtreeSF t = allTreeOps() ;
-    final BtreeSF t = wideTree();
+    final BtreeSF t = allTreeOps() ;
     t.P.run(); t.P.clear();
     t.put();
     final int N = 9;
