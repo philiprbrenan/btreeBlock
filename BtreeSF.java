@@ -2278,12 +2278,12 @@ module $project(button1, stop, clock, Key, Data, data, found, led);             
 endmodule
 
 module Memory                                                                   // Memory used to hold the btree
- (input                      reset,                                             // Reinitialize memory when this bit goes high
-  input                      clock,                                             // Clock
-  input [$bitsPerAddress-1:0] node,                                             // Number of the node to read or write
-  input [31:0] din,
-  output reg [31:0] dout,
-  input        we);
+ (input                           reset,                                        // Reinitialize memory when this bit goes high
+  input                           clock,                                        // Clock
+  input      [$bitsPerAddress-1:0] node,                                        // Number of the node to read or write
+  input      [$nodeSize-1:0]         in,                                        // Input to memory
+  output reg [$nodeSize-1:0]        out,                                        // Output from memory
+  input                            save);                                       // Save the value on in into the memory at the specified node if true, else output the specified node
     // no internal implementation
 endmodule
 
@@ -2485,9 +2485,13 @@ if __name__ == "__main__":
     chip.clock('clock', period=100)                                             # Define clock speed of design
     chip.use($processTechnology_demo)                                           # Load predefined technology and flow target
     chip.set('option', 'remote', False)                                         # Run remote in the cloud
+    chip.set('option', 'nodisplay', True)                                       # Do not open displays
+    chip.set('option', 'loglevel', 'warning')                                   # Warnings and above
     chip.run()                                                                  # Run compilation of design and target
     chip.summary()
-    chip.show()
+    chip.snapshot()
+# chip.show()
+# chip.set('option', 'define', 'CFG_ASIC=1')
 # chip.set('option', 'env', 'PDK_HOME', '/disk/mypdk')
 # chip.set('option', 'idir', './mylib')
 # chip.set('option', 'loglevel', 'warning')
@@ -2579,7 +2583,7 @@ create_clock -name clock -period 100 [get_ports {clock}]
       s = s.replace("$data",             ""+data());
       s = s.replace("$Key",              ""+Key());
       s = s.replace("$Data",             ""+(Data() != null ? Data() : 0));
-      s = s.replace("$sizeOfNode",       ""+nodeLayout.size());
+      s = s.replace("$nodeSize",         ""+nodeLayout.size());
       s = s.replace("$numberOfNodes",    ""+maxSize());
       s = s.replace("$bitsPerAddress",   ""+bitsPerAddress);
       s = s.replace("$maxSteps",         ""+maxSteps());
