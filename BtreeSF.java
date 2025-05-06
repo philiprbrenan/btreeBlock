@@ -2482,13 +2482,13 @@ if __name__ == "__main__":
     chip = Chip('$project')                                                     # Create chip object
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/nano9k/$project.v')            # Define list of source files
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.sdc') # Define list of source files
-    chip.clock('clock', period=100)                                             # Define clock speed of design
+    chip.clock('clock', period=10)                                              # Define clock speed of design was 100
     chip.use($processTechnology_demo)                                           # Load predefined technology and flow target
     chip.set('option', 'remote', False)                                         # Run remote in the cloud
     chip.set('option', 'nodisplay', True)                                       # Do not open displays
     chip.set('option', 'loglevel', 'warning')                                   # Warnings and above
     chip.run()                                                                  # Run compilation of design and target
-    chip.summary()
+#   chip.summary()
     chip.snapshot()
 # chip.show()
 # chip.set('option', 'define', 'CFG_ASIC=1')
