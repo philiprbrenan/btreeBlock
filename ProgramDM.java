@@ -214,6 +214,14 @@ class ProgramDM extends Test                                                    
 
   void clear() {z(); code.clear(); currentCode = 0; running = false;}           // Clear the program code
 
+  void nop()                                                                    // Do nothing, but do it well
+   {new I()
+     {void   a() {z();}
+      String v() {return "/* no operation */";}
+      String n() {return "No operation";}
+     };
+   }
+
 //D1 Blocks                                                                     // Blocks of code used to implement if statements and for loops
 
   void Goto(Label label)                                                        // Goto a label
@@ -1080,6 +1088,16 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
+  static void test_nop()
+   {z();
+    ProgramDM  p = new ProgramDM();
+    p.nop();
+    p.run();
+    ok(p.printVerilog(), """
+   1  /* no operation */
+""");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_inc();
     test_fibonacci();
@@ -1095,12 +1113,13 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_parallel_start_section_end_twice();
     test_parallel_three();
     test_parallel();
+    test_nop();
     //test_debug();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
-    test_parallel_three();
+   {//oldTests();
+    test_nop();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
