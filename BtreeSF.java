@@ -187,8 +187,8 @@ abstract class BtreeSF extends Test                                             
     return b;
    }
 
-  StuckDM createLeafStuck(String name)                                          // Create a branch Stuck
-   {final StuckDM l = new StuckDM(name)                 // Leaf stucks
+  StuckDM createLeafStuck(String name)                                          // Create a leaf Stuck
+   {final StuckDM l = new StuckDM(name)                                         // Leaf stucks
      {int     maxSize() {return BtreeSF.this.maxKeysPerLeaf();}
       int  bitsPerKey() {return BtreeSF.this.bitsPerKey();}
       int bitsPerData() {return BtreeSF.this.bitsPerData();}
@@ -805,7 +805,7 @@ abstract class BtreeSF extends Test                                             
       P.parallelStart();
         if (at != null) T.at(memoryIOAddress).move(at);                         // Index of node in memory
         else            T.at(memoryIOAddress).zero();
-      P.parallelSection(); T.at(memoryIODirection).ones();                      // Read
+      P.parallelSection(); T.at(memoryIODirection).ones();                      // Write
       P.parallelSection(); memoryIn.N.top().move(N.top());                      // Transfer from memory interface buffer into node
       P.parallelEnd();
 
@@ -817,7 +817,7 @@ abstract class BtreeSF extends Test                                             
          {return "/* loadNode */";
          }
        };
-      T.at(memoryIODirection).zero();                                           // Reset the write flag to prevent forth writes from occurring
+      T.at(memoryIODirection).zero();                                           // Reset the write flag to prevent further writes from occurring
      }
 
     void loadRootStuck(StuckDM Stuck)                                           // Load a root stuck from main memory
@@ -830,7 +830,7 @@ abstract class BtreeSF extends Test                                             
      {zz(); Stuck.M.copy(N.at(branchOrLeaf));
      }
 
-    void loadStuck(StuckDM Stuck, Layout.Variable at)                           // Load a stuck from indexed main memory
+    void loadStuck(StuckDM Stuck, Layout.Variable at)                           // Load a stuck from indexed main memory via this node
      {zz();
       loadNode(T.at(at));
       loadStuck(Stuck);
@@ -940,6 +940,9 @@ abstract class BtreeSF extends Test                                             
 
   private void splitLeafRoot()                                                  // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
    {zz();
+    //final  Variable L = new Variable(P, "left",  bitsPerNext);                  // Index of left allocated node
+    //final  Variable R = new Variable(P, "right", bitsPerNext);                  // Index of right allocated node
+
     allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
     allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
 
@@ -1947,6 +1950,7 @@ abstract class BtreeSF extends Test                                             
     abstract int     maxSteps();                                                // Maximum number if execution steps
     abstract int     expSteps();                                                // Expected number of steps
     abstract String  expected();                                                // Expected number of steps
+             int     density () {return 30;}                                    // Indocation of gate density required on die.
 
     String projectFolder()                                                      // Define the project folder
      {if  (statements == null)
@@ -2497,8 +2501,9 @@ if __name__ == "__main__":
     chip.set('option', 'remote', False)                                         # Run remote in the cloud
     chip.set('option', 'nodisplay', True)                                       # Do not open displays
     chip.set('option', 'loglevel', 'warning')                                   # Warnings and above
+    chip.set('constraint', 'density', $density)                                 # Lowering the density gives more area in which to route connections at the cost of wasting surface area
     chip.run()                                                                  # Run compilation of design and target
-#   chip.summary()
+    chip.summary()
     chip.snapshot()
 # chip.show()
 # chip.set('option', 'define', 'CFG_ASIC=1')
@@ -2606,10 +2611,11 @@ create_clock -name clock -period 100 [get_ports {clock}]
       s = s.replace("$processTechnology",   processTechnology);                 // Process technology used for building chips
       s = s.replace("$memoryInitialize",  M.initializeVerilog());               // Initialize memory
       s = s.replace("$memoryIOWrite", T.at(memoryIODirection).verilogLoad());   // True - we are writing to memory, 0 reading from memory
-      s = s.replace("$memoryInBuffer",    memoryIn.N.top().verilogLoad());     // The buffer to hold a node in transit into memory
+      s = s.replace("$memoryInBuffer",    memoryIn.N.top().verilogLoad());      // The buffer to hold a node in transit into memory
       s = s.replace("$memoryIOAddress",   T.at(memoryIOAddress).verilogLoad()); // Address to read or write from or to memory
       s = s.replace("$memoryDeclare",     M.declareVerilog());                  // Declaration of memory
       s = s.replace("$opCodes",           genOpCodes());                        // Generate op codes
+      s = s.replace("$density",        ""+density());                           // An indication of the gate density to use on the chip
 
       return s;
      }
@@ -3892,6 +3898,7 @@ Line T       At      Wide       Size    Indices        Value   Name
       int     maxSteps() {return  2000;}                                        // Maximum number if execution steps
       int     expSteps() {return steps;}                                        // Expected number of steps
       String  expected() {return expected;}                                     // Expected tree if present
+      int      density() {return 10;}                                           // Lower than normal density to facilitate routing
      };
    }
 
