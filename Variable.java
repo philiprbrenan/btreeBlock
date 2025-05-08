@@ -40,6 +40,10 @@ class Variable extends Test                                                     
   void greaterThan       (Variable A, Variable B) {A.a.greaterThan       (B.a, a);} // Set this variable to one if the first variable is greater than the second one else zero
   void greaterThanOrEqual(Variable A, Variable B) {A.a.greaterThanOrEqual(B.a, a);} // Set this variable to one if the first variable is greater than or equal to the second one else zero
 
+  void sameSize(Variable...A)                                                   // Stop unless all the variables have the same size
+   {for (int i = 0; i < A.length; i++) a.sameSize(A[i].a);
+   }
+
   public String toString() {return m.toString();}                               // String to show variable name and value
 
 //D0 Tests                                                                      // Testing
@@ -49,6 +53,8 @@ class Variable extends Test                                                     
     final Variable  i = new Variable(p, "i", 4);
     final Variable  j = new Variable(p, "j", 4);
     final Variable  k = new Variable(p, "k", 4);
+
+    i.sameSize(j, k);
     i.set(1);
     j.copy(i);
     p.run(); p.clear();
@@ -213,8 +219,8 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void test_shift()                                                      // Shift left and right
-   {final ProgramDM p   = new ProgramDM();
-    final Variable  i   = new Variable(p, "i",  4);
+   {final ProgramDM p = new ProgramDM();
+    final Variable  i = new Variable(p, "i",  4);
     i.set(1);
 
     i.slz();i.slz();
