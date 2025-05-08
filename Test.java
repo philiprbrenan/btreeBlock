@@ -756,7 +756,7 @@ public class Test                                                               
     return false;
    }
 
-  static boolean ok(String got, String expected)                                // Confirm two strings match
+  static boolean ok(String got, String expected)                                // Confirm two strings match or show the first line of differences
    {final String G = got, E = expected;
     final int lg = G.length(), le = E.length();
     final StringBuilder b = new StringBuilder();
@@ -775,20 +775,42 @@ public class Test                                                               
 //     }
      }
 
-    int l = 1, c = 0;
-    final int N = le < lg ? le : lg;
-    for (int i = 0; i < N && matches; i++)                                      // Check each character
-     {final int  e = E.charAt(i), g = G.charAt(i);
-      if (e != g)                                                               // Character mismatch
-       {final String ee = e == '\n' ? "new-line" : ""+(char)e;
+    int l = 1, c = 0;                                                           // Line and character of first failure
+    final int N = min(le, lg);                                                  // Print to the end of the shortest string
+    for (int i = 0; i < N && matches; i++)                                      // Check each character in the overlapping area of the got and expected strings
+     {final int e = E.charAt(i), g = G.charAt(i);                               // Each character of the overlap
+      if (e != g)                                                               // Character mismatch between got and expected so print entire string highlighting the differences in the first line that differs
+       {final String ee = e == '\n' ? "new-line" : ""+(char)e;                  // Handle new lines gracefully
         final String gg = g == '\n' ? "new-line" : ""+(char)g;
+        final String ruler = "0----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----";
+        final String error = "Character "+c+", expected="+ee+"= got="+gg+"=";   // Location of error
 
-        say(b, "Character "+c+", expected="+ee+"= got="+gg+"=");
-        say(b, "0----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----");
-        final String[]t = G.split("\\n");
-        for(int k = 0; k < t.length; k++)                                       // Details of  mismatch
-         {say(b, t[k]);
-          if (l == k+1) say(b, " ".repeat(c)+'^');
+        say(b, error); say(b, ruler);
+
+        final String[]sg = G.split("\\n");                                      // Got as lines
+        final String[]se = E.split("\\n");                                      // Expected as lines
+        for(int k = 0; k < sg.length; k++)                                      // Show each line in the string
+         {if (l == k+1)                                                         // Write the difference line for the first line with errors
+           {final String Eg = sg[k], Ee = se[k];                                // Differing versions of first line with errors in it
+            final StringBuilder dg = new StringBuilder();                       // The difference on got
+            final StringBuilder de = new StringBuilder();                       // The difference on expected
+            final StringBuilder dm = new StringBuilder();                       // The difference markers
+            final int n = min(Eg.length(), Ee.length());                        // Overlaps between expected and got on first differing line
+            if (n > 0)                                                          // Overlap exists
+             {for(int j = 0; j < n; j++)                                        // Show each line in the string
+               {final char cg = Eg.charAt(j), ce = Ee.charAt(j);                // Characters at current position
+                dg.append(cg == ce ? ' ' : cg);                                 // Difference line for got
+                de.append(cg == ce ? ' ' : ce);                                 // Difference line for expected
+                dm.append(cg == ce ? ' ' : '^');                                // Difference markers
+               }
+              final String r = ruler.repeat(1 + n / 100);                       // A sufficiently long ruler to bracket the difference lines
+              say(b, r);                                                        // Write the difference lines bracketed with rulers
+              say(b, sg[k]);                                                    // What we got
+              say(b, dg); say(b, de); say(b, dm);                               // Difference markers
+              say(b, error); say(b, r);                                         // Error detail
+             }
+           }
+          else say(b, sg[k]);                                                   // Line that is not the first error line
          }
         matches = false;
        }
@@ -800,9 +822,10 @@ public class Test                                                               
     return pass;
    }
 
-  static boolean ok(int margin, String got, String expected)                    // Confirm two strings match
-   {final String G = differentiateLines(margin, got),
-                 E = differentiateLines(margin, expected);
+  static boolean ok(int margin, String got, String expected)                    // Confirm two strings
+//   {final String G = differentiateLines(margin, got),
+//                 E = differentiateLines(margin, expected);
+   {final String G = got, E = expected;
     if (!G.equals(E))
      {say("Got:\n"+G);
       say("Expected:\n"+E);
@@ -810,7 +833,7 @@ public class Test                                                               
     return ok(G, E);
    }
 
-  static boolean ok(Integer G, Integer E)                                          // Check that two integers are equal
+  static boolean ok(Integer G, Integer E)                                       // Check that two integers are equal
    {if (false)                        {                                                             return true;}
     else if ( G == null && E == null) {                                              ++testsPassed; return true;}
     else if ( G != null && E == null) {err(String.format("Expected null, got:", G)); ++testsFailed; return false;}
