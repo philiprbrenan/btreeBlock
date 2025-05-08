@@ -174,14 +174,14 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
   void copy(final MemoryLayoutDM.At source)                                     // Fill the target from the source starting at the referenced address in the source
    {zz();
     final MemoryLayoutDM m = this;
-    final int N = size();
+    final int N = min(size(), source.width);
     P.new I()
      {void a()
        {source.setOff();
         for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
        }
       String v()
-       {return m.name()+"[0 +: "+N+"] <= "+source.verilogLoad()+"; /* copy2 */";
+       {return m.name()+"[0 +: "+N+"] <= "+source.ml().name()+"["+source.verilogAddr()+" +: "+N+"]; /* copy2 */";
        }
       String n()
        {return "copy "+N+" bits from "+source+" to "+m.name;
