@@ -11,6 +11,10 @@ package com.AppaApps.Silicon;                                                   
 // Start splitting lower down and merge only along split path
 // Separate nano9k gen from silicon compiler gen
 // Try memory operations in parallel in class Node without getting congestion complaints from silicon compiler
+// Remove removable memories as the use of local registers eliminates the need for them
+// Investigate whether it would be worth changing from a block of variables in T to individual memories for each variable now in T.  This would localize access which would simplify routing at the cost of more silicon spent on registers.
+// Can MmeoryLayoutDM be merged with Layout?  I.e. each field laid out would know what memory it resides in.
+// Remove eachStatement on the grounds that OpenRoad does better
 import java.util.*;
 import java.nio.file.*;
 
@@ -24,7 +28,7 @@ abstract class BtreeSF extends Test                                             
   final boolean           runVerilog = true;                                    // Run verilog tests alongside java tests and check they produce the same results
   final static boolean eachStatement = false;                                   // Isolate each statement to get per statement timing
   final static TreeSet<VerilogCode.Range>       ranges = new TreeSet<>();       // Record ranges in each project
-  final static TreeMap<String,String>removableMemories = new TreeMap<>();       // Record memories that can be removed from each project as theya re not used
+  final static TreeMap<String,String>removableMemories = new TreeMap<>();       // Record memories that can be removed from each project as they are not used
   final String     processTechnology = "freepdk45";                             // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
@@ -208,8 +212,7 @@ abstract class BtreeSF extends Test                                             
 
   private static BtreeSF allTreeOps()                                           // Define a tree capable of performing all operations
    {return new BtreeSF()
-//   {int maxSize         () {return 16;}
-     {int maxSize         () {return  9;}
+     {int maxSize         () {return 16;}
       int maxKeysPerLeaf  () {return  2;}
       int maxKeysPerBranch() {return  3;}
       int bitsPerKey      () {return  5;}
@@ -457,8 +460,6 @@ abstract class BtreeSF extends Test                                             
 //private Layout.Variable        mergeDepth;                                    // Current level being traversed by merge
   private Layout.Variable        mergeIndex;                                    // Current index of node being merged across
   private Layout.Variable   memoryIOAddress;                                    // Pipelined input or outoput to memory
-  private Layout.Variable     memoryIBuffer;                                     // A buffer to hold a node being transferred to or from memory
-  private Layout.Variable     memoryOBuffer;                                     // A buffer to hold a node being transferred to or from memory
   private Layout.Bit      memoryIODirection;                                    // If true we are writing into memory else we are reading from memory
 
   private Layout.Variable  node_isLeaf;                                         // The node to be used to implicitly parameterize each method call
@@ -567,8 +568,6 @@ abstract class BtreeSF extends Test                                             
 //                                mergeDepth = L.variable ("mergeDepth"                                    , bitsPerNext);
                                   mergeIndex = L.variable ("mergeIndex"                                    , bitsPerSize);
                              memoryIOAddress = L.variable ("memoryIOAddress"                               , bitsPerNext);
-                              memoryIBuffer  = L.variable ("memoryIBuffer"                                 , nodeLayout.size());
-                              memoryOBuffer  = L.variable ("memoryOBuffer"                                 , nodeLayout.size());
                            memoryIODirection = L.bit      ("memoryIODirection");
 
                                  node_isLeaf = //L.variable ("node_isLeaf"                                   , bitsPerNext);
@@ -669,8 +668,6 @@ abstract class BtreeSF extends Test                                             
         mergeIndex,
         memoryIOAddress,
         memoryIODirection,
-        memoryIBuffer,
-        memoryOBuffer,
       //node_isLeaf,
       //node_setLeaf,
       node_setBranch,
@@ -789,7 +786,7 @@ abstract class BtreeSF extends Test                                             
       P.parallelSection(); T.at(memoryIODirection).zero();                      // Read
       P.parallelEnd();
 
-      P.nop();
+      P.nop();                                                                  // Let memory catch up
 
       P.new I()
        {void a()
@@ -808,9 +805,10 @@ abstract class BtreeSF extends Test                                             
       P.parallelStart();
         if (at != null) T.at(memoryIOAddress).move(at);                         // Index of node in memory
         else            T.at(memoryIOAddress).zero();
-      P.parallelSection(); T.at(memoryIODirection).zero();                      // Read
+      P.parallelSection(); T.at(memoryIODirection).ones();                      // Read
       P.parallelSection(); memoryIn.N.top().move(N.top());                      // Transfer from memory interface buffer into node
       P.parallelEnd();
+
       P.new I()
        {void a()
          {M.at(node, T.at(memoryIOAddress)).moveBits(memoryIn.N.top());
@@ -819,6 +817,7 @@ abstract class BtreeSF extends Test                                             
          {return "/* loadNode */";
          }
        };
+      T.at(memoryIODirection).zero();                                           // Reset the write flag to prevent forth writes from occurring
      }
 
     void loadRootStuck(StuckDM Stuck)                                           // Load a root stuck from main memory
@@ -2024,7 +2023,7 @@ abstract class BtreeSF extends Test                                             
 
     boolean requiredMemory(MemoryLayoutDM m)                                    // Check memory is required for this project
      {final String r = removableMemories.get(project);                          // Removable memories for this project
-      if (r == null) return true;                                               // No removable memorioes yet
+      if (r == null) return true;                                               // No removable memories yet
       return !r.contains(" "+m.name+" ");                                       // Check whether memory is removable or not
      }
 
@@ -2156,7 +2155,7 @@ module $project(reset, stop, clock, Key, Data, data, found);                    
 
   Memory memory_M(.clock(clock), .reset(reset),                                 // Create main memory with the expected name.  There is only one such at the moment but perhaps in the future there will be more at which point it would be worth creating the corresponding memory module automatically.
       .write  ($memoryIOWrite),
-      .in     ($memoryIBuffer),
+      .in     ($memoryInBuffer),
       .out    (memoryOut),                                                      // IVerilog will drive a subset of an array so pipeline instead
       .index  ($memoryIOAddress));
 
@@ -2259,7 +2258,7 @@ module $project(button1, stop, clock, Key, Data, data, found, led);             
 
   Memory memory(.clock(clock), .reset(reset),
       .write  ($memoryIOWrite),
-      .in     ($memoryIBuffer),
+      .in     ($memoryIn),
       .out    (memoryOut),
       .index  ($memoryIOAddress));
 
@@ -2605,12 +2604,11 @@ create_clock -name clock -period 100 [get_ports {clock}]
       s = s.replace("$format",           ""+verilogMemoryPrintFormat());
       s = s.replace("$initialize_opCodeMap","initialize_"+opCodeMap);           // Initialize op code map
       s = s.replace("$processTechnology",   processTechnology);                 // Process technology used for building chips
+      s = s.replace("$memoryInitialize",  M.initializeVerilog());               // Initialize memory
       s = s.replace("$memoryIOWrite", T.at(memoryIODirection).verilogLoad());   // True - we are writing to memory, 0 reading from memory
-      s = s.replace("$memoryIBuffer",     T.at(memoryIBuffer).verilogLoad());   // The buffer to hold a node in transit into memory
-      s = s.replace("$memoryOBuffer",     T.at(memoryOBuffer).verilogLoad());   // The buffer to hold a node in transit from memory
+      s = s.replace("$memoryInBuffer",    memoryIn.N.top().verilogLoad());     // The buffer to hold a node in transit into memory
       s = s.replace("$memoryIOAddress",   T.at(memoryIOAddress).verilogLoad()); // Address to read or write from or to memory
       s = s.replace("$memoryDeclare",     M.declareVerilog());                  // Declaration of memory
-      s = s.replace("$memoryInitialize",  M.initializeVerilog());               // Initialize memory
       s = s.replace("$opCodes",           genOpCodes());                        // Generate op codes
 
       return s;
@@ -3726,7 +3724,7 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
    }
 
-  private static void test_find()                                               // Find using generated verilog code
+  private static void test_find_verilog()                                               // Find using generated verilog code
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps() ;
     t.P.run(); t.P.clear();
@@ -3783,7 +3781,7 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
    }
 
-  private static void test_delete()                                             // Delete using generated verilog code
+  private static void test_delete_verilog()                                             // Delete using generated verilog code
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps();
     t.P.run(); t.P.clear();
@@ -3812,7 +3810,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 483, """
+    t.runVerilogDeleteTest(3, 6, 543, """
                     6           |
                     0           |
                     5           |
@@ -3825,7 +3823,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
     if (eachStatement) return;                                                  // Generate just one so vivado can generate timimg for it rather than executing it.
 
-    t.runVerilogDeleteTest(4, 5, 337, """
+    t.runVerilogDeleteTest(4, 5, 382, """
              6           |
              0           |
              5           |
@@ -3837,7 +3835,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  5,6=3  7=8  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 390, """
+    t.runVerilogDeleteTest(2, 7, 437, """
     4      6      7        |
     0      0.1    0.2      |
     1      3      8        |
@@ -3845,7 +3843,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1=1  5,6=3    7=8    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 281, """
+    t.runVerilogDeleteTest(1, 8, 318, """
       6    7        |
       0    0.1      |
       1    8        |
@@ -3853,7 +3851,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 5,6=1  7=8    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 231, """
+    t.runVerilogDeleteTest(5, 4, 262, """
       7      |
       0      |
       1      |
@@ -3861,7 +3859,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(6, 3, 237, """
+    t.runVerilogDeleteTest(6, 3, 271, """
     7      |
     0      |
     1      |
@@ -3869,15 +3867,15 @@ Line T       At      Wide       Size    Indices        Value   Name
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 204, """
+    t.runVerilogDeleteTest(7, 2, 238, """
 8,9=0 |
 """);
 
-    t.runVerilogDeleteTest(8, 1, 29, """
+    t.runVerilogDeleteTest(8, 1, 35, """
 9=0 |
 """);
 
-    t.runVerilogDeleteTest(9, 0, 29, """
+    t.runVerilogDeleteTest(9, 0, 35, """
 =0 |
 """);
    }
@@ -3897,22 +3895,22 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
    }
 
-  private static void test_put()                                                // Delete using generated verilog code
+  private static void test_put_verilog()                                                // Delete using generated verilog code
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps();
     t.P.run(); t.P.clear();
     t.put();
-    t.runVerilogPutTest(1, 27, """
+    t.runVerilogPutTest(1, 30, """
 1=0 |
 """);
 
     if (eachStatement) return;                                                  // Generate just one so vivado can generate timimg for it rather than executing it.
 
-    t.runVerilogPutTest(2, 27, """
+    t.runVerilogPutTest(2, 30, """
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest(3, 126, """
+    t.runVerilogPutTest(3, 150, """
     1      |
     0      |
     1      |
@@ -3920,7 +3918,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 239, """
+    t.runVerilogPutTest(4, 272, """
     1    2        |
     0    0.1      |
     1    3        |
@@ -3928,7 +3926,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1=1  2=3    3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 293, """
+    t.runVerilogPutTest(5, 332, """
       2    3        |
       0    0.1      |
       1    4        |
@@ -3936,7 +3934,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3=4    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 293, """
+    t.runVerilogPutTest(6, 332, """
       2      4        |
       0      0.1      |
       1      4        |
@@ -3944,7 +3942,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 323, """
+    t.runVerilogPutTest(7, 365, """
       2      4      5        |
       0      0.1    0.2      |
       1      4      3        |
@@ -3952,7 +3950,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5=3    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 427, """
+    t.runVerilogPutTest(8, 488, """
              4                  |
              0                  |
              5                  |
@@ -3964,7 +3962,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5=3  6=7    7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 403, """
+    t.runVerilogPutTest(9, 454, """
              4                    |
              0                    |
              5                    |
@@ -3976,7 +3974,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5,6=3  7=8    8,9=2 |
 """);
 
-    t.runVerilogPutTest(10, 403, """
+    t.runVerilogPutTest(10, 454, """
              4                       |
              0                       |
              5                       |
@@ -3988,7 +3986,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5,6=3  7,8=8    9,10=2 |
 """);
 
-    t.runVerilogPutTest(11, 433, """
+    t.runVerilogPutTest(11, 487, """
              4                               |
              0                               |
              5                               |
@@ -4000,7 +3998,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5,6=3  7,8=8    9=7    10,11=2 |
 """);
 
-    t.runVerilogPutTest(12, 420, """
+    t.runVerilogPutTest(12, 474, """
                                8                 |
                                0                 |
                                5                 |
@@ -4012,7 +4010,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=2 |
 """);
 
-    t.runVerilogPutTest(13, 369, """
+    t.runVerilogPutTest(13, 417, """
                                8                          |
                                0                          |
                                5                          |
@@ -4024,7 +4022,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest(14, 403, """
+    t.runVerilogPutTest(14, 454, """
                                8                             |
                                0                             |
                                5                             |
@@ -4036,7 +4034,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=2 |
 """);
 
-    t.runVerilogPutTest(15, 433, """
+    t.runVerilogPutTest(15, 487, """
                                8                                     |
                                0                                     |
                                5                                     |
@@ -4048,7 +4046,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest(16, 444, """
+    t.runVerilogPutTest(16, 501, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -4060,7 +4058,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=2 |
 """);
 
-    t.runVerilogPutTest(17, 414, """
+    t.runVerilogPutTest(17, 465, """
                                8                  12                            |
                                0                  0.1                           |
                                5                  11                            |
@@ -4072,7 +4070,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest(18, 448, """
+    t.runVerilogPutTest(18, 502, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -4084,7 +4082,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=12    17,18=2 |
 """);
 
-    t.runVerilogPutTest(19, 478, """
+    t.runVerilogPutTest(19, 535, """
                                8                  12                                        |
                                0                  0.1                                       |
                                5                  11                                        |
@@ -4096,7 +4094,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 484, """
+    t.runVerilogPutTest(20, 544, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
@@ -4685,20 +4683,22 @@ StuckSML(maxSize:4 size:1)
     if (longRunning) test_delete_random_not_100();
     test_primes();
     test_node();
-    test_delete();
-    test_find();
-    test_put();
+    test_delete_verilog();
+    test_find_verilog();
+    test_put_verilog();
 //    test_find_wide();
 //    test_put_wide();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_find();
+    test_delete_verilog();
+    test_find_verilog();
+    test_put_verilog();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
-   {deleteAllFiles(verilogFolder, 200);                                         // Clear the verilog folder as otherwise life gets very confusing
+   {deleteAllFiles(verilogFolder, 600);                                         // Clear the verilog folder as otherwise life gets very confusing
     try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
       rangesAsPerl("vivado/ranges.txt");                                        // Print the ranges as a Perl data structure
