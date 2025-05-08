@@ -37,6 +37,7 @@ abstract class BtreeSF extends Test                                             
   final    int bitsPerNext;                                                     // The number of bits in a next field
   final    int bitsPerSize;                                                     // The number of bits in stuck size field
   final static String verilogFolder = "verilog";                                // The folder to write verilog into
+  static   int widthOfMarginInExecutionTrace = 18;                              // The width of the left margin in verilog traces that is to be protected from differential writing
 
   Layout.Field     leaf;                                                        // Layout of a leaf in the memory used by btree
   Layout.Field     branch;                                                      // Layout of a branch in the memory used by btree
@@ -783,10 +784,13 @@ abstract class BtreeSF extends Test                                             
     void loadNode(MemoryLayoutDM.At at)                                         // Load this node from addressed memory
      {zz();
       P.parallelStart();
-        if (at != null) T.at(memoryIOAddress).move(at);                         // Index of node in memory
-        else            T.at(memoryIOAddress).zero();
+        if (at != null)    T.at(memoryIOAddress).move(at);                      // Index of node in memory
+        else               T.at(memoryIOAddress).zero();
       P.parallelSection(); T.at(memoryIODirection).zero();                      // Read
       P.parallelEnd();
+
+      P.nop();
+
       P.new I()
        {void a()
          {N.top().moveBits(M.at(node, T.at(memoryIOAddress)));
@@ -2048,18 +2052,18 @@ abstract class BtreeSF extends Test                                             
       writeFile(initializeMemory(), s);
      }
 
-    String memoryPrintFormat()                                                  // Print format
-     {final StringBuilder f = new StringBuilder("\"%4d  %4d ");
-      final StringBuilder s = new StringBuilder("\", steps, step");
+    String verilogMemoryPrintFormat()                                           // Format statement for printing memory from Verilog to match the tracing used in Java
+     {final StringBuilder f = new StringBuilder("\"%4d  %4d  %4d ");            // Format code  to be used to print an execution trace
+      widthOfMarginInExecutionTrace = 18;                                       // Derived from the previous line
+      final StringBuilder s = new StringBuilder("\", steps, step, opCodeMap[step]");
 
       for(MemoryLayoutDM m : P.memories)
        {final MemoryLayoutDM.BlockArray a = m.block;
         if (a.blocked())
-         {final int N = 8;
+         {final String name = "memory_"+ m.name()+'.'+m.name();                 // Name of the memory module array elements as seen from outside the module
           for (int i = 0; i < a.size; i++)
-           {final String n = m.name()+"["+i+"]";
-            f.append(" "+n+"=%b");
-            s.append(", "+n);
+           {f.append(" " +m.name()+"["+i+"]"+"=%b");
+            s.append(", "+name    +"["+i+"]");                                  // Extract the current value from inside the instantiated module
            }
          }
         else
@@ -2076,9 +2080,9 @@ abstract class BtreeSF extends Test                                             
       for (int i = 0; i < N; i++) {statements = i; generateVerilog();}
      }
 
-
-    void genOpCodes(StringBuilder s)                                            // Generate opcodes
-     {if (OpCodes)                                                              // Reduce program size by refactoring op codes at the cost of one additional look up per instruction cycle. Also appears to reduce synthesis time by about 30% on Vivado and likewise reduces the number of FPGA cells.
+    String genOpCodes()                                                         // Generate opcodes
+     {final StringBuilder s = new StringBuilder();                              // Verilog
+      if (OpCodes)                                                              // Reduce program size by refactoring op codes at the cost of one additional look up per instruction cycle. Also appears to reduce synthesis time by about 30% on Vivado and likewise reduces the number of FPGA cells.
        {s.append("      case(opCodeMap[step])\n");                              // Case statements to select the code for the current instruction
 
         for(StringToNumbers.Order o : ops.outputOrder)                          // I shall say each instruction only once
@@ -2124,13 +2128,14 @@ abstract class BtreeSF extends Test                                             
         default : begin stopped <= 1; /* end of execution */ end                // Any invalid instruction address causes the program to halt
       endcase
 """);
+      return ""+s;
      }
 
     void generateVerilogCode()                                                  // Generate verilog code for standalone verification and for Vivado
      {final StringBuilder s = new StringBuilder();                              // Generate code
       s.append("""
 //-----------------------------------------------------------------------------
-// Database on a chip for simulation with test bench
+// Database on a chip simulation
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-01-07
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
@@ -2149,17 +2154,15 @@ module $project(reset, stop, clock, Key, Data, data, found);                    
 
   reg [$nodeSize-1:0] memoryOut;                                                // Output from memory
 
-  Memory memory(.clock(clock), .reset(reset),
+  Memory memory_M(.clock(clock), .reset(reset),                                 // Create main memory with the expected name.  There is only one such at the moment but perhaps in the future there will be more at which point it would be worth creating the corresponding memory module automatically.
       .write  ($memoryIOWrite),
       .in     ($memoryIBuffer),
       .out    (memoryOut),                                                      // IVerilog will drive a subset of an array so pipeline instead
       .index  ($memoryIOAddress));
 
   integer  step;                                                                // Program counter
-  `ifndef SYNTHESIS                                                             // Synthesis is defined on Vivado which objects to $display statements
-    integer steps;                                                              // Number of steps executed
-    integer traceFile;                                                          // File to write trace to
-  `endif
+  integer steps;                                                                // Number of steps executed
+  integer traceFile;                                                            // File to write trace to
   reg   stopped;                                                                // Set when we stop
   assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
   assign found = T[$found_at];                                                  // Found the key
@@ -2168,38 +2171,24 @@ module $project(reset, stop, clock, Key, Data, data, found);                    
   always @ (posedge clock) begin                                                // Execute next step in program
     if (reset) begin                                                            // Reset
       step     <= 0;
-     `ifndef SYNTHESIS
-        steps  <= 0;
-     `endif
+      steps    <= 0;
       stopped  <= 0;
 
      `include "includes/initializeMemory.vh"                                    // Load memory
       $initialize_opCodeMap();                                                  // Initialize op code map
 
-     `ifndef SYNTHESIS
-        traceFile = $fopen("$traceFile", "w");                                  // Open trace file
-        if (!traceFile) $fatal(1, "Cannot open trace file $traceFile");
-     `endif
+      traceFile = $fopen("$traceFile", "w");                                    // Open trace file
+      if (!traceFile) $fatal(1, "Cannot open trace file $traceFile");
 
-     `ifdef SYNTHESIS
-        T[$Key_at +:$Key_width ] <= Key;                                        // Load test key
-        T[$Data_at+:$Data_width] <= Data;                                       // Load test data
-     `endif
+      T[$Key_at +:$Key_width ] <= Key;                                          // Load test key
+      T[$Data_at+:$Data_width] <= Data;                                         // Load test data
     end
     else begin                                                                  // Run
-     `ifndef SYNTHESIS
-        $display            ($format);                                          // Trace execution
-        $fdisplay(traceFile, $format);                                          // Trace execution in a file
-     `endif
-""");
-
-      genOpCodes(s);
-      s.append("""
-//    step = step + 1;
-     `ifndef SYNTHESIS
-        steps <= steps + 1;
-     `endif
-    end // Execute
+      $display            ($format);                                            // Trace execution
+      $fdisplay(traceFile, $format);                                            // Trace execution in a file
+$opCodes
+      steps <= steps + 1;
+    end
   end // Always
 endmodule
 
@@ -2210,6 +2199,21 @@ module Memory                                                                   
   input      [$nodeSize-1:0]       in,                                          // Input to memory
   output reg [$nodeSize-1:0]      out,                                          // Output from memory
   input                         write);                                         // Write into memory if true
+$memoryDeclare
+
+  always @ (posedge clock) begin                                                // Execute next step in program
+    if (reset) begin                                                            // Reset
+$memoryInitialize
+    end
+    else begin
+      if (write) begin
+        M[index] <= in;
+      end
+      else begin
+        out = M[index];
+      end
+    end
+  end
 endmodule
 """);
       writeFile(sourceVerilog(), editVariables(s));                             // Write verilog module
@@ -2219,7 +2223,7 @@ endmodule
      {final StringBuilder s = new StringBuilder();
       s.append("""
 //-----------------------------------------------------------------------------
-// Database on a chip for nano 9k and other real devices or open roadn asic flow
+// Database on a chip for nano 9k and other real devices or OpenRoad asic flow
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-01-07
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
@@ -2282,11 +2286,7 @@ module $project(button1, stop, clock, Key, Data, data, found, led);             
     end
 
     else begin                                                                  // Run
-      //$display("%2d  %2d  %2d  KeyP=%2d  KeyM=%2d  %2d  %2d  %b %2d  %b", step, opCodeMap[step], stop, Key, T[113+:5 ], found, data, led, T[     134/*child   */ +: 4], nT);
-""");
-      genOpCodes(s);
-
-      s.append("""
+$opCodes
     end // Execute
   end // Always
 endmodule
@@ -2298,21 +2298,6 @@ module Memory                                                                   
   input      [$nodeSize-1:0]       in,                                          // Input to memory
   output reg [$nodeSize-1:0]      out,                                          // Output from memory
   input                         write);                                         // Write into memory if true
-$memoryDeclare
-
-  always @ (posedge clock) begin                                                // Execute next step in program
-    if (reset) begin                                                            // Reset
-$memoryInitialize
-    end
-    else begin
-      if (write) begin
-        M[index] <= in;
-      end
-      else begin
-        out = M[index];
-      end
-    end
-  end
 endmodule
 """);
       writeFile(nano9kVerilog(), editVariables(s));                             // Write verilog for nano 9k
@@ -2349,18 +2334,17 @@ module $project_tb;                                                             
   task execute;                                                                 // Clock the module until it says it has stopped
     integer step;
     begin
-      $display("AAAA %d", stop);
       for(step = 0; step < $maxSteps && !stop; step = step + 1) begin
-        $display("AAAA %d %d", step, stop);
         clock = 0; #1; clock = 1; #1;
       end
       if (stop) begin                                                           // Stopped
-       `ifndef SYNTHESIS
-          testResults = $fopen("$testsFile", "w");
-          $fdisplay(testResults, "Steps=%1d\\nKey=%1d\\ndata=%1d\\n",
-            step, Key, data);
-          $fclose(testResults);
-       `endif
+        testResults = $fopen("$testsFile", "w");
+        $fdisplay(testResults, "Steps=%1d\\nKey=%1d\\ndata=%1d\\n", step, Key, data);
+        $fclose(testResults);
+        $display ("Steps=%1d\\nKey=%1d\\ndata=%1d\\n", step, Key, data);
+      end
+      else begin                                                                // Not stopped
+        $display ("Out of steps at step: %d\\n", step);
       end
     end
   endtask
@@ -2566,6 +2550,7 @@ create_clock -name clock -period 100 [get_ports {clock}]
      {zz();
       deleteFile(javaTraceFile());
       //say("execJavaTest", project, folder, Key());                            // Identify the test
+      P.opCodeMap = ops;                                                        // provide the op code map so that memory tracing in Java matches memory tracing in Verilog
       P.run(javaTraceFile());                                                   // Run the Java version and trace it
 
       resultJava = ok(P.steps+1, expSteps());                                   // Steps in Java code
@@ -2584,7 +2569,7 @@ create_clock -name clock -period 100 [get_ports {clock}]
       final String        e = joinLines(readFile(javaTraceFile()));             // Read java output
       final String        g = joinLines(readFile(traceFile()));                 // Execute verilog
       ok(x.exitCode, 0);                                                        // Confirm exit code
-      ok(12, g, e);                                                             // Width of margin in verilog traces
+      ok(widthOfMarginInExecutionTrace, g, e);                                  // Width of margin in verilog traces
       //ok(0, g, e);                                                            // Width of margin in verilog traces
       final TreeMap<String,String> p = readProperties(testsFile());             // Load test results
       ok(ifs(p.get("Steps")), expSteps());                                      // Confirm results from Verilog
@@ -2617,7 +2602,7 @@ create_clock -name clock -period 100 [get_ports {clock}]
       s = s.replace("$maxSteps",         ""+maxSteps());
       s = s.replace("$expSteps",         ""+expSteps());
       s = s.replace("$found_at",         ""+found.at);
-      s = s.replace("$format",           ""+memoryPrintFormat());
+      s = s.replace("$format",           ""+verilogMemoryPrintFormat());
       s = s.replace("$initialize_opCodeMap","initialize_"+opCodeMap);           // Initialize op code map
       s = s.replace("$processTechnology",   processTechnology);                 // Process technology used for building chips
       s = s.replace("$memoryIOWrite", T.at(memoryIODirection).verilogLoad());   // True - we are writing to memory, 0 reading from memory
@@ -2626,6 +2611,7 @@ create_clock -name clock -period 100 [get_ports {clock}]
       s = s.replace("$memoryIOAddress",   T.at(memoryIOAddress).verilogLoad()); // Address to read or write from or to memory
       s = s.replace("$memoryDeclare",     M.declareVerilog());                  // Declaration of memory
       s = s.replace("$memoryInitialize",  M.initializeVerilog());               // Initialize memory
+      s = s.replace("$opCodes",           genOpCodes());                        // Generate op codes
 
       return s;
      }
@@ -3769,17 +3755,17 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
 
-    //t.run_verilogFind( 0, 0, 0, 24);
-    //t.run_verilogFind( 1, 1, 8, 24);
-    //t.run_verilogFind( 2, 1, 7, 24);
-    //t.run_verilogFind( 3, 1, 6, 24);
-    t.run_verilogFind( 4, 1, 5, 24);
-    //t.run_verilogFind( 5, 1, 4, 24);
-    //t.run_verilogFind( 6, 1, 3, 24);
-    //t.run_verilogFind( 7, 1, 2, 24);
-    //t.run_verilogFind( 8, 1, 1, 24);
-    //t.run_verilogFind( 9, 1, 0, 24);
-    //t.run_verilogFind(10, 0, 0, 24);
+    t.run_verilogFind( 0, 0, 0, 27);
+    t.run_verilogFind( 1, 1, 8, 27);
+    t.run_verilogFind( 2, 1, 7, 27);
+    t.run_verilogFind( 3, 1, 6, 27);
+    t.run_verilogFind( 4, 1, 5, 27);
+    t.run_verilogFind( 5, 1, 4, 27);
+    t.run_verilogFind( 6, 1, 3, 27);
+    t.run_verilogFind( 7, 1, 2, 27);
+    t.run_verilogFind( 8, 1, 1, 27);
+    t.run_verilogFind( 9, 1, 0, 27);
+    t.run_verilogFind(10, 0, 0, 27);
    }
 
   private void runVerilogDeleteTest                                             // Run the java and verilog versions and compare the resulting memory traces
