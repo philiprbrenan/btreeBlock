@@ -1,3 +1,5 @@
 {statements=>0, projects=>{
-  find=>[0, 17],
+  delete_verilog=>[3, 339],
+  find_verilog=>[0, 17],
+  put_verilog=>[1, 367],
 }}
