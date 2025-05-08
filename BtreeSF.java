@@ -2258,7 +2258,7 @@ module $project(button1, stop, clock, Key, Data, data, found, led);             
 
   Memory memory(.clock(clock), .reset(reset),
       .write  ($memoryIOWrite),
-      .in     ($memoryIn),
+      .in     ($memoryInBuffer),
       .out    (memoryOut),
       .index  ($memoryIOAddress));
 
