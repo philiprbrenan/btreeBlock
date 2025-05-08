@@ -1138,7 +1138,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
        };
      }
 
-    void add(At source, int constant)                                           // Add to the source and store in the target
+    void add(At source, int constant)                                           // Add a constant to the source and store in the target
      {zz(); sameSize(source);
       final At target = this;
       P.new I()
@@ -1147,10 +1147,65 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           target.setOff().setInt(v + constant);
          }
         String v()
-         {return target.verilogLoad()+" <= "+source.verilogLoad() + "+" + constant + "; /* MemoryLayoutDM.add */";
+         {return target.verilogLoad()+" <= "+source.verilogLoad() + "+" + constant + "; /* MemoryLayoutDM.add1 */";
          }
         String n() {return field.name+"="+source.field.name + "+ "+ constant;}
         void   i() {}
+       };
+     }
+
+    void add(At a, At b)                                                        // Add two variables and store in the target
+     {zz(); sameSize(a); sameSize(b);
+      final At target = this;
+      P.new I()
+       {void a()
+         {final int A = a.setOff().getInt();
+          final int B = b.setOff().getInt();
+          target.setOff().setInt(A + B);
+         }
+        String v()
+         {return target.verilogLoad()+" <= "+ a.verilogLoad() + "+" + b.verilogLoad() + "; /* MemoryLayoutDM.add2 */";
+         }
+        String n() {return field.name + "=" + a.field.name + "+ " + b.field.name;}
+        void   i() {}
+       };
+     }
+
+    void srz()                                                                  // Shift one place to the right filling with a zero
+     {zz(); final At target = this;                                             // This changes inside the instruction so record it here for posterity
+      final int N = width;
+      P.new I()
+       {void a()
+         {setOff();
+          for  (int i = 0; i < N - 1; ++i)                                      // Each bit to be moved
+           {final boolean b = getBit(i+1);                                      // A bit to be moved
+            setBit(i, b);                                                       // Copy the bit into the target
+           }
+          setBit(N-1, false);                                                   // Set high order bit to zero
+         }
+        String v()
+         {return target.verilogLoad()+" <= "+ target.verilogLoad() + " >> 1; /* MemoryLayoutDM.srz */";
+         }
+        String n() {return field.name + "=" + field.name + " >> 1";}
+       };
+     }
+
+    void slz()                                                                  // Shift one place to the light filling with a zero
+     {zz(); final At target = this;                                             // This changes inside the instruction so record it here for posterity
+      final int N = width;
+      P.new I()
+       {void a()
+         {setOff();
+          for  (int i = N-1; i > 0; --i)                                        // Each bit to be moved
+           {final boolean b = getBit(i-1);                                      // A bit to be moved
+            setBit(i, b);                                                       // Copy the bit into the target
+           }
+          setBit(0, false);                                                     // Set low order bit to zero
+         }
+        String v()
+         {return target.verilogLoad()+" <= "+ target.verilogLoad() + " << 1; /* MemoryLayoutDM.slz */";
+         }
+        String n() {return field.name + "=" + field.name + " << 1";}
        };
      }
    } // At
@@ -2766,10 +2821,11 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout           l = Layout.layout();
     Layout.Variable  a = l.variable("a", N);
     MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "a");
+    m.program(m.P);
     m.top().setInt(12);
 
-    ok(""+m.   declareVerilog(), "reg[8-1 : 0] a_1; /*ProgramDM_declareMemories_2*/");
-    ok(""+m.initializeVerilog(), "a_1 <= 8'b1100;");
+    ok(""+m.   declareVerilog(), "reg[8-1 : 0] a; /*ProgramDM_declareMemories_2*/");
+    ok(""+m.initializeVerilog(), "a <= 8'b1100;");
    }
 
   static void test_block_verilog()
