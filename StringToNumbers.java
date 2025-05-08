@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Strings to numbers
+// Strings to a consecutive sequence of integers starting at zero
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
@@ -10,13 +10,14 @@ class StringToNumbers extends Test                                              
  {final TreeMap<String, TreeSet<Integer>> input = new TreeMap<>();              // Input string to integers
   final TreeSet<Order>                   output = new TreeSet<>();              // Output integers to string
   final Stack  <Order>              outputOrder = new Stack<>();                // Order as a stack
+  final TreeMap<Integer,Integer>         lowest = new TreeMap<>();              // Resulting op code map that maps an integer associated with a string to the lowest integer associated with that string
   Integer min, max;                                                             // Minimum and maximum values encountered
 
 //D1 Construction                                                               // Construct the ordering of strings and numbers
 
   class Order implements Comparable<Order>                                      // Order the strings by the lowest number they are associated with
-   {final TreeSet<Integer> keys;                                                // Numbers asscoaited with this string
-    final String string;                                                        // String asscoiated with numbers
+   {final TreeSet<Integer> keys;                                                // Numbers associated with this string
+    final String string;                                                        // String associated with numbers
     int   ordinal;                                                              // Position in the output order of this element
 
     Order(String String, TreeSet<Integer> Keys)                                 // Create an element of the order
@@ -49,10 +50,11 @@ class StringToNumbers extends Test                                              
     s.add(integer);
    }
 
-  void order()                                                                  // An integer associated with a string
+  void order()                                                                  // Order the strings by lowest associated integer
    {zz(); for (String s : input.keySet()) new Order(s, input.get(s));
     for (Order o : output)
-     {o.ordinal = outputOrder.size(); outputOrder.push(o);
+     {final int l = o.ordinal = outputOrder.size(); outputOrder.push(o);
+      for (Integer i : o.keys) lowest.put(i, l);                            // For each integer associated with a string locates its lowest occurence.
      }
    }
 
@@ -67,7 +69,7 @@ class StringToNumbers extends Test                                              
     return "reg ["+L+"-1: 0] "+name+"["+max+" : 0];";
    }
 
-  String initializeOpCodeProc(String name)                                         // Verilog array to map sets of numbers to the ordinal of the element in the order and then writethe verilog to a file
+  String initializeOpCodeProc(String name)                                      // Verilog array to map sets of numbers to the ordinal of the element in the order and then writethe verilog to a file
    {final StringBuilder s = new StringBuilder();
     final int N = outputOrder.size();
     s.append("task initialize_"+name+";\n");
@@ -135,6 +137,8 @@ endtask
 """);
       deleteFile(t);
      }
+
+    ok(""+s.lowest, "{1=0, 2=0, 3=1, 4=2, 5=2, 6=3}");
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
