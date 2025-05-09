@@ -4700,8 +4700,8 @@ StuckSML(maxSize:4 size:1)
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
     test_delete_verilog();
-    test_find_verilog();
-    test_put_verilog();
+    //test_find_verilog();
+    //test_put_verilog();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
