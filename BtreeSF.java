@@ -25,7 +25,8 @@ abstract class BtreeSF extends Test                                             
   final ProgramDM                  P = new ProgramDM();                         // Program in which to generate instructions
   final boolean              OpCodes = true;                                    // Refactor op codes
   final boolean           runVerilog = true;                                    // Run verilog tests alongside java tests and check they produce the same results
-  //final static TreeMap<String,String>removableMemories = new TreeMap<>();       // Record memories that can be removed from each project as they are not used
+  final String     designDescription = "Add more node buffers to splitLeaf";    // Description of latest change
+  //final static TreeMap<String,String>removableMemories = new TreeMap<>();     // Record memories that can be removed from each project as they are not used
   final String     processTechnology = "freepdk45";                             // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
@@ -2523,8 +2524,9 @@ if __name__ == "__main__":
     chip = Chip('$project')                                                     # Create chip object
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/nano9k/$project.v')            # Define list of source files
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.sdc') # Define list of source files
-    chip.clock('clock', period=10)                                              # Define clock speed of design was 100
     chip.use($processTechnology_demo)                                           # Load predefined technology and flow target
+    chip.set('package', 'description', '$designDescription')                    # Description of design
+    chip.clock('clock', period=10)                                              # Define clock speed of design was 100
     chip.set('option', 'remote', False)                                         # Run remote in the cloud
     chip.set('option', 'nodisplay', True)                                       # Do not open displays
     chip.set('option', 'loglevel', 'warning')                                   # Warnings and above
@@ -2626,6 +2628,7 @@ create_clock -name clock -period 100 [get_ports {clock}]
       s = s.replace("$memoryDeclare",     M.declareVerilog());                  // Declaration of memory
       s = s.replace("$opCodes",           genOpCodes());                        // Generate op codes
       s = s.replace("$density",        ""+density());                           // An indication of the gate density to use on the chip
+      s = s.replace("$designDescription", designDescription);                   // Description of this iteration
 
       return s;
      }
@@ -4502,36 +4505,36 @@ StuckSML(maxSize:4 size:1)
     final BtreeSF t = wideTree();
     t.P.run(); t.P.clear();
     t.put();
-//    final int N = 32;
-//    for (int i = 1; i <= N; ++i)
-//     {t.T.at(t.Key ).setInt(i);
-//      t.T.at(t.Data).setInt(N-i);
-//      t.P.run();
-//     }
-//    //stop(t.M);
-//    //stop(t);
-//    ok(t, """
-//                  8                         16                           24                           |
-//                  0                         0.1                          0.2                          |
-//                  1                         4                            3                            |
-//                                                                         2                            |
-//1,2,3,4,5,6,7,8=1  9,10,11,12,13,14,15,16=4    17,18,19,20,21,22,23,24=3    25,26,27,28,29,30,31,32=2 |
-//""");
+    final int N = 32;
+    for (int i = 1; i <= N; ++i)
+     {t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(N-i);
+      t.P.run();
+     }
+    //stop(t.M);
+    //stop(t);
+    ok(t, """
+                  8                         16                           24                           |
+                  0                         0.1                          0.2                          |
+                  1                         4                            3                            |
+                                                                         2                            |
+1,2,3,4,5,6,7,8=1  9,10,11,12,13,14,15,16=4    17,18,19,20,21,22,23,24=3    25,26,27,28,29,30,31,32=2 |
+""");
       t.P.clear(); t.T.clear();                                                 // Clear program and transaction memory
       t.T.at(t.Key).setInt(2);                                                  // Sets memory directly not via an instruction
       t.find();
-//
-//    t.run_verilogFind(  0, 0,  0, 15);
-    t.run_verilogFind(  1, 1, 31, 15);
-//    t.run_verilogFind(  2, 1, 30, 15);
-//    t.run_verilogFind(  3, 1, 29, 15);
-//    t.run_verilogFind(  4, 1, 28, 15);
-//    t.run_verilogFind(  5, 1, 27, 15);
-//    t.run_verilogFind(  6, 1, 26, 15);
-//    t.run_verilogFind(  7, 1, 25, 15);
-//    t.run_verilogFind(  8, 1, 24, 15);
-//    t.run_verilogFind(  9, 1, 23, 15);
-//    t.run_verilogFind(N+1, 0,  0, 15);
+
+    t.run_verilogFind(  0, 0,  0, 18);
+    t.run_verilogFind(  1, 1, 31, 18);
+    t.run_verilogFind(  2, 1, 30, 18);
+    t.run_verilogFind(  3, 1, 29, 18);
+    t.run_verilogFind(  4, 1, 28, 18);
+    t.run_verilogFind(  5, 1, 27, 18);
+    t.run_verilogFind(  6, 1, 26, 18);
+    t.run_verilogFind(  7, 1, 25, 18);
+    t.run_verilogFind(  8, 1, 24, 18);
+    t.run_verilogFind(  9, 1, 23, 18);
+    t.run_verilogFind(N+1, 0,  0, 18);
    }
 
   private static void test_put_wide()
@@ -4539,39 +4542,39 @@ StuckSML(maxSize:4 size:1)
     final BtreeSF t = wideTree();
     t.P.run(); t.P.clear();
     t.put();
-    t.runVerilogPutTest(1, 29, """
+    t.runVerilogPutTest(1, 32, """
 1=0 |
 """);
 
-    t.runVerilogPutTest(2, 29, """
+    t.runVerilogPutTest(2, 32, """
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest(3, 29, """
+    t.runVerilogPutTest(3, 32, """
 1,2,3=0 |
 """);
 
-    t.runVerilogPutTest(4, 29, """
+    t.runVerilogPutTest(4, 32, """
 1,2,3,4=0 |
 """);
 
-    t.runVerilogPutTest(5, 29, """
+    t.runVerilogPutTest(5, 32, """
 1,2,3,4,5=0 |
 """);
 
-    t.runVerilogPutTest(6, 29, """
+    t.runVerilogPutTest(6, 32, """
 1,2,3,4,5,6=0 |
 """);
 
-    t.runVerilogPutTest(7, 29, """
+    t.runVerilogPutTest(7, 32, """
 1,2,3,4,5,6,7=0 |
 """);
 
-    t.runVerilogPutTest(8, 29, """
+    t.runVerilogPutTest(8, 32, """
 1,2,3,4,5,6,7,8=0 |
 """);
 
-    t.runVerilogPutTest(9, 131, """
+    t.runVerilogPutTest(9, 162, """
           4            |
           0            |
           1            |
@@ -4579,7 +4582,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8,9=2 |
 """);
 
-    t.runVerilogPutTest(10, 36, """
+    t.runVerilogPutTest(10, 40, """
           4               |
           0               |
           1               |
@@ -4587,7 +4590,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8,9,10=2 |
 """);
 
-    t.runVerilogPutTest(11, 36, """
+    t.runVerilogPutTest(11, 40, """
           4                  |
           0                  |
           1                  |
@@ -4595,7 +4598,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8,9,10,11=2 |
 """);
 
-    t.runVerilogPutTest(12, 36, """
+    t.runVerilogPutTest(12, 40, """
           4                     |
           0                     |
           1                     |
@@ -4603,7 +4606,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8,9,10,11,12=2 |
 """);
 
-    t.runVerilogPutTest(13, 246, """
+    t.runVerilogPutTest(13, 286, """
           4          8                  |
           0          0.1                |
           1          3                  |
@@ -4611,7 +4614,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8=3    9,10,11,12,13=2 |
 """);
 
-    t.runVerilogPutTest(14, 36, """
+    t.runVerilogPutTest(14, 40, """
           4          8                     |
           0          0.1                   |
           1          3                     |
@@ -4619,7 +4622,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8=3    9,10,11,12,13,14=2 |
 """);
 
-    t.runVerilogPutTest(15, 36, """
+    t.runVerilogPutTest(15, 40, """
           4          8                        |
           0          0.1                      |
           1          3                        |
@@ -4627,7 +4630,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8=3    9,10,11,12,13,14,15=2 |
 """);
 
-    t.runVerilogPutTest(16, 36, """
+    t.runVerilogPutTest(16, 40, """
           4          8                           |
           0          0.1                         |
           1          3                           |
@@ -4635,7 +4638,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8=3    9,10,11,12,13,14,15,16=2 |
 """);
 
-    t.runVerilogPutTest(17, 305, """
+    t.runVerilogPutTest(17, 358, """
                   8             12                  |
                   0             0.1                 |
                   1             4                   |
@@ -4643,7 +4646,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4,5,6,7,8=1  9,10,11,12=4    13,14,15,16,17=2 |
 """);
 
-    t.runVerilogPutTest(18, 36, """
+    t.runVerilogPutTest(18, 40, """
                   8             12                     |
                   0             0.1                    |
                   1             4                      |
@@ -4651,7 +4654,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4,5,6,7,8=1  9,10,11,12=4    13,14,15,16,17,18=2 |
 """);
 
-    t.runVerilogPutTest(19, 36, """
+    t.runVerilogPutTest(19, 40, """
                   8             12                        |
                   0             0.1                       |
                   1             4                         |
@@ -4659,7 +4662,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4,5,6,7,8=1  9,10,11,12=4    13,14,15,16,17,18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 36, """
+    t.runVerilogPutTest(20, 40, """
                   8             12                           |
                   0             0.1                          |
                   1             4                            |
@@ -4689,8 +4692,8 @@ StuckSML(maxSize:4 size:1)
     test_delete_verilog();
     test_find_verilog();
     test_put_verilog();
-//    test_find_wide();
-//    test_put_wide();
+    test_find_wide();
+    test_put_wide();
    }
 
   protected static void newTests()                                              // Tests being worked on
