@@ -2305,6 +2305,9 @@ module Memory                                                                   
   input      [$nodeSize-1:0]       in,                                          // Input to memory
   output reg [$nodeSize-1:0]      out,                                          // Output from memory
   input                         write);                                         // Write into memory if true
+  always @(*) begin
+    out = 0;                                                                    // Stop a message from Yosys - this module will be replaced during routing.
+  end
 endmodule
 """);
       writeFile(nano9kVerilog(), editVariables(s));                             // Write verilog for nano 9k
