@@ -777,12 +777,12 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       final int size   = Source.ml().size();
       P.new I()                                                                 // Initialize the indexes and length to describe the copy
        {void a()
-         {Target.setOff();
-          Source.setOff();
-          Length.setOff();
-          SourceA.setInt(Source.at);                                            // Source address
-          TargetA.setInt(Target.at);                                            // Target address
-          LengthL.setInt(Length.getInt());                                      // Length of move
+         {Target.setOff();                                                      // Target of move
+          Source.setOff();                                                      // Source of move
+          Length.setOff();                                                      // Length of move
+          SourceA.setInt(Source.at);                                            // A variable that indexes the current location in the source
+          TargetA.setInt(Target.at);                                            // A variable that indexes the current location in the target
+          LengthL.setInt(Length.getInt());                                      // The remaining amount of data to be moved
          }
         String v()                                                              // Logarithmic move
          {final StringBuilder v = new StringBuilder("/* MemoryLayoutDM.copy start */\n");
@@ -790,47 +790,46 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
                        s = Source.verilogAddr(), S = SourceA.verilogLoad(),
                        t = Target.verilogAddr(), T = TargetA.verilogLoad();
 
-          v.append(L + " <= " + l + ";\n");
-          v.append(S + " <= " + s + ";\n");
-          v.append(T + " <= " + t + ";\n");
+          v.append(L + " <= " + l + "; /* copy11 */\n");                        // Initialize at the start of the move
+          v.append(S + " <= " + s + "; /* copy12 */\n");
+          v.append(T + " <= " + t + "; /* copy13 */\n");
           return v.toString();
          }
        };
 
-//    for(int i = nextPowerOfTwo(size); i > 0; i = i >> 1)                      // Copy in logarithmically descending blocks
       for(int i = prevPowerOfTwo(size); i > 0; i = i >> 1)                      // Copy in logarithmically descending blocks
-       {final int I = i;
+       {final int I = i;                                                        // Length of move
         P.new I()
          {void a()
            {final int
-              l = LengthL.setOff().getInt(),
-              s = SourceA   .setOff().getInt(),
-              t = TargetA   .setOff().getInt();
-            final Memory sm = Source.ml().memory();
-            final Memory tm = Target.ml().memory();
+              l = LengthL.setOff().getInt(),                                    // Remaining length
+              s = SourceA.setOff().getInt(),                                    // Current position in source memory
+              t = TargetA.setOff().getInt();                                    // Current position in target memory
+            final Memory sm = Source.ml().memory();                             // Memory containing source
+            final Memory tm = Target.ml().memory();                             // Memory containing target
             if (l >= I)
-             {for (int j = 0; j < I; ++j)                                       // Each element
+             {for (int j = 0; j < I; ++j)                                       // Move a block of power of two size
                {final boolean b = sm.getBit(s + j);
                 tm.set(t+j, b);
                }
-              LengthL.setInt(l - I);
-              SourceA.setInt(s + I);
-              TargetA.setInt(t + I);
+              LengthL.setInt(l - I);                                            // Update remaining length
+              SourceA.setInt(s + I);                                            // Latest position in source
+              TargetA.setInt(t + I);                                            // Latest position in target
              }
            }
           String v()                                                            // Logarithmic move
            {final StringBuilder v = new StringBuilder("/* MemoryLayoutDM.copy "+I+" */\n");
-            final String l = LengthL.verilogLoad(),
-                         s = SourceA.verilogLoad(),
-                         t = TargetA.verilogLoad(),
-                         S = Source.ml().name(),
-                         T = Target.ml().name();
+            final String l = LengthL.verilogLoad(),                             // Size of this move
+                         s = SourceA.verilogLoad(),                             // Position in source memory
+                         t = TargetA.verilogLoad(),                             // position in target memory
+                         S = Source.ml().name(),                                // Memory containing source
+                         T = Target.ml().name();                                // Memory containing target
 
             v.append("if (" +l+" >= "+I+") begin\n");
-            v.append("   "  +T+"["+t+" +: "  +I+"] <= "+S+"["+s+" +: "+I+"]; /* at.copy2 */\n");
-            v.append("   "  +l+" <= "+l+" - "+I+";\n");                         // These assigns have to be made immediately else each block has to be executed one after another to drive the length and pointers sequentially.
-            v.append("   "  +s+" <= "+s+" + "+I+";\n");
-            v.append("   "  +t+" <= "+t+" + "+I+";\n");
+            v.append("   "  +T+"["+t+" +: "  +I+"] <= "+S+"["+s+" +: "+I+"]; /* copy21 */\n");
+            v.append("   "  +l+" <= "+l+" - "+I+"; /* copy22 */\n");            // These assigns have to be made immediately else each block has to be executed one after another to drive the length and pointers sequentially.
+            v.append("   "  +s+" <= "+s+" + "+I+"; /* copy23 */\n");
+            v.append("   "  +t+" <= "+t+" + "+I+"; /* copy24 */\n");
             v.append("end\n");
             return v.toString();
            }
