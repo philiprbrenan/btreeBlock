@@ -14,22 +14,11 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
   ProgramDM             P = new ProgramDM();                                    // Program containing generated code
   static int      numbers = 0;                                                  // Unique number for each memory layout recreated
   final  int       number = ++numbers;                                          // Number each memory layout
+  String       uniqueName;                                                      // A unique name for this layout within its executing program
 
   final BlockArray block;                                                       // The memory layout represents an array the elements of which have a width equal to a power of two
 
 //D1 Construction                                                               // Construct a memory layout
-
-  MemoryLayoutDM(int size, String Name)                                         // Memory layout as an array of bits
-   {z();
-    final int N = 8;
-    name        = Name;
-    layout      = new Layout();
-    final Layout.Variable a = layout.variable("byte", N);
-    final Layout.Array    A = layout.array   ("bytes", a, (size+N-1) / N);
-    layout.compile();
-    memory = new Memory(Name, size);
-    block  = new BlockArray();
-   }
 
   MemoryLayoutDM(Layout Layout, String Name)                                    // Memory with an associated layout and a name so we can generate verilog from it
    {zz();
@@ -42,7 +31,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
    {return Integer.compare(number, other.number);
    }
 
-  At top() {return at(layout.top());}                                           // A reference to the top element of a memory layout.  Useful for moving the entire memory area.
+  At top() {zz(); return at(layout.top());}                                     // A reference to the top element of a memory layout.  Useful for moving the entire memory area.
 
   class BlockArray                                                              // Memory that represents an array of elements whose widths are equal to the power of two and so the memory can be efficiently processed in blocks
    {final boolean      array;                                                   // The memory layout represents an array
@@ -52,7 +41,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
     final int           log;                                                    // The log to base two of the width of the array elements
     boolean         blocked() {return powerOfTwo;}                              // A blocked array
     BlockArray()
-     {array      = layout.top() instanceof Layout.Array;
+     {zz();
+      array      = layout.top() instanceof Layout.Array;
       width      = array ? layout.top().toArray().element.width : 0;
       size       = array ? layout.top().toArray().size : 1;
       powerOfTwo = nextPowerOfTwo(width) == width;
@@ -62,66 +52,49 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
 
 //D1 Control                                                                    // Testing, control and integrity
 
-  Memory memory() {zz(); return memory;}                                        // Real memory used by this layout
+  Memory memory() {return memory;}                                              // Real memory used by this layout - executed very frequently
 
   void program(ProgramDM program, boolean uniqueName)                           // Program in which to generate instructions. If the name is unique it will be used directly in verilog, if not unique, then a unique making number will be added to the end
-   {zz();
-    P = program; program.addMemoryLayout(this, uniqueName);
+   {zz(); P = program; program.addMemoryLayout(this, uniqueName);
    }
 
-  void program(ProgramDM program) {program(program, true);}                     // Add this memory layout to a program with the intention of using its uqnique name to identify it in verilog
+  void program(ProgramDM program) {zz(); program(program, true);}               // Add this memory layout to a program with the intention of using its uqnique name to identify it in verilog
 
-  String  name()                                                                // A unique name for this memory layout within its containing program if any
+  void setUniqueName()                                                          // Set a unique name for this memory layout for use when tracingmemory during program execution in Java and verilog to confirm that memory is being modified identically in the two representations.
    {zz();
-    if (P != null && P.uniqueNames.contains(name)) return name;                 // Use the name without a unique making number as we know that this memeory has a name which is unique among the memory layouts used by this program
-    return name+"_"+number;                                                     // Not sure if the name is unique so have to add a number to make it unique
+    uniqueName = P != null && P.uniqueNames.contains(name) ? name               // Name is already unique
+                                                           : name+"_"+number;   // Not sure if the name is unique so have to add a number to make it unique
    }
 
-  int size () {z(); return memory.size();}                                      // Size of associated memory
-  void clear() {z(); memory.zero();}                                            // Clear underlying memory
-
-  void ok(String Lines)                                                         // Check that specified lines are present in the memory layout
-   {final String  m = toString();                                               // Memory as string
-    final String[]L = Lines.split("\\n");                                       // Lines of expected
-    int p = 0;
-    for(int i = 0; i < L.length; ++i)                                           // Each expected
-     {final String l = L[i];
-      final int    q = m.indexOf(l, p);                                         // Check specified lines are present
-      if (q == -1)                                                              // Line missing
-       {err("Layout does not contain line:", i+1, "\n"+l+"\n");
-        ++Layout.testsFailed;
-        return;
-       }
-      p = q;
+  String name()                                                                 // Retrieve the unique name for this memory layout within its containing program
+   {if (uniqueName == null)
+     {stop("No unique name for memory layout with name:", name,
+           "and number:", number);
+      return name+"_"+number;
      }
-    ++Layout.testsPassed;                                                       // Lines found
+    return uniqueName;
    }
 
-//D1 Copy control                                                               // Verilog variables used to implement a variable length copy
-
-  String  copyIndex() {return "index_"     +name();}                            // Index to a location in this memory layout
-  String copyLength() {return "copyLength_"+name();}                            // Length of a copy in this memory layout
-  int      copySize() {return logTwo(memory.size());}                           // Size of bits for a length or index into this memory
+  int size  () {zz(); return memory.size();}                                    // Size of associated memory
+  void clear() {zz(); memory.zero();}                                           // Clear underlying memory
 
 //D1 Get and Set                                                                // Get and set values in memory but only during testing
 
   boolean getBit(int index)                                                     // Get a bit from the memory layout
-   {zz();return memory.getBit(index);
+   {return memory.getBit(index);
    }
 
   void setBit(int index, boolean value)                                         // Set a value in memory occupied by the layout
-   {zz(); memory.set(index, value);
+   {memory.set(index, value);
    }
 
   int  getInt(Layout.Field field, int...indices)                                // Get a value from memory occupied by the layout
-   {z();
-    final int i = new At(field, indices).setOff().result;
+   {zz(); final int i = new At(field, indices).setOff().result;
     return i;
    }
 
   void setInt(Layout.Field field, int value, int...indices)                     // Set a value in memory occupied by the layout
-   {zz();
-    final At a = new At(field, indices).setOff();
+   {zz(); final At a = new At(field, indices).setOff();
     memory.set(a.at, a.width, value);
    }
 
@@ -139,24 +112,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      };
    }
 
-  void setIntInstruction(Layout.Field field1, int value1,                       // Set values in memory occupied by the layout
-                         Layout.Field field2, int value2)                       // Set a value in memory occupied by the layout
-   {z();
-    P.new I()
-     {void a()
-       {final At a1 = new At(field1).setOff(), a2 = new At(field2).setOff();
-        memory.set(a1.at, a1.width, value1);
-        memory.set(a2.at, a2.width, value2);
-       }
-      String v()
-       {return new At(field1).verilogLoad() + " <= " + value1 + "; /* setIntInstruction */"
-             + new At(field2).verilogLoad() + " <= " + value2 + "; /* setIntInstruction */";
-       }
-     };
-   }
-
-  void zero() {z(); memory.zero(0, size());}                                    // Clear the memory associated with the layout to zeros
-  void ones() {z();memory.ones(0, size());}                                     // Set the memory associated with the layout to zeros
+  void zero() {zz(); memory.zero(0, size());}                                   // Clear the memory associated with the layout to zeros
+  void ones() {zz(); memory.ones(0, size());}                                   // Set the memory associated with the layout to zeros
 
   void copy(MemoryLayoutDM source)                                              // Copy as many of the bits from the source into the target as possible
    {zz();
@@ -166,7 +123,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
        {for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
        }
       String v()
-       {return name()+"[0 +: "+N+"] <= "+source.name()+"[0 +: "+N+"]; /* copy1 */";
+       {return name()+"[0 +: "+N+"] <= "+source.name() +
+                      "[0 +: "+N+"]; /* copy1 */";
        }
      };
    }
@@ -181,7 +139,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
         for(int i = 0; i < N; ++i) setBit(i, source.getBit(i));
        }
       String v()
-       {return m.name()+"[0 +: "+N+"] <= "+source.ml().name()+"["+source.verilogAddr()+" +: "+N+"]; /* copy2 */";
+       {return m.name()+"[0 +: "+N+"] <= "+source.ml().name()+
+                        "["+source.verilogAddr()+" +: "+N+"]; /* copy2 */";
        }
       String n()
        {return "copy "+N+" bits from "+source+" to "+m.name;
@@ -191,84 +150,84 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
 
 //D1 Blocked memory                                                             // Blocked access to memory used to read nodes from and write nodes to memory prior to having memory in a separate module to enable the synthesis of larger designs
 
-  String verilogArrayElement(At at)                                             // Access an array element in an array whose elements are all a power of two in width
-   {return name()+"["+at.verilogLoad()+"] /* MemoryLayoutDM power 2 array access */";
-   }
-
-  void loadFirstBlock(final MemoryLayoutDM source)                              // Load the first block in the source memory into the target memory
-   {zz();
-    if (!source.block.array) stop("Source is not a blocked array");
-    final int T = size(), S = source.block.width;
-    if (S != T) stop("Source has block size of:", S, "but target has size:", T);
-    P.new I()
-     {void a()
-       {for(int i = 0; i < T; ++i) setBit(i, source.getBit(i));
-       }
-      String v()
-       {return name()+"[0+:"+S+"] <= "+source.name+"[0]; /* loadFirstBlock */";
-       }
-      String n()
-       {return "Load first block from: "+source.name+" into: "+name;
-       }
-     };
-   }
-
-  void saveFirstBlock(final MemoryLayoutDM target)                              // Save the first block in the source memory into the target memory
-   {zz();
-    if (!target.block.array) stop("Not a blocked array");
-    final int S = size(), T = target.block.width;
-    if (S != T) stop("Source has block size of:", S, "but target has size:", T);
-    P.new I()
-     {void a()
-       {for(int i = 0; i < T; ++i) target.setBit(i, getBit(i));
-       }
-      String v()
-       {return target.name()+"[0] <= "+name+"[0+:"+S+"]; /* saveFirstBlock */";
-       }
-      String n()
-       {return "Save name: "+name+" into the first block of: "+target.name;
-       }
-     };
-   }
-
-  void loadBlock(final MemoryLayoutDM source, final MemoryLayoutDM.At index)    // Load the indexed block in the source memory into the target memory
-   {zz();
-    if (!source.block.array) stop("Source is not a blocked array");
-    final int T = size(), S = source.block.width;
-    if (S != T) stop("Source has block size of:", S, "but target has size:", T);
-    P.new I()
-     {void a()
-       {index.setOff();
-        for(int i = 0; i < T; ++i) setBit(i, source.getBit(T*index.result + i));
-       }
-      String v()
-       {return name()+"[0+:"+T+"] <= "+source.name+"["+index.verilogLoad()+"]; /* loadBlock */";
-       }
-      String n()
-       {return "Load block from: "+source.name+" into: "+name;
-       }
-     };
-   }
-
-  void saveBlock(final MemoryLayoutDM target, final MemoryLayoutDM.At index)    // Save the indexed block in the source memory into the target memory
-   {zz();
-    if (!target.block.array) stop("Not a blocked array");
-    final int S = size(), T = target.block.width;
-    if (!target.block.array) stop("Not a blocked array");
-    if (S != T) stop("Source has block size of:", S, "but target has size:", T);
-    P.new I()
-     {void a()
-       {index.setOff();
-        for(int i = 0; i < T; ++i) target.setBit(T*index.result + i, getBit(i));
-       }
-      String v()
-       {return target.name()+"["+index.verilogLoad()+"] <= "+name+"[0+:"+T+"]; /* saveBlock */";
-       }
-      String n()
-       {return "Load block from: "+target.name+" into: "+name;
-       }
-     };
-   }
+//  String verilogArrayElement(At at)                                             // Access an array element in an array whose elements are all a power of two in width
+//   {return name()+"["+at.verilogLoad()+"] /* MemoryLayoutDM power 2 array access */";
+//   }
+//
+//  void loadFirstBlock(final MemoryLayoutDM source)                              // Load the first block in the source memory into the target memory
+//   {z();
+//    if (!source.block.array) stop("Source is not a blocked array");
+//    final int T = size(), S = source.block.width;
+//    if (S != T) stop("Source has block size of:", S, "but target has size:", T);
+//    P.new I()
+//     {void a()
+//       {for(int i = 0; i < T; ++i) setBit(i, source.getBit(i));
+//       }
+//      String v()
+//       {return name()+"[0+:"+S+"] <= "+source.name+"[0]; /* loadFirstBlock */";
+//       }
+//      String n()
+//       {return "Load first block from: "+source.name+" into: "+name;
+//       }
+//     };
+//   }
+//
+//  void saveFirstBlock(final MemoryLayoutDM target)                              // Save the first block in the source memory into the target memory
+//   {z();
+//    if (!target.block.array) stop("Not a blocked array");
+//    final int S = size(), T = target.block.width;
+//    if (S != T) stop("Source has block size of:", S, "but target has size:", T);
+//    P.new I()
+//     {void a()
+//       {for(int i = 0; i < T; ++i) target.setBit(i, getBit(i));
+//       }
+//      String v()
+//       {return target.name()+"[0] <= "+name+"[0+:"+S+"]; /* saveFirstBlock */";
+//       }
+//      String n()
+//       {return "Save name: "+name+" into the first block of: "+target.name;
+//       }
+//     };
+//   }
+//
+//  void loadBlock(final MemoryLayoutDM source, final MemoryLayoutDM.At index)    // Load the indexed block in the source memory into the target memory
+//   {z();
+//    if (!source.block.array) stop("Source is not a blocked array");
+//    final int T = size(), S = source.block.width;
+//    if (S != T) stop("Source has block size of:", S, "but target has size:", T);
+//    P.new I()
+//     {void a()
+//       {index.setOff();
+//        for(int i = 0; i < T; ++i) setBit(i, source.getBit(T*index.result + i));
+//       }
+//      String v()
+//       {return name()+"[0+:"+T+"] <= "+source.name+"["+index.verilogLoad()+"]; /* loadBlock */";
+//       }
+//      String n()
+//       {return "Load block from: "+source.name+" into: "+name;
+//       }
+//     };
+//   }
+//
+//  void saveBlock(final MemoryLayoutDM target, final MemoryLayoutDM.At index)    // Save the indexed block in the source memory into the target memory
+//   {z();
+//    if (!target.block.array) stop("Not a blocked array");
+//    final int S = size(), T = target.block.width;
+//    if (!target.block.array) stop("Not a blocked array");
+//    if (S != T) stop("Source has block size of:", S, "but target has size:", T);
+//    P.new I()
+//     {void a()
+//       {index.setOff();
+//        for(int i = 0; i < T; ++i) target.setBit(T*index.result + i, getBit(i));
+//       }
+//      String v()
+//       {return target.name()+"["+index.verilogLoad()+"] <= "+name+"[0+:"+T+"]; /* saveBlock */";
+//       }
+//      String n()
+//       {return "Load block from: "+target.name+" into: "+name;
+//       }
+//     };
+//   }
 
 //D1 Components                                                                 // Locate a variable in memory via its indices
 
@@ -281,7 +240,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
     int  result;                                                                // The contents of memory at this location
 
     String verilogLoadAddr(boolean la, Integer delta)                           // A verilog representation of an addressed location in memory
-     {final Stack<String>      v = new Stack<>();                               // Verilog expression, index variable names
+     {zz();
+      final Stack<String>      v = new Stack<>();                               // Verilog expression, index variable names
       Layout.Locator           L = field.locator;
       final Stack<Layout.Array>A = L.arrays;                                    // The containing arrays
 
@@ -302,10 +262,10 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
         name()+"["+i(field.at)+c()+joinStrings(v, "")+d+" +: "+w+"]");          // IBM S/360 Principles of Operation: L
      }
 
-    String verilogLoad() {return verilogLoadAddr(false, null);}                 // Content of a memory location as a verilog expression
-    String verilogAddr() {return verilogLoadAddr(true,  null);}                 // Address of a memory location
-    String i(int i)      {return String.format("%8d", i);}                      // Format an index
-    String w(int w)      {return String.format("%1d", w);}                      // Format a width
+    String verilogLoad() {zz(); return verilogLoadAddr(false, null);}           // Content of a memory location as a verilog expression
+    String verilogAddr() {zz(); return verilogLoadAddr(true,  null);}           // Address of a memory location
+    String i(int i)      {zz(); return String.format("%8d", i);}                // Format an index
+    String w(int w)      {zz(); return String.format("%1d", w);}                // Format a width
 
     String c()                                                                  // Format a field name as a comment
      {final StringBuilder s = new StringBuilder(field.name);
@@ -316,13 +276,15 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
 
 
     void locateDirectAddress()                                                  // Locate a direct address and its content
-     {final int N = indices.length;
+     {zz();
+      final int N = indices.length;
       at          = field.locator.at(indices);
       result      = memory.getInt(at, width);
      }
 
     void locateInDirectAddress()                                                // Locate an indirect address and its content
-     {final int N = directs.length;
+     {zz();
+      final int N = directs.length;
       for (int i = 0; i < N; i++)
        {indices[i] = directs[i].setOff().getInt();                              // It is assumed by getInt() that setOff() will already have been called.
        }
@@ -381,7 +343,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      }
 
     boolean sameSize(At b)                                                      // Check two fields are the same size
-     {if (field == null) return true;                                           // Constants match any size
+     {zz(); if (field == null) return true;                                     // Constants match any size
       z(); field.sameSize(b.field);
       z(); return true;
      }
@@ -392,16 +354,16 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
 
     At setOff(boolean checkSetOff)                                              // Set the base address of the field
      {zz();
-      if (checkSetOff && !P.running) P.halt("Set off must be inside an instruction");
+      if (checkSetOff && !P.running)                                            // Check this method is being used inside an instruction
+       {P.halt("Set off must be inside an instruction");
+       }
       if (hasIndirection()) {z(); locateInDirectAddress();}                     // Evaluate indirect indices
       else                  {zz(); locateDirectAddress();}                      // Evaluate direct indices
       return this;
      }
 
-    boolean getBit(int i)                                                       // Get a bit from memory assuming that setOff() has been called to fix the location of the field containing the bit
-     {return memory.getBit(at+i);
-     }
-    void    setBit(int i, boolean b) {memory.set(at+i, b);}                     // Set a bit in memory  assuming that setOff() has been called to fix the location of the field containing the bit
+    boolean getBit(int i) {zz(); return memory.getBit(at+i);}                   // Get a bit from memory assuming that setOff() has been called to fix the location of the field containing the bit
+    void    setBit(int i, boolean b) {zz(); memory.set(at+i, b);}               // Set a bit in memory  assuming that setOff() has been called to fix the location of the field containing the bit
 
     int  getInt()          {zz(); return result;}                               // The value in memory, at the indicated location, treated as an integer or the value of the constant, assumming setOff has been called to update the variable description
     void setInt(int value) {zz(); memory.set(at, width, value);}                // Set the value in memory at the indicated location, treated as an integer
@@ -422,7 +384,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       return s.toString();
      }
 
-    MemoryLayoutDM ml() {return MemoryLayoutDM.this;}                           // Containing memory layout
+    MemoryLayoutDM ml() {zz(); return MemoryLayoutDM.this;}                     // Containing memory layout
 
 //D2 Move                                                                       // Copy data between memory locations
 
@@ -449,7 +411,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       P.new I()
        {void a() {moveBits(source);}
         String v()
-         {return target.verilogLoad()+" <= "+source.verilogLoad() + "/* MemoryLayoutDM.move */;";
+         {return target.verilogLoad()+" <= "+source.verilogLoad() + "/* move */;";
          }
         String n() {return field.name+"="+source.field.name;}
         void   i()  {}
@@ -457,7 +419,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      }
 
     void moveTo(At...Targets)                                                   // Move the data to the named fields
-     {zz();
+     {z();
       final int N = Targets.length;
       final At source = this;
       for(int i = 0; i < N; ++i) source.sameSize(Targets[i]);
@@ -477,19 +439,13 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
         String v()
          {final StringBuilder s = new StringBuilder();
           for(int i = 0; i < N; ++i)
-           {return Targets[i].verilogLoad()+" <= "+source.verilogLoad() + "/* MemoryLayoutDM.moveTo */;";
+           {return Targets[i].verilogLoad()+" <= "+source.verilogLoad() + "/* moveTo */;";
            }
           return s.toString();
          }
         String n() {return field.name+"="+source.field.name;}
        };
      }
-
-//    void move(At source, At buffer)                                             // Copy the specified number of bits from source to target via a buffer to allow the operation to proceed in bit parallel assuming the buffer does not overlap either the source or target, each of which can be in different memories.
-//     {zz(); sameSize(source); sameSize(buffer);
-//      buffer.move(source);
-//      move(buffer);
-//     }
 
     private At createField(String Name, int Width)                              // Create a field of the specified width
      {zz();
@@ -578,7 +534,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      }
 
     private void upMoveBuffer(At Start, int Width, int Length)                  // Move the bits in a buffer up by the specified width starting at the indexed location specified in multiples of the width.  The length of the move is specified in multiples of the width.
-     {zz();
+     {z();
       final MemoryLayoutDM l = ml();                                            // Memory layout containing buffer
       final Memory         m = l.memory();                                      // Memory for buffer
       P.new I()
@@ -602,7 +558,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      }
 
     private void downMoveBuffer(At Start, int Width, int Length)                // Move the bits in a buffer down by the specified width starting at the indexed location specified in multiples of the width.  The length of the move is specified in multiples of the width.
-     {zz();
+     {z();
       final MemoryLayoutDM l = ml();                                            // Memory layout containing buffer
       final Memory         m = l.memory();                                      // Memory for buffer
       P.new I()
@@ -626,7 +582,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      }
 
     void moveUp()                                                               // Move the elements of an array up one position deleting the last element.
-     {if (!(field instanceof Layout.Array))  stop("Array required for moveUp");
+     {zz();
+      if (!(field instanceof Layout.Array))  stop("Array required for moveUp");
       final Layout.Array A = field.toArray();                                   // Array of elements to be moved
       final At           B = createMoveBuffer();                                // Buffer containg a copy of the array to be moved
 
@@ -636,7 +593,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      }
 
     void moveDown()                                                             // Move the elements of an array down one position deleting the first element.
-     {if (!(field instanceof Layout.Array))  stop("Array required for moveDown");
+     {zz();
+      if (!(field instanceof Layout.Array)) stop("Array required for moveDown");
       final Layout.Array A = field.toArray();                                   // Array of elements to be moved
       final At           B = createMoveBuffer();                                // Buffer containg a copy of the array to be moved
 
@@ -646,7 +604,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      }
 
     void moveUp(At Index)                                                       // Move the elements of an array up one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Whether each element is copied is dependent on a binary "less than" which is expensive
-     {if (!(field instanceof Layout.Array)) stop("Array required for moveUp");
+     {zz();
+      if (!(field instanceof Layout.Array)) stop("Array required for moveUp");
       final Layout.Array A = field.toArray();                                   // Array of elements to be moved
       final int          S = logTwo(A.size)-1;                                  // Next log 2 of size of array. Minus one because that is the size of the maximum move
       final int      width = A.element.width;                                   // Width of each array element
@@ -689,7 +648,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      }
 
     void moveDown(At Index)                                                     // Move the elements of an array down one position deleting the last element.  A buffer of the same size is used to permit copy in parallel.  Whether each element is copied is dependent on a binary "less than" which is expensive
-     {if (!(field instanceof Layout.Array)) stop("Array required for moveUp");
+     {zz();
+      if (!(field instanceof Layout.Array)) stop("Array required for moveUp");
       final Layout.Array A = field.toArray();                                   // Array of elements to be moved
       final int          S = logTwo(A.size)-1;                                  // Next log 2 of size of array. Minus one because that is the size of the maximum move
       final int      width = A.element.width;                                   // Width of each array element
@@ -730,47 +690,6 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       copyMoveBuffer(B);                                                        // Rewrite the array after performing the move in the buffer
      }
 
-    void copy(At Source, At Length)                                             // Copy the specified number of bits from the location addressed by the source to the location addressed by the target.
-     {z();
-      final At Target = this;
-      P.new I()
-       {void a()
-         {Target.setOff();
-          Source.setOff();
-          Length.setOff();
-          final int L = Length.result, S = Source.at, T = at;                   // Address and length of move
-          for   (int i = 0; i < L; i++)                                         // Each element
-           {final boolean b = Source.ml().memory.getBit(S+i);
-            Target.ml().memory.set(T+i, b);
-           }
-         }
-        String v()                                                              // Logarithmic move
-         {final StringBuilder v = new StringBuilder("/* MemoryLayoutDM.copy */\n");
-
-          final int    N = Length.width;                                        // Log2 of the largest possible copy
-          final String l = Target.ml().copyLength(),                            // Length of move in bits
-                       s = Source.ml().copyIndex(),                             // Source of move in backing memory
-                       t = Target.ml().copyIndex(),                             // Target of move in backing memory
-                       m = Target.ml().name();                                  // Name of backing memory
-
-          v.append(l + " = " + Length.verilogLoad() + ";\n");
-          v.append(s + " = " + Source.verilogAddr() + ";\n");
-          v.append(t + " = " + Target.verilogAddr() + ";\n");
-
-          for (int i = N+1; i > 0; --i)
-           {final int u = 1<<(i-1);
-            v.append("if (" +l+" >= "+u+") begin\n");
-            v.append("   "+m+"["+t+" +: "+u+"] <= "+m+"["+s+" +: "+u+"]; /* copy */\n");
-            v.append("   "  +l+" = "+l+" - "+u+";\n");                          // These assigns have to be made immediately else each block has to be executed one after another to drive the length and pointers sequentially.
-            v.append("   "  +s+" = "+s+" + "+u+";\n");
-            v.append("   "  +t+" = "+t+" + "+u+";\n");
-            v.append("end\n");
-           }
-          return v.toString();
-         }
-       };
-     }
-
     void copy(At Source, At Length, At TargetA, At SourceA, At LengthL)         // Copy the specified number of bits from the location addressed by the source to the location addressed by the target using the specified memory locations to hold the source and target locations and the remaining length
      {zz();
       final At  Target = this;
@@ -785,7 +704,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           LengthL.setInt(Length.getInt());                                      // The remaining amount of data to be moved
          }
         String v()                                                              // Logarithmic move
-         {final StringBuilder v = new StringBuilder("/* MemoryLayoutDM.copy start */\n");
+         {final StringBuilder v = new StringBuilder("/* copy start */\n");
           final String l = Length.verilogLoad(), L = LengthL.verilogLoad(),
                        s = Source.verilogAddr(), S = SourceA.verilogLoad(),
                        t = Target.verilogAddr(), T = TargetA.verilogLoad();
@@ -855,7 +774,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          }
         String v()
          {final int    n = min(size(), N);
-          return ml().name()+"["+verilogAddr()+" +: "+n+"] <= "+Source.name()+"[0 +: "+n+"]; /* MemoryLayoutDM.copy1 */";
+          return ml().name()+"["+verilogAddr()+" +: "+n+"] <= "+
+               Source.name()+"[0 +: "+n+"]; /* copy3 */";
          }
        };
      }
@@ -870,7 +790,9 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          }
         String v()
          {final int n = min(width, source.width);
-           return ml().name()+"["+verilogAddr()+" +: "+n +"] <= "+source.ml().name() + "["+source.verilogAddr()+" +: "+n+"]; /* MemoryLayoutDM.copy2 */";
+           return ml().name() + "["+verilogAddr()+" +: "+n +"] <= "+
+           source.ml().name() + "["+source.verilogAddr()+" +: "+n+
+             "]; /* copy4 */";
          }
        };
      }
@@ -882,7 +804,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       P.new I()
        {void a() {setOff(); memory.zero(at, width);}
         String v()
-         {return verilogLoad()+" <= 0; /* MemoryLayoutDM.zero */";
+         {return verilogLoad()+" <= 0; /* zero */";
          }
         String n()
          {return field.name+" <= 0";
@@ -898,7 +820,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          {setOff(); memory.ones(at, width);
          }
         String v()
-         {return verilogLoad()+" <= "+one+ "; /* MemoryLayoutDM.ones */";
+         {return verilogLoad()+" <= "+one+ "; /* ones */";
          }
         String n()
          {return field.name+" <= "+one;
@@ -913,7 +835,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          {setOff(); memory.invert(a.result, a.width());
          }
         String v()
-         {return verilogLoad()+" <= ~"+verilogLoad()+ ";  /* MemoryLayoutDM.invert */";
+         {return verilogLoad()+" <= ~"+verilogLoad()+ ";  /* invert */";
          }
         String n()
          {return field.name+" <= ~"+field.name;
@@ -942,7 +864,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          {result.setOff().setInt(setOff().isZero() ? 1 : 0);
          }
         String v()
-         {return result.verilogLoad()+" <= "+target.verilogLoad()+" == 0;  /* MemoryLayoutDM.isZero */";
+         {return result.verilogLoad()+" <= "+
+                 target.verilogLoad()+" == 0;  /* isZero */";
          }
         String n() {return result.field.name+" <= isZero "+field.name;}
        };
@@ -965,7 +888,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          }
         String v()
          {return result.verilogLoad()+" <= "+target.verilogLoad()+
-            " == " + target.field.verilogOnes()+ "; /* MemoryLayoutDM.isOnes */";
+            " == " + target.field.verilogOnes()+ "; /* isOnes */";
          }
         String n() {return result.field.name+" <= isOnes "+field.name;}
        };
@@ -980,7 +903,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
       z(); return true;
      }
 
-    void equal(At b, At result)                                                // Whether  a == b
+    void equal(At b, At result)                                                 // Whether  a == b
      {zz();
       final At a = this;
       P.new I()
@@ -989,13 +912,13 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          }
         String v()
          {return result.verilogLoad()+" <= "+a.verilogLoad()+
-                                       " == " + b.verilogLoad()+ ";  /* MemoryLayoutDM.equal */";
+                                    " == " + b.verilogLoad()+ ";  /* equal */";
          }
         String n() {return result.field.name+"="+field.name+" == "+b.field.name;}
        };
      }
 
-    void    notEqual(At b, At result)                                           // Whether  a != b
+    void notEqual(At b, At result)                                              // Whether  a != b
      {z();
       final At a = this;
       P.new I()
@@ -1003,8 +926,9 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          {result.setOff().setInt(!equal(b.setOff()) ? 1 : 0);
          }
         String v()
-         {return result.verilogLoad()+" <= "+a.verilogLoad()+
-                                         " != "+b.verilogLoad()+ ";  /* MemoryLayoutDM.notEqual */";
+         {return result.verilogLoad()+
+             " <= "+a.verilogLoad()+
+             " != "+b.verilogLoad()+ ";  /* notEqual */";
          }
         String n() {return result.field.name+"="+field.name+"!="+b.field.name;}
        };
@@ -1028,8 +952,9 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          {result.setOff().setInt(lessThan(b.setOff()) ? 1 : 0);
          }
         String v()
-         {return result.verilogLoad()+" <= "+a.verilogLoad()+
-                                          " < "+b.verilogLoad()+ ";  /* MemoryLayoutDM.lessThan */";
+         {return result.verilogLoad()+
+            " <= "+a.verilogLoad()+
+            " < "+b.verilogLoad()+ ";  /* lessThan */";
          }
         String n() {return result.field.name+"="+field.name+"<"+b.field.name;}
        };
@@ -1043,14 +968,15 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
         {result.setOff().setInt(lessThan(b.setOff()) || equal(b) ? 1 : 0);
         }
         String v()
-         {return result.verilogLoad()+" <= "+a.verilogLoad()+
-                                         " <= "+b.verilogLoad()+ "; /* MemoryLayoutDM.lessThanOrEqual */";
+         {return result.verilogLoad()+
+            " <= "+a.verilogLoad()+
+            " <= "+b.verilogLoad()+ "; /* lessThanOrEqual */";
          }
         String n() {return result.field.name+"="+field.name+"<="+b.field.name;}
       };
      }
 
-    void    greaterThan(At b, At result)                                        // Whether  a > b
+    void greaterThan(At b, At result)                                           // Whether  a > b
      {zz(); sameSize(b);
       final At a = this;
       P.new I()
@@ -1058,14 +984,15 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          {result.setOff().setInt(!lessThan(b.setOff()) && !equal(b) ? 1 : 0);
          }
         String v()
-         {return result.verilogLoad()+" <= "+a.verilogLoad()+
-                                          " > "+b.verilogLoad()+ "; /* MemoryLayoutDM.greaterThan */";
+         {return result.verilogLoad()+
+             " <= "+a.verilogLoad()+
+             " > " +b.verilogLoad()+ "; /* greaterThan */";
          }
         String n() {return result.field.name+"="+field.name+">"+b.field.name;}
        };
      }
 
-    void    greaterThanOrEqual(At b, At result)                                 // Whether  a >= b
+    void greaterThanOrEqual(At b, At result)                                    // Whether  a >= b
      {zz(); sameSize(b);
       final At a = this;
       P.new I()
@@ -1073,8 +1000,9 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
          {result.setOff().setInt(!lessThan(b.setOff()) ? 1 : 0);
          }
         String v()
-         {return result.verilogLoad()+" <= "+a.verilogLoad()+
-                                         " >= "+b.verilogLoad()+ ";/* MemoryLayoutDM.greaterThanOrEqual */";
+         {return result.verilogLoad()+
+            " <= "+a.verilogLoad()+
+            " >= "+b.verilogLoad()+ ";/* greaterThanOrEqual */";
          }
         String n() {return result.field.name+"="+field.name+">="+b.field.name;}
        };
@@ -1094,7 +1022,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           setInt(i);
          }
         String v()
-         {return a.verilogLoad()+" <= "+a.verilogLoad()+"+ 1; /* MemoryLayoutDM.inc */";
+         {final String o = ""+width+"'d1";
+          return a.verilogLoad()+" <= "+a.verilogLoad()+"+"+o+"; /* inc */";
          }
         String n()
          {return "++"+field.name;
@@ -1111,7 +1040,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           setInt(i);
          }
         String v()
-         {return a.verilogLoad()+" <= "+a.verilogLoad()+"- 1; /* MemoryLayoutDM.dec */";
+         {final String o = ""+width+"'d1";
+          return a.verilogLoad()+" <= "+a.verilogLoad()+"-"+o+"; /* dec */";
          }
         String n()
          {return "--"+field.name;
@@ -1119,26 +1049,13 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
        };
      }
 
-    void dec(int n)                                                             // Decrement a variable treated as an unsigned binary integer by a constant amount with wrap around on overflow.  Return the result after  the increment.
-     {z();
-      final At a = this;
-      P.new I()
-       {void a()
-         {setOff();
-          final int i = getInt()-n;
-          setInt(i);
-         }
-        String v()
-         {return a.verilogLoad()+" <= "+a.verilogLoad()+"- "+n+"; /* MemoryLayoutDM.decN */";
-         }
-        String n()
-         {return field.name + "-= " + n;
-         }
-       };
-     }
-
     void add(At source, int constant)                                           // Add a constant to the source and store in the target
      {zz(); sameSize(source);
+      if (constant == 0) stop("Use nop() instead");                             // There is no point in adding zero
+      if (logTwo(constant) > width)
+       {stop("Constant too big for field. Constant:", constant,
+             "too big for a field of size:", width);
+       }
       final At target = this;
       P.new I()
        {void a()
@@ -1146,7 +1063,9 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           target.setOff().setInt(v + constant);
          }
         String v()
-         {return target.verilogLoad()+" <= "+source.verilogLoad() + "+" + constant + "; /* MemoryLayoutDM.add1 */";
+         {final String c = (constant > 0 ? "+" : "-")+width+"'d"+abs(constant); // Create a signed constant of the same width
+          final String t = target.verilogLoad(), s = source.verilogLoad();
+          return t+" <= " + s + c + "; /* add1 */";
          }
         String n() {return field.name+"="+source.field.name + "+ "+ constant;}
         void   i() {}
@@ -1154,7 +1073,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      }
 
     void add(At a, At b)                                                        // Add two variables and store in the target
-     {zz(); sameSize(a); sameSize(b);
+     {z(); sameSize(a); sameSize(b);
       final At target = this;
       P.new I()
        {void a()
@@ -1163,7 +1082,9 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           target.setOff().setInt(A + B);
          }
         String v()
-         {return target.verilogLoad()+" <= "+ a.verilogLoad() + "+" + b.verilogLoad() + "; /* MemoryLayoutDM.add2 */";
+         {return target.verilogLoad()+" <= "+ a.verilogLoad() + "+"
+                                            + b.verilogLoad() +
+            "; /* MemoryLayoutDM.add2 */";
          }
         String n() {return field.name + "=" + a.field.name + "+ " + b.field.name;}
         void   i() {}
@@ -1171,7 +1092,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      }
 
     void srz()                                                                  // Shift one place to the right filling with a zero
-     {zz(); final At target = this;                                             // This changes inside the instruction so record it here for posterity
+     {z(); final At target = this;                                              // This changes inside the instruction so record it here for posterity
       final int N = width;
       P.new I()
        {void a()
@@ -1183,14 +1104,15 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           setBit(N-1, false);                                                   // Set high order bit to zero
          }
         String v()
-         {return target.verilogLoad()+" <= "+ target.verilogLoad() + " >> 1; /* MemoryLayoutDM.srz */";
+         {return target.verilogLoad()+" <= "+ target.verilogLoad() +
+                                      " >> 1; /* srz */";
          }
         String n() {return field.name + "=" + field.name + " >> 1";}
        };
      }
 
     void slz()                                                                  // Shift one place to the light filling with a zero
-     {zz(); final At target = this;                                             // This changes inside the instruction so record it here for posterity
+     {z(); final At target = this;                                              // This changes inside the instruction so record it here for posterity
       final int N = width;
       P.new I()
        {void a()
@@ -1202,7 +1124,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
           setBit(0, false);                                                     // Set low order bit to zero
          }
         String v()
-         {return target.verilogLoad()+" <= "+ target.verilogLoad() + " << 1; /* MemoryLayoutDM.slz */";
+         {return target.verilogLoad()+" <= "+ target.verilogLoad() +
+                                      " << 1; /* slz */";
          }
         String n() {return field.name + "=" + field.name + " << 1";}
        };
@@ -1224,26 +1147,30 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
 //D1 Verilog                                                                    // Declare and initialize a matchiung array in Verilog
 
   String declareVerilog()                                                       // Declare the array
-   {final StringBuilder s = new StringBuilder();                                // Verilog declaration
+   {zz();
+    final StringBuilder s = new StringBuilder();                                // Verilog declaration
     final MemoryLayoutDM.BlockArray a = block;
     if (a.array)                                                                // Block memory
-     {s.append("reg["+a.width+"-1 : 0] "+name()+"["+a.size+"-1 : 0];/*ProgramDM_declareMemories_1*/"); // Declare the block memory
+     {s.append("reg["+a.width+"-1 : 0] "+name()+
+                  "["+a.size +"-1 : 0]; /* declareMemories_1 */");
      }
     else                                                                        // Bit memory
-     {s.append("reg["+size()+"-1 : 0] "+name()+"; /*ProgramDM_declareMemories_2*/");                   // Declare the bit memory
+     {s.append("reg["+size() +"-1 : 0] "+name()+"; /* declareMemories_2 */");   // Declare the bit memory
      }
     return ""+s;
    }
 
 
   private void removeAllButLastTrailingZero(StringBuilder S)                    // Remove trailing zeros from a string
-   {final String s = S.toString().replaceAll("0+$", "");
+   {zz();
+    final String s = S.toString().replaceAll("0+$", "");
     S.setLength(0);
     S.append(s.length() > 0 ? s : "0");
    }
 
   String initializeVerilog()                                                    // Initialize the array
-   {final StringBuilder s = new StringBuilder();                                // Verilog declaration
+   {zz();
+    final StringBuilder s = new StringBuilder();                                // Verilog declaration
     final MemoryLayoutDM.BlockArray a = block;
     if (a.array)                                                                // Block memory
      {final int L = a.size, W = a.width;
@@ -1255,8 +1182,8 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
         removeAllButLastTrailingZero(S);
         S.reverse();
         s.append(name()+"["+i+"] <= "+W+"'b"+S+";\n");                          // Initialize memory
-        }
-      }
+       }
+     }
     else                                                                        // Bit memory
      {final StringBuilder S = new StringBuilder();
       final int N = size();
@@ -1521,7 +1448,7 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
     m.P.run();
 
     //stop(m);
-    m.ok("""
+    ok(m, """
 MemoryLayout: test
 Memory      : test
 Line T       At      Wide       Size    Indices        Value   Name
@@ -1530,24 +1457,6 @@ Line T       At      Wide       Size    Indices        Value   Name
    3 V        4         4                                 13     b
    4 V        8         4                                  0     c
    5 V       12         4                                 13     d
-   6 V       16         4                                  0     e
-""");
-
-    m.P.clear();
-    m.setIntInstruction(a, 13, b, 12);
-    m.setIntInstruction(c, 11, d, 10);
-    m.P.run();
-
-    //stop(m);
-    m.ok("""
-MemoryLayout: test
-Memory      : test
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        20                                      s
-   2 V        0         4                                 13     a
-   3 V        4         4                                 12     b
-   4 V        8         4                                 11     c
-   5 V       12         4                                 10     d
    6 V       16         4                                  0     e
 """);
    }
@@ -1563,7 +1472,9 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.at(a).setInt(1);
     m.at(b).setInt(3);
     //stop(m);
-    m.ok("""
+    ok(m, """
+MemoryLayout: test
+Memory      : test
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0         8                                      s
    2 V        0         4                                  1     a
@@ -1578,7 +1489,9 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(m.at(b).getInt(), 2);
 
     //stop(m);
-    m.ok("""
+    ok(m, """
+MemoryLayout: test
+Memory      : test
 Line T       At      Wide       Size    Indices        Value   Name
    1 S        0         8                                      s
    2 V        0         4                                  2     a
@@ -1595,21 +1508,6 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     ok(m.at(a).getInt(), 1);
     ok(m.at(b).getInt(), 3);
-
-    m.P.clear();
-    m.at(a).dec(3);
-    m.at(b).dec(4);
-    m.P.run();
-    //stop(m);
-
-    m.ok("""
-MemoryLayout: test
-Memory      : test
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0         8                                      s
-   2 V        0         4                                 14     a
-   3 V        4         4                                 15     b
-""");
    }
 
   static void test_addressing()
@@ -1897,48 +1795,6 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(m.at(b, 2).verilogLoad(), n+"[       2/*b       */ + 2 * 6 +: 2]");
    }
 
-  static void test_copy_bits()
-   {z();
-    Layout               l = Layout.layout();
-    Layout.Variable  a = l.variable ("a", 2);
-    Layout.Array     A = l.array    ("A", a, 4);
-    Layout.Variable  b = l.variable ("b", 4);
-    Layout.Array     B = l.array    ("B", b, 4);
-    Layout.Variable  i = l.variable ("i", 4);
-    Layout.Variable  j = l.variable ("j", 4);
-    Layout.Variable  L = l.variable ("l", 4);
-    Layout.Structure S = l.structure("S", A, B, i, j, L);
-    l.compile();
-
-    MemoryLayoutDM   m = new MemoryLayoutDM(l, "M");
-    for(int I = 0; I < 4; ++I) m.at(a, I).setInt(I);
-    m.at(i).setInt(2);
-    m.at(j).setInt(1);
-    m.at(L).setInt(4);
-    m.at(b, m.at(i)).copy(m.at(a, m.at(j)), m.at(L));
-    m.P.run();
-    //stop(m);
-    ok(m, """
-MemoryLayout: M
-Memory      : M
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0        36                                      S
-   2 A        0         8          4                             A
-   3 V        0         2               0                  0       a
-   4 V        2         2               1                  1       a
-   5 V        4         2               2                  2       a
-   6 V        6         2               3                  3       a
-   7 A        8        16          4                             B
-   8 V        8         4               0                  0       b
-   9 V       12         4               1                  0       b
-  10 V       16         4               2                  9       b
-  11 V       20         4               3                  0       b
-  12 V       24         4                                  2     i
-  13 V       28         4                                  1     j
-  14 V       32         4                                  4     l
-""");
-   }
-
   static void test_copy_memory()
    {z();
     final int N = 8;
@@ -1974,6 +1830,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
 
     M.copy(m.at(a));
+    m.P.setUniqueNames();
     //stop(m.P.printVerilog());
     ok(m.P.printVerilog(), """
    1  M[0 +: 8] <= m[       0/*a       */ +: 8]; /* copy2 */
@@ -1990,7 +1847,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     m.at(c).copy(M);
     ok(m.P.printVerilog(), """
-   1  m[      16/*c       */ +: 8] <= M[0 +: 8]; /* MemoryLayoutDM.copy1 */
+   1  m[      16/*c       */ +: 8] <= M[0 +: 8]; /* copy3 */
 """);
     m.P.run(); m.P.clear();
     //stop(m);
@@ -2020,7 +1877,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     m.at(c).copy(M);
     ok(m.P.printVerilog(), """
-   1  m[      16/*c       */ +: 8] <= M[0 +: 8]; /* MemoryLayoutDM.copy1 */
+   1  m[      16/*c       */ +: 8] <= M[0 +: 8]; /* copy3 */
 """);
     m.P.run(); m.P.clear();
     //stop(m);
@@ -2036,7 +1893,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     m.at(c).copy(m.at(a));
     ok(m.P.printVerilog(), """
-   1  m[      16/*c       */ +: 8] <= m[       0/*a       */ +: 8]; /* MemoryLayoutDM.copy2 */
+   1  m[      16/*c       */ +: 8] <= m[       0/*a       */ +: 8]; /* copy4 */
 """);
     m.P.run(); m.P.clear();
 //  stop(m);
@@ -2082,117 +1939,117 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(m.block.blocked());
     ok(m.block.log, 3);
 
-    M.at(i).setInt(1);
-    ok(m.verilogArrayElement(M.at(i)), "array[index[       0/*i       */ +: 4]] /* MemoryLayoutDM power 2 array access */");
-
-    m.memory.alternating(4);
-    Q.loadFirstBlock(m);
-    m.P.run(); m.P.clear();
-    //stop(Q);
-    ok(Q, """
-MemoryLayout: block1
-Memory      : block1
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         8                                240   q
-""");
-
-    Q.memory.alternating(2);
-    Q.saveFirstBlock(m);
-    m.P.run(); m.P.clear();
-    //stop(m);
-    ok(m, """
-MemoryLayout: array
-Memory      : array
-Line T       At      Wide       Size    Indices        Value   Name
-   1 A        0        48          6                           A
-   2 S        0         8               0                        s
-   3 V        0         4               0                 12       a
-   4 V        4         4               0                 12       b
-   5 S        8         8               1                        s
-   6 V        8         4               1                  0       a
-   7 V       12         4               1                 15       b
-   8 S       16         8               2                        s
-   9 V       16         4               2                  0       a
-  10 V       20         4               2                 15       b
-  11 S       24         8               3                        s
-  12 V       24         4               3                  0       a
-  13 V       28         4               3                 15       b
-  14 S       32         8               4                        s
-  15 V       32         4               4                  0       a
-  16 V       36         4               4                 15       b
-  17 S       40         8               5                        s
-  18 V       40         4               5                  0       a
-  19 V       44         4               5                 15       b
-""");
-
-    M.setIntInstruction(i, 3);
-    Q.saveBlock(m, M.at(i));
-    m.P.run(); m.P.clear();
-    //stop(m);
-    ok(m, """
-MemoryLayout: array
-Memory      : array
-Line T       At      Wide       Size    Indices        Value   Name
-   1 A        0        48          6                           A
-   2 S        0         8               0                        s
-   3 V        0         4               0                 12       a
-   4 V        4         4               0                 12       b
-   5 S        8         8               1                        s
-   6 V        8         4               1                  0       a
-   7 V       12         4               1                 15       b
-   8 S       16         8               2                        s
-   9 V       16         4               2                  0       a
-  10 V       20         4               2                 15       b
-  11 S       24         8               3                        s
-  12 V       24         4               3                 12       a
-  13 V       28         4               3                 12       b
-  14 S       32         8               4                        s
-  15 V       32         4               4                  0       a
-  16 V       36         4               4                 15       b
-  17 S       40         8               5                        s
-  18 V       40         4               5                  0       a
-  19 V       44         4               5                 15       b
-""");
-
-    Y.loadBlock(m, M.at(i));
-    m.P.run(); m.P.clear();
-    //stop(Y);
-    ok(Y, """
-MemoryLayout: block2
-Memory      : block2
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         8                                204   y
-""");
-
-    M.setIntInstruction(i, 2);
-    Q.ones();
-    Q.saveBlock(m, M.at(i));
-    m.P.run(); m.P.clear();
-    //stop(m);
-    ok(m, """
-MemoryLayout: array
-Memory      : array
-Line T       At      Wide       Size    Indices        Value   Name
-   1 A        0        48          6                           A
-   2 S        0         8               0                        s
-   3 V        0         4               0                 12       a
-   4 V        4         4               0                 12       b
-   5 S        8         8               1                        s
-   6 V        8         4               1                  0       a
-   7 V       12         4               1                 15       b
-   8 S       16         8               2                        s
-   9 V       16         4               2                 15       a
-  10 V       20         4               2                 15       b
-  11 S       24         8               3                        s
-  12 V       24         4               3                 12       a
-  13 V       28         4               3                 12       b
-  14 S       32         8               4                        s
-  15 V       32         4               4                  0       a
-  16 V       36         4               4                 15       b
-  17 S       40         8               5                        s
-  18 V       40         4               5                  0       a
-  19 V       44         4               5                 15       b
-""");
+//    M.at(i).setInt(1);
+//    ok(m.verilogArrayElement(M.at(i)), "array[index[       0/*i       */ +: 4]] /* MemoryLayoutDM power 2 array access */");
+//
+//    m.memory.alternating(4);
+//    Q.loadFirstBlock(m);
+//    m.P.run(); m.P.clear();
+//    //stop(Q);
+//    ok(Q, """
+//MemoryLayout: block1
+//Memory      : block1
+//Line T       At      Wide       Size    Indices        Value   Name
+//   1 V        0         8                                240   q
+//""");
+//
+//    Q.memory.alternating(2);
+//    Q.saveFirstBlock(m);
+//    m.P.run(); m.P.clear();
+//    //stop(m);
+//    ok(m, """
+//MemoryLayout: array
+//Memory      : array
+//Line T       At      Wide       Size    Indices        Value   Name
+//   1 A        0        48          6                           A
+//   2 S        0         8               0                        s
+//   3 V        0         4               0                 12       a
+//   4 V        4         4               0                 12       b
+//   5 S        8         8               1                        s
+//   6 V        8         4               1                  0       a
+//   7 V       12         4               1                 15       b
+//   8 S       16         8               2                        s
+//   9 V       16         4               2                  0       a
+//  10 V       20         4               2                 15       b
+//  11 S       24         8               3                        s
+//  12 V       24         4               3                  0       a
+//  13 V       28         4               3                 15       b
+//  14 S       32         8               4                        s
+//  15 V       32         4               4                  0       a
+//  16 V       36         4               4                 15       b
+//  17 S       40         8               5                        s
+//  18 V       40         4               5                  0       a
+//  19 V       44         4               5                 15       b
+//""");
+//
+//    M.setIntInstruction(i, 3);
+//    Q.saveBlock(m, M.at(i));
+//    m.P.run(); m.P.clear();
+//    //stop(m);
+//    ok(m, """
+//MemoryLayout: array
+//Memory      : array
+//Line T       At      Wide       Size    Indices        Value   Name
+//   1 A        0        48          6                           A
+//   2 S        0         8               0                        s
+//   3 V        0         4               0                 12       a
+//   4 V        4         4               0                 12       b
+//   5 S        8         8               1                        s
+//   6 V        8         4               1                  0       a
+//   7 V       12         4               1                 15       b
+//   8 S       16         8               2                        s
+//   9 V       16         4               2                  0       a
+//  10 V       20         4               2                 15       b
+//  11 S       24         8               3                        s
+//  12 V       24         4               3                 12       a
+//  13 V       28         4               3                 12       b
+//  14 S       32         8               4                        s
+//  15 V       32         4               4                  0       a
+//  16 V       36         4               4                 15       b
+//  17 S       40         8               5                        s
+//  18 V       40         4               5                  0       a
+//  19 V       44         4               5                 15       b
+//""");
+//
+//    Y.loadBlock(m, M.at(i));
+//    m.P.run(); m.P.clear();
+//    //stop(Y);
+//    ok(Y, """
+//MemoryLayout: block2
+//Memory      : block2
+//Line T       At      Wide       Size    Indices        Value   Name
+//   1 V        0         8                                204   y
+//""");
+//
+//    M.setIntInstruction(i, 2);
+//    Q.ones();
+//    Q.saveBlock(m, M.at(i));
+//    m.P.run(); m.P.clear();
+//    //stop(m);
+//    ok(m, """
+//MemoryLayout: array
+//Memory      : array
+//Line T       At      Wide       Size    Indices        Value   Name
+//   1 A        0        48          6                           A
+//   2 S        0         8               0                        s
+//   3 V        0         4               0                 12       a
+//   4 V        4         4               0                 12       b
+//   5 S        8         8               1                        s
+//   6 V        8         4               1                  0       a
+//   7 V       12         4               1                 15       b
+//   8 S       16         8               2                        s
+//   9 V       16         4               2                 15       a
+//  10 V       20         4               2                 15       b
+//  11 S       24         8               3                        s
+//  12 V       24         4               3                 12       a
+//  13 V       28         4               3                 12       b
+//  14 S       32         8               4                        s
+//  15 V       32         4               4                  0       a
+//  16 V       36         4               4                 15       b
+//  17 S       40         8               5                        s
+//  18 V       40         4               5                  0       a
+//  19 V       44         4               5                 15       b
+//""");
    }
 
   static void test_upDownMoveBuffer()
@@ -2713,6 +2570,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     Layout.Variable  z = l.variable ("z", M);
     Layout.Structure S = l.structure("s", z, A, i);
     MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "arrays");
+    m.program(m.P);
 
     for (int j = 0; j < N; j++) m.at(a, j).setInt(j);
     m.at(z).setInt(11);
@@ -2745,13 +2603,13 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.P.run();
     //stop(m.P.printVerilog());
     ok(m.P.printVerilog(), """
-   1  buffer_2[       0/*b       */+:48] <= arrays_1[       4/*A       */+:48];/* copyMoveBuffer */
-   2  position_3[       0/*position*/ +: 4] <= arrays_1[      52/*i       */ +: 4]/* MemoryLayoutDM.move */;
+   1  buffer_2[       0/*b       */+:48] <= arrays[       4/*A       */+:48];/* copyMoveBuffer */
+   2  position_3[       0/*position*/ +: 4] <= arrays[      52/*i       */ +: 4]/* move */;
    3  if (position_3[       0/*position*/ +: 4]+       8 < 12) begin buffer_2[position_3[       0/*position*/ +: 4]*4 +:       32] <= buffer_2[position_3[       0/*position*/ +: 4]*4+4 +:       32]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]+       8;end /* moveDown */
    4  if (position_3[       0/*position*/ +: 4]+       4 < 12) begin buffer_2[position_3[       0/*position*/ +: 4]*4 +:       16] <= buffer_2[position_3[       0/*position*/ +: 4]*4+4 +:       16]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]+       4;end /* moveDown */
    5  if (position_3[       0/*position*/ +: 4]+       2 < 12) begin buffer_2[position_3[       0/*position*/ +: 4]*4 +:        8] <= buffer_2[position_3[       0/*position*/ +: 4]*4+4 +:        8]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]+       2;end /* moveDown */
    6  if (position_3[       0/*position*/ +: 4]+       1 < 12) begin buffer_2[position_3[       0/*position*/ +: 4]*4 +:        4] <= buffer_2[position_3[       0/*position*/ +: 4]*4+4 +:        4]; position_3[       0/*position*/ +: 4] <= position_3[       0/*position*/ +: 4]+       1;end /* moveDown */
-   7  arrays_1[       4/*A       */+:48] <= buffer_2[       0/*b       */+:48];/* copyMoveBuffer */
+   7  arrays[       4/*A       */+:48] <= buffer_2[       0/*b       */+:48];/* copyMoveBuffer */
 """);
     //stop(m);
     ok(""+m, """
@@ -2823,7 +2681,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.program(m.P);
     m.top().setInt(12);
 
-    ok(""+m.   declareVerilog(), "reg[8-1 : 0] a; /*ProgramDM_declareMemories_2*/");
+    ok(""+m.   declareVerilog(), "reg[8-1 : 0] a; /* declareMemories_2 */");
     ok(""+m.initializeVerilog(), "a <= 8'b1100;");
    }
 
@@ -2837,7 +2695,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     m.program(m.P);
     for (int i = 0; i < N/2; i++) m.at(a, i).setInt(i);
 
-    ok(""+m.   declareVerilog(), "reg[8-1 : 0] A[8-1 : 0];/*ProgramDM_declareMemories_1*/");
+    ok(""+m.   declareVerilog(), "reg[8-1 : 0] A[8-1 : 0]; /* declareMemories_1 */");
     //stop(m.initializeVerilog());
     ok(""+m.initializeVerilog(), """
 A[0] <= 8'b0;
@@ -2863,7 +2721,6 @@ A[7] <= 8'b0;
     test_is_ones_or_zeros();
     test_union();
     test_verilog_address();
-    test_copy_bits();
     test_copy_memory();
     test_array_addressing();
     test_upDownMoveBuffer();
