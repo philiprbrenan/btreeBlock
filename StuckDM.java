@@ -93,16 +93,16 @@ abstract class StuckDM extends Test                                             
                  isEmpty  = //l.bit      (      "isEmpty");
                    found  = //l.bit      (        "found");
                    equal  = l.bit      (        "equal");
-                  search  = //l.variable (       "search", bitsPerKey());
-                    tKey  = l.variable (          "key", bitsPerKey());
-                   tData  = l.variable (         "data", bitsPerData());
-                   limit  = //l.variable (        "limit", bitsPerSize());
-               copyCount  = l.variable (    "copyCount", bitsPerSize());
-                   index  = l.variable (        "index", bitsPerSize());
-                    size  = //l.variable (         "size", bitsPerSize());
-                    full  = l.variable (         "full", bitsPerSize());
-            copyBitsKeys  = l.variable ( "copyBitsKeys", bitsPerSize() + bitsPerKey());
-            copyBitsData  = l.variable ( "copyBitsData", bitsPerSize() + bitsPerData());
+                  search  = //l.variable (       "search",  bitsPerKey());
+                    tKey  = l.variable (          "key",    bitsPerKey());
+                   tData  = l.variable (         "data",    bitsPerData());
+                   limit  = //l.variable (        "limit",  bitsPerSize());
+               copyCount  = l.variable (    "copyCount",    bitsPerSize());
+                   index  = l.variable (        "index",    bitsPerSize());
+                    size  = //l.variable (         "size",  bitsPerSize());
+                    full  = l.variable (         "full",    bitsPerSize());
+            copyBitsKeys  = l.variable ( "copyBitsKeys",    bitsPerAddress);
+            copyBitsData  = l.variable ( "copyBitsData",    bitsPerAddress);
 
          copy_source_keys = l.variable ("copy_source_keys", bitsPerAddress);
          copy_target_keys = l.variable ("copy_target_keys", bitsPerAddress);
