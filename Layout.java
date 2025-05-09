@@ -204,8 +204,6 @@ public class Layout extends Test                                                
       element = Element;                                                        // Field definition associated with this layout
      }
 
-//  int sizeInBits()  {zz(); return size * element.width;}                      // Number of bits in this array
-
     void layout(int At, int Depth)                                              // Position this array within the layout
      {zz();
       depth = Depth;                                                            // Depth of field in the layout
