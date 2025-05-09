@@ -21,22 +21,20 @@ class Memory extends Test                                                       
    {z(); return new Memory(Name, Size);
    }
 
-  int size() {z(); return bits.length;}                                         // Size of memory
+  int size() {zz(); return bits.length;}                                         // Size of memory
 
 //D1 Print                                                                      // Print memory
 
+  final StringBuilder printString = new StringBuilder();                        // Printing happens very frequently during execution because of memory tracing so we preallocate the string builder to be used to save allocating it a new each time
+
   StringBuilder print(int Start, int Length)                                    // Print a part of the memory
-   {zz();
-    final StringBuilder s = new StringBuilder();
+   {final StringBuilder s = printString; s.setLength(0);
     for(int i = Start; i < Start+Length; i++) s.append(bits[i] ? "1" : "0");
     s.reverse();
     return s;
    }
 
-  StringBuilder print()                                                         // Print all of memory
-   {zz();
-    return print(0, bits.length);
-   }
+  StringBuilder print() {return print(0, bits.length);}                         // Print all of memory
 
   public String toString()                                                      // Print memory in hex
    {z();
@@ -149,17 +147,15 @@ class Memory extends Test                                                       
    }
 
   int getInt(int start, int width)                                              // Get an int from memory
-   {//check(start, width);
-    zz();
-    if (start < 0 || start + width  > size()) stop("Out of range in memory", name, "Start:", start, "width:", width, "size:", size());
-    z();
-    if  (width < 1) stop("width must be one or more, not:", width);
-    z();
+   {zz();
+    //if (start < 0 || start + width  > size()) stop("Out of range in memory", name, "Start:", start, "width:", width, "size:", size());
+    //z();
+    //if  (width < 1) stop("width must be one or more, not:", width);
+    //z();
     final int w = min(Integer.SIZE-1, width);
     int n = 0;
     for(int i = 0; i < w; ++i)
-     {z();
-      if (getBit(start+i)) {z(); n |= (1 << i);}
+     {if (getBit(start+i)) {z(); n |= (1 << i);}
      }
     return n;
    }
