@@ -622,7 +622,7 @@ abstract class StuckDM extends Test                                             
 //D1 Merge and Split                                                            // Merge and split stucks
 
   void checkSameProgram(StuckDM source)                                         // Confirm that we are writing into the same program
-   {final int p = P.number;
+   {zz(); final int p = P.number;
     if (p != source.M.P.number) stop("Mismatched programs");
     if (p != source.T.P.number) stop("Mismatched programs");
     if (p != source.P.number)   stop("Mismatched programs");
