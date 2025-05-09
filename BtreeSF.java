@@ -14,7 +14,6 @@ package com.AppaApps.Silicon;                                                   
 // Remove removable memories as the use of local registers eliminates the need for them
 // Investigate whether it would be worth changing from a block of variables in T to individual memories for each variable now in T.  This would localize access which would simplify routing at the cost of more silicon spent on registers.
 // Can MmeoryLayoutDM be merged with Layout?  I.e. each field laid out would know what memory it resides in.
-// Remove eachStatement on the grounds that OpenRoad does better
 import java.util.*;
 import java.nio.file.*;
 
@@ -26,8 +25,6 @@ abstract class BtreeSF extends Test                                             
   final ProgramDM                  P = new ProgramDM();                         // Program in which to generate instructions
   final boolean              OpCodes = true;                                    // Refactor op codes
   final boolean           runVerilog = true;                                    // Run verilog tests alongside java tests and check they produce the same results
-  final static boolean eachStatement = false;                                   // Isolate each statement to get per statement timing
-  final static TreeSet<VerilogCode.Range>       ranges = new TreeSet<>();       // Record ranges in each project
   final static TreeMap<String,String>removableMemories = new TreeMap<>();       // Record memories that can be removed from each project as they are not used
   final String     processTechnology = "freepdk45";                             // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
@@ -175,7 +172,8 @@ abstract class BtreeSF extends Test                                             
    }
 
   StuckDM createBranchStuck(String name)                                        // Create a branch Stuck
-   {final StuckDM b = new StuckDM(name)                                         // Branch stucks
+   {zz();
+    final StuckDM b = new StuckDM(name)                                         // Branch stucks
      {int     maxSize() {return BtreeSF.this.maxKeysPerBranch()+1;}             // Not forgetting top next
       int  bitsPerKey() {return BtreeSF.this.bitsPerKey();}
       int bitsPerData() {return BtreeSF.this.bitsPerNext;}
@@ -188,7 +186,8 @@ abstract class BtreeSF extends Test                                             
    }
 
   StuckDM createLeafStuck(String name)                                          // Create a leaf Stuck
-   {final StuckDM l = new StuckDM(name)                                         // Leaf stucks
+   {zz();
+    final StuckDM l = new StuckDM(name)                                         // Leaf stucks
      {int     maxSize() {return BtreeSF.this.maxKeysPerLeaf();}
       int  bitsPerKey() {return BtreeSF.this.bitsPerKey();}
       int bitsPerData() {return BtreeSF.this.bitsPerData();}
@@ -201,7 +200,8 @@ abstract class BtreeSF extends Test                                             
   }
 
   private static BtreeSF BtreeSF(int leafKeys, int branchKeys, int maxSize)     // Define a test btree with the specified dimensions
-   {return new BtreeSF()
+   {zz();
+    return new BtreeSF()
      {int maxSize         () {return     maxSize;}
       int maxKeysPerLeaf  () {return    leafKeys;}
       int maxKeysPerBranch() {return  branchKeys;}
@@ -211,7 +211,8 @@ abstract class BtreeSF extends Test                                             
    }
 
   private static BtreeSF allTreeOps()                                           // Define a tree capable of performing all operations
-   {return new BtreeSF()
+   {zz();
+    return new BtreeSF()
      {int maxSize         () {return 16;}
       int maxKeysPerLeaf  () {return  2;}
       int maxKeysPerBranch() {return  3;}
@@ -221,7 +222,8 @@ abstract class BtreeSF extends Test                                             
    }
 
   private static BtreeSF wideTree()                                             // Define a tree with nodes wide enough to test logarithmic moves and searching
-   {return new BtreeSF()
+   {zz();
+    return new BtreeSF()
      {int maxSize         () {return    6;}
       int maxKeysPerLeaf  () {return    8;}
       int maxKeysPerBranch() {return    9;}
@@ -291,7 +293,8 @@ abstract class BtreeSF extends Test                                             
    }
 
   BtreePA btreePA()                                                             // Convert to an earlier version known to work correctly so we can print it without having to write and execute pribt code.
-   {final BtreeSF s = this;                                                     // Source
+   {zz();
+    final BtreeSF s = this;                                                     // Source
     final BtreePA t = new BtreePA()                                             // Target
      {int maxSize         () {return s.maxSize         () ;}
       int maxKeysPerLeaf  () {return s.maxKeysPerLeaf  () ;}
@@ -310,7 +313,8 @@ abstract class BtreeSF extends Test                                             
    }
 
   static BtreeSF btreeDM(BtreePA p)                                             // Convert from an earlier version known to work correctly
-   {final BtreeSF t = new BtreeSF()
+   {zz();
+    final BtreeSF t = new BtreeSF()
      {int maxSize         () {return p.maxSize         () ;}
       int maxKeysPerLeaf  () {return p.maxKeysPerLeaf  () ;}
       int maxKeysPerBranch() {return p.maxKeysPerBranch() ;}
@@ -323,9 +327,9 @@ abstract class BtreeSF extends Test                                             
 
 //D1 Control                                                                    // Testing, control and integrity
 
-  private void ok(String expected) {Test.ok(toString(), expected);}             // Confirm tree is as expected
-  private void stop()              {Test.stop(toString());}                     // Stop after printing the tree
-  public String toString()         {return ""+btreePA();}                       // Print the tree
+  private void ok(String expected) {zz(); Test.ok(toString(), expected);}       // Confirm tree is as expected
+  private void stop()              {zz(); Test.stop(toString());}               // Stop after printing the tree
+  public String toString()         {zz(); return ""+btreePA();}                 // Print the tree
 
 //D1 Memory access                                                              // Access to memory
 
@@ -1127,7 +1131,8 @@ abstract class BtreeSF extends Test                                             
            {nL.loadLeafStuckAndSize(lL, l, nl);                                 // Address leaves on each side and get their size
             nR.loadLeafStuckAndSize(lR, r, nr);
 
-            T.at(nr).greaterThanOrEqual(T.at(maxKeysPerLeaf), T.at(stolenOrMerged));
+            T.at(nr).greaterThanOrEqual(T.at(maxKeysPerLeaf),
+                                        T.at(stolenOrMerged));
             stealNotPossible(end);
 
             T.at(nl).lessThan(T.at(two), T.at(stolenOrMerged));
@@ -1159,7 +1164,8 @@ abstract class BtreeSF extends Test                                             
             nR.loadBranchStuckAndSize(bR, r, nr);
 
 
-            T.at(nr).greaterThanOrEqual(T.at(maxKeysPerBranch), T.at(stolenOrMerged));
+            T.at(nr).greaterThanOrEqual(T.at(maxKeysPerBranch),
+                                        T.at(stolenOrMerged));
             stealNotPossible(end);
 
             T.at(nl).lessThan(T.at(two), T.at(stolenOrMerged));
@@ -1233,7 +1239,8 @@ abstract class BtreeSF extends Test                                             
             nL.loadLeafStuckAndSize(lL, l, nl);
             nR.loadLeafStuckAndSize(lR, r, nr);
 
-            T.at(nl).greaterThanOrEqual(T.at(maxKeysPerLeaf), T.at(stolenOrMerged));
+            T.at(nl).greaterThanOrEqual(T.at(maxKeysPerLeaf),
+                                        T.at(stolenOrMerged));
             stealNotPossible(end);
 
             T.at(nr).lessThan(T.at(two), T.at(stolenOrMerged));                 // Steal not allowed because it would leave the right sibling empty
@@ -1259,7 +1266,8 @@ abstract class BtreeSF extends Test                                             
             nL.loadBranchStuckAndSize(bL, l, nl);
             nR.loadBranchStuckAndSize(bR, r, nr);
 
-            T.at(nl).greaterThanOrEqual(T.at(maxKeysPerBranch), T.at(stolenOrMerged));
+            T.at(nl).greaterThanOrEqual(T.at(maxKeysPerBranch),
+                                        T.at(stolenOrMerged));
             stealNotPossible(end);
             T.at(nr).lessThan(T.at(two), T.at(stolenOrMerged));
             stealNotPossible(end);
@@ -1319,7 +1327,8 @@ abstract class BtreeSF extends Test                                             
         hasLeavesForChildren(bT);
         P.new If (T.at(hasLeavesForChildren))                                   // Leaves
          {void Then()
-           {nL.loadLeafStuckAndSize(lL, l, nl);
+           {z();
+            nL.loadLeafStuckAndSize(lL, l, nl);
             nR.loadLeafStuckAndSize(lR, r, nr);
 
             P.new I()                                                           // Check that combined node would not be too big
@@ -1353,7 +1362,8 @@ abstract class BtreeSF extends Test                                             
             z(); T.at(stolenOrMerged).zero();
            }
           void Else()                                                           // Branches
-           {nL.loadBranchStuckAndSize(bL, l, nl);
+           {z();
+            nL.loadBranchStuckAndSize(bL, l, nl);
             nR.loadBranchStuckAndSize(bR, r, nr);
 
             P.new I()                                                           // Check that combined node would not be too big
@@ -1372,7 +1382,8 @@ abstract class BtreeSF extends Test                                             
 
             P.new If (T.at(mergeable))
              {void Then()
-               {bT.firstElement();
+               {z();
+                bT.firstElement();
                 T.at(parentKey).move(bT.T.at(bT.tKey));
                 bT.clear();
 
@@ -1510,7 +1521,8 @@ abstract class BtreeSF extends Test                                             
         hasLeavesForChildren(bT);
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
-           {nL.loadLeafStuckAndSize(lL, l, nl);
+           {z();
+            nL.loadLeafStuckAndSize(lL, l, nl);
             nR.loadLeafStuckAndSize(lR, r, nr);
 
             P.new I()                                                           // Check that combined node would not be too big
@@ -1532,7 +1544,8 @@ abstract class BtreeSF extends Test                                             
             nL.saveStuck(lL, l);                                                // Save modified left branch
            }
           void Else()                                                           // Children are branches
-           {nL.loadBranchStuckAndSize(bL, l, nl);
+           {z();
+            nL.loadBranchStuckAndSize(bL, l, nl);
             nR.loadBranchStuckAndSize(bR, r, nr);
 
 
@@ -1889,7 +1902,8 @@ abstract class BtreeSF extends Test                                             
             P.new Block()                                                       // Try merging each sibling pair which might change the size of the parent
              {void code()
                {nT.branchSize(T.at(childSize));
-                T.at(mergeIndex).greaterThanOrEqual(T.at(childSize), T.at(nodeMerged));
+                T.at(mergeIndex).greaterThanOrEqual(T.at(childSize),
+                                                    T.at(nodeMerged));
                 P.GoOn(end, T.at(nodeMerged));                                  // All sequential pairs of siblings have been offered a chance to merge
 
                 P.parallelStart();   T.at(index).move(T.at(mergeIndex));
@@ -1937,7 +1951,7 @@ abstract class BtreeSF extends Test                                             
     final String  siliconCompiler = "siliconCompiler";                          // Name of folder containing code for Silicon Compiler
     final ProgramDM       program;                                              // Program associated with this tree
     final StringToNumbers     ops = new StringToNumbers();                      // Collapse identical instructions
-    final String      blockIndent = " ".repeat(10);                             // Indentationm for Verilog case statements
+    final String      blockIndent = " ".repeat(10);                             // Indentation for Verilog case statements
     final String  statementIndent = " ".repeat(16);                             // Indentation for Verilog instruction code
 
     Integer            statements = null;                                       // Set if only one statement is to be generated
@@ -1950,16 +1964,9 @@ abstract class BtreeSF extends Test                                             
     abstract int     maxSteps();                                                // Maximum number if execution steps
     abstract int     expSteps();                                                // Expected number of steps
     abstract String  expected();                                                // Expected number of steps
-             int     density () {return 30;}                                    // Indocation of gate density required on die.
+             int     density () {return 30;}                                    // Indication of gate density required on die.
 
-    String projectFolder()                                                      // Define the project folder
-     {if  (statements == null)
-       {return ""+Paths.get(folder, project, ""+Key());
-       }
-      else
-       {return ""+Paths.get(folder, project, ""+Key(), "statement", ""+statements);
-       }
-     }
+    String projectFolder() {return ""+Paths.get(folder, project, ""+Key());}    // Define the project folder
 
     String     sourceVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.ext);}
     String       testVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.testExt);}
@@ -1979,37 +1986,34 @@ abstract class BtreeSF extends Test                                             
     VerilogCode(String Project, String Folder)                                  // Generate verilog code
      {zz();
       project = Project; folder = Folder; program = P;
-      compactCode();                                                            // Compact the code to make better use of the surface area of the chip
 
       removeMemories();                                                         // Remove memories reported as not used from Vivado
 
       T.at(Key).setInt(Key());                                                  // Key value
       if (Data() != null) T.at(Data).setInt(Data());                            // Optional data value to insert into tree
+      generateVerilog();                                                      // Generate verilog
 
-      if      (github_actions) generateVerilog();
-      else if (eachStatement)  eachStatement();
-      else if (runVerilog)     generateVerilog();
-      else                     execJavaTest();
+      execJavaTest();                                                           // Execute the Java test to load memories
+      if (resultJava)                                                           // Generate verilog if Java test executed successfully
+       {execVerilogTest();                                                      // Execute the corresponding Verilog test if the java test passed
+       }
      }
 
-    class Range implements Comparable<Range>                                    // Number of statements in project and key
-     {final String project;
-      final int key;
-      final int statements;                                                     // Number of unique statements in propgram
-      Range(String Project, int Key, int Statements)
-       {project    = Project;
-        key        = Key;
-        statements = Statements;
-        if (!ranges.contains(this)) ranges.add(this);                           // First test executed for each project will be used during synthesis and routing
-       }
+    void execJavaTest()                                                         // Execute the Java test
+     {zz();
+      deleteFile(javaTraceFile());
+      P.run(javaTraceFile());                                                   // Run the Java version and trace it
 
-      public int compareTo(Range other)                                         // First of each project
-       {return project.compareTo(other.project);
-       }
+      resultJava = ok(P.steps+1, expSteps());                                   // Steps in Java code
+      if (found() != null) ok(T.at(found).getInt(), found());                   // Whether the data was found or not
+      if (data () != null) ok(T.at(data) .getInt(), data());                    // Data associated with key from java code
+      if (debug) stop(""+thisBTree);                                            // Print tree if debugging
+      if (expected() != null) ok(BtreeSF.this, expected());                     // Check resulting tree
      }
 
     void compactCode()                                                          // Reuse comon instructions rather then regenerating them
-     {for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
+     {zz();
+      for(int i = 0; i < program.code.size(); ++i)                              // Write each instruction
        {final Stack<ProgramDM.I> I = program.code.elementAt(i);                 // The block of parallel instructions to write
         if (I.size() > 1)
          {final StringBuilder t = new StringBuilder();
@@ -2022,11 +2026,11 @@ abstract class BtreeSF extends Test                                             
          }
        }
       ops.order();                                                              // Order the instructions
-      new Range(project, Key(), ops.outputOrder.size());                        // Record number of statements on this project and key
      }
 
     boolean requiredMemory(MemoryLayoutDM m)                                    // Check memory is required for this project
-     {final String r = removableMemories.get(project);                          // Removable memories for this project
+     {zz();
+      final String r = removableMemories.get(project);                          // Removable memories for this project
       if (r == null) return true;                                               // No removable memories yet
       return !r.contains(" "+m.name+" ");                                       // Check whether memory is removable or not
      }
@@ -2048,7 +2052,8 @@ abstract class BtreeSF extends Test                                             
      }
 
     void initializeMemories()                                                   // Initialize memories
-     {final StringBuilder s = new StringBuilder();
+     {zz();
+      final StringBuilder s = new StringBuilder();
       for(MemoryLayoutDM m : P.memories)                                        // Each memory declared by the program
        {if (!m.block.blocked()) s.append("  "+m.initializeVerilog()+"\n");
        }
@@ -2056,7 +2061,8 @@ abstract class BtreeSF extends Test                                             
      }
 
     String verilogMemoryPrintFormat()                                           // Format statement for printing memory from Verilog to match the tracing used in Java
-     {final StringBuilder f = new StringBuilder("\"%4d  %4d  %4d ");            // Format code  to be used to print an execution trace
+     {zz();
+      final StringBuilder f = new StringBuilder("\"%4d  %4d  %4d ");            // Format code  to be used to print an execution trace
       widthOfMarginInExecutionTrace = 18;                                       // Derived from the previous line
       final StringBuilder s = new StringBuilder("\", steps, step, opCodeMap[step]");
 
@@ -2078,13 +2084,9 @@ abstract class BtreeSF extends Test                                             
       return ""+f+s;
      }
 
-    void eachStatement()                                                        // Generate verilog with each statement appearing once
-     {final int N = ops.outputOrder.size();
-      for (int i = 0; i < N; i++) {statements = i; generateVerilog();}
-     }
-
     String genOpCodes()                                                         // Generate opcodes
-     {final StringBuilder s = new StringBuilder();                              // Verilog
+     {zz();
+      final StringBuilder s = new StringBuilder();                              // Verilog
       if (OpCodes)                                                              // Reduce program size by refactoring op codes at the cost of one additional look up per instruction cycle. Also appears to reduce synthesis time by about 30% on Vivado and likewise reduces the number of FPGA cells.
        {s.append("      case(opCodeMap[step])\n");                              // Case statements to select the code for the current instruction
 
@@ -2135,7 +2137,8 @@ abstract class BtreeSF extends Test                                             
      }
 
     void generateVerilogCode()                                                  // Generate verilog code for standalone verification and for Vivado
-     {final StringBuilder s = new StringBuilder();                              // Generate code
+     {zz();
+      final StringBuilder s = new StringBuilder();                              // Generate code
       s.append("""
 //-----------------------------------------------------------------------------
 // Database on a chip simulation
@@ -2223,7 +2226,8 @@ endmodule
      }
 
     void generateVerilogNano9k()                                                // Generate verilog code for Nano 9k
-     {final StringBuilder s = new StringBuilder();
+     {zz();
+      final StringBuilder s = new StringBuilder();
       s.append("""
 //-----------------------------------------------------------------------------
 // Database on a chip for nano 9k and other real devices or OpenRoad asic flow
@@ -2307,7 +2311,8 @@ endmodule
      }
 
     void generateVerilogTestBench()                                             // Generate verilog test bench for normal and Vivado versions
-     {final StringBuilder s = new StringBuilder();                              // Test bench
+     {zz();
+      final StringBuilder s = new StringBuilder();                              // Test bench
       s.append("""
 //-----------------------------------------------------------------------------
 // Database on a chip test bench
@@ -2357,7 +2362,8 @@ endmodule
      }
 
     void generateVerilogTestBenchNano9K()                                       // Generate verilog test bench for Nano 9k using leds to veryify correct operation
-     {final StringBuilder s = new StringBuilder();
+     {zz();
+      final StringBuilder s = new StringBuilder();
       s.append("""
 //-----------------------------------------------------------------------------
 // Database on a chip test bench for nano 9k
@@ -2432,7 +2438,8 @@ IO_PORT "button2" PULL_MODE=UP;
      }
 
     void generateBuildNano9K()                                                  // Generate build commands for Nano 9k fpga
-     {final StringBuilder s = new StringBuilder();
+     {zz();
+      final StringBuilder s = new StringBuilder();
       s.append("""
 #!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/
 #-------------------------------------------------------------------------------
@@ -2485,7 +2492,8 @@ system(qq(openFPGALoader -c $cable   $bits));
      }
 
     void generateSiliconCompiler()                                              // Generate build commands for Silicon compiler to get an asic mask
-     {final StringBuilder s = new StringBuilder();
+     {zz();
+      final StringBuilder s = new StringBuilder();
       s.append("""
 #!/usr/bin/env python3
 
@@ -2521,10 +2529,11 @@ create_clock -name clock -period 100 [get_ports {clock}]
       writeFile(scConstraints(), editVariables(c));                             // Write constraints file for silicon compiler
      }
 
-    VerilogCode generateVerilog()                                               // Generate verilog
+    void generateVerilog()                                                      // Generate verilog
      {zz();
-
       makePath(projectFolder());                                                // Write files to the project folder
+      P.setUniqueNames();
+      compactCode();                                                            // Compact the code to make better use of the surface area of the chip
 
       ops.genVerilog(opCodeMapFile(), opCodeMap);                               // Write op code map
 
@@ -2541,28 +2550,6 @@ create_clock -name clock -period 100 [get_ports {clock}]
         generateVerilogConstraintsNano9K();
         generateBuildNano9K();
        }
-
-      if (statements == null)                                                   // All statements are in play so it is possible to execute the programs and compare their outputs to see if they are the same.
-       {if (execJavaTest().resultJava)                                          // Execute the corresponding Java test
-         {execVerilogTest();                                                    // Execute the corresponding Verilog test if the java test passed
-         }
-       }
-      return this;
-     }
-
-    VerilogCode execJavaTest()                                                  // Execute the Java test
-     {zz();
-      deleteFile(javaTraceFile());
-      //say("execJavaTest", project, folder, Key());                            // Identify the test
-      P.opCodeMap = ops;                                                        // provide the op code map so that memory tracing in Java matches memory tracing in Verilog
-      P.run(javaTraceFile());                                                   // Run the Java version and trace it
-
-      resultJava = ok(P.steps+1, expSteps());                                   // Steps in Java code
-      if (found() != null) ok(T.at(found).getInt(), found());                   // Whether the data was found or not
-      if (data () != null) ok(T.at(data) .getInt(), data());                    // Data associated with key from java code
-      if (debug) stop(""+thisBTree);                                            // Print tree if debugging
-      if (expected() != null) ok(BtreeSF.this, expected());                     // Check resulting tree
-      return this;
      }
 
     VerilogCode execVerilogTest()                                               // Execute the Verilog test and compare it with the results from execution under Java
@@ -2581,10 +2568,14 @@ create_clock -name clock -period 100 [get_ports {clock}]
       return this;
      }
 
-    private String editVariables(StringBuilder S) {return editVariables(""+S);} // Edit the variables in a string builder
+    private String editVariables(StringBuilder S)                               // Edit the variables in a string builder
+     {zz();
+      return editVariables(""+S);
+     }
 
     private String editVariables(String s)                                      // Edit the variables in a string builder
-     {s = s.replace("$bitsPerKey",    ""  + bitsPerKey());
+     {zz();
+      s = s.replace("$bitsPerKey",    ""  + bitsPerKey());
       s = s.replace("$bitsPerData",   ""  + bitsPerData());
       s = s.replace("$testsFile",           fileName(testsFile()));
       s = s.replace("$traceFile",           fileName(traceFile()));
@@ -2619,17 +2610,6 @@ create_clock -name clock -period 100 [get_ports {clock}]
 
       return s;
      }
-   }
-
-  static void rangesAsPerl(String File)                                         // Print the ranges as a Perl data structure
-   {final StringBuilder s = new StringBuilder("{statements=>");                 // Generated perl
-    s.append(eachStatement ? "1" : "0");
-    s.append(", projects=>{\n");
-    for(VerilogCode.Range r : ranges)
-     {s.append("  "+r.project+"=>["+r.key+", "+r.statements+"],\n");
-     }
-    s.append("}}");
-    writeFile(File, s);
    }
 
 //D0 Tests                                                                      // Testing
@@ -3787,7 +3767,7 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
    }
 
-  private static void test_delete_verilog()                                             // Delete using generated verilog code
+  private static void test_delete_verilog()                                     // Delete using generated verilog code
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps();
     t.P.run(); t.P.clear();
@@ -3827,7 +3807,6 @@ Line T       At      Wide       Size    Indices        Value   Name
            3             2      |
 1,2=1  4=4    5,6=3  7=8  8,9=2 |
 """);
-    if (eachStatement) return;                                                  // Generate just one so vivado can generate timimg for it rather than executing it.
 
     t.runVerilogDeleteTest(4, 5, 382, """
              6           |
@@ -3910,8 +3889,6 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.runVerilogPutTest(1, 30, """
 1=0 |
 """);
-
-    if (eachStatement) return;                                                  // Generate just one so vivado can generate timimg for it rather than executing it.
 
     t.runVerilogPutTest(2, 30, """
 1,2=0 |
@@ -4700,21 +4677,20 @@ StuckSML(maxSize:4 size:1)
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
     test_delete_verilog();
-    //test_find_verilog();
-    //test_put_verilog();
+    test_find_verilog();
+    test_put_verilog();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
    {deleteAllFiles(verilogFolder, 600);                                         // Clear the verilog folder as otherwise life gets very confusing
     try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
-      rangesAsPerl("vivado/ranges.txt");                                        // Print the ranges as a Perl data structure
       if (github_actions)                                                       // Coverage analysis
-       {//coverageAnalysis(sourceFileName(), 12);
-        coverageAnalysis                                                        // Used for printing
+       {coverageAnalysis                                                        // Used for printing
          (12,
-         "BtreePA.java",
-         "BtreeSFL.java",
+         "BtreePA.java",                                                        // These classes are not fully exercised by these tests
+         "BtreeSF.java",
+         "BtreeSML.java",
          "MemoryLayout.java",
          "MemoryLayoutPA.java",
          "ProgramPA.java",
