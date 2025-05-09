@@ -133,6 +133,8 @@ public class Test                                                               
 
 //D2 Numeric routines                                                           // Numeric routines
 
+  static int abs(int i) {return i >= 0 ? +i : -i;}                              // Absolute value of integer
+
   static int ifs(String n)                                                      // Integer from string
    {final Integer i = Integer.parseInt(n);
     if (i == null) stop("Invalid integer;", n);
@@ -414,8 +416,10 @@ public class Test                                                               
     return e.containsKey(line);                                                 // Whether this line in this file was executed
    }
 
-//final static String coverageAnalysisSubStart = "zz();";                       // A string indicating the start of a subroutine - smethod entries only
-  final static String coverageAnalysisSubStart = "z();";                        // Any labelled statament
+// Uncomment zz for methods not called analysis
+// Uncomment z  for blocks not called analysis
+  final static String coverageAnalysisSubStart = "zz();";                       // A string indicating the start of a subroutine - smethod entries only
+//final static String coverageAnalysisSubStart = "z();";                        // Any labelled statament
 
   static void coverageAnalysis(int top, String...Ignore)                        // Coverage analysis: unexecuted lines and top lines most frequently executed over all files encountered in a Geany clickable format.
    {final TreeMap<String,TreeSet<Integer>> notExecuted      = new TreeMap<>();  // File, lines not executed
@@ -756,7 +760,7 @@ public class Test                                                               
     return false;
    }
 
-  static boolean ok(String got, String expected)                                // Confirm two strings match or show the first line of differences
+  static boolean ok(String got, String expected, int Margin)                    // Confirm two strings match beyond the margin or show the first line of differences
    {final String G = got, E = expected;
     final int lg = G.length(), le = E.length();
     final StringBuilder b = new StringBuilder();
@@ -779,7 +783,7 @@ public class Test                                                               
     final int N = min(le, lg);                                                  // Print to the end of the shortest string
     for (int i = 0; i < N && matches; i++)                                      // Check each character in the overlapping area of the got and expected strings
      {final int e = E.charAt(i), g = G.charAt(i);                               // Each character of the overlap
-      if (e != g)                                                               // Character mismatch between got and expected so print entire string highlighting the differences in the first line that differs
+      if (c >= Margin && e != g)                                                // Character mismatch beyond margin between got and expected so print entire string highlighting the differences in the first line that differs
        {final String ee = e == '\n' ? "new-line" : ""+(char)e;                  // Handle new lines gracefully
         final String gg = g == '\n' ? "new-line" : ""+(char)g;
         final String ruler = "0----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----";
@@ -822,15 +826,14 @@ public class Test                                                               
     return pass;
    }
 
+  static boolean ok(String got, String expected)                                // Confirm two strings match or show the first line of differences
+   {return ok(got, expected, 0);
+   }
+
   static boolean ok(int margin, String got, String expected)                    // Confirm two strings
-//   {final String G = differentiateLines(margin, got),
-//                 E = differentiateLines(margin, expected);
-   {final String G = got, E = expected;
-    if (!G.equals(E))
-     {say("Got:\n"+G);
-      say("Expected:\n"+E);
-     }
-    return ok(G, E);
+   {final String G = differentiateLines(margin, got),
+                 E = differentiateLines(margin, expected);
+    return ok(G, E, margin);
    }
 
   static boolean ok(Integer G, Integer E)                                       // Check that two integers are equal
