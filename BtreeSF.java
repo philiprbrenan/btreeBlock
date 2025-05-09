@@ -12,7 +12,7 @@ package com.AppaApps.Silicon;                                                   
 // Try memory operations in parallel in class Node without getting congestion complaints from silicon compiler
 // +Remove removable memories as the use of local registers eliminates the need for them
 // Investigate whether it would be worth changing from a block of variables in T to individual memories for each variable now in T.  This would localize access which would simplify routing at the cost of more silicon spent on registers.
-// Can MmeoryLayoutDM be merged with Layout?  I.e. each field laid out would know what memory it resides in.
+// Can MemoryLayoutDM be merged with Layout?  I.e. each field laid out would know what memory it resides in.
 // Testing the effect of split branch having its own node buffers
 import java.util.*;
 import java.nio.file.*;
@@ -100,6 +100,8 @@ abstract class BtreeSF extends Test                                             
   final StuckDM lT;                                                             // Process a parent node as a leaf
   final StuckDM lL;                                                             // Process a left node
   final StuckDM lR;                                                             // Process a right node
+  final StuckDM splitLeaf_lL;                                                   // Split a leaf left node
+  final StuckDM splitLeaf_lR;                                                   // Split a leaf right node
   final StuckDM splitBranch_bL;                                                 // Split a branch left node
   final StuckDM splitBranch_bR;                                                 // Split a branch right node
 
@@ -149,7 +151,10 @@ abstract class BtreeSF extends Test                                             
     lL           = createLeafStuck("lL");                                       // Process a left node
     lR           = createLeafStuck("lR");                                       // Process a right node
 
-    splitBranch_bL = createBranchStuck("splitBranch_bL");                       // Left node when splitting a branch
+    splitLeaf_lL = createLeafStuck("splitLeaf_lL");                             // Left node  when splitting a leaf
+    splitLeaf_lR = createLeafStuck("splitLeaf_lR");                             // Right node when splitting a leaf
+
+    splitBranch_bL = createBranchStuck("splitBranch_bL");                       // Left node  when splitting a branch
     splitBranch_bR = createBranchStuck("splitBranch_bR");                       // Right node when splitting a branch
 
     nT = new Node("nT");
@@ -1045,7 +1050,10 @@ abstract class BtreeSF extends Test                                             
 
   private void splitLeaf()                                                      // Split a leaf which is not the root assuming the nT/bT ahave the full details of the parent and that the node to be split is indexed by node_splitLeaf
    {zz();
-    allocLeaf(); tt(l, allocLeaf);                                              // New  split out leaf
+    final StuckDM lL = splitLeaf_lL;                                            // Process a left node
+    final StuckDM lR = splitLeaf_lR;                                            // Process a right node
+
+    allocLeaf(); tt(l, allocLeaf);                                              // New split out leaf
 
     nL.loadStuck(lL, l);                                                        // Clear the left stuck
     nR.loadStuck(lR, node_splitLeaf);                                           // Load stuck on right to be split
@@ -2305,7 +2313,7 @@ $opCodes
     end // Execute
   end // Always
 endmodule
-
+(* blackbox *)
 module Memory                                                                   // Memory used to hold the btree
  (input                         reset,                                          // Reinitialize memory when this bit goes high
   input                         clock,                                          // Clock
@@ -2313,11 +2321,11 @@ module Memory                                                                   
   input      [$nodeSize-1:0]       in,                                          // Input to memory
   output reg [$nodeSize-1:0]      out,                                          // Output from memory
   input                         write);                                         // Write into memory if true
-  always @(*) begin
-    out = 0;                                                                    // Stop a message from Yosys - this module will be replaced during routing.
-  end
 endmodule
 """);
+//  always @(*) begin
+//    out = 0;                                                                  // Stop a message from Yosys - this module will be replaced during routing.
+//  end
       writeFile(nano9kVerilog(), editVariables(s));                             // Write verilog for nano 9k
      }
 
