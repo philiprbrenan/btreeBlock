@@ -23,7 +23,6 @@ class ProgramDM extends Test                                                    
   final  int          number = ++numbers;                                       // Program number
   final TreeSet<MemoryLayoutDM> memories = new TreeSet<>();                     // Memory layouts associated with this program
   final TreeSet<String>      uniqueNames = new TreeSet<>();                     // Confirm that memory layouts that claim they have unique names really do have unique names
-  StringToNumbers opCodeMap  = null;                                            // Optional op code map if the program is using one to compress the number of op codes in use.
 
   ProgramDM() {z();}                                                            // Create a program that instructions can be added to and then executed
 
@@ -53,10 +52,7 @@ class ProgramDM extends Test                                                    
    {int instruction;                                                            // The instruction location to which this labels applies
     final String name;                                                          // An optional name for the label to assist in debugging
     Label()         {zz(); set(); labels.push(this); name = null;}              // A label assigned to an instruction location
-    Label(String n) {zz(); set(); labels.push(this); name = n;;}                // A label assigned to an instruction location with a name
     void set()      {zz(); instruction = code.size();}                          // Reassign the label to an instruction
-    int  get()      {zz(); return instruction;}                                 // Address of instruction
-    int  get1()     {zz(); return instruction-1;}                               // Address of previous instruction - useful in branch instructions because the program counter will be incremented in the execution loop
    }
 
   class I implements Comparable<I>                                              // Instruction definition
@@ -158,24 +154,26 @@ class ProgramDM extends Test                                                    
        {S.append(m.name()+"="+m.memory().print()+" ");
        }
      }
-    if (S.length() > 0) S.setLength(S.length() - 1);
-    if (opCodeMap != null)                                                      // Trace the changes made to memory via an opcode map if present
-     {final Integer os = opCodeMap.lowest.get(step);
-      final String  ot = os == null ? "   x" :                                  // Format the op code to match verilog
-            String.format("%4d", opCodeMap.lowest.get(step));
+    if (S.length() > 0) S.setLength(S.length() - 1);                            // Remove final space if there is one
 
-      Trace.push(String.format("%4d  %4d  %s  %s", steps, step, ot, S));        // Write with op code
-     }
-    else Trace.push(String.format("%4d  %4d  %s",  steps, step, S));            // Changes to memory without op code map translation
+    Trace.push(String.format("%4d  %4d        %s",  steps, step, S));           // Changes to memory with room for verilog to write the op code
    }
 
   void traceInstruction(I i) {}                                                 // Trace instruction
+
+  void setUniqueNames()                                                         // Assign a unique name to each memory layout to speed up tracing
+   {for(MemoryLayoutDM m: memories)
+     {m.setUniqueName();
+     }
+   }
 
   void run(String traceFile)                                                    // Run the program tracing to the named file
    {zz();
     if (currentParallel.size() > 0)                                             // Check all parallel sections have been closed
      {parallelDump(); stop("Parallel sections still open");
      }
+
+    setUniqueNames();                                                           // Assign a unique name to each memory layout to speed up tracing
 
     Trace.clear();
     running = true;
@@ -306,8 +304,7 @@ class ProgramDM extends Test                                                    
   abstract class Block                                                          // A block that can be continued or exited
    {final Label start = new Label(), end = new Label();                         // Labels at start and end of block to facilitate continuing or exiting
     Block()
-     {zz();
-      code();
+     {code();
       end.set();
      }
     abstract void code();
@@ -1126,8 +1123,7 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_nop();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
