@@ -56,14 +56,17 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
 
   void program(ProgramDM program, boolean uniqueName)                           // Program in which to generate instructions. If the name is unique it will be used directly in verilog, if not unique, then a unique making number will be added to the end
    {zz(); P = program; program.addMemoryLayout(this, uniqueName);
+    P.setUniqueNames();
    }
 
   void program(ProgramDM program) {zz(); program(program, true);}               // Add this memory layout to a program with the intention of using its uqnique name to identify it in verilog
 
   void setUniqueName()                                                          // Set a unique name for this memory layout for use when tracingmemory during program execution in Java and verilog to confirm that memory is being modified identically in the two representations.
    {zz();
-    uniqueName = P != null && P.uniqueNames.contains(name) ? name               // Name is already unique
-                                                           : name+"_"+number;   // Not sure if the name is unique so have to add a number to make it unique
+    if (uniqueName == null)                                                     // Name has not already been set
+     {uniqueName = P != null && P.uniqueNames.contains(name) ? name             // Name is already unique
+                                                             : name+"_"+number; // Not sure if the name is unique so have to add a number to make it unique
+     }
    }
 
   String name()                                                                 // Retrieve the unique name for this memory layout within its containing program
@@ -1830,7 +1833,6 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
 
     M.copy(m.at(a));
-    m.P.setUniqueNames();
     //stop(m.P.printVerilog());
     ok(m.P.printVerilog(), """
    1  M[0 +: 8] <= m[       0/*a       */ +: 8]; /* copy2 */
