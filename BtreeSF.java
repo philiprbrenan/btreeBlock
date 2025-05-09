@@ -7,13 +7,13 @@ package com.AppaApps.Silicon;                                                   
 // Node confirm that a load or a save identified by the trace back is actually changing the node - eliminate this that never have an effect
 // Stuck - get penultimate element. Use currentSize field directly instead of copy in it to a temporary variable
 // Use free in node to hold node number while allocated so that Node knows where to write it back to without being told
-// Set an updated field for when an existing key has its associated data updated by put
 // Start splitting lower down and merge only along split path
 // Separate nano9k gen from silicon compiler gen
 // Try memory operations in parallel in class Node without getting congestion complaints from silicon compiler
-// Remove removable memories as the use of local registers eliminates the need for them
+// +Remove removable memories as the use of local registers eliminates the need for them
 // Investigate whether it would be worth changing from a block of variables in T to individual memories for each variable now in T.  This would localize access which would simplify routing at the cost of more silicon spent on registers.
 // Can MmeoryLayoutDM be merged with Layout?  I.e. each field laid out would know what memory it resides in.
+// Testing the effect of split branch having its own node buffers
 import java.util.*;
 import java.nio.file.*;
 
@@ -25,7 +25,7 @@ abstract class BtreeSF extends Test                                             
   final ProgramDM                  P = new ProgramDM();                         // Program in which to generate instructions
   final boolean              OpCodes = true;                                    // Refactor op codes
   final boolean           runVerilog = true;                                    // Run verilog tests alongside java tests and check they produce the same results
-  final static TreeMap<String,String>removableMemories = new TreeMap<>();       // Record memories that can be removed from each project as they are not used
+  //final static TreeMap<String,String>removableMemories = new TreeMap<>();       // Record memories that can be removed from each project as they are not used
   final String     processTechnology = "freepdk45";                             // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
@@ -100,6 +100,8 @@ abstract class BtreeSF extends Test                                             
   final StuckDM lT;                                                             // Process a parent node as a leaf
   final StuckDM lL;                                                             // Process a left node
   final StuckDM lR;                                                             // Process a right node
+  final StuckDM splitBranch_bL;                                                 // Split a branch left node
+  final StuckDM splitBranch_bR;                                                 // Split a branch right node
 
   final Node nT;                                                                // Memory sufficient to contain a single parent node
   final Node nL;                                                                // Memory sufficient to contain a single left node
@@ -147,6 +149,9 @@ abstract class BtreeSF extends Test                                             
     lL           = createLeafStuck("lL");                                       // Process a left node
     lR           = createLeafStuck("lR");                                       // Process a right node
 
+    splitBranch_bL = createBranchStuck("splitBranch_bL");                       // Left node when splitting a branch
+    splitBranch_bR = createBranchStuck("splitBranch_bR");                       // Right node when splitting a branch
+
     nT = new Node("nT");
     nL = new Node("nL"); nC = nL;
     nR = new Node("nR");
@@ -166,9 +171,9 @@ abstract class BtreeSF extends Test                                             
     nC.setLeaf();                                                               // Set the root as a leaf
     nC.saveRoot();                                                              // Write back into memory
 
-    removableMemories.put("find",   " bT_StuckSA_Copy bL_StuckSA_Memory bL_StuckSA_Copy bL_StuckSA_Transaction bR_StuckSA_Memory bR_StuckSA_Copy bR_StuckSA_Transaction lT_StuckSA_Copy lL_StuckSA_Memory lL_StuckSA_Copy lL_StuckSA_Transaction lR_StuckSA_Memory  lR_StuckSA_Copy lR_StuckSA_Transaction nL nR ");
-    removableMemories.put("delete", " bL_StuckSA_Copy lL_StuckSA_Copy ");
-    removableMemories.put("put",    " bL_StuckSA_Copy lL_StuckSA_Copy lR_StuckSA_Copy ");
+    //removableMemories.put("find",   " bT_StuckSA_Copy bL_StuckSA_Memory bL_StuckSA_Copy bL_StuckSA_Transaction bR_StuckSA_Memory bR_StuckSA_Copy bR_StuckSA_Transaction lT_StuckSA_Copy lL_StuckSA_Memory lL_StuckSA_Copy lL_StuckSA_Transaction lR_StuckSA_Memory  lR_StuckSA_Copy lR_StuckSA_Transaction nL nR ");
+    //removableMemories.put("delete", " bL_StuckSA_Copy lL_StuckSA_Copy ");
+    //removableMemories.put("put",    " bL_StuckSA_Copy lL_StuckSA_Copy lR_StuckSA_Copy ");
    }
 
   StuckDM createBranchStuck(String name)                                        // Create a branch Stuck
@@ -1075,6 +1080,9 @@ abstract class BtreeSF extends Test                                             
 
   private void splitBranch()                                                    // Split a branch which is not the root  assuming the nT/bT ahave the full details of the parent and that the node to be split is indexed by node_splitBranch
    {zz();
+    final StuckDM bL = splitBranch_bL;                                          // Process a left node
+    final StuckDM bR = splitBranch_bR;                                          // Process a right node
+
     allocBranch(); tt(l, allocBranch);
 
     nL.loadStuck(bL, l);                                                        // Clear left stuck
@@ -1987,11 +1995,11 @@ abstract class BtreeSF extends Test                                             
      {zz();
       project = Project; folder = Folder; program = P;
 
-      removeMemories();                                                         // Remove memories reported as not used from Vivado
+      //removeMemories();                                                       // Remove memories reported as not used from Vivado
 
       T.at(Key).setInt(Key());                                                  // Key value
       if (Data() != null) T.at(Data).setInt(Data());                            // Optional data value to insert into tree
-      generateVerilog();                                                      // Generate verilog
+      generateVerilog();                                                        // Generate verilog
 
       execJavaTest();                                                           // Execute the Java test to load memories
       if (resultJava)                                                           // Generate verilog if Java test executed successfully
@@ -2028,19 +2036,19 @@ abstract class BtreeSF extends Test                                             
       ops.order();                                                              // Order the instructions
      }
 
-    boolean requiredMemory(MemoryLayoutDM m)                                    // Check memory is required for this project
-     {zz();
-      final String r = removableMemories.get(project);                          // Removable memories for this project
-      if (r == null) return true;                                               // No removable memories yet
-      return !r.contains(" "+m.name+" ");                                       // Check whether memory is removable or not
-     }
-
-    void removeMemories()                                                       // Remove memories reported as unneeded
-     {zz();
-      final Stack<MemoryLayoutDM> r = new Stack<>();                            // Memories that can be removed
-      for(MemoryLayoutDM m : P.memories) if (!requiredMemory(m)) r.push(m);     // Each memory not used by the program
-      for(MemoryLayoutDM m : r) P.memories.remove(m);
-     }
+//    boolean requiredMemory(MemoryLayoutDM m)                                    // Check memory is required for this project
+//     {zz();
+//      final String r = removableMemories.get(project);                          // Removable memories for this project
+//      if (r == null) return true;                                               // No removable memories yet
+//      return !r.contains(" "+m.name+" ");                                       // Check whether memory is removable or not
+//     }
+//
+//    void removeMemories()                                                       // Remove memories reported as unneeded
+//     {zz();
+//      final Stack<MemoryLayoutDM> r = new Stack<>();                            // Memories that can be removed
+//      for(MemoryLayoutDM m : P.memories) if (!requiredMemory(m)) r.push(m);     // Each memory not used by the program
+//      for(MemoryLayoutDM m : r) P.memories.remove(m);
+//     }
 
     void declareMemories()                                                      // Declare memories
      {zz();
