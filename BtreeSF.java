@@ -26,7 +26,6 @@ abstract class BtreeSF extends Test                                             
   final boolean              OpCodes = true;                                    // Refactor op codes
   final boolean           runVerilog = true;                                    // Run verilog tests alongside java tests and check they produce the same results
   final String     designDescription = "Add more node buffers to splitLeaf";    // Description of latest change
-  //final static TreeMap<String,String>removableMemories = new TreeMap<>();     // Record memories that can be removed from each project as they are not used
   final String     processTechnology = "freepdk45";                             // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
@@ -91,16 +90,12 @@ abstract class BtreeSF extends Test                                             
   final StuckDM bTop;                                                           // Get the size of a stuck
   final StuckDM bFirstBranch;                                                   // Locate the first greater or equal key in a branch
   final StuckDM bT;                                                             // Process a parent node
-  final StuckDM bL;                                                             // Process a left node
-  final StuckDM bR;                                                             // Process a right node
 
   final StuckDM lSize;                                                          // Branch size
   final StuckDM lLeaf;                                                          // Check whether a node has leaves for children
   final StuckDM lEqual;                                                         // Locate an equal key
   final StuckDM lFirstLeaf;                                                     // Locate the first greater or equal key in a leaf
   final StuckDM lT;                                                             // Process a parent node as a leaf
-  final StuckDM lL;                                                             // Process a left node
-  final StuckDM lR;                                                             // Process a right node
 
   final Node nT;                                                                // Memory sufficient to contain a single parent node
   final Node nL;                                                                // Memory sufficient to contain a single left node
@@ -137,16 +132,12 @@ abstract class BtreeSF extends Test                                             
     bTop         = //branchTransactions[Branch_Top        ];                    // Get the size of a stuck
     bFirstBranch = //branchTransactions[Branch_FirstBranch];                    // Locate the first greater or equal key in a branch
     bT           = createBranchStuck("bT");                                     // Process a parent node
-    bL           = createBranchStuck("bL");                                     // Process a left node
-    bR           = createBranchStuck("bR");                                     // Process a right node
 
     lSize        =   //leafTransactions[Leaf_Size         ];                    // Leaf size
     lLeaf        =   //leafTransactions[Leaf_Leaf         ];                    // Print a leaf
     lEqual       =   //leafTransactions[Leaf_Equal        ];                    // Locate an equal key
     lFirstLeaf   =   //leafTransactions[Leaf_FirstLeaf    ];                    // Locate the first greater or equal key in a leaf
     lT           = createLeafStuck("lT");                                       // Process a parent node
-    lL           = createLeafStuck("lL");                                       // Process a left node
-    lR           = createLeafStuck("lR");                                       // Process a right node
 
     nT = new Node("nT");
     nL = new Node("nL"); nC = nL;
@@ -166,10 +157,6 @@ abstract class BtreeSF extends Test                                             
     nC.loadRoot();                                                              // Load the allocated node
     nC.setLeaf();                                                               // Set the root as a leaf
     nC.saveRoot();                                                              // Write back into memory
-
-    //removableMemories.put("find",   " bT_StuckSA_Copy bL_StuckSA_Memory bL_StuckSA_Copy bL_StuckSA_Transaction bR_StuckSA_Memory bR_StuckSA_Copy bR_StuckSA_Transaction lT_StuckSA_Copy lL_StuckSA_Memory lL_StuckSA_Copy lL_StuckSA_Transaction lR_StuckSA_Memory  lR_StuckSA_Copy lR_StuckSA_Transaction nL nR ");
-    //removableMemories.put("delete", " bL_StuckSA_Copy lL_StuckSA_Copy ");
-    //removableMemories.put("put",    " bL_StuckSA_Copy lL_StuckSA_Copy lR_StuckSA_Copy ");
    }
 
   StuckDM createBranchStuck(String name)                                        // Create a branch Stuck
@@ -225,11 +212,11 @@ abstract class BtreeSF extends Test                                             
   private static BtreeSF wideTree()                                             // Define a tree with nodes wide enough to test logarithmic moves and searching
    {zz();
     return new BtreeSF()
-     {int maxSize         () {return    6;}
-      int maxKeysPerLeaf  () {return    8;}
-      int maxKeysPerBranch() {return    9;}
-      int bitsPerKey      () {return 1024;}
-      int bitsPerData     () {return 1024;}
+     {int maxSize         () {return 32;}
+      int maxKeysPerLeaf  () {return  8;}
+      int maxKeysPerBranch() {return  9;}
+      int bitsPerKey      () {return 64;}
+      int bitsPerData     () {return 64;}
      };
    }
 
@@ -2058,20 +2045,6 @@ abstract class BtreeSF extends Test                                             
        }
       ops.order();                                                              // Order the instructions
      }
-
-//    boolean requiredMemory(MemoryLayoutDM m)                                    // Check memory is required for this project
-//     {zz();
-//      final String r = removableMemories.get(project);                          // Removable memories for this project
-//      if (r == null) return true;                                               // No removable memories yet
-//      return !r.contains(" "+m.name+" ");                                       // Check whether memory is removable or not
-//     }
-//
-//    void removeMemories()                                                       // Remove memories reported as unneeded
-//     {zz();
-//      final Stack<MemoryLayoutDM> r = new Stack<>();                            // Memories that can be removed
-//      for(MemoryLayoutDM m : P.memories) if (!requiredMemory(m)) r.push(m);     // Each memory not used by the program
-//      for(MemoryLayoutDM m : r) P.memories.remove(m);
-//     }
 
     void declareMemories()                                                      // Declare memories
      {zz();
@@ -4588,7 +4561,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4,5,6,7,8=0 |
 """);
 
-    t.runVerilogPutTest(9, 162, """
+    t.runVerilogPutTest(9, 158, """
           4            |
           0            |
           1            |
@@ -4620,7 +4593,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8,9,10,11,12=2 |
 """);
 
-    t.runVerilogPutTest(13, 286, """
+    t.runVerilogPutTest(13, 282, """
           4          8                  |
           0          0.1                |
           1          3                  |
@@ -4652,7 +4625,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8=3    9,10,11,12,13,14,15,16=2 |
 """);
 
-    t.runVerilogPutTest(17, 358, """
+    t.runVerilogPutTest(17, 350, """
                   8             12                  |
                   0             0.1                 |
                   1             4                   |
@@ -4712,9 +4685,11 @@ StuckSML(maxSize:4 size:1)
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_delete_verilog();
-    test_find_verilog();
-    test_put_verilog();
+    //test_delete_verilog();
+    //test_find_verilog();
+    //test_put_verilog();
+    test_find_wide();
+    test_put_wide();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
