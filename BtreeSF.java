@@ -101,10 +101,6 @@ abstract class BtreeSF extends Test                                             
   final StuckDM lT;                                                             // Process a parent node as a leaf
   final StuckDM lL;                                                             // Process a left node
   final StuckDM lR;                                                             // Process a right node
-  final StuckDM splitLeaf_lL;                                                   // Split a leaf left node
-  final StuckDM splitLeaf_lR;                                                   // Split a leaf right node
-  final StuckDM splitBranch_bL;                                                 // Split a branch left node
-  final StuckDM splitBranch_bR;                                                 // Split a branch right node
 
   final Node nT;                                                                // Memory sufficient to contain a single parent node
   final Node nL;                                                                // Memory sufficient to contain a single left node
@@ -151,12 +147,6 @@ abstract class BtreeSF extends Test                                             
     lT           = createLeafStuck("lT");                                       // Process a parent node
     lL           = createLeafStuck("lL");                                       // Process a left node
     lR           = createLeafStuck("lR");                                       // Process a right node
-
-    splitLeaf_lL = createLeafStuck("splitLeaf_lL");                             // Left node  when splitting a leaf
-    splitLeaf_lR = createLeafStuck("splitLeaf_lR");                             // Right node when splitting a leaf
-
-    splitBranch_bL = createBranchStuck("splitBranch_bL");                       // Left node  when splitting a branch
-    splitBranch_bR = createBranchStuck("splitBranch_bR");                       // Right node when splitting a branch
 
     nT = new Node("nT");
     nL = new Node("nL"); nC = nL;
@@ -955,8 +945,8 @@ abstract class BtreeSF extends Test                                             
 
   private void splitLeafRoot()                                                  // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
    {zz();
-    //final  Variable L = new Variable(P, "left",  bitsPerNext);                  // Index of left allocated node
-    //final  Variable R = new Variable(P, "right", bitsPerNext);                  // Index of right allocated node
+    final StuckDM lL = createLeafStuck("splitLeafRoot_lL");                     // Process a left node
+    final StuckDM lR = createLeafStuck("splitLeafRoot_lR");                     // Process a right node
 
     allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
     allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
@@ -1005,6 +995,9 @@ abstract class BtreeSF extends Test                                             
 
   private void splitBranchRoot()                                                // Split a branch which happens to be a full root into two half full branches while retaining the current branch as the root
    {zz();
+    final StuckDM bL = createBranchStuck("splitBranchRoot_bL");                 // Process a left node
+    final StuckDM bR = createBranchStuck("splitBranchRoot_bR");                 // Process a right node
+
     allocBranch(); tt(l, allocBranch);                                          // New left branch
     allocBranch(); tt(r, allocBranch);                                          // New right branch
 
@@ -1051,8 +1044,8 @@ abstract class BtreeSF extends Test                                             
 
   private void splitLeaf()                                                      // Split a leaf which is not the root assuming the nT/bT ahave the full details of the parent and that the node to be split is indexed by node_splitLeaf
    {zz();
-    final StuckDM lL = splitLeaf_lL;                                            // Process a left node
-    final StuckDM lR = splitLeaf_lR;                                            // Process a right node
+    final StuckDM lL = createLeafStuck("splitLeaf_lL");                         // Process a left node
+    final StuckDM lR = createLeafStuck("splitLeaf_lR");                         // Process a right node
 
     allocLeaf(); tt(l, allocLeaf);                                              // New split out leaf
 
@@ -1089,8 +1082,8 @@ abstract class BtreeSF extends Test                                             
 
   private void splitBranch()                                                    // Split a branch which is not the root  assuming the nT/bT ahave the full details of the parent and that the node to be split is indexed by node_splitBranch
    {zz();
-    final StuckDM bL = splitBranch_bL;                                          // Process a left node
-    final StuckDM bR = splitBranch_bR;                                          // Process a right node
+    final StuckDM bL = createBranchStuck("splitBranch_bL");                     // Process a left node
+    final StuckDM bR = createBranchStuck("splitBranch_bR");                     // Process a right node
 
     allocBranch(); tt(l, allocBranch);
 
@@ -1145,7 +1138,11 @@ abstract class BtreeSF extends Test                                             
 
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
-           {nL.loadLeafStuckAndSize(lL, l, nl);                                 // Address leaves on each side and get their size
+           {z();
+            final StuckDM lL = createLeafStuck("stealFromLeft_lL");             // Process a left node
+            final StuckDM lR = createLeafStuck("stealFromLeft_lR");             // Process a right node
+
+            nL.loadLeafStuckAndSize(lL, l, nl);                                 // Address leaves on each side and get their size
             nR.loadLeafStuckAndSize(lR, r, nr);
 
             T.at(nr).greaterThanOrEqual(T.at(maxKeysPerLeaf),
@@ -1177,6 +1174,8 @@ abstract class BtreeSF extends Test                                             
            }
           void Else()                                                           // Children are branches
            {z();
+            final StuckDM bL = createBranchStuck("stealFromLeft_bL");           // Process a left node
+            final StuckDM bR = createBranchStuck("stealFromLeft_bR");           // Process a right node
             nL.loadBranchStuckAndSize(bL, l, nl);
             nR.loadBranchStuckAndSize(bR, r, nr);
 
@@ -1253,6 +1252,8 @@ abstract class BtreeSF extends Test                                             
         P.new If(T.at(hasLeavesForChildren))                                    // Children are leaves
          {void Then()
            {z();
+            final StuckDM lL = createLeafStuck("stealFromRight_lL");            // Process a left node
+            final StuckDM lR = createLeafStuck("stealFromRight_lR");            // Process a right node
             nL.loadLeafStuckAndSize(lL, l, nl);
             nR.loadLeafStuckAndSize(lR, r, nr);
 
@@ -1280,6 +1281,8 @@ abstract class BtreeSF extends Test                                             
            }
           void Else()                                                           // Children are branches
            {z();
+            final StuckDM bL = createBranchStuck("stealFromRight_bL");          // Process a left node
+            final StuckDM bR = createBranchStuck("stealFromRight_bR");          // Process a right node
             nL.loadBranchStuckAndSize(bL, l, nl);
             nR.loadBranchStuckAndSize(bR, r, nr);
 
@@ -1345,6 +1348,8 @@ abstract class BtreeSF extends Test                                             
         P.new If (T.at(hasLeavesForChildren))                                   // Leaves
          {void Then()
            {z();
+            final StuckDM lL = createLeafStuck("mergeRoot_lL");                 // Process a left node
+            final StuckDM lR = createLeafStuck("mergeRoot_lR");                 // Process a right node
             nL.loadLeafStuckAndSize(lL, l, nl);
             nR.loadLeafStuckAndSize(lR, r, nr);
 
@@ -1380,6 +1385,8 @@ abstract class BtreeSF extends Test                                             
            }
           void Else()                                                           // Branches
            {z();
+            final StuckDM bL = createBranchStuck("mergeRoot_bL");               // Process a left node
+            final StuckDM bR = createBranchStuck("mergeRoot_bR");               // Process a right node
             nL.loadBranchStuckAndSize(bL, l, nl);
             nR.loadBranchStuckAndSize(bR, r, nr);
 
@@ -1450,6 +1457,8 @@ abstract class BtreeSF extends Test                                             
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
            {z();
+            final StuckDM lL = createLeafStuck("mergeLeftSibling_lL");          // Process a left node
+            final StuckDM lR = createLeafStuck("mergeLeftSibling_lR");          // Process a right node
             nL.loadLeafStuckAndSize(lL, l, nl);
             nR.loadLeafStuckAndSize(lR, r, nr);
 
@@ -1473,6 +1482,8 @@ abstract class BtreeSF extends Test                                             
            }
           void Else()                                                           // Children are branches
            {z();
+            final StuckDM bL = createBranchStuck("mergeLeftSibling_bL");        // Process a left node
+            final StuckDM bR = createBranchStuck("mergeLeftSibling_bR");        // Process a right node
             nL.loadBranchStuckAndSize(bL, l, nl);
             nR.loadBranchStuckAndSize(bR, r, nr);
 
@@ -1539,6 +1550,8 @@ abstract class BtreeSF extends Test                                             
         P.new If (T.at(hasLeavesForChildren))                                   // Children are leaves
          {void Then()
            {z();
+            final StuckDM lL = createLeafStuck("mergeRightSibling_lL");         // Process a left node
+            final StuckDM lR = createLeafStuck("mergeRightSibling_lR");         // Process a right node
             nL.loadLeafStuckAndSize(lL, l, nl);
             nR.loadLeafStuckAndSize(lR, r, nr);
 
@@ -1562,9 +1575,10 @@ abstract class BtreeSF extends Test                                             
            }
           void Else()                                                           // Children are branches
            {z();
+            final StuckDM bL = createBranchStuck("mergeRightSibling_bL");       // Process a left node
+            final StuckDM bR = createBranchStuck("mergeRightSibling_bR");       // Process a right node
             nL.loadBranchStuckAndSize(bL, l, nl);
             nR.loadBranchStuckAndSize(bR, r, nr);
-
 
             P.new I()                                                           // Check that combined node would not be too big
              {void a()
@@ -4704,7 +4718,7 @@ StuckSML(maxSize:4 size:1)
    }
 
   public static void main(String[] args)                                        // Test if called as a program
-   {deleteAllFiles(verilogFolder, 600);                                         // Clear the verilog folder as otherwise life gets very confusing
+   {deleteAllFiles(verilogFolder, 1000);                                        // Clear the verilog folder as otherwise life gets very confusing
     try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
       if (github_actions)                                                       // Coverage analysis
