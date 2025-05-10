@@ -53,7 +53,6 @@ if (1)
   @files = grep {!$s{$_}++} @files, @sc;
  }
 
-
 @files = setUnion @files;                                                       # Remove any duplicates
 @files = grep {fileSize($_) > 0} @files;                                        # Remove empty files
 @files = changedFiles $md5File,  @files if 1;                                   # Filter out files that have not changed
