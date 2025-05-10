@@ -31,6 +31,7 @@ push my @files, searchDirectoryTreesForMatchingFiles($home, @ext);              
         @files = grep {!m(/vivado/pins/)}         @files;
         @files = grep {!m(/logs/)}                @files;
         @files = grep {!m(/build/)}               @files;
+say STDERR "AAAA ", dump(\@files);
 
 if (1)                                                                          # Remove most of the verilog except the reports
  {my @f = @files; @files = ();
