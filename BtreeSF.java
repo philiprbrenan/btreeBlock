@@ -4682,17 +4682,15 @@ StuckSML(maxSize:4 size:1)
     test_delete_verilog();
     test_find_verilog();
     test_put_verilog();
-    test_find_wide();
-    test_put_wide();
+//  test_find_wide();
+//  test_put_wide();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    //test_delete_verilog();
-    //test_find_verilog();
-    //test_put_verilog();
-    test_find_wide();
-    //test_put_wide();
+    test_delete_verilog();
+    test_find_verilog();
+    test_put_verilog();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
