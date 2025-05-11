@@ -1982,7 +1982,9 @@ abstract class BtreeSF extends Test                                             
     String nano9kConstraints() {return ""+Paths.get(projectFolder(), nano9k,     project           +Verilog.constraintsExt);}
     String       nano9kBuild() {return ""+Paths.get(projectFolder(), nano9k,     project           +".pl");}
     String           scBuild() {return ""+Paths.get(projectFolder(), siliconCompiler, project      +".py");}
-    String     scConstraints() {return ""+Paths.get(projectFolder(), siliconCompiler, project      +".sdc");}
+    String          scSource() {return ""+Paths.get(projectFolder(), siliconCompiler, project      +Verilog.ext);}
+    String          scMemory() {return ""+Paths.get(projectFolder(), siliconCompiler, "memory"     +Verilog.ext);}
+  //String     scConstraints() {return ""+Paths.get(projectFolder(), siliconCompiler, project      +".sdc");} // Possibly not needed
     String     declareMemory() {return ""+Paths.get(projectFolder(), "includes", "declareMemory"   +Verilog.header);}
     String  initializeMemory() {return ""+Paths.get(projectFolder(), "includes", "initializeMemory"+Verilog.header);}
     String     opCodeMapFile() {return ""+Paths.get(projectFolder(), "includes", opCodeMap         +Verilog.header);}
@@ -2232,7 +2234,7 @@ endmodule
       writeFile(sourceVerilog(), editVariables(s));                             // Write verilog module
      }
 
-    void generateVerilogNano9k()                                                // Generate verilog code for Nano 9k
+    void generateVerilogForSynthesis()                                          // Generate verilog code for Nano 9k
      {zz();
       final StringBuilder s = new StringBuilder();
       s.append("""
@@ -2304,6 +2306,21 @@ $opCodes
     end // Execute
   end // Always
 endmodule
+""");
+      writeFile(nano9kVerilog(), editVariables(s));                             // Write verilog for nano 9k
+      writeFile(scSource(),      editVariables(s));                             // Write verilog for silicon compiler
+     }
+
+    void generateVerilogForMemory()                                             // Generate verilog code for memory black box
+     {zz();
+      final StringBuilder s = new StringBuilder();                              // Generate code
+      s.append("""
+//-----------------------------------------------------------------------------
+// Database on a chip memory black box
+// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025
+//------------------------------------------------------------------------------
+`timescale 10ps/1ps
+(* keep_hierarchy = "yes" *)
 (* blackbox *)
 module Memory                                                                   // Memory used to hold the btree
  (input                         reset,                                          // Reinitialize memory when this bit goes high
@@ -2314,10 +2331,7 @@ module Memory                                                                   
   input                         write);                                         // Write into memory if true
 endmodule
 """);
-//  always @(*) begin
-//    out = 0;                                                                  // Stop a message from Yosys - this module will be replaced during routing.
-//  end
-      writeFile(nano9kVerilog(), editVariables(s));                             // Write verilog for nano 9k
+      writeFile(scMemory(), editVariables(s));                                  // Write verilog for silicon compiler
      }
 
     void generateVerilogTestBench()                                             // Generate verilog test bench for normal and Vivado versions
@@ -2512,8 +2526,9 @@ from siliconcompiler.targets import $processTechnology_demo
 
 if __name__ == "__main__":
     chip = Chip('$project')                                                     # Create chip object
-    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/nano9k/$project.v')            # Define list of source files
-    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.sdc') # Define list of source files
+    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.v', 'verilog')           # Source code
+    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/memory.v',   'verilog', lib=True) # Memory black box
+   #chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.sdc') # Clock - can be ommitted according to chatGpt
     chip.use($processTechnology_demo)                                           # Load predefined technology and flow target
     chip.set('package', 'description', '$designDescription')                    # Description of design
     chip.clock('clock', period=10)                                              # Define clock speed of design was 100
@@ -2537,7 +2552,7 @@ if __name__ == "__main__":
       c.append("""
 create_clock -name clock -period 100 [get_ports {clock}]
 """);
-      writeFile(scConstraints(), editVariables(c));                             // Write constraints file for silicon compiler
+    //writeFile(scConstraints(), editVariables(c));                             // Write constraints file for silicon compiler
      }
 
     void generateVerilog()                                                      // Generate verilog
@@ -2552,9 +2567,10 @@ create_clock -name clock -period 100 [get_ports {clock}]
       initializeMemories();
 
       generateVerilogCode();                                                    // Generate code and test banches for various devices
-      generateVerilogNano9k();                                                  // The nano9K code is reused by silicon compiler
-      generateVerilogTestBench();
-      generateSiliconCompiler();
+      generateVerilogForSynthesis();                                            // Synthesizable verilog
+      generateVerilogTestBench();                                               // Test bench
+      generateSiliconCompiler();                                                // Silicon compiler Python driver
+      generateVerilogForMemory();                                               // Black box for memory
 
       if (project.equalsIgnoreCase("find"))                                     // Only the find project will fit on the nano 9k
        {generateVerilogTestBenchNano9K();
