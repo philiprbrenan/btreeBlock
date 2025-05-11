@@ -434,10 +434,10 @@ abstract class StuckDM extends Test                                             
         final String        X = M.at(currentSize).verilogLoad();                // Number of elements to search
         final int           N = maxSize();
 
-        v.append("/* StuckDM.search2.1 */\n");
+        v.append("/* search2.1 */\n");
         for (int i = 0; i < N; i++)
-         {v.append(T.at(equalLeafKey,     i).verilogLoad()+" <= "+M.at(sKey, i).verilogLoad()+" == "+s+";\n");
-          v.append(T.at(lessThanLeafSize, i).verilogLoad()+" <= "+i+                          " < " +X+";\n");
+         {v.append(T.at(equalLeafKey,     i).verilogLoad()+" <= "+M.at(sKey, i).verilogLoad()+" == "+s+";\n");  // Whether the key matches the current position
+          v.append(T.at(lessThanLeafSize, i).verilogLoad()+" <= "+i+                          " < " +X+";\n");  // Whether the current position is in the valid range of the stuck
          }
         return ""+v;
        }
@@ -457,9 +457,9 @@ abstract class StuckDM extends Test                                             
        {final StringBuilder v = new StringBuilder();                            // Verilog
         final int           N = maxSize();
 
-        v.append("/* StuckDM.search2.2 */\n");
+        v.append("/* search2.2 */\n");
         for (int i = 0; i < N; i++)
-         {v.append(T.at(equalLeafKey,     i).verilogLoad()+" <= ");
+         {v.append(T.at(equalLeafKey,     i).verilogLoad()+" <= ");             // Equals is now restricted to the valid part of the stuck
           v.append(T.at(equalLeafKey,     i).verilogLoad()+" && ");
           v.append(T.at(lessThanLeafSize, i).verilogLoad()+";\n");
          }
@@ -484,7 +484,26 @@ abstract class StuckDM extends Test                                             
          }
        }
 
-      String v()                                                                // Find the first one using ? so this will get slower as the number of keys increases
+      String v()                                                                // Or the valid elements using || rather than sequentially using ? as hopefully Verilog will implement this in log time rather than linear time
+       {final StringBuilder v = new StringBuilder();                            // Verilog
+        final int           N = maxSize();
+
+        v.append("/* search2.3 */\n");
+        v.append(Found.verilogLoad()+" <= 0");                                  // Found
+        for (int i = 0; i < N; i++) v.append(" || "+T.at(equalLeafKey, i).verilogLoad());
+        v.append(";\n");
+
+        v.append(Index.verilogLoad()+" <= 0");                                  // Index
+        for (int i = 0; i < N; i++) v.append(" | ("+T.at(equalLeafKey, i).verilogLoad() + " ? "+i+" : 0)");
+        v.append(";\n");
+
+        v.append(Data.verilogLoad()+" <= 0");                                   // Data
+        for (int i = 0; i < N; i++) v.append(" | ("+T.at(equalLeafKey, i).verilogLoad() + " ? "+M.at(sData, i).verilogLoad()+" : 0)");
+        v.append(";\n");
+        return ""+v;
+       }
+
+      String v2()  // original with ?                                           // Find the first one using ? so this will get slower as the number of keys increases
        {final StringBuilder v = new StringBuilder();                            // Verilog
         final int           N = maxSize();
 
