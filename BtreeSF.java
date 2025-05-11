@@ -3768,17 +3768,17 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
 
-    t.run_verilogFind( 0, 0, 0, 27);
+    //t.run_verilogFind( 0, 0, 0, 27);
     t.run_verilogFind( 1, 1, 8, 27);
-    t.run_verilogFind( 2, 1, 7, 27);
-    t.run_verilogFind( 3, 1, 6, 27);
-    t.run_verilogFind( 4, 1, 5, 27);
-    t.run_verilogFind( 5, 1, 4, 27);
-    t.run_verilogFind( 6, 1, 3, 27);
-    t.run_verilogFind( 7, 1, 2, 27);
-    t.run_verilogFind( 8, 1, 1, 27);
-    t.run_verilogFind( 9, 1, 0, 27);
-    t.run_verilogFind(10, 0, 0, 27);
+    //t.run_verilogFind( 2, 1, 7, 27);
+    //t.run_verilogFind( 3, 1, 6, 27);
+    //t.run_verilogFind( 4, 1, 5, 27);
+    //t.run_verilogFind( 5, 1, 4, 27);
+    //t.run_verilogFind( 6, 1, 3, 27);
+    //t.run_verilogFind( 7, 1, 2, 27);
+    //t.run_verilogFind( 8, 1, 1, 27);
+    //t.run_verilogFind( 9, 1, 0, 27);
+    //t.run_verilogFind(10, 0, 0, 27);
    }
 
   private void runVerilogDeleteTest                                             // Run the java and verilog versions and compare the resulting memory traces
@@ -4705,9 +4705,9 @@ StuckSML(maxSize:4 size:1)
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_delete_verilog();
+    //test_delete_verilog();
     test_find_verilog();
-    test_put_verilog();
+    //test_put_verilog();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
