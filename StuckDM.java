@@ -503,7 +503,7 @@ abstract class StuckDM extends Test                                             
         return ""+v;
        }
 
-      String v()  // original with ?                                           // Find the first one using ? so this will get slower as the number of keys increases
+      String v()  // 777 Mhz                                                    // Find the first one using ? so this will get slower as the number of keys increases
        {final StringBuilder v = new StringBuilder();                            // Verilog
         final int           N = maxSize();
 
