@@ -1984,7 +1984,7 @@ abstract class BtreeSF extends Test                                             
     String           scBuild() {return ""+Paths.get(projectFolder(), siliconCompiler, project      +".py");}
     String          scSource() {return ""+Paths.get(projectFolder(), siliconCompiler, project      +Verilog.ext);}
     String          scMemory() {return ""+Paths.get(projectFolder(), siliconCompiler, "memory"     +Verilog.ext);}
-  //String     scConstraints() {return ""+Paths.get(projectFolder(), siliconCompiler, project      +".sdc");} // Possibly not needed
+    String     scConstraints() {return ""+Paths.get(projectFolder(), siliconCompiler, project      +".sdc");}
     String     declareMemory() {return ""+Paths.get(projectFolder(), "includes", "declareMemory"   +Verilog.header);}
     String  initializeMemory() {return ""+Paths.get(projectFolder(), "includes", "initializeMemory"+Verilog.header);}
     String     opCodeMapFile() {return ""+Paths.get(projectFolder(), "includes", opCodeMap         +Verilog.header);}
@@ -2528,7 +2528,7 @@ if __name__ == "__main__":
     chip = Chip('$project')                                                     # Create chip object
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.v', 'verilog') # Source code
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/memory.v',   'verilog') # Memory black box
-   #chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.sdc') # Clock - can be ommitted according to chatGpt
+    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.sdc')
     chip.set('design', '$project')                                              # Show the top most module
     chip.use($processTechnology_demo)                                           # Load predefined technology and flow target
     chip.set('package', 'description', '$designDescription')                    # Description of design
@@ -2553,7 +2553,7 @@ if __name__ == "__main__":
       c.append("""
 create_clock -name clock -period 100 [get_ports {clock}]
 """);
-    //writeFile(scConstraints(), editVariables(c));                             // Write constraints file for silicon compiler
+      writeFile(scConstraints(), editVariables(c));                             // Write constraints file for silicon compiler
      }
 
     void generateVerilog()                                                      // Generate verilog
