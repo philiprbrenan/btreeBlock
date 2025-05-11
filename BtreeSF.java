@@ -1971,7 +1971,7 @@ abstract class BtreeSF extends Test                                             
     abstract int     maxSteps();                                                // Maximum number if execution steps
     abstract int     expSteps();                                                // Expected number of steps
     abstract String  expected();                                                // Expected number of steps
-             int     density () {return 30;}                                    // Indication of gate density required on die.
+             int     density () {return 60;}                                    // Indication of gate density required on die.
 
     String projectFolder() {return ""+Paths.get(folder, project, ""+Key());}    // Define the project folder
 
@@ -2536,7 +2536,7 @@ if __name__ == "__main__":
     chip.set('option', 'remote', False)                                         # Run remote in the cloud
     chip.set('option', 'nodisplay', True)                                       # Do not open displays
     chip.set('option', 'loglevel', 'warning')                                   # Warnings and above
-   #chip.set('constraint', 'density', $density)                                 # Lowering the density gives more area in which to route connections at the cost of wasting surface area and making teh chip run slower
+    chip.set('constraint', 'density', $density)                                 # Lowering the density gives more area in which to route connections at the cost of wasting surface area and making teh chip run slower
     chip.run()                                                                  # Run compilation of design and target
     chip.summary()
     chip.snapshot()
