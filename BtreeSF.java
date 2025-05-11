@@ -2526,9 +2526,9 @@ from siliconcompiler.targets import $processTechnology_demo
 
 if __name__ == "__main__":
     chip = Chip('$project')                                                     # Create chip object
-    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.v', 'verilog') # Source code
-    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/memory.v',   'verilog') # Memory black box
-    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.sdc')
+    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.v') # Source code
+    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/memory.v'  ) # Memory black box
+   #chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.sdc')
     chip.set('design', '$project')                                              # Show the top most module
     chip.use($processTechnology_demo)                                           # Load predefined technology and flow target
     chip.set('package', 'description', '$designDescription')                    # Description of design
