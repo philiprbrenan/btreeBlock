@@ -2536,7 +2536,7 @@ if __name__ == "__main__":
     chip.set('option', 'remote', False)                                         # Run remote in the cloud
     chip.set('option', 'nodisplay', True)                                       # Do not open displays
     chip.set('option', 'loglevel', 'warning')                                   # Warnings and above
-    chip.set('constraint', 'density', $density)                                 # Lowering the density gives more area in which to route connections at the cost of wasting surface area
+   #chip.set('constraint', 'density', $density)                                 # Lowering the density gives more area in which to route connections at the cost of wasting surface area and making teh chip run slower
     chip.run()                                                                  # Run compilation of design and target
     chip.summary()
     chip.snapshot()
