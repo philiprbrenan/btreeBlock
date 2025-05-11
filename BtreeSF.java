@@ -2526,8 +2526,9 @@ from siliconcompiler.targets import $processTechnology_demo
 
 if __name__ == "__main__":
     chip = Chip('$project')                                                     # Create chip object
-    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.v', 'verilog')           # Source code
-    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/memory.v',   'verilog', lib=True) # Memory black box
+    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.v', 'verilog') # Source code
+    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/memory.v',   'verilog') # Memory black box
+    chip.add_library('/home/azureuser/btreeBlock/verilog/find_verilog/1/siliconCompiler/memory.v')       # Make the memory into a library
    #chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.sdc') # Clock - can be ommitted according to chatGpt
     chip.use($processTechnology_demo)                                           # Load predefined technology and flow target
     chip.set('package', 'description', '$designDescription')                    # Description of design
