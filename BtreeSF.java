@@ -25,7 +25,7 @@ abstract class BtreeSF extends Test                                             
   final ProgramDM                  P = new ProgramDM();                         // Program in which to generate instructions
   final boolean              OpCodes = true;                                    // Refactor op codes
   final boolean           runVerilog = true;                                    // Run verilog tests alongside java tests and check they produce the same results
-  final String     designDescription = "Add more node buffers to splitLeaf";    // Description of latest change
+  final String     designDescription = "? versus |";                            // Description of latest change
   //final static TreeMap<String,String>removableMemories = new TreeMap<>();     // Record memories that can be removed from each project as they are not used
   final String     processTechnology = "freepdk45";                             // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
