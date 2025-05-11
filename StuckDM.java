@@ -484,7 +484,7 @@ abstract class StuckDM extends Test                                             
          }
        }
 
-      String v()     //864 Mhz                                                  // Or the valid elements using || rather than sequentially using ? as hopefully Verilog will implement this in log time rather than linear time
+      String v()     //864 Mhz  829 no denosty                                                 // Or the valid elements using || rather than sequentially using ? as hopefully Verilog will implement this in log time rather than linear time
        {final StringBuilder v = new StringBuilder();                            // Verilog
         final int           N = maxSize();
 
