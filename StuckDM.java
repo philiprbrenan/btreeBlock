@@ -484,7 +484,7 @@ abstract class StuckDM extends Test                                             
          }
        }
 
-      String v()                                                                // Or the valid elements using || rather than sequentially using ? as hopefully Verilog will implement this in log time rather than linear time
+      String v2()     //864 Mhz                                                 // Or the valid elements using || rather than sequentially using ? as hopefully Verilog will implement this in log time rather than linear time
        {final StringBuilder v = new StringBuilder();                            // Verilog
         final int           N = maxSize();
 
@@ -503,7 +503,7 @@ abstract class StuckDM extends Test                                             
         return ""+v;
        }
 
-      String v2()  // original with ?                                           // Find the first one using ? so this will get slower as the number of keys increases
+      String v()  // original with ?                                           // Find the first one using ? so this will get slower as the number of keys increases
        {final StringBuilder v = new StringBuilder();                            // Verilog
         final int           N = maxSize();
 
