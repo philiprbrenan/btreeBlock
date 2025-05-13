@@ -548,7 +548,7 @@ abstract class StuckDM extends Test                                             
           final boolean E =         T.at(equalLeafKey,     i  ).setOff().getInt() > 0;         // Current  value
           final boolean v =         T.at(lessThanLeafSize, i  ).setOff().getInt() > 0;         // In range
           final int     r = !e && E && v ? 1 : 0;
-          T.at(lessThanLeafSize, i).setInt(r);                                  // Need to preserve equalLeafKey unchanged to allow previous element to be referenced
+          T.at(lessThanLeafSize, i).setInt(r);                                  // Need to preserve equalLeafKey unchanged to allow previous element to be referenced so use less than leaf key array to hold whether a match  occurred
          }
 
         final int c = M.at(currentSize).setOff().getInt();                      // Number of elements in stuck
@@ -629,7 +629,7 @@ abstract class StuckDM extends Test                                             
           if (f && Data  != null) Data.setInt(M.at(sData, i).setOff().getInt());// Save data if this key matched
          }
 
-        if (Found != null) Found.setInt(found.getInt() > 0 ? 1 : 0);            // Set found if requested
+        if (Found != null) Found.setInt(found.get() > 0 ? 1 : 0);               // Set found if requested
 
        }
 
@@ -637,10 +637,10 @@ abstract class StuckDM extends Test                                             
        {final StringBuilder v = new StringBuilder();                            // Verilog
         final int           N = maxSize();
 
-        v.append("if ("+found.verilogLoad()+") begin");                         // If found a matching key in the stuck
+        v.append("if ("+found.verilogLoad()+") begin\n");                       // If found a matching key in the stuck
 
         if (Found != null)                                                      // Found requested
-         {v.append(Found.verilogLoad()+" <= " + found.verilogAddr()+ "; /* found default searchFirstGreaterThanOrEqual5 all="+all+" */\n");
+         {v.append(Found.verilogLoad()+" <= " + found.verilogAddr()+ "; /* found default searchFirstGreaterThanOrEqual5 */\n");
          }
 
         if (Index != null)                                                      // Index: either the first index if selected or a selected index preceded by an unselected index. E.g. 111 would sel;ect index 0 while 000111 would select the index 3.
@@ -652,7 +652,7 @@ abstract class StuckDM extends Test                                             
              }
             v.append(      T.at(lessThanLeafSize, i  ).verilogLoad() + ") ? "+i+" : 0)\n");
            }
-          v.append("; /* index searchFirstGreaterThanOrEqual5 all="+all+" */\n");
+          v.append("; /* index searchFirstGreaterThanOrEqual5 */\n");
          }
 
         if (Key != null)                                                        // Key: either the first key if selected or a selected key preceded by an unselected key. E.g. 000111 would select the key at zero based index 3.
@@ -676,9 +676,9 @@ abstract class StuckDM extends Test                                             
              }
             v.append(T.at(lessThanLeafSize, i).verilogLoad() + ") ? "+M.at(sData, i).verilogLoad()+" : 0)\n");
            }
-          v.append("); /* data searchFirstGreaterThanOrEqual5 all="+all+" */\n");
+          v.append("); /* data searchFirstGreaterThanOrEqual5 */\n");
          }
-        v.append("end /* searchFirstGreaterThanOrEqual5 all="+all+" */\n");
+        v.append("end /* searchFirstGreaterThanOrEqual5 */\n");
         return ""+v;
        }
 
@@ -1404,12 +1404,19 @@ Line T       At      Wide       Size    Indices        Value   Name
     MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "m");
                      m.program(s.P);
 
+    ok(""+s, """
+StuckSML(maxSize:8 size:4)
+  0 key:2 data:1
+  1 key:4 data:2
+  2 key:6 data:3
+  3 key:8 data:4
+""");
     m.setIntInstruction(k, 5);
     s.searchFirstGreaterThanOrEqual(true, m.at(k), m.at(f), m.at(i), m.at(K), m.at(d));
     s.P.run(); s.P.clear();
     //stop(s.T);
     //stop(m);
-    ok(m, """
+    ok(""+m, """
 MemoryLayout: m
 Memory      : m
 Line T       At      Wide       Size    Indices        Value   Name
@@ -1743,7 +1750,8 @@ StuckSML(maxSize:8 size:4)
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_search_first_greater_than_or_equal();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
