@@ -2536,7 +2536,8 @@ if __name__ == "__main__":
     chip.set('option', 'remote', False)                                         # Run remote in the cloud
     chip.set('option', 'nodisplay', True)                                       # Do not open displays
     chip.set('option', 'loglevel', 'warning')                                   # Warnings and above
-    chip.set('constraint', 'density', $density)                                 # Lowering the density gives more area in which to route connections at the cost of wasting surface area and making teh chip run slower
+   #chip.set('constraint', 'density', $density)                                 # Lowering the density gives more area in which to route connections at the cost of wasting surface area and making the chip run slower. For find it seems best to leave this parameter alone
+    chip.set('option', 'clean', True)                                           # Clean start else it reuses previous results
     chip.run()                                                                  # Run compilation of design and target
     chip.summary()
     chip.snapshot()
@@ -3746,7 +3747,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.put();
     final int N = 9;
     for (int i = 1; i <= N; ++i)
-     {//say(currentTestName(),  "a", i);
+     {say(currentTestName(),  "a", i);
       t.T.at(t.Key ).setInt(i);
       t.T.at(t.Data).setInt(N-i);
       t.P.run();
@@ -3768,17 +3769,17 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
 
-    //t.run_verilogFind( 0, 0, 0, 27);
-    t.run_verilogFind( 1, 1, 8, 27);
-    //t.run_verilogFind( 2, 1, 7, 27);
-    //t.run_verilogFind( 3, 1, 6, 27);
-    //t.run_verilogFind( 4, 1, 5, 27);
-    //t.run_verilogFind( 5, 1, 4, 27);
-    //t.run_verilogFind( 6, 1, 3, 27);
-    //t.run_verilogFind( 7, 1, 2, 27);
-    //t.run_verilogFind( 8, 1, 1, 27);
-    //t.run_verilogFind( 9, 1, 0, 27);
-    //t.run_verilogFind(10, 0, 0, 27);
+    //t.run_verilogFind( 0, 0, 0, 29);
+    //t.run_verilogFind( 1, 1, 8, 29);
+    //t.run_verilogFind( 2, 1, 7, 29);
+    t.run_verilogFind( 3, 1, 6, 29);
+    //t.run_verilogFind( 4, 1, 5, 29);
+    //t.run_verilogFind( 5, 1, 4, 29);
+    //t.run_verilogFind( 6, 1, 3, 29);
+    //t.run_verilogFind( 7, 1, 2, 29);
+    //t.run_verilogFind( 8, 1, 1, 29);
+    //t.run_verilogFind( 9, 1, 0, 29);
+    //t.run_verilogFind(10, 0, 0, 29);
    }
 
   private void runVerilogDeleteTest                                             // Run the java and verilog versions and compare the resulting memory traces
