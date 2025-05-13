@@ -484,7 +484,7 @@ abstract class StuckDM extends Test                                             
          }
        }
 
-      String v()     //864 Mhz  829 no denosty                                                 // Or the valid elements using || rather than sequentially using ? as hopefully Verilog will implement this in log time rather than linear time
+      String v()                                                                // Or the valid elements using || rather than sequentially using ? as hopefully Verilog will implement this in log time rather than linear time
        {final StringBuilder v = new StringBuilder();                            // Verilog
         final int           N = maxSize();
 
@@ -502,25 +502,6 @@ abstract class StuckDM extends Test                                             
         v.append(";\n");
         return ""+v;
        }
-
-      String v2()  // 777 Mhz                                                    // Find the first one using ? so this will get slower as the number of keys increases
-       {final StringBuilder v = new StringBuilder();                            // Verilog
-        final int           N = maxSize();
-
-        v.append("/* StuckDM.search2.3 */\n");
-        v.append(Found.verilogLoad()+" <= 0");                                  // Found
-        for (int i = 0; i < N; i++) v.append(" || "+T.at(equalLeafKey, i).verilogLoad() + " > 0");
-        v.append(";\n");
-
-        v.append(Index.verilogLoad()+" <= ");                                   // Index
-        for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+i+" : ");
-        v.append("0;\n");                                                       // Not found so it can be anything
-
-        v.append(Data.verilogLoad()+" <= ");                                    // Data
-        for (int i = 0; i < N; i++) v.append(T.at(equalLeafKey, i).verilogLoad() + " > 0 ? "+M.at(sData, i).verilogLoad()+" : ");
-        v.append("0;\n");                                                       // Not found so it can be anything
-        return ""+v;
-       }
      };
    }
 
@@ -529,8 +510,9 @@ abstract class StuckDM extends Test                                             
     MemoryLayoutDM.At Index,
     MemoryLayoutDM.At Key,    MemoryLayoutDM.At Data)
    {zz(); action = "search";
+    final Variable found = new Variable(P, "found", 1);                         // Whether we actually found a match
 
-    P.new I()                                                                   // Matching key, in valid part of  stuck
+    P.new I()                                                                   // Match key and describe valid extent of  stuck
      {void a()
        {final int s = Search           .setOff().getInt();                      // Key to search for
         final int X = M.at(currentSize).setOff().getInt() - (all ? 0 : 1);      // Number of elements to search
@@ -557,7 +539,7 @@ abstract class StuckDM extends Test                                             
        }
      };
 
-    P.new I()                                                                   // Matching key and in valid part of stuck
+    P.new I()                                                                   // Matching key and in valid part of stuck. Set defaults for found,  key, data, index
      {void a()
        {final int N = maxSize();                                                // Maximum number of elements to search
         for (int i = 0; i < N; i++)                                             // Search
@@ -568,7 +550,13 @@ abstract class StuckDM extends Test                                             
           final int     r = !e && E && v ? 1 : 0;
           T.at(lessThanLeafSize, i).setInt(r);                                  // Need to preserve equalLeafKey unchanged to allow previous element to be referenced
          }
+
+        final int c = M.at(currentSize).setOff().getInt();                      // Number of elements in stuck
+        final int C = c - (all ? 0 : 1);                                        // Number of elements to search
+        if (Index != null) Index.setInt(C);                                     // Default index if no key matches
+        if (Data  != null) Data.setInt(M.at(sData, C).setOff().getInt());       // Default data  if no key matches
        }
+
       String v()
        {final StringBuilder v = new StringBuilder();                            // Verilog
         final int           N = maxSize();
@@ -582,29 +570,119 @@ abstract class StuckDM extends Test                                             
            }
           v.append(T.at(lessThanLeafSize, i).verilogLoad()+";\n");
          }
+
+        if (Index != null)                                                      // Index default
+         {v.append(Index.verilogLoad()+" <= ");
+          v.append(M.at(currentSize).verilogLoad());                            // Normal index
+          if (all) v.append(";"); else v.append("-1;");                         // Index one back - known to be possible as every branch always contains at least one key
+          v.append(" /* index  default  searchFirstGreaterThanOrEqual3 all="+all+"*/\n");
+         }
+
+        if (Key != null)                                                        // Key default
+         {v.append(Key.verilogLoad()+" <= 0;/* Key default searchFirstGreaterThanOrEqual3 all="+all+"*/\n");
+         }
+
+        if (Data != null)
+         {v.append(Data.verilogLoad()+" <= ");                                  // Data default
+          if (all) v.append(M.at(sData, M.at(currentSize)).verilogLoad() + ";");              // Normal index of next node
+          else     v.append(M.at(sData, M.at(currentSize)).verilogLoadAddr(false, -1) + ";"); // Prior index of next node - always possible because every branch always contains at least one key
+          v.append("; /*data searchFirstGreaterThanOrEqual3 all="+all+"*/\n");
+         }
+        return ""+v;
+       }
+     };
+
+    P.new I()                                                                   // Set found to show whether in fact we found a matching key
+     {void a()
+       {final int N = maxSize();
+        found.set(0);                                                           // Assume the key was not found
+        for (int i = 0; i < N; i++)                                             // Search
+         {z();
+          final boolean f = T.at(lessThanLeafSize, i).setOff().getInt() > 0;    // Whether this key is in range and is greater than or equal to the search key
+          if (f)                                                                // A matching key was found
+           {found.set(1);
+            break;
+           }
+         }
+       }
+
+      String v()
+       {final StringBuilder v = new StringBuilder();                            // Verilog
+        final int           N = maxSize();
+
+        v.append(found.verilogLoad()+" <= 0");
+        for (int i = 0; i < N; i++) v.append(" || "+T.at(lessThanLeafSize, i).verilogLoad());
+        v.append("; /* found searchFirstGreaterThanOrEqual4 */\n");
         return ""+v;
        }
      };
 
     P.new I()                                                                   // Found or not
      {void a()
-       {if (Found != null) Found.setOff().setInt(0);                            // Assume we will not find the key
-        final int N = maxSize();                                                // Maximum number of elements to search
-        final int c = M.at(currentSize).setOff().getInt();                      // Number of elements in stuck
-        final int C = c - (all ? 0 : 1);                                        // Number of elements to search
-        if (Index != null) Index.setInt(C);                                     // Default index if no key matches
-        if (Data  != null) Data.setInt(M.at(sData, C).setOff().getInt());       // Default data  if no key matches
+       {final int N = maxSize();                                                // Maximum number of elements to search
 
         for (int i = 0; i < N; i++)                                             // Search
          {z();
           final boolean f = T.at(lessThanLeafSize, i).setOff().getInt() > 0;    // Whether this key is in range and is greater than or equal to the search key
-          if (Found != null) Found.setInt((f || Found.setOff().getInt() > 0) ? 1 : 0); // Any key matched ?
           if (f && Index != null) Index.setInt(i);                              // Save index if this key matched
           if (f && Key   != null) Key .setInt(M.at(sKey,  i).setOff().getInt());// Save matching key
           if (f && Data  != null) Data.setInt(M.at(sData, i).setOff().getInt());// Save data if this key matched
          }
+
+        if (Found != null) Found.setInt(found.getInt() > 0 ? 1 : 0);            // Set found if requested
+
        }
+
       String v()
+       {final StringBuilder v = new StringBuilder();                            // Verilog
+        final int           N = maxSize();
+
+        v.append("if ("+found.verilogLoad()+") begin");                         // If found a matching key in the stuck
+
+        if (Found != null)                                                      // Found requested
+         {v.append(Found.verilogLoad()+" <= " + found.verilogAddr()+ "; /* found default searchFirstGreaterThanOrEqual5 all="+all+" */\n");
+         }
+
+        if (Index != null)                                                      // Index: either the first index if selected or a selected index preceded by an unselected index. E.g. 111 would sel;ect index 0 while 000111 would select the index 3.
+         {v.append(Index.verilogLoad()+" <= 0 ");
+          for (int i = 0; i < N; i++)
+           {v.append(" | ((");
+            if (i > 0)
+             {v.append("!"+T.at(lessThanLeafSize, i-1).verilogLoad() + " && ");
+             }
+            v.append(      T.at(lessThanLeafSize, i  ).verilogLoad() + ") ? "+i+" : 0)\n");
+           }
+          v.append("; /* index searchFirstGreaterThanOrEqual5 all="+all+" */\n");
+         }
+
+        if (Key != null)                                                        // Key: either the first key if selected or a selected key preceded by an unselected key. E.g. 000111 would select the key at zero based index 3.
+         {v.append(Key.verilogLoad()+" <= 0\n");
+          for (int i = 0; i < N; i++)
+           {v.append("        | ((");
+            if (i > 0)
+             {v.append("!"+T.at(lessThanLeafSize, i-1).verilogLoad() + " && ");
+             }
+            v.append(      T.at(lessThanLeafSize, i  ).verilogLoad() + ") ? "+M.at(sKey, i).verilogLoad()+" : 0)\n");
+           }
+          v.append("; /* key searchFirstGreaterThanOrEqual5 */\n");
+         }
+
+        if (Data != null)
+         {v.append(Data.verilogLoad()+" <= (0 ");                               // Key: either the first key if selected or a selected key preceded by an unselected key. E.g. 000111 would select the key at zero based index 3.
+          for (int i = 0; i < N; i++)
+           {v.append("        | ((");
+            if (i > 0)
+             {v.append("!"+T.at(lessThanLeafSize, i-1).verilogLoad() + " && ");
+             }
+            v.append(T.at(lessThanLeafSize, i).verilogLoad() + ") ? "+M.at(sData, i).verilogLoad()+" : 0)\n");
+           }
+          v.append("); /* data searchFirstGreaterThanOrEqual5 all="+all+" */\n");
+         }
+        v.append("end /* searchFirstGreaterThanOrEqual5 all="+all+" */\n");
+        return ""+v;
+       }
+
+      String v2()
        {final StringBuilder v = new StringBuilder();                            // Verilog
         final int           N = maxSize();
 
