@@ -23,7 +23,7 @@ class Variable extends Test                                                     
    }
 
   void set(int v) {       a.setInt(v);}                                         // Set the value of the variable
-  int  get()      {return a.getInt();}                                          // Get the value of the variable
+  int  get()      {return a.setOff().getInt();}                                 // Get the value of the variable
   void inc ()     {a.inc();}                                                    // Increment the variable
   void dec ()     {a.dec();}                                                    // Decrement the variable
   void copy(Variable source)        {a.move(source.a);}                         // Copy the value of the source variable ino the target
@@ -249,8 +249,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
   static void test_verilog()
    {final ProgramDM p = new ProgramDM();
-MemoryLayoutDM.numbers = 0;
-say("AAAA", MemoryLayoutDM.numbers);
+    MemoryLayoutDM.numbers = 0;
     final Variable  i = new Variable(p, "i",  4);
     i.set(1);
 
