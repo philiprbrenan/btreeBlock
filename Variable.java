@@ -19,7 +19,7 @@ class Variable extends Test                                                     
     v = l.variable(name, bits);
     m = new MemoryLayoutDM(l.compile(), name);
     a = m.top();
-    m.program(Program);                                                         // Set program for this variable
+    m.program(Program, false);                                                  // Set program for this variable assuming it is not a unique name
    }
 
   void set(int v) {       a.setInt(v);}                                         // Set the value of the variable
@@ -39,6 +39,9 @@ class Variable extends Test                                                     
   void lessThanOrEqual   (Variable A, Variable B) {A.a.lessThanOrEqual   (B.a, a);} // Set this variable to one if the first variable is less than or equal to the second one else zero
   void greaterThan       (Variable A, Variable B) {A.a.greaterThan       (B.a, a);} // Set this variable to one if the first variable is greater than the second one else zero
   void greaterThanOrEqual(Variable A, Variable B) {A.a.greaterThanOrEqual(B.a, a);} // Set this variable to one if the first variable is greater than or equal to the second one else zero
+
+  String verilogLoad() {return a.verilogLoad();}                                // Verilog value   of this variable
+  String verilogAddr() {return a.verilogAddr();}                                // Verilog address of this variable
 
   void sameSize(Variable...A)                                                   // Stop unless all the variables have the same size
    {for (int i = 0; i < A.length; i++) a.sameSize(A[i].a);
@@ -244,10 +247,21 @@ Line T       At      Wide       Size    Indices        Value   Name
 """);
    }
 
+  static void test_verilog()
+   {final ProgramDM p = new ProgramDM();
+MemoryLayoutDM.numbers = 0;
+say("AAAA", MemoryLayoutDM.numbers);
+    final Variable  i = new Variable(p, "i",  4);
+    i.set(1);
+
+    ok(i.verilogLoad(), "i_1[       0/*i       */ +: 4]");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_var();
     test_boolean();
     test_shift();
+    test_verilog();
    }
 
   static void newTests()                                                        // Tests being worked on
