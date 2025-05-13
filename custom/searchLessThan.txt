@@ -1,0 +1,59 @@
+less than all three out   11, 895
+
+First block in:
+ 18      833.124M
+
+Just first two lines of first block in:
+Logic depth 24 864Mhz
+
+Remove opcodeMap:
+Logoc depth 22: fmax 918
+
+Cannot add multiple case stataments but might be worth adding an option to not compact code.
+
+Nothing in case:
+21 894.373M
+
+An empty always blocjk can run at 9Ghz
+With one 8 bit assign: 5ghz . Wider widths drop to around 1GHz .
+with shift right on 8 bits: 1g     0.066mW
+with add 1 on 8 bits: 5g
+
++1
+
+*2:
+errors                       0                 0                 0
+warnings                     5                 0                 2
+drvs                         0                ---                0
+drcs                         0                ---               ---
+unconstrained                15               ---                15
+cellarea       um^2        38.570             ---              38.570
+totalarea      um^2       122.766           122.766           122.766
+macroarea      um^2        0.000              ---              0.000
+padcellarea    um^2        0.000              ---              0.000
+stdcellarea    um^2        38.570             ---              38.570
+utilization       %        51.418             ---              51.418
+logicdepth                   0                ---                0
+peakpower        mw        0.063              ---              0.066
+leakagepower     mw        0.001              ---              0.001
+irdrop           mv         ---               ---              0.304
+holdpaths                    0                ---                0
+setuppaths                   0                ---                0
+holdtns          ns        0.000              ---              0.000
+holdskew         ns        0.000              ---              0.000
+setuptns         ns        0.000              ---              0.000
+setupskew        ns        0.000              ---              0.000
+fmax             Hz        1.709G             ---              1.687G
+macros                       0                ---                0
+cells                        24               ---                24
+registers                    7                ---                7
+buffers                      4                ---                4
+inverters                    0                ---                0
+pins                         19               ---                19
+nets                         29               ---                29
+vias                         89               ---               ---
+wirelength       um       104.000             ---               ---
+memory            B       657.773M          555.082M          282.656M
+exetime           s        03.310            04.240            04.780
+tasktime          s        04.800            05.907            06.514
+totaltime         s        46.932            53.749          01:00.263
