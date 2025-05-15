@@ -630,7 +630,6 @@ abstract class StuckDM extends Test                                             
          }
 
         if (Found != null) Found.setInt(found.get() > 0 ? 1 : 0);               // Set found if requested
-
        }
 
       String v()
@@ -1411,7 +1410,9 @@ StuckSML(maxSize:8 size:4)
   2 key:6 data:3
   3 key:8 data:4
 """);
+
     m.setIntInstruction(k, 5);
+
     s.searchFirstGreaterThanOrEqual(true, m.at(k), m.at(f), m.at(i), m.at(K), m.at(d));
     s.P.run(); s.P.clear();
     //stop(s.T);
@@ -1454,14 +1455,18 @@ Line T       At      Wide       Size    Indices        Value   Name
     MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "m");
                      m.program(s.P, false);
 
-    //s.P.new I() {void a() {s.T.at(s.limit).setInt(1);}};
+    ok(""+s, """
+StuckSML(maxSize:8 size:4)
+  0 key:2 data:1
+  1 key:4 data:2
+  2 key:6 data:3
+  3 key:8 data:4
+""");
+
     m.setIntInstruction(k, 5);
+
     s.searchFirstGreaterThanOrEqual(false, m.at(k), m.at(f), m.at(i), m.at(K), m.at(d));
     s.P.run(); s.P.clear();
-//  //stop(t);
-//    ok(s.print(), """
-//Transaction(action:searchFirstGreaterThanOrEqual search:5 limit:1 found:1 index:2 key:6 data:3 size:3 isFull:0 isEmpty:0)
-//""");
     //stop(m);
     ok(m, """
 MemoryLayout: m
@@ -1479,10 +1484,29 @@ Line T       At      Wide       Size    Indices        Value   Name
     s.searchFirstGreaterThanOrEqual(false, s.T.at(s.search),
                                            s.T.at(s.found), null, null, null);
     s.P.run(); s.P.clear();
-//  //stop(t);
-//    ok(s.print(), """
-//Transaction(action:searchFirstGreaterThanOrEqual search:7 limit:1 found:0 index:3 key:6 data:3 size:3 isFull:0 isEmpty:0)
-//""");
+    ok(s.T.at(s.found).getInt(), 0);
+
+    m.setIntInstruction(k, 7);
+
+    s.searchFirstGreaterThanOrEqual(false, m.at(k), m.at(f), m.at(i), m.at(K), m.at(d));
+    s.P.run(); s.P.clear();
+    //stop(m);
+    ok(m, """
+MemoryLayout: m
+Memory      : m
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0        65                                      S
+   2 V        0        16                                  7     k
+   3 B       16         1                                  0     f
+   4 V       17        16                                  3     i
+   5 V       33        16                                  6     K
+   6 V       49        16                                  4     d
+""");
+
+    s.P.new I() {void a() {s.T.at(s.search).setInt(7);}};
+    s.searchFirstGreaterThanOrEqual(false, s.T.at(s.search),
+                                           s.T.at(s.found), null, null, null);
+    s.P.run(); s.P.clear();
     ok(s.T.at(s.found).getInt(), 0);
    }
 
@@ -1751,7 +1775,7 @@ StuckSML(maxSize:8 size:4)
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_search_first_greater_than_or_equal();
+    test_search_first_greater_than_or_equal_except_last();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
