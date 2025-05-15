@@ -22,23 +22,29 @@ class Variable extends Test                                                     
     m.program(Program, false);                                                  // Set program for this variable assuming it is not a unique name
    }
 
+  Variable(MemoryLayoutDM.At at)                                                // Create a variable from a memory location
+   {this(at.ml().P, at.field.name, at.field.width);
+   }
+
   void set(int v) {       a.setInt(v);}                                         // Set the value of the variable
-  int  get()      {return a.setOff().getInt();}                                 // Get the value of the variable
+  int  get()      {return a.locateDirectAddress().getInt();}                    // Get the value of the variable. A variable cannot be in directly addressed.
   void inc ()     {a.inc();}                                                    // Increment the variable
   void dec ()     {a.dec();}                                                    // Decrement the variable
-  void copy(Variable source)        {a.move(source.a);}                         // Copy the value of the source variable ino the target
-  void add (Variable A, int      B) {a.add(A.a, B);}                            // Add a constant to a variable
-  void add (Variable A, Variable B) {a.add(A.a, B.a);}                          // Add two variables and place the result in this variable
+  void move(Variable source)        {a.move(source.a);}                         // Copy the value of the source variable ino the target
 
   void srz () {a.srz();}                                                        // Shift right filling with zero
   void slz () {a.slz();}                                                        // Shift left  filling with zero
 
-  void equal             (Variable A, Variable B) {A.a.equal             (B.a, a);} // Set this variable to one if the specified variables are equal else zero
-  void notEquals         (Variable A, Variable B) {A.a.notEqual          (B.a, a);} // Set this variable to one if the specified variables are not equal else zero
-  void lessThan          (Variable A, Variable B) {A.a.lessThan          (B.a, a);} // Set this variable to one if the first variable is less than the second one else zero
-  void lessThanOrEqual   (Variable A, Variable B) {A.a.lessThanOrEqual   (B.a, a);} // Set this variable to one if the first variable is less than or equal to the second one else zero
-  void greaterThan       (Variable A, Variable B) {A.a.greaterThan       (B.a, a);} // Set this variable to one if the first variable is greater than the second one else zero
-  void greaterThanOrEqual(Variable A, Variable B) {A.a.greaterThanOrEqual(B.a, a);} // Set this variable to one if the first variable is greater than or equal to the second one else zero
+  Variable copy()           {final Variable r = new Variable(program, "result", a.field.width); r.a.move(a);     return r;} // Create a copy of a variable
+  Variable add (int      A) {final Variable r = new Variable(program, "result", a.field.width); r.a.add(a, A);   return r;} // Add a constant to a variable
+  Variable add (Variable A) {final Variable r = new Variable(program, "result", a.field.width); r.a.add(a, A.a); return r;} // Add two variables and place the result in this variable
+
+  Variable equal             (Variable A) {final Variable r = new Variable(program, "result", 1); a.equal             (A.a, r.a); return r;} // Set this variable to one if the specified variables are equal else zero
+  Variable notEquals         (Variable A) {final Variable r = new Variable(program, "result", 1); a.notEqual          (A.a, r.a); return r;} // Set this variable to one if the specified variables are not equal else zero
+  Variable lessThan          (Variable A) {final Variable r = new Variable(program, "result", 1); a.lessThan          (A.a, r.a); return r;} // Set this variable to one if the first variable is less than the second one else zero
+  Variable lessThanOrEqual   (Variable A) {final Variable r = new Variable(program, "result", 1); a.lessThanOrEqual   (A.a, r.a); return r;} // Set this variable to one if the first variable is less than or equal to the second one else zero
+  Variable greaterThan       (Variable A) {final Variable r = new Variable(program, "result", 1); a.greaterThan       (A.a, r.a); return r;} // Set this variable to one if the first variable is greater than the second one else zero
+  Variable greaterThanOrEqual(Variable A) {final Variable r = new Variable(program, "result", 1); a.greaterThanOrEqual(A.a, r.a); return r;} // Set this variable to one if the first variable is greater than or equal to the second one else zero
 
   String verilogLoad() {return a.verilogLoad();}                                // Verilog value   of this variable
   String verilogAddr() {return a.verilogAddr();}                                // Verilog address of this variable
@@ -47,178 +53,68 @@ class Variable extends Test                                                     
    {for (int i = 0; i < A.length; i++) a.sameSize(A[i].a);
    }
 
-  public String toString() {return m.toString();}                               // String to show variable name and value
+  public String toString() {return a.setOff().toString();}                      // String to show variable name and value
 
 //D0 Tests                                                                      // Testing
 
   static void test_var()
-   {final ProgramDM p = new ProgramDM();
-    final Variable  i = new Variable(p, "i", 4);
-    final Variable  j = new Variable(p, "j", 4);
-    final Variable  k = new Variable(p, "k", 4);
+   {ProgramDM p = new ProgramDM();
+    Variable  i = new Variable(p, "i", 4);
+    Variable  j = new Variable(p, "j", 4);
+    Variable  k = new Variable(p, "k", 4);
 
     i.sameSize(j, k);
     i.set(1);
-    j.copy(i);
+    j.move(i);
     p.run(); p.clear();
-    ok(j, """
-MemoryLayout: j
-Memory      : j
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         4                                  1   j
-""");
+    ok(j.get(), 1);
     j.inc();
     p.run();  p.clear();
-    ok(j, """
-MemoryLayout: j
-Memory      : j
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         4                                  2   j
-""");
+    ok(j.get(), 2);
 
-    k.add(i, j);
+    k = i.add(j);
     p.run();  p.clear();
-    ok(k, """
-MemoryLayout: k
-Memory      : k
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         4                                  3   k
-""");
+    ok(k.get(), 3);
 
-    k.add(j, 2);
+    k = j.add(2);
     p.run();  p.clear();
-    ok(k, """
-MemoryLayout: k
-Memory      : k
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         4                                  4   k
-""");
+    ok(k.get(), 4);
    }
 
   static void test_boolean()
    {final ProgramDM p   = new ProgramDM();
     final Variable  i   = new Variable(p, "i",  4);
     final Variable  j   = new Variable(p, "j",  4);
-    final Variable  eq0 = new Variable(p, "eq0", 1);
-    final Variable  ne0 = new Variable(p, "ne0", 1);
-    final Variable  lt0 = new Variable(p, "lt0", 1);
-    final Variable  le0 = new Variable(p, "le0", 1);
-    final Variable  ge0 = new Variable(p, "ge0", 1);
-    final Variable  gt0 = new Variable(p, "gt0", 1);
-    final Variable  eq1 = new Variable(p, "eq1", 1);
-    final Variable  ne1 = new Variable(p, "ne1", 1);
-    final Variable  lt1 = new Variable(p, "lt1", 1);
-    final Variable  le1 = new Variable(p, "le1", 1);
-    final Variable  ge1 = new Variable(p, "ge1", 1);
-    final Variable  gt1 = new Variable(p, "gt1", 1);
+
     i.set(1); j.set(2);
-    eq1.equal             (i, i); eq0.equal             (i, j);
-    ne1.notEquals         (i, j); ne0.notEquals         (i, i);
-    lt1.lessThan          (i, j); lt0.lessThan          (i, i);
-    le1.lessThanOrEqual   (i, j); le0.lessThanOrEqual   (j, i);
-    ge1.greaterThan       (j, i); ge0.greaterThan       (i, i);
-    gt1.greaterThanOrEqual(j, j); gt0.greaterThanOrEqual(i, j);
+
+    final Variable eq1 = i.equal             (i);
+    final Variable ne1 = i.notEquals         (j);
+    final Variable lt1 = i.lessThan          (j);
+    final Variable le1 = i.lessThanOrEqual   (j);
+    final Variable gt1 = j.greaterThan       (i);
+    final Variable ge1 = j.greaterThanOrEqual(i);
+    final Variable eq0 = i.equal             (j);
+    final Variable ne0 = i.notEquals         (i);
+    final Variable lt0 = i.lessThan          (i);
+    final Variable le0 = j.lessThanOrEqual   (i);
+    final Variable ge0 = i.greaterThan       (i);
+    final Variable gt0 = i.greaterThanOrEqual(j);
+
     p.run(); p.clear();
 
-    //stop(eq0);
-    //stop(ne0);
-    //stop(lt0);
-    //stop(le0);
-    //stop(ge0);
-    //stop(gt0);
+    ok(eq1.get(), 1);
+    ok(ne1.get(), 1);
+    ok(le1.get(), 1);
+    ok(gt1.get(), 1);
+    ok(ge1.get(), 1);
 
-    //stop(eq1);
-    //stop(ne1);
-    //stop(lt1);
-    //stop(le1);
-    //stop(ge1);
-    //stop(gt1);
-
-    ok(""+eq0, """
-MemoryLayout: eq0
-Memory      : eq0
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         1                                  0   eq0
-""");
-
-    ok(""+ne0, """
-MemoryLayout: ne0
-Memory      : ne0
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         1                                  0   ne0
-""");
-
-    ok(""+lt0, """
-MemoryLayout: lt0
-Memory      : lt0
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         1                                  0   lt0
-""");
-
-    ok(""+le0, """
-MemoryLayout: le0
-Memory      : le0
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         1                                  0   le0
-""");
-
-    ok(""+gt0, """
-MemoryLayout: gt0
-Memory      : gt0
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         1                                  0   gt0
-""");
-
-    ok(""+ge0, """
-MemoryLayout: ge0
-Memory      : ge0
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         1                                  0   ge0
-""");
-
-
-    ok(""+eq1, """
-MemoryLayout: eq1
-Memory      : eq1
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         1                                  1   eq1
-""");
-
-    ok(""+ne1, """
-MemoryLayout: ne1
-Memory      : ne1
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         1                                  1   ne1
-""");
-
-    ok(""+lt1, """
-MemoryLayout: lt1
-Memory      : lt1
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         1                                  1   lt1
-""");
-
-    ok(""+le1, """
-MemoryLayout: le1
-Memory      : le1
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         1                                  1   le1
-""");
-
-    ok(""+gt1, """
-MemoryLayout: gt1
-Memory      : gt1
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         1                                  1   gt1
-""");
-
-    ok(""+ge1, """
-MemoryLayout: ge1
-Memory      : ge1
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         1                                  1   ge1
-""");
-
+    ok(eq0.get(), 0);
+    ok(ne0.get(), 0);
+    ok(lt0.get(), 0);
+    ok(le0.get(), 0);
+    ok(gt0.get(), 0);
+    ok(ge0.get(), 0);
    }
 
   static void test_shift()                                                      // Shift left and right
@@ -229,22 +125,12 @@ Line T       At      Wide       Size    Indices        Value   Name
     i.slz();i.slz();
     p.run(); p.clear();
     //stop(i);
-    ok(""+i, """
-MemoryLayout: i
-Memory      : i
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         4                                  4   i
-""");
+    ok(i.get(), 4);
 
     i.srz();
     p.run(); p.clear();
     //stop(i);
-    ok(""+i, """
-MemoryLayout: i
-Memory      : i
-Line T       At      Wide       Size    Indices        Value   Name
-   1 V        0         4                                  2   i
-""");
+    ok(i.get(), 2);
    }
 
   static void test_verilog()
@@ -256,11 +142,55 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(i.verilogLoad(), "i_1[       0/*i       */ +: 4]");
    }
 
+  static void test_location()
+   {z();
+    final int M = 4;
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", M);
+    Layout.Variable  b = l.variable ("b", M);
+    Layout.Variable  c = l.variable ("c", M);
+    Layout.Variable  d = l.variable ("d", M);
+    Layout.Variable  o = l.variable ("o", M);
+    Layout.Variable  t = l.variable ("t", M);
+    Layout.Structure S = l.structure("A", a, b, c, d, o, t);
+    MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "fields");
+    m.program(m.P);
+
+    final Variable A   = new Variable(m.at(a));
+    final Variable D   = new Variable(m.at(d));
+    final Variable One = new Variable(m.at(o));
+    final Variable Two = new Variable(m.at(t));
+
+    A.set(1); One.set(1); Two.set(2);
+    Variable x = A.copy();
+             x.inc();
+    Variable y = A.add(x);
+    m.P.run(); m.P.clear();
+    //stop(B);
+    ok(x.get(), 2);
+    //stop(C);
+    ok(y.get(), 3);
+
+    m.P.clear();
+    m.P.new If (One.greaterThanOrEqual(y))
+     {void Then()
+       {D.move(One);
+       }
+      void Else()
+       {D.move(Two);
+       }
+     };
+    m.P.run();
+    //stop(D);
+    ok(D.get(), 2);
+ }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_var();
     test_boolean();
     test_shift();
     test_verilog();
+    test_location();
    }
 
   static void newTests()                                                        // Tests being worked on
