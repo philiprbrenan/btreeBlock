@@ -297,6 +297,9 @@ class ProgramDM extends Test                                                    
        }
       End.set();                                                                // End of if
      }
+
+    If (Variable Condition) {this(Condition.a);}                                // If a condition held in a variable
+
     void Then() {}
     void Else() {}
    }
