@@ -1721,6 +1721,74 @@ abstract class BtreeSF extends Test                                             
      };
    }
 
+  public void findNext()                                                        // Find the next key relative to the supplied key
+   {zz();
+    P.new Block()
+     {void code()
+       {final ProgramDM.Label Return = end;
+        nT.loadRoot();                                                          // The first thing in the tree is the root
+
+        P.new Block()                                                           // The root is a leaf
+         {void code()
+           {P.parallelStart();   P.GoOff(end, ifRootLeaf(nT));                  // Confirm that the root is a leaf
+            P.parallelSection(); findEqualInLeaf(T.at(Key), nT);                // Assume the root is a leaf and start looking for the key
+            P.parallelEnd();
+
+            leafSize();
+            final Variable empty = new Variable(P, "empty", 1);                 // Whether the tree is empty
+            T.at(size).isZero(empty);
+            P.new If(empty.a)
+             {void Then()                                                       // The tree is empty so there is no next key
+               {T.at(found).zero();
+               }
+              void Else()                                                       // The tree is not empty
+               {T.at(size).dec();                                               // Index of the last element - we know that there is one
+                final Variable more = new Variable(P, "more", 1);               // Whether there are mopr keys
+                T.at(index).lessThan(T.at(size), more.a);
+                P.new If(T.at(empty))
+                 {void Then()                                                       // The tree is empty so there is no next key
+                   {T.at(found).zero();
+                   }
+                  void Else()                                                       // The tree is not empty
+                   {T.at(size).dec();                                               // Index of the last element - we know that there is one
+
+               }
+
+                 T.at(index).inc();
+T.at(found), T.at(index)
+T.at(found), T.at(index)
+               }
+             };
+            T.at(find).zero();                                                  // Leaf that should contain this key is the root
+            P.Goto(Return);
+           }
+         };
+
+        P.new Block()
+         {void code()
+           {findFirstGreaterThanOrEqualInBranch                                 // Find next child in search path of key
+             (nT, T.at(Key), null, null, T.at(child));
+            nT.loadNode(T.at(child));
+
+            P.new Block()                                                       // Found the containing leaf
+             {void code()
+               {P.parallelStart();   P.GoOff(end, ifLeaf(nT));                  // Confirm that it is a leaf
+                P.parallelSection(); findEqualInLeaf(T.at(Key), nT);
+                P.parallelEnd();
+
+                P.parallelStart();   tt(find, child);
+                P.parallelSection(); P.Goto(Return);
+                P.parallelEnd();
+               }
+             };
+
+            P.Goto(start);                                                      // Restart search one level down
+           }
+         };
+       }
+     };
+   }
+
   private void findAndInsert(ProgramDM.Label Success)                           // Find the leaf that should contain this key and insert or update it is possible
    {zz();
     P.new Block()
