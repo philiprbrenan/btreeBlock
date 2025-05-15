@@ -298,6 +298,22 @@ public class Test                                                               
     return null;                                                                // Not called in a test
    }
 
+  static String testLine()                                                      // Locate line associated with the current test
+   {final StackTraceElement[] t = new Exception().getStackTrace();
+    final String T = currentTestName();                                         // Current test name
+    for(int i = 0; i < t.length; ++i)
+     {final StackTraceElement s = t[i];
+      if (s.getMethodName().equals(T))
+       {final String f = s.getFileName();
+        final String m = s.getMethodName();
+        final String l = String.format("%04d", s.getLineNumber());
+        return f+":"+l+":";
+       }
+     }
+    return null;
+   }
+
+
   static String currentTestNameSuffix()                                         // Name of the current test
    {final String t = currentTestName();
     if (t == null) stop("Not in a test");
@@ -716,6 +732,12 @@ public class Test                                                               
     if (!testing) System.err.println(traceBack());
    }
 
+  static void errTest(Object...O)                                               // Say something abut the currest test
+   {say(O);
+    final String t = testLine();
+    if (t != null) System.err.println(t);
+   }
+
   static void stop(Object...O)                                                  // Say something, provide an error trace and stop
    {final boolean sos = sayThisOrStop.size() > 0;                               // Say or stop checking in effect
     say(O);
@@ -841,7 +863,7 @@ public class Test                                                               
     else if ( G == null && E == null) {                                              ++testsPassed; return true;}
     else if ( G != null && E == null) {err(String.format("Expected null, got:", G)); ++testsFailed; return false;}
     else if ( G == null && E != null) {err(String.format("Got null, expected:", E)); ++testsFailed; return false;}
-    else if (!G.equals(E))            {err(currentTestName(), G, "!=", E);           ++testsFailed; return false;}
+    else if (!G.equals(E))            {errTest(currentTestName(), G, "!=", E);       ++testsFailed; return false;}
     else                              {                                              ++testsPassed; return true;}
    }
 
