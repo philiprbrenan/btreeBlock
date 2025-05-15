@@ -278,20 +278,21 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
     String p(String s)   {while(s.length() % 8 > 0) s = s+" "; return s;}       // Pad a string
 
 
-    void locateDirectAddress()                                                  // Locate a direct address and its content
+    At locateDirectAddress()                                                    // Locate a direct address and its content
      {zz();
       final int N = indices.length;
       at          = field.locator.at(indices);
       result      = memory.getInt(at, width);
+      return this;
      }
 
-    void locateInDirectAddress()                                                // Locate an indirect address and its content
+    At locateInDirectAddress()                                                  // Locate an indirect address and its content
      {zz();
       final int N = directs.length;
       for (int i = 0; i < N; i++)
        {indices[i] = directs[i].setOff().getInt();                              // It is assumed by getInt() that setOff() will already have been called.
        }
-      locateDirectAddress();                                                    // Locate the address directly now that its indices are known
+      return locateDirectAddress();                                             // Locate the address directly now that its indices are known
      }
 
     void checkCompiled(Layout.Field Field)                                      // Check the field has been compiled
