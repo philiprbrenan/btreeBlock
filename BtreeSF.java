@@ -1641,8 +1641,9 @@ abstract class BtreeSF extends Test                                             
 
         P.new Block()                                                           // The root is a leaf
          {void code()
-           {P.GoOff(end, ifRootLeaf(nT));                                       // Confirm that the root is a leaf
-            findEqualInLeaf(T.at(Key), nT);
+           {P.parallelStart();   P.GoOff(end, ifRootLeaf(nT));                  // Confirm that the root is a leaf
+            P.parallelSection(); findEqualInLeaf(T.at(Key), nT);                // Assume the root is a leaf and start looking for the key
+            P.parallelEnd();
 
             P.parallelStart();   T.at(find).zero();                             // Leaf that should contain this key is the root
             P.parallelSection(); P.Goto(Return);
@@ -1658,8 +1659,9 @@ abstract class BtreeSF extends Test                                             
 
             P.new Block()                                                       // Found the containing leaf
              {void code()
-               {P.GoOff(end, ifLeaf(nT));                                       // Confirm that it is a leaf
-                findEqualInLeaf(T.at(Key), nT);
+               {P.parallelStart();   P.GoOff(end, ifLeaf(nT));                  // Confirm that it is a leaf
+                P.parallelSection(); findEqualInLeaf(T.at(Key), nT);
+                P.parallelEnd();
 
                 P.parallelStart();   tt(find, child);
                 P.parallelSection(); P.Goto(Return);
@@ -3769,17 +3771,17 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.T.at(t.Key).setInt(2);                                                    // Sets memory directly not via an instruction
     t.find();
 
-    t.run_verilogFind( 0, 0, 0, 29);
-    t.run_verilogFind( 1, 1, 8, 29);
-    t.run_verilogFind( 2, 1, 7, 29);
-    t.run_verilogFind( 3, 1, 6, 29);
-    t.run_verilogFind( 4, 1, 5, 29);
-    t.run_verilogFind( 5, 1, 4, 29);
-    t.run_verilogFind( 6, 1, 3, 29);
-    t.run_verilogFind( 7, 1, 2, 29);
-    t.run_verilogFind( 8, 1, 1, 29);
-    t.run_verilogFind( 9, 1, 0, 29);
-    t.run_verilogFind(10, 0, 0, 29);
+    t.run_verilogFind( 0, 0, 0, 28);
+    t.run_verilogFind( 1, 1, 8, 28);
+    t.run_verilogFind( 2, 1, 7, 28);
+    t.run_verilogFind( 3, 1, 6, 28);
+    t.run_verilogFind( 4, 1, 5, 28);
+    t.run_verilogFind( 5, 1, 4, 28);
+    t.run_verilogFind( 6, 1, 3, 28);
+    t.run_verilogFind( 7, 1, 2, 28);
+    t.run_verilogFind( 8, 1, 1, 28);
+    t.run_verilogFind( 9, 1, 0, 28);
+    t.run_verilogFind(10, 0, 0, 28);
    }
 
   private void runVerilogDeleteTest                                             // Run the java and verilog versions and compare the resulting memory traces
@@ -3826,7 +3828,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 549, """
+    t.runVerilogDeleteTest(3, 6, 548, """
                     6           |
                     0           |
                     5           |
@@ -3838,7 +3840,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  4=4    5,6=3  7=8  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(4, 5, 388, """
+    t.runVerilogDeleteTest(4, 5, 387, """
              6           |
              0           |
              5           |
@@ -3850,7 +3852,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  5,6=3  7=8  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(2, 7, 440, """
+    t.runVerilogDeleteTest(2, 7, 439, """
     4      6      7        |
     0      0.1    0.2      |
     1      3      8        |
@@ -3858,7 +3860,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1=1  5,6=3    7=8    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(1, 8, 321, """
+    t.runVerilogDeleteTest(1, 8, 320, """
       6    7        |
       0    0.1      |
       1    8        |
@@ -3866,7 +3868,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 5,6=1  7=8    8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(5, 4, 265, """
+    t.runVerilogDeleteTest(5, 4, 264, """
       7      |
       0      |
       1      |
@@ -3874,7 +3876,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 6,7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(6, 3, 274, """
+    t.runVerilogDeleteTest(6, 3, 273, """
     7      |
     0      |
     1      |
@@ -3882,15 +3884,15 @@ Line T       At      Wide       Size    Indices        Value   Name
 7=1  8,9=2 |
 """);
 
-    t.runVerilogDeleteTest(7, 2, 240, """
+    t.runVerilogDeleteTest(7, 2, 239, """
 8,9=0 |
 """);
 
-    t.runVerilogDeleteTest(8, 1, 35, """
+    t.runVerilogDeleteTest(8, 1, 34, """
 9=0 |
 """);
 
-    t.runVerilogDeleteTest(9, 0, 35, """
+    t.runVerilogDeleteTest(9, 0, 34, """
 =0 |
 """);
    }
@@ -3916,15 +3918,15 @@ Line T       At      Wide       Size    Indices        Value   Name
     final BtreeSF t = allTreeOps();
     t.P.run(); t.P.clear();
     t.put();
-    t.runVerilogPutTest(1, 31, """
+    t.runVerilogPutTest(1, 30, """
 1=0 |
 """);
 
-    t.runVerilogPutTest(2, 31, """
+    t.runVerilogPutTest(2, 30, """
 1,2=0 |
 """);
                                                                                 // Split instruction
-    t.runVerilogPutTest(3, 152, """
+    t.runVerilogPutTest(3, 150, """
     1      |
     0      |
     1      |
@@ -3932,7 +3934,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1=1  2,3=2 |
 """);
 
-    t.runVerilogPutTest(4, 277, """
+    t.runVerilogPutTest(4, 275, """
     1    2        |
     0    0.1      |
     1    3        |
@@ -3940,7 +3942,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1=1  2=3    3,4=2 |
 """);
 
-    t.runVerilogPutTest(5, 337, """
+    t.runVerilogPutTest(5, 335, """
       2    3        |
       0    0.1      |
       1    4        |
@@ -3948,7 +3950,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3=4    4,5=2 |
 """);
 
-    t.runVerilogPutTest(6, 337, """
+    t.runVerilogPutTest(6, 335, """
       2      4        |
       0      0.1      |
       1      4        |
@@ -3956,7 +3958,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=2 |
 """);
 
-    t.runVerilogPutTest(7, 370, """
+    t.runVerilogPutTest(7, 368, """
       2      4      5        |
       0      0.1    0.2      |
       1      4      3        |
@@ -3964,7 +3966,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5=3    6,7=2 |
 """);
 
-    t.runVerilogPutTest(8, 498, """
+    t.runVerilogPutTest(8, 495, """
              4                  |
              0                  |
              5                  |
@@ -3976,7 +3978,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5=3  6=7    7,8=2 |
 """);
 
-    t.runVerilogPutTest(9, 463, """
+    t.runVerilogPutTest(9, 461, """
              4                    |
              0                    |
              5                    |
@@ -3988,7 +3990,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5,6=3  7=8    8,9=2 |
 """);
 
-    t.runVerilogPutTest(10, 463, """
+    t.runVerilogPutTest(10, 461, """
              4                       |
              0                       |
              5                       |
@@ -4000,7 +4002,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5,6=3  7,8=8    9,10=2 |
 """);
 
-    t.runVerilogPutTest(11, 496, """
+    t.runVerilogPutTest(11, 494, """
              4                               |
              0                               |
              5                               |
@@ -4012,7 +4014,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4  5,6=3  7,8=8    9=7    10,11=2 |
 """);
 
-    t.runVerilogPutTest(12, 484, """
+    t.runVerilogPutTest(12, 482, """
                                8                 |
                                0                 |
                                5                 |
@@ -4024,7 +4026,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=2 |
 """);
 
-    t.runVerilogPutTest(13, 426, """
+    t.runVerilogPutTest(13, 424, """
                                8                          |
                                0                          |
                                5                          |
@@ -4036,7 +4038,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11=10    12,13=2 |
 """);
 
-    t.runVerilogPutTest(14, 463, """
+    t.runVerilogPutTest(14, 461, """
                                8                             |
                                0                             |
                                5                             |
@@ -4048,7 +4050,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=2 |
 """);
 
-    t.runVerilogPutTest(15, 496, """
+    t.runVerilogPutTest(15, 494, """
                                8                                     |
                                0                                     |
                                5                                     |
@@ -4060,7 +4062,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13=9    14,15=2 |
 """);
 
-    t.runVerilogPutTest(16, 511, """
+    t.runVerilogPutTest(16, 509, """
                                8                  12                   |
                                0                  0.1                  |
                                5                  11                   |
@@ -4072,7 +4074,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=2 |
 """);
 
-    t.runVerilogPutTest(17, 474, """
+    t.runVerilogPutTest(17, 472, """
                                8                  12                            |
                                0                  0.1                           |
                                5                  11                            |
@@ -4084,7 +4086,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15=12    16,17=2 |
 """);
 
-    t.runVerilogPutTest(18, 511, """
+    t.runVerilogPutTest(18, 509, """
                                8                  12                               |
                                0                  0.1                              |
                                5                  11                               |
@@ -4096,7 +4098,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=12    17,18=2 |
 """);
 
-    t.runVerilogPutTest(19, 544, """
+    t.runVerilogPutTest(19, 542, """
                                8                  12                                        |
                                0                  0.1                                       |
                                5                  11                                        |
@@ -4108,7 +4110,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 554, """
+    t.runVerilogPutTest(20, 552, """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
