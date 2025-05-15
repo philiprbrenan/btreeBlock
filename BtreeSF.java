@@ -1630,6 +1630,51 @@ abstract class BtreeSF extends Test                                             
      };
    }
 
+//D1 Position                                                                   // Locate the first or last key in the tree
+
+  public void firstLast(boolean first)                                          // Find the first leaf in the treeif true else the last leaf in the tree
+   {zz();
+    P.new Block()
+     {void code()
+       {final ProgramDM.Label Return = end;
+        nT.loadRoot();                                                          // The first thing in the tree is the root
+
+        P.new Block()                                                           // The root is a leaf
+         {void code()
+           {P.GoOff(end, ifRootLeaf(nT));                                       // Confirm that the root is a leaf
+
+            P.parallelStart();   T.at(leafFound).zero();                        // Leaf that should contain this key is the root
+            P.parallelSection(); P.Goto(Return);
+            P.parallelEnd();
+           }
+         };
+
+        P.new Block()
+         {void code()
+           {nT.loadStuck(bT);                                                   // Load the stuck
+            if (first) bT.firstElement(); else bT.lastElement();                // First or last element of stuck
+            nT.loadNode(bT.T.at(bT.tData));                                     // Move down to next level
+
+            P.new Block()                                                       // Found the containing leaf
+             {void code()
+               {P.GoOff(end, ifLeaf(nT));                                       // Confirm that it is a leaf
+
+                P.parallelStart();   T.at(leafFound).move(bT.T.at(bT.tData));   // Save node index of leaf
+                P.parallelSection(); P.Goto(Return);
+                P.parallelEnd();
+               }
+             };
+
+            P.Goto(start);                                                      // Restart traverse one level down
+           }
+         };
+       }
+     };
+   }
+
+  public void first() {firstLast(true);}                                        // Find the first leaf in the tree
+  public void  last() {firstLast(false);}                                       // Find the last  leaf in the tree
+
 //D1 Find                                                                       // Find the data associated with a key.
 
   public void find()                                                            // Find the leaf associated with a key in the tree
@@ -1637,7 +1682,7 @@ abstract class BtreeSF extends Test                                             
     P.new Block()
      {void code()
        {final ProgramDM.Label Return = end;
-        nT.loadRoot();                                                          // The first thing in the tree is the node
+        nT.loadRoot();                                                          // The first thing in the tree is the root
 
         P.new Block()                                                           // The root is a leaf
          {void code()
@@ -3742,6 +3787,44 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
    }
 
+  private static void test_first_last()                                         // First/last node of a tree
+   {z(); sayCurrentTestName();
+    final BtreeSF t = allTreeOps() ;
+    t.P.run(); t.P.clear();
+    t.put();
+    final int N = 9;
+    for (int i = 1; i <= N; ++i)
+     {//say(currentTestName(),  "a", i);
+      t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(N-i);
+      t.P.run();
+     }
+    //stop(t.M);
+    //stop(t);
+    ok(t, """
+             4                    |
+             0                    |
+             5                    |
+             6                    |
+      2             6    7        |
+      5             6    6.1      |
+      1             3    8        |
+      4                  2        |
+1,2=1  3,4=4  5,6=3  7=8    8,9=2 |
+""");
+    t.P.clear();
+    t.first();
+    t.P.run();
+    //stop(t.T.at(t.leafFound));
+    ok(t.T.at(t.leafFound), "T.leafFound@138=1");
+
+    t.P.clear();
+    t.last();
+    t.P.run();
+    //stop(t.T.at(t.leafFound));
+    ok(t.T.at(t.leafFound), "T.leafFound@138=2");
+   }
+
   private static void test_find_verilog()                                               // Find using generated verilog code
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps() ;
@@ -3913,7 +3996,7 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
    }
 
-  private static void test_put_verilog()                                                // Delete using generated verilog code
+  private static void test_put_verilog()                                        // Delete using generated verilog code
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps();
     t.P.run(); t.P.clear();
@@ -4704,13 +4787,15 @@ StuckSML(maxSize:4 size:1)
     test_put_verilog();
 //  test_find_wide();
 //  test_put_wide();
+    test_first_last();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_delete_verilog();
-    test_find_verilog();
-    test_put_verilog();
+    //test_delete_verilog();
+    //test_find_verilog();
+    //test_put_verilog();
+    test_first_last();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
