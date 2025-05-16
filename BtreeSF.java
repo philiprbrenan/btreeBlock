@@ -1734,32 +1734,25 @@ abstract class BtreeSF extends Test                                             
             P.parallelSection(); findEqualInLeaf(T.at(Key), nT);                // Assume the root is a leaf and start looking for the key
             P.parallelEnd();
 
-            leafSize();
-            final Variable empty = new Variable(P, "empty", 1);                 // Whether the tree is empty
-            T.at(size).isZero(empty);
-            P.new If(empty.a)
-             {void Then()                                                       // The tree is empty so there is no next key
-               {T.at(found).zero();
-               }
-              void Else()                                                       // The tree is not empty
-               {T.at(size).dec();                                               // Index of the last element - we know that there is one
-                final Variable more = new Variable(P, "more", 1);               // Whether there are mopr keys
-                T.at(index).lessThan(T.at(size), more.a);
-                P.new If(T.at(empty))
-                 {void Then()                                                       // The tree is empty so there is no next key
-                   {T.at(found).zero();
+            final Variable f = new Variable(T.at(found));                       // Alias found as a variable
+            final Variable i = new Variable(T.at(index));                       // Index where the key was found
+            final Variable s = new Variable(lEqual.T.at(lEqual.size));          // Alias stuck size as a variable
+            f.zero();                                                           // Assume we will not find the next key
+            lEqual.size();
+            P.new If (s)                                                        // Size of stuck
+             {void Else()                                                       // The tree is not empty
+               {s.dec();                                                        // Index of the last element - we know that there is one
+                P.new If (i.lessThan(s))                                        // Compare index to size to see if we can just increment
+                 {void Then()                                                   // Next key can be find by incrementing
+                   {f.one();                                                    // Show as found
+                    i.inc();                                                    // Index
+                    lEqual.T.at(lEqual.index).move(i.a);
+                    lEqual.elementAt();
+                    T.at(Key).move(lEqual.T.at(lEqual.tKey));
                    }
-                  void Else()                                                       // The tree is not empty
-                   {T.at(size).dec();                                               // Index of the last element - we know that there is one
-
-               }
-
-                 T.at(index).inc();
-T.at(found), T.at(index)
-T.at(found), T.at(index)
+                 };
                }
              };
-            T.at(find).zero();                                                  // Leaf that should contain this key is the root
             P.Goto(Return);
            }
          };
