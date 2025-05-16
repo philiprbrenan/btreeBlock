@@ -26,8 +26,9 @@ class Variable extends Test                                                     
    {this(at.ml().P, at.field.name, at.field.width);
    }
 
-  void set(int v) {       a.setInt(v);}                                         // Set the value of the variable
-  int  get()      {return a.locateDirectAddress().getInt();}                    // Get the value of the variable. A variable cannot be in directly addressed.
+  void seti(int v) {       a.setInt(v);}                                        // Set the value of the variable immediately
+  int  geti()      {return a.locateDirectAddress().getInt();}                   // Get the value of the variable immediately. A variable cannot be indirectly addressed.
+
   void inc ()     {a.inc();}                                                    // Increment the variable
   void dec ()     {a.dec();}                                                    // Decrement the variable
   void move(Variable source)        {a.move(source.a);}                         // Copy the value of the source variable ino the target
@@ -45,6 +46,10 @@ class Variable extends Test                                                     
   Variable lessThanOrEqual   (Variable A) {final Variable r = new Variable(program, "result", 1); a.lessThanOrEqual   (A.a, r.a); return r;} // Set this variable to one if the first variable is less than or equal to the second one else zero
   Variable greaterThan       (Variable A) {final Variable r = new Variable(program, "result", 1); a.greaterThan       (A.a, r.a); return r;} // Set this variable to one if the first variable is greater than the second one else zero
   Variable greaterThanOrEqual(Variable A) {final Variable r = new Variable(program, "result", 1); a.greaterThanOrEqual(A.a, r.a); return r;} // Set this variable to one if the first variable is greater than or equal to the second one else zero
+
+  void zero() {a.zero();}                                                       // Zero the storage associated with this variable
+  void one () {a.one ();}                                                       // Set the memory associated with this variable to one
+  void ones() {a.ones();}                                                       // Set the memory associated wiith this variable to all ones
 
   String verilogLoad() {return a.verilogLoad();}                                // Verilog value   of this variable
   String verilogAddr() {return a.verilogAddr();}                                // Verilog address of this variable
@@ -64,21 +69,21 @@ class Variable extends Test                                                     
     Variable  k = new Variable(p, "k", 4);
 
     i.sameSize(j, k);
-    i.set(1);
+    i.seti(1);
     j.move(i);
     p.run(); p.clear();
-    ok(j.get(), 1);
+    ok(j.geti(), 1);
     j.inc();
     p.run();  p.clear();
-    ok(j.get(), 2);
+    ok(j.geti(), 2);
 
     k = i.add(j);
     p.run();  p.clear();
-    ok(k.get(), 3);
+    ok(k.geti(), 3);
 
     k = j.add(2);
     p.run();  p.clear();
-    ok(k.get(), 4);
+    ok(k.geti(), 4);
    }
 
   static void test_boolean()
@@ -86,7 +91,7 @@ class Variable extends Test                                                     
     final Variable  i   = new Variable(p, "i",  4);
     final Variable  j   = new Variable(p, "j",  4);
 
-    i.set(1); j.set(2);
+    i.seti(1); j.seti(2);
 
     final Variable eq1 = i.equal             (i);
     final Variable ne1 = i.notEquals         (j);
@@ -103,41 +108,41 @@ class Variable extends Test                                                     
 
     p.run(); p.clear();
 
-    ok(eq1.get(), 1);
-    ok(ne1.get(), 1);
-    ok(le1.get(), 1);
-    ok(gt1.get(), 1);
-    ok(ge1.get(), 1);
+    ok(eq1.geti(), 1);
+    ok(ne1.geti(), 1);
+    ok(le1.geti(), 1);
+    ok(gt1.geti(), 1);
+    ok(ge1.geti(), 1);
 
-    ok(eq0.get(), 0);
-    ok(ne0.get(), 0);
-    ok(lt0.get(), 0);
-    ok(le0.get(), 0);
-    ok(gt0.get(), 0);
-    ok(ge0.get(), 0);
+    ok(eq0.geti(), 0);
+    ok(ne0.geti(), 0);
+    ok(lt0.geti(), 0);
+    ok(le0.geti(), 0);
+    ok(gt0.geti(), 0);
+    ok(ge0.geti(), 0);
    }
 
   static void test_shift()                                                      // Shift left and right
    {final ProgramDM p = new ProgramDM();
     final Variable  i = new Variable(p, "i",  4);
-    i.set(1);
+    i.seti(1);
 
     i.slz();i.slz();
     p.run(); p.clear();
     //stop(i);
-    ok(i.get(), 4);
+    ok(i.geti(), 4);
 
     i.srz();
     p.run(); p.clear();
     //stop(i);
-    ok(i.get(), 2);
+    ok(i.geti(), 2);
    }
 
   static void test_verilog()
    {final ProgramDM p = new ProgramDM();
     MemoryLayoutDM.numbers = 0;
     final Variable  i = new Variable(p, "i",  4);
-    i.set(1);
+    i.seti(1);
 
     ok(i.verilogLoad(), "i_1[       0/*i       */ +: 4]");
    }
@@ -161,15 +166,15 @@ class Variable extends Test                                                     
     final Variable One = new Variable(m.at(o));
     final Variable Two = new Variable(m.at(t));
 
-    A.set(1); One.set(1); Two.set(2);
+    A.seti(1); One.seti(1); Two.seti(2);
     Variable x = A.copy();
              x.inc();
     Variable y = A.add(x);
     m.P.run(); m.P.clear();
     //stop(B);
-    ok(x.get(), 2);
+    ok(x.geti(), 2);
     //stop(C);
-    ok(y.get(), 3);
+    ok(y.geti(), 3);
 
     m.P.clear();
     m.P.new If (One.greaterThanOrEqual(y))
@@ -182,8 +187,25 @@ class Variable extends Test                                                     
      };
     m.P.run();
     //stop(D);
-    ok(D.get(), 2);
- }
+    ok(D.geti(), 2);
+   }
+
+  static void test_zero()
+   {z();
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "fields");
+    m.program(m.P);
+
+    final Variable A   = new Variable(m.at(a));
+
+    A.seti(1);
+    ok(A.geti(), 1);
+    A.zero();
+    ok(A.geti(), 1);
+    m.P.run(); m.P.clear();
+    ok(A.geti(), 0);
+   }
 
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_var();
@@ -191,10 +213,12 @@ class Variable extends Test                                                     
     test_shift();
     test_verilog();
     test_location();
+    test_zero();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_zero();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
