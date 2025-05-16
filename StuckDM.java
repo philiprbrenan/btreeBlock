@@ -232,19 +232,15 @@ abstract class StuckDM extends Test                                             
 
   void setKeyData()                                                             // Set a key, data element in the stuck
    {zz();
-    P.parallelStart();
-      setKey();
-    P.parallelSection();
-      setData();
+    P.parallelStart();        setKey();
+    P.parallelSection();      setData();
     P.parallelEnd();
    }
 
   void moveKeyData()                                                            // Move key, data
    {zz();
-    P.parallelStart();
-      moveKey();
-    P.parallelSection();
-      moveData();
+    P.parallelStart();        moveKey();
+    P.parallelSection();      moveData();
     P.parallelEnd();
    }
 
@@ -595,12 +591,12 @@ abstract class StuckDM extends Test                                             
     P.new I()                                                                   // Set found to show whether in fact we found a matching key
      {void a()
        {final int N = maxSize();
-        found.set(0);                                                           // Assume the key was not found
+        found.seti(0);                                                          // Assume the key was not found
         for (int i = 0; i < N; i++)                                             // Search
          {z();
           final boolean f = T.at(lessThanLeafSize, i).setOff().getInt() > 0;    // Whether this key is in range and is greater than or equal to the search key
           if (f)                                                                // A matching key was found
-           {found.set(1);
+           {found.seti(1);
             break;
            }
          }
@@ -629,7 +625,7 @@ abstract class StuckDM extends Test                                             
           if (f && Data  != null) Data.setInt(M.at(sData, i).setOff().getInt());// Save data if this key matched
          }
 
-        if (Found != null) Found.setInt(found.get() > 0 ? 1 : 0);               // Set found if requested
+        if (Found != null) Found.setInt(found.geti() > 0 ? 1 : 0);              // Set found if requested
        }
 
       String v()
