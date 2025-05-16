@@ -816,6 +816,21 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
        };
      }
 
+    void one()                                                                  // Set memory to one
+     {zz();
+      P.new I()
+       {void a()
+         {setOff(); setInt(1);
+         }
+        String v()
+         {return verilogLoad()+" <= 1; /* ones */";
+         }
+        String n()
+         {return field.name+" <= 1;";
+         }
+       };
+     }
+
     void ones()                                                                 // Ones some memory
      {zz();
       final String one = field.verilogOnes();
@@ -1401,40 +1416,6 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
     ok(m.at(t.a, 0, 0, 1), "Test.a[0,0,1]16=1");
     ok(m.at(t.a, 0, 0, 2), "Test.a[0,0,2]28=3");
    }
-
-//  static void test_move_buffer()
-//   {z();
-//    Layout           l = Layout.layout();
-//    Layout.Variable  a = l.variable ("a", 4);
-//    Layout.Variable  b = l.variable ("b", 4);
-//    Layout.Variable  c = l.variable ("c", 4);
-//    Layout.Variable  d = l.variable ("d", 4);
-//    Layout.Structure s = l.structure("s", a, b, c, d);
-//
-//    MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "test");
-//    m.memory.alternating(4);
-//    //stop(m);
-//    m.ok("""
-//Line T       At      Wide       Size    Indices        Value   Name
-//   1 S        0        16                                      s
-//   2 V        0         4                                  0     a
-//   3 V        4         4                                 15     b
-//   4 V        8         4                                  0     c
-//   5 V       12         4                                 15     d
-//""");
-//    m.at(d).move(m.at(a),  m.at(b));
-//    m.P.run();
-//
-//    //stop(m);
-//    m.ok("""
-//Line T       At      Wide       Size    Indices        Value   Name
-//   1 S        0        16                                      s
-//   2 V        0         4                                  0     a
-//   3 V        4         4                                  0     b
-//   4 V        8         4                                  0     c
-//   5 V       12         4                                  0     d
-//""");
-// }
 
   static void test_move()
    {z();
@@ -2712,11 +2693,34 @@ A[7] <= 8'b0;
 """);
    }
 
+  static void test_zero_one_ones()
+   {z();
+    final int N = 8;
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable("a",    N);
+    MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "A");
+    m.program(m.P);
+
+    m.at(a).ones();
+    ok(m.at(a).getInt(), 0);
+    m.P.run(); m.P.clear();
+    ok(m.at(a).getInt(), powerTwo(N)-1);
+
+    m.at(a).one();
+    ok(m.at(a).getInt(), powerTwo(N)-1);
+    m.P.run(); m.P.clear();
+    ok(m.at(a).getInt(), 1);
+
+    m.at(a).zero();
+    ok(m.at(a).getInt(), 1);
+    m.P.run(); m.P.clear();
+    ok(m.at(a).getInt(), 0);
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_get_set();
     test_boolean();
     test_copy();
-    //test_move_buffer();
     test_move();
     test_set_inc_dec_get();
     test_addressing();
@@ -2738,10 +2742,12 @@ A[7] <= 8'b0;
     test_top_move();
     test_bit_verilog();
     test_block_verilog();
+    test_zero_one_ones();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {oldTests();
+   {//oldTests();
+    test_zero_one_ones();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
