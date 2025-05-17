@@ -1149,6 +1149,12 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
         String n() {return field.name + "=" + field.name + " << 1";}
        };
      }
+
+//D1 Variables                                                                  // Create a variable from an at reference
+
+    Variable alias() {zz(); return new Variable(this);}                         // Create a variable aliased to this reference
+    Variable dup  () {zz(); return new Variable(P, field.name, field.width);}   // Create a variable with the same characteristics
+    Variable fork () {zz(); final Variable d = dup(); d.a.move(this); return d;}// Create a variable from the source and generate an instruction to load it from the source at run time
    } // At
 
   At at(Layout.Field Field)                                                     // A field without indices or base addressing
