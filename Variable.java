@@ -22,12 +22,12 @@ class Variable extends Test                                                     
     m.program(Program, false);                                                  // Set program for this variable assuming it is not a unique name
    }
 
-  Variable(MemoryLayoutDM.At at)                                                // Create a variable from a memory location
+  Variable(MemoryLayoutDM.At at)                                                // Create a variable with the same anme and wiith but in its own memeory
    {this(at.ml().P, at.field.name, at.field.width);
    }
 
-  Variable dup () {return new Variable(program, a.field.name, a.field.width);}  // Copy the value of the source variable into the target during program execution
-  void move(Variable source)        {a.move(source.a);}                         // Duplicate the definition of a variable before program execution
+  Variable fork() {final Variable r = new Variable(a); r.move(this); return r;} // Duplicate the definition of a variable during compilation and copy its value during execution
+  void move(Variable source)        {a.move(source.a);}                         // Copy the value of the source variable into the target during program execution
 
   void seti(int v) {       a.setInt(v);}                                        // Set the value of the variable immediately
   int  geti()      {return a.locateDirectAddress().getInt();}                   // Get the value of the variable immediately. A variable cannot be indirectly addressed.
@@ -211,24 +211,55 @@ class Variable extends Test                                                     
 
   static void test_dup()
    {z();
-    final ProgramDM p = new ProgramDM();
-    final Variable  a = new Variable(p, "a", 4);
-    final Variable  A = a.dup();
-    a.seti(1);
-    ok(a.geti(), 1);
-    ok(A.geti(), 0);
-    A.move(a);
-    ok(A.geti(), 0);
-    p.run();
-    ok(A.geti(), 1);
-   }
+    Layout           l = Layout.layout();
+    Layout.Variable  a = l.variable ("a", 4);
+    Layout.Variable  b = l.variable ("b", 4);
+    Layout.Structure S = l.structure("S", a, b);
+    MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "fields");
+    m.program(m.P);
 
+    final Variable   A = new Variable(m.at(a));                                 // Same definition but different memory
+    final Variable   B = new Variable(m.at(b));
+
+    A.seti(1);
+    B.seti(2);
+    A.move(B);
+    ok(A.geti(), 1);
+    ok(B.geti(), 2);
+    m.P.run(); m.P.clear();
+    ok(A.geti(), 2);
+    ok(B.geti(), 2);
+    //stop(m);
+    ok(""+m, """
+MemoryLayout: fields
+Memory      : fields
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0         8                                      S
+   2 V        0         4                                  0     a
+   3 V        4         4                                  0     b
+""");
+
+    B.zero();
+    ok(B.geti(), 2);
+    m.P.run(); m.P.clear();
+    ok(B.geti(), 0);
+
+    B.one();
+    ok(B.geti(), 0);
+    m.P.run(); m.P.clear();
+    ok(B.geti(), 1);
+
+    B.ones();
+    ok(B.geti(), 1);
+    m.P.run(); m.P.clear();
+    ok(B.geti(), 15);
+   }
 
   static void test_fork()
    {z();
     final ProgramDM p = new ProgramDM();
     final Variable  a = new Variable(p, "a", 4);
-    final Variable  A = a.a.fork();
+    final Variable  A = a.fork();
     a.seti(1);
     ok(a.geti(), 1);
     ok(A.geti(), 0);
@@ -244,11 +275,11 @@ class Variable extends Test                                                     
     test_location();
     test_zero();
     test_dup();
+    test_fork();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_fork();
+   {oldTests();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
