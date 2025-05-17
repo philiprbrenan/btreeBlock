@@ -27,7 +27,6 @@ abstract class BtreeSF extends Test                                             
   final boolean              OpCodes = true;                                    // Refactor op codes
   final boolean           runVerilog = true;                                    // Run verilog tests alongside java tests and check they produce the same results
   final String     designDescription = "? versus |";                            // Description of latest change
-  //final static TreeMap<String,String>removableMemories = new TreeMap<>();     // Record memories that can be removed from each project as they are not used
   final String     processTechnology = "freepdk45";                             // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
@@ -52,7 +51,6 @@ abstract class BtreeSF extends Test                                             
   Layout.Variable  freeList;                                                    // Single linked list of nodes that have been freed and so can be reused without fragmenting memory
   Layout.Structure bTree;                                                       // Btree
   Layout.Field     bTree_free;                                                  // Free list in node observed from btree main memory and thus likely to add to memory congestion unless separated out into a spearate memory block
-//Layout.Field     bTree_isLeaf;                                                // Is a leaf in node observed from btree main memory and thus likely to add to memory congestion unless separated out into a spearate memory block
   Layout.Field     node_size;                                                   // Size of a node observed from a node
   Layout.Field     freeChainHead;                                               // Head of the free list
 
@@ -63,9 +61,7 @@ abstract class BtreeSF extends Test                                             
     linesToPrintABranch =  4,                                                   // The number of lines required to print a branch
          maxPrintLevels = 10,                                                   // Maximum number of levels to print in a tree
                maxDepth = 99;                                                   // Maximum depth of any realistic tree
-
   int          nodeUsed = 0;                                                    // Number of nodes currently in use
-//int       maxNodeUsed = 0;                                                    // Maximum number of branches plus leaves used
 
   final int        root = 0;                                                    // The root of the tree is always node zero
 
@@ -167,10 +163,6 @@ abstract class BtreeSF extends Test                                             
     nC.loadRoot();                                                              // Load the allocated node
     nC.setLeaf();                                                               // Set the root as a leaf
     nC.saveRoot();                                                              // Write back into memory
-
-    //removableMemories.put("find",   " bT_StuckSA_Copy bL_StuckSA_Memory bL_StuckSA_Copy bL_StuckSA_Transaction bR_StuckSA_Memory bR_StuckSA_Copy bR_StuckSA_Transaction lT_StuckSA_Copy lL_StuckSA_Memory lL_StuckSA_Copy lL_StuckSA_Transaction lR_StuckSA_Memory  lR_StuckSA_Copy lR_StuckSA_Transaction nL nR ");
-    //removableMemories.put("delete", " bL_StuckSA_Copy lL_StuckSA_Copy ");
-    //removableMemories.put("put",    " bL_StuckSA_Copy lL_StuckSA_Copy lR_StuckSA_Copy ");
    }
 
   StuckDM createBranchStuck(String name)                                        // Create a branch Stuck
@@ -389,7 +381,6 @@ abstract class BtreeSF extends Test                                             
 
     nC.zero();                                                                  // Clear the node
     nC.saveNode(T.at(allocate));                                                // Construct and clear the node
-//    maxNodeUsed  = max(maxNodeUsed, ++nodeUsed);                              // Number of nodes in use
    }
 
   private void allocate() {z(); allocate(true);}                                // Allocate a node checking for free space
@@ -458,12 +449,7 @@ abstract class BtreeSF extends Test                                             
   private Layout.Variable         leafFound;                                    // Leaf found by find
   private Layout.Variable    maxKeysPerLeaf;                                    // Maximum keys per leaf
   private Layout.Variable  maxKeysPerBranch;                                    // Maximum keys per branch
-//private Layout.Variable          MaxDepth;                                    // Maximum depth of a search
   private Layout.Variable               two;                                    // The value two
-//private Layout.Variable         findDepth;                                    // Current level being searched by find
-//private Layout.Variable          putDepth;                                    // Current level being traversed by put
-//private Layout.Variable       deleteDepth;                                    // Current level being traversed by delete
-//private Layout.Variable        mergeDepth;                                    // Current level being traversed by merge
   private Layout.Variable        mergeIndex;                                    // Current index of node being merged across
   private Layout.Variable   memoryIOAddress;                                    // Pipelined input or outoput to memory
   private Layout.Bit      memoryIODirection;                                    // If true we are writing into memory else we are reading from memory
@@ -567,11 +553,6 @@ abstract class BtreeSF extends Test                                             
                               maxKeysPerLeaf = L.variable ("maxKeysPerLeaf"                                , bitsPerSize);
                             maxKeysPerBranch = L.variable ("maxKeysPerBranch"                              , bitsPerSize);
                                          two = L.variable ("two"                                           , bitsPerSize);
-//                                  MaxDepth = //L.variable ("maxDepth"                                      , bitsPerNext);
-//                                 findDepth = //L.variable ("findDepth"                                     , bitsPerNext);
-//                                  putDepth = //L.variable ("putDepth"                                      , bitsPerNext);
-//                               deleteDepth = //L.variable ("deleteDepth"                                   , bitsPerNext);
-//                                mergeDepth = L.variable ("mergeDepth"                                    , bitsPerNext);
                                   mergeIndex = L.variable ("mergeIndex"                                    , bitsPerSize);
                              memoryIOAddress = L.variable ("memoryIOAddress"                               , bitsPerNext);
                            memoryIODirection = L.bit      ("memoryIODirection");
@@ -666,14 +647,9 @@ abstract class BtreeSF extends Test                                             
       maxKeysPerLeaf,
       maxKeysPerBranch,
       two,
-      //MaxDepth,
-      //findDepth,
-      //putDepth,
-      //deleteDepth,
-      //mergeDepth,
-        mergeIndex,
-        memoryIOAddress,
-        memoryIODirection,
+      mergeIndex,
+      memoryIOAddress,
+      memoryIODirection,
       //node_isLeaf,
       //node_setLeaf,
       node_setBranch,
@@ -957,8 +933,6 @@ abstract class BtreeSF extends Test                                             
 
   private void splitLeafRoot()                                                  // Split a leaf which happens to be a full root into two half full leaves while transforming the root leaf into a branch
    {zz();
-    //final  Variable L = new Variable(P, "left",  bitsPerNext);                  // Index of left allocated node
-    //final  Variable R = new Variable(P, "right", bitsPerNext);                  // Index of right allocated node
 
     allocLeaf(); tt(l, allocLeaf);                                              // New left leaf
     allocLeaf(); tt(r, allocLeaf);                                              // New right leaf
@@ -1913,25 +1887,12 @@ abstract class BtreeSF extends Test                                             
             findFirstGreaterThanOrEqualInLeaf(lEqual, T.at(Key),                // Leaf known not to contain the search key
               T.at(found), lEqual.T.at(lEqual.index));
 
-//          P.new If(T.at(found))                                               // Insert
-//           {void Then()
-               {z();
-                P.parallelStart();    lEqual.T.at(lEqual.tKey ).move(T.at(Key));
-                P.parallelSection();  lEqual.T.at(lEqual.tData).move(T.at(Data));
-                P.parallelSection(); T.at(inserted).ones();
-                P.parallelEnd();
+            P.parallelStart();   lEqual.T.at(lEqual.tKey ).move(T.at(Key));
+            P.parallelSection(); lEqual.T.at(lEqual.tData).move(T.at(Data));
+            P.parallelSection(); T.at(inserted).ones();
+            P.parallelEnd();
 
-                lEqual.insertElementAt();
-               }
-//              void Else()                                                       // Extend
-//               {z();
-//                P.parallelStart();   lEqual.T.at(lEqual.tKey ).move(T.at(Key));
-//                P.parallelSection(); lEqual.T.at(lEqual.tData).move(T.at(Data));
-//                P.parallelSection(); T.at(inserted).ones();
-//                P.parallelEnd();
-//                lEqual.push();
-//               }
-//             };
+            lEqual.insertElementAt();
             nT.saveStuck(lEqual, leafFound);                                    // Save stuck back into memory
             P.parallelStart();   T.at(success).ones();
             P.parallelSection(); tt(findAndInsert, leafFound);
@@ -2030,7 +1991,6 @@ abstract class BtreeSF extends Test                                             
         P.GoOff(end, T.at(found));                                              // Key not found so nothing to delete
         z(); nT.loadStuck(lT, find);                                            // The leaf that contains the key
         lT.T.at(lT.index).move(T.at(index));
-//      lT.elementAt();                                                         // Position in the leaf of the key
         lT.removeElementAt();                                                   // Remove the key, data pair from the leaf
         T.at(Data).move(lT.T.at(lT.tData));                                     // Key, data pairs in the leaf
         nT.saveStuck(lT, find);
@@ -2044,7 +2004,6 @@ abstract class BtreeSF extends Test                                             
      {void code()
        {final ProgramDM.Label Return = end;
         mergeRoot();
-//      nT.loadRoot();
 
         P.new Block()                                                           // Find and delete directly in root as a leaf
          {void code()
@@ -2073,7 +2032,6 @@ abstract class BtreeSF extends Test                                             
 
             nC.loadNode(T.at(child));
             nC.isLeaf(T.at(isLeaf));
-//          T.at(isLeaf).move(M.at(bTree_isLeaf, T.at(child)));
             P.new If (T.at(isLeaf))                                             // Reached a leaf
              {void Then()
                {z();
@@ -2239,20 +2197,6 @@ abstract class BtreeSF extends Test                                             
        }
       ops.order();                                                              // Order the instructions
      }
-
-//    boolean requiredMemory(MemoryLayoutDM m)                                    // Check memory is required for this project
-//     {zz();
-//      final String r = removableMemories.get(project);                          // Removable memories for this project
-//      if (r == null) return true;                                               // No removable memories yet
-//      return !r.contains(" "+m.name+" ");                                       // Check whether memory is removable or not
-//     }
-//
-//    void removeMemories()                                                       // Remove memories reported as unneeded
-//     {zz();
-//      final Stack<MemoryLayoutDM> r = new Stack<>();                            // Memories that can be removed
-//      for(MemoryLayoutDM m : P.memories) if (!requiredMemory(m)) r.push(m);     // Each memory not used by the program
-//      for(MemoryLayoutDM m : r) P.memories.remove(m);
-//     }
 
     void declareMemories()                                                      // Declare memories
      {zz();
@@ -4739,43 +4683,6 @@ StuckSML(maxSize:4 size:1)
   0 key:1 data:1
 """);
    }
-
-//  private static void test_memory()
-//   {n.saveRootStuck(l);
-//    t.T.setIntInstruction(t.memoryIn, 1);
-//    n.saveStuck(l, t.memoryIn);
-//    t.T.setIntInstruction(t.memoryIn, 2);
-//    n.saveStuck(b, t.memoryIn);
-//    t.P.run(); t.P.clear();
-//
-//    l.M.zero(); b.M.zero();
-//    //stop(l);
-//    ok(l, """
-//StuckSML(maxSize:2 size:0)
-//""");
-//    //stop(b);
-//    ok(b, """
-//StuckSML(maxSize:4 size:0)
-//""");
-//
-//    t.T.setIntInstruction(t.memoryOut, 1);
-//    n.loadStuck(l, t.memoryOut);
-//    t.T.setIntInstruction(t.memoryOut, 2);
-//    n.loadStuck(b, t.memoryOut);
-//    t.P.run(); t.P.clear();
-//
-//    //stop(l);
-//    ok(l, """
-//StuckSML(maxSize:2 size:2)
-//  0 key:1 data:0
-//  1 key:2 data:2
-//""");
-//    //stop(b);
-//    ok(b, """
-//StuckSML(maxSize:4 size:1)
-//  0 key:1 data:1
-//""");
-//   }
 
   private static void test_memory()
    {z(); sayCurrentTestName();
