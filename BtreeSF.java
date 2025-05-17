@@ -14,6 +14,7 @@ package com.AppaApps.Silicon;                                                   
 // Investigate whether it would be worth changing from a block of variables in T to individual memories for each variable now in T.  This would localize access which would simplify routing at the cost of more silicon spent on registers.
 // Can MemoryLayoutDM be merged with Layout?  I.e. each field laid out would know what memory it resides in.
 // Testing the effect of split branch having its own node buffers
+// ifLeaf(nT) to nT.isLeaf()
 import java.util.*;
 import java.nio.file.*;
 
@@ -835,9 +836,15 @@ abstract class BtreeSF extends Test                                             
      {zz(); Stuck.M.copy(N.at(branchOrLeaf));
      }
 
-    void loadStuck(StuckDM Stuck, Layout.Variable at)                           // Load a stuck from indexed main memory via this node
+    void loadStuck(StuckDM Stuck, Layout.Variable at)                           // Load a stuck from indexed main memory via this node with the index in transaction memory
      {zz();
       loadNode(T.at(at));
+      loadStuck(Stuck);
+     }
+
+    void loadStuck(StuckDM Stuck, MemoryLayoutDM.At at)                         // Load a stuck from indexed main memory via this node with the index in any memory
+     {zz();
+      loadNode(at);
       loadStuck(Stuck);
      }
 
@@ -883,7 +890,12 @@ abstract class BtreeSF extends Test                                             
      {zz(); at.copy(N.at(isLeaf));
      }
 
-    void branchSize(MemoryLayoutDM.At at)                                       // Get size of branch stuck
+    void leafSize(MemoryLayoutDM.At at)                                         // Get size of leaf stuck without having to load the stuck
+     {zz();
+      at.copy(N.at(node_size));                                                 // Relies on size being in the same position and having the same size in both branches and leaves
+     }
+
+    void branchSize(MemoryLayoutDM.At at)                                       // Get size of branch stuck without having to load the stuck
      {zz();
       at.copy(N.at(node_size));                                                 // Relies on size being in the same position and having the same size in both branches and leaves
       at.dec();                                                                 // Account for top
@@ -1643,6 +1655,20 @@ abstract class BtreeSF extends Test                                             
          {void code()
            {P.GoOff(end, ifRootLeaf(nT));                                       // Confirm that the root is a leaf
 
+            nT.leafSize(T.at(leafSize));                                        // Size of leaf.
+            P.new If (T.at(leafSize))
+             {void Then()
+               {T.at(found).one();                                              // The tree is not empty so there is a first/last node
+                nT.loadStuck(lT);
+                if (first) lT.firstElement(); else lT.lastElement();            // Get the requested key/data pir
+                T.at(Key) .move(lT.T.at(lT.tKey));                              // Load key
+                T.at(Data).move(lT.T.at(lT.tData));                             // Load data
+               }
+              void Else()
+               {T.at(found).zero();                                             // The tree is empty so there is a no first/last node
+               }
+             };
+
             P.parallelStart();   T.at(leafFound).zero();                        // Leaf that should contain this key is the root
             P.parallelSection(); P.Goto(Return);
             P.parallelEnd();
@@ -1658,6 +1684,12 @@ abstract class BtreeSF extends Test                                             
             P.new Block()                                                       // Found the containing leaf
              {void code()
                {P.GoOff(end, ifLeaf(nT));                                       // Confirm that it is a leaf
+
+                nT.loadStuck(lT, bT.T.at(bT.tData));                            // Load the leaf
+                if (first) lT.firstElement(); else lT.lastElement();            // Get the requested key/data pair
+
+                T.at(Key) .move(lT.T.at(lT.tKey));                              // Load key
+                T.at(Data).move(lT.T.at(lT.tData));                             // Load data
 
                 P.parallelStart();   T.at(leafFound).move(bT.T.at(bT.tData));   // Save node index of leaf
                 P.parallelSection(); P.Goto(Return);
@@ -1727,6 +1759,8 @@ abstract class BtreeSF extends Test                                             
      {void code()
        {final ProgramDM.Label Return = end;
         nT.loadRoot();                                                          // The first thing in the tree is the root
+        final Variable f = new Variable(T.at(found));                           // Alias found as a variable
+        f.zero();                                                               // Assume we will not find the next key
 
         P.new Block()                                                           // The root is a leaf
          {void code()
@@ -1734,10 +1768,8 @@ abstract class BtreeSF extends Test                                             
             P.parallelSection(); findEqualInLeaf(T.at(Key), nT);                // Assume the root is a leaf and start looking for the key
             P.parallelEnd();
 
-            final Variable f = new Variable(T.at(found));                       // Alias found as a variable
             final Variable i = new Variable(T.at(index));                       // Index where the key was found
             final Variable s = new Variable(lEqual.T.at(lEqual.size));          // Alias stuck size as a variable
-            f.zero();                                                           // Assume we will not find the next key
             lEqual.size();
             P.new If (s)                                                        // Size of stuck
              {void Else()                                                       // The tree is not empty
@@ -1746,32 +1778,74 @@ abstract class BtreeSF extends Test                                             
                  {void Then()                                                   // Next key can be find by incrementing
                    {f.one();                                                    // Show as found
                     i.inc();                                                    // Index
-                    lEqual.T.at(lEqual.index).move(i.a);
-                    lEqual.elementAt();
-                    T.at(Key).move(lEqual.T.at(lEqual.tKey));
+                    lEqual.T.at(lEqual.index).move(i.a);                        // The index of the key we want
+                    lEqual.elementAt();                                         // Get the element containing the key
+                    T.at(Key).move(lEqual.T.at(lEqual.tKey));                   // Record the key
+                    f.one();                                                    // Found next key in the root leaf
                    }
                  };
                }
              };
-            P.Goto(Return);
+            P.Goto(Return);                                                     // The tree consists of one leaf so there is nothing more to do
            }
          };
+
+        final Variable last_left = new Variable(P, "last_left", bitsPerNext);   // Make a variable to record the last left turn
+        final Variable parent    = new Variable(P, "parent",    bitsPerNext);   // Make a variable to record the current parent
+        parent.zero();                                                          // Currently we are on the root
 
         P.new Block()
          {void code()
            {findFirstGreaterThanOrEqualInBranch                                 // Find next child in search path of key
-             (nT, T.at(Key), null, null, T.at(child));
-            nT.loadNode(T.at(child));
+             (nT, T.at(Key), T.at(find), null, T.at(child));
+            nT.loadNode(T.at(child));                                           // Load child
 
-            P.new Block()                                                       // Found the containing leaf
+            P.new If (T.at(find))                                               // Record last left turn
+             {void Then()                                                       // Made a left turn from this parent
+               {last_left.move(parent);                                         // Record latest left turn
+               }
+             };
+
+            parent.a.move(T.at(child));                                         // Record new parent
+
+            P.new Block()                                                       // The root is a leaf
              {void code()
-               {P.parallelStart();   P.GoOff(end, ifLeaf(nT));                  // Confirm that it is a leaf
-                P.parallelSection(); findEqualInLeaf(T.at(Key), nT);
+               {P.parallelStart();   P.GoOff(end, ifLeaf(nT));                  // Confirm that we have reached a leaf
+                P.parallelSection(); findEqualInLeaf(T.at(Key), nT);            // Assume the root is a leaf and start looking for the key
                 P.parallelEnd();
 
-                P.parallelStart();   tt(find, child);
-                P.parallelSection(); P.Goto(Return);
-                P.parallelEnd();
+                final Variable i = new Variable(T.at(index));                   // Index where the key was found. We know it will be found because we found it  last time.
+                final Variable s = new Variable(lEqual.T.at(lEqual.size));      // Alias stuck size as a variable
+                s.dec();                                                        // Index of the last element - we know that there is one
+                P.new If (i.lessThan(s))                                        // Compare index to size to see if we can just increment
+                 {void Then()                                                   // Next key can be find by incrementing
+                   {f.one();                                                    // Show as found
+                    i.inc();                                                    // Index
+                    lEqual.T.at(lEqual.index).move(i.a);                        // The index of the key we want
+                    lEqual.elementAt();                                         // Get the element containing the key
+                    T.at(Key).move(lEqual.T.at(lEqual.tKey));                   // Record the key
+                   }
+                  void Else()                                                   // Next key (if there is one) must be found by traversing
+                   {P.new If (last_left)                                        // Was there a turn to the left?
+                     {void Then()
+                       {nT.loadStuck(bT, last_left.a);                          // Node where we last turned left
+                        bT.lastElement();                                       // Last element of left turn parent
+                        nT.loadStuck(bT, bT.T.at(bT.tData));                    // Load last child of left turn parent
+                        P.new Block()                                           // Go to the left most leaf
+                         {void code()                                           // Find the left most leaf
+                           {P.GoOn(end, ifLeaf(nT));                            // Reached the left mode leaf                                                      //
+                            nT.loadStuck(bT);                                   // Load node into a stuck
+                            bT.firstElement();                                  // Left most element
+                            nT.loadStuck(bT, bT.T.at(bT.tData));                // Load left most child
+                            P.Goto(start);
+                           }
+                         };
+                        f.one();                                                // Successfully found the next key
+                       }
+                     };
+                   }
+                 };
+                P.Goto(Return);                                                 // The tree consists of one leaf so there is nothing more to do
                }
              };
 
@@ -3873,17 +3947,26 @@ Line T       At      Wide       Size    Indices        Value   Name
       4                  2        |
 1,2=1  3,4=4  5,6=3  7=8    8,9=2 |
 """);
-    t.P.clear();
     t.first();
-    t.P.run();
+    t.P.run(); t.P.clear();
     //stop(t.T.at(t.leafFound));
     ok(t.T.at(t.leafFound), "T.leafFound@138=1");
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.Key),       "T.Key@113=1");
+    ok(t.T.at(t.Data),      "T.Data@118=8");
 
-    t.P.clear();
+//    t.findNext();
+//    t.P.run(); t.P.clear();
+    //stop(t.T.at(t.leafFound));
+//    ok(t.T.at(t.leafFound), "T.leafFound@138=2");
+
     t.last();
-    t.P.run();
+    t.P.run(); t.P.clear();
     //stop(t.T.at(t.leafFound));
     ok(t.T.at(t.leafFound), "T.leafFound@138=2");
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.Key),       "T.Key@113=9");
+    ok(t.T.at(t.Data),      "T.Data@118=0");
    }
 
   private static void test_find_verilog()                                               // Find using generated verilog code
