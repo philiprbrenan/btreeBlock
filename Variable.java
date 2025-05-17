@@ -26,12 +26,14 @@ class Variable extends Test                                                     
    {this(at.ml().P, at.field.name, at.field.width);
    }
 
+  Variable dup () {return new Variable(program, a.field.name, a.field.width);}  // Copy the value of the source variable into the target during program execution
+  void move(Variable source)        {a.move(source.a);}                         // Duplicate the definition of a variable before program execution
+
   void seti(int v) {       a.setInt(v);}                                        // Set the value of the variable immediately
   int  geti()      {return a.locateDirectAddress().getInt();}                   // Get the value of the variable immediately. A variable cannot be indirectly addressed.
 
-  void inc ()     {a.inc();}                                                    // Increment the variable
-  void dec ()     {a.dec();}                                                    // Decrement the variable
-  void move(Variable source)        {a.move(source.a);}                         // Copy the value of the source variable ino the target
+  void inc () {a.inc();}                                                        // Increment the variable
+  void dec () {a.dec();}                                                        // Decrement the variable
 
   void srz () {a.srz();}                                                        // Shift right filling with zero
   void slz () {a.slz();}                                                        // Shift left  filling with zero
@@ -207,6 +209,33 @@ class Variable extends Test                                                     
     ok(A.geti(), 0);
    }
 
+  static void test_dup()
+   {z();
+    final ProgramDM p = new ProgramDM();
+    final Variable  a = new Variable(p, "a", 4);
+    final Variable  A = a.dup();
+    a.seti(1);
+    ok(a.geti(), 1);
+    ok(A.geti(), 0);
+    A.move(a);
+    ok(A.geti(), 0);
+    p.run();
+    ok(A.geti(), 1);
+   }
+
+
+  static void test_fork()
+   {z();
+    final ProgramDM p = new ProgramDM();
+    final Variable  a = new Variable(p, "a", 4);
+    final Variable  A = a.a.fork();
+    a.seti(1);
+    ok(a.geti(), 1);
+    ok(A.geti(), 0);
+    p.run();
+    ok(A.geti(), 1);
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_var();
     test_boolean();
@@ -214,11 +243,12 @@ class Variable extends Test                                                     
     test_verilog();
     test_location();
     test_zero();
+    test_dup();
    }
 
   static void newTests()                                                        // Tests being worked on
    {//oldTests();
-    test_zero();
+    test_fork();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
