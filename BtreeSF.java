@@ -1628,8 +1628,9 @@ abstract class BtreeSF extends Test                                             
         P.new Block()                                                           // The root is a leaf
          {void code()
            {P.GoOff(end, ifRootLeaf(nT));                                       // Confirm that the root is a leaf
-
+P.new I() {void a() {say("SSSS");}};
             nT.leafSize(T.at(leafSize));                                        // Size of leaf.
+P.new I() {void a() {say("SS11", T.at(leafSize));}};
             P.new If (T.at(leafSize))
              {void Then()
                {T.at(found).one();                                              // The tree is not empty so there is a first/last node
@@ -1637,6 +1638,8 @@ abstract class BtreeSF extends Test                                             
                 if (first) lT.firstElement(); else lT.lastElement();            // Get the requested key/data pir
                 T.at(Key) .move(lT.T.at(lT.tKey));                              // Load key
                 T.at(Data).move(lT.T.at(lT.tData));                             // Load data
+                T.at(leafFound).zero();                                         // Show found in root
+P.new I() {void a() {say("SS11", T.at(found), T.at(Key), T.at(Data));}};
                }
               void Else()
                {T.at(found).zero();                                             // The tree is empty so there is a no first/last node
@@ -1728,7 +1731,7 @@ abstract class BtreeSF extends Test                                             
      };
    }
 
-  public void findNext()                                                        // Find the next key relative to the supplied key
+  public void findNext()                                                        // Find the next key relative to the supplied key which must exist in the tree
    {zz();
     P.new Block()
      {void code()
@@ -1744,8 +1747,8 @@ abstract class BtreeSF extends Test                                             
             P.parallelEnd();
 
             final Variable i = new Variable(T.at(index));                       // Index where the key was found
-            final Variable s = new Variable(lEqual.T.at(lEqual.size));          // Alias stuck size as a variable
-            lEqual.size();
+            final Variable s = new Variable(lEqual.T.at(lEqual.size));          // Stuck size as a variable
+
             P.new If (s)                                                        // Size of stuck
              {void Else()                                                       // The tree is not empty
                {s.dec();                                                        // Index of the last element - we know that there is one
@@ -3887,6 +3890,45 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
    }
 
+  private static void test_first_last_root()                                    // First/last node of a tree
+   {z(); sayCurrentTestName();
+    final BtreeSF t = allTreeOps() ;
+    t.P.run(); t.P.clear();
+    t.put();
+    final int N = 2;
+    for (int i = 1; i <= N; ++i)
+     {//say(currentTestName(),  "a", i);
+      t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(N-i);
+      t.P.run();
+     }
+    //stop(t);
+    ok(t, """
+1,2=0 |
+""");
+    t.first();
+    t.P.run(); t.P.clear();
+    ok(t.T.at(t.leafFound), "T.leafFound@138=0");
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.Key),       "T.Key@113=1");
+    ok(t.T.at(t.Data),      "T.Data@118=1");
+
+    t.findNext();
+    t.P.run();
+    ok(t.T.at(t.leafFound), "T.leafFound@138=1");
+    ok(t.T.at(t.found),     "T.found@22=2");
+    ok(t.T.at(t.Key),       "T.Key@113=0");
+    ok(t.T.at(t.Data),      "T.Data@118=7");
+stop("AAA");
+
+    t.last();
+    t.P.run(); t.P.clear();
+    ok(t.T.at(t.leafFound), "T.leafFound@138=2");
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.Key),       "T.Key@113=2");
+    ok(t.T.at(t.Data),      "T.Data@118=0");
+   }
+
   private static void test_first_last()                                         // First/last node of a tree
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps() ;
@@ -4911,15 +4953,16 @@ StuckSML(maxSize:4 size:1)
    }
 
   protected static void newTests()                                              // Tests being worked on
-   {oldTests();
+   {//oldTests();
     //test_delete_verilog();
     //test_find_verilog();
     //test_put_verilog();
     //test_first_last();
+    test_first_last_root();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
-   {deleteAllFiles(verilogFolder, 1000);                                         // Clear the verilog folder as otherwise life gets very confusing
+   {deleteAllFiles(verilogFolder, 1000);                                        // Clear the verilog folder as otherwise life gets very confusing
     try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
      {if (github_actions) oldTests(); else newTests();                          // Tests to run
       if (github_actions)                                                       // Coverage analysis
