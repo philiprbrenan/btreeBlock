@@ -14,7 +14,7 @@ package com.AppaApps.Silicon;                                                   
 // Investigate whether it would be worth changing from a block of variables in T to individual memories for each variable now in T.  This would localize access which would simplify routing at the cost of more silicon spent on registers.
 // Can MemoryLayoutDM be merged with Layout?  I.e. each field laid out would know what memory it resides in.
 // Testing the effect of split branch having its own node buffers
-// ifLeaf(nT) to nT.isLeaf()
+// Parallel for find/First/Next/Last
 import java.util.*;
 import java.nio.file.*;
 
@@ -686,14 +686,6 @@ abstract class BtreeSF extends Test                                             
     return L.compile();
    }
 
-  private MemoryLayoutDM.At ifRootLeaf(Node n)                                  // A variable that indicates whether the root is a leaf
-   {zz(); return n.N.at(isLeaf);
-   }
-
-  private MemoryLayoutDM.At ifLeaf(Node Node)                                   // A variable that indicates whether the node is a leaf
-   {zz(); return Node.N.at(isLeaf);
-   }
-
   private void allocLeaf()                                                      // Allocate leaf
    {zz();
     allocate();
@@ -891,6 +883,8 @@ abstract class BtreeSF extends Test                                             
          }
        };
      }
+
+    MemoryLayoutDM.At isLeaf() {zz(); return N.at(isLeaf);}                     // Return a variable that shows whether a node contains a leaf
 
     void isLeafFull()                                                           // Set isFull to show whether the node known to be a leaf is full or not
      {zz();
@@ -1627,7 +1621,7 @@ abstract class BtreeSF extends Test                                             
 
         P.new Block()                                                           // The root is a leaf
          {void code()
-           {P.GoOff(end, ifRootLeaf(nT));                                       // Confirm that the root is a leaf
+           {P.GoOff(end, nT.isLeaf());                                          // Confirm that the root is a leaf
             T.at(leafFound).zero();                                             // Show found in root
             nT.leafSize(T.at(leafSize));                                        // Size of leaf.
             P.new If (T.at(leafSize))
@@ -1657,7 +1651,7 @@ abstract class BtreeSF extends Test                                             
 
             P.new Block()                                                       // Found the containing leaf
              {void code()
-               {P.GoOff(end, ifLeaf(nT));                                       // Confirm that it is a leaf
+               {P.GoOff(end, nT.isLeaf());                                      // Confirm that it is a leaf
 
                 nT.loadStuck(lT, bT.T.at(bT.tData));                            // Load the leaf
                 if (first) lT.firstElement(); else lT.lastElement();            // Get the requested key/data pair
@@ -1693,7 +1687,7 @@ abstract class BtreeSF extends Test                                             
 
         P.new Block()                                                           // The root is a leaf
          {void code()
-           {P.parallelStart();   P.GoOff(end, ifRootLeaf(nT));                  // Confirm that the root is a leaf
+           {P.parallelStart();   P.GoOff(end, nT.isLeaf());                     // Confirm that the root is a leaf
             P.parallelSection(); findEqualInLeaf(T.at(Key), nT);                // Assume the root is a leaf and start looking for the key
             P.parallelEnd();
 
@@ -1711,7 +1705,7 @@ abstract class BtreeSF extends Test                                             
 
             P.new Block()                                                       // Found the containing leaf
              {void code()
-               {P.parallelStart();   P.GoOff(end, ifLeaf(nT));                  // Confirm that it is a leaf
+               {P.parallelStart();   P.GoOff(end, nT.isLeaf());                 // Confirm that it is a leaf
                 P.parallelSection(); findEqualInLeaf(T.at(Key), nT);
                 P.parallelEnd();
 
@@ -1738,7 +1732,7 @@ abstract class BtreeSF extends Test                                             
         f.zero();                                                               // Assume we will not find the next key
         P.new Block()                                                           // The root is a leaf
          {void code()
-           {P.GoOff(end, ifRootLeaf(nT));                                       // Confirm that the root is a leaf
+           {P.GoOff(end, nT.isLeaf());                                          // Confirm that the root is a leaf
 
             nT.leafSize(T.at(leafSize));                                        // Size of leaf.
             final Variable s = T.at(leafSize).fork();                           // Stuck size as a variable
@@ -1797,7 +1791,7 @@ abstract class BtreeSF extends Test                                             
 
             P.new Block()                                                       // The root is not a leaf so we must step down through the tree
              {void code()
-               {P.parallelStart();   P.GoOff(end, ifLeaf(nT));                  // Confirm that we have reached a leaf
+               {P.parallelStart();   P.GoOff(end, nT.isLeaf());                 // Confirm that we have reached a leaf
                 P.parallelSection(); findEqualInLeaf(T.at(Key), nT);            // Assume the root is a leaf and start looking for the key
                 P.parallelEnd();
 
@@ -1824,7 +1818,7 @@ abstract class BtreeSF extends Test                                             
                         nT.loadNode(bT.T.at(bT.tData));                         // Load last child of left turn parent
                         P.new Block()                                           // Go to the left most leaf
                          {void code()                                           // Find the left most leaf
-                           {P.GoOn(end, ifLeaf(nT));                            // Reached the left mode leaf
+                           {P.GoOn(end, nT.isLeaf());                           // Reached the left mode leaf
                             nT.loadStuck(bT);                                   // Load last child of left turn parent
                             bT.firstElement();                                  // Left most element
                             nT.loadNode(bT.T.at(bT.tData));                     // Load first node on left
@@ -1840,8 +1834,8 @@ abstract class BtreeSF extends Test                                             
                         T.at(leafFound).move(bT.T.at(bT.tData));                // Record the leaf index
                        }
                       void Else()                                               // No last left run so we are at the end of the tree
-                       {f.zero();                                                           // No next node as we are at the end of the tree
-                        P.Goto(Return);                                                     // The
+                       {f.zero();                                               // No next node as we are at the end of the tree
+                        P.Goto(Return);                                         // The
                        }
                      };
                    }
@@ -2012,7 +2006,7 @@ abstract class BtreeSF extends Test                                             
 
         P.new Block()                                                           // Find and delete directly in root as a leaf
          {void code()
-           {P.GoOff(end, ifRootLeaf(nT));
+           {P.GoOff(end, nT.isLeaf());
             findAndDelete();
 
             P.parallelStart();   tt(deleted, found);
