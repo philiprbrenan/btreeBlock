@@ -1628,9 +1628,8 @@ abstract class BtreeSF extends Test                                             
         P.new Block()                                                           // The root is a leaf
          {void code()
            {P.GoOff(end, ifRootLeaf(nT));                                       // Confirm that the root is a leaf
-P.new I() {void a() {say("SSSS");}};
+            T.at(leafFound).zero();                                             // Show found in root
             nT.leafSize(T.at(leafSize));                                        // Size of leaf.
-P.new I() {void a() {say("SS11", T.at(leafSize));}};
             P.new If (T.at(leafSize))
              {void Then()
                {T.at(found).one();                                              // The tree is not empty so there is a first/last node
@@ -1638,8 +1637,6 @@ P.new I() {void a() {say("SS11", T.at(leafSize));}};
                 if (first) lT.firstElement(); else lT.lastElement();            // Get the requested key/data pir
                 T.at(Key) .move(lT.T.at(lT.tKey));                              // Load key
                 T.at(Data).move(lT.T.at(lT.tData));                             // Load data
-                T.at(leafFound).zero();                                         // Show found in root
-P.new I() {void a() {say("SS11", T.at(found), T.at(Key), T.at(Data));}};
                }
               void Else()
                {T.at(found).zero();                                             // The tree is empty so there is a no first/last node
@@ -1739,19 +1736,18 @@ P.new I() {void a() {say("SS11", T.at(found), T.at(Key), T.at(Data));}};
         nT.loadRoot();                                                          // The first thing in the tree is the root
         final MemoryLayoutDM.At f = T.at(found);                                // The shorter is his daughter
         f.zero();                                                               // Assume we will not find the next key
-
         P.new Block()                                                           // The root is a leaf
          {void code()
-           {P.parallelStart();   P.GoOff(end, ifRootLeaf(nT));                  // Confirm that the root is a leaf
-            P.parallelSection(); findEqualInLeaf(T.at(Key), nT);                // Assume the root is a leaf and start looking for the key
-            P.parallelEnd();
+           {P.GoOff(end, ifRootLeaf(nT));                                       // Confirm that the root is a leaf
 
-            final Variable i = new Variable(T.at(index));                       // Index where the key was found
-            final Variable s = new Variable(lEqual.T.at(lEqual.size));          // Stuck size as a variable
+            nT.leafSize(T.at(leafSize));                                        // Size of leaf.
+            final Variable s = T.at(leafSize).fork();                           // Stuck size as a variable
+            P.new If (s)
+             {void Then()
+               {findEqualInLeaf(T.at(Key), nT);                                 // Assume the root is a leaf and start looking for the key
 
-            P.new If (s)                                                        // Size of stuck
-             {void Else()                                                       // The tree is not empty
-               {s.dec();                                                        // Index of the last element - we know that there is one
+                final Variable i = T.at(index).fork();                          // Index where the key was found
+                s.dec();                                                        // Index of the last element - we know that there is one
                 P.new If (i.lessThan(s))                                        // Compare index to size to see if we can just increment
                  {void Then()                                                   // Next key can be find by incrementing
                    {f.one();                                                    // Show as found
@@ -1762,7 +1758,13 @@ P.new I() {void a() {say("SS11", T.at(found), T.at(Key), T.at(Data));}};
                     T.at(Data).move(lEqual.T.at(lEqual.tData));                 // Record the data
                     f.one();                                                    // Found next key in the root leaf
                    }
+                  void Else()                                                   // No more keys in root so no next key
+                   {f.zero();                                                   // No next element
+                   }
                  };
+               }
+              void Else()                                                       // The tree is empty so thre is no next node
+               {f.zero();
                }
              };
             P.Goto(Return);                                                     // The tree consists of one leaf so there is nothing more to do
@@ -3890,7 +3892,24 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
    }
 
-  private static void test_first_last_root()                                    // First/last node of a tree
+  private static void test_first_last_empty()                                   // First/next/last node of an empty tree
+   {z(); sayCurrentTestName();
+    final BtreeSF t = allTreeOps() ;
+
+    t.first();
+    t.P.run(); t.P.clear();
+    ok(t.T.at(t.found),     "T.found@22=0");
+
+    t.findNext();
+    t.P.run(); t.P.clear();
+    ok(t.T.at(t.found),     "T.found@22=0");
+
+    t.last();
+    t.P.run();
+    ok(t.T.at(t.leafFound), "T.leafFound@138=0");
+   }
+
+  private static void test_first_last_root()                                    // First/next/last node of a single node tree
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps() ;
     t.P.run(); t.P.clear();
@@ -3915,21 +3934,24 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     t.findNext();
     t.P.run();
-    ok(t.T.at(t.leafFound), "T.leafFound@138=1");
-    ok(t.T.at(t.found),     "T.found@22=2");
-    ok(t.T.at(t.Key),       "T.Key@113=0");
-    ok(t.T.at(t.Data),      "T.Data@118=7");
-stop("AAA");
+    ok(t.T.at(t.leafFound), "T.leafFound@138=0");
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.Key),       "T.Key@113=2");
+    ok(t.T.at(t.Data),      "T.Data@118=0");
 
+    t.P.run();
+    ok(t.T.at(t.found),     "T.found@22=0");
+
+    t.P.clear();
     t.last();
-    t.P.run(); t.P.clear();
-    ok(t.T.at(t.leafFound), "T.leafFound@138=2");
+    t.P.run();
+    ok(t.T.at(t.leafFound), "T.leafFound@138=0");
     ok(t.T.at(t.found),     "T.found@22=1");
     ok(t.T.at(t.Key),       "T.Key@113=2");
     ok(t.T.at(t.Data),      "T.Data@118=0");
    }
 
-  private static void test_first_last()                                         // First/last node of a tree
+  private static void test_first_last()                                         // First/next/last node of a tree
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps() ;
     t.P.run(); t.P.clear();
@@ -4016,15 +4038,16 @@ stop("AAA");
     ok(t.T.at(t.Key),       "T.Key@113=9");
     ok(t.T.at(t.Data),      "T.Data@118=0");
 
+    t.P.clear();
     t.last();
-    t.P.run(); t.P.clear();
+    t.P.run();
     ok(t.T.at(t.leafFound), "T.leafFound@138=2");
     ok(t.T.at(t.found),     "T.found@22=1");
     ok(t.T.at(t.Key),       "T.Key@113=9");
     ok(t.T.at(t.Data),      "T.Data@118=0");
    }
 
-  private static void test_find_verilog()                                               // Find using generated verilog code
+  private static void test_find_verilog()                                       // Find using generated verilog code
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps() ;
     t.P.run(); t.P.clear();
@@ -4949,6 +4972,8 @@ StuckSML(maxSize:4 size:1)
     test_put_verilog();
 //  test_find_wide();
 //  test_put_wide();
+    test_first_last_empty();
+    test_first_last_root();
     test_first_last();
    }
 
@@ -4958,7 +4983,9 @@ StuckSML(maxSize:4 size:1)
     //test_find_verilog();
     //test_put_verilog();
     //test_first_last();
+    test_first_last_empty();
     test_first_last_root();
+    test_first_last();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
