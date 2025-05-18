@@ -721,7 +721,7 @@ class MemoryLayoutPA extends Test                                               
       z(); return true;
      }
 
-    void equal(At b, At result)                                                // Whether  a == b
+    void equal(At b, At result)                                                 // Whether  a == b
      {zz();
       final At a = this;
       P.new I()
