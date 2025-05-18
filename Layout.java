@@ -42,6 +42,7 @@ public class Layout extends Test                                                
   abstract class Field                                                          // Variable/Array/Structure/Union definition.
    {String                       name;                                          // Name of field
     int                        number;                                          // Number of field
+    String                   fullName2;                                          // Full name of this field
     int                            at;                                          // Offset of field from start of memory
     int                         width;                                          // Number of bits in a field
     int                         depth;                                          // Depth of field - the number of containing arrays/structures/unions above
@@ -55,7 +56,7 @@ public class Layout extends Test                                                
       fields.push(this);
      }
 
-    Layout container2() {return Layout.this;}                                    // The containing layout
+    Layout container() {return Layout.this;}                                    // The containing layout
 
     int at(int...Indices) {zz(); return locator.at(Indices);}                   // Location of field taking into account field indices
     int width()   {z(); return width;}                                          // Size of the memory in bits occupied by this field
@@ -688,6 +689,37 @@ V    0     2              a                    A.a
     ok(l.get("A.a").at(2, 3), 22);
    }
 
+  static void test_container()
+   {z();
+    Layout    l = new Layout();
+    Variable  a = l.variable ("a", 2);
+    Variable  b = l.variable ("b", 2);
+    Variable  c = l.variable ("c", 4);
+    Structure s = l.structure("s", a, b, c);
+    l.compile();  l.layoutName = "aaa";
+
+    Layout    L = new Layout();
+    Variable  A = L.variable ("A", 2);
+    Field     B = L.duplicate("B", l);
+    Variable  C = L.variable ("C", 4);
+    Structure S = L.structure("S", A, B, C);
+    L.compile();  L.layoutName = "bbb";
+
+    ok(L, """
+Memory Layout: bbb
+T   At  Wide  Size    Name                   Path
+S    0    14          S
+V    0     2            A                    A
+S    2     8            B                    B
+V    2     2              a                    B.a
+V    4     2              b                    B.b
+V    6     4              c                    B.c
+V   10     4            C                    C
+""");
+    ok(a.container().layoutName, "aaa");
+    ok(A.container().layoutName, "bbb");
+   }
+
   static void test_verilog_ones()
    {Layout    l = new Layout();
     Variable  a = l.variable ("a", 2);
@@ -705,6 +737,7 @@ V    0     2              a                    A.a
     test_duplicate_part();
     test_duplicate_array();
     test_array_indexing();
+    test_container();
     test_verilog_ones();
    }
 
