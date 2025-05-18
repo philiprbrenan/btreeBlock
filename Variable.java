@@ -217,9 +217,24 @@ class Variable extends Test                                                     
     Layout.Structure S = l.structure("S", a, b);
     MemoryLayoutDM   m = new MemoryLayoutDM(l.compile(), "fields");
     m.program(m.P);
+    m.at(a).setInt(12);
+    m.at(b).setInt(13);
 
-    final Variable   A = new Variable(m.at(a));                                 // Same definition but different memory
-    final Variable   B = new Variable(m.at(b));
+    //stop(m);
+    ok(""+m, """
+MemoryLayout: fields
+Memory      : fields
+Line T       At      Wide       Size    Indices        Value   Name
+   1 S        0         8                                      S
+   2 V        0         4                                 12     a
+   3 V        4         4                                 13     b
+""");
+
+    final Variable A = new Variable(m.at(a));                                   // Same definition but different memory
+    final Variable B = new Variable(m.at(b));
+
+    ok(A.geti(), 0);
+    ok(B.geti(), 0);
 
     A.seti(1);
     B.seti(2);
@@ -229,15 +244,6 @@ class Variable extends Test                                                     
     m.P.run(); m.P.clear();
     ok(A.geti(), 2);
     ok(B.geti(), 2);
-    //stop(m);
-    ok(""+m, """
-MemoryLayout: fields
-Memory      : fields
-Line T       At      Wide       Size    Indices        Value   Name
-   1 S        0         8                                      S
-   2 V        0         4                                  0     a
-   3 V        4         4                                  0     b
-""");
 
     B.zero();
     ok(B.geti(), 2);
