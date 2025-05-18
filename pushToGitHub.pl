@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/ -I/home/phil/perl/cpan/GitHubCrud/lib/
 #-------------------------------------------------------------------------------
 # Push Btree block code to GitHub .
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2024
