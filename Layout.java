@@ -42,7 +42,6 @@ public class Layout extends Test                                                
   abstract class Field                                                          // Variable/Array/Structure/Union definition.
    {String                       name;                                          // Name of field
     int                        number;                                          // Number of field
-    String                   fullName;                                          // Full name of this field
     int                            at;                                          // Offset of field from start of memory
     int                         width;                                          // Number of bits in a field
     int                         depth;                                          // Depth of field - the number of containing arrays/structures/unions above
@@ -291,7 +290,6 @@ public class Layout extends Test                                                
        }
      }
    }
-
 
   Bit       bit      (String n)                   {z(); return new Bit      (n);}
   Variable  variable (String n, int w)            {z(); return new Variable (n, w);}
