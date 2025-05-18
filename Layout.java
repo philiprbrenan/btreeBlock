@@ -22,15 +22,7 @@ public class Layout extends Test                                                
     top.layout(0, 0);                                                           // Locate field positions
     top.indexNames();                                                           // Index the names of the fields
     for (Field f: fields) f.locator  = new Locator(f);                          // Create a locator for each field
-    for (Field f: fields) f.compiled = true;                                    // Mark field as having being compiled
     return this;
-   }
-
-  Layout compile(String name)                                                   // Lay out the layout giving the top most field a new name
-   {z();
-    final Layout l = compile();
-    l.top.name = name;
-    return l;
    }
 
   int size() {z(); return top == null ? 0 : top.width;}                         // Size of memory
@@ -51,7 +43,6 @@ public class Layout extends Test                                                
    {String                       name;                                          // Name of field
     int                        number;                                          // Number of field
     String                   fullName;                                          // Full name of this field
-    boolean                  compiled;                                          // Whether this field has been compiled
     int                            at;                                          // Offset of field from start of memory
     int                         width;                                          // Number of bits in a field
     int                         depth;                                          // Depth of field - the number of containing arrays/structures/unions above
