@@ -100,8 +100,6 @@ public class Layout extends Test                                                
       return f;
      }
 
-    abstract void indexNames();                                                 // Set the full names of all the sub fields in a field
-
     int sameSize(Field b)                                                       // Check the specified field is the same size as this field
      {zz();
       final int A = width, B = b.width;
@@ -111,7 +109,7 @@ public class Layout extends Test                                                
      }
 
     abstract void layout(int at, int depth);                                    // Layout this field
-
+    abstract void indexNames();                                                 // Set the full names of all the sub fields in a field
     private String  indent() {return "  ".repeat(depth);}                       // Indentation during printing
 
     protected char fieldType()                                                  // First letter of inner most class name to identify type of field
