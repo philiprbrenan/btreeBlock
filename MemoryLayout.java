@@ -88,41 +88,22 @@ class MemoryLayout extends Test                                                 
       locateDirectAddress();                                                    // Locate the address directly now that its indices are known
      }
 
-    void checkCompiled(Layout.Field Field)                                      // Check the field has been compiled
-     {if (!Field.compiled)
-       {stop("Field:", Field.name, "has not been compiled yet");
-       }
-     if (layout == null)
-       {stop("No layout has been supplied for this memory layout");
-       }
-     if (memory == null)
-       {stop("No memory has been supplied for this memory layout");
-       }
-     if (layout != Field.container())
-       {final String n = Field.name, m = layout.layoutName, f = Field.container().layoutName;
-        if (f == null || m == null || !f.equals(m))
-         {stop("Field:", n,      (f == null ? "" : "in layout: "+ f),
-               "is not part of", (m == null ? "this layout" : "layout: "+ f));
-         }
-       }
-     }
-
     At(Layout.Field Field)                                                      // No indices or base
-     {z(); checkCompiled(Field);
+     {z();
       field = Field; indices = new int[0]; width = field.width;
       type = Type.direct; directs = null;
       locateDirectAddress();                                                    // The indices are constant so the address will not change over time
      }
 
     At(Layout.Field Field, int...Indices)                                       // Constant indices used for setting initial values
-     {z(); checkCompiled(Field);
+     {z();
       field = Field; indices = Indices; width = field.width;
       type = Type.direct; directs = null;
       locateDirectAddress();                                                    // The indices are constant so the address will not change over time
      }
 
     At(Layout.Field Field, At...Directs)                                        // Variable indices used for obtaining run time values
-     {z(); checkCompiled(Field);
+     {z();
       for (int i = 0; i < Directs.length; i++)
        {if (Directs[i].type != Type.direct) stop("Index:", i, "must not have a base or indices");
        }
