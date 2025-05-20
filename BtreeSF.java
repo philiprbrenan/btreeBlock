@@ -2675,9 +2675,9 @@ from siliconcompiler.targets import $processTechnology_demo
 
 if __name__ == "__main__":
     chip = Chip('$project')                                                     # Create chip object
-    chip.input('/home/azureuser/btreeBlock/verilog/$project/$designDescription/siliconCompiler/$project.v') # Source code
-    chip.input('/home/azureuser/btreeBlock/verilog/$project/$designDescription/siliconCompiler/memory.v'  ) # Memory black box
-   #chip.input('/home/azureuser/btreeBlock/verilog/$project/$designDescription/siliconCompiler/$project.sdc')
+    chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/$project.v') # Source code
+    chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/memory.v'  ) # Memory black box
+   #chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/$project.sdc')
     chip.set('design', '$project')                                              # Show the top most module
     chip.use($processTechnology_demo)                                           # Load predefined technology and flow target
     chip.set('package', 'description', '$designDescription')                    # Description of design
@@ -2788,6 +2788,7 @@ create_clock -name clock -period 100 [get_ports {clock}]
       s = s.replace("$opCodes",           genOpCodes());                        // Generate op codes
       s = s.replace("$density",        ""+density());                           // An indication of the gate density to use on the chip
       s = s.replace("$designDescription", designDescription);                   // Description of this iteration
+      s = s.replace("$instance",          instance());                          // Instance within project
 
       return s;
      }
