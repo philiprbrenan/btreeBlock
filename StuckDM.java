@@ -571,18 +571,18 @@ abstract class StuckDM extends Test                                             
          {v.append(Index.verilogLoad()+" <= ");
           v.append(M.at(currentSize).verilogLoad());                            // Normal index
           if (all) v.append(";"); else v.append("-1;");                         // Index one back - known to be possible as every branch always contains at least one key
-          v.append(" /* index  default  searchFirstGreaterThanOrEqual3 all="+all+"*/\n");
+          v.append(" /* index  default  searchFirstGreaterThanOrEqual3 */\n");
          }
 
         if (Key != null)                                                        // Key default
-         {v.append(Key.verilogLoad()+" <= 0;/* Key default searchFirstGreaterThanOrEqual3 all="+all+"*/\n");
+         {v.append(Key.verilogLoad()+" <= 0; /* Key default searchFirstGreaterThanOrEqual3 */\n");
          }
 
         if (Data != null)
          {v.append(Data.verilogLoad()+" <= ");                                  // Data default
-          if (all) v.append(M.at(sData, M.at(currentSize)).verilogLoad() + ";");              // Normal index of next node
-          else     v.append(M.at(sData, M.at(currentSize)).verilogLoadAddr(false, -1) + ";"); // Prior index of next node - always possible because every branch always contains at least one key
-          v.append("; /*data searchFirstGreaterThanOrEqual3 all="+all+"*/\n");
+          if (all) v.append(M.at(sData, M.at(currentSize)).verilogLoad());      // Normal index of next node
+          else     v.append(M.at(sData, M.at(currentSize)).verilogLoadAddr(false, -1)); // Prior index of next node - always possible because every branch always contains at least one key
+          v.append("; /*data searchFirstGreaterThanOrEqual3 */\n");
          }
         return ""+v;
        }
@@ -618,7 +618,6 @@ abstract class StuckDM extends Test                                             
        {final int N = maxSize();                                                // Maximum number of elements to search
 
         if (Found != null) Found.setInt(found.geti() > 0 ? 1 : 0);              // Set found if requested
-if (debug) say("BBBB", P.step, Found == null, Found, found, traceBack);
 
         if (found.geti() > 0)
          {for (int i = 0; i < N; i++)                                           // Search
