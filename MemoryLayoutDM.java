@@ -3,7 +3,7 @@
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Memory layout
-// Remove block memory if modular memory works
+
 import java.util.*;
 
 class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         // Memory layout
@@ -1083,7 +1083,6 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
      }
     return ""+s;
    }
-
 
   private void removeAllButLastTrailingZero(StringBuilder S)                    // Remove trailing zeros from a string
    {zz();
