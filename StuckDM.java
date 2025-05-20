@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// StuckDM using distributed memory
+// StuckDM using distributed memory.
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2024
 //------------------------------------------------------------------------------
 package com.AppaApps.Silicon;                                                   // Btree in a block on the surface of a silicon chip.
