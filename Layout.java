@@ -59,7 +59,7 @@ public class Layout extends Test                                                
     Layout container() {return Layout.this;}                                    // The containing layout
 
     int at(int...Indices) {zz(); return locator.at(Indices);}                   // Location of field taking into account field indices
-    int width()   {z(); return width;}                                          // Size of the memory in bits occupied by this field
+    int width()           {zz(); return width;}                                 // Size of the memory in bits occupied by this field
 
     private void fullName(Layout.Field top, StringBuilder s)                    // The full name of a field relative to the indicated top
      {z();
@@ -110,7 +110,7 @@ public class Layout extends Test                                                
 
     abstract void layout(int at, int depth);                                    // Layout this field
     abstract void indexNames();                                                 // Set the full names of all the sub fields in a field
-    private String  indent() {return "  ".repeat(depth);}                       // Indentation during printing
+    private String    indent() {return "  ".repeat(depth);}                     // Indentation during printing
 
     protected char fieldType()                                                  // First letter of inner most class name to identify type of field
      {z(); return getClass().getName().split("\\$")[1].charAt(0);
@@ -316,7 +316,7 @@ public class Layout extends Test                                                
 
   private Layout duplicate()                                                    // Duplicate this layout
    {z();
-    Layout l = layout();                                                        // Start the layout
+    final Layout l = layout();                                                  // Start the layout
 
     for(Field f: fields)
      {z();
