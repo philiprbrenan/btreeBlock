@@ -2675,9 +2675,9 @@ from siliconcompiler.targets import $processTechnology_demo
 
 if __name__ == "__main__":
     chip = Chip('$project')                                                     # Create chip object
-    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.v') # Source code
-    chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/memory.v'  ) # Memory black box
-   #chip.input('/home/azureuser/btreeBlock/verilog/$project/$Key/siliconCompiler/$project.sdc')
+    chip.input('/home/azureuser/btreeBlock/verilog/$project/$designDescription/siliconCompiler/$project.v') # Source code
+    chip.input('/home/azureuser/btreeBlock/verilog/$project/$designDescription/siliconCompiler/memory.v'  ) # Memory black box
+   #chip.input('/home/azureuser/btreeBlock/verilog/$project/$designDescription/siliconCompiler/$project.sdc')
     chip.set('design', '$project')                                              # Show the top most module
     chip.use($processTechnology_demo)                                           # Load predefined technology and flow target
     chip.set('package', 'description', '$designDescription')                    # Description of design
@@ -3897,20 +3897,39 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
    }
 
+  private void verilog_first_last                                               // Test a first/next/last operation in Verilog
+   (int found, int key, int data, int ExpSteps)
+   {VerilogCode v = new VerilogCode()                                           // Generate verilog now that memories have been initialized and the program written
+     {String  instance() {return   ""+key;}                                     // Output key value is instance name
+      Integer Key     () {return     null;}                                     // No input key value
+      Integer Data    () {return     null;}                                     // No input data value
+      Integer found   () {return    found;}                                     // Whether we should expect to find the key on a find operation
+      Integer key     () {return      key;}                                     // Expected output key value
+      Integer data    () {return     data;}                                     // Expected output data value
+      int     maxSteps() {return     4000;}                                     // Maximum number of execution steps
+      int     expSteps() {return ExpSteps;}                                     // Expected number of steps
+      String  expected() {return null;}                                         // Expected tree if present
+     };
+   }
+
   private static void test_first_last_empty()                                   // First/next/last node of an empty tree
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps() ;
+    t.P.run(); t.P.clear();
 
     t.first();
-    t.P.run(); t.P.clear();
+    t.verilog_first_last(0, 0, 0, 10);
+    t.P.clear();
     ok(t.T.at(t.found),     "T.found@22=0");
 
     t.findNext();
-    t.P.run(); t.P.clear();
+    t.verilog_first_last(0, 0, 0, 11);
+    t.P.clear();
     ok(t.T.at(t.found),     "T.found@22=0");
 
     t.last();
-    t.P.run();
+    t.verilog_first_last(0, 0, 0, 10);
+    t.P.clear();
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
    }
 
@@ -3930,45 +3949,35 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(t, """
 1,2=0 |
 """);
+
+    t.P.clear();
     t.first();
-    t.P.run(); t.P.clear();
+    t.verilog_first_last(1, 3, 1, 15);
+    t.P.clear();
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
     ok(t.T.at(t.found),     "T.found@22=1");
     ok(t.T.at(t.key),       "T.key@23=1");
     ok(t.T.at(t.data),      "T.data@28=1");
 
+    t.P.clear();
     t.findNext();
-    t.P.run();
+    t.verilog_first_last(1, 3, 0, 27);
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
     ok(t.T.at(t.found),     "T.found@22=1");
     ok(t.T.at(t.key),       "T.key@23=2");
     ok(t.T.at(t.data),      "T.data@28=0");
 
-    t.P.run();
+    t.verilog_first_last(0, 3, 0, 20);
     ok(t.T.at(t.found),     "T.found@22=0");
 
     t.P.clear();
     t.last();
-    t.P.run();
+    t.verilog_first_last(1, 3, 0, 16);
+    t.P.clear();
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
     ok(t.T.at(t.found),     "T.found@22=1");
     ok(t.T.at(t.key),       "T.key@23=2");
     ok(t.T.at(t.data),      "T.data@28=0");
-   }
-
-  private void verilog_first_last                                               // Test a first/next/last operation in Verilog
-   (int found, int key, int data, int ExpSteps)
-   {VerilogCode v = new VerilogCode()                                           // Generate verilog now that memories have been initialized and the program written
-     {String  instance() {return   ""+key;}                                     // Output key value is instance name
-      Integer Key     () {return     null;}                                     // No input key value
-      Integer Data    () {return     null;}                                     // No input data value
-      Integer found   () {return    found;}                                     // Whether we should expect to find the key on a find operation
-      Integer key     () {return      key;}                                     // Expected output key value
-      Integer data    () {return     data;}                                     // Expected output data value
-      int     maxSteps() {return     4000;}                                     // Maximum number of execution steps
-      int     expSteps() {return ExpSteps;}                                     // Expected number of steps
-      String  expected() {return null;}                                         // Expected tree if present
-     };
    }
 
   private static void test_first_last()                                         // First/next/last node of a tree
@@ -5003,9 +5012,9 @@ StuckSML(maxSize:4 size:1)
     //test_delete_verilog();
     //test_find_verilog();
     //test_put_verilog();
-    //test_first_last_empty();
-    //test_first_last_root();
-      test_first_last();
+    test_first_last_empty();
+    test_first_last_root();
+    test_first_last();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
