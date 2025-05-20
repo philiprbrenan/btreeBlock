@@ -318,14 +318,14 @@ abstract class StuckDM extends Test                                             
   void setElementAt()                                                           // Set an element either in range or one above the current range
    {zz(); action = "setElementAt";
     //size();
-    //T.at(index).equal(T.at(size), T.at(equal));                                 // Extended range
+    //T.at(index).equal(T.at(size), T.at(equal));                               // Extended range
     //P.new If(T.at(equal))
     // {void Then()
     //   {setKeyData();
     //    inc();
     //    T.at(size).inc();
     //   }
-    //  void Else()                                                               // In range
+    //  void Else()                                                             // In range
     // {assertInNormal();
         setKeyData();
     //   }
@@ -617,26 +617,29 @@ abstract class StuckDM extends Test                                             
      {void a()
        {final int N = maxSize();                                                // Maximum number of elements to search
 
-        for (int i = 0; i < N; i++)                                             // Search
-         {z();
-          final boolean f = T.at(lessThanLeafSize, i).setOff().getInt() > 0;    // Whether this key is in range and is greater than or equal to the search key
-          if (f && Index != null) Index.setInt(i);                              // Save index if this key matched
-          if (f && Key   != null) Key .setInt(M.at(sKey,  i).setOff().getInt());// Save matching key
-          if (f && Data  != null) Data.setInt(M.at(sData, i).setOff().getInt());// Save data if this key matched
-         }
-
         if (Found != null) Found.setInt(found.geti() > 0 ? 1 : 0);              // Set found if requested
+if (debug) say("BBBB", P.step, Found == null, Found, found, traceBack);
+
+        if (found.geti() > 0)
+         {for (int i = 0; i < N; i++)                                           // Search
+           {z();
+            final boolean f = T.at(lessThanLeafSize, i).setOff().getInt() > 0;  // Whether this key is in range and is greater than or equal to the search key
+            if (f && Index != null) Index.setInt(i);                            // Save index if this key matched
+            if (f && Key   != null) Key .setInt(M.at(sKey,  i).setOff().getInt());// Save matching key
+            if (f && Data  != null) Data.setInt(M.at(sData, i).setOff().getInt());// Save data if this key matched
+           }
+         }
        }
 
       String v()
        {final StringBuilder v = new StringBuilder();                            // Verilog
         final int           N = maxSize();
 
-        v.append("if ("+found.verilogLoad()+") begin\n");                       // If found a matching key in the stuck
-
         if (Found != null)                                                      // Found requested
-         {v.append(Found.verilogLoad()+" <= " + found.verilogAddr()+ "; /* found default searchFirstGreaterThanOrEqual5 */\n");
+         {v.append(Found.verilogLoad()+" <= " + found.verilogLoad()+ "; /* found default searchFirstGreaterThanOrEqual5 */\n");
          }
+
+        v.append("if ("+found.verilogLoad()+") begin\n");                       // If found a matching key in the stuck
 
         if (Index != null)                                                      // Index: either the first index if selected or a selected index preceded by an unselected index. E.g. 111 would sel;ect index 0 while 000111 would select the index 3.
          {v.append(Index.verilogLoad()+" <= 0 ");
