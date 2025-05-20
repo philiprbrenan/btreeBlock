@@ -6,7 +6,7 @@ Create an Azure [spot](https://aws.amazon.com/ec2/spot/) instance with at least 
 Azure with a convenient name to make access easier. Configure [Secure Shell](https://www.ssh.com/ssh) to allow x
 forwarding.
 
-Update the Ubunbtu instance:
+Update the Ubuntu instance:
 
 ```
 sudo apt update
@@ -36,13 +36,14 @@ Supply [login](https://en.wikipedia.org/wiki/Login) details for: (https://login.
 
 ## Clone GitHub
 
-### Update GitHub [Secure Shell](https://www.ssh.com/ssh) [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) Copy ```Azure.pem``` on the local machine to the instance:
+### Update GitHub [Secure Shell](https://www.ssh.com/ssh) key
+Copy ```Azure.pem``` on the local machine to the instance:
 
 ```
 scp .ssh/Azure.pem aaa:.ssh/
 ```
 
-On the remote instance extract the public [database key](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) and load it into to GitHub oif
+On the remote instance extract the public key and load it into to GitHub oif
 convert the ```pem``` [file](https://en.wikipedia.org/wiki/Computer_file) to r```rsa``` format and load it into GutHub if it
 is not already there:
 
