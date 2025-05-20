@@ -19,10 +19,11 @@ import java.util.stream.*;
 //D2 Construct                                                                  // Develop and test a java program
 
 public class Test                                                               // Describe a chip and emulate its operation.
- {final static boolean github_actions =                                         // Whether we are on a github
+ {final static boolean github_actions          =                                // Whether we are on a github
     "true".equals(System.getenv("GITHUB_ACTIONS"));
-  final static long start = System.nanoTime();                                  // Start time
-  final static Stack<String> sayThisOrStop = new Stack<>();                     // The next says should say this or else we should stop
+  final static long start                      = System.nanoTime();             // Start time
+  final static Stack<String> sayThisOrStop     = new Stack<>();                 // The next says should say this or else we should stop
+  final static boolean theShorterIsTheDaughter = true;                          // True for a shorter traceback during tests to get more counts on the page at a time in Geany
 
 //D2 String routines                                                            // String routines
 
@@ -863,7 +864,10 @@ public class Test                                                               
     else if ( G == null && E == null) {                                              ++testsPassed; return true;}
     else if ( G != null && E == null) {err(String.format("Expected null, got:", G)); ++testsFailed; return false;}
     else if ( G == null && E != null) {err(String.format("Got null, expected:", E)); ++testsFailed; return false;}
-    else if (!G.equals(E))            {errTest(currentTestName(), G, "!=", E);       ++testsFailed; return false;}
+    else if (!G.equals(E))
+     {if (theShorterIsTheDaughter)    {errTest(currentTestName(), G, "!=", E);       ++testsFailed; return false;}
+      else                            {err(currentTestName(), G, "!=", E);           ++testsFailed; return false;}
+     }
     else                              {                                              ++testsPassed; return true;}
    }
 
