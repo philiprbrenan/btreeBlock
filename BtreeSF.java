@@ -1629,8 +1629,8 @@ abstract class BtreeSF extends Test                                             
                {T.at(found).one();                                              // The tree is not empty so there is a first/last node
                 nT.loadStuck(lT);
                 if (first) lT.firstElement(); else lT.lastElement();            // Get the requested key/data pir
-                T.at(Key) .move(lT.T.at(lT.tKey));                              // Load key
-                T.at(Data).move(lT.T.at(lT.tData));                             // Load data
+                T.at(key) .move(lT.T.at(lT.tKey));                              // Load key
+                T.at(data).move(lT.T.at(lT.tData));                             // Load data
                }
               void Else()
                {T.at(found).zero();                                             // The tree is empty so there is a no first/last node
@@ -1657,8 +1657,8 @@ abstract class BtreeSF extends Test                                             
                 if (first) lT.firstElement(); else lT.lastElement();            // Get the requested key/data pair
 
                 T.at(found).one();                                              // Show that the tree was not empty
-                T.at(Key)  .move(lT.T.at(lT.tKey));                             // Load key
-                T.at(Data) .move(lT.T.at(lT.tData));                            // Load data
+                T.at(key)  .move(lT.T.at(lT.tKey));                             // Load key
+                T.at(data) .move(lT.T.at(lT.tData));                            // Load data
 
                 P.parallelStart();   T.at(leafFound).move(bT.T.at(bT.tData));   // Save node index of leaf
                 P.parallelSection(); P.Goto(Return);
@@ -1738,7 +1738,7 @@ abstract class BtreeSF extends Test                                             
             final Variable s = T.at(leafSize).fork();                           // Stuck size as a variable
             P.new If (s)
              {void Then()
-               {findEqualInLeaf(T.at(Key), nT);                                 // Assume the root is a leaf and start looking for the key
+               {findEqualInLeaf(T.at(key), nT);                                 // Assume the root is a leaf and start looking for the key
 
                 final Variable i = T.at(index).fork();                          // Index where the key was found
                 s.dec();                                                        // Index of the last element - we know that there is one
@@ -1748,8 +1748,8 @@ abstract class BtreeSF extends Test                                             
                     i.inc();                                                    // Index
                     lEqual.T.at(lEqual.index).move(i.a);                        // The index of the key we want
                     lEqual.elementAt();                                         // Get the element containing the key
-                    T.at(Key) .move(lEqual.T.at(lEqual.tKey));                  // Record the key
-                    T.at(Data).move(lEqual.T.at(lEqual.tData));                 // Record the data
+                    T.at(key) .move(lEqual.T.at(lEqual.tKey));                  // Record the key
+                    T.at(data).move(lEqual.T.at(lEqual.tData));                 // Record the data
                     f.one();                                                    // Found next key in the root leaf
                    }
                   void Else()                                                   // No more keys in root so no next key
@@ -1776,7 +1776,7 @@ abstract class BtreeSF extends Test                                             
         P.new Block()
          {void code()
            {findFirstGreaterThanOrEqualInBranch                                 // Find next child in search path of key
-             (nT, T.at(Key), T.at(find), T.at(index), T.at(child));
+             (nT, T.at(key), T.at(find), T.at(index), T.at(child));
             nT.loadNode(T.at(child));                                           // Load child
 
             P.new If (T.at(find))                                               // Record last left turn
@@ -1792,7 +1792,7 @@ abstract class BtreeSF extends Test                                             
             P.new Block()                                                       // The root is not a leaf so we must step down through the tree
              {void code()
                {P.parallelStart();   P.GoOff(end, nT.isLeaf());                 // Confirm that we have reached a leaf
-                P.parallelSection(); findEqualInLeaf(T.at(Key), nT);            // Assume the root is a leaf and start looking for the key
+                P.parallelSection(); findEqualInLeaf(T.at(key), nT);            // Assume the root is a leaf and start looking for the key
                 P.parallelEnd();
 
                 lEqual.size();
@@ -1805,8 +1805,8 @@ abstract class BtreeSF extends Test                                             
                     i.inc();                                                    // Index
                     lEqual.T.at(lEqual.index).move(i.a);                        // The index of the key we want
                     lEqual.elementAt();                                         // Get the element containing the key
-                    T.at(Key) .move(lEqual.T.at(lEqual.tKey));                  // Record the key
-                    T.at(Data).move(lEqual.T.at(lEqual.tData));                 // Record the data
+                    T.at(key) .move(lEqual.T.at(lEqual.tKey));                  // Record the key
+                    T.at(data).move(lEqual.T.at(lEqual.tData));                 // Record the data
                    }
                   void Else()                                                   // Next key (if there is one) must be found by traversing
                    {P.new If (ll_found)                                         // Was there a turn to the left?
@@ -1829,8 +1829,8 @@ abstract class BtreeSF extends Test                                             
                         lT.firstElement();                                      // First element of leaf is the next key/data
                         f.one();                                                // Successfully found the next key
                         T.at(index).zero();                                     // Record the index of the next key
-                        T.at(Key)      .move(lT.T.at(lT.tKey));                 // Record the key
-                        T.at(Data)     .move(lT.T.at(lT.tData));                // Record the data
+                        T.at(key)      .move(lT.T.at(lT.tKey));                 // Record the key
+                        T.at(data)     .move(lT.T.at(lT.tData));                // Record the data
                         T.at(leafFound).move(bT.T.at(bT.tData));                // Record the leaf index
                        }
                       void Else()                                               // No last left run so we are at the end of the tree
@@ -2108,7 +2108,6 @@ abstract class BtreeSF extends Test                                             
 
   abstract class VerilogCode                                                    // Generate verilog code
    {final String          project;                                              // Project name - used to generate file names
-    final String           folder;                                              // Folder in which to place project
     final String        opCodeMap = "opCodeMap";                                // Name of op code map
     final String           nano9k = "nano9k";                                   // Name of folder containing code for the GoWin Nano 9k
     final String  siliconCompiler = "siliconCompiler";                          // Name of folder containing code for Silicon Compiler
@@ -2120,16 +2119,20 @@ abstract class BtreeSF extends Test                                             
     Integer            statements = null;                                       // Set if only one statement is to be generated
     Boolean            resultJava = null;                                       // Pass or fail of Java test
 
-    abstract int     Key     ();                                                // Input key value
-    abstract Integer Data    ();                                                // Input data value if not null
-    abstract Integer found   ();                                                // Whether the key was found (1) or not (0) if not null
-    abstract Integer data    ();                                                // Expected output data value if not null
+    Integer Key    () {return null;}                                            // Input key value if not null
+    Integer Data   () {return null;}                                            // Input data value if not null
+    Integer found  () {return null;}                                            // Whether the key was found (1) or not (0) if not null
+    Integer key    () {return null;}                                            // Expected output key
+    Integer data   () {return null;}                                            // Expected output data value if not null
+    abstract String  instance();                                                // The name of the instance of this test
     abstract int     maxSteps();                                                // Maximum number if execution steps
     abstract int     expSteps();                                                // Expected number of steps
     abstract String  expected();                                                // Expected number of steps
              int     density () {return 60;}                                    // Indication of gate density required on die.
 
-    String projectFolder() {return ""+Paths.get(folder, project, ""+Key());}    // Define the project folder
+    String projectFolder()                                                      // Define the project folder
+     {return ""+Paths.get(verilogFolder, project, instance());
+     }
 
     String     sourceVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.ext);}
     String       testVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.testExt);}
@@ -2148,13 +2151,10 @@ abstract class BtreeSF extends Test                                             
     String         traceFile() {return ""+Paths.get(projectFolder(), "trace.txt");}
     String     javaTraceFile() {return ""+Paths.get(projectFolder(), "traceJava.txt");}
 
-    VerilogCode(String Project, String Folder)                                  // Generate verilog code
+    VerilogCode()                                                               // Generate verilog code
      {zz();
-      project = Project; folder = Folder; program = P;
-
-      //removeMemories();                                                       // Remove memories reported as not used from Vivado
-
-      T.at(Key).setInt(Key());                                                  // Key value
+      project = currentTestNameSuffix(); program = P;
+      if (Key () != null) T.at(Key) .setInt(Key());                             // Key value
       if (Data() != null) T.at(Data).setInt(Data());                            // Optional data value to insert into tree
       generateVerilog();                                                        // Generate verilog
 
@@ -2168,7 +2168,6 @@ abstract class BtreeSF extends Test                                             
      {zz();
       deleteFile(javaTraceFile());
       P.run(javaTraceFile());                                                   // Run the Java version and trace it
-
       resultJava = ok(P.steps+1, expSteps());                                   // Steps in Java code
       if (found() != null) ok(T.at(found).getInt(), found());                   // Whether the data was found or not
       if (data () != null) ok(T.at(data) .getInt(), data());                    // Data associated with key from java code
@@ -2297,14 +2296,13 @@ abstract class BtreeSF extends Test                                             
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
 (* keep_hierarchy = "yes" *)
-module $project(reset, stop, clock, Key, Data, data, found);                    // Database on a chip
-  input                   reset;                                                // Restart the program run sequence when this goes high
-  input                   clock;                                                // Program counter clock
-  input [$bitsPerKey-1 :0]  Key;                                                // Input key
-  input [$bitsPerData-1:0] Data;                                                // Input data
-  output                   stop;                                                // Program has stopped when this goes high
-  output[$bitsPerData-1:0] data;                                                // Output data
-  output                  found;                                                // Whether the key was found on put, find delete
+module $project(reset, clock, stop, key, data, found);                          // Database on a chip
+  input                    reset;                                               // Restart the program run sequence when this goes high
+  input                    clock;                                               // Program counter clock
+  output                    stop;                                               // Program has stopped when this goes high
+  output [$bitsPerKey -1:0]  key;                                               // Output key
+  output [$bitsPerData-1:0] data;                                               // Output data
+  output                   found;                                               // Whether the key was found on put, find delete
 
   `include "includes/declareMemory.vh"                                          // Declare memory
   `include "includes/opCodeMap.vh"                                              // Op code map gives step to instruction
@@ -2323,7 +2321,8 @@ module $project(reset, stop, clock, Key, Data, data, found);                    
   reg   stopped;                                                                // Set when we stop
   assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
   assign found = T[$found_at];                                                  // Found the key
-  assign data  = T[$data_at+:$data_width];                                      // Data associated with key found
+  assign key   = T[$key_at +: $key_width];                                      // Drive with found key
+  assign data  = T[$data_at+:$data_width];                                      // Drive wuth data associated with key found
 
   always @ (posedge clock) begin                                                // Execute next step in program
     if (reset) begin                                                            // Reset
@@ -2337,8 +2336,14 @@ module $project(reset, stop, clock, Key, Data, data, found);                    
       traceFile = $fopen("$traceFile", "w");                                    // Open trace file
       if (!traceFile) $fatal(1, "Cannot open trace file $traceFile");
 
-      T[$Key_at +:$Key_width ] <= Key;                                          // Load test key
-      T[$Data_at+:$Data_width] <= Data;                                         // Load test data
+""");
+      if (Key() != null) s.append("""
+      T[$Key_at +:$Key_width ] <= $Key;                                         // Load test key
+""");
+      if (Data() != null) s.append("""
+      T[$Data_at+:$Data_width] <= $Data;                                        // Load test data
+""");
+    s.append("""
     end
     else begin                                                                  // Run
       $display            ($format);                                            // Trace execution
@@ -2386,15 +2391,14 @@ endmodule
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
 (* keep_hierarchy = "yes" *)
-module $project(button1, stop, clock, Key, Data, data, found, led);             // Database on a chip
-  input                     button1;                                            // Restart the program run sequence when this button is pushed
-  input                     clock;                                              // Program counter clock
-  input  [$bitsPerKey-1:0]  Key;                                                // Input key
-  input  [$bitsPerData-1:0] Data;                                               // Input data
+module $project(button1, stop, clock, key, data, found, led);                   // Database on a chip
+  input                   button1;                                              // Restart the program run sequence when this button is pushed
+  input                    clock;                                               // Program counter clock
   output                    stop;                                               // Program has stopped when this goes high
+  output [$bitsPerKey -1:0]  key;                                               // Output key
   output [$bitsPerData-1:0] data;                                               // Output data
-  output                    found;                                              // Whether the key was found on put, find delete
-  output [6-1:0]            led;
+  output                   found;                                               // Whether the key was found on put, find delete
+  output [6-1:0]             led;
 
   assign led = ~{data,found,stop};                                              // Show output on leds
 
@@ -2439,8 +2443,14 @@ module $project(button1, stop, clock, Key, Data, data, found, led);             
      `include "../includes/initializeMemory.vh"                                 // Load memory
       initialize_opCodeMap();                                                   // Initialize op code map
 
+""");
+      if (Key()  != null) s.append("""
       T[$Key_at +:$Key_width ] <= $Key;                                         // Load test key
+""");
+      if (Data() != null) s.append("""
       T[$Data_at+:$Data_width] <= $Data;                                        // Load test data
+""");
+      s.append("""
     end
 
     else begin                                                                  // Run
@@ -2487,16 +2497,15 @@ endmodule
 `timescale 10ps/1ps
 module $project_tb;                                                             // Test bench for database on a chip
   reg                   reset;                                                  // Restart the program run sequence when this goes high
-  reg                   stop;                                                   // Program has stopped when this goes high
+  reg                    stop;                                                  // Program has stopped when this goes high
   reg                   clock;                                                  // Program counter clock
-  reg  [$bitsPerKey -1:0] Key  = $Key;                                          // Input key
-  reg  [$bitsPerData-1:0]Data = $Data;                                          // Input data
-  reg  [$bitsPerData-1:0]data;                                                  // Output data
+  reg [$bitsPerKey -1:0]  key;                                                  // Output key
+  reg [$bitsPerData-1:0] data;                                                  // Output data
   reg                   found;                                                  // Whether the key was found on put, find delete
   integer testResults;                                                          // Test results file
 
   $project a1(.reset(reset), .stop(stop), .clock(clock),                        // Connect to the module
-    .Key(Key), .Data(Data), .data(data), .found(found));
+    .key(key), .data(data), .found(found));
 
   initial begin                                                                 // Test the module
     clock = 0; reset = 0; #1;                                                   // Reset the module
@@ -2513,9 +2522,9 @@ module $project_tb;                                                             
       end
       if (stop) begin                                                           // Stopped
         testResults = $fopen("$testsFile", "w");
-        $fdisplay(testResults, "Steps=%1d\\nKey=%1d\\ndata=%1d\\n", step, Key, data);
+        $fdisplay(testResults, "Steps=%d\\nkey=%d\\ndata=%d\\n", step, key, data);
         $fclose(testResults);
-        $display ("Steps=%1d\\nKey=%1d\\ndata=%1d\\n", step, Key, data);
+        $display ("Steps=%1d\\nkey=%d\\ndata=%d\\n", step, key, data);
       end
       else begin                                                                // Not stopped
         $display ("Out of steps at step: %d\\n", step);
@@ -2539,20 +2548,18 @@ endmodule
 module $project_tb;                                                             // Test bench for database on a chip
   reg                 button1;                                                  // Restart the program run sequence when this button is pushed
   reg                   clock;                                                  // Program counter clock
-  reg [$bitsPerKey-1:0]   Key;                                                  // Input key
-  reg [$bitsPerData-1:0] Data;                                                  // Input data
   reg                    stop;                                                  // Program has stopped when this goes high
   reg                   found;                                                  // Whether the key was found on put, find delete
+  reg [$bitsPerKey -1:0]  key;                                                  // Output key
   reg [$bitsPerData-1:0] data;                                                  // Output data
   reg [6-1:0]             led;                                                  // leds
 
   find a1                                                                       // Connect to the module
    (.button1(button1),
     .clock(clock),
-    .Key(Key),
-    .Data(Data),
     .stop(stop),
     .found(found),
+    .key(key),
     .data(data),
     .led(led));
 
@@ -2756,6 +2763,8 @@ create_clock -name clock -period 100 [get_ports {clock}]
       s = s.replace("$Key_width",        ""+Key.width);
       s = s.replace("$Data_at",          ""+Data.at);
       s = s.replace("$Data_width",       ""+Data.width);
+      s = s.replace("$key_at",           ""+key.at);
+      s = s.replace("$key_width",        ""+key.width);
       s = s.replace("$data_at",          ""+data.at);
       s = s.replace("$data_width",       ""+data.width);
       s = s.replace("$data",             ""+data());
@@ -3875,10 +3884,12 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   void run_verilogFind(int Key, int Found, int Data, int ExpSteps)              // Test a find operation in Verilog
-   {VerilogCode v = new VerilogCode(currentTestNameSuffix(), verilogFolder)     // Generate verilog now that memories have been initialized and the program written
-     {int     Key     () {return      Key;}                                     // Input key value
+   {VerilogCode v = new VerilogCode()                                           // Generate verilog now that memories have been initialized and the program written
+     {String  instance() {return   ""+Key;}                                     // Input key value is instance name
+      Integer Key     () {return      Key;}                                     // Input key value
       Integer Data    () {return     null;}                                     // Input data value
       Integer found   () {return    Found;}                                     // Whether we should expect to find the key on a find operation
+      Integer key     () {return     null;}                                     // Expected output data value
       Integer data    () {return     Data;}                                     // Expected output data value
       int     maxSteps() {return       40;}                                     // Maximum number of execution steps
       int     expSteps() {return ExpSteps;}                                     // Expected number of steps
@@ -3923,15 +3934,15 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.P.run(); t.P.clear();
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
     ok(t.T.at(t.found),     "T.found@22=1");
-    ok(t.T.at(t.Key),       "T.Key@113=1");
-    ok(t.T.at(t.Data),      "T.Data@118=1");
+    ok(t.T.at(t.key),       "T.key@23=1");
+    ok(t.T.at(t.data),      "T.data@28=1");
 
     t.findNext();
     t.P.run();
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
     ok(t.T.at(t.found),     "T.found@22=1");
-    ok(t.T.at(t.Key),       "T.Key@113=2");
-    ok(t.T.at(t.Data),      "T.Data@118=0");
+    ok(t.T.at(t.key),       "T.key@23=2");
+    ok(t.T.at(t.data),      "T.data@28=0");
 
     t.P.run();
     ok(t.T.at(t.found),     "T.found@22=0");
@@ -3941,8 +3952,23 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.P.run();
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
     ok(t.T.at(t.found),     "T.found@22=1");
-    ok(t.T.at(t.Key),       "T.Key@113=2");
-    ok(t.T.at(t.Data),      "T.Data@118=0");
+    ok(t.T.at(t.key),       "T.key@23=2");
+    ok(t.T.at(t.data),      "T.data@28=0");
+   }
+
+  private void verilog_first_last                                               // Test a first/next/last operation in Verilog
+   (int found, int key, int data, int ExpSteps)
+   {VerilogCode v = new VerilogCode()                                           // Generate verilog now that memories have been initialized and the program written
+     {String  instance() {return   ""+key;}                                     // Output key value is instance name
+      Integer Key     () {return     null;}                                     // No input key value
+      Integer Data    () {return     null;}                                     // No input data value
+      Integer found   () {return    found;}                                     // Whether we should expect to find the key on a find operation
+      Integer key     () {return      key;}                                     // Expected output key value
+      Integer data    () {return     data;}                                     // Expected output data value
+      int     maxSteps() {return     4000;}                                     // Maximum number of execution steps
+      int     expSteps() {return ExpSteps;}                                     // Expected number of steps
+      String  expected() {return null;}                                         // Expected tree if present
+     };
    }
 
   private static void test_first_last()                                         // First/next/last node of a tree
@@ -3970,75 +3996,74 @@ Line T       At      Wide       Size    Indices        Value   Name
       4                  2        |
 1,2=1  3,4=4  5,6=3  7=8    8,9=2 |
 """);
-    t.first();
-    t.P.run(); t.P.clear();
+    t.first(); t.verilog_first_last(1, 1, 8, 63);
+    t.P.clear();
     ok(t.T.at(t.leafFound), "T.leafFound@138=1");
     ok(t.T.at(t.found),     "T.found@22=1");
-    ok(t.T.at(t.Key),       "T.Key@113=1");
-    ok(t.T.at(t.Data),      "T.Data@118=8");
+    ok(t.T.at(t.key),       "T.key@23=1");
+    ok(t.T.at(t.data),      "T.data@28=8");
 
-    t.findNext();
-    t.P.run();
+    t.findNext(); t.verilog_first_last(1, 2, 7, 55);
     ok(t.T.at(t.leafFound), "T.leafFound@138=1");
     ok(t.T.at(t.found),     "T.found@22=1");
-    ok(t.T.at(t.Key),       "T.Key@113=2");
-    ok(t.T.at(t.Data),      "T.Data@118=7");
+    ok(t.T.at(t.key),       "T.key@23=2");
+    ok(t.T.at(t.data),      "T.data@28=7");
 
-    t.P.run();
+    t.verilog_first_last(1, 3, 6, 71);
     ok(t.T.at(t.leafFound), "T.leafFound@138=4");
     ok(t.T.at(t.found),     "T.found@22=1");
-    ok(t.T.at(t.Key),       "T.Key@113=3");
-    ok(t.T.at(t.Data),      "T.Data@118=6");
+    ok(t.T.at(t.key),       "T.key@23=3");
+    ok(t.T.at(t.data),      "T.data@28=6");
 
-    t.P.run();
+    t.verilog_first_last(1, 4, 5, 52);
     ok(t.T.at(t.leafFound), "T.leafFound@138=4");
     ok(t.T.at(t.found),     "T.found@22=1");
-    ok(t.T.at(t.Key),       "T.Key@113=4");
-    ok(t.T.at(t.Data),      "T.Data@118=5");
+    ok(t.T.at(t.key),       "T.key@23=4");
+    ok(t.T.at(t.data),      "T.data@28=5");
 
-    t.P.run();
+    t.verilog_first_last(1, 5, 4, 75);
     ok(t.T.at(t.leafFound), "T.leafFound@138=3");
     ok(t.T.at(t.found),     "T.found@22=1");
-    ok(t.T.at(t.Key),       "T.Key@113=5");
-    ok(t.T.at(t.Data),      "T.Data@118=4");
+    ok(t.T.at(t.key),       "T.key@23=5");
+    ok(t.T.at(t.data),      "T.data@28=4");
 
-    t.P.run();
+    t.verilog_first_last(1, 6, 3, 52);
     ok(t.T.at(t.leafFound), "T.leafFound@138=3");
     ok(t.T.at(t.found),     "T.found@22=1");
-    ok(t.T.at(t.Key),       "T.Key@113=6");
-    ok(t.T.at(t.Data),      "T.Data@118=3");
+    ok(t.T.at(t.key),       "T.key@23=6");
+    ok(t.T.at(t.data),      "T.data@28=3");
 
-    t.P.run();
+    t.verilog_first_last(1, 7, 2, 68);
     ok(t.T.at(t.leafFound), "T.leafFound@138=8");
     ok(t.T.at(t.found),     "T.found@22=1");
-    ok(t.T.at(t.Key),       "T.Key@113=7");
-    ok(t.T.at(t.Data),      "T.Data@118=2");
+    ok(t.T.at(t.key),       "T.key@23=7");
+    ok(t.T.at(t.data),      "T.data@28=2");
 
-    t.P.run();
+    t.verilog_first_last(1, 8, 1, 68);
     ok(t.T.at(t.leafFound), "T.leafFound@138=2");
     ok(t.T.at(t.found),     "T.found@22=1");
-    ok(t.T.at(t.Key),       "T.Key@113=8");
-    ok(t.T.at(t.Data),      "T.Data@118=1");
+    ok(t.T.at(t.key),       "T.key@23=8");
+    ok(t.T.at(t.data),      "T.data@28=1");
 
-    t.P.run();
+    t.verilog_first_last(1, 9, 0, 49);
     ok(t.T.at(t.leafFound), "T.leafFound@138=2");
     ok(t.T.at(t.found),     "T.found@22=1");
-    ok(t.T.at(t.Key),       "T.Key@113=9");
-    ok(t.T.at(t.Data),      "T.Data@118=0");
+    ok(t.T.at(t.key),       "T.key@23=9");
+    ok(t.T.at(t.data),      "T.data@28=0");
 
-    t.P.run();
+    t.verilog_first_last(0, 9, 0, 44);
     ok(t.T.at(t.leafFound), "T.leafFound@138=2");
     ok(t.T.at(t.found),     "T.found@22=0");
-    ok(t.T.at(t.Key),       "T.Key@113=9");
-    ok(t.T.at(t.Data),      "T.Data@118=0");
+    ok(t.T.at(t.key),       "T.key@23=9");
+    ok(t.T.at(t.data),      "T.data@28=0");
 
     t.P.clear();
     t.last();
-    t.P.run();
+    t.verilog_first_last(1, 9, 0, 30);
     ok(t.T.at(t.leafFound), "T.leafFound@138=2");
     ok(t.T.at(t.found),     "T.found@22=1");
-    ok(t.T.at(t.Key),       "T.Key@113=9");
-    ok(t.T.at(t.Data),      "T.Data@118=0");
+    ok(t.T.at(t.key),       "T.key@23=9");
+    ok(t.T.at(t.data),      "T.data@28=0");
    }
 
   private static void test_find_verilog()                                       // Find using generated verilog code
@@ -4087,14 +4112,15 @@ Line T       At      Wide       Size    Indices        Value   Name
    (int Key, int data, int steps, String expected)
    {z();
 
-    VerilogCode v = new VerilogCode(currentTestNameSuffix(), "verilog")         // Generate verilog now that memories have beeninitialzied and the program written
-     {int     Key     () {return   Key;}                                        // Input key value
-      Integer Data    () {return     3;}                                        // Input key value
-      Integer found   () {return     1;}                                        // Whether we should expect to find the key on a find operation
-      Integer data    () {return  data;}                                        // Expected output data value
-      int     maxSteps() {return  2000;}                                        // Maximum number if execution steps
-      int     expSteps() {return steps;}                                        // Expected number of steps
-      String  expected() {return expected;}                                     // Expected tree if present
+    VerilogCode v = new VerilogCode()                                           // Generate verilog now that memories have beeninitialzied and the program written
+     {String  instance() {return ""+Key;}                                       // Input key value is instance name
+      Integer Key     () {return    Key;}                                       // Input key value
+      Integer Data    () {return      3;}                                       // Input key value
+      Integer found   () {return      1;}                                       // Whether we should expect to find the key on a find operation
+      Integer data    () {return   data;}                                       // Expected output data value
+      int     maxSteps() {return   2000;}                                       // Maximum number if execution steps
+      int     expSteps() {return  steps;}                                       // Expected number of steps
+      String  expected() {return  expected;}                                    // Expected tree if present
      };
    }
 
@@ -4200,8 +4226,9 @@ Line T       At      Wide       Size    Indices        Value   Name
    (int value, int steps, String expected)
    {z();
 
-    VerilogCode v = new VerilogCode(currentTestNameSuffix(), "verilog")         // Generate verilog now that memories have been initialized and the program written
-     {int     Key     () {return value;}                                        // Input key value
+    VerilogCode v = new VerilogCode()                                           // Generate verilog now that memories have been initialized and the program written
+     {String  instance() {return ""+value;}                                     // Input key value is instance name
+      Integer Key     () {return value;}                                        // Input key value
       Integer Data    () {return value;}                                        // Input data value
       Integer found   () {return     0;}                                        // Whether we should expect to find the key on a find operation
       Integer data    () {return     0;}                                        // Expected output data value
@@ -4976,10 +5003,9 @@ StuckSML(maxSize:4 size:1)
     //test_delete_verilog();
     //test_find_verilog();
     //test_put_verilog();
-    //test_first_last();
-    test_first_last_empty();
-    test_first_last_root();
-    test_first_last();
+    //test_first_last_empty();
+    //test_first_last_root();
+      test_first_last();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
