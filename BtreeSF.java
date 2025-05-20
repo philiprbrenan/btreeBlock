@@ -1776,10 +1776,10 @@ abstract class BtreeSF extends Test                                             
         P.new Block()
          {void code()
            {findFirstGreaterThanOrEqualInBranch                                 // Find next child in search path of key
-             (nT, T.at(key), T.at(find), T.at(index), T.at(child));
+             (nT, T.at(key), T.at(success), T.at(index), T.at(child));
             nT.loadNode(T.at(child));                                           // Load child
 
-            P.new If (T.at(find))                                               // Record last left turn
+            P.new If (T.at(success))                                            // Record last left turn
              {void Then()                                                       // Made a left turn from this parent
                {last_left.move(parent);                                         // Record latest left turn
                 ll_found.one();                                                 // Made a left turn
