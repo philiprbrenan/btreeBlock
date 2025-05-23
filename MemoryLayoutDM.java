@@ -705,7 +705,9 @@ class MemoryLayoutDM extends Test implements Comparable<MemoryLayoutDM>         
     void zero()                                                                 // Zero some memory
      {zz();
       P.new I()
-       {void a() {setOff(); memory.zero(at, width);}
+       {void a()
+         {setOff(); memory.zero(at, width);
+         }
         String v()
          {return verilogLoad()+" <= 0; /* zero */";
          }
