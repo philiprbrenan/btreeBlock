@@ -5043,9 +5043,9 @@ StuckSML(maxSize:4 size:1)
     //test_delete_verilog();
     //test_find_verilog();
     //test_put_verilog();
-    //test_first_last_empty();
-    //test_first_last_root();
-    //test_first_last();
+    test_first_last_empty();
+    test_first_last_root();
+    test_first_last();
     test_empty();
    }
 
