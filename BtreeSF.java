@@ -867,6 +867,15 @@ abstract class BtreeSF extends Test                                             
       at.dec();                                                                 // Account for top
      }
 
+    void isRootEmpty(MemoryLayoutDM.At at)                                      // Set the specified reference to one if the root of is empty else zero
+     {zz();
+      loadRoot();
+      P.new If (N.at(node_size))
+        {void Then() {at.zero();};
+         void Else() {at.one ();};
+       };
+     }
+
     void isFull()                                                               // Set isFull to show whether the node is full or not, incidentlly setting IsLeaf as well
      {zz();
       isLeaf(T.at(IsLeaf));
@@ -4980,6 +4989,26 @@ StuckSML(maxSize:4 size:1)
 """);
    }
 
+  private static void test_empty()                                              // Empty
+   {z(); sayCurrentTestName();
+    final BtreeSF t = allTreeOps() ;
+    t.P.run(); t.P.clear();
+
+    final Node      r = t.new Node("root");
+
+    final Variable e = new Variable(t.P, "result", 1);
+    r.isRootEmpty(e.a);
+    t.P.run(); t.P.clear();
+    ok(e.geti(), 1);
+
+    t.put();
+    t.T.at(t.Key ).setInt(1);
+    t.T.at(t.Data).setInt(11);
+    r.isRootEmpty(e.a);
+    t.P.run();
+    ok(e.geti(), 0);
+   }
+
   protected static void oldTests()                                              // Tests thought to be in good shape
    {final boolean longRunning = github_actions && 1 == 0;
     test_memory();
@@ -5006,6 +5035,7 @@ StuckSML(maxSize:4 size:1)
     test_first_last_empty();
     test_first_last_root();
     test_first_last();
+    test_empty();
    }
 
   protected static void newTests()                                              // Tests being worked on
@@ -5013,9 +5043,10 @@ StuckSML(maxSize:4 size:1)
     //test_delete_verilog();
     //test_find_verilog();
     //test_put_verilog();
-    test_first_last_empty();
-    test_first_last_root();
-    test_first_last();
+    //test_first_last_empty();
+    //test_first_last_root();
+    //test_first_last();
+    test_empty();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
