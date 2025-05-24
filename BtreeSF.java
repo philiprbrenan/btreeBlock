@@ -2255,7 +2255,7 @@ abstract class BtreeSF extends Test                                             
     Integer found   () {return null;}                                           // Whether the key was found (1) or not (0) if not null
     Integer key     () {return null;}                                           // Expected output key
     Integer data    () {return null;}                                           // Expected output data value if not null
-    boolean openRoad() {return false;}                                          // Whether to run on OpenRoad or not to see if it will place and route reliably
+    boolean openRoad() {return false;}                                          // Picks out tests instances to run on OpenRoad to see if it will place and route reliably. As the runs only doffere by teh input dat and not inteh layiout of the chip (unless a lot of constant propagation is done) it is reasonably safe to assume that this sub sample is representative of the whole.
     abstract String  instance();                                                // The name of the instance of this test
     abstract int     maxSteps();                                                // Maximum number if execution steps
     abstract int     expSteps();                                                // Expected number of steps
@@ -2809,12 +2809,12 @@ from siliconcompiler import Chip                                                
 from siliconcompiler.targets import $processTechnology_demo
 
 if __name__ == "__main__":
-    chip = Chip('$project')                                                     # Create chip object
+    chip = Chip('$project - $instance')                                         # Create chip object
    #chip.set('option', 'loglevel', 'warning')                                   # Warnings and above
     chip.set('option', 'loglevel', 'error')                                     # Warnings and above
-    chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/$project.v') # Source code
-    chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/memory.v'  ) # Memory black box
-   #chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/$project.sdc')
+    chip.input('~/btreeBlock/verilog/$project/$instance/siliconCompiler/$instance.v') # Source code
+    chip.input('~/btreeBlock/verilog/$project/$instance/siliconCompiler/memory.v'   ) # Memory black box
+   #chip.input('~/btreeBlock/verilog/$project/$instance/siliconCompiler/$instance.sdc')
     chip.set('design', '$project')                                              # Show the top most module
     chip.use($processTechnology_demo)                                           # Load predefined technology and flow target
     chip.set('package', 'description', '$designDescription')                    # Description of design
@@ -2824,8 +2824,8 @@ if __name__ == "__main__":
    #chip.set('constraint', 'density', $density)                                 # Lowering the density gives more area in which to route connections at the cost of wasting surface area and making the chip run slower. For find it seems best to leave this parameter alone
     chip.set('option', 'clean', True)                                           # Clean start else it reuses previous results
     chip.run()                                                                  # Run compilation of design and target
-    chip.summary()
-    chip.snapshot()
+    chip.summary()                                                              # Create a summary - but at the moment it is only printed on stdout so for automation you have to get the same information from the summary pkg.json
+    chip.snapshot()                                                             # Create the charming image of the chip along with its size, power, clock frequency
 # chip.show()
 # chip.set('option', 'define', 'CFG_ASIC=1')
 # chip.set('option', 'env', 'PDK_HOME', '/disk/mypdk')
