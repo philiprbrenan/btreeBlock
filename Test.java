@@ -23,6 +23,7 @@ public class Test                                                               
     "true".equals(System.getenv("GITHUB_ACTIONS"));
   final static long start                      = System.nanoTime();             // Start time
   final static Stack<String> sayThisOrStop     = new Stack<>();                 // The next says should say this or else we should stop
+  final static TreeSet<String> filesWritten    = new TreeSet<>();               // Files written
   final static boolean theShorterIsTheDaughter = true;                          // True for a shorter traceback during tests to get more counts on the page at a time in Geany
 
 //D2 String routines                                                            // String routines
@@ -521,6 +522,7 @@ public class Test                                                               
    {try
      {makePath(folderName(filePath));
       Files.write(Paths.get(filePath), string.toString().getBytes());
+      filesWritten.add(filePath);
      }
     catch (Exception e)
      {stop("Cannot write file", filePath, e);
@@ -617,6 +619,20 @@ public class Test                                                               
    {final int p = filePath.lastIndexOf(".");
     return p > 0 && p < filePath.length() - 1 ?
       filePath.substring(p + 1) : null;
+   }
+
+  static String fne(String...Names)                                             // Join file name components
+   {final StringBuilder f = new StringBuilder();
+    final int N = Names.length;
+    for (int i = 0; i < N-1; i++)
+     {f.append(Names[i]) ;
+      while(f.length() > 0 && f.charAt(f.length()-1) == '/')
+       {f.setLength(f.length()-1);
+       }
+      f.append("/");
+     }
+    f.setLength(f.length()-1);
+    return ""+f+"."+Names[N-1];
    }
 
 //D2 Timing                                                                     // Print log messages
@@ -1135,6 +1151,10 @@ BBBB
     ok(""+Methodology.all_tree_ops, "all_tree_ops");
    }
 
+  static void test_fileNames()
+   {ok(fne("/home/phil", "a", "b", "c"), "/home/phil/a/b.c");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_log_two();
     test_power_two();
@@ -1150,12 +1170,12 @@ BBBB
     test_ifs();
     test_md5();
     test_methodology();
+    test_fileNames();
    }
 
   static void newTests()                                                        // Tests being worked on
-   {//oldTests();
-    test_power_two();
-   }
+   {oldTests();
+  }
 
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
