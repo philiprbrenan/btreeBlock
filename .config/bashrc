@@ -9,6 +9,7 @@ function g { # Search for lines in files in current folder tree case insensitive
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
+alias j='bash j.sh'
 alias b='cd   /home/azureuser/btreeBlock/'
 alias bv='cd  /home/azureuser/btreeBlock/vivado'
 alias gg='cd; sudo rm -r ~/btreeBlock/; git clone git@github.com:philiprbrenan/btreeBlock.git; cd ~/btreeBlock'
@@ -17,16 +18,10 @@ alias dv='cd  /home/azureuser/btreeBlock/verilog/delete/3/vivado/reports ;ll'
 alias fv='cd  /home/azureuser/btreeBlock/verilog/find/0/vivado/reports   ;ll'
 alias pv='cd  /home/azureuser/btreeBlock/verilog/put/1/vivado/reports    ;ll'
 alias s='perl /home/azureuser/btreeBlock/vivado/synthesis.pl'
-alias t='top -u azureuser -E g'
+alias t='top -u azureuser -E g -c'
 alias v='/home/azureuser/Vivado/2024.2/bin/vivado'
-alias x='bash /home/azureuser/btreeBlock/j.sh BtreeSF'
-alias scd="source /home/azureuser/siliconcompiler/bin/activate; cd /home/azureuser/btreeBlock/verilog/delete/1/siliconCompiler; python3 delete.py"
-alias scf="source /home/azureuser/siliconcompiler/bin/activate; cd /home/azureuser/btreeBlock/verilog/find/1/siliconCompiler;   python3 find.py"
-alias scp="source /home/azureuser/siliconcompiler/bin/activate; cd /home/azureuser/btreeBlock/verilog/put/1/siliconCompiler;    python3 put.py"
-
-alias scdw="source /home/azureuser/siliconcompiler/bin/activate; cd /home/azureuser/btreeBlock/verilog/delete_wide/1/siliconCompiler; python3 delete_wide.py"
-alias scfw="source /home/azureuser/siliconcompiler/bin/activate; cd /home/azureuser/btreeBlock/verilog/find_wide/1/siliconCompiler;   python3 find_wide.py"
-alias scpw="source /home/azureuser/siliconcompiler/bin/activate; cd /home/azureuser/btreeBlock/verilog/put_wide/1/siliconCompiler;    python3 put_wide.py"
+alias x='bash /home/azureuser/btreeBlock/j.sh BtreeSF; cd verilog; bash sc.sh'
+alias sc="source /home/azureuser/siliconcompiler/bin/activate"
 
 export GIT_SSH_COMMAND="ssh -i ~/.ssh/Azure.pem"
 export XINSTALLER_SCALE=2
