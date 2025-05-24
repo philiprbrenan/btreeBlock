@@ -23,7 +23,7 @@ abstract class BtreeSF extends Test                                             
   final ProgramDM                  P = new ProgramDM();                         // Program in which to generate instructions
   final boolean              OpCodes = true;                                    // Refactor op codes
   final boolean           runVerilog = true;                                    // Run verilog tests alongside java tests and check they produce the same results
-  final String     designDescription = "? versus |";                            // Description of latest change
+  final String     designDescription = "findNext vs findGreater";               // Description of latest change
   final String     processTechnology = "freepdk45";                             // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
@@ -921,6 +921,13 @@ abstract class BtreeSF extends Test                                             
     Leaf.searchFirstGreaterThanOrEqual(true, Search, Found, Index, null, null);
    }
 
+  private void findFirstGreaterInLeaf                                           // Find the first key in the  leaf that is greater than the search key
+   (StuckDM Leaf, MemoryLayoutDM.At Search,
+    MemoryLayoutDM.At Found, MemoryLayoutDM.At Index)
+   {zz();
+    Leaf.searchFirstGreater(true, Search, Found, Index, null, null);
+   }
+
   private void findFirstGreaterThanOrEqualInBranch                              // Find the first key in the branch that is equal to or greater than the search key
    (Node Node,  MemoryLayoutDM.At Search, MemoryLayoutDM.At Found,
     MemoryLayoutDM.At Index, MemoryLayoutDM.At Data)
@@ -1801,7 +1808,7 @@ abstract class BtreeSF extends Test                                             
             P.new Block()                                                       // The root is not a leaf so we must step down through the tree
              {void code()
                {P.parallelStart();   P.GoOff(end, nT.isLeaf());                 // Confirm that we have reached a leaf
-                P.parallelSection(); findEqualInLeaf(T.at(key), nT);            // Assume the root is a leaf and start looking for the key
+                P.parallelSection(); findEqualInLeaf(T.at(key), nT);            // Search leaf for next greater key
                 P.parallelEnd();
 
                 lEqual.size();
@@ -1827,7 +1834,7 @@ abstract class BtreeSF extends Test                                             
                         nT.loadNode(bT.T.at(bT.tData));                         // Load last child of left turn parent
                         P.new Block()                                           // Go to the left most leaf
                          {void code()                                           // Find the left most leaf
-                           {P.GoOn(end, nT.isLeaf());                           // Reached the left mode leaf
+                           {P.GoOn(end, nT.isLeaf());                           // Reached the left most leaf
                             nT.loadStuck(bT);                                   // Load last child of left turn parent
                             bT.firstElement();                                  // Left most element
                             nT.loadNode(bT.T.at(bT.tData));                     // Load first node on left
@@ -1845,6 +1852,120 @@ abstract class BtreeSF extends Test                                             
                       void Else()                                               // No last left run so we are at the end of the tree
                        {f.zero();                                               // No next node as we are at the end of the tree
                         P.Goto(Return);                                         // The
+                       }
+                     };
+                   }
+                 };
+                P.Goto(Return);                                                 // Found the containing leaf so there is nothing more to do
+               }
+             };
+            P.Goto(start);                                                      // Restart search one level down
+           }
+         };
+       }
+     };
+   }
+
+  public void findGreater()                                                     // Find the next key relative to the supplied key which might not be present in the tree
+   {zz();
+    P.new Block()
+     {void code()
+       {final ProgramDM.Label Return = end;
+        nT.loadRoot();                                                          // The first thing in the tree is the root
+
+        T.at(found).zero();                                                               // Assume we will not find the next key
+        P.new Block()                                                           // The root is a leaf
+         {void code()
+           {P.GoOff(end, nT.isLeaf());                                          // Confirm that the root is a leaf
+
+            nT.leafSize(T.at(leafSize));                                        // Size of leaf.
+            final Variable s = T.at(leafSize).fork();                           // Stuck size as a variable
+            P.new If (s)
+             {void Then()
+               {final StuckDM leaf = createLeafStuck("leafRoot");               // Load root as a leaf
+
+                nT.loadStuck(leaf);                                             // Load Search leaf for next greater key
+                findFirstGreaterInLeaf(leaf, T.at(key), T.at(found), T.at(index)); // Search leaf for next greater key
+
+                P.new If (T.at(found))                                          // A greater key was found
+                 {void Then()                                                   // Next key can be find by incrementing
+                   {leaf.T.at(lEqual.index).move(T.at(index));                  // The index of the key we want
+                    leaf.elementAt();                                           // Get the element containing the key
+                    T.at(key) .move(leaf.T.at(lEqual.tKey));                    // Record the key
+                    T.at(data).move(leaf.T.at(lEqual.tData));                   // Record the data
+                   }
+                 };
+               }
+             };
+            P.Goto(Return);                                                     // The tree consists of one leaf so there is nothing more to do
+           }
+         };
+
+        final Variable last_left = new Variable(P, "last_left", bitsPerNext);   // Make a variable to record the last left turn
+        final Variable ll_found  = new Variable(P, "ll_found",  1);             // A left turn was made
+        final Variable ll_index  = new Variable(P, "ll_index",  bitsPerSize);   // The index at which the left turn was made
+        final Variable parent    = new Variable(P, "parent",    bitsPerNext);   // Make a variable to record the current parent
+        ll_found.zero();                                                        // No left turns so far
+        ll_index.zero();                                                        // No left turns so far
+        parent.zero();                                                          // Currently we are on the root
+
+        P.new Block()
+         {void code()
+           {findFirstGreaterThanOrEqualInBranch                                 // Find next child in search path of key
+             (nT, T.at(key), T.at(success), T.at(index), T.at(child));
+            nT.loadNode(T.at(child));                                           // Load child
+
+            P.new If (T.at(success))                                            // Record last left turn
+             {void Then()                                                       // Made a left turn from this parent
+               {last_left.move(parent);                                         // Record latest left turn
+                ll_found.one();                                                 // Made a left turn
+                ll_index.a.move(T.at(index));                                   // Index at which we made a left turn
+               }
+             };
+
+            parent.a.move(T.at(child));                                         // Record new parent
+
+            P.new Block()                                                       // The root is not a leaf so we must step down through the tree
+             {void code()
+               {final StuckDM leaf = createLeafStuck("leaf");
+
+                P.parallelStart();   P.GoOff(end, nT.isLeaf());                 // Confirm that we have reached a leaf
+                P.parallelSection(); nT.loadStuck(leaf);                        // Load Search leaf for next greater key
+                P.parallelEnd();
+
+                findFirstGreaterInLeaf(leaf, T.at(key), T.at(found), T.at(index)); // Search leaf for next greater key
+                P.new If (T.at(found))                                          // Compare index to size to see if we can just increment
+                 {void Then()                                                   // Next key can be find by incrementing
+                   {leaf.T.at(leaf.index).move(T.at(index));
+                    leaf.elementAt();
+                    T.at(key) .move(leaf.T.at(leaf.tKey));                      // Record the key
+                    T.at(data).move(leaf.T.at(leaf.tData));                     // Record the data
+                   }
+                  void Else()                                                   // Next key (if there is one) must be found by traversing
+                   {P.new If (ll_found)                                         // Was there a turn to the left?
+                     {void Then()
+                       {nT.loadStuck(bT, last_left.a);                          // Node where we last turned left
+                        bT.T.at(bT.index).move(ll_index.a);                     // Index at which we turned left
+                        bT.T.at(bT.index).inc();                                // Turn left at the next index which must exist otherwise we would not have been able to turn left
+                        bT.elementAt();                                         // Last element of left turn parent
+                        nT.loadNode(bT.T.at(bT.tData));                         // Load last child of left turn parent
+                        P.new Block()                                           // Go to the left most leaf
+                         {void code()                                           // Find the left most leaf
+                           {P.GoOn(end, nT.isLeaf());                           // Reached the left most leaf
+                            nT.loadStuck(bT);                                   // Load last child of left turn parent
+                            bT.firstElement();                                  // Left most element
+                            nT.loadNode(bT.T.at(bT.tData));                     // Load first node on left
+                            P.Goto(start);
+                           }
+                         };
+                        nT.loadStuck(lT, bT.T.at(bT.tData));                    // Load left most child of last branch to get left most leaf
+                        lT.firstElement();                                      // First element of leaf is the next key/data
+                        T.at(child).move(bT.T.at(bT.tData));                    // Record node containing next key
+                        T.at(index).zero();                                     // Record the index of the next key
+                        T.at(key)      .move(lT.T.at(lT.tKey));                 // Record the key
+                        T.at(data)     .move(lT.T.at(lT.tData));                // Record the data
+                        T.at(leafFound).move(bT.T.at(bT.tData));                // Record the leaf index
+                        T.at(found).one();                                      // Mark as found
                        }
                      };
                    }
@@ -2531,9 +2652,11 @@ module $project_tb;                                                             
       end
       if (stop) begin                                                           // Stopped
         testResults = $fopen("$testsFile", "w");
-        $fdisplay(testResults, "Steps=%d\\nkey=%d\\ndata=%d\\n", step, key, data);
+        $fdisplay(testResults, "Steps=%d\\nfound=%d\\nkey=%d\\ndata=%d\\n",
+                                step,      found,     key,     data);
         $fclose(testResults);
-        $display ("Steps=%1d\\nkey=%d\\ndata=%d\\n", step, key, data);
+        $display ("Steps=%1d\\nfound=%d\\nkey=%d\\ndata=%d\\n",
+                   step,       found,     key,     data);
       end
       else begin                                                                // Not stopped
         $display ("Out of steps at step: %d\\n", step);
@@ -2751,7 +2874,10 @@ create_clock -name clock -period 100 [get_ports {clock}]
       //ok(0, g, e);                                                            // Width of margin in verilog traces
       final TreeMap<String,String> p = readProperties(testsFile());             // Load test results
       ok(ifs(p.get("Steps")), expSteps());                                      // Confirm results from Verilog
-      ok(ifs(p.get("data")),  data());
+      final boolean f = found() != null && found() > 0;                         // Should we test for key, data - yes if found was specified and is true
+      if (found()     != null) ok(ifs(p.get("found")), found());                // Confirm found if specified
+      if (f && key () != null) ok(ifs(p.get("key")),   key());                  // Confirm output key if specified
+      if (f && data() != null) ok(ifs(p.get("data")),  data());                 // Confirm output data if specified
       return this;
      }
 
@@ -3922,7 +4048,7 @@ Line T       At      Wide       Size    Indices        Value   Name
      };
    }
 
-  private static void test_first_last_empty()                                   // First/next/last node of an empty tree
+  private static void test_first_empty()                                        // First/next node of an empty tree
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps() ;
     t.P.run(); t.P.clear();
@@ -3933,12 +4059,23 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(t.T.at(t.found),     "T.found@22=0");
 
     t.findNext();
-    t.verilog_first_last(0, 0, 0, 11);
+    t.verilog_first_last(0, 1, 0, 11);
     t.P.clear();
     ok(t.T.at(t.found),     "T.found@22=0");
 
     t.last();
     t.verilog_first_last(0, 0, 0, 10);
+    t.P.clear();
+    ok(t.T.at(t.leafFound), "T.leafFound@138=0");
+   }
+
+  private static void test_last_empty()                                         // Last node of an empty tree
+   {z(); sayCurrentTestName();
+    final BtreeSF t = allTreeOps() ;
+    t.P.run(); t.P.clear();
+
+    t.last();
+    t.verilog_first_last(0, 1, 0, 10);
     t.P.clear();
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
    }
@@ -3962,7 +4099,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     t.P.clear();
     t.first();
-    t.verilog_first_last(1, 3, 1, 15);
+    t.verilog_first_last(1, 1, 1, 15);
     t.P.clear();
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
     ok(t.T.at(t.found),     "T.found@22=1");
@@ -3971,7 +4108,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     t.P.clear();
     t.findNext();
-    t.verilog_first_last(1, 3, 0, 27);
+    t.verilog_first_last(1, 2, 0, 27);
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
     ok(t.T.at(t.found),     "T.found@22=1");
     ok(t.T.at(t.key),       "T.key@23=2");
@@ -3982,7 +4119,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 
     t.P.clear();
     t.last();
-    t.verilog_first_last(1, 3, 0, 16);
+    t.verilog_first_last(1, 2, 0, 16);
     t.P.clear();
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
     ok(t.T.at(t.found),     "T.found@22=1");
@@ -4083,6 +4220,152 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(t.T.at(t.found),     "T.found@22=1");
     ok(t.T.at(t.key),       "T.key@23=9");
     ok(t.T.at(t.data),      "T.data@28=0");
+   }
+
+  private static void test_greater_empty()                                      // Next greater key in an emoty tree
+   {z(); sayCurrentTestName();
+    final BtreeSF t = allTreeOps() ;
+    t.P.run(); t.P.clear();
+
+    t.T.at(t.key).setInt(0);
+    t.findGreater();
+    t.verilog_first_last(0, 1, 0, 10);
+
+    ok(t.T.at(t.found),     "T.found@22=0");
+   }
+
+  private static void test_greater_root()                                       // Next greater key in a tree that is just one leaf
+   {z(); sayCurrentTestName();
+    final BtreeSF t = allTreeOps() ;
+    t.P.run(); t.P.clear();
+    t.put();
+    final int N = 2;
+    for (int i = 1; i <= N; ++i)
+     {t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(N-i);
+      t.P.run();
+     }
+    //stop(t);
+    ok(t, """
+1,2=0 |
+""");
+    t.P.clear();
+    t.T.at(t.key).setInt(0);
+    t.findGreater();
+    t.verilog_first_last(1, 1, 1, 20);
+
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.child),     "T.child@134=0");
+    ok(t.T.at(t.index),     "T.index@70=0");
+    ok(t.T.at(t.key),       "T.key@23=1");
+    ok(t.T.at(t.data),      "T.data@28=1");
+
+    t.verilog_first_last(1, 2, 0, 20);
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.child),     "T.child@134=0");
+    ok(t.T.at(t.index),     "T.index@70=1");
+    ok(t.T.at(t.key),       "T.key@23=2");
+    ok(t.T.at(t.data),      "T.data@28=0");
+
+    t.verilog_first_last(0, 2, 0, 16);
+    ok(t.T.at(t.found),     "T.found@22=0");
+   }
+
+  private static void test_greater()                                            // Next greater key
+   {z(); sayCurrentTestName();
+    final BtreeSF t = allTreeOps() ;
+    t.P.run(); t.P.clear();
+    t.put();
+    final int N = 9;
+    for (int i = 1; i <= N; ++i)
+     {//say(currentTestName(),  "a", i);
+      t.T.at(t.Key ).setInt(i);
+      t.T.at(t.Data).setInt(N-i);
+      t.P.run();
+     }
+    //stop(t.M);
+    //stop(t);
+    ok(t, """
+             4                    |
+             0                    |
+             5                    |
+             6                    |
+      2             6    7        |
+      5             6    6.1      |
+      1             3    8        |
+      4                  2        |
+1,2=1  3,4=4  5,6=3  7=8    8,9=2 |
+""");
+    t.P.clear();
+    t.T.at(t.key).setInt(0);
+    t.findGreater();
+
+    t.verilog_first_last(1, 1, 8, 49);
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.child),     "T.child@134=1");
+    ok(t.T.at(t.index),     "T.index@70=0");
+    ok(t.T.at(t.key),       "T.key@23=1");
+    ok(t.T.at(t.data),      "T.data@28=8");
+
+    t.verilog_first_last(1, 2, 7, 49);
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.child),     "T.child@134=1");
+    ok(t.T.at(t.index),     "T.index@70=1");
+    ok(t.T.at(t.key),       "T.key@23=2");
+    ok(t.T.at(t.data),      "T.data@28=7");
+
+    t.verilog_first_last(1, 3, 6, 67);
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.child),     "T.child@134=4");
+    ok(t.T.at(t.index),     "T.index@70=0");
+    ok(t.T.at(t.key),       "T.key@23=3");
+    ok(t.T.at(t.data),      "T.data@28=6");
+
+    t.verilog_first_last(1, 4, 5, 46);
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.child),     "T.child@134=4");
+    ok(t.T.at(t.index),     "T.index@70=1");
+    ok(t.T.at(t.key),       "T.key@23=4");
+    ok(t.T.at(t.data),      "T.data@28=5");
+
+    t.verilog_first_last(1, 5, 4, 71);
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.child),     "T.child@134=3");
+    ok(t.T.at(t.index),     "T.index@70=0");
+    ok(t.T.at(t.key),       "T.key@23=5");
+    ok(t.T.at(t.data),      "T.data@28=4");
+
+    t.verilog_first_last(1, 6, 3, 46);
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.child),     "T.child@134=3");
+    ok(t.T.at(t.index),     "T.index@70=1");
+    ok(t.T.at(t.key),       "T.key@23=6");
+    ok(t.T.at(t.data),      "T.data@28=3");
+
+    t.verilog_first_last(1, 7, 2, 64);
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.child),     "T.child@134=8");
+    ok(t.T.at(t.index),     "T.index@70=0");
+    ok(t.T.at(t.key),       "T.key@23=7");
+    ok(t.T.at(t.data),      "T.data@28=2");
+
+    t.verilog_first_last(1, 8, 1, 64);
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.child),     "T.child@134=2");
+    ok(t.T.at(t.index),     "T.index@70=0");
+    ok(t.T.at(t.key),       "T.key@23=8");
+    ok(t.T.at(t.data),      "T.data@28=1");
+
+    t.verilog_first_last(1, 9, 0, 43);
+    ok(t.T.at(t.found),     "T.found@22=1");
+    ok(t.T.at(t.child),     "T.child@134=2");
+    ok(t.T.at(t.index),     "T.index@70=1");
+    ok(t.T.at(t.key),       "T.key@23=9");
+    ok(t.T.at(t.data),      "T.data@28=0");
+
+    t.verilog_first_last(0, 2, 0, 39);
+    ok(t.T.at(t.found),     "T.found@22=0");
+    ok(t.T.at(t.key),       "T.key@23=9");
    }
 
   private static void test_find_verilog()                                       // Find using generated verilog code
@@ -5009,6 +5292,16 @@ StuckSML(maxSize:4 size:1)
     ok(e.geti(), 0);
    }
 
+  static void openRoadList()                                                    // Write a file specifying open road silicompiler invocations
+   {final StringBuilder s = new StringBuilder();                                // Silicon compiler commands
+    for (String f : filesWritten)
+     {if (f.endsWith(".py") && f.contains("/1/siliconCompiler"))
+       {s.append("python3 "+f+"\n");
+       }
+     }
+    writeFile(fne(verilogFolder, "sc", "sh"), s);                               // Files list
+   }
+
   protected static void oldTests()                                              // Tests thought to be in good shape
    {final boolean longRunning = github_actions && 1 == 0;
     test_memory();
@@ -5032,21 +5325,27 @@ StuckSML(maxSize:4 size:1)
     test_put_verilog();
 //  test_find_wide();
 //  test_put_wide();
-    test_first_last_empty();
+    test_first_empty();
+    test_last_empty();
     test_first_last_root();
     test_first_last();
     test_empty();
+    test_greater();
+    test_greater_root();
+    test_greater_empty();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    //test_delete_verilog();
-    //test_find_verilog();
-    //test_put_verilog();
-    test_first_last_empty();
+    test_first_empty();
+    test_last_empty();
     test_first_last_root();
     test_first_last();
     test_empty();
+    test_greater();
+    test_greater_root();
+    test_greater_empty();
+    openRoadList();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
