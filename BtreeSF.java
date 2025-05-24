@@ -2809,7 +2809,7 @@ from siliconcompiler import Chip                                                
 from siliconcompiler.targets import $processTechnology_demo
 
 if __name__ == "__main__":
-    chip = Chip('$instance')                                                    # Create chip object
+    chip = Chip('$instance')                                                    # Create chip object.  The name is used to create the summary and mask image file
    #chip.set('option', 'loglevel', 'warning')                                   # Warnings and above
     chip.set('option', 'loglevel', 'error')                                     # Warnings and above
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/$instance.v') # Source code
@@ -4522,12 +4522,12 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   private void runVerilogPutTest                                                // Run the java and verilog versions and compare the resulting memory traces
-   (int value, int steps, String Instance, String expected)
+   (int Key, int steps, String Instance, String expected)
    {zz();
     VerilogCode v = new VerilogCode()                                           // Generate verilog now that memories have been initialized and the program written
      {String  instance() {return Instance != null ? Instance : ""+Key;}         // The instance of this test which is=f supplied indiocates thatthjis is a candodate for running an an fpga or for generating an asic mask
-      Integer Key     () {return value;}                                        // Input key value
-      Integer Data    () {return value;}                                        // Input data value
+      Integer Key     () {return   Key;}                                        // Input key value
+      Integer Data    () {return   Key;}                                        // Input data value
       Integer found   () {return     0;}                                        // Whether we should expect to find the key on a find operation
       Integer data    () {return     0;}                                        // Expected output data value
       boolean openRoad() {return Instance != null;}                             // Whether to generate a silicon compiler definition of this test instance
@@ -4539,9 +4539,9 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   private void runVerilogPutTest                                                // Run the java and verilog versions and compare the resulting memory traces
-   (int value, int steps, String expected)
+   (int Key, int steps, String expected)
    {zz();
-    runVerilogPutTest(value, steps, null, expected);
+    runVerilogPutTest(Key, steps, null, expected);
    }
 
   private static void test_put_verilog()                                        // Delete using generated verilog code
