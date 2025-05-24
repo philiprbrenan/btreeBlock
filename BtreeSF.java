@@ -5332,11 +5332,10 @@ StuckSML(maxSize:4 size:1)
      {if (v.openRoad())
        {final String p = v.project;                                             // The name of the verilog project. Normally the name of the test in which the code as run
         final String f = v.instance();                                          // The instance of the test with the set of tests - often the value of the key being operated on.
-// /home/azureuser/btreeBlock/verilog/greater/findGreater/siliconCompiler/greater.py
 
         s.append("( echo "+f+"; ulimit -t 600 ; python3 ~/btreeBlock/verilog/"+p+"/"+f+"/siliconCompiler/"+f+".py )\n");
-        z.append("  ~/btreeBlock/verilog/build/"+p+"/job0/"+f+".pkg.json \\\n");
-        z.append("  ~/btreeBlock/verilog/build/"+p+"/job0/"+f+".png      \\\n");
+        z.append("  ~/btreeBlock/verilog/build/"+f+"/job0/"+f+".pkg.json \\\n");
+        z.append("  ~/btreeBlock/verilog/build/"+f+"/job0/"+f+".png      \\\n");
        }
      }
     //s.append("wait\n");                                                       // Wait for the commands to finish
