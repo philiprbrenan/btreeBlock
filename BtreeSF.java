@@ -5287,12 +5287,12 @@ StuckSML(maxSize:4 size:1)
         final String f = v.instance();                                          // The instance of the test with the set of tests - often the value of the key being operated on.
 // /home/azureuser/btreeBlock/verilog/greater/findGreater/siliconCompiler/greater.py
 
-        s.append("( ulimit -t 600 ; python3 ~/btreeBlock/verilog/"+p+"/"+f+"/siliconCompiler/"+f+".py ) &\n");
+        s.append("( ulimit -t 600 ; python3 ~/btreeBlock/verilog/"+p+"/"+f+"/siliconCompiler/"+f+".py )\n");
         z.append("  ~/btreeBlock/verilog/build/"+p+"/job0/"+f+".pkg.json \\\n");
         z.append("  ~/btreeBlock/verilog/build/"+p+"/job0/"+f+".png      \\\n");
        }
      }
-    s.append("wait\n");                                                         // Wait for the commands to finish
+    //s.append("wait\n");                                                       // Wait for the commands to finish
 
     s.append("rm  -f ~/sc.zip\n");
     s.append("zip -j ~/sc.zip \\\n");
