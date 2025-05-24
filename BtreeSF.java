@@ -2268,14 +2268,14 @@ abstract class BtreeSF extends Test                                             
 
     String     sourceVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.ext);}
     String       testVerilog() {return ""+Paths.get(projectFolder(), project                       +Verilog.testExt);}
-    String     nano9kVerilog() {return ""+Paths.get(projectFolder(), nano9k,     project           +Verilog.ext);}
-    String   nano9kTestBench() {return ""+Paths.get(projectFolder(), nano9k,     project           +Verilog.testExt);}
-    String nano9kConstraints() {return ""+Paths.get(projectFolder(), nano9k,     project           +Verilog.constraintsExt);}
-    String       nano9kBuild() {return ""+Paths.get(projectFolder(), nano9k,     project           +".pl");}
-    String           scBuild() {return ""+Paths.get(projectFolder(), siliconCompiler, project      +".py");}
-    String          scSource() {return ""+Paths.get(projectFolder(), siliconCompiler, project      +Verilog.ext);}
+    String     nano9kVerilog() {return ""+Paths.get(projectFolder(), nano9k,     instance()        +Verilog.ext);}
+    String   nano9kTestBench() {return ""+Paths.get(projectFolder(), nano9k,     instance()        +Verilog.testExt);}
+    String nano9kConstraints() {return ""+Paths.get(projectFolder(), nano9k,     instance()        +Verilog.constraintsExt);}
+    String       nano9kBuild() {return ""+Paths.get(projectFolder(), nano9k,     instance()        +".pl");}
+    String           scBuild() {return ""+Paths.get(projectFolder(), siliconCompiler, instance()   +".py");}
+    String          scSource() {return ""+Paths.get(projectFolder(), siliconCompiler, instance()      +Verilog.ext);}
     String          scMemory() {return ""+Paths.get(projectFolder(), siliconCompiler, "memory"     +Verilog.ext);}
-    String     scConstraints() {return ""+Paths.get(projectFolder(), siliconCompiler, project      +".sdc");}
+    String     scConstraints() {return ""+Paths.get(projectFolder(), siliconCompiler, instance()   +".sdc");}
     String     declareMemory() {return ""+Paths.get(projectFolder(), "includes", "declareMemory"   +Verilog.header);}
     String  initializeMemory() {return ""+Paths.get(projectFolder(), "includes", "initializeMemory"+Verilog.header);}
     String     opCodeMapFile() {return ""+Paths.get(projectFolder(), "includes", opCodeMap         +Verilog.header);}
@@ -5283,10 +5283,13 @@ StuckSML(maxSize:4 size:1)
     s.append("source ~/siliconcompiler/bin/activate\n");                        // Activate silicon compiler python virtual environment
     for (VerilogCode v : verilogTests)                                          // Verilog tests executed
      {if (v.openRoad())
-       {final String f = v.instance();
-        s.append("( ulimit -t 600 ; python3 ~/btreeBlock/verilog/"+f+"/1/siliconCompiler/"+f+".py ) &\n");
-        z.append("  ~/btreeBlock/verilog/build/"+f+"/job0/"+f+".pkg.json \\\n");
-        z.append("  ~/btreeBlock/verilog/build/"+f+"/job0/"+f+".png      \\\n");
+       {final String p = v.project;                                             // The name of the verilog project. Normally the name of the test in which the code as run
+        final String f = v.instance();                                          // The instance of the test with the set of tests - often the value of the key being operated on.
+// /home/azureuser/btreeBlock/verilog/greater/findGreater/siliconCompiler/greater.py
+
+        s.append("( ulimit -t 600 ; python3 ~/btreeBlock/verilog/"+p+"/"+f+"/siliconCompiler/"+f+".py ) &\n");
+        z.append("  ~/btreeBlock/verilog/build/"+p+"/job0/"+f+".pkg.json \\\n");
+        z.append("  ~/btreeBlock/verilog/build/"+p+"/job0/"+f+".png      \\\n");
        }
      }
     s.append("wait\n");                                                         // Wait for the commands to finish
