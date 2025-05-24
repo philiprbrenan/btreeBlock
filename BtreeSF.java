@@ -2812,9 +2812,9 @@ if __name__ == "__main__":
     chip = Chip('$project - $instance')                                         # Create chip object
    #chip.set('option', 'loglevel', 'warning')                                   # Warnings and above
     chip.set('option', 'loglevel', 'error')                                     # Warnings and above
-    chip.input('~/btreeBlock/verilog/$project/$instance/siliconCompiler/$instance.v') # Source code
-    chip.input('~/btreeBlock/verilog/$project/$instance/siliconCompiler/memory.v'   ) # Memory black box
-   #chip.input('~/btreeBlock/verilog/$project/$instance/siliconCompiler/$instance.sdc')
+    chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/$instance.v') # Source code
+    chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/memory.v'   ) # Memory black box
+   #chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/$instance.sdc')
     chip.set('design', '$project')                                              # Show the top most module
     chip.use($processTechnology_demo)                                           # Load predefined technology and flow target
     chip.set('package', 'description', '$designDescription')                    # Description of design
