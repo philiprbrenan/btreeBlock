@@ -2524,7 +2524,7 @@ endmodule
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
 (* keep_hierarchy = "yes" *)
-module $project(button1, stop, clock, key, data, found, led);                   // Database on a chip
+module $instance(button1, stop, clock, key, data, found, led);                  // Database on a chip
   input                   button1;                                              // Restart the program run sequence when this button is pushed
   input                    clock;                                               // Program counter clock
   output                    stop;                                               // Program has stopped when this goes high
@@ -2671,7 +2671,7 @@ endmodule
       writeFile(testVerilog(), editVariables(s));                               // Write verilog test bench
      }
 
-    void generateVerilogTestBenchNano9K()                                       // Generate verilog test bench for Nano 9k using leds to veryify correct operation
+    void generateVerilogTestBenchNano9K()                                       // Generate verilog test bench for Nano 9k using leds to verify correct operation in siimulation before loading device
      {zz();
       final StringBuilder s = new StringBuilder();
       s.append("""
@@ -2680,7 +2680,7 @@ endmodule
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-03-21
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
-module $project_tb;                                                             // Test bench for database on a chip
+module $instance_tb;                                                            // Test bench for database on a chip
   reg                 button1;                                                  // Restart the program run sequence when this button is pushed
   reg                   clock;                                                  // Program counter clock
   reg                    stop;                                                  // Program has stopped when this goes high
@@ -2761,9 +2761,9 @@ use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
 
 my $project = q(find);
-my $verilog = fpe $project, q(v);
-my $cst     = fpe $project, q(xdc);
-my $bits    = fpe $project, q(fs);
+my $verilog = fpe $instance, q(v);
+my $cst     = fpe $instance, q(xdc);
+my $bits    = fpe $instance, q(fs);
 my $cable   = q(ft2232);
 my $device  = q(GW1NR-LV9QN88PC6/I5);
 my $pack    = q(GW1N-9C);
@@ -2809,7 +2809,7 @@ from siliconcompiler import Chip                                                
 from siliconcompiler.targets import $processTechnology_demo
 
 if __name__ == "__main__":
-    chip = Chip('$project - $instance')                                         # Create chip object
+    chip = Chip('$instance')                                                    # Create chip object
    #chip.set('option', 'loglevel', 'warning')                                   # Warnings and above
     chip.set('option', 'loglevel', 'error')                                     # Warnings and above
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/$instance.v') # Source code
@@ -2817,7 +2817,7 @@ if __name__ == "__main__":
    #chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/$instance.sdc')
     chip.set('design', '$project')                                              # Show the top most module
     chip.use($processTechnology_demo)                                           # Load predefined technology and flow target
-    chip.set('package', 'description', '$designDescription')                    # Description of design
+    chip.set('package', 'description', '$designDescription - $project - $instance') # Description of design
     chip.clock('clock', period=10)                                              # Define clock speed of design was 100
     chip.set('option', 'remote', False)                                         # Run remote in the cloud
     chip.set('option', 'nodisplay', True)                                       # Do not open displays
@@ -2859,7 +2859,7 @@ create_clock -name clock -period 100 [get_ports {clock}]
       generateSiliconCompiler();                                                // Silicon compiler Python driver
       generateVerilogForMemory();                                               // Black box for memory
 
-      if (project.equalsIgnoreCase("find"))                                     // Only the find project will fit on the nano 9k
+      if (instance().equalsIgnoreCase("find"))                                  // Only the find project will fit on the nano 9k
        {generateVerilogTestBenchNano9K();
         generateVerilogConstraintsNano9K();
         generateBuildNano9K();
@@ -4338,18 +4338,24 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(t.T.at(t.key),       "T.key@23=9");
    }
 
-  void run_verilogFind(int Key, int Found, int Data, int ExpSteps)              // Test a find operation in Verilog
+  void run_verilogFind                                                          // Test an instance of a find operation in Verilog
+   (int Key, int Found, int Data, int ExpSteps, String Instance)
    {VerilogCode v = new VerilogCode()                                           // Generate verilog now that memories have been initialized and the program written
-     {String  instance() {return   ""+Key;}                                     // Input key value is instance name
+     {String  instance() {return Instance != null ? Instance : ""+Key;}         // The instance of this test which is=f supplied indiocates thatthjis is a candodate for running an an fpga or for generating an asic mask
       Integer Key     () {return      Key;}                                     // Input key value
       Integer Data    () {return     null;}                                     // Input data value
       Integer found   () {return    Found;}                                     // Whether we should expect to find the key on a find operation
       Integer key     () {return     null;}                                     // Expected output data value
       Integer data    () {return     Data;}                                     // Expected output data value
+      boolean openRoad() {return Instance != null;}                             // Whether to generate a silicon compiler definition of this test instance
       int     maxSteps() {return       40;}                                     // Maximum number of execution steps
       int     expSteps() {return ExpSteps;}                                     // Expected number of steps
       String  expected() {return null;}                                         // Expected tree if present
      };
+   }
+
+  void run_verilogFind(int Key, int Found, int Data, int ExpSteps)              // Test a find operation in Verilog but without expecting it to be run on  fpga or used to generate an asic mask
+   {run_verilogFind(Key, Found, Data, ExpSteps, null);                          // Generate verilog now that memories have been initialized and the program written
    }
 
   private static void test_find_verilog()                                       // Find using generated verilog code
@@ -4385,7 +4391,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.run_verilogFind( 1, 1, 8, 28);
     t.run_verilogFind( 2, 1, 7, 28);
     t.run_verilogFind( 3, 1, 6, 28);
-    t.run_verilogFind( 4, 1, 5, 28);
+    t.run_verilogFind( 4, 1, 5, 28, "find");
     t.run_verilogFind( 5, 1, 4, 28);
     t.run_verilogFind( 6, 1, 3, 28);
     t.run_verilogFind( 7, 1, 2, 28);
@@ -4395,19 +4401,26 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   private void runVerilogDeleteTest                                             // Run the java and verilog versions and compare the resulting memory traces
-   (int Key, int data, int steps, String expected)
+   (int Key, int data, int steps, String Instance, String expected)
    {z();
 
-    VerilogCode v = new VerilogCode()                                           // Generate verilog now that memories have beeninitialzied and the program written
-     {String  instance() {return ""+Key;}                                       // Input key value is instance name
+    VerilogCode v = new VerilogCode()                                           // Generate verilog now that memories have been initialzied and the program written
+     {String  instance() {return Instance != null ? Instance : ""+Key;}         // The instance of this test which is=f supplied indiocates thatthjis is a candodate for running an an fpga or for generating an asic mask
       Integer Key     () {return    Key;}                                       // Input key value
       Integer Data    () {return      3;}                                       // Input key value
       Integer found   () {return      1;}                                       // Whether we should expect to find the key on a find operation
       Integer data    () {return   data;}                                       // Expected output data value
+      boolean openRoad() {return Instance != null;}                             // Whether to generate a silicon compiler definition of this test instance
       int     maxSteps() {return   2000;}                                       // Maximum number if execution steps
       int     expSteps() {return  steps;}                                       // Expected number of steps
       String  expected() {return  expected;}                                    // Expected tree if present
      };
+   }
+
+  private void runVerilogDeleteTest                                             // Run the java and verilog versions and compare the resulting memory traces
+   (int Key, int data, int steps, String expected)
+   {zz();
+    runVerilogDeleteTest(Key, data, steps, null, expected);
    }
 
   private static void test_delete_verilog()                                     // Delete using generated verilog code
@@ -4439,7 +4452,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 548, """
+    t.runVerilogDeleteTest(3, 6, 548, "Delete", """
                     6           |
                     0           |
                     5           |
@@ -4509,20 +4522,26 @@ Line T       At      Wide       Size    Indices        Value   Name
    }
 
   private void runVerilogPutTest                                                // Run the java and verilog versions and compare the resulting memory traces
-   (int value, int steps, String expected)
-   {z();
-
+   (int value, int steps, String Instance, String expected)
+   {zz();
     VerilogCode v = new VerilogCode()                                           // Generate verilog now that memories have been initialized and the program written
-     {String  instance() {return ""+value;}                                     // Input key value is instance name
+     {String  instance() {return Instance != null ? Instance : ""+Key;}         // The instance of this test which is=f supplied indiocates thatthjis is a candodate for running an an fpga or for generating an asic mask
       Integer Key     () {return value;}                                        // Input key value
       Integer Data    () {return value;}                                        // Input data value
       Integer found   () {return     0;}                                        // Whether we should expect to find the key on a find operation
       Integer data    () {return     0;}                                        // Expected output data value
+      boolean openRoad() {return Instance != null;}                             // Whether to generate a silicon compiler definition of this test instance
       int     maxSteps() {return  2000;}                                        // Maximum number if execution steps
       int     expSteps() {return steps;}                                        // Expected number of steps
       String  expected() {return expected;}                                     // Expected tree if present
       int      density() {return 10;}                                           // Lower than normal density to facilitate routing
      };
+   }
+
+  private void runVerilogPutTest                                                // Run the java and verilog versions and compare the resulting memory traces
+   (int value, int steps, String expected)
+   {zz();
+    runVerilogPutTest(value, steps, null, expected);
    }
 
   private static void test_put_verilog()                                        // Delete using generated verilog code
@@ -4722,7 +4741,7 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=1  3,4=4    5,6=3    7,8=8  9,10=7   11,12=10    13,14=9   15,16=12    17=13    18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 552, """
+    t.runVerilogPutTest(20, 552, "Put", """
                                8                                           16                    |
                                0                                           0.1                   |
                                5                                           11                    |
@@ -5287,7 +5306,7 @@ StuckSML(maxSize:4 size:1)
         final String f = v.instance();                                          // The instance of the test with the set of tests - often the value of the key being operated on.
 // /home/azureuser/btreeBlock/verilog/greater/findGreater/siliconCompiler/greater.py
 
-        s.append("( ulimit -t 600 ; python3 ~/btreeBlock/verilog/"+p+"/"+f+"/siliconCompiler/"+f+".py )\n");
+        s.append("( echo "+f+"; ulimit -t 600 ; python3 ~/btreeBlock/verilog/"+p+"/"+f+"/siliconCompiler/"+f+".py )\n");
         z.append("  ~/btreeBlock/verilog/build/"+p+"/job0/"+f+".pkg.json \\\n");
         z.append("  ~/btreeBlock/verilog/build/"+p+"/job0/"+f+".png      \\\n");
        }
