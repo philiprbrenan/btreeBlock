@@ -2514,12 +2514,13 @@ endmodule
       writeFile(sourceVerilog(), editVariables(s));                             // Write verilog module
      }
 
-    void generateVerilogForSynthesis()                                          // Generate verilog code for Nano 9k
+    void generateVerilogForSynthesis(boolean Nano, String sourceFile)           // Generate verilog code for Nano 9k or Silicon Compiler as provied by OpenRoad
      {zz();
       final StringBuilder s = new StringBuilder();
-      s.append("""
+                                                                                // Nano 9K
+      if (Nano) s.append("""
 //-----------------------------------------------------------------------------
-// Database on a chip for nano 9k and other real devices or OpenRoad asic flow
+// Database on a chip for nano 9k
 // Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-01-07
 //------------------------------------------------------------------------------
 `timescale 10ps/1ps
@@ -2535,28 +2536,11 @@ module $instance(button1, stop, clock, key, data, found, led);                  
 
   assign led = ~{data,found,stop};                                              // Show output on leds
 
-  wire reset;
-  assign reset = button1_state;                                                 // Button if button 1 is not beiong pushed
-
-  `include "../includes/declareMemory.vh"                                       // Declare memory
-  `include "../includes/opCodeMap.vh"                                           // Op code map gives step to instruction
-
-  integer  step;                                                                // Program counter
-  reg    stopped;                                                               // Set when we stop
-  assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
-  assign found = T[$found_at];                                                  // Found the key
-  assign data  = T[$data_at+:$data_width];                                      // Data associated with key found
-
   reg [16-1:0] button1_count;                                                   // 16 bit integer used to debounce the button
   reg button1_state;
 
-  reg [$nodeSize-1:0] memoryOut;                                                // Output from memory
-
-  Memory memory(.clock(clock), .reset(reset),
-      .write  ($memoryIOWrite),
-      .in     ($memoryInBuffer),
-      .out    (memoryOut),
-      .index  ($memoryIOAddress));
+  wire reset;
+  assign reset = button1_state;                                                 // Button if button 1 is not beiong pushed
 
   initial begin                                                                 // It does not matter what state we start in as long as we start in some state
     button1_count = 0;
@@ -2567,6 +2551,42 @@ module $instance(button1, stop, clock, key, data, found, led);                  
     else if ( button1 && button1_count < 8) button1_count <= button1_count + 1;
     button1_state <= button1_count     < 4;                                     // Button state == 0 when pushed and debounced
   end
+""");
+                                                                                // Silicon compiler from OpenRoad
+      else s.append("""
+//-----------------------------------------------------------------------------
+// Database on a chip for OpenRoad asic flow
+// Philip R Brenan at appaapps dot com, Appa Apps Ltd Inc., 2025-01-07
+//------------------------------------------------------------------------------
+`timescale 10ps/1ps
+(* keep_hierarchy = "yes" *)
+module $instance(clock, reset, stop, found, key, data);                         // Database on a chip
+  input                    clock;                                               // Program counter clock
+  input                    reset;                                               // Restart the program run sequence when this button is pushed
+  output                    stop;                                               // Program has stopped when this goes high
+  output                   found;                                               // Whether the key was found on put, find delete
+  output [$bitsPerKey -1:0]  key;                                               // Output key
+  output [$bitsPerData-1:0] data;                                               // Output data
+""");
+
+                                                                                // Common body
+      s.append("""
+  `include "../includes/declareMemory.vh"                                       // Declare memory
+  `include "../includes/opCodeMap.vh"                                           // Op code map gives step to instruction
+
+  integer  step;                                                                // Program counter
+  reg    stopped;                                                               // Set when we stop
+  assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
+  assign found = T[$found_at];                                                  // Found the key
+  assign data  = T[$data_at+:$data_width];                                      // Data associated with key found
+
+  reg [$nodeSize-1:0] memoryOut;                                                // Output from memory
+
+  Memory memory(.clock(clock), .reset(reset),
+      .write  ($memoryIOWrite),
+      .in     ($memoryInBuffer),
+      .out    (memoryOut),
+      .index  ($memoryIOAddress));
 
   always @ (posedge clock) begin                                                // Execute next step in program
     if (reset) begin                                                            // Reset as long as the button is not being pushed, run the program if it is being pushed
@@ -2592,8 +2612,15 @@ $opCodes
   end // Always
 endmodule
 """);
-      writeFile(nano9kVerilog(), editVariables(s));                             // Write verilog for nano 9k
-      writeFile(scSource(),      editVariables(s));                             // Write verilog for silicon compiler
+      writeFile(sourceFile, editVariables(s));                                  // Write verilog
+     }
+
+    void generateVerilogForNano9k()                                             // Generate verilog code for Nano 9k
+     {generateVerilogForSynthesis(true, nano9kVerilog());
+     }
+
+    void generateVerilogForSiliconCompiler()                                    // Generate verilog code for Silicon Compiler as provided by OpenRoad
+     {generateVerilogForSynthesis(false, scSource());
      }
 
     void generateVerilogForMemory()                                             // Generate verilog code for memory black box
@@ -2854,13 +2881,14 @@ create_clock -name clock -period 100 [get_ports {clock}]
       initializeMemories();
 
       generateVerilogCode();                                                    // Generate code and test banches for various devices
-      generateVerilogForSynthesis();                                            // Synthesizable verilog
+      if (openRoad()) generateVerilogForSiliconCompiler();                      // Verilog for Silicon compiler from OpenRoad
       generateVerilogTestBench();                                               // Test bench
       generateSiliconCompiler();                                                // Silicon compiler Python driver
       generateVerilogForMemory();                                               // Black box for memory
 
       if (instance().equalsIgnoreCase("find"))                                  // Only the find project will fit on the nano 9k
-       {generateVerilogTestBenchNano9K();
+       {generateVerilogForNano9k();
+        generateVerilogTestBenchNano9K();
         generateVerilogConstraintsNano9K();
         generateBuildNano9K();
        }
@@ -4050,7 +4078,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.P.run();
 
     t.P.clear(); t.first();
-    t.verilog_first_last(0, 0, 0, 10, "first");
+    t.verilog_first_last(0, 0, 0, 10, "findFirst");
     ok(t.T.at(t.found),     "T.found@22=0");
 
     t.P.clear(); t.findNext();
@@ -4058,7 +4086,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(t.T.at(t.found),     "T.found@22=0");
 
     t.P.clear(); t.last();
-    t.verilog_first_last(0, 0, 0, 10, "last");
+    t.verilog_first_last(0, 0, 0, 10, "findLast");
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
    }
 
