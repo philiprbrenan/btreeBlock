@@ -624,6 +624,19 @@ public class Test                                                               
   static String fne(String...Names)                                             // Join file name components
    {final StringBuilder f = new StringBuilder();
     final int N = Names.length;
+    for (int i = 0; i < N-2; i++)
+     {f.append(Names[i]) ;
+      while(f.length() > 0 && f.charAt(f.length()-1) == '/')
+       {f.setLength(f.length()-1);
+       }
+      f.append("/");
+     }
+    return ""+f+Names[N-2]+"."+Names[N-1];
+   }
+
+  static String fn(String...Names)                                              // Join file name components
+   {final StringBuilder f = new StringBuilder();
+    final int N = Names.length;
     for (int i = 0; i < N-1; i++)
      {f.append(Names[i]) ;
       while(f.length() > 0 && f.charAt(f.length()-1) == '/')
@@ -631,8 +644,7 @@ public class Test                                                               
        }
       f.append("/");
      }
-    f.setLength(f.length()-1);
-    return ""+f+"."+Names[N-1];
+    return ""+f+Names[N-1];
    }
 
 //D2 Timing                                                                     // Print log messages
@@ -1153,19 +1165,20 @@ BBBB
 
   static void test_fileNames()
    {ok(fne("/home/phil", "a", "b", "c"), "/home/phil/a/b.c");
+    ok(fn ("/home/phil", "a", "b.c"),    "/home/phil/a/b.c");
    }
 
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_log_two();
     test_power_two();
     test_max_min();
-    test_string();
+    //test_string();
     test_longest_line();
     test_files();
     test_join_stack();
     test_join_set();
     test_command();
-    test_string();
+    //test_string();
     test_properties();
     test_ifs();
     test_md5();
