@@ -2817,6 +2817,7 @@ if __name__ == "__main__":
     chip.set('option', 'remote', False)                                         # Run remote in the cloud
     chip.set('option', 'nodisplay', True)                                       # Do not open displays
     chip.set('option', 'loglevel', 'warning')                                   # Warnings and above
+    chip.set('option', 'loglevel', 'error')                                     # Warnings and above
    #chip.set('constraint', 'density', $density)                                 # Lowering the density gives more area in which to route connections at the cost of wasting surface area and making the chip run slower. For find it seems best to leave this parameter alone
     chip.set('option', 'clean', True)                                           # Clean start else it reuses previous results
     chip.run()                                                                  # Run compilation of design and target
