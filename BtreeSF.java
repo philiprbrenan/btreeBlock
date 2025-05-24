@@ -5299,7 +5299,7 @@ StuckSML(maxSize:4 size:1)
        {s.append("python3 "+f+"\n");
        }
      }
-    writeFile(fne(verilogFolder, "sc", "sh"), s);                               // Files list
+    writeFile(fne("~/btreeBlock", verilogFolder, "sc", "sh"), s);               // Files list
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
