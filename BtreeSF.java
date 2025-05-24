@@ -2842,7 +2842,7 @@ if __name__ == "__main__":
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/$instance.v') # Source code
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/memory.v'   ) # Memory black box
    #chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/$instance.sdc')
-    chip.set('design', '$project')                                              # Show the top most module
+    chip.set('design', '$instance')                                             # Show the top most module
     chip.use($processTechnology_demo)                                           # Load predefined technology and flow target
     chip.set('package', 'description', '$designDescription - $project - $instance') # Description of design
     chip.clock('clock', period=10)                                              # Define clock speed of design was 100
