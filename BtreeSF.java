@@ -2452,7 +2452,7 @@ module $project(reset, clock, stop, key, data, found);                          
   integer steps;                                                                // Number of steps executed
   integer traceFile;                                                            // File to write trace to
   reg   stopped;                                                                // Set when we stop
-  assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
+  assign stop  = stopped;                                                       // Stopped execution
   assign found = T[$found_at];                                                  // Found the key
   assign key   = T[$key_at +: $key_width];                                      // Drive with found key
   assign data  = T[$data_at+:$data_width];                                      // Drive wuth data associated with key found
@@ -2576,7 +2576,7 @@ module $instance(clock, reset, stop, found, key, data);                         
 
   integer  step;                                                                // Program counter
   reg    stopped;                                                               // Set when we stop
-  assign stop  = stopped > 0 ? 1 : 0;                                           // Stopped execution
+  assign stop  = stopped;                                                       // Stopped execution
   assign found = T[$found_at];                                                  // Found the key
   assign data  = T[$data_at+:$data_width];                                      // Data associated with key found
 
