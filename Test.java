@@ -22,8 +22,9 @@ public class Test                                                               
  {final static boolean github_actions          =                                // Whether we are on a github
     "true".equals(System.getenv("GITHUB_ACTIONS"));
   final static long start                      = System.nanoTime();             // Start time
-  final static Stack<String> sayThisOrStop     = new Stack<>();                 // The next says should say this or else we should stop
-  final static TreeSet<String> filesWritten    = new TreeSet<>();               // Files written
+  final static Stack<String>     sayThisOrStop = new Stack<>();                 // The next says should say this or else we should stop
+  final static TreeSet<String>    filesWritten = new TreeSet<>();               // Files written
+  final static TreeSet<String>   testsExecuted = new TreeSet<>();               // Tests executed
   final static boolean theShorterIsTheDaughter = true;                          // True for a shorter traceback during tests to get more counts on the page at a time in Geany
 
 //D2 String routines                                                            // String routines
@@ -315,12 +316,12 @@ public class Test                                                               
     return null;
    }
 
-
   static String currentTestNameSuffix()                                         // Name of the current test
    {final String t = currentTestName();
     if (t == null) stop("Not in a test");
     final String[]s = t.split("_", 2);
     if (s.length < 2) stop("Not in a test_name");
+    testsExecuted.add(s[1]);
     return s[1];
    }
 
@@ -1168,6 +1169,11 @@ BBBB
     ok(fn ("/home/phil", "a", "b.c"),    "/home/phil/a/b.c");
    }
 
+  static void test_executed()
+   {currentTestNameSuffix();
+    ok(testsExecuted, "[executed]");
+   }
+
   static void oldTests()                                                        // Tests thought to be in good shape
    {test_log_two();
     test_power_two();
@@ -1184,11 +1190,12 @@ BBBB
     test_md5();
     test_methodology();
     test_fileNames();
+    test_executed();
    }
 
   static void newTests()                                                        // Tests being worked on
    {oldTests();
-  }
+   }
 
   public static void main(String[] args)                                        // Test if called as a program
    {try                                                                         // Get a traceback in a format clickable in Geany if something goes wrong to speed up debugging.
