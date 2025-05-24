@@ -5296,10 +5296,10 @@ StuckSML(maxSize:4 size:1)
    {final StringBuilder s = new StringBuilder();                                // Silicon compiler commands
     for (String f : filesWritten)
      {if (f.endsWith(".py") && f.contains("/1/siliconCompiler"))
-       {s.append("python3 "+f+"\n");
+       {s.append("python3 "+fn("~/btreeBlock", f)+"\n");
        }
      }
-    writeFile(fne("~/btreeBlock", verilogFolder, "sc", "sh"), s);               // Files list
+    writeFile(fne(verilogFolder, "sc", "sh"), s);                               // Write files list
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
