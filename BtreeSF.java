@@ -2807,6 +2807,8 @@ from siliconcompiler.targets import $processTechnology_demo
 
 if __name__ == "__main__":
     chip = Chip('$project')                                                     # Create chip object
+   #chip.set('option', 'loglevel', 'warning')                                   # Warnings and above
+    chip.set('option', 'loglevel', 'error')                                     # Warnings and above
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/$project.v') # Source code
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/memory.v'  ) # Memory black box
    #chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/$project.sdc')
@@ -2816,8 +2818,6 @@ if __name__ == "__main__":
     chip.clock('clock', period=10)                                              # Define clock speed of design was 100
     chip.set('option', 'remote', False)                                         # Run remote in the cloud
     chip.set('option', 'nodisplay', True)                                       # Do not open displays
-    chip.set('option', 'loglevel', 'warning')                                   # Warnings and above
-    chip.set('option', 'loglevel', 'error')                                     # Warnings and above
    #chip.set('constraint', 'density', $density)                                 # Lowering the density gives more area in which to route connections at the cost of wasting surface area and making the chip run slower. For find it seems best to leave this parameter alone
     chip.set('option', 'clean', True)                                           # Clean start else it reuses previous results
     chip.run()                                                                  # Run compilation of design and target
@@ -5293,14 +5293,23 @@ StuckSML(maxSize:4 size:1)
     ok(e.geti(), 0);
    }
 
-  static void openRoadList()                                                    // Write a file specifying open road silicompiler invocations
+  static void openRoadList()                                                    // Write a file containing teh commnands to run silicon compiler
    {final StringBuilder s = new StringBuilder();                                // Silicon compiler commands
-    for (String f : filesWritten)
-     {if (f.endsWith(".py") && f.contains("/1/siliconCompiler"))
-       {s.append("python3 "+fn("~/btreeBlock", f)+"\n");
-       }
+
+    for (String f : testsExecuted)                                              // Tests executed
+     {s.append("python3 ~/btreeBlock/verilog/"+f+"/1/siliconCompiler/"+f+".py &\n");
      }
-    writeFile(fne(verilogFolder, "sc", "sh"), s);                               // Write files list
+    s.append("wait\n");                                                         // Wait for the commands to finish
+
+    s.append("rm  -f ~/sc.zip\n");
+    s.append("zip -j ~/sc.zip \\\n");
+
+    for (String f : testsExecuted)
+     {s.append("  ~/btreeBlock/verilog/build/"+f+"/job0/"+f+".pkg.json \\\n");
+      s.append("  ~/btreeBlock/verilog/build/"+f+"/job0/"+f+".png      \\\n");
+     }
+    s.append("\n");
+    writeFile(fne(verilogFolder, "sc", "sh"), s);                                // Write files list
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
