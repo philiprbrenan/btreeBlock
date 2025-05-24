@@ -36,6 +36,7 @@ abstract class BtreeSF extends Test                                             
   final    int bitsPerNext;                                                     // The number of bits in a next field
   final    int bitsPerSize;                                                     // The number of bits in stuck size field
   final static String verilogFolder = "verilog";                                // The folder to write verilog into
+  final static Stack<VerilogCode> verilogTests = new Stack<>();                 // The verilog tests executed
   static   int widthOfMarginInExecutionTrace = 18;                              // The width of the left margin in verilog traces that is to be protected from differential writing
 
   Layout.Field     leaf;                                                        // Layout of a leaf in the memory used by btree
@@ -2249,11 +2250,12 @@ abstract class BtreeSF extends Test                                             
     Integer            statements = null;                                       // Set if only one statement is to be generated
     Boolean            resultJava = null;                                       // Pass or fail of Java test
 
-    Integer Key    () {return null;}                                            // Input key value if not null
-    Integer Data   () {return null;}                                            // Input data value if not null
-    Integer found  () {return null;}                                            // Whether the key was found (1) or not (0) if not null
-    Integer key    () {return null;}                                            // Expected output key
-    Integer data   () {return null;}                                            // Expected output data value if not null
+    Integer Key     () {return null;}                                           // Input key value if not null
+    Integer Data    () {return null;}                                           // Input data value if not null
+    Integer found   () {return null;}                                           // Whether the key was found (1) or not (0) if not null
+    Integer key     () {return null;}                                           // Expected output key
+    Integer data    () {return null;}                                           // Expected output data value if not null
+    boolean openRoad() {return false;}                                          // Whether to run on OpenRoad or not to see if it will place and route reliably
     abstract String  instance();                                                // The name of the instance of this test
     abstract int     maxSteps();                                                // Maximum number if execution steps
     abstract int     expSteps();                                                // Expected number of steps
@@ -2286,6 +2288,7 @@ abstract class BtreeSF extends Test                                             
       project = currentTestNameSuffix(); program = P;
       if (Key () != null) T.at(Key) .setInt(Key());                             // Key value
       if (Data() != null) T.at(Data).setInt(Data());                            // Optional data value to insert into tree
+      verilogTests.push(this);                                                  // Track verilog tests
       generateVerilog();                                                        // Generate verilog
 
       execJavaTest();                                                           // Execute the Java test to load memories
@@ -4020,64 +4023,42 @@ Line T       At      Wide       Size    Indices        Value   Name
     test_delete_random(random_large, 1000, null);
    }
 
-  void run_verilogFind(int Key, int Found, int Data, int ExpSteps)              // Test a find operation in Verilog
-   {VerilogCode v = new VerilogCode()                                           // Generate verilog now that memories have been initialized and the program written
-     {String  instance() {return   ""+Key;}                                     // Input key value is instance name
-      Integer Key     () {return      Key;}                                     // Input key value
-      Integer Data    () {return     null;}                                     // Input data value
-      Integer found   () {return    Found;}                                     // Whether we should expect to find the key on a find operation
-      Integer key     () {return     null;}                                     // Expected output data value
-      Integer data    () {return     Data;}                                     // Expected output data value
-      int     maxSteps() {return       40;}                                     // Maximum number of execution steps
-      int     expSteps() {return ExpSteps;}                                     // Expected number of steps
-      String  expected() {return null;}                                         // Expected tree if present
-     };
-   }
-
   private void verilog_first_last                                               // Test a first/next/last operation in Verilog
-   (int found, int key, int data, int ExpSteps)
+   (int found, int key, int data, int ExpSteps, String OpenRoad)
    {VerilogCode v = new VerilogCode()                                           // Generate verilog now that memories have been initialized and the program written
-     {String  instance() {return   ""+key;}                                     // Output key value is instance name
+     {String  instance() {return   OpenRoad != null ? OpenRoad : ""+key;}       // Instance of thistest -0 often the key name unless OpenRoad requested
       Integer Key     () {return     null;}                                     // No input key value
       Integer Data    () {return     null;}                                     // No input data value
       Integer found   () {return    found;}                                     // Whether we should expect to find the key on a find operation
       Integer key     () {return      key;}                                     // Expected output key value
       Integer data    () {return     data;}                                     // Expected output data value
+      boolean openRoad() {return OpenRoad != null;}                             // Open road processing has been requested
       int     maxSteps() {return     4000;}                                     // Maximum number of execution steps
       int     expSteps() {return ExpSteps;}                                     // Expected number of steps
       String  expected() {return null;}                                         // Expected tree if present
      };
    }
 
-  private static void test_first_empty()                                        // First/next node of an empty tree
-   {z(); sayCurrentTestName();
-    final BtreeSF t = allTreeOps() ;
-    t.P.run(); t.P.clear();
-
-    t.first();
-    t.verilog_first_last(0, 0, 0, 10);
-    t.P.clear();
-    ok(t.T.at(t.found),     "T.found@22=0");
-
-    t.findNext();
-    t.verilog_first_last(0, 1, 0, 11);
-    t.P.clear();
-    ok(t.T.at(t.found),     "T.found@22=0");
-
-    t.last();
-    t.verilog_first_last(0, 0, 0, 10);
-    t.P.clear();
-    ok(t.T.at(t.leafFound), "T.leafFound@138=0");
+  private void verilog_first_last                                               // Test a first/next/last operation in Verilog but do not use OpenRoad to place and route
+   (int Found, int Key, int Data, int ExpSteps)
+   {verilog_first_last(Found, Key, Data, ExpSteps, null);
    }
 
-  private static void test_last_empty()                                         // Last node of an empty tree
+  private static void test_first_last_empty()                                   // First/next/last node of an empty tree
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps() ;
-    t.P.run(); t.P.clear();
+    t.P.run();
 
-    t.last();
-    t.verilog_first_last(0, 1, 0, 10);
-    t.P.clear();
+    t.P.clear(); t.first();
+    t.verilog_first_last(0, 0, 0, 10, "first");
+    ok(t.T.at(t.found),     "T.found@22=0");
+
+    t.P.clear(); t.findNext();
+    t.verilog_first_last(0, 1, 0, 11, "findNext");
+    ok(t.T.at(t.found),     "T.found@22=0");
+
+    t.P.clear(); t.last();
+    t.verilog_first_last(0, 0, 0, 10, "last");
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
    }
 
@@ -4098,18 +4079,13 @@ Line T       At      Wide       Size    Indices        Value   Name
 1,2=0 |
 """);
 
-    t.P.clear();
-    t.first();
-    t.verilog_first_last(1, 1, 1, 15);
-    t.P.clear();
+    t.P.clear(); t.first(); t.verilog_first_last(1, 1, 1, 15);
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
     ok(t.T.at(t.found),     "T.found@22=1");
     ok(t.T.at(t.key),       "T.key@23=1");
     ok(t.T.at(t.data),      "T.data@28=1");
 
-    t.P.clear();
-    t.findNext();
-    t.verilog_first_last(1, 2, 0, 27);
+    t.P.clear(); t.findNext(); t.verilog_first_last(1, 2, 0, 27);
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
     ok(t.T.at(t.found),     "T.found@22=1");
     ok(t.T.at(t.key),       "T.key@23=2");
@@ -4118,10 +4094,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.verilog_first_last(0, 3, 0, 20);
     ok(t.T.at(t.found),     "T.found@22=0");
 
-    t.P.clear();
-    t.last();
-    t.verilog_first_last(1, 2, 0, 16);
-    t.P.clear();
+    t.P.clear(); t.last(); t.verilog_first_last(1, 2, 0, 16);
     ok(t.T.at(t.leafFound), "T.leafFound@138=0");
     ok(t.T.at(t.found),     "T.found@22=1");
     ok(t.T.at(t.key),       "T.key@23=2");
@@ -4153,14 +4126,13 @@ Line T       At      Wide       Size    Indices        Value   Name
       4                  2        |
 1,2=1  3,4=4  5,6=3  7=8    8,9=2 |
 """);
-    t.first(); t.verilog_first_last(1, 1, 8, 63);
-    t.P.clear();
+    t.P.clear(); t.first(); t.verilog_first_last(1, 1, 8, 27);
     ok(t.T.at(t.leafFound), "T.leafFound@138=1");
     ok(t.T.at(t.found),     "T.found@22=1");
     ok(t.T.at(t.key),       "T.key@23=1");
     ok(t.T.at(t.data),      "T.data@28=8");
 
-    t.findNext(); t.verilog_first_last(1, 2, 7, 55);
+    t.P.clear(); t.findNext(); t.verilog_first_last(1, 2, 7, 55);
     ok(t.T.at(t.leafFound), "T.leafFound@138=1");
     ok(t.T.at(t.found),     "T.found@22=1");
     ok(t.T.at(t.key),       "T.key@23=2");
@@ -4226,10 +4198,10 @@ Line T       At      Wide       Size    Indices        Value   Name
   private static void test_greater_empty()                                      // Next greater key in an emoty tree
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps() ;
-    t.P.run(); t.P.clear();
+    t.P.run();
 
+    t.P.clear(); t.findGreater();
     t.T.at(t.key).setInt(0);
-    t.findGreater();
     t.verilog_first_last(0, 1, 0, 10);
 
     ok(t.T.at(t.found),     "T.found@22=0");
@@ -4238,8 +4210,8 @@ Line T       At      Wide       Size    Indices        Value   Name
   private static void test_greater_root()                                       // Next greater key in a tree that is just one leaf
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps() ;
-    t.P.run(); t.P.clear();
-    t.put();
+    t.P.run();
+    t.P.clear(); t.put();
     final int N = 2;
     for (int i = 1; i <= N; ++i)
      {t.T.at(t.Key ).setInt(i);
@@ -4250,9 +4222,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     ok(t, """
 1,2=0 |
 """);
-    t.P.clear();
-    t.T.at(t.key).setInt(0);
-    t.findGreater();
+    t.P.clear(); t.findGreater(); t.T.at(t.key).setInt(0);
     t.verilog_first_last(1, 1, 1, 20);
 
     ok(t.T.at(t.found),     "T.found@22=1");
@@ -4297,11 +4267,10 @@ Line T       At      Wide       Size    Indices        Value   Name
       4                  2        |
 1,2=1  3,4=4  5,6=3  7=8    8,9=2 |
 """);
-    t.P.clear();
+    t.P.clear(); t.findGreater();
     t.T.at(t.key).setInt(0);
-    t.findGreater();
 
-    t.verilog_first_last(1, 1, 8, 49);
+    t.verilog_first_last(1, 1, 8, 49, "findGreater");
     ok(t.T.at(t.found),     "T.found@22=1");
     ok(t.T.at(t.child),     "T.child@134=1");
     ok(t.T.at(t.index),     "T.index@70=0");
@@ -4367,6 +4336,20 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.verilog_first_last(0, 2, 0, 39);
     ok(t.T.at(t.found),     "T.found@22=0");
     ok(t.T.at(t.key),       "T.key@23=9");
+   }
+
+  void run_verilogFind(int Key, int Found, int Data, int ExpSteps)              // Test a find operation in Verilog
+   {VerilogCode v = new VerilogCode()                                           // Generate verilog now that memories have been initialized and the program written
+     {String  instance() {return   ""+Key;}                                     // Input key value is instance name
+      Integer Key     () {return      Key;}                                     // Input key value
+      Integer Data    () {return     null;}                                     // Input data value
+      Integer found   () {return    Found;}                                     // Whether we should expect to find the key on a find operation
+      Integer key     () {return     null;}                                     // Expected output data value
+      Integer data    () {return     Data;}                                     // Expected output data value
+      int     maxSteps() {return       40;}                                     // Maximum number of execution steps
+      int     expSteps() {return ExpSteps;}                                     // Expected number of steps
+      String  expected() {return null;}                                         // Expected tree if present
+     };
    }
 
   private static void test_find_verilog()                                       // Find using generated verilog code
@@ -5293,23 +5276,26 @@ StuckSML(maxSize:4 size:1)
     ok(e.geti(), 0);
    }
 
-  static void openRoadList()                                                    // Write a file containing teh commnands to run silicon compiler
+  static void openRoadList()                                                    // Write a file containing the commnands to run silicon compiler
    {final StringBuilder s = new StringBuilder();                                // Silicon compiler commands
+    final StringBuilder z = new StringBuilder();                                // Files to zip
 
-    for (String f : testsExecuted)                                              // Tests executed
-     {s.append("python3 ~/btreeBlock/verilog/"+f+"/1/siliconCompiler/"+f+".py &\n");
+    s.append("source ~/siliconcompiler/bin/activate\n");                        // Activate silicon compiler python virtual environment
+    for (VerilogCode v : verilogTests)                                          // Verilog tests executed
+     {if (v.openRoad())
+       {final String f = v.instance();
+        s.append("( ulimit -t 600 ; python3 ~/btreeBlock/verilog/"+f+"/1/siliconCompiler/"+f+".py ) &\n");
+        z.append("  ~/btreeBlock/verilog/build/"+f+"/job0/"+f+".pkg.json \\\n");
+        z.append("  ~/btreeBlock/verilog/build/"+f+"/job0/"+f+".png      \\\n");
+       }
      }
     s.append("wait\n");                                                         // Wait for the commands to finish
 
     s.append("rm  -f ~/sc.zip\n");
     s.append("zip -j ~/sc.zip \\\n");
-
-    for (String f : testsExecuted)
-     {s.append("  ~/btreeBlock/verilog/build/"+f+"/job0/"+f+".pkg.json \\\n");
-      s.append("  ~/btreeBlock/verilog/build/"+f+"/job0/"+f+".png      \\\n");
-     }
+    s.append(z);
     s.append("\n");
-    writeFile(fne(verilogFolder, "sc", "sh"), s);                                // Write files list
+    writeFile(fne(verilogFolder, "sc", "sh"), s);                               // Write files list
    }
 
   protected static void oldTests()                                              // Tests thought to be in good shape
@@ -5335,8 +5321,7 @@ StuckSML(maxSize:4 size:1)
     test_put_verilog();
 //  test_find_wide();
 //  test_put_wide();
-    test_first_empty();
-    test_last_empty();
+    test_first_last_empty();
     test_first_last_root();
     test_first_last();
     test_empty();
@@ -5347,8 +5332,7 @@ StuckSML(maxSize:4 size:1)
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_first_empty();
-    test_last_empty();
+    test_first_last_empty();
     test_first_last_root();
     test_first_last();
     test_empty();
