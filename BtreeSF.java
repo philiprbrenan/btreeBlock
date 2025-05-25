@@ -2834,6 +2834,7 @@ system(qq(openFPGALoader -c $cable   $bits));
 
 from siliconcompiler import Chip                                                # import python package
 from siliconcompiler.targets import $processTechnology_demo
+import os
 
 if __name__ == "__main__":
     chip = Chip('$instance')                                                    # Create chip object.  The name is used to create the summary and mask image file
@@ -2850,6 +2851,7 @@ if __name__ == "__main__":
     chip.set('option', 'nodisplay', True)                                       # Do not open displays
    #chip.set('constraint', 'density', $density)                                 # Lowering the density gives more area in which to route connections at the cost of wasting surface area and making the chip run slower. For find it seems best to leave this parameter alone
     chip.set('option', 'clean', True)                                           # Clean start else it reuses previous results
+    chip.set('option', 'threads', os.cpu_count())                               # Use all available cores
     chip.run()                                                                  # Run compilation of design and target
     chip.summary()                                                              # Create a summary - but at the moment it is only printed on stdout so for automation you have to get the same information from the summary pkg.json
     chip.snapshot()                                                             # Create the charming image of the chip along with its size, power, clock frequency
