@@ -11,7 +11,7 @@ package com.AppaApps.Silicon;                                                   
 // Investigate whether it would be worth changing from a block of variables in T to individual memories for each variable now in T.  This would localize access which would simplify routing at the cost of more silicon spent on registers.
 // Can MemoryLayoutDM be merged with Layout?  I.e. each field laid out would know what memory it resides in.
 // Testing the effect of split branch having its own node buffers
-// Parallel for find/First/Next/Last
+// Parallel for find/First/Next/Last and findNext
 import java.util.*;
 import java.nio.file.*;
 
@@ -1867,14 +1867,14 @@ abstract class BtreeSF extends Test                                             
      };
    }
 
-  public void findGreater()                                                     // Find the next key relative to the supplied key which might not be present in the tree
+  public void findGreater()                                                     // Find the next key relative to the supplied key which might not be present in the tree. This method is an improvement over findNext because OpenRoad reports it as 30% faster although it does use 14% more area and it does not require the previous key to be present in the tree.  Possibly the improved performance is due to less binary arithmetic or to the prescence of a local stuck?
    {zz();
     P.new Block()
      {void code()
        {final ProgramDM.Label Return = end;
         nT.loadRoot();                                                          // The first thing in the tree is the root
 
-        T.at(found).zero();                                                               // Assume we will not find the next key
+        T.at(found).zero();                                                     // Assume we will not find the next key
         P.new Block()                                                           // The root is a leaf
          {void code()
            {P.GoOff(end, nT.isLeaf());                                          // Confirm that the root is a leaf
