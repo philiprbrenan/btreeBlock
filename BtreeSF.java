@@ -5327,18 +5327,18 @@ StuckSML(maxSize:4 size:1)
    {final StringBuilder s = new StringBuilder();                                // Silicon compiler commands
     final StringBuilder z = new StringBuilder();                                // Files to zip
 
-    s.append("source ~/siliconcompiler/bin/activate\n");                        // Activate silicon compiler python virtual environment
+    s.append("source ~/siliconcompiler/bin/activate\n (");                      // Activate silicon compiler python virtual environment
     for (VerilogCode v : verilogTests)                                          // Verilog tests executed
      {if (v.openRoad())
        {final String p = v.project;                                             // The name of the verilog project. Normally the name of the test in which the code as run
         final String f = v.instance();                                          // The instance of the test with the set of tests - often the value of the key being operated on.
 
-        s.append("( echo "+f+"; ulimit -t 600 ; python3 ~/btreeBlock/verilog/"+p+"/"+f+"/siliconCompiler/"+f+".py )\n");
+        s.append("( echo "+f+"; ulimit -t 600 ; python3 ~/btreeBlock/verilog/"+p+"/"+f+"/siliconCompiler/"+f+".py ) &\n");
         z.append("  ~/btreeBlock/verilog/build/"+f+"/job0/"+f+".pkg.json \\\n");
         z.append("  ~/btreeBlock/verilog/build/"+f+"/job0/"+f+".png      \\\n");
        }
      }
-    //s.append("wait\n");                                                       // Wait for the commands to finish
+    s.append("wait )\n");                                                       // Wait for the commands to finish
 
     s.append("rm  -f ~/sc.zip\n");
     s.append("zip -j ~/sc.zip \\\n");
