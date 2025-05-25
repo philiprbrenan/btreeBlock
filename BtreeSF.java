@@ -5160,7 +5160,7 @@ StuckSML(maxSize:4 size:1)
     t.run_verilogFind(  1, 1, 31, 18);
     t.run_verilogFind(  2, 1, 30, 18);
     t.run_verilogFind(  3, 1, 29, 18);
-    t.run_verilogFind(  4, 1, 28, 18);
+    t.run_verilogFind(  4, 1, 28, 18, "find_wide");
     t.run_verilogFind(  5, 1, 27, 18);
     t.run_verilogFind(  6, 1, 26, 18);
     t.run_verilogFind(  7, 1, 25, 18);
@@ -5206,7 +5206,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4,5,6,7,8=0 |
 """);
 
-    t.runVerilogPutTest(9, 162, """
+    t.runVerilogPutTest(9, 158, """
           4            |
           0            |
           1            |
@@ -5214,7 +5214,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8,9=2 |
 """);
 
-    t.runVerilogPutTest(10, 40, """
+    t.runVerilogPutTest(10, 41, """
           4               |
           0               |
           1               |
@@ -5222,7 +5222,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8,9,10=2 |
 """);
 
-    t.runVerilogPutTest(11, 40, """
+    t.runVerilogPutTest(11, 41, """
           4                  |
           0                  |
           1                  |
@@ -5230,7 +5230,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8,9,10,11=2 |
 """);
 
-    t.runVerilogPutTest(12, 40, """
+    t.runVerilogPutTest(12, 41, """
           4                     |
           0                     |
           1                     |
@@ -5238,7 +5238,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8,9,10,11,12=2 |
 """);
 
-    t.runVerilogPutTest(13, 286, """
+    t.runVerilogPutTest(13, 285, """
           4          8                  |
           0          0.1                |
           1          3                  |
@@ -5246,7 +5246,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8=3    9,10,11,12,13=2 |
 """);
 
-    t.runVerilogPutTest(14, 40, """
+    t.runVerilogPutTest(14, 41, """
           4          8                     |
           0          0.1                   |
           1          3                     |
@@ -5254,7 +5254,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8=3    9,10,11,12,13,14=2 |
 """);
 
-    t.runVerilogPutTest(15, 40, """
+    t.runVerilogPutTest(15, 41, """
           4          8                        |
           0          0.1                      |
           1          3                        |
@@ -5262,7 +5262,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8=3    9,10,11,12,13,14,15=2 |
 """);
 
-    t.runVerilogPutTest(16, 40, """
+    t.runVerilogPutTest(16, 41, """
           4          8                           |
           0          0.1                         |
           1          3                           |
@@ -5270,7 +5270,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4=1  5,6,7,8=3    9,10,11,12,13,14,15,16=2 |
 """);
 
-    t.runVerilogPutTest(17, 358, """
+    t.runVerilogPutTest(17, 353, """
                   8             12                  |
                   0             0.1                 |
                   1             4                   |
@@ -5278,7 +5278,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4,5,6,7,8=1  9,10,11,12=4    13,14,15,16,17=2 |
 """);
 
-    t.runVerilogPutTest(18, 40, """
+    t.runVerilogPutTest(18, 41, """
                   8             12                     |
                   0             0.1                    |
                   1             4                      |
@@ -5286,7 +5286,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4,5,6,7,8=1  9,10,11,12=4    13,14,15,16,17,18=2 |
 """);
 
-    t.runVerilogPutTest(19, 40, """
+    t.runVerilogPutTest(19, 41, """
                   8             12                        |
                   0             0.1                       |
                   1             4                         |
@@ -5294,7 +5294,7 @@ StuckSML(maxSize:4 size:1)
 1,2,3,4,5,6,7,8=1  9,10,11,12=4    13,14,15,16,17,18,19=2 |
 """);
 
-    t.runVerilogPutTest(20, 40, """
+    t.runVerilogPutTest(20, 41, "putWide", """
                   8             12                           |
                   0             0.1                          |
                   1             4                            |
@@ -5340,8 +5340,8 @@ StuckSML(maxSize:4 size:1)
      }
     s.append("wait )\n");                                                       // Wait for the commands to finish
 
-    s.append("rm  -f ~/sc.zip\n");
-    s.append("zip -j ~/sc.zip \\\n");
+    s.append("rm  -f ~/sc.zip\n");                                              // Remove any existing zip file
+    s.append("zip -j ~/sc.zip ~/btreeBlock/BtreeSF.java \\\n");                 // Add source code to record the state of play
     s.append(z);
     s.append("\n");
     writeFile(fne(verilogFolder, "sc", "sh"), s);                               // Write files list
@@ -5388,6 +5388,8 @@ StuckSML(maxSize:4 size:1)
     test_greater();
     test_greater_root();
     test_greater_empty();
+    test_find_wide();
+    test_put_wide();
     openRoadList();
    }
 
