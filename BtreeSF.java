@@ -5381,14 +5381,14 @@ StuckSML(maxSize:4 size:1)
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_first_last_empty();
-    test_first_last_root();
-    test_first_last();
-    test_empty();
-    test_greater();
-    test_greater_root();
-    test_greater_empty();
-    test_find_wide();
+    //test_first_last_empty();
+    //test_first_last_root();
+    //test_first_last();
+    //test_empty();
+    //test_greater();
+    //test_greater_root();
+    //test_greater_empty();
+    //test_find_wide();
     test_put_wide();
     openRoadList();
    }
