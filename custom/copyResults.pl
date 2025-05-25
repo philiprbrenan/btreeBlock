@@ -11,7 +11,7 @@ use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
 
 my $home   = q(/home/phil/btreeBlock/custom/);                                  # Home folder
-my $date   = dateStamp;
+my $date   = dateTimeStamp;                                                     # Separate runs
 my $source = q(/home/phil/aaa/sc.zip);                                          # Source file after execution on remote server
 my $target = fpe qw(/home/phil/btreeBlock/custom/), $date, qw(zip);             # Local target
 
