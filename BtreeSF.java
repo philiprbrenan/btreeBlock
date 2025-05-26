@@ -11,20 +11,21 @@ package com.AppaApps.Silicon;                                                   
 // Investigate whether it would be worth changing from a block of variables in T to individual memories for each variable now in T.  This would localize access which would simplify routing at the cost of more silicon spent on registers.
 // Can MemoryLayoutDM be merged with Layout?  I.e. each field laid out would know what memory it resides in.
 // Testing the effect of split branch having its own node buffers
-// Parallel for find/First/Next/Last and findNext
+// Parallel for find/First/Next/Last and findNext findandDelete etc.
 import java.util.*;
 import java.nio.file.*;
 
 abstract class BtreeSF extends Test                                             // Manipulate a btree using static methods and memory
- {final BtreeSF            thisBTree = this;                                    // Direct access to this btree even when this goes out of range
-  final MemoryLayoutDM             F;                                           // Free chain of nodes not currently in use
-  final MemoryLayoutDM             M;                                           // The memory layout of the btree
-  final MemoryLayoutDM             T;                                           // The memory used to hold temporary variable used during a transaction on the btree
-  final ProgramDM                  P = new ProgramDM();                         // Program in which to generate instructions
-  final boolean              OpCodes = true;                                    // Refactor op codes
-  final boolean           runVerilog = true;                                    // Run verilog tests alongside java tests and check they produce the same results
-  final String     designDescription = "findNext vs findGreater";               // Description of latest change
-  final String     processTechnology = "freepdk45";                             // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
+ {final BtreeSF        thisBTree = this;                                        // Direct access to this btree even when this goes out of range
+  final MemoryLayoutDM         F;                                               // Free chain of nodes not currently in use
+  final MemoryLayoutDM         M;                                               // The memory layout of the btree
+  final MemoryLayoutDM         T;                                               // The memory used to hold temporary variable used during a transaction on the btree
+  final ProgramDM              P = new ProgramDM();                             // Program in which to generate instructions
+  final Variable   numberOfPairs = new Variable(P, "size", 32);                 // Count the number of key/data pairs in the leaves of the tree
+  final boolean          OpCodes = true;                                        // Refactor op codes
+  final boolean       runVerilog = true;                                        // Run verilog tests alongside java tests and check they produce the same results
+  final String designDescription = "findNext vs findGreater";                   // Description of latest change
+  final String processTechnology = "freepdk45";                                 // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
   abstract int bitsPerData();                                                   // The number of bits per data
@@ -681,6 +682,8 @@ abstract class BtreeSF extends Test                                             
 
     nC.zero();                                                                  // Clear the node
     nC.saveNode(T.at(allocate));                                                // Construct and clear the node
+
+    numberOfPairs.zero();                                                       // Initially the tree is empty
    }
 
   private void allocate() {z(); allocate(true);}                                // Allocate a node checking for free space
@@ -890,6 +893,12 @@ abstract class BtreeSF extends Test                                             
           N.at(node_size).greaterThan(T.at(maxKeysPerBranch), T.at(isFull));    // The presence of top adds one more to the size so greater than is required rather than equals
          }
        };
+     }
+
+    void isRootLeaf(MemoryLayoutDM.At at)                                       // Set the specified reference to one if the root is a leaf else zero
+     {zz();
+      loadRoot();
+      isLeaf(at);
      }
 
     MemoryLayoutDM.At isLeaf() {zz(); return N.at(isLeaf);}                     // Return a variable that shows whether a node contains a leaf
@@ -2027,6 +2036,7 @@ abstract class BtreeSF extends Test                                             
             lEqual.insertElementAt();
             nT.saveStuck(lEqual, leafFound);                                    // Save stuck back into memory
             P.parallelStart();   T.at(success).ones();
+            P.parallelSection(); numberOfPairs.inc();                           // Increase the number of lements in the tree
             P.parallelSection(); tt(findAndInsert, leafFound);
             P.parallelSection(); P.Goto(Success == null ? Return : Success);
             P.parallelEnd();
@@ -2124,6 +2134,7 @@ abstract class BtreeSF extends Test                                             
         lT.removeElementAt();                                                   // Remove the key, data pair from the leaf
         T.at(Data).move(lT.T.at(lT.tData));                                     // Key, data pairs in the leaf
         nT.saveStuck(lT, find);
+        numberOfPairs.inc();                                                    // Increase the number of lements in the tree
        }
      };
    }
@@ -2834,12 +2845,11 @@ system(qq(openFPGALoader -c $cable   $bits));
 
 from siliconcompiler import Chip                                                # import python package
 from siliconcompiler.targets import $processTechnology_demo
-import os
 
 if __name__ == "__main__":
     chip = Chip('$instance')                                                    # Create chip object.  The name is used to create the summary and mask image file
    #chip.set('option', 'loglevel', 'warning')                                   # Warnings and above
-    chip.set('option', 'loglevel', 'error')                                     # Warnings and above
+   #chip.set('option', 'loglevel', 'error')                                     # Warnings and above
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/$instance.v') # Source code
     chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/memory.v'   ) # Memory black box
    #chip.input('/home/azureuser/btreeBlock/verilog/$project/$instance/siliconCompiler/$instance.sdc')
@@ -2851,7 +2861,6 @@ if __name__ == "__main__":
     chip.set('option', 'nodisplay', True)                                       # Do not open displays
    #chip.set('constraint', 'density', $density)                                 # Lowering the density gives more area in which to route connections at the cost of wasting surface area and making the chip run slower. For find it seems best to leave this parameter alone
     chip.set('option', 'clean', True)                                           # Clean start else it reuses previous results
-    chip.set('option', 'threads', os.cpu_count())                               # Use all available cores
     chip.run()                                                                  # Run compilation of design and target
     chip.summary()                                                              # Create a summary - but at the moment it is only printed on stdout so for automation you have to get the same information from the summary pkg.json
     chip.snapshot()                                                             # Create the charming image of the chip along with its size, power, clock frequency
@@ -3388,6 +3397,7 @@ Line T       At      Wide       Size    Indices        Value   Name
       t.T.at(t.Key ).setInt(i);
       t.T.at(t.Data).setInt(i);
       t.P.run();
+      ok(t.numberOfPairs.geti(), 0);
      }
     //t.stop();
     t.ok("""
@@ -3410,6 +3420,7 @@ Line T       At      Wide       Size    Indices        Value   Name
      {//say(currentTestName(), "b", i);
       t.T.at(t.Key).setInt( i);
       t.P.run();
+      ok(t.numberOfPairs.geti(), N+1-i);
       //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
       if (box) say("After deleting:", i, t.printBoxed());
       switch(i) {
@@ -5305,7 +5316,7 @@ StuckSML(maxSize:4 size:1)
 """);
    }
 
-  private static void test_empty()                                              // Empty
+  private static void test_isRootEmpty()                                        // Empty
    {z(); sayCurrentTestName();
     final BtreeSF t = allTreeOps() ;
     t.P.run(); t.P.clear();
@@ -5323,6 +5334,32 @@ StuckSML(maxSize:4 size:1)
     r.isRootEmpty(e.a);
     t.P.run();
     ok(e.geti(), 0);
+    ok(t.numberOfPairs.geti(), 1);
+   }
+
+  private static void test_isRootLeaf()                                         // Is the root a leaf
+   {z(); sayCurrentTestName();
+    final BtreeSF t = allTreeOps() ;
+    t.P.run(); t.P.clear();
+
+    final Variable l = new Variable(t.P, "leaf", 1);
+    final Node     r = t.new Node("leaf");
+    r.isRootLeaf(l.a);
+    t.P.run();
+    ok(l.geti(), 1);
+
+    final int N = 4;
+    t.P.clear(); t.put();
+    for(int i = 1; i <= N; ++i)
+     {t.T.at(t.Key).setInt (i);
+      t.T.at(t.Data).setInt(i);
+      t.P.run();
+     }
+
+    t.P.clear();
+    r.isRootLeaf(l.a);
+    t.P.run();
+    ok(l.geti(), 0);
    }
 
   static void openRoadList()                                                    // Write a file containing the commnands to run silicon compiler
@@ -5375,23 +5412,24 @@ StuckSML(maxSize:4 size:1)
     test_first_last_empty();
     test_first_last_root();
     test_first_last();
-    test_empty();
+    test_isRootEmpty();
+    test_isRootLeaf();
     test_greater();
     test_greater_root();
     test_greater_empty();
+    test_isRootLeaf();
    }
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    //test_first_last_empty();
-    //test_first_last_root();
-    //test_first_last();
-    //test_empty();
-    //test_greater();
-    //test_greater_root();
-    //test_greater_empty();
+    test_first_last_empty();
+    test_first_last_root();
+    test_first_last();
+    test_greater();
+    test_greater_root();
+    test_greater_empty();
     //test_find_wide();
-    test_put_wide();
+    //test_put_wide();
     openRoadList();
    }
 
