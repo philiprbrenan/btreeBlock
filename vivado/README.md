@@ -80,16 +80,16 @@ perl synthesis.pl
 ```
 # Enable swap space
 
-This might [help](https://en.wikipedia.org/wiki/Online_help) simulate more [memory](https://en.wikipedia.org/wiki/Computer_memory) if Vovado runs out of [memory](https://en.wikipedia.org/wiki/Computer_memory). Normally it seems to take aboit 15GB.
+This might [help](https://en.wikipedia.org/wiki/Online_help) simulate more [memory](https://en.wikipedia.org/wiki/Computer_memory) if Vivado runs out of [memory](https://en.wikipedia.org/wiki/Computer_memory). Normally it seems to take aboit 15GB.
 
 ```
 sudo dmesg | grep -i 'oom'
 sudo swapon --show
 df -h
-sudo fallocate -l 128G /swapfile
-sudo chmod 600         /swapfile
-sudo mkswap            /swapfile
-sudo swapon            /swapfile
+sudo fallocate -l 64G /swapfile
+sudo chmod 600        /swapfile
+sudo mkswap           /swapfile
+sudo swapon           /swapfile
 sudo swapon --show
 sudo sysctl vm.swappiness=99
 ```
