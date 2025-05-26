@@ -162,6 +162,8 @@ abstract class BtreeSF extends Test                                             
     nC.loadRoot();                                                              // Load the allocated node
     nC.setLeaf();                                                               // Set the root as a leaf
     nC.saveRoot();                                                              // Write back into memory
+
+    numberOfPairs.zero();                                                       // Initially the tree is empty
    }
 
   StuckDM createBranchStuck(String name)                                        // Create a branch Stuck
@@ -682,8 +684,6 @@ abstract class BtreeSF extends Test                                             
 
     nC.zero();                                                                  // Clear the node
     nC.saveNode(T.at(allocate));                                                // Construct and clear the node
-
-    numberOfPairs.zero();                                                       // Initially the tree is empty
    }
 
   private void allocate() {z(); allocate(true);}                                // Allocate a node checking for free space
@@ -2031,12 +2031,12 @@ abstract class BtreeSF extends Test                                             
             P.parallelStart();   lEqual.T.at(lEqual.tKey ).move(T.at(Key));
             P.parallelSection(); lEqual.T.at(lEqual.tData).move(T.at(Data));
             P.parallelSection(); T.at(inserted).ones();
+            P.parallelSection(); numberOfPairs.inc();                           // Increase the number of elements in the tree
             P.parallelEnd();
 
             lEqual.insertElementAt();
             nT.saveStuck(lEqual, leafFound);                                    // Save stuck back into memory
             P.parallelStart();   T.at(success).ones();
-            P.parallelSection(); numberOfPairs.inc();                           // Increase the number of lements in the tree
             P.parallelSection(); tt(findAndInsert, leafFound);
             P.parallelSection(); P.Goto(Success == null ? Return : Success);
             P.parallelEnd();
@@ -2060,9 +2060,7 @@ abstract class BtreeSF extends Test                                             
            {nT.isLeaf(T.at(IsLeaf));
             P.new If (T.at(IsLeaf))
              {void Then() {splitLeafRoot  ();}
-              void Else() {
-                splitBranchRoot();
-                }
+              void Else() {splitBranchRoot();}
              };
             z();
             findAndInsert(Return);                                              // Splitting the root() might have been enough
@@ -2128,13 +2126,18 @@ abstract class BtreeSF extends Test                                             
     P.new Block()
      {void code()
        {find();                                                                 // Try direct insertion with no modifications to the shape of the tree
-        P.GoOff(end, T.at(found));                                              // Key not found so nothing to delete
-        z(); nT.loadStuck(lT, find);                                            // The leaf that contains the key
+        P.parallelStart();   P.GoOff(end, T.at(found));                         // Key not found so nothing to delete
+        P.parallelSection(); nT.loadStuck(lT, find);                            // The leaf that contains the key
+        P.parallelEnd();
+
+
         lT.T.at(lT.index).move(T.at(index));
         lT.removeElementAt();                                                   // Remove the key, data pair from the leaf
-        T.at(Data).move(lT.T.at(lT.tData));                                     // Key, data pairs in the leaf
-        nT.saveStuck(lT, find);
-        numberOfPairs.dec();                                                    // Increase the number of lements in the tree
+
+        P.parallelStart();   T.at(Data).move(lT.T.at(lT.tData));                // Key, data pairs in the leaf
+        P.parallelSection(); nT.saveStuck(lT, find);
+        P.parallelSection(); numberOfPairs.dec();                               // Increase the number of lements in the tree
+        P.parallelEnd();
        }
      };
    }
@@ -4475,6 +4478,7 @@ Line T       At      Wide       Size    Indices        Value   Name
       t.T.at(t.Key ).setInt(i);
       t.T.at(t.Data).setInt(N-i);
       t.P.run();
+      ok(t.numberOfPairs.geti(), i);
      }
     //stop(t.M);
     //stop(t);
@@ -4493,7 +4497,7 @@ Line T       At      Wide       Size    Indices        Value   Name
     t.P.clear();                                                                // Replace program with delete
     t.delete();                                                                 // Delete code
 
-    t.runVerilogDeleteTest(3, 6, 548, "Delete", """
+    t.runVerilogDeleteTest(3, 6, 546, "Delete", """
                     6           |
                     0           |
                     5           |
@@ -4504,8 +4508,9 @@ Line T       At      Wide       Size    Indices        Value   Name
            3             2      |
 1,2=1  4=4    5,6=3  7=8  8,9=2 |
 """);
+    ok(t.numberOfPairs.geti(), 8);
 
-    t.runVerilogDeleteTest(4, 5, 387, """
+    t.runVerilogDeleteTest(4, 5, 385, """
              6           |
              0           |
              5           |
@@ -4516,50 +4521,58 @@ Line T       At      Wide       Size    Indices        Value   Name
       3           2      |
 1,2=1  5,6=3  7=8  8,9=2 |
 """);
+    ok(t.numberOfPairs.geti(), 7);
 
-    t.runVerilogDeleteTest(2, 7, 439, """
+    t.runVerilogDeleteTest(2, 7, 437, """
     4      6      7        |
     0      0.1    0.2      |
     1      3      8        |
                   2        |
 1=1  5,6=3    7=8    8,9=2 |
 """);
+    ok(t.numberOfPairs.geti(), 6);
 
-    t.runVerilogDeleteTest(1, 8, 320, """
+    t.runVerilogDeleteTest(1, 8, 318, """
       6    7        |
       0    0.1      |
       1    8        |
            2        |
 5,6=1  7=8    8,9=2 |
 """);
+    ok(t.numberOfPairs.geti(), 5);
 
-    t.runVerilogDeleteTest(5, 4, 264, """
+    t.runVerilogDeleteTest(5, 4, 262, """
       7      |
       0      |
       1      |
       2      |
 6,7=1  8,9=2 |
 """);
+    ok(t.numberOfPairs.geti(), 4);
 
-    t.runVerilogDeleteTest(6, 3, 273, """
+    t.runVerilogDeleteTest(6, 3, 271, """
     7      |
     0      |
     1      |
     2      |
 7=1  8,9=2 |
 """);
+    ok(t.numberOfPairs.geti(), 3);
 
-    t.runVerilogDeleteTest(7, 2, 239, """
+    t.runVerilogDeleteTest(7, 2, 237, """
 8,9=0 |
 """);
+    ok(t.numberOfPairs.geti(), 2);
 
-    t.runVerilogDeleteTest(8, 1, 34, """
+    t.runVerilogDeleteTest(8, 1, 32, """
 9=0 |
 """);
+    ok(t.numberOfPairs.geti(), 1);
 
-    t.runVerilogDeleteTest(9, 0, 34, """
+    t.runVerilogDeleteTest(9, 0, 32, """
 =0 |
 """);
+    ok(t.numberOfPairs.geti(), 0);
    }
 
   private void runVerilogPutTest                                                // Run the java and verilog versions and compare the resulting memory traces
@@ -5422,15 +5435,16 @@ StuckSML(maxSize:4 size:1)
 
   protected static void newTests()                                              // Tests being worked on
    {//oldTests();
-    test_first_last_empty();
-    test_first_last_root();
-    test_first_last();
-    test_greater();
-    test_greater_root();
-    test_greater_empty();
+    //test_first_last_empty();
+    //test_first_last_root();
+    //test_first_last();
+    //test_greater();
+    //test_greater_root();
+    //test_greater_empty();
     //test_find_wide();
     //test_put_wide();
-    openRoadList();
+    //openRoadList();
+    //test_delete_verilog();
    }
 
   public static void main(String[] args)                                        // Test if called as a program
