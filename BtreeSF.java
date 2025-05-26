@@ -2134,7 +2134,7 @@ abstract class BtreeSF extends Test                                             
         lT.removeElementAt();                                                   // Remove the key, data pair from the leaf
         T.at(Data).move(lT.T.at(lT.tData));                                     // Key, data pairs in the leaf
         nT.saveStuck(lT, find);
-        numberOfPairs.inc();                                                    // Increase the number of lements in the tree
+        numberOfPairs.dec();                                                    // Increase the number of lements in the tree
        }
      };
    }
@@ -3397,7 +3397,7 @@ Line T       At      Wide       Size    Indices        Value   Name
       t.T.at(t.Key ).setInt(i);
       t.T.at(t.Data).setInt(i);
       t.P.run();
-      ok(t.numberOfPairs.geti(), 0);
+      ok(t.numberOfPairs.geti(), i);
      }
     //t.stop();
     t.ok("""
