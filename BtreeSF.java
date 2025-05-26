@@ -24,7 +24,7 @@ abstract class BtreeSF extends Test                                             
   final Variable   numberOfPairs = new Variable(P, "size", 32);                 // Count the number of key/data pairs in the leaves of the tree
   final boolean          OpCodes = true;                                        // Refactor op codes
   final boolean       runVerilog = true;                                        // Run verilog tests alongside java tests and check they produce the same results
-  final String designDescription = "findNext vs findGreater";                   // Description of latest change
+  final String designDescription = "count number of elements";                  // Description of latest change
   final String processTechnology = "freepdk45";                                 // Process technology from: https://docs.siliconcompiler.com/en/stable/#supported-technologies . Ask chat for details of each.
   abstract int maxSize();                                                       // The maximum number of leaves plus branches in the bree
   abstract int bitsPerKey();                                                    // The number of bits per key
