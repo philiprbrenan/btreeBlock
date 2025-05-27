@@ -3423,7 +3423,7 @@ Line T       At      Wide       Size    Indices        Value   Name
      {//say(currentTestName(), "b", i);
       t.T.at(t.Key).setInt( i);
       t.P.run();
-      ok(t.numberOfPairs.geti(), N+1-i);
+      ok(t.numberOfPairs.geti(), N-i);
       //say("        case", i, "-> t.ok(\"\"\"", t, "\"\"\");"); if (true) continue;
       if (box) say("After deleting:", i, t.printBoxed());
       switch(i) {
