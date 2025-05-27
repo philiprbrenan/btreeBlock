@@ -15,6 +15,6 @@ my $date   = dateTimeStamp;                                                     
 my $source = q(/home/phil/aaa/sc.zip);                                          # Source file after execution on remote server
 my $target = fpe qw(/home/phil/btreeBlock/custom/), $date, qw(zip);             # Local target
 
-my $cmd    = qq(cp $source $target);                                            # Copy the zip file from ht e remote server
+my $cmd    = qq(cp $source "$target");                                          # Copy the zip file from ht e remote server
 say STDERR qq($cmd);
 say STDERR qx($cmd);
